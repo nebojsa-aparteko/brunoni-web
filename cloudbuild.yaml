@@ -3,5 +3,10 @@ steps:
     args: ['install']
   - name: 'gcr.io/cloud-builders/yarn'
     args: ['build']
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['rsync', '-d', 'build', 'gs://mybrunoni']
+  - name: 'eu.gcr.io/brunoni-allmarine/firebase-tools'
+    args: ['deploy', '--project', 'brunoni-allmarine']
+    secretEnv: ['FIREBASE_TOKEN']
+secrets:
+  - kmsKeyName: projects/brunoni-allmarine/locations/global/keyRings/development/cryptoKeys/main
+    secretEnv:
+      FIREBASE_TOKEN: CiQA8aklnTwFg6yy77MMx/XKwBI3Hub47Dlpl6a+9BrhILpPDlESkAEAM9nvKgl/X7ZCNExhhCo3Deq6pZSp6qUNgQGjoiUR+zmn69j2wyjQakSPnT/6QKMUF8mPp+3M4KX1lxIg2wApH5XgJMrYYFziRLYTl+xIzOhsU39JNDNtFefziGDkbBYLZOnZ7aEo3DYS3WO32EJFQKGDkwjoYpVJb8xeLzCgiuh25qJPYyGI+mezSc5uxcU=
