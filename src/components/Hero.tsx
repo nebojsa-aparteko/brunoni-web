@@ -1,5 +1,4 @@
 import React from 'react';
-import background from '../assets/background.jpg';
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
 
 interface Props extends WithStyles<typeof styles> {}
@@ -10,8 +9,8 @@ const styles = (theme: Theme) =>
   createStyles({
     container: {
       height: 0,
-      padding: `${20000 / 1400}%`,
-      background: `url(${background})`,
+      padding: `${200 / 14}%`,
+      background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
       backgroundSize: 'cover',
     },
   });

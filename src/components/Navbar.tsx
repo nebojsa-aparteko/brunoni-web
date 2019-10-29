@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 import { WithStyles, createStyles, Theme, withStyles, AppBar, Toolbar, Link } from '@material-ui/core';
-import logo from '../assets/logo.png';
+import changeCase from 'change-case';
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 interface Props extends WithStyles<typeof styles> {}
 
@@ -9,8 +10,12 @@ const Navbar: React.FC<Props> = ({ classes }) => (
   <div className={classes.container}>
     <AppBar className={classes.appBar}>
       <Toolbar className={classes.toolbar}>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/">
-          <img src={logo} alt="Brunoni" className={classes.logo} />
+        <Link component={Link1} className={classes.logo} to="https://www.brunoni.ch/">
+          <img
+            src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+            alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+            className={classes.logo}
+          />
         </Link>
         <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/">
           HOME
@@ -62,10 +67,19 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
       color: 'white',
     },
+    toolbarItem: {},
     logo: {
-      position: 'relative',
-      top: -12,
-      width: 132,
+      '& > img':
+        ({
+          brunoni: {
+            position: 'relative',
+            top: 38,
+            width: 132,
+          },
+          allmarine: {
+            height: 80,
+          },
+        } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
     },
     link: {
       height: 40,
