@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "brunoni-allmarine"
+  },
+  "targets": {
+    "brunoni-allmarine": {
+      "hosting": {
+        "brunoni-stage": [
+          "oskar-web-brunoni-stage"
+        ],
+        "allmarine-stage": [
+          "oskar-web-allmarine-stage"
+        ]
+      }
+    }
   }
 }
