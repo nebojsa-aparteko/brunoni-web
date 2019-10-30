@@ -10,6 +10,12 @@
         ],
         "allmarine-stage": [
           "oskar-web-allmarine-stage"
+        ],
+        "allmarine-production": [
+          "oskar-web-allmarine-production"
+        ],
+        "brunoni-production": [
+          "oskar-web-brunoni-production"
         ]
       }
     }
