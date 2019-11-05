@@ -45,7 +45,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
     const signal = controller.signal;
 
     (async () => {
-      const response = await fetch('http://localhost:8080/ports', { signal });
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/ports`, { signal });
       const body = await response.json();
       setPorts(body.Ports as Port[]);
     })();

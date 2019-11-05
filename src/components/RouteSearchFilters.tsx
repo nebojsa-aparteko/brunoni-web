@@ -19,7 +19,7 @@ const RouteSearchFilters: React.FC<Props> = ({}) => {
     const signal = controller.signal;
 
     (async () => {
-      const response = await fetch('http://localhost:8080/carriers', { signal });
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/carriers`, { signal });
       const body = await response.json();
       setCarriers(body.Carriers as Carrier[]);
     })();

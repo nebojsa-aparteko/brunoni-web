@@ -52,7 +52,7 @@ const RouteSearch: React.FC<Props> = ({}) => {
           date: formatDate(params.date, 'yyyy-MM-dd'),
           weeks: params.weeks.toString(),
         });
-        const response = await fetch(`http://localhost:8080/routes?${search}`, { signal });
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/routes?${search}`, { signal });
         const body = await response.json();
         setResults(body as RouteSearchResults);
       } catch (e) {
