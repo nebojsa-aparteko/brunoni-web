@@ -1,59 +1,10 @@
 import React from 'react';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
-import { WithStyles, createStyles, Theme, withStyles, AppBar, Toolbar, Link } from '@material-ui/core';
+import { makeStyles, Theme, AppBar, Toolbar, createStyles } from '@material-ui/core';
 import changeCase from 'change-case';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import Link from './Link';
 
-interface Props extends WithStyles<typeof styles> {}
-
-const Navbar: React.FC<Props> = ({ classes }) => (
-  <div className={classes.container}>
-    <AppBar className={classes.appBar}>
-      <Toolbar className={classes.toolbar}>
-        <Link component={Link1} className={classes.logo} to="https://www.brunoni.ch/">
-          <img
-            src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-            alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
-            className={classes.logo}
-          />
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/">
-          HOME
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/company/history">
-          COMPANY
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/carriers/hamburg-sued">
-          CARRIERS
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/cases-studies/antwerp-fujairah">
-          CASE STUDIES
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/vgm/definition">
-          VGM
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/news">
-          NEWS
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/blog">
-          BLOG
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/contact/address">
-          CONTACT
-        </Link>
-        <Link component={Link1} className={classes.link} to="https://www.brunoni.ch/links">
-          LINKS
-        </Link>
-      </Toolbar>
-    </AppBar>
-  </div>
-);
-
-const Link1 = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((props, ref) => (
-  <RouterLink innerRef={ref} {...props} />
-));
-
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       height: 100,
@@ -110,6 +61,30 @@ const styles = (theme: Theme) =>
         },
       },
     },
-  });
+  }),
+);
 
-export default withStyles(styles)(Navbar);
+const Navbar: React.FC = () => {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      <AppBar className={classes.appBar}>
+        <Toolbar className={classes.toolbar}>
+          <Link className={classes.logo} to="https://www.brunoni.ch/">
+            <img
+              src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+              alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+              className={classes.logo}
+            />
+          </Link>
+          {/*<Link className={classes.link} to="https://www.brunoni.ch/links">*/}
+          {/*LINKS*/}
+          {/*</Link>*/}
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+};
+
+export default Navbar;

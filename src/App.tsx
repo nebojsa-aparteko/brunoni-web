@@ -1,14 +1,13 @@
-import React, { Fragment } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Routes from './Routes';
+import React from 'react';
+import { Route, Switch } from 'react-router';
+import Routes from './pages/Routes';
+import NotFound from './pages/NotFound';
 
 const App: React.FC = () => (
-  <Fragment>
-    <Navbar />
-    <Hero />
-    <Routes />
-  </Fragment>
+  <Switch>
+    <Route exact path="/" component={Routes} />
+    <Route component={NotFound} />
+  </Switch>
 );
 
 export default App;

@@ -5,11 +5,4 @@ export default createMuiTheme({
     fontFamily: 'Montserrat,Helvetica,Arial,sans-serif',
     fontSize: 14,
   },
-  palette: {
-    background: {
-      // TODO Review this.
-      default: 'white',
-      paper: 'lightgrey',
-    },
-  },
 });
