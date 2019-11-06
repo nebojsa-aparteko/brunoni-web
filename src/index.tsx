@@ -7,6 +7,10 @@ import theme from './theme';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const app = (
   <Router>
     <ThemeProvider theme={theme}>
