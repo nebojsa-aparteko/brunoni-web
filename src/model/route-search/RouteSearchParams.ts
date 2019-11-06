@@ -5,4 +5,5 @@ export default interface RouteSearchParams {
   destinationPort?: Port;
   date: Date;
   weeks: number;
+  carrier?: string;
 }

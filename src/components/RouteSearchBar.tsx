@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import set from 'lodash/set';
-import { Theme, makeStyles, Grid, Button, Paper } from '@material-ui/core';
+import { Theme, makeStyles, Grid, Button, Paper, CircularProgress, Hidden } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
@@ -10,7 +10,7 @@ import RouteSearchParams from '../model/route-search/RouteSearchParams';
 interface Props {
   value: RouteSearchParams;
   onChange: (params: RouteSearchParams) => void;
-  onSearch: () => void;
+  onSearch: (callback: () => void) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
   const classes = useStyles();
+  const [busy, setBusy] = useState(false);
   const [ports, setPorts] = useState<Port[]>();
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
@@ -94,7 +95,8 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
     } else if (!weeks) {
       setWeeksOpen(true);
     } else {
-      onSearch();
+      setBusy(true);
+      onSearch(() => setBusy(false));
     }
   };
 
@@ -151,7 +153,8 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
             className={classes.button}
             onClick={handleSearch}
           >
-            Search
+            {busy && <CircularProgress size={16} color="inherit" style={{ marginRight: 10 }} />}
+            <span>Search</span>
           </Button>
         </Grid>
       </Grid>
