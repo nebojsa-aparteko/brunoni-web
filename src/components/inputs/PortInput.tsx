@@ -1,9 +1,7 @@
 import 'isomorphic-fetch';
 import React, { HTMLAttributes, MutableRefObject, Ref } from 'react';
-import TextField from '@material-ui/core/TextField';
 import Autocomplete, { PopupProps } from '@material-ui/lab/Autocomplete';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles, Paper, Popper, Theme, Typography } from '@material-ui/core';
+import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme, Typography } from '@material-ui/core';
 import Port from '../../model/Port';
 
 const getOptionLabel = (option: Port) => `${option.HarbourName} - ${option.Land} (${option.ID})`;

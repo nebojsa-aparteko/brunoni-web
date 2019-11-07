@@ -18,6 +18,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
     padding: theme.spacing(10),
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
   },
   sidebar: {
     marginTop: theme.spacing(2),

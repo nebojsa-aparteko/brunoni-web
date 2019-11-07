@@ -3,6 +3,11 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 export default createMuiTheme({
   typography: {
     fontFamily: 'Montserrat,Helvetica,Arial,sans-serif',
-    fontSize: 14,
+    fontSize: 13,
+  },
+  palette: {
+    primary: {
+      main: '#4781bd',
+    },
   },
 });

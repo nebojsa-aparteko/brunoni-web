@@ -16,10 +16,14 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
     fontSize: 16,
-    paddingTop: 14,
-    paddingBottom: 14,
+    paddingTop: 13,
+    paddingBottom: 13,
     paddingLeft: 27,
     paddingRight: 27,
+    position: 'relative',
+  },
+  progress: {
+    position: 'absolute',
   },
 }));
 
@@ -105,7 +109,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
       <Grid container justify="center" spacing={2}>
         <Grid item sm={3}>
           <PortInput
-            label="Origin Port"
+            label="Origin"
             ports={ports}
             inputRef={originInput}
             value={originPort}
@@ -117,7 +121,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
         </Grid>
         <Grid item sm={3}>
           <PortInput
-            label="Destination Port"
+            label="Destination"
             ports={ports}
             inputRef={destinationInput}
             value={destinationPort}
@@ -153,8 +157,13 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
             className={classes.button}
             onClick={handleSearch}
           >
-            {busy && <CircularProgress size={16} color="inherit" style={{ marginRight: 10 }} />}
-            <span>Search</span>
+            <CircularProgress
+              size={20}
+              color="inherit"
+              className={classes.progress}
+              style={{ visibility: busy ? 'visible' : 'hidden' }}
+            />
+            <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Search</span>
           </Button>
         </Grid>
       </Grid>
