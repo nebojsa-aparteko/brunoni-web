@@ -114,13 +114,14 @@ const RouteSearch: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <Sticky enabled={true} top={50}>
-        <Box className={classes.hero}>
-          <Container>
+      <Box className={classes.hero}>
+        <Container>
+          <Sticky enabled={true} top={50}>
             <RouteSearchBar value={params} onChange={setParams} onSearch={callback => setAction({ callback })} />
-          </Container>
-        </Box>
-      </Sticky>
+          </Sticky>
+        </Container>
+      </Box>
+      {error}
       {results && (
         <Container>
           <Grid container spacing={2}>
@@ -133,8 +134,8 @@ const RouteSearch: React.FC<Props> = () => {
               <Paper className={classes.sorting}>
                 <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
               </Paper>
-              {results.Routes.map(route => (
-                <Paper key={route.OriginInfo.VoyageInfo.VoyageNr} className={classes.route}>
+              {results.Routes.map((route, i) => (
+                <Paper key={i} className={classes.route}>
                   <dl>
                     <dt>TransitTime</dt>
                     <dd>{JSON.stringify(route.TransitTime)}</dd>

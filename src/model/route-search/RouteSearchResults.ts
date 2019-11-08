@@ -36,7 +36,12 @@ export interface RouteSearchResultVoyageInfo {
   Carrier: string;
 }
 
-export interface RouteSearchResultIntermediatePortInfo {}
+export interface RouteSearchResultIntermediatePortInfo {
+  ArrivalDate: string;
+  DepartureDate: string;
+  Port: Port;
+  VoyageInfo: RouteSearchResultVoyageInfo;
+}
 
 export interface RouteSearchResultDeadline {
   Typ: string;
