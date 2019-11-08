@@ -4,12 +4,13 @@ import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
-import { Theme, makeStyles, Box, Container, Paper, Grid, Button } from '@material-ui/core';
+import { Theme, makeStyles, Box, Paper, Grid, Button } from '@material-ui/core';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
+import Container from './Container';
 
 interface Props {}
 
@@ -106,13 +107,13 @@ const RouteSearch: React.FC<Props> = ({}) => {
     <Fragment>
       <Sticky enabled={true} top={50}>
         <Box className={classes.hero}>
-          <Container maxWidth="lg">
+          <Container>
             <RouteSearchBar value={params} onChange={setParams} onSearch={callback => setAction({ callback })} />
           </Container>
         </Box>
       </Sticky>
       {results && (
-        <Container maxWidth="lg">
+        <Container>
           <Grid container spacing={2}>
             <Grid item md={3}>
               <Paper className={classes.sidebar}>
