@@ -64,7 +64,7 @@ const usePopupStyles = makeStyles((theme: Theme) => ({
 }));
 
 function Popup(props: PopupProps) {
-  const { popperRef, anchorEl, open, children, ...other } = props;
+  const { popperRef, anchorEl, open, children } = props;
   const classes = usePopupStyles();
 
   return (

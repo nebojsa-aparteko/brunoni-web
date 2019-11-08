@@ -1,19 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useId } from 'react-id-generator';
-import {
-  Theme,
-  makeStyles,
-  List,
-  ListItem,
-  ListItemIcon,
-  Checkbox,
-  ListItemText,
-  Typography,
-  Button,
-  Grid,
-  Radio,
-  CircularProgress,
-} from '@material-ui/core';
+import { Theme, makeStyles, List, Typography } from '@material-ui/core';
 import Carrier from '../model/Carrier';
 import RouteSearchFilter from './RouteSearchFilter';
 

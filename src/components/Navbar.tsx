@@ -1,15 +1,6 @@
 import React from 'react';
 import changeCase from 'change-case';
-import {
-  makeStyles,
-  Theme,
-  AppBar,
-  Toolbar,
-  createStyles,
-  Button,
-  Link as ExternalLink,
-  Grid,
-} from '@material-ui/core';
+import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button, Grid } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import Container from './Container';

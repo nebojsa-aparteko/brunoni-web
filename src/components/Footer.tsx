@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Theme, makeStyles, Box, Grid, Typography, Link, List, ListItem } from '@material-ui/core';
+import { Theme, makeStyles, Box, Grid, Typography, Link } from '@material-ui/core';
 import Container from './Container';
 
 interface Props {}
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const Footer: React.FC<Props> = ({}) => {
+const Footer: React.FC<Props> = () => {
   const classes = useStyles();
 
   return (

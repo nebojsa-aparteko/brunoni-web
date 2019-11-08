@@ -4,7 +4,7 @@ import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
-import { Theme, makeStyles, Box, Paper, Grid, Button } from '@material-ui/core';
+import { Theme, makeStyles, Box, Paper, Grid } from '@material-ui/core';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
 import RouteSearchBar from './RouteSearchBar';
@@ -15,10 +15,18 @@ import Container from './Container';
 interface Props {}
 
 const useStyles = makeStyles((theme: Theme) => ({
+  stickyActive: {
+    '> div': {
+      padding: 0,
+    },
+  },
   hero: {
-    display: 'flex',
+    '> .sticky-outer-wrapper > .sticky-inner-wrapper': {
+      display: 'flex',
+    },
     background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
-    padding: theme.spacing(10),
+    paddingTop: theme.spacing(10),
+    paddingBottom: theme.spacing(10),
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
   },
@@ -40,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSearch: React.FC<Props> = ({}) => {
+const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
@@ -89,6 +97,7 @@ const RouteSearch: React.FC<Props> = ({}) => {
     return () => {
       controller.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, action]);
 
   const handleFiltersChange = (carrier: string | undefined, callback: () => void) => {
@@ -125,7 +134,7 @@ const RouteSearch: React.FC<Props> = ({}) => {
                 <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
               </Paper>
               {results.Routes.map(route => (
-                <Paper key={route.idRoute} className={classes.route}>
+                <Paper key={route.OriginInfo.VoyageInfo.VoyageNr} className={classes.route}>
                   <dl>
                     <dt>TransitTime</dt>
                     <dd>{JSON.stringify(route.TransitTime)}</dd>
