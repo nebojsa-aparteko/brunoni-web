@@ -17,7 +17,14 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
 }
 
+const useStyles = makeStyles({
+  input: {
+    flexWrap: 'nowrap',
+  },
+});
+
 const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, open, onOpen, onClose }) => {
+  const classes = useStyles();
   const loading = open && !ports;
 
   return (
@@ -45,6 +52,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
                 {params.InputProps.endAdornment}
               </React.Fragment>
             ),
+            className: classes.input,
           }}
         />
       )}
