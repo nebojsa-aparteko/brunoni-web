@@ -116,7 +116,7 @@ const RouteSearch: React.FC<Props> = () => {
     <Fragment>
       <Box className={classes.hero}>
         <Container>
-          <Sticky enabled={true} top={50}>
+          <Sticky enabled={true} top={50} innerZ={1}>
             <RouteSearchBar value={params} onChange={setParams} onSearch={callback => setAction({ callback })} />
           </Sticky>
         </Container>
