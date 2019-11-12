@@ -11,6 +11,7 @@ interface Props {
   value: RouteSearchParams;
   onChange: (params: RouteSearchParams) => void;
   onSearch: (callback: () => void) => void;
+  paperVisibility: any;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
+const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisibility }) => {
   const classes = useStyles();
   const [busy, setBusy] = useState(false);
   const [ports, setPorts] = useState<Port[]>();
@@ -105,7 +106,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch }) => {
   };
 
   return (
-    <Paper>
+    <Paper className={paperVisibility}>
       <Grid container justify="center" spacing={2}>
         <Grid item sm={3}>
           <PortInput

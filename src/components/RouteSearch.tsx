@@ -15,10 +15,10 @@ import Container from './Container';
 interface Props {}
 
 const useStyles = makeStyles((theme: Theme) => ({
-  stickyActive: {
-    '> div': {
-      padding: 0,
-    },
+  hideSearch: {
+    width: '100%',
+    background: 'transparent',
+    boxShadow: 'none',
   },
   hero: {
     '> .sticky-outer-wrapper > .sticky-inner-wrapper': {
@@ -55,6 +55,7 @@ const RouteSearch: React.FC<Props> = () => {
   const [results, setResults] = useState<RouteSearchResults | undefined>();
   const [error, setError] = useState<Error | undefined>();
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
+  const [visibility, setVisibility] = useState(false);
 
   useEffect(() => {
     if (!action) {
@@ -112,14 +113,33 @@ const RouteSearch: React.FC<Props> = () => {
     }
   };
 
+  const handleVisibility = (isVisible: boolean) => {
+    return isVisible ? '' : classes.hideSearch;
+  };
+
+  const handleStateChange = (status: any) => {
+    if (status.status === Sticky.STATUS_FIXED) {
+      setVisibility(true);
+    } else {
+      setVisibility(false);
+    }
+  };
+
   return (
     <Fragment>
       <Box className={classes.hero}>
-        <Container>
-          <Sticky enabled={true} top={50} innerZ={1}>
-            <RouteSearchBar value={params} onChange={setParams} onSearch={callback => setAction({ callback })} />
-          </Sticky>
-        </Container>
+        <Sticky enabled={true} top={8} innerZ={1} onStateChange={handleStateChange}>
+          <Paper square className={handleVisibility(visibility)}>
+            <Container>
+              <RouteSearchBar
+                value={params}
+                onChange={setParams}
+                onSearch={callback => setAction({ callback })}
+                paperVisibility={handleVisibility(!visibility)}
+              />
+            </Container>
+          </Paper>
+        </Sticky>
       </Box>
       {error}
       {results && (
