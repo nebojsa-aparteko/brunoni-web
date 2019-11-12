@@ -7,4 +7,6 @@ steps:
     args: ['build']
     env: ['REACT_APP_API_URL=$_API_URL']
   - name: 'eu.gcr.io/brunoni-allmarine/firebase-tools'
-    args: ['deploy', '--only', 'hosting:$_BRAND-$BRANCH_NAME']
+    args: ['use', '$_BRAND']
+  - name: 'eu.gcr.io/brunoni-allmarine/firebase-tools'
+    args: ['deploy', '--only', 'hosting:$BRANCH_NAME']

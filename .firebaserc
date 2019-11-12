@@ -1,21 +1,27 @@
 {
   "projects": {
-    "default": "brunoni-allmarine"
+    "default": "brunoni-allmarine",
+    "brunoni": "brunoni",
+    "allmarine": "allmarine"
   },
   "targets": {
-    "brunoni-allmarine": {
+    "brunoni": {
       "hosting": {
-        "brunoni-stage": [
-          "oskar-web-brunoni-stage"
+        "production": [
+          "brunoni"
         ],
-        "allmarine-stage": [
-          "oskar-web-allmarine-stage"
+        "stage": [
+          "brunoni-stage"
+        ]
+      }
+    },
+    "allmarine": {
+      "hosting": {
+        "production": [
+          "allmarine"
         ],
-        "allmarine-production": [
-          "oskar-web-allmarine-production"
-        ],
-        "brunoni-production": [
-          "oskar-web-brunoni-production"
+        "stage": [
+          "allmarine-stage"
         ]
       }
     }
