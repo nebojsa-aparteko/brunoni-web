@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Theme, makeStyles, Box, Grid, Typography, Link } from '@material-ui/core';
+import { Theme, makeStyles, Box, Grid, Typography, Link, Divider } from '@material-ui/core';
 import Container from './Container';
 
 interface Props {}
@@ -10,16 +10,29 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   info: {
     background: '#2c3c50',
-    color: 'rgba(215, 227, 243, 0.6)',
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+    color: theme.palette.common.white,
   },
   copyright: {
-    background: '#3d516a',
-    color: 'rgba(215, 227, 243, 0.3)',
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
+    background: '#273546',
+    color: 'rgba(255,255,255,.35)',
     textAlign: 'center',
+    fontWeigh: theme.typography.fontWeightMedium,
+  },
+  list: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+
+    '& li > a': {
+      color: theme.palette.common.white,
+      opacity: 0.65,
+      fontSize: '1.25em',
+
+      '&:hover': {
+        opacity: 1,
+        textDecoration: 'none',
+      },
+    },
   },
 }));
 
@@ -28,51 +41,84 @@ const Footer: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <Box className={classes.spacer} />
-      <Box className={classes.info}>
+      <Box p={5} />
+      <Box className={classes.info} py={6}>
         <Container>
           <Grid container spacing={2}>
-            <Grid item md={3}>
-              <Typography variant="subtitle1">Company</Typography>
-              <Box>
-                <Link href="https://www.brunoni.ch/company/history">History</Link>
+            <Grid item md={3} sm={6} xs={12}>
+              <Box mb={4}>
+                <Typography variant="h5">Company</Typography>
               </Box>
-              <Box>
-                <Link href="https://www.brunoni.ch/company/philosophy">Philosophy</Link>
-              </Box>
-              <Box>
-                <Link href="https://www.brunoni.ch/company/management">Management</Link>
-              </Box>
-              <Box>
-                <Link href="https://www.brunoni.ch/company/team">Team</Link>
-              </Box>
-              <Box>
-                <Link href="https://www.brunoni.ch/company/careers">Careers</Link>
+              <Box mb={4}>
+                <ul className={classes.list}>
+                  <li>
+                    <Link href="https://www.brunoni.ch/company/history">History</Link>
+                  </li>
+                  <li>
+                    <Link href="https://www.brunoni.ch/company/philosophy">Philosophy</Link>
+                  </li>
+                  <li>
+                    <Link href="https://www.brunoni.ch/company/management">Management</Link>
+                  </li>
+                  <li>
+                    <Link href="https://www.brunoni.ch/company/team">Team</Link>
+                  </li>
+                  <li>
+                    <Link href="https://www.brunoni.ch/company/careers">Careers</Link>
+                  </li>
+                </ul>
               </Box>
             </Grid>
-            <Grid item md={3}>
-              <Typography variant="subtitle1">Office Hours</Typography>
-              <Box>
+
+            <Grid item md={3} sm={6} xs={12}>
+              <Box mb={4}>
+                <Typography variant="h5">Office Hours</Typography>
+              </Box>
+              <Box mb={2} style={{ opacity: 0.65 }}>
                 <Typography>Mon-Fri</Typography>
-              </Box>
-              <Box>
                 <Typography>08:00 - 12:00</Typography>
-              </Box>
-              <Box>
                 <Typography>13:00 - 17:30</Typography>
               </Box>
-              <Box />
-              <Box>
+
+              <Box mb={4} style={{ opacity: 0.65 }}>
                 <Typography>Phone +41 44 455 58 58</Typography>
-              </Box>
-              <Box>
                 <Typography>Fax +41 44 455 58 55</Typography>
+              </Box>
+            </Grid>
+
+            <Grid item md={3} sm={6} xs={12}>
+              <Box mb={4}>
+                <Typography variant="h5">Follow Us</Typography>
+              </Box>
+              <Box mb={4}>
+                <ul className={classes.list}>
+                  <li>
+                    <Link href="https://www.linkedin.com/in/nenad-milutinovic-3aa677b0?originalSubdomain=ch">
+                      LinkedIn
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="https://www.brunoni.ch/newsletter-abo/user/modify">Newsletter ABO</Link>
+                  </li>
+                </ul>
+              </Box>
+            </Grid>
+
+            <Grid item md={3} sm={6} xs={12}>
+              <Box mb={4}>
+                <Typography variant="h5">About Us</Typography>
+              </Box>
+              <Box mb={4}>
+                <Typography variant="body1" style={{ opacity: 0.65 }}>
+                  Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
+                  represent foreign shipping lines in Switzerland.
+                </Typography>
               </Box>
             </Grid>
           </Grid>
         </Container>
       </Box>
-      <Box className={classes.copyright}>
+      <Box className={classes.copyright} py={4}>
         <Container>Copyright © {new Date().getFullYear()} O. Brunoni S.A. Agence Maritime</Container>
       </Box>
     </Fragment>
