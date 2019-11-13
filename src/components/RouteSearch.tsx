@@ -252,17 +252,17 @@ const RouteSearch: React.FC<Props> = () => {
                     aria-controls="panel1c-content"
                   >
                     <Grid container spacing={2}>
-                      <Grid item md={8} sm={12}>
+                      <Grid item md={9} sm={12}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Carrier
+                          <Box fontWeight="fontWeightBold">Carrier</Box>
                         </Typography>
                         <Typography variant="h5" display="block" gutterBottom>
                           {route.OriginInfo.VoyageInfo.Carrier}
                         </Typography>
                       </Grid>
-                      <Grid item md={4} sm={12}>
+                      <Grid item md={3} sm={12}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Space Availability
+                          <Box fontWeight="fontWeightBold">Space Availability</Box>
                         </Typography>
                         <Chip
                           label={route.SpaceInfo}
@@ -275,9 +275,9 @@ const RouteSearch: React.FC<Props> = () => {
                         <Divider light />
                       </Grid>
 
-                      <Grid item md={4} sm={12}>
+                      <Grid item md={3} sm={12}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Departure
+                          <Box fontWeight="fontWeightBold">Departure</Box>
                         </Typography>
                         <Typography variant="body1" display="block">
                           ETS {route.OriginInfo.DepartureDate}
@@ -286,9 +286,9 @@ const RouteSearch: React.FC<Props> = () => {
                           {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
                         </Typography>
                       </Grid>
-                      <Grid item md={4} sm={12}>
+                      <Grid item md={3} sm={12}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Arrival
+                          <Box fontWeight="fontWeightBold">Arrival</Box>
                         </Typography>
                         <Typography variant="body1" display="block">
                           ETA {route.DestinationInfo.ArrivalDate}
@@ -297,17 +297,17 @@ const RouteSearch: React.FC<Props> = () => {
                           {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
                         </Typography>
                       </Grid>
-                      <Grid item md={2} sm={6} xs={6}>
+                      <Grid item md={3} sm={6} xs={6}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Transit Time
+                          <Box fontWeight="fontWeightBold">Transit Time</Box>
                         </Typography>
                         <Typography variant="body2" display="block" gutterBottom>
                           {route.TransitTime} days
                         </Typography>
                       </Grid>
-                      <Grid item md={2} sm={6} xs={6}>
+                      <Grid item md={3} sm={6} xs={6}>
                         <Typography variant="subtitle2" display="block" gutterBottom>
-                          Routing
+                          <Box fontWeight="fontWeightBold">Routing</Box>
                         </Typography>
                         <Typography variant="body2" display="block" gutterBottom>
                           {route.Routing}
@@ -339,7 +339,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Vessel
+                                        <Box fontWeight="fontWeightBold">Vessel</Box>
                                       </Typography>
                                       <Typography variant="body2" display="block" gutterBottom>
                                         {route.OriginInfo.VoyageInfo.VesselName}
@@ -354,7 +354,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Delivery Address
+                                        <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
                                         <div dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)} />
@@ -376,7 +376,7 @@ const RouteSearch: React.FC<Props> = () => {
                               <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                   <Typography variant="h5" display="block">
-                                    {intermediatePortInfo.DepartureDate}
+                                    <Box fontWeight="fontWeightMedium">{intermediatePortInfo.DepartureDate}</Box>
                                   </Typography>
                                   <Typography variant="subtitle1" display="block" gutterBottom>
                                     {intermediatePortInfo.Port.HarbourName}, {intermediatePortInfo.Port.Land}
@@ -389,7 +389,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Vessel
+                                        <Box fontWeight="fontWeightBold">Vessel</Box>
                                       </Typography>
                                       <Typography variant="body2" display="block" gutterBottom>
                                         {intermediatePortInfo.VoyageInfo.VesselName}
@@ -404,7 +404,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Delivery Address
+                                        <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
                                         <div
@@ -428,7 +428,7 @@ const RouteSearch: React.FC<Props> = () => {
                               <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                   <Typography variant="h5" display="block">
-                                    {route.DestinationInfo.ArrivalDate}
+                                    <Box fontWeight="fontWeightMedium">{route.DestinationInfo.ArrivalDate}</Box>
                                   </Typography>
                                   <Typography variant="subtitle1" display="block" gutterBottom>
                                     {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
@@ -441,7 +441,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Vessel
+                                        <Box fontWeight="fontWeightBold">Vessel</Box>
                                       </Typography>
                                       <Typography variant="body2" display="block" gutterBottom>
                                         {route.DestinationInfo.VoyageInfo.VesselName}
@@ -456,7 +456,7 @@ const RouteSearch: React.FC<Props> = () => {
                                     </Grid>
                                     <Grid>
                                       <Typography variant="subtitle2" display="block">
-                                        Delivery Address
+                                        <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
                                         <div
