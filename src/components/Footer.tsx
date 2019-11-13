@@ -41,7 +41,7 @@ const Footer: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <Box p={5} />
+      <Box className={classes.spacer} />
       <Box className={classes.info} py={6}>
         <Container>
           <Grid container spacing={2}>
