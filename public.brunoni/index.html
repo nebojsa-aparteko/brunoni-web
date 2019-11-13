@@ -35,70 +35,53 @@
         min-height:100vh;
       }
 
-      .lds-ellipsis {
-        display: none;
+      @keyframes wave {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-15px);
+        }
+      }
+
+      .loader {
+        width: 64px;
+        height: 72px;
+        overflow: hidden;
         position: relative;
+        margin: calc(50vh - 32px) auto 0;
+      }
+
+      .loader-static {
+        background: transparent url(cargo-ship.svg) center no-repeat;
         width: 64px;
         height: 64px;
-        margin:0 auto;
-        top: 30vh;
-      }
-      .lds-ellipsis:after {
-        content: '\A\A ...loading...';
-        white-space: pre;
-        font-size: 0.8em;
-        color: #666666;
-        text-align: center;
-        width: 100%;
-      }
-      .lds-ellipsis div {
         position: absolute;
-        top: 27px;
-        width: 11px;
-        height: 11px;
-        border-radius: 50%;
-        background: #666;
-        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        left: 0;
+        top: 0;
       }
-      .lds-ellipsis div:nth-child(1) {
-        left: 6px;
-        animation: lds-ellipsis1 0.6s infinite;
+
+      .loader-animated {
+        background: transparent url(cargo-ship-wave.svg) center no-repeat;
+        width: 87px;
+        height: 64px;
+        animation: wave 1s infinite linear;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
       }
-      .lds-ellipsis div:nth-child(2) {
-        left: 6px;
-        animation: lds-ellipsis2 0.6s infinite;
-      }
-      .lds-ellipsis div:nth-child(3) {
-        left: 26px;
-        animation: lds-ellipsis2 0.6s infinite;
-      }
-      .lds-ellipsis div:nth-child(4) {
-        left: 45px;
-        animation: lds-ellipsis3 0.6s infinite;
-      }
-      @keyframes lds-ellipsis1 {
-        0% {
-          transform: scale(0);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      @keyframes lds-ellipsis3 {
-        0% {
-          transform: scale(1);
-        }
-        100% {
-          transform: scale(0);
-        }
-      }
-      @keyframes lds-ellipsis2 {
-        0% {
-          transform: translate(0, 0);
-        }
-        100% {
-          transform: translate(19px, 0);
-        }
+
+      .loader-text {
+        font-weight: bold;
+        font-size: .75em;
+        font-family: sans-serif;
+        position: absolute;
+        top: 56px;
+        color: #2C3C50;
+        text-align: center;
+        left: 0;
+        right: 0;
       }
     </style>
 
@@ -119,7 +102,10 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
-      <div id="rootspinner" class="lds-ellipsis"><div></div><div></div><div></div><div></div>
+      <div id="rootspinner" class="loader">
+        <div class="loader-static"></div>
+        <div class="loader-animated"></div>
+        <div class="loader-text">Loading...</div>
       </div>
     </div>
     <!--
