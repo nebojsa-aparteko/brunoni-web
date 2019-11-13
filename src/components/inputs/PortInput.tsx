@@ -1,8 +1,10 @@
 import 'isomorphic-fetch';
 import React, { HTMLAttributes, MutableRefObject, Ref } from 'react';
-import Autocomplete, { PopupProps } from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme, Typography } from '@material-ui/core';
+import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
+import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme } from '@material-ui/core';
 import Port from '../../model/Port';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 
 const getOptionLabel = (option: Port) => `${option.HarbourName} - ${option.Land} (${option.ID})`;
 
@@ -31,6 +33,8 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
     <Autocomplete
       value={value}
       onChange={(_, port: Port) => onChange(port)}
+      autoSelect={true}
+      autoHighlight={true}
       open={open}
       onOpen={onOpen}
       onClose={onClose}
@@ -56,9 +60,22 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
           }}
         />
       )}
-      PopupComponent={Popup}
+      PopperComponent={Popup}
       PaperComponent={Papyrus}
-      renderOption={option => <Typography>{getOptionLabel(option)}</Typography>}
+      renderOption={(option, { inputValue }) => {
+        const matches = match(getOptionLabel(option), inputValue);
+        const parts = parse(getOptionLabel(option), matches);
+
+        return (
+          <div>
+            {parts.map((part, index) => (
+              <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                {part.text}
+              </span>
+            ))}
+          </div>
+        );
+      }}
     />
   );
 };
@@ -67,11 +84,12 @@ const usePopupStyles = makeStyles((theme: Theme) => ({
   popper: {
     [theme.breakpoints.up('sm')]: {
       width: theme.breakpoints.values.md / 2,
+      zIndex: 100,
     },
   },
 }));
 
-function Popup(props: PopupProps) {
+function Popup(props: PopperProps) {
   const { popperRef, anchorEl, open, children } = props;
   const classes = usePopupStyles();
 
