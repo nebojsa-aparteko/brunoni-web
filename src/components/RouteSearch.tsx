@@ -13,6 +13,7 @@ import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSortin
 import Container from './Container';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
+import { Skeleton } from '@material-ui/lab';
 
 interface Props {}
 
@@ -62,6 +63,7 @@ const RouteSearch: React.FC<Props> = () => {
   const [error, setError] = useState<Error | undefined>();
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
+  const [searchInProgress, setSearchInProgress] = useState(false);
 
   useEffect(() => {
     if (!action) {
@@ -79,6 +81,7 @@ const RouteSearch: React.FC<Props> = () => {
     const signal = controller.signal;
 
     (async () => {
+      setSearchInProgress(true);
       try {
         const search = querySting.stringify({
           origin: params.originPort!.ID,
@@ -98,6 +101,7 @@ const RouteSearch: React.FC<Props> = () => {
           action.callback();
         }
         setAction(undefined);
+        setSearchInProgress(false);
       }
     })();
 
@@ -148,7 +152,7 @@ const RouteSearch: React.FC<Props> = () => {
         </Sticky>
       </Box>
       {error}
-      {results && (
+      {results ? (
         <Container>
           <Grid container spacing={4}>
             <Grid item md={3}>
@@ -230,6 +234,21 @@ const RouteSearch: React.FC<Props> = () => {
             </Grid>
           </Grid>
         </Container>
+      ) : (
+        searchInProgress && (
+          <Container>
+            <Grid container spacing={4}>
+              <Grid item md={3}>
+                <Skeleton className={classes.sidebar} variant="rect" width="100%" height={450} />
+              </Grid>
+              <Grid item md={9}>
+                <Skeleton className={classes.sorting} variant="rect" width="100%" height={104} />
+                <Skeleton className={classes.route} variant="rect" width="100%" height={232} />
+                <Skeleton className={classes.route} variant="rect" width="100%" height={232} />
+              </Grid>
+            </Grid>
+          </Container>
+        )
       )}
     </Fragment>
   );
