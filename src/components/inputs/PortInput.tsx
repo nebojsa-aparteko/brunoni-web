@@ -34,6 +34,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
       value={value}
       onChange={(_, port: Port) => onChange(port)}
       autoSelect
+      autoHighlight
       open={open}
       onOpen={onOpen}
       onClose={onClose}
