@@ -33,8 +33,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
     <Autocomplete
       value={value}
       onChange={(_, port: Port) => onChange(port)}
-      autoSelect={true}
-      autoHighlight={true}
+      autoSelect
       open={open}
       onOpen={onOpen}
       onClose={onClose}
@@ -68,7 +67,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
 
         return (
           <div>
-            {parts.map((part, index) => (
+            {parts.map((part: { highlight: boolean; text: string }, index: number) => (
               <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
                 {part.text}
               </span>

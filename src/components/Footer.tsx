@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Theme, makeStyles, Box, Grid, Typography, Link, Divider } from '@material-ui/core';
+import { Theme, makeStyles, Box, Grid, Typography, Link } from '@material-ui/core';
 import Container from './Container';
 
 interface Props {}
