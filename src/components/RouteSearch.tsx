@@ -1,10 +1,23 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import Sticky from 'react-stickynode';
-import querySting from 'querystring';
+import querySting, { stringify } from 'querystring';
 import formatDate from 'date-fns/format';
 import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
-import { Theme, makeStyles, Box, Paper, Grid, Divider } from '@material-ui/core';
+import {
+  Theme,
+  makeStyles,
+  Box,
+  Paper,
+  Grid,
+  Divider,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
+  ExpansionPanelActions,
+  Button,
+} from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
 import RouteSearchBar from './RouteSearchBar';
@@ -14,6 +27,8 @@ import Container from './Container';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import { Skeleton } from '@material-ui/lab';
+
+import routesTestData from '../test/RoutesSearchDataTest';
 
 interface Props {}
 
@@ -66,6 +81,7 @@ const RouteSearch: React.FC<Props> = () => {
   const [searchInProgress, setSearchInProgress] = useState(false);
 
   useEffect(() => {
+    setResults(update('Routes', sorting.sort)(JSON.parse(routesTestData) as RouteSearchResults));
     if (!action) {
       return undefined;
     }
@@ -135,6 +151,10 @@ const RouteSearch: React.FC<Props> = () => {
     }
   };
 
+  const createMarkup = (htmlMarkup: any) => {
+    return { __html: htmlMarkup };
+  };
+
   return (
     <Fragment>
       <Box className={classes.hero}>
@@ -165,71 +185,183 @@ const RouteSearch: React.FC<Props> = () => {
                 <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
               </Paper>
               {results.Routes.map((route, i) => (
-                <Paper key={i} className={classes.route}>
-                  <Grid container spacing={2}>
-                    <Grid item md={8} sm={6} xs={12}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Carrier
-                      </Typography>
-                      <Typography variant="h5" display="block" gutterBottom>
-                        {route.OriginInfo.VoyageInfo.Carrier}
-                      </Typography>
-                    </Grid>
-                    <Grid item md={4} sm={6} xs={12}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Space Availability
-                      </Typography>
-                      <Chip
-                        label={route.SpaceInfo}
-                        style={{ backgroundColor: route.SpaceInfoColor }}
-                        className={classes.chip}
-                      />
-                    </Grid>
+                <ExpansionPanel defaultExpanded>
+                  <ExpansionPanelSummary
+                    key={i}
+                    className={classes.route}
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1c-content"
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item md={8} sm={6} xs={12}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Carrier
+                        </Typography>
+                        <Typography variant="h5" display="block" gutterBottom>
+                          {route.OriginInfo.VoyageInfo.Carrier}
+                        </Typography>
+                      </Grid>
+                      <Grid item md={4} sm={6} xs={12}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Space Availability
+                        </Typography>
+                        <Chip
+                          label={route.SpaceInfo}
+                          style={{ backgroundColor: route.SpaceInfoColor }}
+                          className={classes.chip}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12}>
-                      <Divider light />
-                    </Grid>
+                      <Grid item xs={12}>
+                        <Divider light />
+                      </Grid>
 
-                    <Grid item md={4} sm={6} xs={12}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Departure
-                      </Typography>
-                      <Typography variant="body1" display="block">
-                        ETS {route.OriginInfo.DepartureDate}
-                      </Typography>
-                      <Typography variant="body2" display="block">
-                        From {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
-                      </Typography>
+                      <Grid item md={4} sm={6} xs={12}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Departure
+                        </Typography>
+                        <Typography variant="body1" display="block">
+                          ETS {route.OriginInfo.DepartureDate}
+                        </Typography>
+                        <Typography variant="body2" display="block">
+                          {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
+                        </Typography>
+                      </Grid>
+                      <Grid item md={4} sm={6} xs={12}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Arrival
+                        </Typography>
+                        <Typography variant="body1" display="block">
+                          ETA {route.DestinationInfo.ArrivalDate}
+                        </Typography>
+                        <Typography variant="body2" display="block">
+                          {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
+                        </Typography>
+                      </Grid>
+                      <Grid item md={2} sm={6} xs={6}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Transit Time
+                        </Typography>
+                        <Typography variant="body2" display="block" gutterBottom>
+                          {route.TransitTime} days
+                        </Typography>
+                      </Grid>
+                      <Grid item md={2} sm={6} xs={6}>
+                        <Typography variant="subtitle2" display="block" gutterBottom>
+                          Routing
+                        </Typography>
+                        <Typography variant="body2" display="block" gutterBottom>
+                          {route.Routing}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item md={4} sm={6} xs={12}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Arrival
-                      </Typography>
-                      <Typography variant="body1" display="block">
-                        ETA {route.DestinationInfo.ArrivalDate}
-                      </Typography>
-                      <Typography variant="body2" display="block">
-                        To {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
-                      </Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Grid container spacing={2} direction="column">
+                      {route.OriginInfo && (
+                        <Paper className={classes.route}>
+                          <Grid container spacing={2}>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Vessel
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {route.OriginInfo.VoyageInfo.VesselName}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Origin
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
+                              </Typography>
+                              <Typography variant="body2" display="block">
+                                ETS {route.OriginInfo.DepartureDate}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Delivery Address
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                <div dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)} />
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      )}
+
+                      {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
+                        <Paper key={i} className={classes.route}>
+                          <Grid container spacing={2}>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Vessel
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {intermediatePortInfo.VoyageInfo.VesselName}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Origin
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {intermediatePortInfo.Port.HarbourName}, {intermediatePortInfo.Port.Land}
+                              </Typography>
+                              <Typography variant="body2" display="block">
+                                ETA {intermediatePortInfo.DepartureDate}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Delivery Address
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                <div dangerouslySetInnerHTML={createMarkup(intermediatePortInfo.Port.PortName)} />
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      ))}
+
+                      {route.DestinationInfo && (
+                        <Paper className={classes.route}>
+                          <Grid container spacing={2}>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Vessel
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {route.DestinationInfo.VoyageInfo.VesselName}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Origin
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
+                              </Typography>
+                              <Typography variant="body2" display="block">
+                                ETA {route.DestinationInfo.ArrivalDate}
+                              </Typography>
+                            </Grid>
+                            <Grid item md={4} sm={6} xs={12}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                Delivery Address
+                              </Typography>
+                              <Typography variant="body1" display="block" gutterBottom>
+                                <div dangerouslySetInnerHTML={createMarkup(route.DestinationInfo.Port.PortName)} />
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Paper>
+                      )}
                     </Grid>
-                    <Grid item md={2} sm={6} xs={6}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Transit Time
-                      </Typography>
-                      <Typography variant="body1" display="block" gutterBottom>
-                        {route.TransitTime} days
-                      </Typography>
-                    </Grid>
-                    <Grid item md={2} sm={6} xs={6}>
-                      <Typography variant="subtitle2" display="block" gutterBottom>
-                        Routing
-                      </Typography>
-                      <Typography variant="body1" display="block" gutterBottom>
-                        {route.Routing}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Paper>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
               ))}
             </Grid>
           </Grid>
