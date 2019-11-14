@@ -20,6 +20,7 @@ import {
 import LoginForm from './LoginForm';
 
 import firebase from '../firebase';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -34,6 +35,7 @@ interface Props {}
 
 const LoginWidget: React.FC<Props> = () => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const history = useHistory();
   const params = location.search ? queryString.parse(location.search.slice(1)) : {};
@@ -62,10 +64,12 @@ const LoginWidget: React.FC<Props> = () => {
         await firebase.auth().signInWithCustomToken(token);
         setOpen(false);
       } catch (e) {
+        setOpen(false);
+        enqueueSnackbar(<Typography>Unable to sign you in.</Typography>, { variant: 'error' });
         console.error(e);
       }
     })();
-  }, [token, history, location, open, params]);
+  }, [token, history, location, open, params, enqueueSnackbar]);
 
   return (
     <Fragment>
