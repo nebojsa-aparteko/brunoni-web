@@ -86,17 +86,13 @@
     </style>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function(event) {
-        console.log("DomLoaded")
-        //the event occurred
-        setTimeout(()=>{
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
           if (document.getElementById('rootspinner') !== null) {
             document.getElementById('rootspinner').style.display = 'block';
           }
         }, 1000);
-
-      })
-
+      });
     </script>
   </head>
   <body>
@@ -105,7 +101,7 @@
       <div id="rootspinner" class="loader">
         <div class="loader-static"></div>
         <div class="loader-animated"></div>
-        <div class="loader-text">Loading...</div>
+        <div class="loader-text">Loading…</div>
       </div>
     </div>
     <!--

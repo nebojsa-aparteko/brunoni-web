@@ -34,11 +34,76 @@
         flex-direction: column;
         min-height:100vh;
       }
+
+      @keyframes wave {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-15px);
+        }
+      }
+
+      .loader {
+        width: 64px;
+        height: 72px;
+        overflow: hidden;
+        position: relative;
+        margin: calc(50vh - 32px) auto 0;
+      }
+
+      .loader-static {
+        background: transparent url(cargo-ship.svg) center no-repeat;
+        width: 64px;
+        height: 64px;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      .loader-animated {
+        background: transparent url(cargo-ship-wave.svg) center no-repeat;
+        width: 87px;
+        height: 64px;
+        animation: wave 1s infinite linear;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
+      }
+
+      .loader-text {
+        font-weight: bold;
+        font-size: .75em;
+        font-family: sans-serif;
+        position: absolute;
+        top: 56px;
+        color: #2C3C50;
+        text-align: center;
+        left: 0;
+        right: 0;
+      }
     </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          if (document.getElementById('rootspinner') !== null) {
+            document.getElementById('rootspinner').style.display = 'block';
+          }
+        }, 1000);
+      });
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root">
+      <div id="rootspinner" class="loader">
+        <div class="loader-static"></div>
+        <div class="loader-animated"></div>
+        <div class="loader-text">Loading…</div>
+      </div>
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
