@@ -1,9 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import identity from 'lodash/identity';
 import { Theme, makeStyles, List, Typography } from '@material-ui/core';
 import Carrier from '../model/Carrier';
 import RouteSearchFilter from './RouteSearchFilter';
 
 interface Props {
+  only?: string[];
   value?: string;
   onChange: (carrier: string | undefined, callback: () => void) => void;
 }
@@ -18,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSearchFilters: React.FC<Props> = ({ value, onChange }) => {
+const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
   const classes = useStyles();
   const [carriers, setCarriers] = useState<Carrier[]>([]);
 
@@ -37,6 +39,8 @@ const RouteSearchFilters: React.FC<Props> = ({ value, onChange }) => {
     };
   }, []);
 
+  const filter = only ? (carrier: Carrier) => only.indexOf(carrier.CarrierName) !== -1 : identity;
+
   return (
     <Fragment>
       <Typography variant="subtitle2" className={classes.padded}>
@@ -49,14 +53,16 @@ const RouteSearchFilters: React.FC<Props> = ({ value, onChange }) => {
           onSelect={callback => onChange(undefined, callback)}
         />
         {carriers &&
-          carriers.map(carrier => (
-            <RouteSearchFilter
-              key={carrier.ID}
-              label={carrier.CarrierName}
-              selected={value === (carrier || {}).ID}
-              onSelect={callback => onChange(carrier.ID, callback)}
-            />
-          ))}
+          carriers
+            .filter(filter)
+            .map(carrier => (
+              <RouteSearchFilter
+                key={carrier.ID}
+                label={carrier.CarrierName}
+                selected={value === (carrier || {}).ID}
+                onSelect={callback => onChange(carrier.ID, callback)}
+              />
+            ))}
       </List>
     </Fragment>
   );

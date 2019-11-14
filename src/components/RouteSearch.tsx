@@ -4,6 +4,7 @@ import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
+import uniq from 'lodash/fp/uniq';
 import {
   Theme,
   makeStyles,
@@ -241,7 +242,11 @@ const RouteSearch: React.FC<Props> = () => {
           <Grid container spacing={4}>
             <Grid item md={3}>
               <Paper className={classes.sidebar}>
-                <RouteSearchFilters value={params.carrier} onChange={handleFiltersChange} />
+                <RouteSearchFilters
+                  only={uniq(results.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
+                  value={params.carrier}
+                  onChange={handleFiltersChange}
+                />
               </Paper>
             </Grid>
             <Grid item md={9}>
