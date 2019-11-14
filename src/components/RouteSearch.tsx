@@ -27,6 +27,7 @@ import Chip from '@material-ui/core/Chip';
 import { Skeleton } from '@material-ui/lab';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import FlagIcon from '@material-ui/icons/Flag';
+import { useSnackbar } from 'notistack';
 
 interface DotProps {
   noLine: boolean;
@@ -116,14 +117,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
-const initialResults = process.env.NODE_ENV !== 'production' ? require('../test/RoutesSearchDataTest.json') : undefined;
+const initialResults = undefined; //process.env.NODE_ENV !== 'production' ? require('../test/RoutesSearchDataTest.json') : undefined;
 
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
   const [results, setResults] = useState<RouteSearchResults | undefined>(initialResults);
-  const [error, setError] = useState<Error | undefined>();
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
   const [searchInProgress, setSearchInProgress] = useState(false);
@@ -156,14 +157,17 @@ const RouteSearch: React.FC<Props> = () => {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/routes?${search}`, { signal });
         const body = await response.json();
         setResults(update('Routes', sorting.sort)(body as RouteSearchResults));
+        setAction(undefined);
       } catch (e) {
         console.error('Failed to load routes', e);
-        setError(e);
+        if (e.code !== e.ABORT_ERR) {
+          setAction(undefined);
+          enqueueSnackbar(<Typography>Failed to load routes.</Typography>, { variant: 'error' });
+        }
       } finally {
         if (action.callback) {
           action.callback();
         }
-        setAction(undefined);
         setSearchInProgress(false);
       }
     })();
@@ -229,7 +233,6 @@ const RouteSearch: React.FC<Props> = () => {
           </Paper>
         </Sticky>
       </Box>
-      {error}
       {results ? (
         <Container>
           <Grid container spacing={4}>
