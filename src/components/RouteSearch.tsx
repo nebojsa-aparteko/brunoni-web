@@ -114,11 +114,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
+
+const initialResults = process.env.NODE_ENV !== 'production' ? require('../test/RoutesSearchDataTest.json') : undefined;
+
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
-  const [results, setResults] = useState<RouteSearchResults | undefined>();
+  const [results, setResults] = useState<RouteSearchResults | undefined>(initialResults);
   const [error, setError] = useState<Error | undefined>();
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
@@ -275,7 +279,7 @@ const RouteSearch: React.FC<Props> = () => {
                           <Box fontWeight="fontWeightBold">Departure</Box>
                         </Typography>
                         <Typography variant="body1" display="block">
-                          ETS {route.OriginInfo.DepartureDate}
+                          ETS {formatDateString(route.OriginInfo.DepartureDate)}
                         </Typography>
                         <Typography variant="body2" display="block">
                           {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
@@ -286,7 +290,7 @@ const RouteSearch: React.FC<Props> = () => {
                           <Box fontWeight="fontWeightBold">Arrival</Box>
                         </Typography>
                         <Typography variant="body1" display="block">
-                          ETA {route.DestinationInfo.ArrivalDate}
+                          ETA {formatDateString(route.DestinationInfo.ArrivalDate)}
                         </Typography>
                         <Typography variant="body2" display="block">
                           {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
@@ -321,7 +325,9 @@ const RouteSearch: React.FC<Props> = () => {
                               <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                   <Typography variant="h5" display="block">
-                                    <Box fontWeight="fontWeightMedium">{route.OriginInfo.DepartureDate}</Box>
+                                    <Box fontWeight="fontWeightMedium">
+                                      {formatDateString(route.OriginInfo.DepartureDate)}
+                                    </Box>
                                   </Typography>
                                   <Typography variant="subtitle1" display="block" gutterBottom>
                                     {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
@@ -371,7 +377,9 @@ const RouteSearch: React.FC<Props> = () => {
                               <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                   <Typography variant="h5" display="block">
-                                    <Box fontWeight="fontWeightMedium">{intermediatePortInfo.DepartureDate}</Box>
+                                    <Box fontWeight="fontWeightMedium">
+                                      {formatDateString(intermediatePortInfo.DepartureDate)}
+                                    </Box>
                                   </Typography>
                                   <Typography variant="subtitle1" display="block" gutterBottom>
                                     {intermediatePortInfo.Port.HarbourName}, {intermediatePortInfo.Port.Land}
@@ -423,7 +431,9 @@ const RouteSearch: React.FC<Props> = () => {
                               <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                   <Typography variant="h5" display="block">
-                                    <Box fontWeight="fontWeightMedium">{route.DestinationInfo.ArrivalDate}</Box>
+                                    <Box fontWeight="fontWeightMedium">
+                                      {formatDateString(route.DestinationInfo.ArrivalDate)}
+                                    </Box>
                                   </Typography>
                                   <Typography variant="subtitle1" display="block" gutterBottom>
                                     {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
