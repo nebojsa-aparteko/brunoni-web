@@ -117,7 +117,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
-const initialResults = undefined; //process.env.NODE_ENV !== 'production' ? require('../test/RoutesSearchDataTest.json') : undefined;
+const initialResults =
+  process.env.NODE_ENV !== 'production'
+    ? update('Routes', sortingOptions[0].sort)(require('../test/RoutesSearchDataTest.json'))
+    : undefined;
 
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
@@ -186,7 +189,7 @@ const RouteSearch: React.FC<Props> = () => {
   const handleSortingChange = (s: Sorting) => {
     setSorting(s);
     if (results) {
-      setResults(update('Routes', sorting.sort)(results!));
+      setResults(update('Routes', s.sort)(results!));
     }
   };
 
@@ -279,17 +282,6 @@ const RouteSearch: React.FC<Props> = () => {
 
                         <Grid item md={3} sm={12}>
                           <Typography variant="subtitle2" display="block" gutterBottom>
-                            <Box fontWeight="fontWeightBold">Departure</Box>
-                          </Typography>
-                          <Typography variant="body1" display="block">
-                            ETS {formatDateString(route.OriginInfo.DepartureDate)}
-                          </Typography>
-                          <Typography variant="body2" display="block">
-                            {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
-                          </Typography>
-                        </Grid>
-                        <Grid item md={3} sm={12}>
-                          <Typography variant="subtitle2" display="block" gutterBottom>
                             <Box fontWeight="fontWeightBold">Arrival</Box>
                           </Typography>
                           <Typography variant="body1" display="block">
@@ -299,12 +291,23 @@ const RouteSearch: React.FC<Props> = () => {
                             {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
                           </Typography>
                         </Grid>
+                        <Grid item md={3} sm={12}>
+                          <Typography variant="subtitle2" display="block" gutterBottom>
+                            <Box fontWeight="fontWeightBold">Departure</Box>
+                          </Typography>
+                          <Typography variant="body1" display="block">
+                            ETS {formatDateString(route.OriginInfo.DepartureDate)}
+                          </Typography>
+                          <Typography variant="body2" display="block">
+                            {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
+                          </Typography>
+                        </Grid>
                         <Grid item md={3} sm={6} xs={6}>
                           <Typography variant="subtitle2" display="block" gutterBottom>
                             <Box fontWeight="fontWeightBold">Transit Time</Box>
                           </Typography>
                           <Typography variant="body2" display="block" gutterBottom>
-                            {route.TransitTime} days
+                            {route.TransitTime} DAYS
                           </Typography>
                         </Grid>
                         <Grid item md={3} sm={6} xs={6}>

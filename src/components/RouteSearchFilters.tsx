@@ -44,7 +44,7 @@ const RouteSearchFilters: React.FC<Props> = ({ value, onChange }) => {
       </Typography>
       <List dense className={classes.root}>
         <RouteSearchFilter
-          label="Any"
+          label="ANY"
           selected={value === undefined}
           onSelect={callback => onChange(undefined, callback)}
         />
