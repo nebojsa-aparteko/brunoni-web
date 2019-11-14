@@ -243,9 +243,8 @@ const RouteSearch: React.FC<Props> = () => {
                 <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
               </Paper>
               {results.Routes.map((route, i) => (
-                <ExpansionPanel>
+                <ExpansionPanel key={i}>
                   <ExpansionPanelSummary
-                    key={i}
                     className={classes.route}
                     expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1c-content"
@@ -358,7 +357,7 @@ const RouteSearch: React.FC<Props> = () => {
                                         <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
-                                        <div dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)} />
+                                        <span dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)} />
                                       </Typography>
                                     </Grid>
                                   </Grid>
@@ -410,7 +409,7 @@ const RouteSearch: React.FC<Props> = () => {
                                         <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
-                                        <div
+                                        <span
                                           dangerouslySetInnerHTML={createMarkup(intermediatePortInfo.Port.PortName)}
                                         />
                                       </Typography>
@@ -464,7 +463,7 @@ const RouteSearch: React.FC<Props> = () => {
                                         <Box fontWeight="fontWeightBold">Delivery Address</Box>
                                       </Typography>
                                       <Typography variant="body1" display="block" gutterBottom>
-                                        <div
+                                        <span
                                           dangerouslySetInnerHTML={createMarkup(route.DestinationInfo.Port.PortName)}
                                         />
                                       </Typography>
