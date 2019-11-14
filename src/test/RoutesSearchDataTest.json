@@ -1,10 +1,10 @@
 {
   "Routes": [
     {
-      "TransitTime": "28",
+      "TransitTime": "30",
       "ErrorMessage": null,
-      "Service": "NERA - E6",
-      "Routing": "DIRECT",
+      "Service": "ECSA - AE",
+      "Routing": "1 TRANSSHIPMENT",
       "SpaceInfo": "OK",
       "SpaceInfoColor": "#04aa06",
       "idRequest": null,
@@ -14,53 +14,69 @@
         "Port": {
           "ID": "NLRTM",
           "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
+          "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
           "Land": "NETHERLANDS"
         },
         "VoyageInfo": {
-          "VesselName": "MSC ARINA",
-          "VoyageNr": "945E",
+          "VesselName": "CAP SAN ARTEMISSIO",
+          "VoyageNr": "946S",
           "Carrier": "HAMBURG SÜD"
         }
       },
       "DestinationInfo": {
-        "ArrivalDate": "2019-12-12",
+        "ArrivalDate": "2019-12-14",
         "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI GUANDONG INTERNATIONAL<br/> CONTAINER TERMINAL CO. LTD.<br/> HUOGAITANG ROAD, SHENGSI XIAN<br/> ZHOUSHAN SHI, ZHEJIANG SHENG<br/> SHANGHAI / CHINA",
-          "Land": "CHINA"
+          "ID": "BRSSA",
+          "HarbourName": "SALVADOR DE BAHIA",
+          "PortName": "BRAZIL / SALVADOR DE BAHIA<br/> TECON SALVADOR SA<br/> AV ENGENHEIRO OSCAR PONTES<br/> POSTCAL CODE 40460-130<br/> SALVADOR DE BAHIA, BRAZIL",
+          "Land": "BRAZIL"
         },
         "VoyageInfo": {
-          "VesselName": "MSC ARINA",
-          "VoyageNr": "945E",
+          "VesselName": "PEDRO ALVARES CABRAL",
+          "VoyageNr": "949N",
           "Carrier": "HAMBURG SÜD"
         }
       },
-      "IntermediatePortInfos": [],
+      "IntermediatePortInfos": [
+        {
+          "ArrivalDate": "2019-12-07",
+          "DepartureDate": "2019-12-10",
+          "Port": {
+            "ID": "BRSSZ",
+            "HarbourName": "SANTOS",
+            "PortName": null,
+            "Land": "BRAZIL"
+          },
+          "VoyageInfo": {
+            "VesselName": "PEDRO ALVARES CABRAL",
+            "VoyageNr": "949N",
+            "Carrier": "HAMBURG SÜD"
+          }
+        }
+      ],
       "Deadlines": [
         {
           "Typ": "FCL",
-          "Time": "11.11.2019 (MO - 12.00 H)",
+          "Time": "12.11.2019 (DI - 16.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "S/I",
-          "Time": "11.11.2019 (MO - 10.00 H)",
+          "Time": "12.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "VGM",
-          "Time": "11.11.2019 (MO - 10.00 H)",
+          "Time": "12.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         }
       ]
     },
     {
-      "TransitTime": "28",
+      "TransitTime": "35",
       "ErrorMessage": null,
-      "Service": "HMM - E2",
-      "Routing": "DIRECT",
+      "Service": "ECSA - AE",
+      "Routing": "1 TRANSSHIPMENT",
       "SpaceInfo": "OK",
       "SpaceInfoColor": "#04aa06",
       "idRequest": null,
@@ -70,445 +86,69 @@
         "Port": {
           "ID": "NLRTM",
           "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC ARINA",
-          "VoyageNr": "945E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-12",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC ARINA",
-          "VoyageNr": "945E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "11.11.2019 (MO - 11.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "08.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "08.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "39",
-      "ErrorMessage": null,
-      "Service": "HMM - F4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-15",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> ROTTERDAM WORLD GATEWAY<br/> HAVENNUMMER 8970<br/> AMOERWEG 50, MAASVLAKTE 2<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "AL MURABBA",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-24",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "AL MURABBA",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "13.11.2019 (MI - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "12.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "12.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "46",
-      "ErrorMessage": null,
-      "Service": "HMM - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-16",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MUMBAI MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-01",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHAN PHASE 1,2<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MUMBAI MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "14.11.2019 (DO - 04.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "13.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "13.11.2019 (MI - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "45",
-      "ErrorMessage": null,
-      "Service": "NERA - E5",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-17",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MUMBAI MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-01",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MUMBAI MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "13.11.2019 (MI - 16.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "13.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "13.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "65",
-      "ErrorMessage": null,
-      "Service": "NERA - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-17",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM1 TERMINAL ROTTERDAM<br/> COLORADOWEG 50 / HAVENNR. 8203<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC KALINA",
-          "VoyageNr": "946E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-21",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC KALINA",
-          "VoyageNr": "946E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "14.11.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "14.11.2019 (DO - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "14.11.2019 (DO - 08.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "41",
-      "ErrorMessage": null,
-      "Service": "HMM - F2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-18",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
           "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
           "Land": "NETHERLANDS"
         },
         "VoyageInfo": {
-          "VesselName": "MOL TRIUMPH",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-29",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOL TRIUMPH",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "15.11.2019 (FR - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "15.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "14.11.2019 (DO - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "50",
-      "ErrorMessage": null,
-      "Service": "NERA - E4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-18",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "ELLY MAERSK",
-          "VoyageNr": "947E",
+          "VesselName": "CAP SAN ARTEMISSIO",
+          "VoyageNr": "946S",
           "Carrier": "HAMBURG SÜD"
         }
       },
       "DestinationInfo": {
-        "ArrivalDate": "2020-01-07",
+        "ArrivalDate": "2019-12-19",
         "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
+          "ID": "BRSSA",
+          "HarbourName": "SALVADOR DE BAHIA",
+          "PortName": "BRAZIL / SALVADOR DE BAHIA<br/> TECON SALVADOR SA<br/> AV ENGENHEIRO OSCAR PONTES<br/> POSTCAL CODE 40460-130<br/> SALVADOR DE BAHIA, BRAZIL",
+          "Land": "BRAZIL"
         },
         "VoyageInfo": {
-          "VesselName": "ELLY MAERSK",
-          "VoyageNr": "947E",
+          "VesselName": "MSC FIAMMETTA",
+          "VoyageNr": "950N",
           "Carrier": "HAMBURG SÜD"
         }
       },
-      "IntermediatePortInfos": [],
+      "IntermediatePortInfos": [
+        {
+          "ArrivalDate": "2019-12-07",
+          "DepartureDate": "2019-12-14",
+          "Port": {
+            "ID": "BRSSZ",
+            "HarbourName": "SANTOS",
+            "PortName": null,
+            "Land": "BRAZIL"
+          },
+          "VoyageInfo": {
+            "VesselName": "MSC FIAMMETTA",
+            "VoyageNr": "950N",
+            "Carrier": "HAMBURG SÜD"
+          }
+        }
+      ],
       "Deadlines": [
         {
           "Typ": "FCL",
-          "Time": "15.11.2019 (FR - 16.00 H)",
+          "Time": "12.11.2019 (DI - 16.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "S/I",
-          "Time": "15.11.2019 (FR - 10.00 H)",
+          "Time": "12.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "VGM",
-          "Time": "15.11.2019 (FR - 10.00 H)",
+          "Time": "12.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         }
       ]
     },
     {
-      "TransitTime": "50",
+      "TransitTime": "30",
       "ErrorMessage": null,
-      "Service": "HMM - E6",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-18",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "ELLY MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-07",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "ELLY MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "15.11.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "15.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "15.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "NERA - E6",
-      "Routing": "DIRECT",
+      "Service": "ECSA - AE",
+      "Routing": "1 TRANSSHIPMENT",
       "SpaceInfo": "OK",
       "SpaceInfoColor": "#04aa06",
       "idRequest": null,
@@ -518,53 +158,69 @@
         "Port": {
           "ID": "NLRTM",
           "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
+          "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
           "Land": "NETHERLANDS"
         },
         "VoyageInfo": {
-          "VesselName": "MSC LENI",
-          "VoyageNr": "946E",
+          "VesselName": "CAP SAN MARCO",
+          "VoyageNr": "947S",
           "Carrier": "HAMBURG SÜD"
         }
       },
       "DestinationInfo": {
-        "ArrivalDate": "2019-12-19",
+        "ArrivalDate": "2019-12-21",
         "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI GUANDONG INTERNATIONAL<br/> CONTAINER TERMINAL CO. LTD.<br/> HUOGAITANG ROAD, SHENGSI XIAN<br/> ZHOUSHAN SHI, ZHEJIANG SHENG<br/> SHANGHAI / CHINA",
-          "Land": "CHINA"
+          "ID": "BRSSA",
+          "HarbourName": "SALVADOR DE BAHIA",
+          "PortName": "BRAZIL / SALVADOR DE BAHIA<br/> TECON SALVADOR SA<br/> AV ENGENHEIRO OSCAR PONTES<br/> POSTCAL CODE 40460-130<br/> SALVADOR DE BAHIA, BRAZIL",
+          "Land": "BRAZIL"
         },
         "VoyageInfo": {
-          "VesselName": "MSC LENI",
-          "VoyageNr": "946E",
+          "VesselName": "MONTE SARMIENTO",
+          "VoyageNr": "950N",
           "Carrier": "HAMBURG SÜD"
         }
       },
-      "IntermediatePortInfos": [],
+      "IntermediatePortInfos": [
+        {
+          "ArrivalDate": "2019-12-14",
+          "DepartureDate": "2019-12-17",
+          "Port": {
+            "ID": "BRSSZ",
+            "HarbourName": "SANTOS",
+            "PortName": null,
+            "Land": "BRAZIL"
+          },
+          "VoyageInfo": {
+            "VesselName": "MONTE SARMIENTO",
+            "VoyageNr": "950N",
+            "Carrier": "HAMBURG SÜD"
+          }
+        }
+      ],
       "Deadlines": [
         {
           "Typ": "FCL",
-          "Time": "18.11.2019 (MO - 12.00 H)",
+          "Time": "19.11.2019 (DI - 16.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "S/I",
-          "Time": "18.11.2019 (MO - 10.00 H)",
+          "Time": "19.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "VGM",
-          "Time": "18.11.2019 (MO - 10.00 H)",
+          "Time": "19.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         }
       ]
     },
     {
-      "TransitTime": "28",
+      "TransitTime": "34",
       "ErrorMessage": null,
-      "Service": "HMM - E2",
-      "Routing": "DIRECT",
+      "Service": "ECSA - AE",
+      "Routing": "1 TRANSSHIPMENT",
       "SpaceInfo": "OK",
       "SpaceInfoColor": "#04aa06",
       "idRequest": null,
@@ -574,501 +230,69 @@
         "Port": {
           "ID": "NLRTM",
           "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
+          "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
           "Land": "NETHERLANDS"
         },
         "VoyageInfo": {
-          "VesselName": "MSC LENI",
-          "VoyageNr": "946E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-19",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC LENI",
-          "VoyageNr": "946E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "18.11.2019 (MO - 11.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "15.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "15.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "39",
-      "ErrorMessage": null,
-      "Service": "HMM - F4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-22",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> ROTTERDAM WORLD GATEWAY<br/> HAVENNUMMER 8970<br/> AMOERWEG 50, MAASVLAKTE 2<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "LINAH",
-          "VoyageNr": "012E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-31",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "LINAH",
-          "VoyageNr": "012E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "20.11.2019 (MI - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "19.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "19.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "46",
-      "ErrorMessage": null,
-      "Service": "HMM - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-23",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-08",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHAN PHASE 1,2<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "21.11.2019 (DO - 04.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "20.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "20.11.2019 (MI - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "46",
-      "ErrorMessage": null,
-      "Service": "HMM - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-23",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOSCOW MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-08",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHAN PHASE 1,2<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOSCOW MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "21.11.2019 (DO - 04.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "20.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "20.11.2019 (MI - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "45",
-      "ErrorMessage": null,
-      "Service": "NERA - E5",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-24",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOSCOW MAERSK",
-          "VoyageNr": "949E",
+          "VesselName": "CAP SAN MARCO",
+          "VoyageNr": "947S",
           "Carrier": "HAMBURG SÜD"
         }
       },
       "DestinationInfo": {
-        "ArrivalDate": "2020-01-08",
+        "ArrivalDate": "2019-12-25",
         "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
+          "ID": "BRSSA",
+          "HarbourName": "SALVADOR DE BAHIA",
+          "PortName": "BRAZIL / SALVADOR DE BAHIA<br/> TECON SALVADOR SA<br/> AV ENGENHEIRO OSCAR PONTES<br/> POSTCAL CODE 40460-130<br/> SALVADOR DE BAHIA, BRAZIL",
+          "Land": "BRAZIL"
         },
         "VoyageInfo": {
-          "VesselName": "MOSCOW MAERSK",
-          "VoyageNr": "949E",
+          "VesselName": "MONTE ACONCAGUA",
+          "VoyageNr": "951N",
           "Carrier": "HAMBURG SÜD"
         }
       },
-      "IntermediatePortInfos": [],
+      "IntermediatePortInfos": [
+        {
+          "ArrivalDate": "2019-12-14",
+          "DepartureDate": "2019-12-20",
+          "Port": {
+            "ID": "BRSSZ",
+            "HarbourName": "SANTOS",
+            "PortName": null,
+            "Land": "BRAZIL"
+          },
+          "VoyageInfo": {
+            "VesselName": "MONTE ACONCAGUA",
+            "VoyageNr": "951N",
+            "Carrier": "HAMBURG SÜD"
+          }
+        }
+      ],
       "Deadlines": [
         {
           "Typ": "FCL",
-          "Time": "20.11.2019 (MI - 16.00 H)",
+          "Time": "19.11.2019 (DI - 16.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "S/I",
-          "Time": "20.11.2019 (MI - 10.00 H)",
+          "Time": "19.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "VGM",
-          "Time": "20.11.2019 (MI - 10.00 H)",
+          "Time": "19.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         }
       ]
     },
     {
-      "TransitTime": "65",
+      "TransitTime": "30",
       "ErrorMessage": null,
-      "Service": "NERA - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-24",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM1 TERMINAL ROTTERDAM<br/> COLORADOWEG 50 / HAVENNR. 8203<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC EVA",
-          "VoyageNr": "947E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-28",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC EVA",
-          "VoyageNr": "947E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "21.11.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "21.11.2019 (DO - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "21.11.2019 (DO - 08.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "34",
-      "ErrorMessage": null,
-      "Service": "HMM - E4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-25",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC INGY",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-29",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC INGY",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "22.11.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "21.11.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "22.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "50",
-      "ErrorMessage": null,
-      "Service": "NERA - E4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-25",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MATZ MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-14",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MATZ MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "22.11.2019 (FR - 16.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "22.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "22.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "50",
-      "ErrorMessage": null,
-      "Service": "HMM - E6",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-25",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MATZ MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-14",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MATZ MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "22.11.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "22.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "22.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "NERA - E6",
-      "Routing": "DIRECT",
+      "Service": "ECSA - AE",
+      "Routing": "1 TRANSSHIPMENT",
       "SpaceInfo": "OK",
       "SpaceInfoColor": "#04aa06",
       "idRequest": null,
@@ -1078,940 +302,60 @@
         "Port": {
           "ID": "NLRTM",
           "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-26",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI GUANDONG INTERNATIONAL<br/> CONTAINER TERMINAL CO. LTD.<br/> HUOGAITANG ROAD, SHENGSI XIAN<br/> ZHOUSHAN SHI, ZHEJIANG SHENG<br/> SHANGHAI / CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "25.11.2019 (MO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "25.11.2019 (MO - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "25.11.2019 (MO - 10.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "HMM - E2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-28",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2019-12-26",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOGENS MAERSK",
-          "VoyageNr": "947E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "25.11.2019 (MO - 11.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "22.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "22.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "39",
-      "ErrorMessage": null,
-      "Service": "HMM - F4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-29",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> ROTTERDAM WORLD GATEWAY<br/> HAVENNUMMER 8970<br/> AMOERWEG 50, MAASVLAKTE 2<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "UMM QARN",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-07",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "UMM QARN",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "27.11.2019 (MI - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "26.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "26.11.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "45",
-      "ErrorMessage": null,
-      "Service": "NERA - E5",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-30",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MURCIA MAERSK",
-          "VoyageNr": "950E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-14",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MURCIA MAERSK",
-          "VoyageNr": "950E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "27.11.2019 (MI - 16.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "27.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "27.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "46",
-      "ErrorMessage": null,
-      "Service": "HMM - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-11-30",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MURCIA MAERSK",
-          "VoyageNr": "950E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-15",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHAN PHASE 1,2<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MURCIA MAERSK",
-          "VoyageNr": "950E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "28.11.2019 (DO - 04.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "27.11.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "27.11.2019 (MI - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "65",
-      "ErrorMessage": null,
-      "Service": "NERA - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-01",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM1 TERMINAL ROTTERDAM<br/> COLORADOWEG 50 / HAVENNR. 8203<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC VALERIA",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-02-04",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI SHENGDONG INTERNATIONAL<br/> CONTAINER TERMINAL<br/> TONGHUI ROAD / POSTAL 201308<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC VALERIA",
-          "VoyageNr": "948E",
-          "Carrier": "HAMBURG SÜD"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "28.11.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "28.11.2019 (DO - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "28.11.2019 (DO - 08.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "34",
-      "ErrorMessage": null,
-      "Service": "HMM - E4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-02",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIBO MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-05",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIBO MAERSK",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "29.11.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "28.11.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "29.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "41",
-      "ErrorMessage": null,
-      "Service": "HMM - F2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-02",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
           "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
           "Land": "NETHERLANDS"
         },
         "VoyageInfo": {
-          "VesselName": "TIHAMA",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-12",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "TIHAMA",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "29.11.2019 (FR - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "29.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "28.11.2019 (DO - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "50",
-      "ErrorMessage": null,
-      "Service": "HMM - E6",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-02",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIBO MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-21",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIBO MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "29.11.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "29.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "29.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "NERA - E6",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-05",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC GULSUN",
-          "VoyageNr": "948E",
+          "VesselName": "CAP SAN NICOLAS",
+          "VoyageNr": "948S",
           "Carrier": "HAMBURG SÜD"
         }
       },
       "DestinationInfo": {
-        "ArrivalDate": "2020-01-02",
+        "ArrivalDate": "2019-12-28",
         "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> SHANGHAI GUANDONG INTERNATIONAL<br/> CONTAINER TERMINAL CO. LTD.<br/> HUOGAITANG ROAD, SHENGSI XIAN<br/> ZHOUSHAN SHI, ZHEJIANG SHENG<br/> SHANGHAI / CHINA",
-          "Land": "CHINA"
+          "ID": "BRSSA",
+          "HarbourName": "SALVADOR DE BAHIA",
+          "PortName": "BRAZIL / SALVADOR DE BAHIA<br/> TECON SALVADOR SA<br/> AV ENGENHEIRO OSCAR PONTES<br/> POSTCAL CODE 40460-130<br/> SALVADOR DE BAHIA, BRAZIL",
+          "Land": "BRAZIL"
         },
         "VoyageInfo": {
-          "VesselName": "MSC GULSUN",
-          "VoyageNr": "948E",
+          "VesselName": "AMERICO VESPUCIO",
+          "VoyageNr": "951N",
           "Carrier": "HAMBURG SÜD"
         }
       },
-      "IntermediatePortInfos": [],
+      "IntermediatePortInfos": [
+        {
+          "ArrivalDate": "2019-12-21",
+          "DepartureDate": "2019-12-24",
+          "Port": {
+            "ID": "BRSSZ",
+            "HarbourName": "SANTOS",
+            "PortName": null,
+            "Land": "BRAZIL"
+          },
+          "VoyageInfo": {
+            "VesselName": "AMERICO VESPUCIO",
+            "VoyageNr": "951N",
+            "Carrier": "HAMBURG SÜD"
+          }
+        }
+      ],
       "Deadlines": [
         {
           "Typ": "FCL",
-          "Time": "02.12.2019 (MO - 12.00 H)",
+          "Time": "26.11.2019 (DI - 16.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "S/I",
-          "Time": "02.12.2019 (MO - 10.00 H)",
+          "Time": "26.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         },
         {
           "Typ": "VGM",
-          "Time": "02.12.2019 (MO - 10.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "HMM - E2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-05",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC GULSUN",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-02",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC GULSUN",
-          "VoyageNr": "948E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "02.12.2019 (MO - 11.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "29.11.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "29.11.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "39",
-      "ErrorMessage": null,
-      "Service": "HMM - F4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-06",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> ROTTERDAM WORLD GATEWAY<br/> HAVENNUMMER 8970<br/> AMOERWEG 50, MAASVLAKTE 2<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "AL DHAIL",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-14",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "AL DHAIL",
-          "VoyageNr": "011E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "04.12.2019 (MI - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "03.12.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "03.12.2019 (DI - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "46",
-      "ErrorMessage": null,
-      "Service": "HMM - E1",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-07",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MERETE MAERSK",
-          "VoyageNr": "951E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-22",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHAN PHASE 1,2<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MERETE MAERSK",
-          "VoyageNr": "951E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "05.12.2019 (DO - 04.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "04.12.2019 (MI - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "04.12.2019 (MI - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "34",
-      "ErrorMessage": null,
-      "Service": "HMM - E4",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-09",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MERETE MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-12",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MERETE MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "06.12.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "05.12.2019 (DO - 12.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "06.12.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "41",
-      "ErrorMessage": null,
-      "Service": "HMM - F2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-09",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> DDE ECT DELTA TERMINAL<br/> EUROPAWEG 875 / PORT NO. 8200<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOL TRIBUTE",
-          "VoyageNr": "010E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-19",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MOL TRIBUTE",
-          "VoyageNr": "010E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "06.12.2019 (FR - 17.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "06.12.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "05.12.2019 (DO - 09.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "50",
-      "ErrorMessage": null,
-      "Service": "HMM - E6",
-      "Routing": "DIRECT",
-      "SpaceInfo": "ON REQUEST",
-      "SpaceInfoColor": "#ff8200",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-09",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC RIFAYA",
-          "VoyageNr": "950E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-28",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MSC RIFAYA",
-          "VoyageNr": "950E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "06.12.2019 (FR - 23.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "06.12.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "06.12.2019 (FR - 12.00 H)",
-          "AdditionalInfo": null
-        }
-      ]
-    },
-    {
-      "TransitTime": "28",
-      "ErrorMessage": null,
-      "Service": "HMM - E2",
-      "Routing": "DIRECT",
-      "SpaceInfo": "OK",
-      "SpaceInfoColor": "#04aa06",
-      "idRequest": null,
-      "idRoute": null,
-      "OriginInfo": {
-        "DepartureDate": "2019-12-12",
-        "Port": {
-          "ID": "NLRTM",
-          "HarbourName": "ROTTERDAM",
-          "PortName": "NETHERLANDS / ROTTERDAM<br/> APM TERMINALS MAASVLAKTE II B.V.<br/> EUROPAWEG 910 / HAVENNR. 8410<br/> ROTTERDAM, NETHERLANDS",
-          "Land": "NETHERLANDS"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIE MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "DestinationInfo": {
-        "ArrivalDate": "2020-01-09",
-        "Port": {
-          "ID": "CNSHA",
-          "HarbourName": "SHANGHAI",
-          "PortName": "CHINA / SHANGHAI<br/> YANGSHA PHASE 3,4<br/> 1299, GANGHUARD,<br/> PUDONG NEW AREA<br/> SHANGHAI, CHINA",
-          "Land": "CHINA"
-        },
-        "VoyageInfo": {
-          "VesselName": "MARIE MAERSK",
-          "VoyageNr": "949E",
-          "Carrier": "HYUNDAI"
-        }
-      },
-      "IntermediatePortInfos": [],
-      "Deadlines": [
-        {
-          "Typ": "FCL",
-          "Time": "09.12.2019 (MO - 11.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "S/I",
-          "Time": "06.12.2019 (FR - 10.00 H)",
-          "AdditionalInfo": null
-        },
-        {
-          "Typ": "VGM",
-          "Time": "06.12.2019 (FR - 12.00 H)",
+          "Time": "26.11.2019 (DI - 10.00 H)",
           "AdditionalInfo": null
         }
       ]

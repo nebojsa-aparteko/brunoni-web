@@ -6,19 +6,25 @@ import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import {
-  Theme,
-  makeStyles,
   Box,
-  Paper,
-  Grid,
   Divider,
   ExpansionPanel,
-  ExpansionPanelSummary,
+  ExpansionPanelActions,
   ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Grid,
+  makeStyles,
+  Paper,
+  Theme,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';
-import RouteSearchResults from '../model/route-search/RouteSearchResults';
+import RouteSearchResults, {
+  ItemType,
+  RouteSearchResultDestinationInfo,
+  RouteSearchResultIntermediatePortInfo,
+  RouteSearchResultOriginInfo,
+} from '../model/route-search/RouteSearchResults';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
@@ -27,6 +33,7 @@ import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import { Skeleton } from '@material-ui/lab';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
 import { useSnackbar } from 'notistack';
 
@@ -35,6 +42,11 @@ interface DotProps {
 }
 
 interface Props {}
+
+interface RouteSearchItineraryItemProps {
+  itineraryItem: RouteSearchResultOriginInfo | RouteSearchResultIntermediatePortInfo | RouteSearchResultDestinationInfo;
+  noLine: boolean;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   hideSearch: {
@@ -69,7 +81,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(4),
   },
   routePoint: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 0),
     position: 'relative',
   },
   paper: {
@@ -217,6 +229,99 @@ const RouteSearch: React.FC<Props> = () => {
     );
   };
 
+  const RouteSearchItineraryItem: React.FC<RouteSearchItineraryItemProps> = ({ itineraryItem, noLine }) => (
+    <div className={classes.routePoint}>
+      <DotAndLine noLine={noLine} />
+      <Box>
+        <Paper className={classes.paper}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="h5" display="block">
+                <Box fontWeight="fontWeightMedium">
+                  {isIntermediary(itineraryItem)
+                    ? `${formatDateString(
+                        (itineraryItem as RouteSearchResultIntermediatePortInfo).ArrivalDate,
+                      )} - ${formatDateString((itineraryItem as RouteSearchResultIntermediatePortInfo).DepartureDate)}`
+                    : (itineraryItem as RouteSearchResultOriginInfo).DepartureDate
+                    ? formatDateString((itineraryItem as RouteSearchResultOriginInfo).DepartureDate)
+                    : formatDateString((itineraryItem as RouteSearchResultDestinationInfo).ArrivalDate)}
+                </Box>
+              </Typography>
+              <Typography variant="subtitle1" display="block" gutterBottom>
+                {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
+              </Typography>
+            </Grid>
+            <Grid item md={4} sm={12}>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <DirectionsBoatIcon color="primary" />
+                </Grid>
+                <Grid>
+                  <Typography variant="subtitle2" display="block">
+                    <Box fontWeight="fontWeightBold">Vessel</Box>
+                  </Typography>
+                  <Typography variant="body2" display="block" gutterBottom>
+                    {itineraryItem.VoyageInfo.VesselName}
+                  </Typography>
+                  <Typography variant="body2" display="block" gutterBottom>
+                    {itineraryItem.VoyageInfo.VoyageNr}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item md={4} sm={12}>
+              <Grid container spacing={2}>
+                <Grid item>
+                  <DirectionsPortIcon color="primary" />
+                </Grid>
+                <Grid>
+                  <Typography variant="subtitle2" display="block">
+                    <Box fontWeight="fontWeightBold">Port</Box>
+                  </Typography>
+                  <Typography variant="body2" display="block" gutterBottom>
+                    {itineraryItem.Port.HarbourName}
+                  </Typography>
+                  <Typography variant="body2" display="block" gutterBottom>
+                    {itineraryItem.Port.Land}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            {!isIntermediary(itineraryItem) && (
+              <Grid item md={4} sm={12}>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <FlagIcon color="primary" />
+                  </Grid>
+                  <Grid>
+                    <Typography variant="subtitle2" display="block">
+                      <Box fontWeight="fontWeightBold">Delivery Address</Box>
+                    </Typography>
+                    <Typography variant="body1" display="block" gutterBottom>
+                      <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+        </Paper>
+      </Box>
+    </div>
+  );
+
+  const isIntermediary = (
+    itineraryItem:
+      | RouteSearchResultOriginInfo
+      | RouteSearchResultIntermediatePortInfo
+      | RouteSearchResultDestinationInfo,
+  ) => {
+    return (
+      (itineraryItem as RouteSearchResultIntermediatePortInfo).ArrivalDate &&
+      (itineraryItem as RouteSearchResultIntermediatePortInfo).DepartureDate
+    );
+  };
+
   const createMarkup = (htmlMarkup: any) => {
     return { __html: htmlMarkup };
   };
@@ -255,7 +360,7 @@ const RouteSearch: React.FC<Props> = () => {
               </Paper>
               {results.Routes.map((route, i) => (
                 <Box key={i}>
-                  <ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }} defaultExpanded>
                     <ExpansionPanelSummary
                       className={classes.route}
                       expandIcon={<ExpandMoreIcon />}
@@ -326,171 +431,44 @@ const RouteSearch: React.FC<Props> = () => {
                       </Grid>
                     </ExpansionPanelSummary>
 
-                    <ExpansionPanelDetails>
-                      <div className={classes.stepsWrapper}>
-                        {route.OriginInfo && (
-                          <div className={classes.routePoint}>
-                            <DotAndLine noLine={false} />
-                            <Box>
-                              <Paper className={classes.paper}>
-                                <Grid container spacing={3}>
-                                  <Grid item xs={12}>
-                                    <Typography variant="h5" display="block">
-                                      <Box fontWeight="fontWeightMedium">
-                                        {formatDateString(route.OriginInfo.DepartureDate)}
-                                      </Box>
-                                    </Typography>
-                                    <Typography variant="subtitle1" display="block" gutterBottom>
-                                      {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item md={4} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <DirectionsBoatIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Vessel</Box>
-                                        </Typography>
-                                        <Typography variant="body2" display="block" gutterBottom>
-                                          {route.OriginInfo.VoyageInfo.VesselName}
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                  <Grid item md={8} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <FlagIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Delivery Address</Box>
-                                        </Typography>
-                                        <Typography variant="body1" display="block" gutterBottom>
-                                          <span
-                                            dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)}
-                                          />
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
-                              </Paper>
-                            </Box>
-                          </div>
-                        )}
+                    <ExpansionPanelDetails className={classes.route}>
+                      {/* Deadlines Display */}
 
-                        {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                          <div key={i} className={classes.routePoint}>
-                            <DotAndLine noLine={false} />
-                            <Box>
-                              <Paper className={classes.paper}>
-                                <Grid container spacing={3}>
-                                  <Grid item xs={12}>
-                                    <Typography variant="h5" display="block">
-                                      <Box fontWeight="fontWeightMedium">
-                                        {formatDateString(intermediatePortInfo.DepartureDate)}
-                                      </Box>
-                                    </Typography>
-                                    <Typography variant="subtitle1" display="block" gutterBottom>
-                                      {intermediatePortInfo.Port.HarbourName}, {intermediatePortInfo.Port.Land}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item md={4} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <DirectionsBoatIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Vessel</Box>
-                                        </Typography>
-                                        <Typography variant="body2" display="block" gutterBottom>
-                                          {intermediatePortInfo.VoyageInfo.VesselName}
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                  <Grid item md={8} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <FlagIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Delivery Address</Box>
-                                        </Typography>
-                                        <Typography variant="body1" display="block" gutterBottom>
-                                          <span
-                                            dangerouslySetInnerHTML={createMarkup(intermediatePortInfo.Port.PortName)}
-                                          />
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
-                              </Paper>
-                            </Box>
-                          </div>
-                        ))}
+                      <Grid container>
+                        <Grid item container xs={12} spacing={2}>
+                          {route.Deadlines.map((deadline, i) => (
+                            <Grid key={i} item md={3} sm={3}>
+                              <Typography variant="subtitle2" display="block" gutterBottom>
+                                <Box fontWeight="fontWeightBold">{deadline.Typ} closing</Box>
+                              </Typography>
+                              <Typography variant="body2" display="block" gutterBottom>
+                                {deadline.Time}
+                              </Typography>
+                            </Grid>
+                          ))}
+                        </Grid>
 
-                        {route.DestinationInfo && (
-                          <div className={classes.routePoint}>
-                            <DotAndLine noLine={true} />
-                            <Box>
-                              <Paper className={classes.paper}>
-                                <Grid container spacing={3}>
-                                  <Grid item xs={12}>
-                                    <Typography variant="h5" display="block">
-                                      <Box fontWeight="fontWeightMedium">
-                                        {formatDateString(route.DestinationInfo.ArrivalDate)}
-                                      </Box>
-                                    </Typography>
-                                    <Typography variant="subtitle1" display="block" gutterBottom>
-                                      {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item md={4} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <DirectionsBoatIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Vessel</Box>
-                                        </Typography>
-                                        <Typography variant="body2" display="block" gutterBottom>
-                                          {route.DestinationInfo.VoyageInfo.VesselName}
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                  <Grid item md={8} sm={12}>
-                                    <Grid container spacing={2}>
-                                      <Grid item>
-                                        <FlagIcon color="primary" />
-                                      </Grid>
-                                      <Grid>
-                                        <Typography variant="subtitle2" display="block">
-                                          <Box fontWeight="fontWeightBold">Delivery Address</Box>
-                                        </Typography>
-                                        <Typography variant="body1" display="block" gutterBottom>
-                                          <span
-                                            dangerouslySetInnerHTML={createMarkup(route.DestinationInfo.Port.PortName)}
-                                          />
-                                        </Typography>
-                                      </Grid>
-                                    </Grid>
-                                  </Grid>
-                                </Grid>
-                              </Paper>
-                            </Box>
-                          </div>
-                        )}
-                      </div>
+                        {/* Itinerary */}
+
+                        <Grid item xs={12}>
+                          {route.OriginInfo && (
+                            <RouteSearchItineraryItem noLine={false} itineraryItem={route.OriginInfo} />
+                          )}
+
+                          {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
+                            <RouteSearchItineraryItem noLine={false} itineraryItem={intermediatePortInfo} />
+                          ))}
+
+                          {route.DestinationInfo && (
+                            <RouteSearchItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />
+                          )}
+                        </Grid>
+                      </Grid>
                     </ExpansionPanelDetails>
+                    <ExpansionPanelActions>
+                      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING.
+                      ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                    </ExpansionPanelActions>
                   </ExpansionPanel>
                 </Box>
               ))}
