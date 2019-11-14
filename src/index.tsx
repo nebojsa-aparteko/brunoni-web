@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { SnackbarProvider } from 'notistack';
 import { ThemeProvider } from '@material-ui/styles';
 import { CssBaseline } from '@material-ui/core';
 import theme from './theme';
 import App from './App';
+import UserProvider from './components/UserProvider';
 import * as serviceWorker from './serviceWorker';
 import FontFaceObserver from 'fontfaceobserver';
 
@@ -17,8 +19,12 @@ if (process.env.NODE_ENV !== 'production') {
 const app = (
   <Router>
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <App />
+      <SnackbarProvider>
+        <UserProvider>
+          <CssBaseline />
+          <App />
+        </UserProvider>
+      </SnackbarProvider>
     </ThemeProvider>
   </Router>
 );

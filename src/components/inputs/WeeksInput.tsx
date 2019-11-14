@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { Theme, makeStyles, FormControl, InputLabel, Select, MenuItem, useTheme } from '@material-ui/core';
 
 interface Props {
@@ -37,7 +37,7 @@ const WeeksInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose })
         labelId="demo-simple-select-outlined-label"
         id="demo-simple-select-outlined"
         value={value || ''}
-        onChange={e => onChange((e.target as any).value)}
+        onChange={(e: ChangeEvent<{ value: unknown }>) => onChange(e.target.value as number)}
         open={open}
         onOpen={onOpen}
         onClose={onClose}

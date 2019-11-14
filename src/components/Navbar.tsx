@@ -1,9 +1,11 @@
 import React from 'react';
 import changeCase from 'change-case';
-import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button, Grid } from '@material-ui/core';
+import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import Container from './Container';
+import IdentityWidget from './IdentityWidget';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,40 +35,16 @@ const useStyles = makeStyles((theme: Theme) =>
     spacer: {
       flex: 1,
     },
-    link: {
-      // height: 40,
-      // padding: '0 10px',
-      // lineHeight: '40px',
-      // color: '#666', // TODO Externalize.
-      // fontWeight: 300,
-      // letterSpacing: 1,
-      // transition: 'all .15s ease-in-out',
-      // transform: 'translateZ(0)',
-      // '&::after': {
-      //   content: "''",
-      //   position: 'absolute',
-      //   bottom: 2,
-      //   right: 10,
-      //   left: 10,
-      //   height: 1,
-      //   background: '#4b6992', // TODO Externalize.
-      //   opacity: 0,
-      //   transition: 'height 0.3s, opacity 0.3s, transform 0.3s',
-      //   transform: 'translateY(-10px)',
-      // },
-      // '&:hover': {
-      //   textDecoration: 'none',
-      //   '&::after': {
-      //     opacity: 1,
-      //     transform: 'translateY(0px)',
-      //   },
-      // },
+    item: {
+      display: 'flex',
+      marginLeft: theme.spacing(2),
     },
   }),
 );
 
 const Navbar: React.FC = () => {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <AppBar position="relative" className={classes.appBar}>
@@ -80,16 +58,22 @@ const Navbar: React.FC = () => {
             />
           </Link>
           <div className={classes.spacer} />
-          <Grid container justify="flex-end" spacing={2}>
-            <Grid item>
-              <Button component="a" href="https://www.brunoni.ch/links">
+          {process.env.REACT_APP_BRAND === 'brunoni' ? (
+            <div className={classes.item}>
+              <Button component="a" href="https://brunoni.ch">
                 Visit brunoni.ch
               </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="outlined">Login</Button>
-            </Grid>
-          </Grid>
+            </div>
+          ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+            <div className={classes.item}>
+              <Button component="a" href="https://allmarine.ch">
+                Visit allmarine.ch
+              </Button>
+            </div>
+          ) : null}
+          <div className={classes.item}>
+            <IdentityWidget />
+          </div>
         </Toolbar>
       </Container>
     </AppBar>
