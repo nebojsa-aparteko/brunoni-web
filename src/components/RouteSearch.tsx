@@ -28,8 +28,6 @@ import { Skeleton } from '@material-ui/lab';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import FlagIcon from '@material-ui/icons/Flag';
 
-import routesTestData from '../test/RoutesSearchDataTest';
-
 interface DotProps {
   noLine: boolean;
 }
@@ -127,7 +125,6 @@ const RouteSearch: React.FC<Props> = () => {
   const [searchInProgress, setSearchInProgress] = useState(false);
 
   useEffect(() => {
-    setResults(update('Routes', sorting.sort)(JSON.parse(routesTestData) as RouteSearchResults));
     if (!action) {
       return undefined;
     }
@@ -242,7 +239,7 @@ const RouteSearch: React.FC<Props> = () => {
                 <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
               </Paper>
               {results.Routes.map((route, i) => (
-                <ExpansionPanel defaultExpanded>
+                <ExpansionPanel>
                   <ExpansionPanelSummary
                     key={i}
                     className={classes.route}
@@ -471,117 +468,6 @@ const RouteSearch: React.FC<Props> = () => {
                       )}
                     </div>
                   </ExpansionPanelDetails>
-
-                  {/*<ExpansionPanelDetails>*/}
-                  {/*  <Grid container direction="column">*/}
-                  {/*    {route.OriginInfo && (*/}
-                  {/*      <div className={classes.wrapper}>*/}
-                  {/*        <DotAndLine />*/}
-                  {/*        <div className={classes.route}>*/}
-                  {/*          <Grid container spacing={2}>*/}
-                  {/*            <Grid item md={3} sm={6} xs={12}>*/}
-                  {/*              <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*                Vessel*/}
-                  {/*              </Typography>*/}
-                  {/*              <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*                {route.OriginInfo.VoyageInfo.VesselName}*/}
-                  {/*              </Typography>*/}
-                  {/*            </Grid>*/}
-                  {/*            <Grid item md={4} sm={12}>*/}
-                  {/*              <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*                Origin*/}
-                  {/*              </Typography>*/}
-                  {/*              <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*                {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}*/}
-                  {/*              </Typography>*/}
-                  {/*              <Typography variant="body2" display="block">*/}
-                  {/*                ETS {route.OriginInfo.DepartureDate}*/}
-                  {/*              </Typography>*/}
-                  {/*            </Grid>*/}
-                  {/*            <Grid item md={4} sm={12}>*/}
-                  {/*              <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*                Delivery Address*/}
-                  {/*              </Typography>*/}
-                  {/*              <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*                <div dangerouslySetInnerHTML={createMarkup(route.OriginInfo.Port.PortName)} />*/}
-                  {/*              </Typography>*/}
-                  {/*            </Grid>*/}
-                  {/*          </Grid>*/}
-                  {/*        </div>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-
-                  {/*    {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (*/}
-                  {/*      <div key={i} className={classes.route}>*/}
-                  {/*        <DotAndLine />*/}
-                  {/*        <Grid container spacing={2}>*/}
-                  {/*          <Grid item md={3} sm={6} xs={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Vessel*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              {intermediatePortInfo.VoyageInfo.VesselName}*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*          <Grid item md={4} sm={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Origin*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              {intermediatePortInfo.Port.HarbourName}, {intermediatePortInfo.Port.Land}*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body2" display="block">*/}
-                  {/*              ETA {intermediatePortInfo.DepartureDate}*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*          <Grid item md={4} sm={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Delivery Address*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              <div dangerouslySetInnerHTML={createMarkup(intermediatePortInfo.Port.PortName)} />*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*        </Grid>*/}
-                  {/*      </div>*/}
-                  {/*    ))}*/}
-
-                  {/*    {route.DestinationInfo && (*/}
-                  {/*      <div className={classes.route}>*/}
-                  {/*        <DotAndLine />*/}
-                  {/*        <Grid container spacing={2}>*/}
-                  {/*          <Grid item md={3} sm={6} xs={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Vessel*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              {route.DestinationInfo.VoyageInfo.VesselName}*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*          <Grid item md={4} sm={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Origin*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body2" display="block">*/}
-                  {/*              ETA {route.DestinationInfo.ArrivalDate}*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*          <Grid item md={4} sm={12}>*/}
-                  {/*            <Typography variant="subtitle2" display="block" gutterBottom>*/}
-                  {/*              Delivery Address*/}
-                  {/*            </Typography>*/}
-                  {/*            <Typography variant="body1" display="block" gutterBottom>*/}
-                  {/*              <div dangerouslySetInnerHTML={createMarkup(route.DestinationInfo.Port.PortName)} />*/}
-                  {/*            </Typography>*/}
-                  {/*          </Grid>*/}
-                  {/*        </Grid>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*  </Grid>*/}
-                  {/*</ExpansionPanelDetails>*/}
                 </ExpansionPanel>
               ))}
             </Grid>
