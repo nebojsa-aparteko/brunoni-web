@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import Sticky from 'react-stickynode';
-import querySting, { stringify } from 'querystring';
+import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
@@ -14,8 +14,6 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
-  ExpansionPanelActions,
-  Button,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';

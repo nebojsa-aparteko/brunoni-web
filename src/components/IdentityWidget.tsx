@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const IdentityWidget: React.FC<Props> = ({}) => {
+const IdentityWidget: React.FC<Props> = () => {
   const classes = useStyles();
   const user = useUser();
 

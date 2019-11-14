@@ -5,7 +5,6 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import Container from './Container';
 import IdentityWidget from './IdentityWidget';
-import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,7 +43,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Navbar: React.FC = () => {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <AppBar position="relative" className={classes.appBar}>

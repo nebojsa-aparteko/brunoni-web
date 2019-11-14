@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {}
 
-const LoginWidget: React.FC<Props> = ({}) => {
+const LoginWidget: React.FC<Props> = () => {
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
@@ -59,13 +59,13 @@ const LoginWidget: React.FC<Props> = ({}) => {
       try {
         const search = queryString.stringify(omit(params, 'logIn'));
         history.replace({ ...location, search });
-        const result = await firebase.auth().signInWithCustomToken(token);
+        await firebase.auth().signInWithCustomToken(token);
         setOpen(false);
       } catch (e) {
         console.error(e);
       }
     })();
-  }, [token]);
+  }, [token, history, location, open, params]);
 
   return (
     <Fragment>

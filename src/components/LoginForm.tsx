@@ -2,10 +2,6 @@ import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'reac
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { CircularProgress, TextField } from '@material-ui/core';
-import querySting from 'querystring';
-import formatDate from 'date-fns/format';
-import update from 'lodash/fp';
-import RouteSearchResults from '../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles((theme: Theme) => ({
   button: {
@@ -108,6 +104,7 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
         label="Your Work Email Address"
         value={emailAddress}
         onChange={handleEmailAddressChange}
+        error={Boolean(error)}
         fullWidth
         autoFocus
       />

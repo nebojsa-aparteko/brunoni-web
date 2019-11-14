@@ -8,7 +8,7 @@ import firebase from '../firebase';
 
 interface Props {}
 
-const UserWidget: React.FC<Props> = ({}) => {
+const UserWidget: React.FC<Props> = () => {
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
 
