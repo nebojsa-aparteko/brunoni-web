@@ -71,15 +71,15 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
               </Typography>
             </Grid>
             <Grid item md={4} sm={12}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} wrap="nowrap">
                 <Grid item>
                   <DirectionsBoatIcon color="primary" />
                 </Grid>
-                <Grid>
+                <Grid item>
                   <Typography variant="subtitle2" display="block">
                     <Box fontWeight="fontWeightBold">Vessel</Box>
                   </Typography>
-                  <Typography variant="body2" display="block" gutterBottom>
+                  <Typography variant="body2" display="block">
                     {itineraryItem.VoyageInfo.VesselName}
                   </Typography>
                   <Typography variant="body2" display="block" gutterBottom>
@@ -88,16 +88,16 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item md={4} sm={12}>
-              <Grid container spacing={2}>
+            <Grid item md={3} sm={12}>
+              <Grid container spacing={2} wrap="nowrap">
                 <Grid item>
                   <DirectionsPortIcon color="primary" />
                 </Grid>
-                <Grid>
+                <Grid item>
                   <Typography variant="subtitle2" display="block">
                     <Box fontWeight="fontWeightBold">Port</Box>
                   </Typography>
-                  <Typography variant="body2" display="block" gutterBottom>
+                  <Typography variant="body2" display="block">
                     {itineraryItem.Port.HarbourName}
                   </Typography>
                   <Typography variant="body2" display="block" gutterBottom>
@@ -107,16 +107,16 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
               </Grid>
             </Grid>
             {!isIntermediary(itineraryItem) && (
-              <Grid item md={4} sm={12}>
-                <Grid container spacing={2}>
+              <Grid item md={5} sm={12}>
+                <Grid container spacing={2} wrap="nowrap">
                   <Grid item>
                     <FlagIcon color="primary" />
                   </Grid>
-                  <Grid>
+                  <Grid item>
                     <Typography variant="subtitle2" display="block">
                       <Box fontWeight="fontWeightBold">Delivery Address</Box>
                     </Typography>
-                    <Typography variant="body1" display="block" gutterBottom>
+                    <Typography variant="body2" display="block">
                       <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
                     </Typography>
                   </Grid>
