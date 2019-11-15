@@ -392,17 +392,6 @@ const RouteSearch: React.FC<Props> = () => {
 
                         <Grid item md={3} sm={12}>
                           <Typography variant="subtitle2" display="block" gutterBottom>
-                            <Box fontWeight="fontWeightBold">Arrival</Box>
-                          </Typography>
-                          <Typography variant="body1" display="block">
-                            ETA {formatDateString(route.DestinationInfo.ArrivalDate)}
-                          </Typography>
-                          <Typography variant="body2" display="block">
-                            {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
-                          </Typography>
-                        </Grid>
-                        <Grid item md={3} sm={12}>
-                          <Typography variant="subtitle2" display="block" gutterBottom>
                             <Box fontWeight="fontWeightBold">Departure</Box>
                           </Typography>
                           <Typography variant="body1" display="block">
@@ -410,6 +399,17 @@ const RouteSearch: React.FC<Props> = () => {
                           </Typography>
                           <Typography variant="body2" display="block">
                             {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
+                          </Typography>
+                        </Grid>
+                        <Grid item md={3} sm={12}>
+                          <Typography variant="subtitle2" display="block" gutterBottom>
+                            <Box fontWeight="fontWeightBold">Arrival</Box>
+                          </Typography>
+                          <Typography variant="body1" display="block">
+                            ETA {formatDateString(route.DestinationInfo.ArrivalDate)}
+                          </Typography>
+                          <Typography variant="body2" display="block">
+                            {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
                           </Typography>
                         </Grid>
                         <Grid item md={3} sm={6} xs={6}>

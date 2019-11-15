@@ -15,13 +15,13 @@ export const sortingOptions: Sorting[] = [
     sort: (routes: RouteSearchResult[]) => sortBy(routes, (route: RouteSearchResult) => route.TransitTime),
   },
   {
+    name: 'Earliest departure date',
+    sort: (routes: RouteSearchResult[]) => sortBy(routes, (route: RouteSearchResult) => route.OriginInfo.DepartureDate),
+  },
+  {
     name: 'Earliest arrival date',
     sort: (routes: RouteSearchResult[]) =>
       sortBy(routes, (route: RouteSearchResult) => route.DestinationInfo.ArrivalDate),
-  },
-  {
-    name: 'Earliest departure date',
-    sort: (routes: RouteSearchResult[]) => sortBy(routes, (route: RouteSearchResult) => route.OriginInfo.DepartureDate),
   },
 ];
 
