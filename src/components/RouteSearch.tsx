@@ -360,7 +360,7 @@ const RouteSearch: React.FC<Props> = () => {
               </Paper>
               {results.Routes.map((route, i) => (
                 <Box key={i}>
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }} defaultExpanded>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
                     <ExpansionPanelSummary
                       className={classes.route}
                       expandIcon={<ExpandMoreIcon />}
@@ -454,20 +454,24 @@ const RouteSearch: React.FC<Props> = () => {
                           {route.OriginInfo && (
                             <RouteSearchItineraryItem noLine={false} itineraryItem={route.OriginInfo} />
                           )}
-
                           {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
                             <RouteSearchItineraryItem noLine={false} itineraryItem={intermediatePortInfo} />
                           ))}
-
                           {route.DestinationInfo && (
                             <RouteSearchItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />
                           )}
                         </Grid>
                       </Grid>
                     </ExpansionPanelDetails>
-                    <ExpansionPanelActions>
-                      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING.
-                      ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                    <ExpansionPanelActions className={classes.route}>
+                      <Grid>
+                        <Box paddingBottom={1}>SERVICE {route.Service}</Box>
+                        <Divider light />
+                        <Box paddingTop={1}>
+                          ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY
+                          BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                        </Box>
+                      </Grid>
                     </ExpansionPanelActions>
                   </ExpansionPanel>
                 </Box>
