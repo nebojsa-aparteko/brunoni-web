@@ -28,6 +28,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const focusAndSelect = (input: HTMLInputElement) => {
+  input.focus();
+  input.setSelectionRange(0, input.value.length);
+};
+
 const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisibility }) => {
   const classes = useStyles();
   const [busy, setBusy] = useState(false);
@@ -63,7 +68,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
 
   const handleOriginPortChange = (port: Port) => {
     setOriginPort(port);
-    destinationInput.current!.focus();
+    focusAndSelect(destinationInput.current!);
   };
 
   const handleDestinationPortChange = (port: Port) => {
@@ -92,9 +97,9 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
 
   const handleSearch = () => {
     if (!originPort) {
-      originInput.current!.focus();
+      focusAndSelect(originInput.current!);
     } else if (!destinationPort) {
-      destinationInput.current!.focus();
+      focusAndSelect(destinationInput.current!);
     } else if (!date) {
       setDateOpen(true);
     } else if (!weeks) {
