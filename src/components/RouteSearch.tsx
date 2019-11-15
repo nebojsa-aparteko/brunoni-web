@@ -457,7 +457,7 @@ const RouteSearch: React.FC<Props> = () => {
                             <RouteSearchItineraryItem noLine={false} itineraryItem={route.OriginInfo} />
                           )}
                           {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                            <RouteSearchItineraryItem noLine={false} itineraryItem={intermediatePortInfo} />
+                            <RouteSearchItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
                           ))}
                           {route.DestinationInfo && (
                             <RouteSearchItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />
