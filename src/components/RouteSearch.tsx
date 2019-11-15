@@ -375,16 +375,18 @@ const RouteSearch: React.FC<Props> = () => {
                             {route.OriginInfo.VoyageInfo.Carrier}
                           </Typography>
                         </Grid>
-                        <Grid item md={3} sm={12}>
-                          <Typography variant="subtitle2" display="block" gutterBottom>
-                            <Box fontWeight="fontWeightBold">Space Availability</Box>
-                          </Typography>
-                          <Chip
-                            label={route.SpaceInfo}
-                            style={{ backgroundColor: route.SpaceInfoColor }}
-                            className={classes.chip}
-                          />
-                        </Grid>
+                        {route.SpaceInfo && (
+                          <Grid item md={3} sm={12}>
+                            <Typography variant="subtitle2" display="block" gutterBottom>
+                              <Box fontWeight="fontWeightBold">Space Availability</Box>
+                            </Typography>
+                            <Chip
+                              label={route.SpaceInfo}
+                              style={{ backgroundColor: route.SpaceInfoColor }}
+                              className={classes.chip}
+                            />
+                          </Grid>
+                        )}
 
                         <Grid item xs={12}>
                           <Divider light />
