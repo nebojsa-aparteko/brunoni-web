@@ -24,15 +24,20 @@ export interface RouteSearchResult {
   Deadlines: RouteSearchResultDeadline[];
 }
 
-export interface RouteSearchResultOriginInfo {
-  type: 'origin';
+export interface ItineraryItem {
+  ArrivalDate?: string;
+  DepartureDate?: string;
+  Port: Port;
+  VoyageInfo: RouteSearchResultVoyageInfo;
+}
+
+export interface RouteSearchResultOriginInfo extends ItineraryItem {
   DepartureDate: string;
   Port: Port;
   VoyageInfo: RouteSearchResultVoyageInfo;
 }
 
-export interface RouteSearchResultDestinationInfo {
-  type: ItemType.Destination;
+export interface RouteSearchResultDestinationInfo extends ItineraryItem {
   ArrivalDate: string;
   Port: Port;
   VoyageInfo: RouteSearchResultVoyageInfo;
@@ -44,8 +49,7 @@ export interface RouteSearchResultVoyageInfo {
   Carrier: string;
 }
 
-export interface RouteSearchResultIntermediatePortInfo {
-  type: ItemType.Intermediate;
+export interface RouteSearchResultIntermediatePortInfo extends ItineraryItem {
   ArrivalDate: string;
   DepartureDate: string;
   Port: Port;

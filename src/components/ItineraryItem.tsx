@@ -5,13 +5,7 @@ import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
 import DotAndLine from './DotAndLine';
-import {
-  RouteSearchResultDestinationInfo,
-  RouteSearchResultIntermediatePortInfo,
-  RouteSearchResultOriginInfo,
-} from '../model/route-search/RouteSearchResults';
-
-interface Props {}
+import { ItineraryItem as ItineraryItemModel } from '../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
@@ -26,24 +20,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  itineraryItem: RouteSearchResultOriginInfo | RouteSearchResultIntermediatePortInfo | RouteSearchResultDestinationInfo;
+  itineraryItem: ItineraryItemModel;
   noLine: boolean;
 }
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
-const isIntermediary = (
-  itineraryItem: RouteSearchResultOriginInfo | RouteSearchResultIntermediatePortInfo | RouteSearchResultDestinationInfo,
-) => {
-  return (
-    (itineraryItem as RouteSearchResultIntermediatePortInfo).ArrivalDate &&
-    (itineraryItem as RouteSearchResultIntermediatePortInfo).DepartureDate
-  );
-};
+const isIntermediary = (itineraryItem: ItineraryItemModel) => itineraryItem.ArrivalDate && itineraryItem.DepartureDate;
 
-const createMarkup = (htmlMarkup: any) => {
-  return { __html: htmlMarkup };
-};
+const createMarkup = (htmlMarkup: any) => ({ __html: htmlMarkup });
 
 const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
   const classes = useStyles();
@@ -58,12 +43,12 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
               <Typography variant="h5" display="block">
                 <Box fontWeight="fontWeightMedium">
                   {isIntermediary(itineraryItem)
-                    ? `${formatDateString(
-                        (itineraryItem as RouteSearchResultIntermediatePortInfo).ArrivalDate,
-                      )} - ${formatDateString((itineraryItem as RouteSearchResultIntermediatePortInfo).DepartureDate)}`
-                    : (itineraryItem as RouteSearchResultOriginInfo).DepartureDate
-                    ? formatDateString((itineraryItem as RouteSearchResultOriginInfo).DepartureDate)
-                    : formatDateString((itineraryItem as RouteSearchResultDestinationInfo).ArrivalDate)}
+                    ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(
+                        itineraryItem.DepartureDate!,
+                      )}`
+                    : itineraryItem.DepartureDate
+                    ? formatDateString(itineraryItem.DepartureDate!)
+                    : formatDateString(itineraryItem.ArrivalDate!)}
                 </Box>
               </Typography>
               <Typography variant="subtitle1" display="block" gutterBottom>
