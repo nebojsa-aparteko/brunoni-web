@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Mousetrap from 'mousetrap';
 import set from 'lodash/set';
 import { Theme, makeStyles, Grid, Button, Paper, CircularProgress } from '@material-ui/core';
 import Port from '../model/Port';
@@ -50,6 +51,19 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
   const setDestinationPort = (port: Port) => onChange(set(value, 'destinationPort', port));
   const setDate = (date: Date) => onChange(set(value, 'date', date));
   const setWeeks = (weeks: number) => onChange(set(value, 'weeks', weeks));
+
+  useEffect(() => {
+    const focusSearch = () =>
+      setTimeout(() => {
+        focusAndSelect(originInput.current!);
+      });
+
+    Mousetrap.bind('g s', focusSearch);
+
+    return () => {
+      Mousetrap.unbind('g s');
+    };
+  }, [originInput]);
 
   useEffect(() => {
     const controller = new AbortController();
