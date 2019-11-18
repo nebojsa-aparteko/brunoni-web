@@ -20,6 +20,11 @@ import RouteSearchResults from '../model/route-search/RouteSearchResults';
 interface Props {}
 
 const useStyles = makeStyles((theme: Theme) => ({
+  containerRoot: {
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(0),
+    },
+  },
   hideSearch: {
     width: '100%',
     background: 'transparent',
@@ -152,9 +157,9 @@ const RouteSearch: React.FC<Props> = () => {
   return (
     <Fragment>
       <Box className={classes.hero}>
-        <Sticky enabled={true} top={8} innerZ={3} onStateChange={handleStateChange}>
+        <Sticky enabled={true} top={0} innerZ={3} onStateChange={handleStateChange}>
           <Paper square className={handleVisibility(visibility)}>
-            <Container>
+            <Container className={classes.containerRoot}>
               <RouteSearchBar
                 value={params}
                 onChange={setParams}

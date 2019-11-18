@@ -9,7 +9,6 @@ import { ItineraryItem as ItineraryItemModel } from '../model/route-search/Route
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
-    padding: theme.spacing(2, 0),
     position: 'relative',
   },
   paper: {
@@ -34,7 +33,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
   const classes = useStyles();
 
   return (
-    <div className={classes.routePoint}>
+    <Box className={classes.routePoint} p={1}>
       <DotAndLine noLine={noLine} />
       <Box>
         <Paper className={classes.paper}>
@@ -99,7 +98,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
                   </Grid>
                   <Grid item>
                     <Typography variant="subtitle2" display="block">
-                      <Box fontWeight="fontWeightBold">Delivery Address</Box>
+                      <Box fontWeight="fontWeightBold">Receiving Address</Box>
                     </Typography>
                     <Typography variant="body2" display="block">
                       <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
@@ -111,7 +110,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
           </Grid>
         </Paper>
       </Box>
-    </div>
+    </Box>
   );
 };
 
