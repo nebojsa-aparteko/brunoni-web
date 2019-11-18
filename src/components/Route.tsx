@@ -25,7 +25,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   route: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
-    padding: theme.spacing(4),
   },
   chip: {
     fontWeight: theme.typography.fontWeightBold,
@@ -48,10 +47,10 @@ const Route: React.FC<Props> = ({ route }) => {
         >
           <Grid container spacing={2}>
             <Grid item md={9} sm={12}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
+              <Typography variant="subtitle2" display="block">
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
-              <Typography variant="h5" display="block" gutterBottom>
+              <Typography variant="h6" display="block" gutterBottom>
                 {route.OriginInfo.VoyageInfo.Carrier}
               </Typography>
             </Grid>

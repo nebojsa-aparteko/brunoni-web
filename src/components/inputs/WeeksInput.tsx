@@ -12,6 +12,9 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) => ({
   formControl: {
     minWidth: 120,
+    [theme.breakpoints.up('xs')]: {
+      width: '100%',
+    },
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
