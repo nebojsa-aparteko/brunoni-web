@@ -16,6 +16,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import formatDate from 'date-fns/format';
 import ItineraryItem from './ItineraryItem';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
+import Stepper from '@material-ui/core/Stepper';
 
 interface Props {
   route: RouteSearchResult;
@@ -29,6 +30,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   chip: {
     fontWeight: theme.typography.fontWeightBold,
     color: theme.palette.common.white,
+  },
+  deadlines: {
+    marginBottom: theme.spacing(2),
+  },
+  stepper: {
+    paddingLeft: theme.spacing(0),
+    paddingRight: theme.spacing(0),
   },
 }));
 
@@ -50,7 +58,7 @@ const Route: React.FC<Props> = ({ route }) => {
               <Typography variant="subtitle2" display="block">
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
-              <Typography variant="h6" display="block" gutterBottom>
+              <Typography variant="h6" display="block">
                 {route.OriginInfo.VoyageInfo.Carrier}
               </Typography>
             </Grid>
@@ -117,7 +125,7 @@ const Route: React.FC<Props> = ({ route }) => {
           {/* Deadlines Display */}
 
           <Grid container>
-            <Grid item container xs={12} spacing={2}>
+            <Grid item container xs={12} spacing={2} className={classes.deadlines}>
               {route.Deadlines.map((deadline, i) => (
                 <Grid key={i} item md={3} sm={3}>
                   <Typography variant="subtitle2" display="block" gutterBottom>
@@ -133,11 +141,13 @@ const Route: React.FC<Props> = ({ route }) => {
             {/* Itinerary */}
 
             <Grid item xs={12}>
-              {route.OriginInfo && <ItineraryItem noLine={false} itineraryItem={route.OriginInfo} />}
-              {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
-              ))}
-              {route.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />}
+              <Stepper orientation="vertical" className={classes.stepper}>
+                {route.OriginInfo && <ItineraryItem noLine={false} itineraryItem={route.OriginInfo} />}
+                {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
+                  <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
+                ))}
+                {route.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />}
+              </Stepper>
             </Grid>
           </Grid>
         </ExpansionPanelDetails>

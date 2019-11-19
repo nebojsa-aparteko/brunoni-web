@@ -1,11 +1,13 @@
 import React from 'react';
 import formatDate from 'date-fns/format';
-import { Theme, Typography, makeStyles, Box, Paper, Grid } from '@material-ui/core';
+import { Theme, Typography, makeStyles, Box, Grid } from '@material-ui/core';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
-import DotAndLine from './DotAndLine';
 import { ItineraryItem as ItineraryItemModel } from '../model/route-search/RouteSearchResults';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
@@ -15,6 +17,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(4),
     paddingLeft: '6em',
     marginBottom: theme.spacing(2),
+  },
+  stepContent: {
+    paddingTop: theme.spacing(1),
   },
 }));
 
@@ -29,88 +34,97 @@ const isIntermediary = (itineraryItem: ItineraryItemModel) => itineraryItem.Arri
 
 const createMarkup = (htmlMarkup: any) => ({ __html: htmlMarkup });
 
-const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine }) => {
+const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
   const classes = useStyles();
 
   return (
-    <Box className={classes.routePoint} p={1}>
-      <DotAndLine noLine={noLine} />
-      <Box>
-        <Paper className={classes.paper}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h5" display="block">
-                <Box fontWeight="fontWeightMedium">
-                  {isIntermediary(itineraryItem)
-                    ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(
-                        itineraryItem.DepartureDate!,
-                      )}`
-                    : itineraryItem.DepartureDate
-                    ? formatDateString(itineraryItem.DepartureDate!)
-                    : formatDateString(itineraryItem.ArrivalDate!)}
-                </Box>
-              </Typography>
-              <Typography variant="subtitle1" display="block" gutterBottom>
-                {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
-              </Typography>
-            </Grid>
-            <Grid item md={4} sm={12}>
-              <Grid container spacing={2} wrap="nowrap">
-                <Grid item>
-                  <DirectionsBoatIcon color="primary" />
-                </Grid>
-                <Grid item>
-                  <Typography variant="subtitle2" display="block">
-                    <Box fontWeight="fontWeightBold">Vessel</Box>
-                  </Typography>
-                  <Typography variant="body2" display="block">
-                    {itineraryItem.VoyageInfo.VesselName}
-                  </Typography>
-                  <Typography variant="body2" display="block" gutterBottom>
-                    {itineraryItem.VoyageInfo.VoyageNr}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <Grid container spacing={2} wrap="nowrap">
-                <Grid item>
-                  <DirectionsPortIcon color="primary" />
-                </Grid>
-                <Grid item>
-                  <Typography variant="subtitle2" display="block">
-                    <Box fontWeight="fontWeightBold">Port</Box>
-                  </Typography>
-                  <Typography variant="body2" display="block">
-                    {itineraryItem.Port.HarbourName}
-                  </Typography>
-                  <Typography variant="body2" display="block" gutterBottom>
-                    {itineraryItem.Port.Land}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-            {!isIntermediary(itineraryItem) && (
-              <Grid item md={5} sm={12}>
-                <Grid container spacing={2} wrap="nowrap">
+    <Step {...rest} active={true}>
+      <StepLabel>
+        {isIntermediary(itineraryItem)
+          ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(itineraryItem.DepartureDate!)}`
+          : itineraryItem.DepartureDate
+          ? formatDateString(itineraryItem.DepartureDate!)
+          : formatDateString(itineraryItem.ArrivalDate!)}
+        <div>
+          {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
+        </div>
+      </StepLabel>
+      <StepContent className={classes.stepContent}>
+        <Grid container spacing={3}>
+          <Grid item md={3} sm={12}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Grid container direction="row" alignItems="center">
+                  {/*<Grid item>*/}
+                  {/*  <DirectionsBoatIcon color="primary" />*/}
+                  {/*</Grid>*/}
                   <Grid item>
-                    <FlagIcon color="primary" />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="subtitle2" display="block">
-                      <Box fontWeight="fontWeightBold">Receiving Address</Box>
-                    </Typography>
-                    <Typography variant="body2" display="block">
-                      <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
+                    <Typography variant="subtitle2" display="inline">
+                      <Box fontWeight="fontWeightBold">Vessel</Box>
                     </Typography>
                   </Grid>
                 </Grid>
               </Grid>
-            )}
+              <Grid item xs={12}>
+                <Typography variant="body2" display="block">
+                  {itineraryItem.VoyageInfo.VesselName}
+                </Typography>
+                <Typography variant="body2" display="block" gutterBottom>
+                  {itineraryItem.VoyageInfo.VoyageNr}
+                </Typography>
+              </Grid>
+            </Grid>
           </Grid>
-        </Paper>
-      </Box>
-    </Box>
+          <Grid item md={3} sm={12}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Grid container direction="row" alignItems="center">
+                  {/*<Grid item>*/}
+                  {/*  <DirectionsPortIcon color="primary" />*/}
+                  {/*</Grid>*/}
+                  <Grid item>
+                    <Typography variant="subtitle2" display="inline">
+                      <Box fontWeight="fontWeightBold">Port</Box>
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body2" display="block">
+                  {itineraryItem.Port.HarbourName}
+                </Typography>
+                <Typography variant="body2" display="block" gutterBottom>
+                  {itineraryItem.Port.Land}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+          {!isIntermediary(itineraryItem) && (
+            <Grid item md={6} sm={12}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Grid container direction="row" alignItems="center">
+                    {/*<Grid item>*/}
+                    {/*  <FlagIcon color="primary" />*/}
+                    {/*</Grid>*/}
+                    <Grid item>
+                      <Typography variant="subtitle2" display="inline">
+                        <Box fontWeight="fontWeightBold">Receiving Address</Box>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="body2" display="block">
+                    <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+        </Grid>
+      </StepContent>
+    </Step>
   );
 };
 
