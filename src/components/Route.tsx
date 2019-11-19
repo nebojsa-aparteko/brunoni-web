@@ -60,6 +60,7 @@ const Route: React.FC<Props> = ({ route }) => {
                   <Box fontWeight="fontWeightBold">Space Availability</Box>
                 </Typography>
                 <Chip
+                  size="small"
                   label={route.SpaceInfo}
                   style={{ backgroundColor: route.SpaceInfoColor }}
                   className={classes.chip}
