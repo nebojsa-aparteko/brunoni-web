@@ -17,6 +17,10 @@ import formatDate from 'date-fns/format';
 import ItineraryItem from './ItineraryItem';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import Stepper from '@material-ui/core/Stepper';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import WavesIcon from '@material-ui/icons/Waves';
+import ShareIcon from '@material-ui/icons/Share';
 
 interface Props {
   route: RouteSearchResult;
@@ -82,7 +86,10 @@ const Route: React.FC<Props> = ({ route }) => {
 
             <Grid item md={3} sm={12}>
               <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box fontWeight="fontWeightBold">Departure</Box>
+                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
+                  <ChevronRightIcon fontSize="small" color="secondary" />
+                  <Box ml=".5em">Departure</Box>
+                </Box>
               </Typography>
               <Typography variant="body1" display="block">
                 ETS {formatDateString(route.OriginInfo.DepartureDate)}
@@ -93,7 +100,10 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
             <Grid item md={3} sm={12}>
               <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box fontWeight="fontWeightBold">Arrival</Box>
+                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
+                  <LastPageIcon fontSize="small" color="secondary" />
+                  <Box ml=".5em">Arrival</Box>
+                </Box>
               </Typography>
               <Typography variant="body1" display="block">
                 ETA {formatDateString(route.DestinationInfo.ArrivalDate)}
@@ -104,7 +114,10 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
               <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box fontWeight="fontWeightBold">Transit Time</Box>
+                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
+                  <WavesIcon fontSize="small" color="secondary" />
+                  <Box ml=".5em">TransitTime</Box>
+                </Box>
               </Typography>
               <Typography variant="body2" display="block" gutterBottom>
                 {route.TransitTime} DAYS
@@ -112,7 +125,10 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
               <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box fontWeight="fontWeightBold">Routing</Box>
+                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
+                  <ShareIcon fontSize="small" color="secondary" />
+                  <Box ml=".5em">Routing</Box>
+                </Box>
               </Typography>
               <Typography variant="body2" display="block" gutterBottom>
                 {route.Routing}

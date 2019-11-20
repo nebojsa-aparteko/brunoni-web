@@ -21,6 +21,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   stepContent: {
     paddingTop: theme.spacing(1),
   },
+  label: {
+    marginBottom: '.25em',
+  },
+  icon: {
+    marginRight: '.25em',
+  },
 }));
 
 interface Props {
@@ -40,30 +46,30 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
   return (
     <Step {...rest} active={true}>
       <StepLabel>
-        {isIntermediary(itineraryItem)
-          ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(itineraryItem.DepartureDate!)}`
-          : itineraryItem.DepartureDate
-          ? formatDateString(itineraryItem.DepartureDate!)
-          : formatDateString(itineraryItem.ArrivalDate!)}
-        <div>
-          {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
-        </div>
+        <Box fontWeight="fontWeightBold">
+          {isIntermediary(itineraryItem)
+            ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(itineraryItem.DepartureDate!)}`
+            : itineraryItem.DepartureDate
+            ? formatDateString(itineraryItem.DepartureDate!)
+            : formatDateString(itineraryItem.ArrivalDate!)}
+          <div>
+            {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
+          </div>
+        </Box>
       </StepLabel>
       <StepContent className={classes.stepContent}>
         <Grid container spacing={3}>
           <Grid item md={3} sm={12}>
             <Grid container>
               <Grid item xs={12}>
-                <Grid container direction="row" alignItems="center">
-                  {/*<Grid item>*/}
-                  {/*  <DirectionsBoatIcon color="primary" />*/}
-                  {/*</Grid>*/}
-                  <Grid item>
-                    <Typography variant="subtitle2" display="inline">
-                      <Box fontWeight="fontWeightBold">Vessel</Box>
-                    </Typography>
-                  </Grid>
-                </Grid>
+                <Box display="flex" alignItems="center" className={classes.label}>
+                  <DirectionsBoatIcon fontSize="small" color="secondary" className={classes.icon} />
+                  <Typography variant="subtitle2" display="inline">
+                    <Box component="span" fontWeight="fontWeightBold">
+                      Vessel
+                    </Box>
+                  </Typography>
+                </Box>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" display="block">
@@ -78,16 +84,14 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
           <Grid item md={3} sm={12}>
             <Grid container>
               <Grid item xs={12}>
-                <Grid container direction="row" alignItems="center">
-                  {/*<Grid item>*/}
-                  {/*  <DirectionsPortIcon color="primary" />*/}
-                  {/*</Grid>*/}
-                  <Grid item>
-                    <Typography variant="subtitle2" display="inline">
-                      <Box fontWeight="fontWeightBold">Port</Box>
-                    </Typography>
-                  </Grid>
-                </Grid>
+                <Box display="flex" alignItems="center" className={classes.label}>
+                  <DirectionsPortIcon fontSize="small" color="secondary" className={classes.icon} />
+                  <Typography variant="subtitle2" display="inline">
+                    <Box component="span" fontWeight="fontWeightBold">
+                      Port
+                    </Box>
+                  </Typography>
+                </Box>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" display="block">
@@ -103,16 +107,14 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
             <Grid item md={6} sm={12}>
               <Grid container>
                 <Grid item xs={12}>
-                  <Grid container direction="row" alignItems="center">
-                    {/*<Grid item>*/}
-                    {/*  <FlagIcon color="primary" />*/}
-                    {/*</Grid>*/}
-                    <Grid item>
-                      <Typography variant="subtitle2" display="inline">
-                        <Box fontWeight="fontWeightBold">Receiving Address</Box>
-                      </Typography>
-                    </Grid>
-                  </Grid>
+                  <Box display="flex" alignItems="center" className={classes.label}>
+                    <FlagIcon fontSize="small" color="secondary" className={classes.icon} />
+                    <Typography variant="subtitle2" display="inline">
+                      <Box component="span" fontWeight="fontWeightBold">
+                        Receiving Address
+                      </Box>
+                    </Typography>
+                  </Box>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="body2" display="block">
