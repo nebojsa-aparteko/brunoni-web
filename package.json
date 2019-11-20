@@ -28,6 +28,7 @@
     "firebase": "^7.3.0",
     "fontfaceobserver": "^2.1.0",
     "isomorphic-fetch": "^2.2.1",
+    "material-ui-image": "^3.2.2",
     "mousetrap": "^1.6.3",
     "notistack": "^0.9.6",
     "react": "^16.11.0",
