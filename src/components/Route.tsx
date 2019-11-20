@@ -121,7 +121,7 @@ const Route: React.FC<Props> = ({ route }) => {
           </Grid>
         </ExpansionPanelSummary>
 
-        <ExpansionPanelDetails className={classes.route}>
+        <ExpansionPanelDetails>
           {/* Deadlines Display */}
 
           <Grid container>
@@ -151,14 +151,22 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
-        <ExpansionPanelActions className={classes.route}>
-          <Grid>
-            <Box paddingBottom={1}>SERVICE {route.Service}</Box>
-            <Divider light />
-            <Box paddingTop={1}>
-              ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING. ALL
-              DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
-            </Box>
+        <ExpansionPanelActions>
+          <Grid container>
+            <Grid item>
+              <Box p={2}>
+                <Typography variant="subtitle2">
+                  <Box paddingBottom={1}>SERVICE {route.Service}</Box>
+                </Typography>
+                <Divider light />
+                <Typography variant="body2">
+                  <Box paddingTop={1}>
+                    ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING.
+                    ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                  </Box>
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
         </ExpansionPanelActions>
       </ExpansionPanel>
