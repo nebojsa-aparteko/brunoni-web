@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Theme, makeStyles, CircularProgress } from '@material-ui/core';
 
 import LoginWidget from './LoginWidget';
@@ -18,13 +18,15 @@ const IdentityWidget: React.FC<Props> = () => {
   const classes = useStyles();
   const user = useUser();
 
-  switch (user) {
-    case undefined:
-      return <CircularProgress size={24} className={classes.progress} />;
-    case null:
-      return <LoginWidget />;
-    default:
-      return <UserWidget />;
+  if (user === undefined) {
+    return <CircularProgress size={24} className={classes.progress} />;
+  } else {
+    return (
+      <Fragment>
+        {user === null && <LoginWidget />}
+        <UserWidget active={user !== null} />
+      </Fragment>
+    );
   }
 };
 

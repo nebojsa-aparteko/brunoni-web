@@ -6,9 +6,11 @@ import { AccountCircle } from '@material-ui/icons';
 
 import firebase from '../firebase';
 
-interface Props {}
+interface Props {
+  active: boolean;
+}
 
-const UserWidget: React.FC<Props> = () => {
+const UserWidget: React.FC<Props> = ({ active }) => {
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -32,15 +34,17 @@ const UserWidget: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <IconButton
-        edge="end"
-        aria-label="User menu"
-        aria-controls={menuId}
-        aria-haspopup="true"
-        onClick={handleProfileMenuOpen}
-      >
-        <AccountCircle />
-      </IconButton>
+      {active && (
+        <IconButton
+          edge="end"
+          aria-label="User menu"
+          aria-controls={menuId}
+          aria-haspopup="true"
+          onClick={handleProfileMenuOpen}
+        >
+          <AccountCircle />
+        </IconButton>
+      )}
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}

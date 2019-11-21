@@ -1,4 +1,5 @@
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import { CircularProgress, TextField } from '@material-ui/core';
@@ -21,6 +22,7 @@ interface Props {
 const LoginForm: React.FC<Props> = ({ onComplete }) => {
   const classes = useStyles();
   const inputRef = useRef<HTMLInputElement>();
+  const location = useLocation();
   const [emailAddress, setEmailAddress] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -46,6 +48,7 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
           },
           body: JSON.stringify({
             emailAddress,
+            nextPath: `${location.pathname}?${location.search}`,
           }),
           signal,
         });

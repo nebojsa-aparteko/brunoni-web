@@ -2,13 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
+import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
 import { CssBaseline } from '@material-ui/core';
 import theme from './theme';
 import App from './App';
+import LoginDialogProvider from './components/LoginDialogProvider';
 import UserProvider from './components/UserProvider';
 import * as serviceWorker from './serviceWorker';
-import FontFaceObserver from 'fontfaceobserver';
 
 const appFont = new FontFaceObserver('Montserrat');
 
@@ -20,10 +21,12 @@ const app = (
   <Router>
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
-        <UserProvider>
-          <CssBaseline />
-          <App />
-        </UserProvider>
+        <LoginDialogProvider>
+          <UserProvider>
+            <CssBaseline />
+            <App />
+          </UserProvider>
+        </LoginDialogProvider>
       </SnackbarProvider>
     </ThemeProvider>
   </Router>
