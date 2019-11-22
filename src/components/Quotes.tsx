@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Theme, makeStyles, Box, Typography, Grid } from '@material-ui/core';
 import useUser from '../hooks/useUser';
 import set from 'lodash/fp/set';
@@ -9,6 +9,13 @@ import Container from './Container';
 import { Skeleton } from '@material-ui/lab';
 import sortBy from 'lodash/sortBy';
 import MaterialTable from 'material-table';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Divider from '@material-ui/core/Divider';
+import QuotesList from './quotes/index.js';
 
 interface Props {}
 
@@ -99,18 +106,7 @@ const Quotes: React.FC<Props> = ({}) => {
         <Typography variant="caption">{JSON.stringify(error)}</Typography>
       </Box>*/}
       {result ? (
-        <Box>
-          <MaterialTable
-            data={result.QuoteHeader}
-            columns={[
-              { title: 'Quote Reference', field: 'AdrId' },
-              { title: 'Carrier ID', field: 'CarrierID' },
-              { title: 'Quote Number', field: 'QuoteNumber' },
-              { title: 'Quote Date', field: 'QuoteDate' },
-              { title: 'Quote Validity', field: 'QuoteValidity' },
-            ]}
-          />
-        </Box>
+        <QuotesList quoteHeaders={result.QuoteHeader} />
       ) : (
         <Container>
           <Grid container spacing={4}>
