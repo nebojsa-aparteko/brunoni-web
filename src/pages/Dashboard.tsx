@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import { Theme, makeStyles, Grid, Paper, Typography } from '@material-ui/core';
+import { Theme, makeStyles, Grid, Paper, Typography, Button } from '@material-ui/core';
 import Navbar from '../components/Navbar';
 import Container from '../components/Container';
+import Quotes from '../components/Quotes';
 
 interface Props {}
 
@@ -24,9 +25,17 @@ const Dashboard: React.FC<Props> = ({}) => {
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Paper className={classes.paper}>
-              <Typography variant="h6" gutterBottom>
-                Quotes
-              </Typography>
+              <Grid container spacing={2} justify="space-between">
+                <Grid item>
+                  <Typography variant="h6" gutterBottom>
+                    Quotes
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Button>Get Quote</Button>
+                </Grid>
+              </Grid>
+              <Quotes />
             </Paper>
           </Grid>
           <Grid item xs={6}>
