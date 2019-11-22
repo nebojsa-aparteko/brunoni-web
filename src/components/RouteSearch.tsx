@@ -172,27 +172,31 @@ const RouteSearch: React.FC<Props> = () => {
         </Sticky>
       </Box>
       {results ? (
-        <Container>
-          <Grid container spacing={4}>
-            <Grid item md={3}>
-              <Paper className={classes.sidebar}>
-                <RouteSearchFilters
-                  only={uniq(results.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
-                  value={params.carrier}
-                  onChange={handleFiltersChange}
-                />
-              </Paper>
+        results.Routes.length === 0 ? (
+          <Typography>No results found…</Typography>
+        ) : (
+          <Container>
+            <Grid container spacing={4}>
+              <Grid item md={3}>
+                <Paper className={classes.sidebar}>
+                  <RouteSearchFilters
+                    only={uniq(results.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
+                    value={params.carrier}
+                    onChange={handleFiltersChange}
+                  />
+                </Paper>
+              </Grid>
+              <Grid item md={9}>
+                <Paper className={classes.sorting}>
+                  <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
+                </Paper>
+                {results.Routes.map((route, i) => (
+                  <Route key={i} route={route} />
+                ))}
+              </Grid>
             </Grid>
-            <Grid item md={9}>
-              <Paper className={classes.sorting}>
-                <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
-              </Paper>
-              {results.Routes.map((route, i) => (
-                <Route key={i} route={route} />
-              ))}
-            </Grid>
-          </Grid>
-        </Container>
+          </Container>
+        )
       ) : searchInProgress ? (
         <Container>
           <Grid container spacing={4}>
