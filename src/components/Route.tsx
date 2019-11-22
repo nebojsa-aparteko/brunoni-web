@@ -30,6 +30,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   route: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
+
+    '&:hover': {
+      backgroundColor: '#f1f6f8', // TODO use theme for this
+    },
   },
   chip: {
     fontWeight: theme.typography.fontWeightBold,
