@@ -23,7 +23,7 @@ const Dashboard: React.FC<Props> = ({}) => {
       <Navbar />
       <Container className={classes.root}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={10}>
             <Paper className={classes.paper}>
               <Grid container spacing={2} justify="space-between">
                 <Grid item>
@@ -38,7 +38,7 @@ const Dashboard: React.FC<Props> = ({}) => {
               <Quotes />
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={2}>
             <Paper className={classes.paper}></Paper>
           </Grid>
         </Grid>

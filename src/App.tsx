@@ -6,6 +6,7 @@ import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 
 import useUser from './hooks/useUser';
+import update from 'lodash/fp/update';
 
 const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.ComponentType<P>) => (props: P) => {
   const user = useUser();
@@ -23,7 +24,11 @@ const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.
 const App: React.FC = () => (
   <Switch>
     <Route exact path="/" component={Routes} />
-    <Route exact path="/dashboard" component={requireUser(Dashboard)} />
+    {process.env.NODE_ENV !== 'production' ? (
+      <Route exact path="/dashboard" component={Dashboard} />
+    ) : (
+      <Route exact path="/dashboard" component={requireUser(Dashboard)} />
+    )}
     <Route component={NotFound} />
   </Switch>
 );

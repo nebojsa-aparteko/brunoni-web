@@ -56,9 +56,13 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
         if (response.ok) {
           onComplete();
         } else {
-          const body = await response.json();
-          setError(body.error);
-          console.error('Failed to request the login email', response, body);
+          console.error('Failed to request the login email', response);
+          if (response.status === 500) {
+            setError('Internal server error occurred. Please try again.');
+          } else {
+            const body = await response.json();
+            setError(body.error);
+          }
         }
       } catch (e) {
         setError('Something went wrong. Please try again later.');

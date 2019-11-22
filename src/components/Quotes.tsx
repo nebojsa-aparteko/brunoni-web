@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Theme, makeStyles, Box, Typography } from '@material-ui/core';
+import { Theme, makeStyles, Box, Typography, Grid } from '@material-ui/core';
 import useUser from '../hooks/useUser';
+import set from 'lodash/fp/set';
+import update from 'lodash/fp/update';
+import uniq from 'lodash/fp/uniq';
+import QuotesResult, { QuoteHeader } from '../model/quotes/QuotesResult';
+import Container from './Container';
+import { Skeleton } from '@material-ui/lab';
+import sortBy from 'lodash/sortBy';
+import MaterialTable from 'material-table';
 
 interface Props {}
 
@@ -10,11 +18,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
+
+const initialResults =
+  process.env.NODE_ENV !== 'production'
+    ? update('Quote', updateQuoteResults)(require('../test/QuotesDataTest.json'))
+    : undefined;
+
 const useEndpoint = (uri: string) => {
   const user = useUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [data, setData] = useState<string[] | undefined>();
+  const [result, setResult] = useState<QuotesResult | undefined>(initialResults);
   const [request, setRequest] = useState(0);
 
   useEffect(() => {
@@ -43,7 +58,7 @@ const useEndpoint = (uri: string) => {
 
         if (response.ok) {
           const body = await response.json();
-          setData(body);
+          setResult(update('Quote', updateQuoteResults)(body as QuotesResult));
         } else {
           const body = await response.json();
           setError(body.error);
@@ -64,31 +79,56 @@ const useEndpoint = (uri: string) => {
 
   const refresh = () => setRequest(request + 1);
 
-  return [busy, error, data, refresh];
+  console.log('Results returned', result);
+
+  return { busy: busy, error: error, result: result, refresh: refresh };
 };
 
 const Quotes: React.FC<Props> = ({}) => {
   const classes = useStyles();
-  const [busy, error, data, refresh] = useEndpoint('/quotes');
+  const { busy, error, result, refresh } = useEndpoint('/quotes');
 
   return (
     <Box>
-      <Box>
+      {/*<Box>
         <Typography variant="h6">Busy</Typography>
         <Typography variant="caption">{JSON.stringify(busy)}</Typography>
       </Box>
       <Box>
         <Typography variant="h6">Error</Typography>
         <Typography variant="caption">{JSON.stringify(error)}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="h6">Data</Typography>
-        <Typography variant="caption">{JSON.stringify(data)}</Typography>
-      </Box>
-      <Box>
+      </Box>*/}
+      {result ? (
+        <Box>
+          <MaterialTable
+            data={result.QuoteHeader}
+            columns={[
+              { title: 'Quote Reference', field: 'AdrId' },
+              { title: 'Carrier ID', field: 'CarrierID' },
+              { title: 'Quote Number', field: 'QuoteNumber' },
+              { title: 'Quote Date', field: 'QuoteDate' },
+              { title: 'Quote Validity', field: 'QuoteValidity' },
+            ]}
+          />
+        </Box>
+      ) : (
+        <Container>
+          <Grid container spacing={4}>
+            <Grid item md={3}>
+              <Skeleton variant="rect" width="100%" height={450} />
+            </Grid>
+            <Grid item md={9}>
+              <Skeleton variant="rect" width="100%" height={104} />
+              <Skeleton variant="rect" width="100%" height={232} />
+              <Skeleton variant="rect" width="100%" height={232} />
+            </Grid>
+          </Grid>
+        </Container>
+      )}
+      {/*<Box>
         <Typography variant="h6">Refresh</Typography>
         <Typography variant="caption">{JSON.stringify(refresh)}</Typography>
-      </Box>
+      </Box>*/}
     </Box>
   );
 };

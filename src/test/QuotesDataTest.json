@@ -1,0 +1,2592 @@
+{
+  "QuoteHeader": [
+    {
+      "AdrId": "004261",
+      "PersID": "004261-001",
+      "idRequest": "21",
+      "idRoute": "27,26,25",
+      "CarrierID": "HSG",
+      "QuoteNumber": "100025",
+      "QuoteDate": "15.11.2019",
+      "QuoteValidity": "27.09.2019 - 31.12.2100",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "1",
+            "CtypID": "22G1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "1",
+            "CtypID": "22R1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "3",
+            "CtypID": "42G1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/CY",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": [
+          {
+            "Pos": "1",
+            "Description": "FOB-Charges",
+            "Currency": "EUR",
+            "CostValue": "37.00",
+            "CostUnit": "pro Shipment",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "2",
+            "Description": "AMS Filing/Documentation",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "3",
+            "Description": "Terminal Handling Charge",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "4",
+            "Description": "Security Surcharge ISPS",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "5",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "1,500.00",
+            "CostUnit": "pro 20'DC",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "6",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "2,000.00",
+            "CostUnit": "pro 40'DC",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "7",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "2,900.00",
+            "CostUnit": "pro 20'RF",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "8",
+            "Description": "Bunker Adjust. Factor",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "9",
+            "Description": "Emission Control Area S.",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "10",
+            "Description": "THC Destination",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "11",
+            "Description": "B/L Issuance",
+            "Currency": "CHF",
+            "CostValue": "70.00",
+            "CostUnit": "pro Set",
+            "Remark": null,
+            "RemarkRef": "(1)"
+          },
+          {
+            "Pos": "12",
+            "Description": "VGM manual submission",
+            "Currency": "EUR",
+            "CostValue": "20.00",
+            "CostUnit": "pro Container",
+            "Remark": "if required",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "13",
+            "Description": "Rebooking Fee",
+            "Currency": "CHF",
+            "CostValue": "10.00",
+            "CostUnit": "pro Sendung",
+            "Remark": "if required",
+            "RemarkRef": "(2)"
+          },
+          {
+            "Pos": "14",
+            "Description": "Cancellation Fee",
+            "Currency": "CHF",
+            "CostValue": "25.00",
+            "CostUnit": "pro Sendung",
+            "Remark": "if required",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "15",
+            "Description": "Certificate",
+            "Currency": "CHF",
+            "CostValue": "35.00",
+            "CostUnit": "pro Set",
+            "Remark": null,
+            "RemarkRef": null
+          }
+        ]
+      },
+      "CostDetailsRemarks": {
+        "CostDetailRemark": [
+          {
+            "RemarkRef": "(1)",
+            "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+          },
+          {
+            "RemarkRef": "(2)",
+            "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+          }
+        ]
+      },
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Via ALTAMIRA",
+        "TransitTime": "26"
+      },
+      "Remarks": {
+        "Remark": [
+          {
+            "RemarkTitle": "Free time at Origin",
+            "Reefer": "NO",
+            "RemarkLabel": "Detention/Demurrage",
+            "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "NO",
+            "RemarkLabel": "Detention/Demurrage",
+            "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "YES",
+            "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+            "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "YES",
+            "RemarkLabel": "Plugin BREMERHAVEN",
+            "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "NO",
+            "RemarkLabel": "Rates mentioned",
+            "RemarkText": "Subject to local charges at destination"
+          }
+        ]
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": "004261-001",
+      "idRequest": "21",
+      "idRoute": "24,23,22",
+      "CarrierID": "HSG",
+      "QuoteNumber": "100022",
+      "QuoteDate": "15.11.2019",
+      "QuoteValidity": "27.09.2019 - 31.12.2100",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "1",
+            "CtypID": "22G1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "1",
+            "CtypID": "22R1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "3",
+            "CtypID": "42G1",
+            "CommodityID": "2",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/CY",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": [
+          {
+            "Pos": "1",
+            "Description": "FOB-Charges",
+            "Currency": "EUR",
+            "CostValue": "37.00",
+            "CostUnit": "pro Shipment",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "2",
+            "Description": "AMS Filing/Documentation",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "3",
+            "Description": "Terminal Handling Charge",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "4",
+            "Description": "Security Surcharge ISPS",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "5",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "1,300.00",
+            "CostUnit": "pro 20'DC",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "6",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "1,550.00",
+            "CostUnit": "pro 40'DC",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "7",
+            "Description": "Seafreight",
+            "Currency": "USD",
+            "CostValue": "2,500.00",
+            "CostUnit": "pro 20'RF",
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "8",
+            "Description": "Bunker Adjust. Factor",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": "v.a.t.o.s",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "9",
+            "Description": "Emission Control Area S.",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": "v.a.t.o.s",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "10",
+            "Description": "THC Destination",
+            "Currency": "incl.",
+            "CostValue": null,
+            "CostUnit": null,
+            "Remark": null,
+            "RemarkRef": null
+          },
+          {
+            "Pos": "11",
+            "Description": "B/L Issuance",
+            "Currency": "CHF",
+            "CostValue": "70.00",
+            "CostUnit": "pro Set",
+            "Remark": null,
+            "RemarkRef": "(1)"
+          },
+          {
+            "Pos": "12",
+            "Description": "VGM manual submission",
+            "Currency": "EUR",
+            "CostValue": "20.00",
+            "CostUnit": "pro Container",
+            "Remark": "if required",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "13",
+            "Description": "Rebooking Fee",
+            "Currency": "CHF",
+            "CostValue": "10.00",
+            "CostUnit": "pro Sendung",
+            "Remark": "if required",
+            "RemarkRef": "(2)"
+          },
+          {
+            "Pos": "14",
+            "Description": "Cancellation Fee",
+            "Currency": "CHF",
+            "CostValue": "25.00",
+            "CostUnit": "pro Sendung",
+            "Remark": "if required",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "15",
+            "Description": "House-Bill of Lading",
+            "Currency": "CHF",
+            "CostValue": "50.00",
+            "CostUnit": "pro Set",
+            "Remark": "if required",
+            "RemarkRef": null
+          },
+          {
+            "Pos": "16",
+            "Description": "Certificate",
+            "Currency": "CHF",
+            "CostValue": "35.00",
+            "CostUnit": "pro Set",
+            "Remark": null,
+            "RemarkRef": null
+          }
+        ]
+      },
+      "CostDetailsRemarks": {
+        "CostDetailRemark": [
+          {
+            "RemarkRef": "(1)",
+            "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+          },
+          {
+            "RemarkRef": "(2)",
+            "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+          }
+        ]
+      },
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Direct",
+        "TransitTime": "15"
+      },
+      "Remarks": {
+        "Remark": [
+          {
+            "RemarkTitle": "Free time at Origin",
+            "Reefer": "NO",
+            "RemarkLabel": "Detention/Demurrage",
+            "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "NO",
+            "RemarkLabel": "Detention/Demurrage",
+            "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "YES",
+            "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+            "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "YES",
+            "RemarkLabel": "Plugin BREMERHAVEN",
+            "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+          },
+          {
+            "RemarkTitle": null,
+            "Reefer": "NO",
+            "RemarkLabel": "Rates mentioned",
+            "RemarkText": "Subject to local charges at destination"
+          }
+        ]
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": "004261-001",
+      "idRequest": "20",
+      "idRoute": null,
+      "CarrierID": "HSG",
+      "QuoteNumber": "100020",
+      "QuoteDate": "15.11.2019",
+      "QuoteValidity": "03.11.2019 - 31.12.2100",
+      "CargoDetails": [
+        {
+          "CargoDetail": [
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            }
+          ]
+        },
+        {
+          "CargoDetail": [
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            }
+          ]
+        }
+      ],
+      "Terms": [
+        {
+          "Term": [
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            },
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            }
+          ]
+        },
+        {
+          "Term": [
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            },
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            }
+          ]
+        }
+      ],
+      "QuoteDetails": [
+        {
+          "QuoteDetail": [
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "USD",
+              "CostValue": "35.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,000.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,050.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,450.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "USD",
+              "CostValue": "241.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "USD",
+              "CostValue": "80.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "11",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "12",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "13",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "14",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,300.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,550.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "2,500.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "THC Destination",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "11",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "12",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "13",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "14",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "15",
+              "Description": "House-Bill of Lading",
+              "Currency": "CHF",
+              "CostValue": "50.00",
+              "CostUnit": "pro Set",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "16",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            }
+          ]
+        },
+        {
+          "QuoteDetail": [
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "USD",
+              "CostValue": "35.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,000.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,050.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,450.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "USD",
+              "CostValue": "241.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "USD",
+              "CostValue": "80.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "11",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "12",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "13",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "14",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,300.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,550.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "2,500.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "THC Destination",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "11",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "12",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "13",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "14",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "15",
+              "Description": "House-Bill of Lading",
+              "Currency": "CHF",
+              "CostValue": "50.00",
+              "CostUnit": "pro Set",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "16",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            }
+          ]
+        }
+      ],
+      "CostDetailsRemarks": [
+        {
+          "CostDetailRemark": [
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            },
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            }
+          ]
+        },
+        {
+          "CostDetailRemark": [
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            },
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            }
+          ]
+        }
+      ],
+      "ServiceDetail": [
+        {
+          "Frequency": "Weekly",
+          "Routing": "Direct",
+          "TransitTime": "18"
+        },
+        {
+          "Frequency": "Weekly",
+          "Routing": "Direct",
+          "TransitTime": "15"
+        }
+      ],
+      "Remarks": [
+        {
+          "Remark": [
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            },
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            }
+          ]
+        },
+        {
+          "Remark": [
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            },
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "AdrId": "004261",
+      "PersID": "004261-001",
+      "idRequest": "20",
+      "idRoute": null,
+      "CarrierID": "HSG",
+      "QuoteNumber": "100019",
+      "QuoteDate": "15.11.2019",
+      "QuoteValidity": "03.11.2019 - 31.12.2100",
+      "CargoDetails": [
+        {
+          "CargoDetail": [
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            }
+          ]
+        },
+        {
+          "CargoDetail": [
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "1",
+              "CtypID": "22R1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            },
+            {
+              "Quantity": "3",
+              "CtypID": "42G1",
+              "CommodityID": "2",
+              "PickupAdrID": null
+            }
+          ]
+        }
+      ],
+      "Terms": [
+        {
+          "Term": [
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            },
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            }
+          ]
+        },
+        {
+          "Term": [
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            },
+            {
+              "TermLabel": null,
+              "TermValue": "FULL LINER TERMS",
+              "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+              "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+            },
+            {
+              "TermLabel": "TERMS & CONDITIONS",
+              "TermValue": "FCL/FCL - CY/CY",
+              "TermDetail": null,
+              "TermURL": null
+            }
+          ]
+        }
+      ],
+      "QuoteDetails": [
+        {
+          "QuoteDetail": [
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "USD",
+              "CostValue": "35.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,000.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,050.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,450.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "USD",
+              "CostValue": "241.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "USD",
+              "CostValue": "80.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "11",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "12",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "13",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "14",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,300.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,550.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "2,500.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "THC Destination",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "11",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "12",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "13",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "14",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "15",
+              "Description": "House-Bill of Lading",
+              "Currency": "CHF",
+              "CostValue": "50.00",
+              "CostUnit": "pro Set",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "16",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            }
+          ]
+        },
+        {
+          "QuoteDetail": [
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "USD",
+              "CostValue": "35.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,000.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,050.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,450.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "USD",
+              "CostValue": "241.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "USD",
+              "CostValue": "80.00",
+              "CostUnit": "pro TEU",
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "11",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "12",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "13",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "14",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "1",
+              "Description": "FOB-Charges",
+              "Currency": "EUR",
+              "CostValue": "37.00",
+              "CostUnit": "pro Shipment",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "2",
+              "Description": "AMS Filing/Documentation",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "3",
+              "Description": "Terminal Handling Charge",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "4",
+              "Description": "Security Surcharge ISPS",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "5",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,300.00",
+              "CostUnit": "pro 20'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "6",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "1,550.00",
+              "CostUnit": "pro 40'DC",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "7",
+              "Description": "Seafreight",
+              "Currency": "USD",
+              "CostValue": "2,500.00",
+              "CostUnit": "pro 20'RF",
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "8",
+              "Description": "Bunker Adjust. Factor",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "9",
+              "Description": "Emission Control Area S.",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": "v.a.t.o.s",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "10",
+              "Description": "THC Destination",
+              "Currency": "incl.",
+              "CostValue": null,
+              "CostUnit": null,
+              "Remark": null,
+              "RemarkRef": null
+            },
+            {
+              "Pos": "11",
+              "Description": "B/L Issuance",
+              "Currency": "CHF",
+              "CostValue": "70.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": "(1)"
+            },
+            {
+              "Pos": "12",
+              "Description": "VGM manual submission",
+              "Currency": "EUR",
+              "CostValue": "20.00",
+              "CostUnit": "pro Container",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "13",
+              "Description": "Rebooking Fee",
+              "Currency": "CHF",
+              "CostValue": "10.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": "(2)"
+            },
+            {
+              "Pos": "14",
+              "Description": "Cancellation Fee",
+              "Currency": "CHF",
+              "CostValue": "25.00",
+              "CostUnit": "pro Sendung",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "15",
+              "Description": "House-Bill of Lading",
+              "Currency": "CHF",
+              "CostValue": "50.00",
+              "CostUnit": "pro Set",
+              "Remark": "if required",
+              "RemarkRef": null
+            },
+            {
+              "Pos": "16",
+              "Description": "Certificate",
+              "Currency": "CHF",
+              "CostValue": "35.00",
+              "CostUnit": "pro Set",
+              "Remark": null,
+              "RemarkRef": null
+            }
+          ]
+        }
+      ],
+      "CostDetailsRemarks": [
+        {
+          "CostDetailRemark": [
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            },
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            }
+          ]
+        },
+        {
+          "CostDetailRemark": [
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            },
+            {
+              "RemarkRef": "(1)",
+              "RemarkText": "INCLUDING ONE DRAFT CORRECTION; EACH ADDITIONAL CORRECTION CHF 10.-"
+            },
+            {
+              "RemarkRef": "(2)",
+              "RemarkText": "ONE REBOOKING INCLUDING IN INITIAL BOOKING; EACH ADDITIONAL REBOOKING CHF 10.-"
+            }
+          ]
+        }
+      ],
+      "ServiceDetail": [
+        {
+          "Frequency": "Weekly",
+          "Routing": "Direct",
+          "TransitTime": "18"
+        },
+        {
+          "Frequency": "Weekly",
+          "Routing": "Direct",
+          "TransitTime": "15"
+        }
+      ],
+      "Remarks": [
+        {
+          "Remark": [
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            },
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            }
+          ]
+        },
+        {
+          "Remark": [
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            },
+            {
+              "RemarkTitle": "Free time at Origin",
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "3 calendar days (comb.) after pick up until day of departure thereafter Day 4 - 10 EUR 71.00 / 20'RF p/Day thereafter 11 EUR 111.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Detention/Demurrage",
+              "RemarkText": "7 calendar days (comb.) after pick up until day of departure thereafter Day 8 - 14 EUR 21.00 / 20'DC p/Day / EUR 36.00 / 40'DC p/Day thereafter 15 EUR 41.00 / 20'DC p/Day / EUR 71.00 / 40'DC p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Storage BREMERHAVEN (Reefer)",
+              "RemarkText": "5 calendar days free as from day of delivery until day of departure thereafter 6 EUR 35.00 / TEU p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "YES",
+              "RemarkLabel": "Plugin BREMERHAVEN",
+              "RemarkText": "2 calendar days free as from day of delivery until day of departure thereafter 3 EUR 100.00 / 20'RF p/Day"
+            },
+            {
+              "RemarkTitle": null,
+              "Reefer": "NO",
+              "RemarkLabel": "Rates mentioned",
+              "RemarkText": "Subject to local charges at destination"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "AdrId": "004261",
+      "PersID": null,
+      "idRequest": null,
+      "idRoute": "43189",
+      "CarrierID": "HSG",
+      "QuoteNumber": "43189",
+      "QuoteDate": "07.11.2019",
+      "QuoteValidity": "16.10.2019 - 15.01.2020",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "0",
+            "CtypID": "42G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "0",
+            "CtypID": "45G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/CY",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": {
+          "Pos": "1",
+          "Description": "Seafreight",
+          "Currency": "USD",
+          "CostValue": "3,098.00",
+          "CostUnit": "pro Container",
+          "Remark": null,
+          "RemarkRef": null
+        }
+      },
+      "CostDetailsRemarks": null,
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Direct",
+        "TransitTime": "21"
+      },
+      "Remarks": {
+        "Remark": {
+          "RemarkTitle": null,
+          "Reefer": "NO",
+          "RemarkLabel": "Rates mentioned",
+          "RemarkText": "Subject to local charges at both ends"
+        }
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": null,
+      "idRequest": null,
+      "idRoute": "43005",
+      "CarrierID": "HSG",
+      "QuoteNumber": "43005",
+      "QuoteDate": "25.10.2019",
+      "QuoteValidity": "16.10.2019 - 15.01.2020",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "0",
+            "CtypID": "42G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "0",
+            "CtypID": "45G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/DOOR",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": {
+          "Pos": "1",
+          "Description": "Seafreight",
+          "Currency": "USD",
+          "CostValue": "2,698.00",
+          "CostUnit": "pro Container",
+          "Remark": null,
+          "RemarkRef": null
+        }
+      },
+      "CostDetailsRemarks": null,
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Direct",
+        "TransitTime": "12"
+      },
+      "Remarks": {
+        "Remark": {
+          "RemarkTitle": null,
+          "Reefer": "NO",
+          "RemarkLabel": "Rates mentioned",
+          "RemarkText": "Subject to local charges at both ends"
+        }
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": null,
+      "idRequest": null,
+      "idRoute": "43004",
+      "CarrierID": "HSG",
+      "QuoteNumber": "43004",
+      "QuoteDate": "25.10.2019",
+      "QuoteValidity": "16.10.2019 - 15.01.2020",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "0",
+            "CtypID": "42G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "0",
+            "CtypID": "45G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/DOOR",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": {
+          "Pos": "1",
+          "Description": "Seafreight",
+          "Currency": "USD",
+          "CostValue": "2,922.00",
+          "CostUnit": "pro Container",
+          "Remark": null,
+          "RemarkRef": null
+        }
+      },
+      "CostDetailsRemarks": null,
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Direct",
+        "TransitTime": "26"
+      },
+      "Remarks": {
+        "Remark": {
+          "RemarkTitle": null,
+          "Reefer": "NO",
+          "RemarkLabel": "Rates mentioned",
+          "RemarkText": "Subject to local charges at both ends"
+        }
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": null,
+      "idRequest": null,
+      "idRoute": "43003",
+      "CarrierID": "HSG",
+      "QuoteNumber": "43003",
+      "QuoteDate": "25.10.2019",
+      "QuoteValidity": "16.10.2019 - 15.01.2020",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "0",
+            "CtypID": "42G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "0",
+            "CtypID": "45G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/DOOR",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": {
+          "Pos": "1",
+          "Description": "Seafreight",
+          "Currency": "USD",
+          "CostValue": "2,995.00",
+          "CostUnit": "pro Container",
+          "Remark": null,
+          "RemarkRef": null
+        }
+      },
+      "CostDetailsRemarks": null,
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Via CARTAGENA",
+        "TransitTime": "18"
+      },
+      "Remarks": {
+        "Remark": {
+          "RemarkTitle": null,
+          "Reefer": "NO",
+          "RemarkLabel": "Rates mentioned",
+          "RemarkText": "Subject to local charges at both ends"
+        }
+      }
+    },
+    {
+      "AdrId": "004261",
+      "PersID": null,
+      "idRequest": null,
+      "idRoute": "42953",
+      "CarrierID": "HSG",
+      "QuoteNumber": "42953",
+      "QuoteDate": "22.10.2019",
+      "QuoteValidity": "16.10.2019 - 15.01.2020",
+      "CargoDetails": {
+        "CargoDetail": [
+          {
+            "Quantity": "0",
+            "CtypID": "42G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          },
+          {
+            "Quantity": "0",
+            "CtypID": "45G1",
+            "CommodityID": "0",
+            "PickupAdrID": null
+          }
+        ]
+      },
+      "Terms": {
+        "Term": [
+          {
+            "TermLabel": null,
+            "TermValue": "FULL LINER TERMS",
+            "TermDetail": "- SUBJECT TO SPACE AND EQUIPMENT AVAILABILITY, AS WELL AS ACCEPTANCE BY THE CARRIER UNLESS OTHERWISE AGREED ALL SHIPMENTS ARE SUBJECT TO THE TERMS AND CONDITIONS LISTED UNDER:",
+            "TermURL": "https://www.hamburgsud-line.com/liner/media/sonstiges/terms___conditions/bl/2017-01_HS_BL.pdf"
+          },
+          {
+            "TermLabel": "TERMS & CONDITIONS",
+            "TermValue": "FCL/FCL - CY/DOOR",
+            "TermDetail": null,
+            "TermURL": null
+          }
+        ]
+      },
+      "QuoteDetails": {
+        "QuoteDetail": {
+          "Pos": "1",
+          "Description": "Seafreight",
+          "Currency": "USD",
+          "CostValue": "2,895.00",
+          "CostUnit": "pro Container",
+          "Remark": null,
+          "RemarkRef": null
+        }
+      },
+      "CostDetailsRemarks": null,
+      "ServiceDetail": {
+        "Frequency": "Weekly",
+        "Routing": "Direct",
+        "TransitTime": "12"
+      },
+      "Remarks": {
+        "Remark": {
+          "RemarkTitle": null,
+          "Reefer": "NO",
+          "RemarkLabel": "Rates mentioned",
+          "RemarkText": "Subject to local charges at both ends"
+        }
+      }
+    }
+  ]
+}
