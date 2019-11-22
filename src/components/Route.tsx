@@ -180,7 +180,7 @@ const Route: React.FC<Props> = ({ route }) => {
                 </Typography>
                 <Divider light />
                 <Typography variant="body2">
-                  <Box paddingTop={1}>
+                  <Box paddingTop={1} component="span">
                     ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING.
                     ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
                   </Box>
