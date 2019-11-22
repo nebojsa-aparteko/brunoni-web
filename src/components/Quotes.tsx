@@ -1,29 +1,14 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Theme, makeStyles, Box, Typography, Grid } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Box, Grid } from '@material-ui/core';
 import useUser from '../hooks/useUser';
-import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
-import uniq from 'lodash/fp/uniq';
 import QuotesResult, { QuoteHeader } from '../model/quotes/QuotesResult';
 import Container from './Container';
 import { Skeleton } from '@material-ui/lab';
 import sortBy from 'lodash/sortBy';
-import MaterialTable from 'material-table';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Divider from '@material-ui/core/Divider';
 import QuotesList from './quotes/index.js';
 
 interface Props {}
-
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    fontWeight: 'bold',
-  },
-}));
 
 const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
@@ -92,7 +77,6 @@ const useEndpoint = (uri: string) => {
 };
 
 const Quotes: React.FC<Props> = ({}) => {
-  const classes = useStyles();
   const { busy, error, result, refresh } = useEndpoint('/quotes');
 
   return (

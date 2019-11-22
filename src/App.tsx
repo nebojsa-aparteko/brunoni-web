@@ -2,11 +2,11 @@ import React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
+import GetQuotes from './pages/GetQuotes';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 
 import useUser from './hooks/useUser';
-import update from 'lodash/fp/update';
 
 const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.ComponentType<P>) => (props: P) => {
   const user = useUser();
@@ -29,6 +29,7 @@ const App: React.FC = () => (
     ) : (
       <Route exact path="/dashboard" component={requireUser(Dashboard)} />
     )}
+    <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
     <Route component={NotFound} />
   </Switch>
 );
