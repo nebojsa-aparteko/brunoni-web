@@ -8,6 +8,22 @@ import Unauthorized from './pages/Unauthorized';
 
 import useUser from './hooks/useUser';
 
+const switchUser = <P extends RouteComponentProps<any> | any>(
+  ComponentA: React.ComponentType<P>,
+  ComponentB: React.ComponentType<P>,
+) => (props: P) => {
+  const user = useUser();
+
+  switch (user) {
+    case undefined:
+      return null;
+    case null:
+      return <ComponentB {...props} />;
+    default:
+      return <ComponentA {...props} />;
+  }
+};
+
 const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.ComponentType<P>) => (props: P) => {
   const user = useUser();
 
@@ -23,12 +39,8 @@ const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.
 
 const App: React.FC = () => (
   <Switch>
-    <Route exact path="/" component={Routes} />
-    {process.env.NODE_ENV !== 'production' ? (
-      <Route exact path="/dashboard" component={Dashboard} />
-    ) : (
-      <Route exact path="/dashboard" component={requireUser(Dashboard)} />
-    )}
+    <Route exact path="/" component={switchUser(Dashboard, Routes)} />
+    <Route exact path="/schedule" component={requireUser(Routes)} />
     <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
     <Route component={NotFound} />
   </Switch>

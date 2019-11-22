@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import changeCase from 'change-case';
 import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import Container from './Container';
 import IdentityWidget from './IdentityWidget';
+import useUser from '../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbarItem: {},
     logo: {
+      marginRight: theme.spacing(2),
       '& > img':
         ({
           brunoni: {
@@ -43,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Navbar: React.FC = () => {
   const classes = useStyles();
+  const user = useUser();
 
   return (
     <AppBar position="relative" className={classes.appBar}>
@@ -55,6 +58,20 @@ const Navbar: React.FC = () => {
               className={classes.logo}
             />
           </Link>
+          {user !== undefined && user !== null && (
+            <Fragment>
+              <div className={classes.item}>
+                <Button component={Link} to="/schedule">
+                  Schedule
+                </Button>
+              </div>
+              <div className={classes.item}>
+                <Button component={Link} to="/quotes/get">
+                  Request quotes
+                </Button>
+              </div>
+            </Fragment>
+          )}
           <div className={classes.spacer} />
           {process.env.REACT_APP_BRAND === 'brunoni' ? (
             <div className={classes.item}>
