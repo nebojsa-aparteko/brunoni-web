@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import { Box, Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';

@@ -9,7 +9,7 @@ import App from './App';
 import LoginDialogProvider from './components/LoginDialogProvider';
 import UserProvider from './components/UserProvider';
 import * as serviceWorker from './serviceWorker';
-import { theme } from './theme';
+import theme from './theme';
 
 const appFont = new FontFaceObserver('Montserrat');
 
