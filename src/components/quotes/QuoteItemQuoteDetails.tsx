@@ -33,7 +33,8 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => (
               <TableCell>{quoteDetail.CostValue}</TableCell>
               <TableCell>{quoteDetail.CostUnit}</TableCell>
               <TableCell>
-                {quoteDetail.Remark} {quoteDetail.RemarkRef || ''}
+                {quoteDetail.RemarkRef || ''}
+                {quoteDetail.Remark}
               </TableCell>
             </TableRow>
           ))}
