@@ -1,8 +1,9 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import identity from 'lodash/identity';
 import { Theme, makeStyles, List, Typography } from '@material-ui/core';
 import Carrier from '../model/Carrier';
 import RouteSearchFilter from './RouteSearchFilter';
+import Carriers from '../contexts/Carriers';
 
 interface Props {
   only?: string[];
@@ -22,22 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
   const classes = useStyles();
-  const [carriers, setCarriers] = useState<Carrier[]>([]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    (async () => {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/carriers`, { signal });
-      const body = await response.json();
-      setCarriers(body.Carriers as Carrier[]);
-    })();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  const carriers = useContext(Carriers);
 
   const filter = only ? (carrier: Carrier) => only.indexOf(carrier.CarrierName) !== -1 : identity;
 

@@ -195,20 +195,14 @@ const GetQuotes: React.FC<Props> = () => {
           <Typography variant="h6" gutterBottom>
             Containers
           </Typography>
-          <ContainerTypesProvider>
-            <CommodityTypesProvider>
-              <LocationsProvider>
-                <ListInput
-                  listRef={listInput}
-                  addButtonRef={addButton}
-                  ItemInput={ContainerInput}
-                  defaultItemValue={{ quantity: 1 }}
-                  value={containers}
-                  onChange={setContainers}
-                />
-              </LocationsProvider>
-            </CommodityTypesProvider>
-          </ContainerTypesProvider>
+          <ListInput
+            listRef={listInput}
+            addButtonRef={addButton}
+            ItemInput={ContainerInput}
+            defaultItemValue={{ quantity: 1 }}
+            value={containers}
+            onChange={setContainers}
+          />
         </Grid>
         <Grid item sm="auto" xs={12}>
           <Button
