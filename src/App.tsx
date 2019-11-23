@@ -42,6 +42,7 @@ const App: React.FC = () => (
     <Route exact path="/" component={switchUser(Dashboard, Routes)} />
     <Route exact path="/schedule" component={requireUser(Routes)} />
     <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
+    <Route exact path="/dashboard" component={Dashboard} />
     <Route component={NotFound} />
   </Switch>
 );
