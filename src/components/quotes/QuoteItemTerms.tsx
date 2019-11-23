@@ -1,29 +1,24 @@
-import { Term, TermTerm } from '../../model/quotes/QuotesResult';
+import { TermTerm } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
-import { Grid } from '@material-ui/core';
+import { Typography, Link } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
-import InfoBoxItem from '../InfoBoxItem';
 
 interface Props {
-  terms: Term;
+  terms: TermTerm[];
 }
 
 const QuoteItemTerms: React.FC<Props> = ({ terms }) => (
   <Fragment>
-    {terms.Term.map((term: TermTerm) => (
-      <Fragment>
-        <Divider />
-        <Grid item xs={4}>
-          <InfoBoxItem title="Term Label" label1={term.TermLabel || ''} />
-        </Grid>
-        <Grid item xs={4}>
-          <InfoBoxItem title="Term Detail" label1={term.TermDetail || ''} />
-        </Grid>
-        <Grid item xs={4}>
-          <InfoBoxItem title="Term Value" label1={term.TermValue} />
-        </Grid>
-      </Fragment>
+    {terms.map((term: TermTerm) => (
+      <Typography variant="body2">
+        {term.TermValue} - {term.TermDetail}
+        <br />
+        <Link href={term.TermURL || ''} target="_blank" rel="noreferrer">
+          {term.TermURL}
+        </Link>
+      </Typography>
     ))}
+    <Divider />
   </Fragment>
 );
 

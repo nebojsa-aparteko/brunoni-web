@@ -7,12 +7,14 @@ export interface QuoteHeaderNormalized {
 }
 
 export interface QuoteItemNormalized {
-  CargoDetail: CargoDetail;
-  Terms: Term;
+  QuoteHeader: QuoteHeader;
+  CargoDetail: CargoDetailCargoDetail[];
+  Terms: TermTerm[];
   QuoteDetails: QuoteDetailQuoteDetail[];
   CostDetailsRemarks: CostDetailRemark[];
   Remarks: RemarkRemark[];
   ServiceDetail: ServiceDetailElement;
+  TermsHeader: TermTerm[];
 }
 
 export interface QuoteHeader {

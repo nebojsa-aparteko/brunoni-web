@@ -1,11 +1,6 @@
-import { QuoteDetailQuoteDetail, ServiceDetailElement } from '../../model/quotes/QuotesResult';
+import { ServiceDetailElement } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
 import { Grid } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import TableBody from '@material-ui/core/TableBody';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
 

@@ -1,10 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import {
+  CargoDetailCargoDetail,
   QuoteDetailQuoteDetail,
   QuoteDetailsQuoteDetailClass,
   QuoteHeader,
   QuoteItemNormalized,
   ServiceDetailElement,
+  TermTerm,
 } from '../../model/quotes/QuotesResult';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
@@ -30,12 +32,12 @@ const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
   return (
     <Fragment>
       {quoteHeaders.map((quoteHeader: QuoteHeader) => {
-        const asArray = (quoteDetail: any) => (Array.isArray(quoteDetail) ? quoteDetail : [quoteDetail]);
+        const asArray = (item: any) => (item === null ? [] : Array.isArray(item) ? item : [item]);
         const normalizeQuoteHeaderProps = flow(
           update('QuoteDetails', flow(asArray, map(update('QuoteDetail', asArray)))),
-          update('CostDetailsRemarks', flow(asArray, map(update('QuoteDetail', asArray)))),
+          update('CostDetailsRemarks', flow(asArray, map(update('CostDetailRemark', asArray)))),
           update('ServiceDetail', asArray),
-          update('CargoDetails', asArray),
+          update('CargoDetails', flow(asArray, map(update('CargoDetail', asArray)))),
           update('Remarks', flow(asArray, map(update('Remark', asArray)))),
           update('Terms', flow(asArray, map(update('Term', asArray)))),
         );
@@ -45,16 +47,26 @@ const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
         for (let i = 0; i < normalizedQuotesResult.QuoteDetails.length; i++) {
           normalizedQuoteItems[i] = {
             QuoteDetails: normalizedQuotesResult.QuoteDetails[i].QuoteDetail,
-            CargoDetail: normalizedQuotesResult.CargoDetails[i],
-            Remarks: normalizedQuotesResult.Remarks[i],
-            CostDetailsRemarks: normalizedQuotesResult.CostDetailsRemarks[i],
-            Terms: normalizedQuotesResult.Terms[i],
+            CargoDetail: normalizedQuotesResult.CargoDetails[i]
+              ? normalizedQuotesResult.CargoDetails[i].CargoDetail
+              : [],
+            Remarks: normalizedQuotesResult.Remarks[i].Remark,
+            CostDetailsRemarks: normalizedQuotesResult.CostDetailsRemarks[i]
+              ? normalizedQuotesResult.CostDetailsRemarks[i].CostDetailRemark
+              : [],
+            Terms: normalizedQuotesResult.Terms[i]
+              ? normalizedQuotesResult.Terms[i].Term.filter((item: TermTerm) => item.TermLabel === null)
+              : [],
             ServiceDetail: normalizedQuotesResult.ServiceDetail[i],
+            TermsHeader: normalizedQuotesResult.Terms[i]
+              ? normalizedQuotesResult.Terms[i].Term.filter((item: TermTerm) => item.TermLabel !== null)
+              : [],
+            QuoteHeader: normalizedQuotesResult,
           };
         }
         console.log('Normalized ', normalizedQuoteItems);
         return (
-          <ExpansionPanel defaultExpanded={true} TransitionProps={{ unmountOnExit: true }}>
+          <ExpansionPanel defaultExpanded={false} TransitionProps={{ unmountOnExit: true }}>
             <ExpansionPanelSummary>
               <Grid container spacing={2}>
                 <Grid item md={3} sm={12}>

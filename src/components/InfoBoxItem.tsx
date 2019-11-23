@@ -4,7 +4,7 @@ import { SvgIconProps } from '@material-ui/core/SvgIcon';
 
 interface Props {
   IconComponent?: React.ComponentType<SvgIconProps>;
-  title: String;
+  title?: String | null;
   label1?: String;
   label1HTML?: any;
   label2?: String;
@@ -18,7 +18,7 @@ const InfoBoxItem: React.FC<Props> = ({ IconComponent, title, label1, label1HTML
       <Typography variant="subtitle2" display="block" gutterBottom>
         <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
           {IconComponent && <IconComponent fontSize="small" color="secondary" />}
-          <Box ml={IconComponent && '.5em'}>{title}</Box>
+          <Box ml={IconComponent && '.5em'}>{title || ''}</Box>
         </Box>
       </Typography>
       {hasLabel1 && (
