@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
 import { InputProps } from '../../model/InputProps';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import { CommodityType } from '../../model/get-quotes/CommodityType';
@@ -9,12 +9,26 @@ interface Props extends InputProps<CommodityType | undefined> {}
 const getCommodityTypeLabel = (commodityType: CommodityType | undefined) =>
   commodityType ? commodityType.CommodityText : '';
 
-const CommodityTypeInput: React.FC<Props> = ({ value, onChange }) => {
+const focusAndSelect = (input: HTMLInputElement) => {
+  input.focus();
+  input.setSelectionRange(0, input.value.length);
+};
+
+const CommodityTypeInput: React.FC<Props> = ({ value, onChange }, ref) => {
+  const input = useRef();
   const commodityTypes = useContext(CommodityTypes);
   const [open, setOpen] = useState(false);
 
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      focusAndSelect(input.current!);
+    },
+  }));
+
   return (
     <SelectInput
+      inputRef={input}
+      label="Commodity Type"
       options={commodityTypes}
       getOptionLabel={getCommodityTypeLabel}
       open={open}
@@ -25,4 +39,4 @@ const CommodityTypeInput: React.FC<Props> = ({ value, onChange }) => {
   );
 };
 
-export default CommodityTypeInput;
+export default forwardRef(CommodityTypeInput);

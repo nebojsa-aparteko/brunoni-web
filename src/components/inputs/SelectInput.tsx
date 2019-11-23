@@ -6,6 +6,7 @@ import parse from 'autosuggest-highlight/parse';
 import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
 
 interface Props<T> extends InputProps<T> {
+  label: string;
   options: T[] | undefined;
   getOptionLabel: (value: T) => string;
   inputRef?: React.Ref<any>;
@@ -14,6 +15,7 @@ interface Props<T> extends InputProps<T> {
 }
 
 export default function SelectInput<T>({
+  label,
   options,
   getOptionLabel,
   inputRef,
@@ -40,7 +42,7 @@ export default function SelectInput<T>({
         <TextField
           {...params}
           inputRef={inputRef}
-          label="Container Type"
+          label={label}
           fullWidth
           variant="outlined"
           InputProps={{

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
-import { Theme, makeStyles, Grid, Button, CircularProgress, Typography } from '@material-ui/core';
+import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
@@ -13,6 +13,7 @@ import ContainerInput from './inputs/ContainerInput';
 import ContainerTypesProvider from './ContainerTypesProvider';
 import Container from './Container';
 import CommodityTypesProvider from './CommodityTypesProvider';
+import LocationsProvider from './LocationsProvider';
 
 interface Props {}
 
@@ -49,7 +50,8 @@ const GetQuotes: React.FC<Props> = () => {
   const [weeksOpen, setWeeksOpen] = useState<boolean>(false);
   const originInput = useRef<HTMLInputElement>();
   const destinationInput = useRef<HTMLInputElement>();
-  const searchButton = useRef<HTMLButtonElement>();
+  const listInput = useRef<unknown>();
+  const addButton = useRef<HTMLButtonElement>();
 
   const { originPort, destinationPort, date, weeks, containers } = value;
   const setOriginPort = (port: Port) => onChange(set('originPort', port)(value));
@@ -93,7 +95,7 @@ const GetQuotes: React.FC<Props> = () => {
 
   const handleDestinationPortChange = (port: Port) => {
     setDestinationPort(port);
-    searchButton.current!.focus();
+    addButton.current!.focus();
     if (!date) {
       setDateOpen(true);
     } else if (!weeks) {
@@ -104,7 +106,7 @@ const GetQuotes: React.FC<Props> = () => {
   const handleDateChange = (date: Date) => {
     setDate(date);
     setDateOpen(false);
-    searchButton.current!.focus();
+    addButton.current!.focus();
     if (!weeks) {
       setWeeksOpen(true);
     }
@@ -112,7 +114,7 @@ const GetQuotes: React.FC<Props> = () => {
 
   const handleWeeksChange = (weeks: number) => {
     setWeeks(weeks);
-    setTimeout(() => searchButton.current!.focus());
+    setTimeout(() => addButton.current!.focus());
   };
 
   const handleSearch = () => {
@@ -124,8 +126,17 @@ const GetQuotes: React.FC<Props> = () => {
       setDateOpen(true);
     } else if (!weeks) {
       setWeeksOpen(true);
+    } else if (containers.length === 0) {
+      addButton.current!.focus();
     } else {
-      setBusy(true);
+      for (let i = 0, n = containers.length; i < n; i++) {
+        const container = containers[i];
+        if (!container.containerType || !container.commodityType) {
+          (listInput.current! as { focus: (i: number) => void }).focus(i);
+          return;
+        }
+      }
+      // setBusy(true);
       // TODO
       alert('search');
       // onSearch(() => setBusy(false));
@@ -186,18 +197,21 @@ const GetQuotes: React.FC<Props> = () => {
           </Typography>
           <ContainerTypesProvider>
             <CommodityTypesProvider>
-              <ListInput
-                ItemInput={ContainerInput}
-                defaultItemValue={{ quantity: 1 }}
-                value={containers}
-                onChange={setContainers}
-              />
+              <LocationsProvider>
+                <ListInput
+                  listRef={listInput}
+                  addButtonRef={addButton}
+                  ItemInput={ContainerInput}
+                  defaultItemValue={{ quantity: 1 }}
+                  value={containers}
+                  onChange={setContainers}
+                />
+              </LocationsProvider>
             </CommodityTypesProvider>
           </ContainerTypesProvider>
         </Grid>
         <Grid item sm="auto" xs={12}>
           <Button
-            buttonRef={searchButton}
             variant="contained"
             size="large"
             color="primary"
@@ -215,6 +229,40 @@ const GetQuotes: React.FC<Props> = () => {
           </Button>
         </Grid>
       </Grid>
+      {process.env.NODE_ENV !== 'production' && (
+        <Box mt={4}>
+          <Typography variant="subtitle2">This is visible in development only.</Typography>
+          <Typography variant="h5">For testing purposes please use following options:</Typography>
+          <Box display="flex" flexDirection="column" my={1}>
+            <Box my={1}>
+              <Typography variant="h6">Hamburg Süd</Typography>
+              <Box display="flex" mx={-1}>
+                <Box mx={1}>
+                  <Typography>Rotterdam to Santos</Typography>
+                  <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                </Box>
+                <Box mx={1}>
+                  <Typography>Rotterdam to Santos</Typography>
+                  <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box my={1}>
+              <Typography variant="h6">Hyundai</Typography>
+              <Box display="flex" mx={-1}>
+                <Box mx={1}>
+                  <Typography>Rotterdam to Shanghai</Typography>
+                  <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                </Box>
+                <Box mx={1}>
+                  <Typography>Rotterdam to Shanghai</Typography>
+                  <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      )}
     </Container>
   );
 };
