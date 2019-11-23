@@ -11,7 +11,16 @@ import {
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
-import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Typography } from '@material-ui/core';
+import {
+  Box,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Grid,
+  makeStyles,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -87,8 +96,8 @@ const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
                 </Grid>
               </Grid>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <Grid container spacing={2}>
+            <ExpansionPanelDetails className={classes.expansionPanelDetails}>
+              <Grid container>
                 {normalizedQuoteItems.map(quoteItem => (
                   <Grid item xs={12}>
                     <QuoteItem quoteItemNormalized={quoteItem} />

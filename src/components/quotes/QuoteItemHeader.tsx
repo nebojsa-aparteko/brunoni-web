@@ -19,14 +19,17 @@ const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => (
     <Grid item xs={12}>
       <InfoBoxItemHorizontal title="Quote Reference" label1={quoteHeader.AdrId} />
     </Grid>
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Quote Validity" label1={quoteHeader.QuoteValidity} />
-    </Grid>
+
     {termsHeader.map((term: TermTerm) => (
       <Grid item xs={12}>
         <InfoBoxItemHorizontal title={term.TermLabel} label1={term.TermValue} />
       </Grid>
     ))}
+
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal title="Quote Validity" label1={quoteHeader.QuoteValidity} />
+    </Grid>
+
     <Grid item xs={12}>
       <Divider />
     </Grid>

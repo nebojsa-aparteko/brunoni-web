@@ -17,17 +17,15 @@ interface Props {
 
 const QuoteItem: React.FC<Props> = ({ quoteItemNormalized }) => (
   <Page title="Quotation">
-    <Container maxWidth="lg">
-      <Grid container spacing={4}>
-        <QuoteItemHeader quoteHeader={quoteItemNormalized.QuoteHeader} termsHeader={quoteItemNormalized.TermsHeader} />
-        <QuoteItemCargoDetail cargoDetails={quoteItemNormalized.CargoDetail} />
-        <QuoteItemTerms terms={quoteItemNormalized.Terms} />
-        <QuoteItemQuoteDetails quoteDetails={quoteItemNormalized.QuoteDetails} />
-        <QuoteItemCostDetailsRemark costDetailRemarks={quoteItemNormalized.CostDetailsRemarks} />
-        <QuoteItemServiceDetail serviceDetailElement={quoteItemNormalized.ServiceDetail} />
-        <QuoteItemRemarks remarks={quoteItemNormalized.Remarks} />
-      </Grid>
-    </Container>
+    <Grid container spacing={4}>
+      <QuoteItemHeader quoteHeader={quoteItemNormalized.QuoteHeader} termsHeader={quoteItemNormalized.TermsHeader} />
+      <QuoteItemCargoDetail cargoDetails={quoteItemNormalized.CargoDetail} />
+      <QuoteItemTerms terms={quoteItemNormalized.Terms} />
+      <QuoteItemQuoteDetails quoteDetails={quoteItemNormalized.QuoteDetails} />
+      <QuoteItemCostDetailsRemark costDetailRemarks={quoteItemNormalized.CostDetailsRemarks} />
+      <QuoteItemServiceDetail serviceDetailElement={quoteItemNormalized.ServiceDetail} />
+      <QuoteItemRemarks remarks={quoteItemNormalized.Remarks} />
+    </Grid>
   </Page>
 );
 
