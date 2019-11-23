@@ -1,36 +1,10 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import {
-  CargoDetailCargoDetail,
-  QuoteDetailQuoteDetail,
-  QuoteDetailsQuoteDetailClass,
-  QuoteHeader,
-  QuoteItemNormalized,
-  ServiceDetailElement,
-  TermTerm,
-} from '../../model/quotes/QuotesResult';
+import React, { Fragment } from 'react';
+import { QuoteHeader, QuoteItemNormalized, TermTerm } from '../../model/quotes/QuotesResult';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
-import {
-  Box,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Grid,
-  makeStyles,
-  Theme,
-  Typography,
-} from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import TableBody from '@material-ui/core/TableBody';
-import Divider from '@material-ui/core/Divider';
-import Container from '@material-ui/core/Container';
+import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid } from '@material-ui/core';
 import InfoBoxItem from '../InfoBoxItem';
-import Page from './Page';
-import QuoteItemQuoteDetails from './QuoteItemQuoteDetails';
 import QuoteItem from './QuoteItem';
 
 interface Props {
@@ -96,7 +70,7 @@ const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
                 </Grid>
               </Grid>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={classes.expansionPanelDetails}>
+            <ExpansionPanelDetails>
               <Grid container>
                 {normalizedQuoteItems.map(quoteItem => (
                   <Grid item xs={12}>
