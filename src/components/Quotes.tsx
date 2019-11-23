@@ -6,7 +6,7 @@ import QuotesResult, { QuoteHeader } from '../model/quotes/QuotesResult';
 import Container from './Container';
 import { Skeleton } from '@material-ui/lab';
 import sortBy from 'lodash/sortBy';
-import QuotesList from './quotes/index.js';
+import QuotesList from './quotes/index';
 
 interface Props {}
 
