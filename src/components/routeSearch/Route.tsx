@@ -14,27 +14,19 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import formatDate from 'date-fns/format';
-import ItineraryItem from './ItineraryItem';
-import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
+import ItineraryItem from '../ItineraryItem';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import Stepper from '@material-ui/core/Stepper';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
-import ShareIcon from '@material-ui/icons/Share';
+import InfoBoxItem from '../InfoBoxItem';
 
 interface Props {
   route: RouteSearchResult;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  route: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-
-    '&:hover': {
-      backgroundColor: '#f1f6f8', // TODO use theme for this
-    },
-  },
   chip: {
     fontWeight: theme.typography.fontWeightBold,
     color: theme.palette.common.white,
@@ -56,11 +48,7 @@ const Route: React.FC<Props> = ({ route }) => {
   return (
     <Box>
       <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-        <ExpansionPanelSummary
-          className={classes.route}
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1c-content"
-        >
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content">
           <Grid container spacing={2}>
             <Grid item md={9} sm={12}>
               <Typography variant="subtitle2" display="block">
@@ -89,54 +77,26 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
 
             <Grid item md={3} sm={12}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
-                  <ChevronRightIcon fontSize="small" color="secondary" />
-                  <Box ml=".5em">Departure</Box>
-                </Box>
-              </Typography>
-              <Typography variant="body1" display="block">
-                ETS {formatDateString(route.OriginInfo.DepartureDate)}
-              </Typography>
-              <Typography variant="body2" display="block">
-                {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land}
-              </Typography>
+              <InfoBoxItem
+                IconComponent={ChevronRightIcon}
+                title="Departure"
+                label1={`ETS ${formatDateString(route.OriginInfo.DepartureDate)}`}
+                label2={`${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land}`}
+              />
             </Grid>
             <Grid item md={3} sm={12}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
-                  <LastPageIcon fontSize="small" color="secondary" />
-                  <Box ml=".5em">Arrival</Box>
-                </Box>
-              </Typography>
-              <Typography variant="body1" display="block">
-                ETA {formatDateString(route.DestinationInfo.ArrivalDate)}
-              </Typography>
-              <Typography variant="body2" display="block">
-                {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land}
-              </Typography>
+              <InfoBoxItem
+                IconComponent={LastPageIcon}
+                title="Arrival"
+                label1={`ETA ${formatDateString(route.DestinationInfo.ArrivalDate)}`}
+                label2={`${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land}`}
+              />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
-                  <WavesIcon fontSize="small" color="secondary" />
-                  <Box ml=".5em">TransitTime</Box>
-                </Box>
-              </Typography>
-              <Typography variant="body2" display="block" gutterBottom>
-                {route.TransitTime} DAYS
-              </Typography>
+              <InfoBoxItem IconComponent={WavesIcon} title="TransitTime" label1={`${route.TransitTime} DAYS`} />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
-                  <ShareIcon fontSize="small" color="secondary" />
-                  <Box ml=".5em">Routing</Box>
-                </Box>
-              </Typography>
-              <Typography variant="body2" display="block" gutterBottom>
-                {route.Routing}
-              </Typography>
+              <InfoBoxItem IconComponent={WavesIcon} title="Routing" label1={route.Routing} />
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
@@ -148,12 +108,7 @@ const Route: React.FC<Props> = ({ route }) => {
             <Grid item container xs={12} spacing={2} className={classes.deadlines}>
               {route.Deadlines.map((deadline, i) => (
                 <Grid key={i} item md={3} sm={3}>
-                  <Typography variant="subtitle2" display="block" gutterBottom>
-                    <Box fontWeight="fontWeightBold">{deadline.Typ} closing</Box>
-                  </Typography>
-                  <Typography variant="body2" display="block" gutterBottom>
-                    {deadline.Time}
-                  </Typography>
+                  <InfoBoxItem title={`${deadline.Typ} closing`} label1={deadline.Time} />
                 </Grid>
               ))}
             </Grid>

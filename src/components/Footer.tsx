@@ -47,7 +47,7 @@ const Footer: React.FC<Props> = () => {
           <Grid container spacing={2}>
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="h5">Company</Typography>
+                <Typography variant="subtitle2">Company</Typography>
               </Box>
               <Box mb={4}>
                 <ul className={classes.list}>
@@ -72,23 +72,23 @@ const Footer: React.FC<Props> = () => {
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="h5">Office Hours</Typography>
+                <Typography variant="subtitle2">Office Hours</Typography>
               </Box>
               <Box mb={2} style={{ opacity: 0.65 }}>
-                <Typography>Mon-Fri</Typography>
-                <Typography>08:00 - 12:00</Typography>
-                <Typography>13:00 - 17:30</Typography>
+                <Typography variant="body2">Mon-Fri</Typography>
+                <Typography variant="body2">08:00 - 12:00</Typography>
+                <Typography variant="body2">13:00 - 17:30</Typography>
               </Box>
 
               <Box mb={4} style={{ opacity: 0.65 }}>
-                <Typography>Phone +41 44 455 58 58</Typography>
-                <Typography>Fax +41 44 455 58 55</Typography>
+                <Typography variant="body2">Phone +41 44 455 58 58</Typography>
+                <Typography variant="body2">Fax +41 44 455 58 55</Typography>
               </Box>
             </Grid>
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="h5">Follow Us</Typography>
+                <Typography variant="subtitle2">Follow Us</Typography>
               </Box>
               <Box mb={4}>
                 <ul className={classes.list}>
@@ -106,10 +106,10 @@ const Footer: React.FC<Props> = () => {
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="h5">About Us</Typography>
+                <Typography variant="subtitle2">About Us</Typography>
               </Box>
               <Box mb={4}>
-                <Typography variant="body1" style={{ opacity: 0.65 }}>
+                <Typography variant="body2" style={{ opacity: 0.65 }}>
                   Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
                   represent foreign shipping lines in Switzerland.
                 </Typography>

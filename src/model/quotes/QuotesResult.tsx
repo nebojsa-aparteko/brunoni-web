@@ -2,6 +2,19 @@ export default interface QuotesResult {
   QuoteHeader: QuoteHeader[];
 }
 
+export interface QuoteHeaderNormalized {
+  QuoteItems: QuoteItemNormalized[];
+}
+
+export interface QuoteItemNormalized {
+  CargoDetail: CargoDetail;
+  Terms: Term;
+  QuoteDetails: QuoteDetailQuoteDetail[];
+  CostDetailsRemarks: CostDetailRemark[];
+  Remarks: RemarkRemark[];
+  ServiceDetail: ServiceDetailElement;
+}
+
 export interface QuoteHeader {
   AdrId: string;
   PersID: null | string;

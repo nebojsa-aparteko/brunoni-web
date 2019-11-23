@@ -14,9 +14,10 @@ import Container from './Container';
 import Typography from '@material-ui/core/Typography';
 import { Skeleton } from '@material-ui/lab';
 import { useSnackbar } from 'notistack';
-import Route from './Route';
+import Route from './routeSearch/Route';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
-import Image from 'material-ui-image';
+import SearchHowTo from './routeSearch/SearchHowTo';
+import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 
 interface Props {}
 
@@ -173,7 +174,7 @@ const RouteSearch: React.FC<Props> = () => {
       </Box>
       {results ? (
         results.Routes.length === 0 ? (
-          <Typography>No results found…</Typography>
+          <SearchEmptyResults />
         ) : (
           <Container>
             <Grid container spacing={4}>
@@ -211,27 +212,7 @@ const RouteSearch: React.FC<Props> = () => {
           </Grid>
         </Container>
       ) : (
-        <Container>
-          <Grid container justify="center" alignItems="center">
-            <Grid item md={6}>
-              <Box p={6} textAlign="center">
-                <Image
-                  src={require(`../assets/state.server.overload.svg`)}
-                  aspectRatio={16 / 9}
-                  color="transparent"
-                  disableSpinner
-                />
-                <Typography variant="h5" gutterBottom>
-                  <Box fontWeight="fontWeightBold">Search Voyages</Box>
-                </Typography>
-                <Typography variant="subtitle1">
-                  To see the voyages that are best for you, please input origin, destination and earliest date of
-                  departure and click "Search"
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
+        <SearchHowTo />
       )}
     </Fragment>
   );

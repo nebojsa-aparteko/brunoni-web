@@ -1,6 +1,6 @@
 import React from 'react';
 import formatDate from 'date-fns/format';
-import { Theme, Typography, makeStyles, Box, Grid } from '@material-ui/core';
+import { Theme, makeStyles, Box, Grid } from '@material-ui/core';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
@@ -8,6 +8,7 @@ import { ItineraryItem as ItineraryItemModel } from '../model/route-search/Route
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
+import InfoBoxItem from './InfoBoxItem';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
@@ -60,68 +61,31 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
       <StepContent className={classes.stepContent}>
         <Grid container spacing={3}>
           <Grid item md={3} sm={12}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Box display="flex" alignItems="center" className={classes.label}>
-                  <DirectionsBoatIcon fontSize="small" color="secondary" className={classes.icon} />
-                  <Typography variant="subtitle2" display="inline">
-                    <Box component="span" fontWeight="fontWeightBold">
-                      Vessel
-                    </Box>
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body2" display="block">
-                  {itineraryItem.VoyageInfo.VesselName}
-                </Typography>
-                <Typography variant="body2" display="block" gutterBottom>
-                  {itineraryItem.VoyageInfo.VoyageNr}
-                </Typography>
-              </Grid>
-            </Grid>
+            <InfoBoxItem
+              IconComponent={DirectionsBoatIcon}
+              title="Vessel"
+              label1={itineraryItem.VoyageInfo.VesselName}
+              label2={itineraryItem.VoyageInfo.VoyageNr}
+              gutterBottom
+            />
           </Grid>
           <Grid item md={3} sm={12}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Box display="flex" alignItems="center" className={classes.label}>
-                  <DirectionsPortIcon fontSize="small" color="secondary" className={classes.icon} />
-                  <Typography variant="subtitle2" display="inline">
-                    <Box component="span" fontWeight="fontWeightBold">
-                      Port
-                    </Box>
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body2" display="block">
-                  {itineraryItem.Port.HarbourName}
-                </Typography>
-                <Typography variant="body2" display="block" gutterBottom>
-                  {itineraryItem.Port.Land}
-                </Typography>
-              </Grid>
-            </Grid>
+            <InfoBoxItem
+              IconComponent={DirectionsPortIcon}
+              title="Port"
+              label1={itineraryItem.Port.HarbourName}
+              label2={itineraryItem.Port.Land}
+              gutterBottom
+            />
           </Grid>
           {!isIntermediary(itineraryItem) && (
             <Grid item md={6} sm={12}>
-              <Grid container>
-                <Grid item xs={12}>
-                  <Box display="flex" alignItems="center" className={classes.label}>
-                    <FlagIcon fontSize="small" color="secondary" className={classes.icon} />
-                    <Typography variant="subtitle2" display="inline">
-                      <Box component="span" fontWeight="fontWeightBold">
-                        Receiving Address
-                      </Box>
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" display="block">
-                    <span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)} />
-                  </Typography>
-                </Grid>
-              </Grid>
+              <InfoBoxItem
+                IconComponent={FlagIcon}
+                title="Receiving Address"
+                label1HTML={createMarkup(itineraryItem.Port.PortName)}
+              />
+              {/*<span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)}/>*/}
             </Grid>
           )}
         </Grid>

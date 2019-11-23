@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, Ref, useState } from 'react';
+import React, { HTMLAttributes, Ref } from 'react';
 import { Theme, makeStyles, TextField, CircularProgress, Popper, Paper } from '@material-ui/core';
 import { InputProps } from '../../model/InputProps';
 import match from 'autosuggest-highlight/match';

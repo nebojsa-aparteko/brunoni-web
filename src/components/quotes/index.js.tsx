@@ -1,23 +1,26 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/styles';
 import {
   QuoteDetailQuoteDetail,
   QuoteDetailsQuoteDetailClass,
   QuoteHeader,
+  QuoteItemNormalized,
   ServiceDetailElement,
 } from '../../model/quotes/QuotesResult';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
-import Container from '../Container';
-import { Box, Grid, Typography } from '@material-ui/core';
+import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Typography } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import Divider from '@material-ui/core/Divider';
-import MaterialTable from 'material-table';
+import Container from '@material-ui/core/Container';
+import InfoBoxItem from '../InfoBoxItem';
+import Page from './Page';
+import QuoteItemQuoteDetails from './QuoteItemQuoteDetails';
+import QuoteItem from './QuoteItem';
 
 interface Props {
   quoteHeaders: QuoteHeader[];
@@ -25,87 +28,66 @@ interface Props {
 
 const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
   return (
-    <Box>
-      <MaterialTable
-        data={quoteHeaders}
-        columns={[
-          { title: 'Quote Reference', field: 'AdrId' },
-          { title: 'Carrier ID', field: 'CarrierID' },
-          { title: 'Quote Number', field: 'QuoteNumber' },
-          { title: 'Quote Date', field: 'QuoteDate' },
-          { title: 'Quote Validity', field: 'QuoteValidity' },
-        ]}
-        detailPanel={rowData => {
-          let asArray = (quoteDetail: any) => (Array.isArray(quoteDetail) ? quoteDetail : [quoteDetail]);
-          const normalizeQuotesResult = flow(
-            update('QuoteDetails', flow(asArray, map(update('QuoteDetail', asArray)))),
-            update('ServiceDetail', asArray),
-            update('Remarks', asArray),
-          );
-          const normalizedQuotesResult = normalizeQuotesResult(rowData);
+    <Fragment>
+      {quoteHeaders.map((quoteHeader: QuoteHeader) => {
+        const asArray = (quoteDetail: any) => (Array.isArray(quoteDetail) ? quoteDetail : [quoteDetail]);
+        const normalizeQuoteHeaderProps = flow(
+          update('QuoteDetails', flow(asArray, map(update('QuoteDetail', asArray)))),
+          update('CostDetailsRemarks', flow(asArray, map(update('QuoteDetail', asArray)))),
+          update('ServiceDetail', asArray),
+          update('CargoDetails', asArray),
+          update('Remarks', flow(asArray, map(update('Remark', asArray)))),
+          update('Terms', flow(asArray, map(update('Term', asArray)))),
+        );
+        const normalizedQuotesResult = normalizeQuoteHeaderProps(quoteHeader);
 
-          return (
-            <Container>
-              <Grid container spacing={4}>
-                {normalizedQuotesResult.QuoteDetails.map((quoteDetails: QuoteDetailsQuoteDetailClass) => (
-                  <Fragment>
-                    <Grid item xs={12}>
-                      <Table aria-label="simple table">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Description</TableCell>
-                            <TableCell>Currency</TableCell>
-                            <TableCell>Cost Value</TableCell>
-                            <TableCell>Cost Unit</TableCell>
-                            <TableCell>Remark</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {quoteDetails.QuoteDetail.map((quoteDetail: QuoteDetailQuoteDetail) => (
-                            <TableRow key={quoteDetail.Pos}>
-                              <TableCell component="th" scope="row">
-                                {quoteDetail.Description}
-                              </TableCell>
-                              <TableCell>{quoteDetail.Currency}</TableCell>
-                              <TableCell>{quoteDetail.CostValue}</TableCell>
-                              <TableCell>{quoteDetail.CostUnit}</TableCell>
-                              <TableCell>{quoteDetail.Remark}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Grid>
-                  </Fragment>
-                ))}
-                {normalizedQuotesResult.ServiceDetail.map((item: ServiceDetailElement) => (
-                  <Fragment>
-                    <Divider />
-                    <Grid item xs={4}>
-                      <Typography variant="h5" gutterBottom>
-                        <Box fontWeight="fontWeightBold">Frequency</Box>
-                      </Typography>
-                      <Typography variant="subtitle1">{item.Frequency}</Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Typography variant="h5" gutterBottom>
-                        <Box fontWeight="fontWeightBold">Routing</Box>
-                      </Typography>
-                      <Typography variant="subtitle1">{item.Routing}</Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Typography variant="h5" gutterBottom>
-                        <Box fontWeight="fontWeightBold">Transit Time</Box>
-                      </Typography>
-                      <Typography variant="subtitle1">{item.TransitTime}</Typography>
-                    </Grid>
-                  </Fragment>
+        let normalizedQuoteItems: QuoteItemNormalized[] = [];
+        for (let i = 0; i < normalizedQuotesResult.QuoteDetails.length; i++) {
+          normalizedQuoteItems[i] = {
+            QuoteDetails: normalizedQuotesResult.QuoteDetails[i].QuoteDetail,
+            CargoDetail: normalizedQuotesResult.CargoDetails[i],
+            Remarks: normalizedQuotesResult.Remarks[i],
+            CostDetailsRemarks: normalizedQuotesResult.CostDetailsRemarks[i],
+            Terms: normalizedQuotesResult.Terms[i],
+            ServiceDetail: normalizedQuotesResult.ServiceDetail[i],
+          };
+        }
+        console.log('Normalized ', normalizedQuoteItems);
+        return (
+          <ExpansionPanel defaultExpanded={true} TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary>
+              <Grid container spacing={2}>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem title="Quote Number" label1={quoteHeader.QuoteNumber} />
+                </Grid>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem
+                    title="Quote Reference"
+                    label1={quoteHeader.AdrId}
+                    label2={'Carrier: ' + quoteHeader.CarrierID}
+                  />
+                </Grid>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem title="Quote Date" label1={quoteHeader.QuoteDate} />
+                </Grid>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem title="Quote Validity" label1={quoteHeader.QuoteValidity} />
+                </Grid>
+              </Grid>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container spacing={2}>
+                {normalizedQuoteItems.map(quoteItem => (
+                  <Grid item xs={12}>
+                    <QuoteItem quoteItemNormalized={quoteItem} />
+                  </Grid>
                 ))}
               </Grid>
-            </Container>
-          );
-        }}
-      />
-    </Box>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+        );
+      })}
+    </Fragment>
   );
 };
 
