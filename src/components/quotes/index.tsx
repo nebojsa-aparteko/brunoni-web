@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { QuoteHeader, QuoteItemNormalized, TermTerm } from '../../model/quotes/QuotesResult';
+import { CargoDetail, QuoteHeader, QuoteItemNormalized, TermTerm } from '../../model/quotes/QuotesResult';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
