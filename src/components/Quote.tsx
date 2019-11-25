@@ -1,5 +1,15 @@
 import React, { useContext } from 'react';
-import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid } from '@material-ui/core';
+import {
+  Box,
+  Container,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Grid,
+  makeStyles,
+  Paper,
+  Theme,
+} from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
@@ -12,6 +22,13 @@ import InfoBoxItem from './InfoBoxItem';
 interface Props {
   id: string;
 }
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    marginTop: theme.spacing(5),
+    marginBottom: theme.spacing(4),
+    padding: theme.spacing(3),
+  },
+}));
 
 const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
@@ -22,7 +39,7 @@ const initialResults =
 
 const Quote: React.FC<Props> = ({ id }) => {
   const { busy, error, result, refresh } = useContext(QuotesContext);
-
+  const classes = useStyles();
   const quoteHeader = result?.QuoteHeader?.find((quote: QuoteHeader) => quote.QuoteNumber === id);
 
   if (!quoteHeader) {
@@ -62,39 +79,15 @@ const Quote: React.FC<Props> = ({ id }) => {
   console.log('Normalized ', normalizedQuoteItems);
 
   return (
-    <Box>
-      <ExpansionPanel defaultExpanded={false} TransitionProps={{ unmountOnExit: true }}>
-        <ExpansionPanelSummary>
-          <Grid container spacing={2}>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem title="Quote Number" label1={quoteHeader.QuoteNumber} />
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem
-                title="Quote Reference"
-                label1={quoteHeader.AdrId}
-                label2={'Carrier: ' + quoteHeader.CarrierID}
-              />
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem title="Quote Date" label1={quoteHeader.QuoteDate} />
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem title="Quote Validity" label1={quoteHeader.QuoteValidity} />
-            </Grid>
+    <Container maxWidth="lg">
+      <Paper className={classes.root}>
+        {normalizedQuoteItems.map(quoteItem => (
+          <Grid item xs={12}>
+            <QuoteItem quoteItemNormalized={quoteItem} />
           </Grid>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Grid container>
-            {normalizedQuoteItems.map(quoteItem => (
-              <Grid item xs={12}>
-                <QuoteItem quoteItemNormalized={quoteItem} />
-              </Grid>
-            ))}
-          </Grid>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-    </Box>
+        ))}
+      </Paper>
+    </Container>
   );
 };
 
