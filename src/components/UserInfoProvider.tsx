@@ -1,5 +1,5 @@
 import React from 'react';
-import identity from 'lodash/identity';
+import get from 'lodash/fp/get';
 import Context from '../contexts/UserInfo';
 import useEndpoint from '../hooks/useEndpoint';
 
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const UserInfoProvider: React.FC<Props> = ({ children }) => {
-  const userInfo = useEndpoint('/session', identity, undefined);
+  const userInfo = useEndpoint('/session', get('UserInfo'), undefined);
   return <Context.Provider value={userInfo}>{children}</Context.Provider>;
 };
 

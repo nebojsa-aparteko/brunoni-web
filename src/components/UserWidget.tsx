@@ -59,6 +59,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
       >
         {userInfo && (
           <MenuItem disabled style={{ opacity: 'initial' }}>
+            {console.log('userInfo', userInfo) as any}
             <Box>
               <Box>
                 <Typography>{userInfo.AdrName}</Typography>

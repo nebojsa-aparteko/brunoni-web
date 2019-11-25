@@ -18,6 +18,7 @@ import QuotesProvider from './components/QuotesProvider';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import CookiesNotification from './components/CookiesNotification';
+import UserInfoProvider from './components/UserInfoProvider';
 
 const appFont = new FontFaceObserver('Montserrat');
 
@@ -33,20 +34,22 @@ const app = (
         <LoginDialogProvider>
           <UserProvider>
             <UserRecordProvider>
-              <ContainerTypesProvider>
-                <CommodityTypesProvider>
-                  <LocationsProvider>
-                    <CarriersProvider>
-                      <PortsProvider>
-                        <QuotesProvider>
-                          <CssBaseline />
-                          <App />
-                        </QuotesProvider>
-                      </PortsProvider>
-                    </CarriersProvider>
-                  </LocationsProvider>
-                </CommodityTypesProvider>
-              </ContainerTypesProvider>
+              <UserInfoProvider>
+                <ContainerTypesProvider>
+                  <CommodityTypesProvider>
+                    <LocationsProvider>
+                      <CarriersProvider>
+                        <PortsProvider>
+                          <QuotesProvider>
+                            <CssBaseline />
+                            <App />
+                          </QuotesProvider>
+                        </PortsProvider>
+                      </CarriersProvider>
+                    </LocationsProvider>
+                  </CommodityTypesProvider>
+                </ContainerTypesProvider>
+              </UserInfoProvider>
             </UserRecordProvider>
           </UserProvider>
         </LoginDialogProvider>
