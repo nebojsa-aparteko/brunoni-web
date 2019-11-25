@@ -10,6 +10,10 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
 
   useEffect(() => {
     if (!user) {
+      if (busy) setBusy(false);
+      if (error !== undefined) setError(undefined);
+      if (result !== initialResults) setResult(initialResults);
+      if (request !== 0) setRequest(0);
       return;
     }
 

@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Container from '../components/Container';
 import Quotes from '../components/Quotes';
 import ClientPerformance from '../components/ClientPerformance';
+import Footer from '../components/Footer';
 
 interface Props {}
 
@@ -40,6 +41,7 @@ const Dashboard: React.FC<Props> = ({}) => {
           <Quotes />
         </Paper>
       </Container>
+      <Footer />
     </Fragment>
   );
 };

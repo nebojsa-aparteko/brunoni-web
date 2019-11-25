@@ -1,35 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import update from 'lodash/fp/update';
-import sortBy from 'lodash/sortBy';
-import useEndpoint from '../hooks/useEndpoint';
-import { QuoteHeader } from '../model/quotes/QuotesResult';
 import Container from './Container';
 import QuotesList from './quotes/index';
+import QuotesContext from '../contexts/Quotes';
 
 interface Props {}
 
-const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
-
-const updateQuoteBody = update('Quote', updateQuoteResults);
-
-const initialResults =
-  process.env.NODE_ENV !== 'production' ? updateQuoteBody(require('../test/QuotesDataTest.json')) : undefined;
-
 const Quotes: React.FC<Props> = ({}) => {
-  const { busy, error, result, refresh } = useEndpoint('/quotes', updateQuoteBody, initialResults);
+  const { busy, error, result, refresh } = useContext(QuotesContext);
 
   return (
     <Box>
-      {/*<Box>
-        <Typography variant="h6">Busy</Typography>
-        <Typography variant="caption">{JSON.stringify(busy)}</Typography>
-      </Box>
-      <Box>
-        <Typography variant="h6">Error</Typography>
-        <Typography variant="caption">{JSON.stringify(error)}</Typography>
-      </Box>*/}
       {result ? (
         <QuotesList quoteHeaders={result.QuoteHeader} />
       ) : (
@@ -46,10 +28,6 @@ const Quotes: React.FC<Props> = ({}) => {
           </Grid>
         </Container>
       )}
-      {/*<Box>
-        <Typography variant="h6">Refresh</Typography>
-        <Typography variant="caption">{JSON.stringify(refresh)}</Typography>
-      </Box>*/}
     </Box>
   );
 };
