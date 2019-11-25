@@ -3,6 +3,7 @@ import { Theme, makeStyles, Grid, Paper, Typography, Button } from '@material-ui
 import Navbar from '../components/Navbar';
 import Container from '../components/Container';
 import Quotes from '../components/Quotes';
+import ClientPerformance from '../components/ClientPerformance';
 
 interface Props {}
 
@@ -22,26 +23,22 @@ const Dashboard: React.FC<Props> = ({}) => {
     <Fragment>
       <Navbar />
       <Container className={classes.root}>
-        <Grid container spacing={2}>
-          <Grid item xs={10}>
-            <Paper className={classes.paper}>
-              <Grid container spacing={2} justify="space-between">
-                <Grid item>
-                  <Typography variant="h6" gutterBottom>
-                    Quotes
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Button>Get Quote</Button>
-                </Grid>
-              </Grid>
-              <Quotes />
-            </Paper>
+        <Paper className={classes.paper}>
+          <ClientPerformance />
+        </Paper>
+        <Paper className={classes.paper}>
+          <Grid container spacing={2} justify="space-between">
+            <Grid item>
+              <Typography variant="h6" gutterBottom>
+                Quotes
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Button>Get Quote</Button>
+            </Grid>
           </Grid>
-          <Grid item xs={2}>
-            <Paper className={classes.paper}></Paper>
-          </Grid>
-        </Grid>
+          <Quotes />
+        </Paper>
       </Container>
     </Fragment>
   );

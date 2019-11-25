@@ -1,83 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Grid } from '@material-ui/core';
-import useUser from '../hooks/useUser';
-import update from 'lodash/fp/update';
-import QuotesResult, { QuoteHeader } from '../model/quotes/QuotesResult';
-import Container from './Container';
 import { Skeleton } from '@material-ui/lab';
+import update from 'lodash/fp/update';
 import sortBy from 'lodash/sortBy';
+import useEndpoint from '../hooks/useEndpoint';
+import { QuoteHeader } from '../model/quotes/QuotesResult';
+import Container from './Container';
 import QuotesList from './quotes/index';
 
 interface Props {}
 
 const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
+const updateQuoteBody = update('Quote', updateQuoteResults);
+
 const initialResults =
-  process.env.NODE_ENV !== 'production'
-    ? update('Quote', updateQuoteResults)(require('../test/QuotesDataTest.json'))
-    : undefined;
-
-const useEndpoint = (uri: string) => {
-  const user = useUser();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | undefined>();
-  const [result, setResult] = useState<QuotesResult | undefined>(initialResults);
-  const [request, setRequest] = useState(0);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    (async () => {
-      try {
-        const token = await user.getIdToken();
-
-        const response = await fetch(`${process.env.REACT_APP_API_URL}${uri}`, {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          signal,
-        });
-
-        if (response.ok) {
-          const body = await response.json();
-          setResult(update('Quote', updateQuoteResults)(body as QuotesResult));
-        } else {
-          const body = await response.json();
-          setError(body.error);
-          console.error(`Failed to request ${uri}`, response, body);
-        }
-      } catch (e) {
-        setError('Something went wrong. Please try again later.');
-        console.error('Failed to request the login email', e);
-      } finally {
-        setBusy(false);
-      }
-    })();
-
-    return () => {
-      controller.abort();
-    };
-  }, [user, uri, request]);
-
-  const refresh = () => setRequest(request + 1);
-
-  console.log('Results returned', result);
-
-  return { busy: busy, error: error, result: result, refresh: refresh };
-};
+  process.env.NODE_ENV !== 'production' ? updateQuoteBody(require('../test/QuotesDataTest.json')) : undefined;
 
 const Quotes: React.FC<Props> = ({}) => {
-  const { busy, error, result, refresh } = useEndpoint('/quotes');
+  const { busy, error, result, refresh } = useEndpoint('/quotes', updateQuoteBody, initialResults);
 
   return (
     <Box>

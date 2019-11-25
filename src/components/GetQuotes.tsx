@@ -138,7 +138,8 @@ const GetQuotes: React.FC<Props> = () => {
       }
       // setBusy(true);
       // TODO
-      alert('search');
+      // alert('search');
+      console.log('search', value);
       // onSearch(() => setBusy(false));
     }
   };
