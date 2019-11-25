@@ -45,7 +45,6 @@ const QuoteItemCargoDetail: React.FC<Props> = ({ cargoDetails }) => {
           })}
         </List>
       </Typography>
-      <Divider />
     </Grid>
   );
 };

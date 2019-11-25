@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import changeCase from 'change-case';
-import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button } from '@material-ui/core';
+import { makeStyles, Theme, AppBar, Toolbar, createStyles, Button, Box } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import Container from './Container';
@@ -58,37 +58,39 @@ const Navbar: React.FC = () => {
               className={classes.logo}
             />
           </Link>
-          {user !== undefined && user !== null && (
-            <Fragment>
+          <Box displayPrint="none" width="100%" display="flex">
+            {user !== undefined && user !== null && (
+              <Fragment>
+                <div className={classes.item}>
+                  <Button component={Link} to="/schedule">
+                    Schedule
+                  </Button>
+                </div>
+                <div className={classes.item}>
+                  <Button component={Link} to="/quotes/get">
+                    Request quotes
+                  </Button>
+                </div>
+              </Fragment>
+            )}
+            <div className={classes.spacer} />
+            {process.env.REACT_APP_BRAND === 'brunoni' ? (
               <div className={classes.item}>
-                <Button component={Link} to="/schedule">
-                  Schedule
+                <Button component="a" href="https://brunoni.ch">
+                  Visit brunoni.ch
                 </Button>
               </div>
+            ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
               <div className={classes.item}>
-                <Button component={Link} to="/quotes/get">
-                  Request quotes
+                <Button component="a" href="https://allmarine.ch">
+                  Visit allmarine.ch
                 </Button>
               </div>
-            </Fragment>
-          )}
-          <div className={classes.spacer} />
-          {process.env.REACT_APP_BRAND === 'brunoni' ? (
+            ) : null}
             <div className={classes.item}>
-              <Button component="a" href="https://brunoni.ch">
-                Visit brunoni.ch
-              </Button>
+              <IdentityWidget />
             </div>
-          ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-            <div className={classes.item}>
-              <Button component="a" href="https://allmarine.ch">
-                Visit allmarine.ch
-              </Button>
-            </div>
-          ) : null}
-          <div className={classes.item}>
-            <IdentityWidget />
-          </div>
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>

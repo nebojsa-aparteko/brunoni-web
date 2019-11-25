@@ -50,6 +50,9 @@ export default {
     fontSize: '16px',
     letterSpacing: '-0.05px',
     lineHeight: '25px',
+    '@media print': {
+      fontSize: '14px',
+    },
   },
   subtitle2: {
     color: palette.text.secondary,
@@ -57,18 +60,27 @@ export default {
     fontSize: '14px',
     letterSpacing: '-0.05px',
     lineHeight: '21px',
+    '@media print': {
+      fontSize: '12px',
+    },
   },
   body1: {
     color: palette.text.primary,
     fontSize: '14px',
     letterSpacing: '-0.05px',
     lineHeight: '21px',
+    '@media print': {
+      fontSize: '12px',
+    },
   },
   body2: {
     color: palette.text.secondary,
     fontSize: '12px',
     letterSpacing: '-0.04px',
     lineHeight: '18px',
+    '@media print': {
+      fontSize: '10px',
+    },
   },
   button: {
     color: palette.text.primary,

@@ -5,5 +5,8 @@ export default {
   root: {
     ...typography.body1,
     borderBottom: `1px solid ${palette.divider}`,
+    '@media print': {
+      fontSize: '10px',
+    },
   },
 };

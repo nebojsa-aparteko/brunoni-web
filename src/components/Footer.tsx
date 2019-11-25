@@ -41,8 +41,8 @@ const Footer: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <Box className={classes.spacer} />
-      <Box className={classes.info} py={6}>
+      <Box className={classes.spacer} displayPrint="none" />
+      <Box className={classes.info} py={6} displayPrint="none">
         <Container>
           <Grid container spacing={2}>
             <Grid item md={3} sm={6} xs={12}>
@@ -118,7 +118,7 @@ const Footer: React.FC<Props> = () => {
           </Grid>
         </Container>
       </Box>
-      <Box className={classes.copyright} py={4}>
+      <Box className={classes.copyright} py={4} displayPrint="none">
         <Container>Copyright © {new Date().getFullYear()} O. Brunoni S.A. Agence Maritime</Container>
       </Box>
     </Fragment>

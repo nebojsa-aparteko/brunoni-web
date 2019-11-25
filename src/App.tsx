@@ -43,9 +43,9 @@ const App: React.FC = () => (
   <Switch>
     <Route exact path="/" component={switchUser(Dashboard, Routes)} />
     <Route exact path="/schedule" component={requireUser(Routes)} />
-    <Route exact path="/quotes" component={Quotes} />
+    <Route exact path="/quotes" component={requireUser(Quotes)} />
     <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
-    <Route exact path="/quotes/:id" component={Quote} />
+    <Route exact path="/quotes/:id" component={requireUser(Quote)} />
     {/** TODO Remove temporary route /dashboard */}
     <Route exact path="/dashboard" component={Dashboard} />
     <Route component={NotFound} />

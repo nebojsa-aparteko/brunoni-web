@@ -20,6 +20,9 @@ const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => {
   return (
     <Fragment>
       <Grid item xs={12}>
+        <InfoBoxItemHorizontal title="Quote Number" label1={quoteHeader.QuoteNumber} />
+      </Grid>
+      <Grid item xs={12}>
         <InfoBoxItemHorizontal title="Quote Date" label1={quoteHeader.QuoteDate} />
         <Divider />
       </Grid>
@@ -42,10 +45,6 @@ const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => {
 
       <Grid item xs={12}>
         <InfoBoxItemHorizontal title="Quote Validity" label1={quoteHeader.QuoteValidity} />
-      </Grid>
-
-      <Grid item xs={12}>
-        <Divider />
       </Grid>
     </Fragment>
   );
