@@ -44,13 +44,13 @@ const UserWidget: React.FC<Props> = ({ active }) => {
           aria-label="User menu"
           aria-controls={menuId}
           aria-haspopup="true"
-          label={user?.email ?? '???'}
+          label={user?.email || '???'}
           onClick={handleProfileMenuOpen}
         />
       )}
       <Menu
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         id={menuId}
         keepMounted
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}

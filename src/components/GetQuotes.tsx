@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
-import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box } from '@material-ui/core';
+import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box, Paper } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
@@ -21,14 +21,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
   },
   button: {
     position: 'relative',
   },
   progress: {
     position: 'absolute',
+  },
+  paper: {
+    padding: theme.spacing(2),
   },
 }));
 
@@ -170,84 +173,86 @@ const GetQuotes: React.FC<Props> = () => {
 
   return (
     <Container className={classes.root}>
-      <Typography variant="h5" gutterBottom>
-        Request Quotes
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
-          <PortInput
-            label="Origin"
-            ports={ports}
-            inputRef={originInput}
-            value={originPort}
-            onChange={handleOriginPortChange}
-            open={originPortOpen}
-            onOpen={() => setOriginPortOpen(true)}
-            onClose={() => setOriginPortOpen(false)}
-          />
-        </Grid>
-        <Grid item sm={3} xs={12}>
-          <PortInput
-            label="Destination"
-            ports={ports}
-            inputRef={destinationInput}
-            value={destinationPort}
-            onChange={handleDestinationPortChange}
-            open={destinationPortOpen}
-            onOpen={() => setDestinationPortOpen(true)}
-            onClose={() => setDestinationPortOpen(false)}
-          />
-        </Grid>
-        <Grid item sm="auto" xs={6}>
-          <DateInput
-            value={date}
-            onChange={handleDateChange}
-            open={dateOpen}
-            onOpen={() => setDateOpen(true)}
-            onClose={() => setDateOpen(false)}
-          />
-        </Grid>
-        <Grid item sm="auto" xs={6}>
-          <WeeksInput
-            value={weeks}
-            onChange={handleWeeksChange}
-            open={weeksOpen}
-            onOpen={() => setWeeksOpen(true)}
-            onClose={() => setWeeksOpen(false)}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>
-            Containers
-          </Typography>
-          <ListInput
-            listRef={listInput}
-            addButtonRef={addButton}
-            ItemInput={ContainerInput}
-            defaultItemValue={{ quantity: 1 }}
-            value={containers}
-            onChange={setContainers}
-          />
-        </Grid>
-        <Grid item sm="auto" xs={12}>
-          <Button
-            variant="contained"
-            size="large"
-            color="primary"
-            className={classes.button}
-            onClick={handleSearch}
-            fullWidth
-          >
-            <CircularProgress
-              size={20}
-              color="inherit"
-              className={classes.progress}
-              style={{ visibility: busy ? 'visible' : 'hidden' }}
+      <Paper className={classes.paper}>
+        <Typography variant="h4" gutterBottom>
+          Request Quotes
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item sm={3} xs={12}>
+            <PortInput
+              label="Origin"
+              ports={ports}
+              inputRef={originInput}
+              value={originPort}
+              onChange={handleOriginPortChange}
+              open={originPortOpen}
+              onOpen={() => setOriginPortOpen(true)}
+              onClose={() => setOriginPortOpen(false)}
             />
-            <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
-          </Button>
+          </Grid>
+          <Grid item sm={3} xs={12}>
+            <PortInput
+              label="Destination"
+              ports={ports}
+              inputRef={destinationInput}
+              value={destinationPort}
+              onChange={handleDestinationPortChange}
+              open={destinationPortOpen}
+              onOpen={() => setDestinationPortOpen(true)}
+              onClose={() => setDestinationPortOpen(false)}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={6}>
+            <DateInput
+              value={date}
+              onChange={handleDateChange}
+              open={dateOpen}
+              onOpen={() => setDateOpen(true)}
+              onClose={() => setDateOpen(false)}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={6}>
+            <WeeksInput
+              value={weeks}
+              onChange={handleWeeksChange}
+              open={weeksOpen}
+              onOpen={() => setWeeksOpen(true)}
+              onClose={() => setWeeksOpen(false)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Containers
+            </Typography>
+            <ListInput
+              listRef={listInput}
+              addButtonRef={addButton}
+              ItemInput={ContainerInput}
+              defaultItemValue={{ quantity: 1 }}
+              value={containers}
+              onChange={setContainers}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={12}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              className={classes.button}
+              onClick={handleSearch}
+              fullWidth
+            >
+              <CircularProgress
+                size={20}
+                color="inherit"
+                className={classes.progress}
+                style={{ visibility: busy ? 'visible' : 'hidden' }}
+              />
+              <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
+      </Paper>
       {process.env.NODE_ENV !== 'production' && (
         <Box mt={4}>
           <Typography variant="subtitle2">This is visible in development only.</Typography>
