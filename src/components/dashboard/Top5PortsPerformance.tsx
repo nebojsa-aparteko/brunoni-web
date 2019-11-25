@@ -3,10 +3,10 @@ import { Card, CardHeader, Divider, CardContent, Typography } from '@material-ui
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 interface Props {
-  dataset: any;
+  clientPerformance: any;
 }
 
-const Top5PortsPerformance: React.FC<Props> = ({ dataset }) => {
+const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance }) => {
   return (
     <Card>
       <CardHeader title="Top 5 Ports" />

@@ -1,27 +1,56 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
+import flow from 'lodash/fp/flow';
+import map from 'lodash/fp/map';
+import get from 'lodash/fp/get';
+import keys from 'lodash/fp/keys';
+import sum from 'lodash/fp/sum';
 import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Doughnut } from 'react-chartjs-2';
+import Carriers from '../../contexts/Carriers';
 
 interface Props {
-  dataset: any;
+  clientPerformance: any;
 }
 
-const CarrierPerformance: React.FC<Props> = ({ dataset }) => {
+const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
   const theme = useTheme();
+  const cs = useContext(Carriers);
 
-  const data = {
-    datasets: [
+  const data = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+
+    const carriers = flow(get('TEU'), keys)(clientPerformance);
+
+    const performance = map((carrier: string) => {
+      return flow(
+        get(['TEU', carrier, String(currentYear)]),
+        map(flow(get(['Details', 'Amount']), Number)),
+        sum,
+      )(clientPerformance);
+    })(carriers);
+
+    const backgroundColors = map((carrier: string) => {
+      return cs?.find(c => c.ID === carrier)?.Color || colors.indigo[400];
+    })(carriers);
+
+    const total = sum(performance);
+
+    const datasets = [
       {
-        data: [48, 32],
-        backgroundColor: [colors.indigo[500], colors.indigo[300]],
+        data: map((value: number) => (100 * value) / total)(performance),
+        backgroundColor: backgroundColors,
         borderWidth: 8,
         borderColor: theme.palette.common.white,
         hoverBorderColor: theme.palette.common.white,
       },
-    ],
-    labels: ['HSG', 'HAMBURG'],
-  };
+    ];
+
+    return {
+      datasets,
+      labels: carriers,
+    };
+  }, [clientPerformance, cs]);
 
   const options = {
     responsive: true,

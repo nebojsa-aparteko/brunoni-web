@@ -1,55 +1,81 @@
-import React from 'react';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
+import React, { useMemo } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Bar } from 'react-chartjs-2';
+import flow from 'lodash/fp/flow';
+import map from 'lodash/fp/map';
+import mapValues from 'lodash/fp/mapValues';
+import get from 'lodash/fp/get';
+import values from 'lodash/fp/values';
+import flatten from 'lodash/fp/flatten';
+import groupBy from 'lodash/fp/groupBy';
+import sum from 'lodash/fp/sum';
+import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
 
 interface Props {
-  dataset: any;
+  clientPerformance: any;
 }
 
-const CustomerPerformance: React.FC<Props> = ({ dataset }) => {
+const TEUPerformance: React.FC<Props> = ({ clientPerformance }) => {
   const theme = useTheme();
 
-  const dataProp = {
-    thisYear: [18, 16, 5, 8, 3, 14, 14, 16, 17, 19, 18, 20],
-    lastYear: [12, 11, 4, 6, 2, 9, 9, 10, 11, 12, 13, 13],
-    yearBeforeLast: [4, 2, 5, 0, 12, 24, 44, 10, 11, 12, 13, 13],
-  };
+  const data = useMemo(() => {
+    const currentYear = new Date().getFullYear();
 
-  const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const normalizeByYear = (year: number) =>
+      flow(
+        get('TEU'),
+        values,
+        flatten,
+        map(get(String(year))),
+        flatten,
+        groupBy('Month'),
+        mapValues(flow(map(flow(get('Details.Amount'), Number)), sum)),
+        values,
+      );
 
-  const data = {
-    datasets: [
+    const dataProp = {
+      [currentYear]: normalizeByYear(currentYear)(clientPerformance),
+      [currentYear - 1]: normalizeByYear(currentYear - 1)(clientPerformance),
+      [currentYear - 2]: normalizeByYear(currentYear - 2)(clientPerformance),
+    };
+
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const datasets = [
+      {
+        label: currentYear - 2,
+        backgroundColor: colors.grey[200],
+        data: dataProp[currentYear - 2],
+        barThickness: 12,
+        maxBarThickness: 10,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5,
+      },
+      {
+        label: currentYear - 1,
+        backgroundColor: colors.grey[400],
+        data: dataProp[currentYear - 1],
+        barThickness: 12,
+        maxBarThickness: 10,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5,
+      },
       {
         label: 'YTD',
         backgroundColor: theme.palette.primary.main,
-        data: dataProp.thisYear,
+        data: dataProp[currentYear],
         barThickness: 12,
         maxBarThickness: 10,
         barPercentage: 0.5,
         categoryPercentage: 0.5,
       },
-      {
-        label: '2018',
-        backgroundColor: colors.grey[400],
-        data: dataProp.lastYear,
-        barThickness: 12,
-        maxBarThickness: 10,
-        barPercentage: 0.5,
-        categoryPercentage: 0.5,
-      },
-      {
-        label: '2017',
-        backgroundColor: colors.grey[200],
-        data: dataProp.yearBeforeLast,
-        barThickness: 12,
-        maxBarThickness: 10,
-        barPercentage: 0.5,
-        categoryPercentage: 0.5,
-      },
-    ],
-    labels,
-  };
+    ];
+
+    return {
+      datasets,
+      labels,
+    };
+  }, [clientPerformance]);
 
   const options = {
     responsive: true,
@@ -133,4 +159,4 @@ const CustomerPerformance: React.FC<Props> = ({ dataset }) => {
   );
 };
 
-export default CustomerPerformance;
+export default TEUPerformance;

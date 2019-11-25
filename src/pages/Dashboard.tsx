@@ -11,9 +11,11 @@ interface Props {}
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
   },
   paper: {
-    padding: theme.spacing(2),
+    marginTop: theme.spacing(4),
+    padding: theme.spacing(4),
   },
 }));
 
@@ -24,9 +26,7 @@ const Dashboard: React.FC<Props> = ({}) => {
     <Fragment>
       <Navbar />
       <Container className={classes.root}>
-        <Paper className={classes.paper}>
-          <ClientPerformance />
-        </Paper>
+        <ClientPerformance />
         <Paper className={classes.paper}>
           <Grid container spacing={2} justify="space-between">
             <Grid item>

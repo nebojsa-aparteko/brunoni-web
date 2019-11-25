@@ -1,13 +1,13 @@
 import React from 'react';
 import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import { Doughnut, Pie } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 
 interface Props {
-  dataset: any;
+  clientPerformance: any;
 }
 
-const ContainerTypePerformance: React.FC<Props> = ({ dataset }) => {
+const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
   const theme = useTheme();
 
   const data = {
