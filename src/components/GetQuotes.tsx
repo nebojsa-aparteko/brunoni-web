@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
 import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box } from '@material-ui/core';
@@ -10,10 +10,8 @@ import GetQuotesParams from '../model/get-quotes/GetQuotesParams';
 import { Container as ContainerModel } from '../model/get-quotes/Container';
 import ListInput from './inputs/ListInput';
 import ContainerInput from './inputs/ContainerInput';
-import ContainerTypesProvider from './ContainerTypesProvider';
 import Container from './Container';
-import CommodityTypesProvider from './CommodityTypesProvider';
-import LocationsProvider from './LocationsProvider';
+import Ports from '../contexts/Ports';
 
 interface Props {}
 
@@ -43,7 +41,7 @@ const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });
   const [busy, setBusy] = useState(false);
-  const [ports, setPorts] = useState<Port[]>();
+  const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
   const [dateOpen, setDateOpen] = useState<boolean>(false);
@@ -74,13 +72,43 @@ const GetQuotes: React.FC<Props> = () => {
   }, [originInput]);
 
   useEffect(() => {
+    if (!busy) {
+      return;
+    }
+
     const controller = new AbortController();
     const signal = controller.signal;
 
     (async () => {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/ports`, { signal });
-      const body = await response.json();
-      setPorts(body.Ports as Port[]);
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            origin: originPort!.ID,
+            destination: destinationPort!.ID,
+            date: date.toISOString(),
+            weeks: Number(weeks),
+            containers: containers.map(container => ({
+              type: container.containerType,
+              commodity: container.commodityType,
+              location: container.location,
+              quantity: container.quantity,
+            })),
+          }),
+          signal,
+        });
+
+        console.log('response');
+      } finally {
+        setBusy(false);
+      }
     })();
 
     return () => {
@@ -136,11 +164,7 @@ const GetQuotes: React.FC<Props> = () => {
           return;
         }
       }
-      // setBusy(true);
-      // TODO
-      // alert('search');
-      console.log('search', value);
-      // onSearch(() => setBusy(false));
+      setBusy(true);
     }
   };
 

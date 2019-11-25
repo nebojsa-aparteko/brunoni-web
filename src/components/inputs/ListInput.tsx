@@ -35,6 +35,11 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
     });
   };
 
+  const handleRemove = (i: number) => () => {
+    const v = [...value];
+    v.splice(i, 1);
+    onChange(v);
+  };
   return (
     <Box>
       {value.map((item, i) => (
@@ -43,16 +48,7 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
             <ItemInput ref={ref => (refs.current[i] = ref)} value={item} onChange={v => onChange(set(i, v)(value))} />
           </Box>
           <Box ml={2} alignSelf="center">
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<RemoveIcon />}
-              onClick={() => {
-                const v = [...value];
-                v.splice(i, 1);
-                onChange(v);
-              }}
-            >
+            <Button variant="contained" size="small" startIcon={<RemoveIcon />} onClick={handleRemove(i)}>
               Remove
             </Button>
           </Box>

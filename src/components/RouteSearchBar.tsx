@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/set';
 import { Theme, makeStyles, Grid, Button, Paper, CircularProgress } from '@material-ui/core';
@@ -7,6 +7,7 @@ import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
 import RouteSearchParams from '../model/route-search/RouteSearchParams';
+import Ports from '../contexts/Ports';
 
 interface Props {
   value: RouteSearchParams;
@@ -43,7 +44,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
 const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisibility }) => {
   const classes = useStyles();
   const [busy, setBusy] = useState(false);
-  const [ports, setPorts] = useState<Port[]>();
+  const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
   const [dateOpen, setDateOpen] = useState<boolean>(false);
@@ -70,21 +71,6 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
       Mousetrap.unbind('g s');
     };
   }, [originInput]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    (async () => {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/ports`, { signal });
-      const body = await response.json();
-      setPorts(body.Ports as Port[]);
-    })();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   const handleOriginPortChange = (port: Port) => {
     setOriginPort(port);

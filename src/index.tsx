@@ -13,6 +13,7 @@ import ContainerTypesProvider from './components/ContainerTypesProvider';
 import CarriersProvider from './components/CarriersProvider';
 import CommodityTypesProvider from './components/CommodityTypesProvider';
 import LocationsProvider from './components/LocationsProvider';
+import PortsProvider from './components/PortsProvider';
 import QuotesProvider from './components/QuotesProvider';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
@@ -34,10 +35,12 @@ const app = (
                 <CommodityTypesProvider>
                   <LocationsProvider>
                     <CarriersProvider>
-                      <QuotesProvider>
-                        <CssBaseline />
-                        <App />
-                      </QuotesProvider>
+                      <PortsProvider>
+                        <QuotesProvider>
+                          <CssBaseline />
+                          <App />
+                        </QuotesProvider>
+                      </PortsProvider>
                     </CarriersProvider>
                   </LocationsProvider>
                 </CommodityTypesProvider>
