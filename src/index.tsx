@@ -17,6 +17,7 @@ import PortsProvider from './components/PortsProvider';
 import QuotesProvider from './components/QuotesProvider';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
+import CookiesNotification from './components/CookiesNotification';
 
 const appFont = new FontFaceObserver('Montserrat');
 
@@ -26,6 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = (
   <Router>
+    <CookiesNotification />
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
         <LoginDialogProvider>
