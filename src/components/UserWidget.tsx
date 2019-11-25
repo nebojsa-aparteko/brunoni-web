@@ -1,10 +1,12 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { useId } from 'react-id-generator';
 import { useSnackbar } from 'notistack';
-import { IconButton, Menu, MenuItem, Typography } from '@material-ui/core';
-import { AccountCircle } from '@material-ui/icons';
+import { Box, Chip, Menu, MenuItem, Typography } from '@material-ui/core';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import firebase from '../firebase';
+import UserInfo from '../contexts/UserInfo';
+import useUser from '../hooks/useUser';
 
 interface Props {
   active: boolean;
@@ -13,6 +15,8 @@ interface Props {
 const UserWidget: React.FC<Props> = ({ active }) => {
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
+  const user = useUser();
+  const { result: userInfo } = useContext(UserInfo);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -35,15 +39,14 @@ const UserWidget: React.FC<Props> = ({ active }) => {
   return (
     <Fragment>
       {active && (
-        <IconButton
-          edge="end"
+        <Chip
+          avatar={<AccountCircle />}
           aria-label="User menu"
           aria-controls={menuId}
           aria-haspopup="true"
+          label={user?.email ?? '???'}
           onClick={handleProfileMenuOpen}
-        >
-          <AccountCircle />
-        </IconButton>
+        />
       )}
       <Menu
         anchorEl={anchorEl}
@@ -54,6 +57,18 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
+        {userInfo && (
+          <MenuItem disabled style={{ opacity: 'initial' }}>
+            <Box>
+              <Box>
+                <Typography>{userInfo.AdrName}</Typography>
+              </Box>
+              <Box>
+                <Typography>{userInfo.AdrName2}</Typography>
+              </Box>
+            </Box>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
       </Menu>
     </Fragment>
