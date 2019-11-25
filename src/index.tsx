@@ -8,6 +8,7 @@ import { CssBaseline } from '@material-ui/core';
 import App from './App';
 import LoginDialogProvider from './components/LoginDialogProvider';
 import UserProvider from './components/UserProvider';
+import UserRecordProvider from './components/UserRecordProvider';
 import ContainerTypesProvider from './components/ContainerTypesProvider';
 import CarriersProvider from './components/CarriersProvider';
 import CommodityTypesProvider from './components/CommodityTypesProvider';
@@ -27,16 +28,18 @@ const app = (
       <SnackbarProvider>
         <LoginDialogProvider>
           <UserProvider>
-            <ContainerTypesProvider>
-              <CommodityTypesProvider>
-                <LocationsProvider>
-                  <CarriersProvider>
-                    <CssBaseline />
-                    <App />
-                  </CarriersProvider>
-                </LocationsProvider>
-              </CommodityTypesProvider>
-            </ContainerTypesProvider>
+            <UserRecordProvider>
+              <ContainerTypesProvider>
+                <CommodityTypesProvider>
+                  <LocationsProvider>
+                    <CarriersProvider>
+                      <CssBaseline />
+                      <App />
+                    </CarriersProvider>
+                  </LocationsProvider>
+                </CommodityTypesProvider>
+              </ContainerTypesProvider>
+            </UserRecordProvider>
           </UserProvider>
         </LoginDialogProvider>
       </SnackbarProvider>
