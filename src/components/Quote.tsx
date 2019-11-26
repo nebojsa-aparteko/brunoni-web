@@ -100,6 +100,15 @@ const Quote: React.FC<Props> = ({ id }) => {
                       <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.QuoteNumber}`}>
                         View more
                       </Button>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        component={RouterLink}
+                        size="small"
+                        to={`/quotes/${quote.QuoteNumber}`}
+                      >
+                        Request Booking
+                      </Button>
                     </TableCell>
                   ))}
                 </TableRow>

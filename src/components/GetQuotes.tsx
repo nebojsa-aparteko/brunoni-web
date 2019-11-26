@@ -13,6 +13,8 @@ import ContainerInput from './inputs/ContainerInput';
 import Container from './Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
+import QuotesContext from '../contexts/Quotes';
+import { useHistory } from 'react-router';
 
 interface Props {}
 
@@ -44,6 +46,8 @@ const focusAndSelect = (input: HTMLInputElement) => {
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const user = useUser();
+  const history = useHistory();
+  const { refresh } = useContext(QuotesContext);
   const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });
   const [busy, setBusy] = useState(false);
   const ports = useContext(Ports);
@@ -128,7 +132,12 @@ const GetQuotes: React.FC<Props> = () => {
           signal,
         });
 
+        const json = await response.json();
+
+        refresh();
+
         console.log('Quoteationaksdjfh', 'response', response);
+        history.push(`/quotes/${json.QuoteHeader[0].idRequest}`);
       } finally {
         setBusy(false);
       }
