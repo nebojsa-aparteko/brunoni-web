@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Context from '../contexts/Locations';
 import { Location } from '../model/get-quotes/Location';
+import useTestData from '../utilities/useTestData';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const initialState = process.env.NODE_ENV !== 'production' ? require('../test/LocationsDataTest.json') : undefined;
-
 const LocationsProvider: React.FC<Props> = ({ children }) => {
-  const [locations, setLocations] = useState<Location[] | undefined>(initialState);
+  const [locations, setLocations] = useState<Location[] | undefined>(useTestData('locations'));
 
   useEffect(() => {
     const controller = new AbortController();

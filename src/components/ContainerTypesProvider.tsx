@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Context from '../contexts/ContainerTypes';
 import { ContainerType } from '../model/get-quotes/ContainerType';
+import useTestData from '../utilities/useTestData';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const initialState = process.env.NODE_ENV !== 'production' ? require('../test/ContainerTypesDataTest.json') : undefined;
-
 const ContainerTypesProvider: React.FC<Props> = ({ children }) => {
-  const [containerTypes, setContainerTypes] = useState<ContainerType[] | undefined>(initialState);
+  const [containerTypes, setContainerTypes] = useState<ContainerType[] | undefined>(useTestData('containerTypes'));
 
   useEffect(() => {
     const controller = new AbortController();

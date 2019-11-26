@@ -59,7 +59,5 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
 
   const refresh = () => setRequest(request + 1);
 
-  console.log('Results returned', result);
-
   return { busy: busy, error: error, result: result, refresh: refresh };
 }

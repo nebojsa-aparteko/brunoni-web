@@ -15,23 +15,44 @@ import TEUPerformance from './dashboard/TEUPerformance';
 import CarrierPerformance from './dashboard/CarrierPerformance';
 import ContainerTypePerformance from './dashboard/ContainerTypePerformance';
 import Top5PortsPerformance from './dashboard/Top5PortsPerformance';
-
-const asArray = (item: any) => (item === null ? [] : Array.isArray(item) ? item : [item]);
+import asArray from '../utilities/asArray';
+import useTestData from '../utilities/useTestData';
 
 interface Props {}
 
 const updateClientPerformanceBody = get('idStat_011.Statistics');
 
-const initialResults =
-  process.env.NODE_ENV !== 'production'
-    ? updateClientPerformanceBody(require('../test/ClientPerformanceDataTest.json'))
-    : undefined;
+const normalizeClientPerformance = flow(
+  groupBy('StatisticType'),
+  mapValues(
+    flow(
+      head,
+      omit('StatisticType'),
+      update(
+        'Carriers',
+        flow(
+          asArray,
+          groupBy('Carrier'),
+          mapValues(
+            flow(
+              head,
+              get('Data'),
+              groupBy('Year'),
+              mapValues(map(flow(pick(['Month', 'Details']), update('Month', Number)))),
+            ),
+          ),
+        ),
+      ),
+      get('Carriers'),
+    ),
+  ),
+);
 
 const ClientPerformance: React.FC<Props> = ({}) => {
   const { busy, error, result, refresh } = useEndpoint(
     '/clientPerformance',
     updateClientPerformanceBody,
-    initialResults,
+    useTestData('clientPerformance', updateClientPerformanceBody),
   );
 
   const clientPerformance = useMemo(() => {
@@ -43,31 +64,7 @@ const ClientPerformance: React.FC<Props> = ({}) => {
       return null;
     }
 
-    return flow(
-      groupBy('StatisticType'),
-      mapValues(
-        flow(
-          head,
-          omit('StatisticType'),
-          update(
-            'Carriers',
-            flow(
-              asArray,
-              groupBy('Carrier'),
-              mapValues(
-                flow(
-                  head,
-                  get('Data'),
-                  groupBy('Year'),
-                  mapValues(map(flow(pick(['Month', 'Details']), update('Month', Number)))),
-                ),
-              ),
-            ),
-          ),
-          get('Carriers'),
-        ),
-      ),
-    )(result);
+    return normalizeClientPerformance(result);
   }, [result]);
 
   return (

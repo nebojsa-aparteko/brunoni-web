@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Context from '../contexts/Ports';
 import Port from '../model/Port';
+import useTestData from '../utilities/useTestData';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const initialState = process.env.NODE_ENV !== 'production' ? require('../test/PortsDataTest.json') : undefined;
-
 const PortsProvider: React.FC<Props> = ({ children }) => {
-  const [ports, setPorts] = useState<Port[] | undefined>(initialState);
+  const [ports, setPorts] = useState<Port[] | undefined>(useTestData<Port[]>('portsDataTest'));
 
   useEffect(() => {
     const controller = new AbortController();

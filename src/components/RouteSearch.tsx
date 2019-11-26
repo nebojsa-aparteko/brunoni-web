@@ -18,6 +18,7 @@ import Route from './routeSearch/Route';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
 import SearchHowTo from './routeSearch/SearchHowTo';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
+import useTestData from '../utilities/useTestData';
 
 interface Props {}
 
@@ -68,17 +69,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const initialResults =
-  process.env.NODE_ENV !== 'production'
-    ? update('Routes', sortingOptions[0].sort)(require('../test/RoutesSearchDataTest.json'))
-    : undefined;
-
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
-  const [results, setResults] = useState<RouteSearchResults | undefined>(initialResults);
+  const [results, setResults] = useState<RouteSearchResults | undefined>(
+    useTestData('routesSearch', update('Routes', sortingOptions[0].sort)),
+  );
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
   const [searchInProgress, setSearchInProgress] = useState(false);

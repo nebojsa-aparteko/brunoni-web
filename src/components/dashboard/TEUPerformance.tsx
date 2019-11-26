@@ -15,23 +15,23 @@ interface Props {
   clientPerformance: any;
 }
 
+const normalizeByYear = (year: number) =>
+  flow(
+    get('TEU'),
+    values,
+    flatten,
+    map(get(String(year))),
+    flatten,
+    groupBy('Month'),
+    mapValues(flow(map(flow(get('Details.Amount'), Number)), sum)),
+    values,
+  );
+
 const TEUPerformance: React.FC<Props> = ({ clientPerformance }) => {
   const theme = useTheme();
 
   const data = useMemo(() => {
     const currentYear = new Date().getFullYear();
-
-    const normalizeByYear = (year: number) =>
-      flow(
-        get('TEU'),
-        values,
-        flatten,
-        map(get(String(year))),
-        flatten,
-        groupBy('Month'),
-        mapValues(flow(map(flow(get('Details.Amount'), Number)), sum)),
-        values,
-      );
 
     const dataProp = {
       [currentYear]: normalizeByYear(currentYear)(clientPerformance),

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import Context from '../contexts/CommodityTypes';
 import { CommodityType } from '../model/get-quotes/CommodityType';
+import useTestData from '../utilities/useTestData';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const initialState = process.env.NODE_ENV !== 'production' ? require('../test/CommodityTypesDataTest.json') : undefined;
-
 const CommodityTypesProvider: React.FC<Props> = ({ children }) => {
-  const [containerTypes, setCommodityTypes] = useState<CommodityType[] | undefined>(initialState);
+  const [containerTypes, setCommodityTypes] = useState<CommodityType[] | undefined>(
+    useTestData<CommodityType[]>('commodityTypes'),
+  );
 
   useEffect(() => {
     const controller = new AbortController();
