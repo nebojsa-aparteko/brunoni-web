@@ -12,6 +12,7 @@ import ListInput from './inputs/ListInput';
 import ContainerInput from './inputs/ContainerInput';
 import Container from './Container';
 import Ports from '../contexts/Ports';
+import useUser from '../hooks/useUser';
 
 interface Props {}
 
@@ -42,6 +43,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
 
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
+  const user = useUser();
   const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });
   const [busy, setBusy] = useState(false);
   const ports = useContext(Ports);
@@ -75,15 +77,32 @@ const GetQuotes: React.FC<Props> = () => {
   }, [originInput]);
 
   useEffect(() => {
-    if (!busy) {
+    console.log('Quoteationaksdjfh', 'about to request');
+
+    if (!busy || !user) {
       return;
     }
+
+    console.log('Quoteationaksdjfh', 'requesting', {
+      origin: originPort!.ID,
+      destination: destinationPort!.ID,
+      date: date.toISOString(),
+      weeks: Number(weeks),
+      containers: containers.map(container => ({
+        type: container.containerType!.CtypID,
+        commodity: container.commodityType!.CommodityID,
+        location: container.location?.AdrID,
+        quantity: container.quantity,
+      })),
+    });
 
     const controller = new AbortController();
     const signal = controller.signal;
 
     (async () => {
       try {
+        const token = await user.getIdToken();
+
         const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {
           method: 'POST',
           mode: 'cors',
@@ -92,6 +111,7 @@ const GetQuotes: React.FC<Props> = () => {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             origin: originPort!.ID,
@@ -99,16 +119,16 @@ const GetQuotes: React.FC<Props> = () => {
             date: date.toISOString(),
             weeks: Number(weeks),
             containers: containers.map(container => ({
-              type: container.containerType,
-              commodity: container.commodityType,
-              location: container.location,
+              type: container.containerType!.CtypID,
+              commodity: container.commodityType!.CommodityID,
+              location: container.location?.AdrID,
               quantity: container.quantity,
             })),
           }),
           signal,
         });
 
-        console.log('response');
+        console.log('Quoteationaksdjfh', 'response', response);
       } finally {
         setBusy(false);
       }
@@ -117,7 +137,7 @@ const GetQuotes: React.FC<Props> = () => {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [user, busy]);
 
   const handleOriginPortChange = (port: Port) => {
     setOriginPort(port);

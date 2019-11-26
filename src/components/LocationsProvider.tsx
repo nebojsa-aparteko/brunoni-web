@@ -6,8 +6,10 @@ interface Props {
   children: React.ReactNode;
 }
 
+const initialState = process.env.NODE_ENV !== 'production' ? require('../test/LocationsDataTest.json') : undefined;
+
 const LocationsProvider: React.FC<Props> = ({ children }) => {
-  const [locations, setLocations] = useState<Location[] | undefined>(undefined);
+  const [locations, setLocations] = useState<Location[] | undefined>(initialState);
 
   useEffect(() => {
     const controller = new AbortController();

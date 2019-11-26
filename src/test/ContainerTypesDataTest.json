@@ -1,0 +1,163 @@
+[
+  {
+    "CtypID": "22G1",
+    "DisplayID": "20'DC",
+    "Description": "20'BOXCONTAINER",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "22G1S",
+    "DisplayID": "20'SO",
+    "Description": "20'BOXCONTAINER S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "22P1",
+    "DisplayID": "20'FR",
+    "Description": "20'FLAT RACK",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "22P1S",
+    "DisplayID": "20'SO",
+    "Description": "20'FLAT RACK S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "22P3",
+    "DisplayID": "20'PF",
+    "Description": "20'PLAT FORM",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "22P5",
+    "DisplayID": "20'SR",
+    "Description": "20'SUPERRACK",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "22R1",
+    "DisplayID": "20'RF",
+    "Description": "20'REEFER",
+    "Reefer": "yes",
+    "ContainerGroup": "Reefer"
+  },
+  {
+    "CtypID": "22T2S",
+    "DisplayID": "20'TK",
+    "Description": "20'TANK-CTR S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "22U1",
+    "DisplayID": "20'OT",
+    "Description": "20'OPEN TOP",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "22U1S",
+    "DisplayID": "20'SO",
+    "Description": "20'OPEN TOP S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42G1",
+    "DisplayID": "40'DC",
+    "Description": "40'BOXCONTAINER",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "42G1S",
+    "DisplayID": "40'SO",
+    "Description": "40'BOXCONTAINER S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "42P1",
+    "DisplayID": "40'FR",
+    "Description": "40'FLAT RACK",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42P1S",
+    "DisplayID": "40'SO",
+    "Description": "40'FLAT RACK S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42P3",
+    "DisplayID": "40'PF",
+    "Description": "40'PLAT FORM",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42P5",
+    "DisplayID": "40'SR",
+    "Description": "40'SUPERRACK",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42U1",
+    "DisplayID": "40'OT",
+    "Description": "40'OPEN TOP",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "42U1S",
+    "DisplayID": "40'SO",
+    "Description": "40'OPEN TOP S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "45G1",
+    "DisplayID": "40'HC",
+    "Description": "40'HIGH CUBE CONT.",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "45G1S",
+    "DisplayID": "40'SO",
+    "Description": "40'HIGH CUBE S.O.",
+    "Reefer": "no",
+    "ContainerGroup": "Dry"
+  },
+  {
+    "CtypID": "45P3",
+    "DisplayID": "40'FH",
+    "Description": "40'FLAT RACK H.C.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  },
+  {
+    "CtypID": "45R1",
+    "DisplayID": "40'RH",
+    "Description": "40'REEFER HIGH CUBE",
+    "Reefer": "yes",
+    "ContainerGroup": "Reefer"
+  },
+  {
+    "CtypID": "45U1",
+    "DisplayID": "40'OH",
+    "Description": "40'OPEN TOP H.C.",
+    "Reefer": "no",
+    "ContainerGroup": "Special"
+  }
+]

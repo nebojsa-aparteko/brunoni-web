@@ -1,0 +1,4094 @@
+[
+  {
+    "ID": "DELEE",
+    "HarbourName": "LEER",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "DKAAR",
+    "HarbourName": "AARHUS",
+    "PortName": null,
+    "Land": "DENMARK"
+  },
+  {
+    "ID": "CIABJ",
+    "HarbourName": "ABIDJAN",
+    "PortName": null,
+    "Land": "C\u00d4TE D'IVOIRE"
+  },
+  {
+    "ID": "FITKU",
+    "HarbourName": "TURKU/ABO",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "AEAUH",
+    "HarbourName": "ABU DHABI",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "SVAQJ",
+    "HarbourName": "ACAJUTLA",
+    "PortName": null,
+    "Land": "EL SALVADOR"
+  },
+  {
+    "ID": "YEADE",
+    "HarbourName": "ADEN",
+    "PortName": null,
+    "Land": "YEMEN"
+  },
+  {
+    "ID": "AUADL",
+    "HarbourName": "ADELAIDE",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "NOAES",
+    "HarbourName": "ALESUND",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "MAAGA",
+    "HarbourName": "AGADIR",
+    "PortName": null,
+    "Land": "MOROCCO"
+  },
+  {
+    "ID": "ESAGP",
+    "HarbourName": "MALAGA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "SEAHU",
+    "HarbourName": "AHUS",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "CRCAL",
+    "HarbourName": "PUERTO CALDERA",
+    "PortName": null,
+    "Land": "COSTA RICA"
+  },
+  {
+    "ID": "JPAXT",
+    "HarbourName": "AKITA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "NZAKL",
+    "HarbourName": "AUCKLAND",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "TRALI",
+    "HarbourName": "ALIAGA-IZMIR",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "ESALG",
+    "HarbourName": "ALGECIRAS",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "DZALG",
+    "HarbourName": "ALGER",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "ESALC",
+    "HarbourName": "ALICANTE",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "MXATM",
+    "HarbourName": "ALTAMIRA",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "EGALY",
+    "HarbourName": "ALEXANDRIA",
+    "PortName": null,
+    "Land": "EGYPT"
+  },
+  {
+    "ID": "NLAMS",
+    "HarbourName": "AMSTERDAM",
+    "PortName": null,
+    "Land": "NETHERLANDS"
+  },
+  {
+    "ID": "ITAOI",
+    "HarbourName": "ANCONA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "CLANF",
+    "HarbourName": "ANTOFAGASTA",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "CLPAG",
+    "HarbourName": "PUERTO ANGAMOS",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "DZAAE",
+    "HarbourName": "ANNABA",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "CNAQG",
+    "HarbourName": "ANQING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "BEANR",
+    "HarbourName": "ANTWERP",
+    "PortName": null,
+    "Land": "BELGIUM"
+  },
+  {
+    "ID": "NGAPP",
+    "HarbourName": "APAPA",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "WSAPW",
+    "HarbourName": "APIA",
+    "PortName": null,
+    "Land": "SAMOA"
+  },
+  {
+    "ID": "JOAQB",
+    "HarbourName": "AQABA",
+    "PortName": null,
+    "Land": "JORDAN"
+  },
+  {
+    "ID": "CLARI",
+    "HarbourName": "ARICA",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "DZAZW",
+    "HarbourName": "ARZEW",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "ILASH",
+    "HarbourName": "ASHDOD",
+    "PortName": null,
+    "Land": "ISRAEL"
+  },
+  {
+    "ID": "ERASA",
+    "HarbourName": "ASSAB",
+    "PortName": null,
+    "Land": "ERITREA"
+  },
+  {
+    "ID": "PYASU",
+    "HarbourName": "ASUNCION",
+    "PortName": null,
+    "Land": "PARAGUAY"
+  },
+  {
+    "ID": "TRAYT",
+    "HarbourName": "ANTALYA",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "NZAKL",
+    "HarbourName": "AUCKLAND",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "BHBAH",
+    "HarbourName": "BAHRAIN",
+    "PortName": null,
+    "Land": "BAHRAIN"
+  },
+  {
+    "ID": "USBAL",
+    "HarbourName": "BALTIMORE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "GMBJL",
+    "HarbourName": "BANJUL",
+    "PortName": null,
+    "Land": "GAMBIA"
+  },
+  {
+    "ID": "COBAQ",
+    "HarbourName": "BARRANQUILLA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "ESBCN",
+    "HarbourName": "BARCELONA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "BMBDA",
+    "HarbourName": "HAMILTON/BERMUDA",
+    "PortName": null,
+    "Land": "BERMUDA"
+  },
+  {
+    "ID": "IDBDJ",
+    "HarbourName": "BANJARMASIN",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "MZBEW",
+    "HarbourName": "BEIRA",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "GBBEL",
+    "HarbourName": "BELFAST",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "DZBJA",
+    "HarbourName": "BEJAJA",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "BRBEL",
+    "HarbourName": "BELEM",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "LYBEN",
+    "HarbourName": "BENGHAZI",
+    "PortName": null,
+    "Land": "LIBYA"
+  },
+  {
+    "ID": "NOBGO",
+    "HarbourName": "BERGEN",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "LBBEY",
+    "HarbourName": "BEIRUT",
+    "PortName": null,
+    "Land": "LEBANON"
+  },
+  {
+    "ID": "BZBGK",
+    "HarbourName": "BIG CREEK",
+    "PortName": null,
+    "Land": "BELIZE"
+  },
+  {
+    "ID": "BBBGI",
+    "HarbourName": "BRIDGETOWN",
+    "PortName": null,
+    "Land": "BARBADOS"
+  },
+  {
+    "ID": "ARBHI",
+    "HarbourName": "BAHIA BLANCA",
+    "PortName": null,
+    "Land": "ARGENTINA"
+  },
+  {
+    "ID": "ESBIO",
+    "HarbourName": "BILBAO",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "GWOXB",
+    "HarbourName": "BISSAU",
+    "PortName": null,
+    "Land": "GUINEA-BISSAU"
+  },
+  {
+    "ID": "TNBIZ",
+    "HarbourName": "BIZERTE",
+    "PortName": null,
+    "Land": "TUNISIA"
+  },
+  {
+    "ID": "THBKK",
+    "HarbourName": "BANGKOK",
+    "PortName": null,
+    "Land": "THAILAND"
+  },
+  {
+    "ID": "PABLB",
+    "HarbourName": "BALBOA",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "CNBEI",
+    "HarbourName": "BEILUN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "IRBND",
+    "HarbourName": "BANDAR ABBAS",
+    "PortName": null,
+    "Land": "IRAN, ISLAMIC REPUBLIC OF"
+  },
+  {
+    "ID": "CDBNW",
+    "HarbourName": "BANANA",
+    "PortName": null,
+    "Land": "CONGO, THE DEMOCRATIC REPUBLIC OF THE"
+  },
+  {
+    "ID": "CDBOA",
+    "HarbourName": "BOMA",
+    "PortName": null,
+    "Land": "CONGO, THE DEMOCRATIC REPUBLIC OF THE"
+  },
+  {
+    "ID": "FRBOD",
+    "HarbourName": "BORDEAUX",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "COBOG",
+    "HarbourName": "BOGOTA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "USBOS",
+    "HarbourName": "BOSTON",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "IDBPN",
+    "HarbourName": "BALIKPAPAN",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "COBAQ",
+    "HarbourName": "BARRANQUILLA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "DEBKE",
+    "HarbourName": "BRAKE",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "DEBLM",
+    "HarbourName": "BREMEN",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "NOBVK",
+    "HarbourName": "BREVIK",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "USBRO",
+    "HarbourName": "BROWNSVILLE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "DEBRV",
+    "HarbourName": "BREMERHAVEN",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "AUBNE",
+    "HarbourName": "BRISBANE",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "CHBSL",
+    "HarbourName": "BASLE",
+    "PortName": null,
+    "Land": "SWITZERLAND"
+  },
+  {
+    "ID": "KRPUS",
+    "HarbourName": "BUSAN",
+    "PortName": null,
+    "Land": "KOREA, REPUBLIC OF"
+  },
+  {
+    "ID": "IDBTM",
+    "HarbourName": "BATAM ISLAND",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "USBTR",
+    "HarbourName": "BATON ROUGE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "MYBTU",
+    "HarbourName": "BINTULU",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "ARBUE",
+    "HarbourName": "BUENOS AIRES",
+    "PortName": null,
+    "Land": "ARGENTINA"
+  },
+  {
+    "ID": "COBUN",
+    "HarbourName": "BUENAVENTURA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "AUBWT",
+    "HarbourName": "BURNIE / TASMANIA",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "NOBVK",
+    "HarbourName": "BREVIK",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "MYWOT",
+    "HarbourName": "BUTTERWORTH",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "IDBLW",
+    "HarbourName": "BELAWAN",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "BZBZE",
+    "HarbourName": "BELIZE",
+    "PortName": null,
+    "Land": "BELIZE"
+  },
+  {
+    "ID": "BRCDO",
+    "HarbourName": "CABEDELO",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "ESCAD",
+    "HarbourName": "CADIZ",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "INCCU",
+    "HarbourName": "CALCUTTA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "PECLL",
+    "HarbourName": "CALLAO",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "ZACPT",
+    "HarbourName": "CAPE TOWN",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "ESCAR",
+    "HarbourName": "CARTAGENA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "MACAS",
+    "HarbourName": "CASABLANCA",
+    "PortName": null,
+    "Land": "MOROCCO"
+  },
+  {
+    "ID": "DOCAU",
+    "HarbourName": "CAUCEDO",
+    "PortName": null,
+    "Land": "DOMINICAN REPUBLIC"
+  },
+  {
+    "ID": "AOCAB",
+    "HarbourName": "CABINDA",
+    "PortName": null,
+    "Land": "ANGOLA"
+  },
+  {
+    "ID": "LKCMB",
+    "HarbourName": "COLOMBO",
+    "PortName": null,
+    "Land": "SRI LANKA"
+  },
+  {
+    "ID": "PECHM",
+    "HarbourName": "CHIMBOTE",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "VECCS",
+    "HarbourName": "CARACAS",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "PHCEB",
+    "HarbourName": "CEBU",
+    "PortName": null,
+    "Land": "PHILIPPINES"
+  },
+  {
+    "ID": "PACFZ",
+    "HarbourName": "COLON",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "ITCAG",
+    "HarbourName": "CAGLIARI",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "CNCGO",
+    "HarbourName": "ZHENGZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CACAL",
+    "HarbourName": "CALGARY",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "CNCHH",
+    "HarbourName": "CHANGSHU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "USCHI",
+    "HarbourName": "CHICAGO",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "INMAA",
+    "HarbourName": "CHENNAI",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "USCHS",
+    "HarbourName": "CHARLESTON",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNCWN",
+    "HarbourName": "CHIWAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "USCVG",
+    "HarbourName": "CINCINNATI",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "BDCGP",
+    "HarbourName": "CHITTAGONG",
+    "PortName": null,
+    "Land": "BANGLADESH"
+  },
+  {
+    "ID": "USCLE",
+    "HarbourName": "CLEVELAND, OH",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "USCLE",
+    "HarbourName": "CLEVELAND",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "VNCLN",
+    "HarbourName": "CAI LAN",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "LKCMB",
+    "HarbourName": "COLOMBO",
+    "PortName": null,
+    "Land": "SRI LANKA"
+  },
+  {
+    "ID": "VNCMT",
+    "HarbourName": "CAI MEP",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "CLCNR",
+    "HarbourName": "CHANARAL",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "MXCOA",
+    "HarbourName": "COATZACOALCOS",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "INCOK",
+    "HarbourName": "COCHIN",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "ZAZBA",
+    "HarbourName": "COEGA",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "USCMH",
+    "HarbourName": "COLUMBUS",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "GNCKY",
+    "HarbourName": "CONAKRY",
+    "PortName": null,
+    "Land": "GUINEA"
+  },
+  {
+    "ID": "CLCQQ",
+    "HarbourName": "COQUIMBO",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "NICIO",
+    "HarbourName": "CORINTO",
+    "PortName": null,
+    "Land": "NICARAGUA"
+  },
+  {
+    "ID": "ROCND",
+    "HarbourName": "CONSTANTA",
+    "PortName": null,
+    "Land": "ROMANIA"
+  },
+  {
+    "ID": "BJCOO",
+    "HarbourName": "COTONOU",
+    "PortName": null,
+    "Land": "BENIN"
+  },
+  {
+    "ID": "DKCPH",
+    "HarbourName": "COPENHAGEN",
+    "PortName": null,
+    "Land": "DENMARK"
+  },
+  {
+    "ID": "PACTB",
+    "HarbourName": "CRISTOBAL",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "USCRP",
+    "HarbourName": "CORPUS CHRISTI",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNCSX",
+    "HarbourName": "CHANGSHA",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "COCTG",
+    "HarbourName": "CARTAGENA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "CNCTU",
+    "HarbourName": "CHENGDU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "ITCVV",
+    "HarbourName": "CIVITAVECCHIA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "CNCZX",
+    "HarbourName": "CHANGZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "VNDAD",
+    "HarbourName": "DANANG",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "SNDKR",
+    "HarbourName": "DAKAR",
+    "PortName": null,
+    "Land": "SENEGAL"
+  },
+  {
+    "ID": "CNDLC",
+    "HarbourName": "DALIAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "EGDAM",
+    "HarbourName": "DAMIETTA",
+    "PortName": null,
+    "Land": "EGYPT"
+  },
+  {
+    "ID": "TZDAR",
+    "HarbourName": "DAR ES SALAAM",
+    "PortName": null,
+    "Land": "TANZANIA, UNITED REPUBLIC OF"
+  },
+  {
+    "ID": "USDET",
+    "HarbourName": "DETROIT",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "DJJIB",
+    "HarbourName": "DJIBOUTI",
+    "PortName": null,
+    "Land": "DJIBOUTI"
+  },
+  {
+    "ID": "SNDKR",
+    "HarbourName": "DAKAR",
+    "PortName": null,
+    "Land": "SENEGAL"
+  },
+  {
+    "ID": "SADMM",
+    "HarbourName": "DAMMAN",
+    "PortName": null,
+    "Land": "SAUDI ARABIA"
+  },
+  {
+    "ID": "QADOH",
+    "HarbourName": "DOHA",
+    "PortName": null,
+    "Land": "QATAR"
+  },
+  {
+    "ID": "CMDLA",
+    "HarbourName": "DOUALA",
+    "PortName": null,
+    "Land": "CAMEROON"
+  },
+  {
+    "ID": "NODRM",
+    "HarbourName": "DRAMMEN",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "ALDRZ",
+    "HarbourName": "DURRES",
+    "PortName": null,
+    "Land": "ALBANIA"
+  },
+  {
+    "ID": "IEDUB",
+    "HarbourName": "DUBLIN",
+    "PortName": null,
+    "Land": "IRELAND"
+  },
+  {
+    "ID": "FRIRK",
+    "HarbourName": "DUNKIRK",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "ZADUR",
+    "HarbourName": "DURBAN",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "PHDVO",
+    "HarbourName": "DAVAO",
+    "PortName": null,
+    "Land": "PHILIPPINES"
+  },
+  {
+    "ID": "AEDXB",
+    "HarbourName": "DUBAI",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "DKEBJ",
+    "HarbourName": "ESBJERG",
+    "PortName": null,
+    "Land": "DENMARK"
+  },
+  {
+    "ID": "CAEDM",
+    "HarbourName": "EDMONTON",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "LYMEH",
+    "HarbourName": "EL BREGA",
+    "PortName": null,
+    "Land": "LIBYA"
+  },
+  {
+    "ID": "ZAELS",
+    "HarbourName": "EAST LONDON",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "SVELS",
+    "HarbourName": "EL SALVADOR",
+    "PortName": null,
+    "Land": "EL SALVADOR"
+  },
+  {
+    "ID": "DEEME",
+    "HarbourName": "EMDEN",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "ECESM",
+    "HarbourName": "ESMERALDAS",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "MQFDF",
+    "HarbourName": "FORT DE FRANCE",
+    "PortName": null,
+    "Land": "MARTINIQUE"
+  },
+  {
+    "ID": "JPFKY",
+    "HarbourName": "FUKUYAMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "USFLL",
+    "HarbourName": "FORT LAUDERDALE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "GBFXT",
+    "HarbourName": "FELIXSTOWE",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "AUFRE",
+    "HarbourName": "FREMANTLE",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "BRFOR",
+    "HarbourName": "FORTALEZA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "FRFOS",
+    "HarbourName": "FOS/MARSEILLE",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "USFPO",
+    "HarbourName": "FREEPORT",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "DKFRC",
+    "HarbourName": "FREDERICIA",
+    "PortName": null,
+    "Land": "DENMARK"
+  },
+  {
+    "ID": "NOFRK",
+    "HarbourName": "FREDRIKSTAD",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "AUFRE",
+    "HarbourName": "FREMANTLE",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "NOFRO",
+    "HarbourName": "FLORO",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "CNFRT",
+    "HarbourName": "FOSHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "FRFOS",
+    "HarbourName": "FOS SUR MER",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "CNSHM",
+    "HarbourName": "MAFANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "SLFNA",
+    "HarbourName": "FREETOWN",
+    "PortName": null,
+    "Land": "SIERRA LEONE"
+  },
+  {
+    "ID": "CNFQG",
+    "HarbourName": "Fuqing",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "AEOFJ",
+    "HarbourName": "FUJAIRAH",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "PTFNC",
+    "HarbourName": "FUNCHAL",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "GBFXT",
+    "HarbourName": "FELIXSTOWE",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "CNFZH",
+    "HarbourName": "FUZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "SEGVX",
+    "HarbourName": "GAEVLE",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "USGLS",
+    "HarbourName": "GALVESTON",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "PLGDN",
+    "HarbourName": "GDANSK",
+    "PortName": null,
+    "Land": "POLAND"
+  },
+  {
+    "ID": "PLGDY",
+    "HarbourName": "GDYNIA",
+    "PortName": null,
+    "Land": "POLAND"
+  },
+  {
+    "ID": "TRGEB",
+    "HarbourName": "GEBZE",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "TRGEM",
+    "HarbourName": "GEMLIK",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "CNGGZ",
+    "HarbourName": "GUANGZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "DZGHZ",
+    "HarbourName": "GHAZAOUET",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "USGHE",
+    "HarbourName": "GHENT",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "PHGIN",
+    "HarbourName": "GINGOOG",
+    "PortName": null,
+    "Land": "PHILIPPINES"
+  },
+  {
+    "ID": "ITGOA",
+    "HarbourName": "GENOA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "CNGOM",
+    "HarbourName": "GAOMING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "SEGOT",
+    "HarbourName": "GOTHENBURG",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "USGPT",
+    "HarbourName": "GULFPORT",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "GBGRG",
+    "HarbourName": "GRANGEMOUTH",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "ITGIT",
+    "HarbourName": "GIOIA TAURO",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "GTGUA",
+    "HarbourName": "GUATEMALA CITY",
+    "PortName": null,
+    "Land": "GUATEMALA"
+  },
+  {
+    "ID": "VEGUT",
+    "HarbourName": "GUANTA",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "CHGVA",
+    "HarbourName": "GENEVA",
+    "PortName": null,
+    "Land": "SWITZERLAND"
+  },
+  {
+    "ID": "ECGYE",
+    "HarbourName": "GUAYAQUIL",
+    "PortName": null,
+    "Land": "ECUADOR"
+  },
+  {
+    "ID": "ILHFA",
+    "HarbourName": "HAIFA",
+    "PortName": null,
+    "Land": "ISRAEL"
+  },
+  {
+    "ID": "VNHPH",
+    "HarbourName": "HAIPHONG",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "JPHTD",
+    "HarbourName": "HAKATA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CAHAL",
+    "HarbourName": "HALIFAX",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "DEHAM",
+    "HarbourName": "HAMBURG",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "VNHAN",
+    "HarbourName": "HANOI",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "NGPHC",
+    "HarbourName": "PORT HARCOURT",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "NOHAU",
+    "HarbourName": "HAUGESUND",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "CUHAV",
+    "HarbourName": "HAVANA",
+    "PortName": null,
+    "Land": "CUBA"
+  },
+  {
+    "ID": "TRHAY",
+    "HarbourName": "HAYDRAPASA",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "VNSGN",
+    "HarbourName": "HO CHI MINH CITY",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "FIHEL",
+    "HarbourName": "HELSINKI",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "CNHGH",
+    "HarbourName": "HANGZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNHUA",
+    "HarbourName": "HUANG PU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPHHE",
+    "HarbourName": "HACHINOHE",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPHIJ",
+    "HarbourName": "HIROSHIMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPHKD",
+    "HarbourName": "HAKODATE",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "HKHKG",
+    "HarbourName": "HONGKONG",
+    "PortName": null,
+    "Land": "HONG KONG"
+  },
+  {
+    "ID": "NOHAL",
+    "HarbourName": "HALDEN",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "QAHMD",
+    "HarbourName": "HAMAD",
+    "PortName": null,
+    "Land": "QATAR"
+  },
+  {
+    "ID": "FIHMN",
+    "HarbourName": "HAMINA",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "CNHNG",
+    "HarbourName": "HENGGANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "FIHKO",
+    "HarbourName": "HANKO",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "YEHOD",
+    "HarbourName": "HODEIDAH",
+    "PortName": null,
+    "Land": "YEMEN"
+  },
+  {
+    "ID": "USHNL",
+    "HarbourName": "HONOLULU",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "USHOU",
+    "HarbourName": "HOUSTON",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "SEHEL",
+    "HarbourName": "HELSINGBORG",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "JPHSM",
+    "HarbourName": "HOSOSHIMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CNHSN",
+    "HarbourName": "HESHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNHUD",
+    "HarbourName": "HUADU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "GBHUL",
+    "HarbourName": "HULL",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "GBHRW",
+    "HarbourName": "HARWICH",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "INSNI",
+    "HarbourName": "ICD SAHNEWAL (FCA)",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INDER",
+    "HarbourName": "ICD DADRI FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INFBE",
+    "HarbourName": "ICD FARIDABAD FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INDDL",
+    "HarbourName": "ICD DHANDARI K FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "UAILY",
+    "HarbourName": "ILLYCHEVSK",
+    "PortName": null,
+    "Land": "UKRAINE"
+  },
+  {
+    "ID": "INLUH",
+    "HarbourName": "ICD LUDHIANA FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "PEILQ",
+    "HarbourName": "ILO",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "JPIMI",
+    "HarbourName": "IMARI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "BRIBB",
+    "HarbourName": "IMBITUBA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "GBIMM",
+    "HarbourName": "IMMINGHAM",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "KRINC",
+    "HarbourName": "INCHON",
+    "PortName": null,
+    "Land": "KOREA, REPUBLIC OF"
+  },
+  {
+    "ID": "INHYD",
+    "HarbourName": "ICD HYDERABAD FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "BRIOA",
+    "HarbourName": "ITAPOA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "INPTL",
+    "HarbourName": "ICD PATLI (FCA)",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "GBIPS",
+    "HarbourName": "ISPWICH",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "PEIQT",
+    "HarbourName": "IQUITOS",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "CLIQQ",
+    "HarbourName": "IQUIQUE",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "JPISM",
+    "HarbourName": "ISHINOMAKI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "TRISK",
+    "HarbourName": "ISKENDRUN",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "INSAA",
+    "HarbourName": "ICD SANAND (FCA)",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "JPISS",
+    "HarbourName": "ISHIKARI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "TRIST",
+    "HarbourName": "ISTANBUL",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "BRSPB",
+    "HarbourName": "ITAGUAI (SEPETIBA)",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "BRITJ",
+    "HarbourName": "ITAJAI",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "INTKD",
+    "HarbourName": "ICD TUGHLAKAB. FCA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "BRITQ",
+    "HarbourName": "ITAQUI",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "JPIWK",
+    "HarbourName": "IWAKUNI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPIYM",
+    "HarbourName": "IYOMISHIMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "TRIZM",
+    "HarbourName": "IZMIR",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "USJAX",
+    "HarbourName": "JACKSONVILLE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "AEJEA",
+    "HarbourName": "JEBEL ALI",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "SAJED",
+    "HarbourName": "JEDDAH",
+    "PortName": null,
+    "Land": "SAUDI ARABIA"
+  },
+  {
+    "ID": "CNJIA",
+    "HarbourName": "JIANGYIN JIANGSU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNJIU",
+    "HarbourName": "JIUJIANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNJIX",
+    "HarbourName": "JIAXING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "IDJKT",
+    "HarbourName": "JAKARTA",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "USJKV",
+    "HarbourName": "JACKSONVILLE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNJMN",
+    "HarbourName": "JIANGMEN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "ZAJNB",
+    "HarbourName": "JOHANNESBURG",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "SAJUB",
+    "HarbourName": "JUBAIL",
+    "PortName": null,
+    "Land": "SAUDI ARABIA"
+  },
+  {
+    "ID": "CNJXN",
+    "HarbourName": "JIAOXIN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "SAKAC",
+    "HarbourName": "KING ABUDALLAH",
+    "PortName": null,
+    "Land": "SAUDI ARABIA"
+  },
+  {
+    "ID": "GNKMR",
+    "HarbourName": "KAMSAR",
+    "PortName": null,
+    "Land": "GUINEA"
+  },
+  {
+    "ID": "TWKHH",
+    "HarbourName": "KAOHSIUNG",
+    "PortName": null,
+    "Land": "TAIWAN, PROVINCE OF CHINA"
+  },
+  {
+    "ID": "INKAT",
+    "HarbourName": "KATTUPALLI",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "MYKCH",
+    "HarbourName": "KUCHING",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "JPKCZ",
+    "HarbourName": "KOCHI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "TWKEL",
+    "HarbourName": "KEELUNG",
+    "PortName": null,
+    "Land": "TAIWAN, PROVINCE OF CHINA"
+  },
+  {
+    "ID": "RUKGD",
+    "HarbourName": "KALININGRAD",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "PKKHI",
+    "HarbourName": "KARACHI",
+    "PortName": null,
+    "Land": "PAKISTAN"
+  },
+  {
+    "ID": "CNKHN",
+    "HarbourName": "NANCHANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPKIJ",
+    "HarbourName": "NIIGATA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JMKIN",
+    "HarbourName": "KINGSTON",
+    "PortName": null,
+    "Land": "JAMAICA"
+  },
+  {
+    "ID": "MYBKI",
+    "HarbourName": "KOTA KINABALU",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "LTKLJ",
+    "HarbourName": "KLAIPEDA",
+    "PortName": null,
+    "Land": "LITHUANIA"
+  },
+  {
+    "ID": "AEKLF",
+    "HarbourName": "KHOR FAKKAN",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "JPKNZ",
+    "HarbourName": "KANAZAWA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPUKB",
+    "HarbourName": "KOBE",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "INCCU",
+    "HarbourName": "KOLKATA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "SIKOP",
+    "HarbourName": "KOPER",
+    "PortName": null,
+    "Land": "SLOVENIA"
+  },
+  {
+    "ID": "KHKOS",
+    "HarbourName": "SIHANOUKVILLE",
+    "PortName": null,
+    "Land": "CAMBODIA"
+  },
+  {
+    "ID": "FIKTK",
+    "HarbourName": "KOTKA",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "NOKRS",
+    "HarbourName": "KRISTIANSAND",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "MYKUA",
+    "HarbourName": "KUANTAN",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "JPKUH",
+    "HarbourName": "KUSHIRO",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "TRKMX",
+    "HarbourName": "KUMPORT",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "CNKUS",
+    "HarbourName": "KUNSHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "KWKWI",
+    "HarbourName": "KUWAIT",
+    "PortName": null,
+    "Land": "KUWAIT"
+  },
+  {
+    "ID": "KRKWA",
+    "HarbourName": "KWANGYANG",
+    "PortName": null,
+    "Land": "KOREA, REPUBLIC OF"
+  },
+  {
+    "ID": "PGLAE",
+    "HarbourName": "LAE",
+    "PortName": null,
+    "Land": "PAPUA NEW GUINEA"
+  },
+  {
+    "ID": "VELAG",
+    "HarbourName": "LA GUAIRA",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "NGLAG",
+    "HarbourName": "LAGOS",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "NOLAR",
+    "HarbourName": "LARVIK",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "USLAX",
+    "HarbourName": "LOS ANGELES",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "GALBV",
+    "HarbourName": "LIBREVILLE",
+    "PortName": null,
+    "Land": "GABON"
+  },
+  {
+    "ID": "THLCH",
+    "HarbourName": "LAEM CHABANG",
+    "PortName": null,
+    "Land": "THAILAND"
+  },
+  {
+    "ID": "FRLEH",
+    "HarbourName": "LE HAVRE",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "PTLEI",
+    "HarbourName": "LEIXOES",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "USLGB",
+    "HarbourName": "LONG BEACH",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNLIH",
+    "HarbourName": "LIANHUASHAN PANYU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "PELIM",
+    "HarbourName": "LIMA",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "CRLIO",
+    "HarbourName": "PUERTO LIMON",
+    "PortName": null,
+    "Land": "COSTA RICA"
+  },
+  {
+    "ID": "DELIP",
+    "HarbourName": "D-LIPPSTADT",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "CLLQN",
+    "HarbourName": "LIRQUEN",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "PTLIS",
+    "HarbourName": "LISBON",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "ITLIV",
+    "HarbourName": "LIVORNO",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "THLKR",
+    "HarbourName": "LAT KRABANG",
+    "PortName": null,
+    "Land": "THAILAND"
+  },
+  {
+    "ID": "CYLMS",
+    "HarbourName": "LIMASSOL",
+    "PortName": null,
+    "Land": "CYPRUS"
+  },
+  {
+    "ID": "YTLON",
+    "HarbourName": "LONGONI",
+    "PortName": null,
+    "Land": "MAYOTTE"
+  },
+  {
+    "ID": "GBLGP",
+    "HarbourName": "LONDON GATEWAY",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "TGLFW",
+    "HarbourName": "LOME",
+    "PortName": null,
+    "Land": "TOGO"
+  },
+  {
+    "ID": "GBLON",
+    "HarbourName": "LONDON",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "AOLOB",
+    "HarbourName": "LOBITO",
+    "PortName": null,
+    "Land": "ANGOLA"
+  },
+  {
+    "ID": "ESLPA",
+    "HarbourName": "LAS PALMAS",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "GBLIV",
+    "HarbourName": "LIVERPOOL",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "FRLRH",
+    "HarbourName": "LA ROCHELLE",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "ITSPE",
+    "HarbourName": "LA SPEZIA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "SYLTK",
+    "HarbourName": "LATTAKIA",
+    "PortName": null,
+    "Land": "SYRIAN ARAB REPUBLIC"
+  },
+  {
+    "ID": "AOLAD",
+    "HarbourName": "LUANDA",
+    "PortName": null,
+    "Land": "ANGOLA"
+  },
+  {
+    "ID": "MYLUM",
+    "HarbourName": "LUMUT",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "CNLUU",
+    "HarbourName": "LELIU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNLUZ",
+    "HarbourName": "LUZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNLYG",
+    "HarbourName": "LIANYUNGANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "NZLYT",
+    "HarbourName": "LYTTELTON",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "MXLZC",
+    "HarbourName": "LAZARO CARDENAS",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "INMAA",
+    "HarbourName": "MADRAS",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INMAI",
+    "HarbourName": "MANGALORE",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INMAH",
+    "HarbourName": "MAHE",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "MTMAR",
+    "HarbourName": "MARSAXLOKK",
+    "PortName": null,
+    "Land": "MALTA"
+  },
+  {
+    "ID": "GBMNC",
+    "HarbourName": "MANCHESTER",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "MZMPM",
+    "HarbourName": "MAPUTO",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "VEMAR",
+    "HarbourName": "MARACAIBO",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "THMTP",
+    "HarbourName": "MAP TA PHUT",
+    "PortName": null,
+    "Land": "THAILAND"
+  },
+  {
+    "ID": "BRMAO",
+    "HarbourName": "MANAUS",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "KEMBA",
+    "HarbourName": "MOMBASA",
+    "PortName": null,
+    "Land": "KENYA"
+  },
+  {
+    "ID": "GQSSG",
+    "HarbourName": "MALABO",
+    "PortName": null,
+    "Land": "EQUATORIAL GUINEA"
+  },
+  {
+    "ID": "RUGDX",
+    "HarbourName": "MAGADAN",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "ECMEC",
+    "HarbourName": "MANTA",
+    "PortName": null,
+    "Land": "ECUADOR"
+  },
+  {
+    "ID": "AUMEL",
+    "HarbourName": "MELBOURNE",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "CNDOU",
+    "HarbourName": "DOUMEN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "TRMER",
+    "HarbourName": "MERSIN",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "MXMEX",
+    "HarbourName": "MEXICO CITY",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "ESMPG",
+    "HarbourName": "MARIN, PONTEVEDRA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "USMIA",
+    "HarbourName": "MIAMI",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "ITMIL",
+    "HarbourName": "MILAN",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "LYMRA",
+    "HarbourName": "MISURATA",
+    "PortName": null,
+    "Land": "LIBYA"
+  },
+  {
+    "ID": "PAMIT",
+    "HarbourName": "MANZANILLO PA",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "JPMIZ",
+    "HarbourName": "MIZUSHIMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "MXZLO",
+    "HarbourName": "MANZANILLO MX",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "SEMMA",
+    "HarbourName": "MALMOE",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "PHMNL",
+    "HarbourName": "MANILA",
+    "PortName": null,
+    "Land": "PHILIPPINES"
+  },
+  {
+    "ID": "USMOB",
+    "HarbourName": "MOBILE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "NLMOE",
+    "HarbourName": "MOERDIJK",
+    "PortName": null,
+    "Land": "NETHERLANDS"
+  },
+  {
+    "ID": "SOMGQ",
+    "HarbourName": "MOGADISHU",
+    "PortName": null,
+    "Land": "SOMALIA"
+  },
+  {
+    "ID": "JPMOJ",
+    "HarbourName": "MOJI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "YEMOK",
+    "HarbourName": "MOKHA",
+    "PortName": null,
+    "Land": "YEMEN"
+  },
+  {
+    "ID": "LRMLW",
+    "HarbourName": "MONROVIA",
+    "PortName": null,
+    "Land": "LIBERIA"
+  },
+  {
+    "ID": "USMRH",
+    "HarbourName": "MOREHEAD CITY",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "DZMOS",
+    "HarbourName": "MOSTAGANEM",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "MZMPM",
+    "HarbourName": "MAPUTO",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "CUMAR",
+    "HarbourName": "MARIEL",
+    "PortName": null,
+    "Land": "CUBA"
+  },
+  {
+    "ID": "NOMSS",
+    "HarbourName": "MOSS",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "ERMSW",
+    "HarbourName": "MASSAWA",
+    "PortName": null,
+    "Land": "ERITREA"
+  },
+  {
+    "ID": "AOMSZ",
+    "HarbourName": "NAMIBE",
+    "PortName": null,
+    "Land": "ANGOLA"
+  },
+  {
+    "ID": "CDMAT",
+    "HarbourName": "MATADI",
+    "PortName": null,
+    "Land": "CONGO, THE DEMOCRATIC REPUBLIC OF THE"
+  },
+  {
+    "ID": "CAMTR",
+    "HarbourName": "MONTREAL",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "PEMRI",
+    "HarbourName": "MATARANI",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "TZMYW",
+    "HarbourName": "MTWARA",
+    "PortName": null,
+    "Land": "TANZANIA, UNITED REPUBLIC OF"
+  },
+  {
+    "ID": "FRMTX",
+    "HarbourName": "MONTOIRE DE BRETAG",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "BNMUA",
+    "HarbourName": "MUARA PORT",
+    "PortName": null,
+    "Land": "BRUNEI DARUSSALAM"
+  },
+  {
+    "ID": "INBOM",
+    "HarbourName": "MUMBAI",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "INMUN",
+    "HarbourName": "MUNDRA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "UYMVD",
+    "HarbourName": "MONTEVIDEO",
+    "PortName": null,
+    "Land": "URUGUAY"
+  },
+  {
+    "ID": "USMKE",
+    "HarbourName": "MILWAUKEE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "MXMXL",
+    "HarbourName": "MEXICALI",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "JPMYJ",
+    "HarbourName": "MATSUYAMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "MZMNC",
+    "HarbourName": "NACALA",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "JPNGO",
+    "HarbourName": "NAGOYA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPNAH",
+    "HarbourName": "NAHA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CNNJI",
+    "HarbourName": "NANJING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPNAO",
+    "HarbourName": "NAOETSU",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "ITNAP",
+    "HarbourName": "NAPLES",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "BSNAS",
+    "HarbourName": "NASSAU",
+    "PortName": null,
+    "Land": "BAHAMAS"
+  },
+  {
+    "ID": "BRNVT",
+    "HarbourName": "NAVEGANTES",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "USORF",
+    "HarbourName": "NORFOLK",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNNGB",
+    "HarbourName": "NINGBO",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNNGG",
+    "HarbourName": "NANGANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPNGS",
+    "HarbourName": "NAGASAKI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "INNSA",
+    "HarbourName": "NHAVA SHEVA",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "NCNOU",
+    "HarbourName": "NOUMEA",
+    "PortName": null,
+    "Land": "NEW CALEDONIA"
+  },
+  {
+    "ID": "USNNS",
+    "HarbourName": "NEWPORT NEWS, VA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "USMSY",
+    "HarbourName": "NEW ORLEANS",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "MRNKC",
+    "HarbourName": "NOUAKCHOTT",
+    "PortName": null,
+    "Land": "MAURITANIA"
+  },
+  {
+    "ID": "RUNVS",
+    "HarbourName": "NOVOROSSIYSK",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "NZNPE",
+    "HarbourName": "NAPIER",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "SENRK",
+    "HarbourName": "NORRKOEPING",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "CNNSA",
+    "HarbourName": "NANSHA",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "USNTD",
+    "HarbourName": "PORT HUENEME, CA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNNTG",
+    "HarbourName": "NANTONG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "BRNVT",
+    "HarbourName": "NAVEGANTES",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "USNYC",
+    "HarbourName": "NEW YORK",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "USOAK",
+    "HarbourName": "OAKLAND",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "UAODS",
+    "HarbourName": "ODESSA",
+    "PortName": null,
+    "Land": "UKRAINE"
+  },
+  {
+    "ID": "JPOIT",
+    "HarbourName": "OITA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPOKA",
+    "HarbourName": "OKINAWA/JAPAN",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPONA",
+    "HarbourName": "ONAHAMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "NGONN",
+    "HarbourName": "ONNE",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "PAONX",
+    "HarbourName": "COCOLI, PA",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "PTOPO",
+    "HarbourName": "OPORTO",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "BQORA",
+    "HarbourName": "ORANJESTAD",
+    "PortName": null,
+    "Land": "BONAIRE, SINT EUSTATIUS AND SABA"
+  },
+  {
+    "ID": "NOORK",
+    "HarbourName": "ORKANGER",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "IEORK",
+    "HarbourName": "CORK",
+    "PortName": null,
+    "Land": "IRELAND"
+  },
+  {
+    "ID": "DZORN",
+    "HarbourName": "ORAN",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "JPOSA",
+    "HarbourName": "OSAKA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "NOOSL",
+    "HarbourName": "OSLO",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "GAOWE",
+    "HarbourName": "OWENDO",
+    "PortName": null,
+    "Land": "GABON"
+  },
+  {
+    "ID": "PEPAI",
+    "HarbourName": "PAITA",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "ITPMO",
+    "HarbourName": "PALERMO",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "IDPNJ",
+    "HarbourName": "PANJANG",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "HTPAP",
+    "HarbourName": "PORT AU PRINCE",
+    "PortName": null,
+    "Land": "HAITI"
+  },
+  {
+    "ID": "FRPAR",
+    "HarbourName": "PARIS",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "VEPBL",
+    "HarbourName": "PUERTO CABELLO",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "ECPBO",
+    "HarbourName": "PUERTO BOLIVAR",
+    "PortName": null,
+    "Land": "ECUADOR"
+  },
+  {
+    "ID": "GTPBR",
+    "HarbourName": "PUERTO BARRIOS",
+    "PortName": null,
+    "Land": "GUATEMALA"
+  },
+  {
+    "ID": "CRPTC",
+    "HarbourName": "PUERTO CALDERA",
+    "PortName": null,
+    "Land": "COSTA RICA"
+  },
+  {
+    "ID": "NZPOE",
+    "HarbourName": "PORT CHALMERS",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "HNPCR",
+    "HarbourName": "PUERTO CORTES",
+    "PortName": null,
+    "Land": "HONDURAS"
+  },
+  {
+    "ID": "REPDG",
+    "HarbourName": "POINTE DES GALETS",
+    "PortName": null,
+    "Land": "R\u2554UNION"
+  },
+  {
+    "ID": "BRPEC",
+    "HarbourName": "PECEM",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "USPEF",
+    "HarbourName": "PORT EVERGLADES",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "MZPOL",
+    "HarbourName": "PEMBA",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "MYPEN",
+    "HarbourName": "PENANG",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "GAPOG",
+    "HarbourName": "PORT GENTIL",
+    "PortName": null,
+    "Land": "GABON"
+  },
+  {
+    "ID": "NGPHC",
+    "HarbourName": "PORT HARCOURT",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "USPHL",
+    "HarbourName": "PHILADELPHIA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "MYPGU",
+    "HarbourName": "PASIR GUDANG",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "GRPIR",
+    "HarbourName": "PIRAEUS",
+    "PortName": null,
+    "Land": "GREECE"
+  },
+  {
+    "ID": "PEPIO",
+    "HarbourName": "PISCO",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "PEPAI",
+    "HarbourName": "PAITA",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "MYPKG",
+    "HarbourName": "PORT KELANG",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "USPDX",
+    "HarbourName": "PORTLAND",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "IDPLM",
+    "HarbourName": "PALEMBANG",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "CRLIO",
+    "HarbourName": "PUERTO LIMON",
+    "PortName": null,
+    "Land": "COSTA RICA"
+  },
+  {
+    "ID": "ZAPLZ",
+    "HarbourName": "PORT ELIZABETH",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "CRPMN",
+    "HarbourName": "PUERTO MOIN",
+    "PortName": null,
+    "Land": "COSTA RICA"
+  },
+  {
+    "ID": "BRPNG",
+    "HarbourName": "PARANAGUA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "KHPNH",
+    "HarbourName": "PHNOM PENH",
+    "PortName": null,
+    "Land": "CAMBODIA"
+  },
+  {
+    "ID": "PRPSE",
+    "HarbourName": "PONCE",
+    "PortName": null,
+    "Land": "PUERTO RICO"
+  },
+  {
+    "ID": "MUPLU",
+    "HarbourName": "PORT LOUIS",
+    "PortName": null,
+    "Land": "MAURITIUS"
+  },
+  {
+    "ID": "CGPNR",
+    "HarbourName": "POINTE NOIRE",
+    "PortName": null,
+    "Land": "CONGO"
+  },
+  {
+    "ID": "GAPOG",
+    "HarbourName": "PORT-GENTIL",
+    "PortName": null,
+    "Land": "GABON"
+  },
+  {
+    "ID": "TTPOS",
+    "HarbourName": "PORT OF SPAIN",
+    "PortName": null,
+    "Land": "TRINIDAD AND TOBAGO"
+  },
+  {
+    "ID": "ASPPG",
+    "HarbourName": "PAGO PAGO",
+    "PortName": null,
+    "Land": "AMERICAN SAMOA"
+  },
+  {
+    "ID": "PKBQM",
+    "HarbourName": "PORT QASIM",
+    "PortName": null,
+    "Land": "PAKISTAN"
+  },
+  {
+    "ID": "GTPRQ",
+    "HarbourName": "PUERTO QUETZAL",
+    "PortName": null,
+    "Land": "GUATEMALA"
+  },
+  {
+    "ID": "MXPGO",
+    "HarbourName": "PROGRESO",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "CAPRR",
+    "HarbourName": "PRINCE RUPERT",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "USPNS",
+    "HarbourName": "PENSACOLA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "EGPSD",
+    "HarbourName": "PORT SAID",
+    "PortName": null,
+    "Land": "EGYPT"
+  },
+  {
+    "ID": "NOPOR",
+    "HarbourName": "PORSGRUNN",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "NZPOE",
+    "HarbourName": "PORT CHALMERS",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "PFPPT",
+    "HarbourName": "PAPEETE",
+    "PortName": null,
+    "Land": "FRENCH POLYNESIA"
+  },
+  {
+    "ID": "TTPTS",
+    "HarbourName": "POINT LISAS",
+    "PortName": null,
+    "Land": "TRINIDAD AND TOBAGO"
+  },
+  {
+    "ID": "ITPMA",
+    "HarbourName": "PORTO MARGHERA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "ITPTO",
+    "HarbourName": "PORTO TORRES",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "GPPTP",
+    "HarbourName": "POINT A PITRE",
+    "PortName": null,
+    "Land": "GUADELOUPE"
+  },
+  {
+    "ID": "PAPTY",
+    "HarbourName": "PANAMA CITY",
+    "PortName": null,
+    "Land": "PANAMA"
+  },
+  {
+    "ID": "GBPFT",
+    "HarbourName": "PURFLEET",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "SCPOV",
+    "HarbourName": "PORT VICTORIA",
+    "PortName": null,
+    "Land": "SEYCHELLES"
+  },
+  {
+    "ID": "SDPZU",
+    "HarbourName": "PORT SUDAN",
+    "PortName": null,
+    "Land": "SUDAN"
+  },
+  {
+    "ID": "CNCQI",
+    "HarbourName": "CHONGQING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNTAO",
+    "HarbourName": "QINGDAO",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "MZUEL",
+    "HarbourName": "QUELIMANE",
+    "PortName": null,
+    "Land": "MOZAMBIQUE"
+  },
+  {
+    "ID": "CNQZH",
+    "HarbourName": "QINZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNQZJ",
+    "HarbourName": "QUANZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CARAM",
+    "HarbourName": "RAMEY'S BEND, ON",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "AEPRA",
+    "HarbourName": "PORT RASHID",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "FIRAU",
+    "HarbourName": "RAUMA",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "ITRAN",
+    "HarbourName": "RAVENNA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "BRREC",
+    "HarbourName": "RECIFE",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "CAREG",
+    "HarbourName": "REGINA",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "ISREY",
+    "HarbourName": "REYKJAVIK",
+    "PortName": null,
+    "Land": "ICELAND"
+  },
+  {
+    "ID": "MMRGN",
+    "HarbourName": "YANGON",
+    "PortName": null,
+    "Land": "MYANMAR"
+  },
+  {
+    "ID": "BRRIG",
+    "HarbourName": "RIO GRANDE",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "DOHAI",
+    "HarbourName": "RIO HAINA",
+    "PortName": null,
+    "Land": "DOMINICAN REPUBLIC"
+  },
+  {
+    "ID": "ZARCB",
+    "HarbourName": "RICHARDS BAY",
+    "PortName": null,
+    "Land": "SOUTH AFRICA"
+  },
+  {
+    "ID": "LVRIX",
+    "HarbourName": "RIGA",
+    "PortName": null,
+    "Land": "LATVIA"
+  },
+  {
+    "ID": "HRRJK",
+    "HarbourName": "RIJEKA",
+    "PortName": null,
+    "Land": "CROATIA"
+  },
+  {
+    "ID": "BRRIO",
+    "HarbourName": "RIO DE JANEIRO",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "LYRLA",
+    "HarbourName": "RAS LANUF",
+    "PortName": null,
+    "Land": "LIBYA"
+  },
+  {
+    "ID": "CNROQ",
+    "HarbourName": "RONGQI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "ARROS",
+    "HarbourName": "ROSARIO",
+    "PortName": null,
+    "Land": "ARGENTINA"
+  },
+  {
+    "ID": "FRURO",
+    "HarbourName": "ROUEN",
+    "PortName": null,
+    "Land": "FRANCE"
+  },
+  {
+    "ID": "NLRTM",
+    "HarbourName": "ROTTERDAM",
+    "PortName": null,
+    "Land": "NETHERLANDS"
+  },
+  {
+    "ID": "SARUH",
+    "HarbourName": "RIYADH",
+    "PortName": null,
+    "Land": "SAUDI ARABIA"
+  },
+  {
+    "ID": "CNRZH",
+    "HarbourName": "RIZHAO",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "OMSLL",
+    "HarbourName": "SALALAH",
+    "PortName": null,
+    "Land": "OMAN"
+  },
+  {
+    "ID": "CLSAI",
+    "HarbourName": "SAN ANTONIO",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "ITSAL",
+    "HarbourName": "SALERNO",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "CISPY",
+    "HarbourName": "SAN PEDRO",
+    "PortName": null,
+    "Land": "C\u00d4TE D'IVOIRE"
+  },
+  {
+    "ID": "HNSAP",
+    "HarbourName": "SAN PEDRO SULA",
+    "PortName": null,
+    "Land": "HONDURAS"
+  },
+  {
+    "ID": "CASAK",
+    "HarbourName": "SASKATTON",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "USSAV",
+    "HarbourName": "SAVANNAH",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "JPSBS",
+    "HarbourName": "SHIBUSHI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CLSCL",
+    "HarbourName": "SANTIAGO DE CHILE",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "USTCX",
+    "HarbourName": "SAINT CROIX",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "DOSDQ",
+    "HarbourName": "SANTO DOMINGO",
+    "PortName": null,
+    "Land": "DOMINICAN REPUBLIC"
+  },
+  {
+    "ID": "ESSDR",
+    "HarbourName": "SANTANDER",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "USSEA",
+    "HarbourName": "SEATTLE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "KRSEL",
+    "HarbourName": "SEOUL",
+    "PortName": null,
+    "Land": "KOREA, REPUBLIC OF"
+  },
+  {
+    "ID": "PTSNT",
+    "HarbourName": "SANTAREM",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "JPSEN",
+    "HarbourName": "SENDAI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "USSFO",
+    "HarbourName": "SAN FRANCISCO",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "BRSFS",
+    "HarbourName": "SAO FRANCISCO D.S.",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "TNSFA",
+    "HarbourName": "SFAX",
+    "PortName": null,
+    "Land": "TUNISIA"
+  },
+  {
+    "ID": "VNSGN",
+    "HarbourName": "HO CHI MINH",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "ESSAG",
+    "HarbourName": "SAGUNTO",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "CNSHA",
+    "HarbourName": "SHANGHAI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNNHS",
+    "HarbourName": "SANSHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPSMZ",
+    "HarbourName": "SHIMIZU",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "AESHJ",
+    "HarbourName": "SHARJAH",
+    "PortName": null,
+    "Land": "UNITED ARAB EMIRATES"
+  },
+  {
+    "ID": "CNSHK",
+    "HarbourName": "SHEKOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPSHS",
+    "HarbourName": "SHIMONOSEKI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "KWSAA",
+    "HarbourName": "SHUAIBA",
+    "PortName": null,
+    "Land": "KUWAIT"
+  },
+  {
+    "ID": "SGSIN",
+    "HarbourName": "SINGAPORE",
+    "PortName": null,
+    "Land": "SINGAPORE"
+  },
+  {
+    "ID": "LRSNI",
+    "HarbourName": "SINOE",
+    "PortName": null,
+    "Land": "LIBERIA"
+  },
+  {
+    "ID": "USS2J",
+    "HarbourName": "SAN JOSE",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CNSJQ",
+    "HarbourName": "SANSHUI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "PRSJU",
+    "HarbourName": "SAN JUAN",
+    "PortName": null,
+    "Land": "PUERTO RICO"
+  },
+  {
+    "ID": "DZSKI",
+    "HarbourName": "SKIKDA",
+    "PortName": null,
+    "Land": "ALGERIA"
+  },
+  {
+    "ID": "JPSKT",
+    "HarbourName": "SAKATA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "IDSRG",
+    "HarbourName": "SEMARANG",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "COSMR",
+    "HarbourName": "SANTA MARTA",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "PTSIE",
+    "HarbourName": "SINES",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "SESOE",
+    "HarbourName": "S\u00d6DERT\u00c4LJE",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "OMSOH",
+    "HarbourName": "SOHAR",
+    "PortName": null,
+    "Land": "OMAN"
+  },
+  {
+    "ID": "EGSOK",
+    "HarbourName": "SOKHNA",
+    "PortName": null,
+    "Land": "EGYPT"
+  },
+  {
+    "ID": "THSGK",
+    "HarbourName": "SONGKHLA PORT",
+    "PortName": null,
+    "Land": "THAILAND"
+  },
+  {
+    "ID": "GBSOU",
+    "HarbourName": "SOUTHAMPTON",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "TNSUS",
+    "HarbourName": "SOUSSE",
+    "PortName": null,
+    "Land": "TUNISIA"
+  },
+  {
+    "ID": "AOSZA",
+    "HarbourName": "SOYO",
+    "PortName": null,
+    "Land": "ANGOLA"
+  },
+  {
+    "ID": "RULED",
+    "HarbourName": "ST. PETERSBURG",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "USSPQ",
+    "HarbourName": "SAN PEDRO / LAX",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "IDSRI",
+    "HarbourName": "SAMARINDA",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "BRSSA",
+    "HarbourName": "SALVADOR DE BAHIA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "BRSSZ",
+    "HarbourName": "SANTOS",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "SESTO",
+    "HarbourName": "STOCKHOLM",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "GTSTC",
+    "HarbourName": "STO TOMAS DE CAST.",
+    "PortName": null,
+    "Land": "GUATEMALA"
+  },
+  {
+    "ID": "KWSWK",
+    "HarbourName": "SHUWAIKH",
+    "PortName": null,
+    "Land": "KUWAIT"
+  },
+  {
+    "ID": "BRSUA",
+    "HarbourName": "SUAPE",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "IDSUB",
+    "HarbourName": "SURABAYA",
+    "PortName": null,
+    "Land": "INDONESIA"
+  },
+  {
+    "ID": "CLSVE",
+    "HarbourName": "SAN VICENTE",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "NOSVG",
+    "HarbourName": "STAVANGER",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "SVSAL",
+    "HarbourName": "SAN SALVADOR",
+    "PortName": null,
+    "Land": "EL SALVADOR"
+  },
+  {
+    "ID": "PESVY",
+    "HarbourName": "SALAVERRY",
+    "PortName": null,
+    "Land": "PERU"
+  },
+  {
+    "ID": "CNSWA",
+    "HarbourName": "SHANTOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "AUSYD",
+    "HarbourName": "SYDNEY",
+    "PortName": null,
+    "Land": "AUSTRALIA"
+  },
+  {
+    "ID": "CNSZH",
+    "HarbourName": "SUZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNSZX",
+    "HarbourName": "SHENZHEN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "PLSSZ",
+    "HarbourName": "SZCZECIN",
+    "PortName": null,
+    "Land": "POLAND"
+  },
+  {
+    "ID": "USTIW",
+    "HarbourName": "TACOMA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "NOTAE",
+    "HarbourName": "TANANGER",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "MAPTM",
+    "HarbourName": "TANGER",
+    "PortName": null,
+    "Land": "MOROCCO"
+  },
+  {
+    "ID": "TWTXG",
+    "HarbourName": "TAICHUNG",
+    "PortName": null,
+    "Land": "TAIWAN, PROVINCE OF CHINA"
+  },
+  {
+    "ID": "JPTHR",
+    "HarbourName": "TAKEHARA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CLTAL",
+    "HarbourName": "TALCAHUANO",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "MXTAM",
+    "HarbourName": "TAMPICO",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "TZTGT",
+    "HarbourName": "TANGA",
+    "PortName": null,
+    "Land": "TANZANIA, UNITED REPUBLIC OF"
+  },
+  {
+    "ID": "GHTKD",
+    "HarbourName": "TAKORADI",
+    "PortName": null,
+    "Land": "GHANA"
+  },
+  {
+    "ID": "CNTAP",
+    "HarbourName": "TAIPING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "SYTTS",
+    "HarbourName": "TARTOUS",
+    "PortName": null,
+    "Land": "SYRIAN ARAB REPUBLIC"
+  },
+  {
+    "ID": "CNTAC",
+    "HarbourName": "TAICANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "GBTEE",
+    "HarbourName": "TEESPORT",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "GHTEM",
+    "HarbourName": "TEMA",
+    "PortName": null,
+    "Land": "GHANA"
+  },
+  {
+    "ID": "ESSCT",
+    "HarbourName": "S.CRUZ DE TENERIFE",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "PYTER",
+    "HarbourName": "TERPORT (ASUNCION)",
+    "PortName": null,
+    "Land": "PARAGUAY"
+  },
+  {
+    "ID": "ESTAR",
+    "HarbourName": "TARRAGONA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "GBTHP",
+    "HarbourName": "THAMESPORT",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "GRSKG",
+    "HarbourName": "THESSALONIKI",
+    "PortName": null,
+    "Land": "GREECE"
+  },
+  {
+    "ID": "JPTHS",
+    "HarbourName": "TOYOHASHI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "GBTIL",
+    "HarbourName": "TILBURY",
+    "PortName": null,
+    "Land": "UNITED KINGDOM"
+  },
+  {
+    "ID": "NZTIU",
+    "HarbourName": "TIMARU",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "NGTIN",
+    "HarbourName": "TIN CAN ISLAND",
+    "PortName": null,
+    "Land": "NIGERIA"
+  },
+  {
+    "ID": "TRTIR",
+    "HarbourName": "TEKIRDAG",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "CNTIS",
+    "HarbourName": "TAISHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPTKS",
+    "HarbourName": "TOKUSHIMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "JPTKY",
+    "HarbourName": "TOKUYAMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "EETLL",
+    "HarbourName": "TALLINN",
+    "PortName": null,
+    "Land": "ESTONIA"
+  },
+  {
+    "ID": "JPTMK",
+    "HarbourName": "TOMAKOMAI",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "FITOR",
+    "HarbourName": "TORNIO",
+    "PortName": null,
+    "Land": "FINLAND"
+  },
+  {
+    "ID": "CNTOL",
+    "HarbourName": "TONGLING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CATOR",
+    "HarbourName": "TORONTO",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "JPTOS",
+    "HarbourName": "TOYAMA SHINKO",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "ESTTL",
+    "HarbourName": "TORTOLA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "USTPA",
+    "HarbourName": "TAMPA",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "TWTPE",
+    "HarbourName": "TAIPEI",
+    "PortName": null,
+    "Land": "TAIWAN, PROVINCE OF CHINA"
+  },
+  {
+    "ID": "CNTAP",
+    "HarbourName": "TAIPING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "MYTPP",
+    "HarbourName": "TANJUNG PELEPAS",
+    "PortName": null,
+    "Land": "MALAYSIA"
+  },
+  {
+    "ID": "COTRB",
+    "HarbourName": "TURBO",
+    "PortName": null,
+    "Land": "COLOMBIA"
+  },
+  {
+    "ID": "NOTRD",
+    "HarbourName": "TROENDHEIM",
+    "PortName": null,
+    "Land": "NORWAY"
+  },
+  {
+    "ID": "ITTRS",
+    "HarbourName": "TRIESTE",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "NZTRG",
+    "HarbourName": "TAURANGA",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "LYTIP",
+    "HarbourName": "TRIPOLI",
+    "PortName": null,
+    "Land": "LIBYA"
+  },
+  {
+    "ID": "TRMPT",
+    "HarbourName": "MARPORT",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "CNTSN",
+    "HarbourName": "TIANJIN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "MGTMM",
+    "HarbourName": "TAMATAVE",
+    "PortName": null,
+    "Land": "MADAGASCAR"
+  },
+  {
+    "ID": "MGTLE",
+    "HarbourName": "TULEAR",
+    "PortName": null,
+    "Land": "MADAGASCAR"
+  },
+  {
+    "ID": "TNTUN",
+    "HarbourName": "TUNIS",
+    "PortName": null,
+    "Land": "TUNISIA"
+  },
+  {
+    "ID": "INTUT",
+    "HarbourName": "TUTICORIN",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "TWTYN",
+    "HarbourName": "TAOYUAN",
+    "PortName": null,
+    "Land": "TAIWAN, PROVINCE OF CHINA"
+  },
+  {
+    "ID": "JPTYO",
+    "HarbourName": "TOKYO",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CNTZO",
+    "HarbourName": "TAIZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "VNUIH",
+    "HarbourName": "QUI NHON",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "IQUQR",
+    "HarbourName": "UMM QASR",
+    "PortName": null,
+    "Land": "IRAQ"
+  },
+  {
+    "ID": "CHUSR",
+    "HarbourName": "USTER",
+    "PortName": null,
+    "Land": "SWITZERLAND"
+  },
+  {
+    "ID": "ESVLC",
+    "HarbourName": "VALENCIA",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "CAVAN",
+    "HarbourName": "VANCOUVER",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "CLVAP",
+    "HarbourName": "VALPARAISO",
+    "PortName": null,
+    "Land": "CHILE"
+  },
+  {
+    "ID": "BGVAR",
+    "HarbourName": "VARNA",
+    "PortName": null,
+    "Land": "BULGARIA"
+  },
+  {
+    "ID": "PTVIC",
+    "HarbourName": "VILA DO CONDE",
+    "PortName": null,
+    "Land": "PORTUGAL"
+  },
+  {
+    "ID": "ITVDL",
+    "HarbourName": "VADO LIGURE",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "VEEGU",
+    "HarbourName": "EL GUAMACHE",
+    "PortName": null,
+    "Land": "VENEZUELA"
+  },
+  {
+    "ID": "ITVCE",
+    "HarbourName": "VENEZIA",
+    "PortName": null,
+    "Land": "ITALY"
+  },
+  {
+    "ID": "MXVER",
+    "HarbourName": "VERACRUZ",
+    "PortName": null,
+    "Land": "MEXICO"
+  },
+  {
+    "ID": "ESVGO",
+    "HarbourName": "VIGO",
+    "PortName": null,
+    "Land": "SPAIN"
+  },
+  {
+    "ID": "BRVIX",
+    "HarbourName": "VITORIA",
+    "PortName": null,
+    "Land": "BRAZIL"
+  },
+  {
+    "ID": "CAVLF",
+    "HarbourName": "VALLEYFIELD, QC",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "NLVLI",
+    "HarbourName": "VLISSINGEN",
+    "PortName": null,
+    "Land": "NETHERLANDS"
+  },
+  {
+    "ID": "VNVUT",
+    "HarbourName": "VUNG TAU",
+    "PortName": null,
+    "Land": "VIET NAM"
+  },
+  {
+    "ID": "INVTZ",
+    "HarbourName": "VISHAKHAPATNAM",
+    "PortName": null,
+    "Land": "INDIA"
+  },
+  {
+    "ID": "RUVVO",
+    "HarbourName": "VLADIVOSTOK",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "RUVYP",
+    "HarbourName": "VOSTOCHNY PORT",
+    "PortName": null,
+    "Land": "RUSSIAN FEDERATION"
+  },
+  {
+    "ID": "SEWAL",
+    "HarbourName": "WALLHAM",
+    "PortName": null,
+    "Land": "SWEDEN"
+  },
+  {
+    "ID": "CNWHG",
+    "HarbourName": "WUHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "NAWVB",
+    "HarbourName": "WALVIS BAY",
+    "PortName": null,
+    "Land": "NAMIBIA"
+  },
+  {
+    "ID": "CNWEI",
+    "HarbourName": "WEIHAI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "NZWLG",
+    "HarbourName": "WELLINGTON",
+    "PortName": null,
+    "Land": "NEW ZEALAND"
+  },
+  {
+    "ID": "ATVIE",
+    "HarbourName": "WIEN",
+    "PortName": null,
+    "Land": "AUSTRIA"
+  },
+  {
+    "ID": "USILM",
+    "HarbourName": "WILMINGTON",
+    "PortName": null,
+    "Land": "UNITED STATES"
+  },
+  {
+    "ID": "CAWNP",
+    "HarbourName": "WINNIPEG",
+    "PortName": null,
+    "Land": "CANADA"
+  },
+  {
+    "ID": "CNWNZ",
+    "HarbourName": "WENZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "ATWFT",
+    "HarbourName": "WOLFURT",
+    "PortName": null,
+    "Land": "AUSTRIA"
+  },
+  {
+    "ID": "CNWHI",
+    "HarbourName": "WUHU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNWUZ",
+    "HarbourName": "WUZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "DEWVN",
+    "HarbourName": "WILHELMSHAVEN",
+    "PortName": null,
+    "Land": "GERMANY"
+  },
+  {
+    "ID": "CNXAO",
+    "HarbourName": "XIAOLAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNXIG",
+    "HarbourName": "XINGANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNXIN",
+    "HarbourName": "XINHUI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNXIT",
+    "HarbourName": "XINTANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNCWN",
+    "HarbourName": "CHIWAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNXMN",
+    "HarbourName": "XIAMEN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "TRYAR",
+    "HarbourName": "YARIMCA",
+    "PortName": null,
+    "Land": "TURKEY"
+  },
+  {
+    "ID": "JPYAT",
+    "HarbourName": "YATSUSHIRO",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CNYNT",
+    "HarbourName": "YANTAI",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "JPYOK",
+    "HarbourName": "YOKOHAMA",
+    "PortName": null,
+    "Land": "JAPAN"
+  },
+  {
+    "ID": "CNBJO",
+    "HarbourName": "BEIJIAO",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNYTN",
+    "HarbourName": "YANTIAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNYYA",
+    "HarbourName": "YUEYANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNYZH",
+    "HarbourName": "YANGZHOU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "TZZNZ",
+    "HarbourName": "ZANZIBAR",
+    "PortName": null,
+    "Land": "TANZANIA, UNITED REPUBLIC OF"
+  },
+  {
+    "ID": "CNZPU",
+    "HarbourName": "ZHAPU",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "ARZAE",
+    "HarbourName": "ZARATE",
+    "PortName": null,
+    "Land": "ARGENTINA"
+  },
+  {
+    "ID": "BEZEE",
+    "HarbourName": "ZEEBRUGGE",
+    "PortName": null,
+    "Land": "BELGIUM"
+  },
+  {
+    "ID": "CNZJG",
+    "HarbourName": "ZHANGJIAGANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNZHE",
+    "HarbourName": "ZHENJIANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNZNG",
+    "HarbourName": "ZHANJIANG",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNZSN",
+    "HarbourName": "ZHONGSHAN",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CNZQG",
+    "HarbourName": "ZHAOQING",
+    "PortName": null,
+    "Land": "CHINA"
+  },
+  {
+    "ID": "CHZRH",
+    "HarbourName": "ZURICH",
+    "PortName": null,
+    "Land": "SWITZERLAND"
+  },
+  {
+    "ID": "CNZUH",
+    "HarbourName": "ZHUHAI",
+    "PortName": null,
+    "Land": "CHINA"
+  }
+]

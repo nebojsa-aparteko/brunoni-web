@@ -6,8 +6,10 @@ interface Props {
   children: React.ReactNode;
 }
 
+const initialState = process.env.NODE_ENV !== 'production' ? require('../test/ContainerTypesDataTest.json') : undefined;
+
 const ContainerTypesProvider: React.FC<Props> = ({ children }) => {
-  const [containerTypes, setContainerTypes] = useState<ContainerType[] | undefined>(undefined);
+  const [containerTypes, setContainerTypes] = useState<ContainerType[] | undefined>(initialState);
 
   useEffect(() => {
     const controller = new AbortController();

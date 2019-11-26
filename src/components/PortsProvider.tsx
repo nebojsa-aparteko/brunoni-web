@@ -6,8 +6,10 @@ interface Props {
   children: React.ReactNode;
 }
 
+const initialState = process.env.NODE_ENV !== 'production' ? require('../test/PortsDataTest.json') : undefined;
+
 const PortsProvider: React.FC<Props> = ({ children }) => {
-  const [ports, setPorts] = useState<Port[] | undefined>(undefined);
+  const [ports, setPorts] = useState<Port[] | undefined>(initialState);
 
   useEffect(() => {
     const controller = new AbortController();

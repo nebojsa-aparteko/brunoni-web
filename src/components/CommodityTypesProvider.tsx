@@ -6,8 +6,10 @@ interface Props {
   children: React.ReactNode;
 }
 
+const initialState = process.env.NODE_ENV !== 'production' ? require('../test/CommodityTypesDataTest.json') : undefined;
+
 const CommodityTypesProvider: React.FC<Props> = ({ children }) => {
-  const [containerTypes, setCommodityTypes] = useState<CommodityType[] | undefined>(undefined);
+  const [containerTypes, setCommodityTypes] = useState<CommodityType[] | undefined>(initialState);
 
   useEffect(() => {
     const controller = new AbortController();
