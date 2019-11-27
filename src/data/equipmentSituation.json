@@ -1,0 +1,76 @@
+{
+  "idStat_012": {
+    "AdrID": "004261",
+    "Statistics": {
+      "StatisticType": "Equipment",
+      "Carrier": {
+        "CarrierID": "HSG",
+        "Location": {
+          "AdrID": "Depot Basel",
+          "Detail": [
+            {
+              "CtypID": "22G1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "22P1",
+              "Status": "ON REQUEST"
+            },
+            {
+              "CtypID": "22P3",
+              "Status": "NOT AVAILABLE"
+            },
+            {
+              "CtypID": "22P5",
+              "Status": "NOT AVAILABLE"
+            },
+            {
+              "CtypID": "22R1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "22U1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "42G1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "42P1",
+              "Status": "ON REQUEST"
+            },
+            {
+              "CtypID": "42P3",
+              "Status": "NOT AVAILABLE"
+            },
+            {
+              "CtypID": "42P5",
+              "Status": "NOT AVAILABLE"
+            },
+            {
+              "CtypID": "42U1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "45G1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "45P3",
+              "Status": "ON REQUEST"
+            },
+            {
+              "CtypID": "45R1",
+              "Status": "GOOD"
+            },
+            {
+              "CtypID": "45U1",
+              "Status": "GOOD"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

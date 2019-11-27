@@ -76,6 +76,11 @@ const Navbar: React.FC = () => {
                     Quotes
                   </Button>
                 </div>
+                <div className={classes.item}>
+                  <Button component={Link} to="/equipment">
+                    Equipment Situation
+                  </Button>
+                </div>
               </Fragment>
             )}
             <div className={classes.spacer} />

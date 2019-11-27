@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
+import EquipmentSituation from './pages/EquipmentSituation';
 import GetQuotes from './pages/GetQuotes';
 import Quotes from './pages/Quotes';
 import Quote from './pages/Quote';
@@ -46,6 +47,7 @@ const App: React.FC = () => (
     <Route exact path="/quotes" component={requireUser(Quotes)} />
     <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
     <Route exact path="/quotes/:id" component={requireUser(Quote)} />
+    <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
     {/** TODO Remove temporary route /dashboard */}
     <Route exact path="/dashboard" component={Dashboard} />
     <Route component={NotFound} />
