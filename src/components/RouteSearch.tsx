@@ -74,12 +74,11 @@ const RouteSearch: React.FC<Props> = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
-  const [results, setResults] = useState<RouteSearchResults | undefined>(
+  const [results, setResults] = useState<RouteSearchResults | null | undefined>(
     useTestData('routesSearch', update('Routes', sortingOptions[0].sort)),
   );
   const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
-  const [searchInProgress, setSearchInProgress] = useState(false);
 
   useEffect(() => {
     if (!action) {
@@ -93,11 +92,14 @@ const RouteSearch: React.FC<Props> = () => {
       return undefined;
     }
 
+    if (results === undefined) {
+      setResults(null);
+    }
+
     const controller = new AbortController();
     const signal = controller.signal;
 
     (async () => {
-      setSearchInProgress(true);
       try {
         const search = querySting.stringify({
           origin: params.originPort!.id,
@@ -120,7 +122,6 @@ const RouteSearch: React.FC<Props> = () => {
         if (action.callback) {
           action.callback();
         }
-        setSearchInProgress(false);
       }
     })();
 
@@ -170,16 +171,16 @@ const RouteSearch: React.FC<Props> = () => {
           </Paper>
         </Sticky>
       </Box>
-      {results ? (
-        results.Routes.length === 0 ? (
-          <SearchEmptyResults />
-        ) : (
-          <Container>
+      <Container>
+        {results !== undefined ? (
+          results?.Routes.length === 0 ? (
+            <SearchEmptyResults />
+          ) : (
             <Grid container spacing={4}>
               <Grid item md={3}>
                 <Paper className={classes.sidebar}>
                   <RouteSearchFilters
-                    only={uniq(results.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
+                    only={uniq(results?.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
                     value={params.carrier}
                     onChange={handleFiltersChange}
                   />
@@ -189,29 +190,20 @@ const RouteSearch: React.FC<Props> = () => {
                 <Paper className={classes.sorting}>
                   <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
                 </Paper>
-                {results.Routes.map((route, i) => (
-                  <Route key={i} route={route} />
-                ))}
+                {results ? (
+                  results.Routes.map((route, i) => <Route key={i} route={route} />)
+                ) : (
+                  <Fragment>
+                    <Route />
+                  </Fragment>
+                )}
               </Grid>
             </Grid>
-          </Container>
-        )
-      ) : searchInProgress ? (
-        <Container>
-          <Grid container spacing={4}>
-            <Grid item md={3}>
-              <Skeleton className={classes.sidebar} variant="rect" width="100%" height={450} />
-            </Grid>
-            <Grid item md={9}>
-              <Skeleton className={classes.sorting} variant="rect" width="100%" height={104} />
-              <Skeleton className={classes.route} variant="rect" width="100%" height={232} />
-              <Skeleton className={classes.route} variant="rect" width="100%" height={232} />
-            </Grid>
-          </Grid>
-        </Container>
-      ) : (
-        <SearchHowTo />
-      )}
+          )
+        ) : (
+          <SearchHowTo />
+        )}
+      </Container>
     </Fragment>
   );
 };

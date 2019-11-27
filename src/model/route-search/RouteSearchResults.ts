@@ -1,5 +1,3 @@
-import Port from '../Port';
-
 export enum ItemType {
   Origin = 'origin',
   Intermediate = 'intermediate',
@@ -23,6 +21,12 @@ export interface RouteSearchResult {
   IntermediatePortInfos: RouteSearchResultIntermediatePortInfo[];
   Deadlines: RouteSearchResultDeadline[];
 }
+
+type Port = {
+  ID: string;
+  HarbourName: string;
+  Land: string;
+};
 
 export interface ItineraryItem {
   ArrivalDate?: string;

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Fragment, useMemo } from 'react';
+import isArray from 'lodash/fp/isArray';
 import {
   Theme,
   makeStyles,
@@ -11,6 +12,7 @@ import {
   ExpansionPanelActions,
   Typography,
   Chip,
+  useTheme,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import formatDate from 'date-fns/format';
@@ -21,9 +23,10 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
 import InfoBoxItem from '../InfoBoxItem';
+import TextSkeleton from '../TextSkeleton';
 
 interface Props {
-  route: RouteSearchResult;
+  route?: RouteSearchResult;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -44,29 +47,44 @@ const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM')
 
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
+  const theme = useTheme();
+
+  const disabled = !route;
+
+  const expansionPanelStyle: React.CSSProperties = {
+    backgroundColor: disabled ? theme.palette.background.paper : undefined,
+  };
+
+  const expansionPanelSummaryStyle: React.CSSProperties = {
+    opacity: disabled ? 1 : undefined,
+  };
 
   return (
     <Box>
-      <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1c-content">
+      <ExpansionPanel TransitionProps={{ unmountOnExit: true }} disabled={disabled} style={expansionPanelStyle}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1c-content"
+          style={expansionPanelSummaryStyle}
+        >
           <Grid container spacing={2}>
             <Grid item md={9} sm={12}>
               <Typography variant="subtitle2" display="block">
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
               <Typography variant="h6" display="block">
-                {route.OriginInfo.VoyageInfo.Carrier}
+                {route ? route!.OriginInfo.VoyageInfo.Carrier : <TextSkeleton width={[60, 90]} />}
               </Typography>
             </Grid>
-            {route.SpaceInfo && (
+            {route?.SpaceInfo && (
               <Grid item md={3} sm={12}>
                 <Typography variant="subtitle2" display="block" gutterBottom>
                   <Box fontWeight="fontWeightBold">Space Availability</Box>
                 </Typography>
                 <Chip
                   size="small"
-                  label={route.SpaceInfo}
-                  style={{ backgroundColor: route.SpaceInfoColor }}
+                  label={route?.SpaceInfo}
+                  style={{ backgroundColor: route?.SpaceInfoColor }}
                   className={classes.chip}
                 />
               </Grid>
@@ -80,70 +98,95 @@ const Route: React.FC<Props> = ({ route }) => {
               <InfoBoxItem
                 IconComponent={ChevronRightIcon}
                 title="Departure"
-                label1={`ETS ${formatDateString(route.OriginInfo.DepartureDate)}`}
-                label2={`${route.OriginInfo.Port.city}, ${route.OriginInfo.Port.country}`}
+                label1={
+                  route ? `ETS ${formatDateString(route!.OriginInfo.DepartureDate)}` : <TextSkeleton width={100} />
+                }
+                label2={
+                  route ? (
+                    `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land}`
+                  ) : (
+                    <TextSkeleton width={[80, 120]} />
+                  )
+                }
               />
             </Grid>
             <Grid item md={3} sm={12}>
               <InfoBoxItem
                 IconComponent={LastPageIcon}
                 title="Arrival"
-                label1={`ETA ${formatDateString(route.DestinationInfo.ArrivalDate)}`}
-                label2={`${route.DestinationInfo.Port.city}, ${route.DestinationInfo.Port.country}`}
+                label1={
+                  route ? `ETA ${formatDateString(route!.DestinationInfo.ArrivalDate)}` : <TextSkeleton width={100} />
+                }
+                label2={
+                  route ? (
+                    `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land}`
+                  ) : (
+                    <TextSkeleton width={[80, 120]} />
+                  )
+                }
               />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
-              <InfoBoxItem IconComponent={WavesIcon} title="TransitTime" label1={`${route.TransitTime} DAYS`} />
+              <InfoBoxItem
+                IconComponent={WavesIcon}
+                title="TransitTime"
+                label1={route ? `${route!.TransitTime} DAYS` : <TextSkeleton width={70} />}
+              />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
-              <InfoBoxItem IconComponent={WavesIcon} title="Routing" label1={route.Routing} />
+              <InfoBoxItem
+                IconComponent={WavesIcon}
+                title="Routing"
+                label1={route ? route!.Routing : <TextSkeleton width={[50, 80]} />}
+              />
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
 
-        <ExpansionPanelDetails>
-          {/* Deadlines Display */}
-
-          <Grid container>
-            <Grid item container xs={12} spacing={2} className={classes.deadlines}>
-              {route.Deadlines.map((deadline, i) => (
-                <Grid key={i} item md={3} sm={3}>
-                  <InfoBoxItem title={`${deadline.Typ} closing`} label1={deadline.Time} />
+        {route && (
+          <Fragment>
+            <ExpansionPanelDetails>
+              {/* Deadlines Display */}
+              <Grid container>
+                <Grid item container xs={12} spacing={2} className={classes.deadlines}>
+                  {route!.Deadlines.map((deadline, i) => (
+                    <Grid key={i} item md={3} sm={3}>
+                      <InfoBoxItem title={`${deadline.Typ} closing`} label1={deadline.Time} />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-
-            {/* Itinerary */}
-
-            <Grid item xs={12}>
-              <Stepper orientation="vertical" className={classes.stepper}>
-                {route.OriginInfo && <ItineraryItem noLine={false} itineraryItem={route.OriginInfo} />}
-                {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                  <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
-                ))}
-                {route.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />}
-              </Stepper>
-            </Grid>
-          </Grid>
-        </ExpansionPanelDetails>
-        <ExpansionPanelActions>
-          <Grid container>
-            <Grid item>
-              <Box p={2}>
-                <Typography variant="subtitle2">
-                  <Box paddingBottom={1}>SERVICE {route.Service}</Box>
-                </Typography>
-                <Divider light />
-                <Typography variant="body2">
-                  <Box paddingTop={1} component="span">
-                    ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING.
-                    ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                {/* Itinerary */}
+                <Grid item xs={12}>
+                  <Stepper orientation="vertical" className={classes.stepper}>
+                    {route!.OriginInfo && <ItineraryItem noLine={false} itineraryItem={route!.OriginInfo} />}
+                    {route!.IntermediatePortInfos.map((intermediatePortInfo, i) => (
+                      <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
+                    ))}
+                    {route!.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route!.DestinationInfo} />}
+                  </Stepper>
+                </Grid>
+              </Grid>
+            </ExpansionPanelDetails>
+            <ExpansionPanelActions>
+              <Grid container>
+                <Grid item>
+                  <Box p={2}>
+                    <Typography variant="subtitle2">
+                      <Box paddingBottom={1}>SERVICE {route!.Service}</Box>
+                    </Typography>
+                    <Divider light />
+                    <Typography variant="body2">
+                      <Box paddingTop={1} component="span">
+                        ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY
+                        BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                      </Box>
+                    </Typography>
                   </Box>
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </ExpansionPanelActions>
+                </Grid>
+              </Grid>
+            </ExpansionPanelActions>
+          </Fragment>
+        )}
       </ExpansionPanel>
     </Box>
   );

@@ -1,7 +1,5 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
-import identity from 'lodash/identity';
+import React, { Fragment, useContext, useMemo } from 'react';
 import { Theme, makeStyles, List, Typography } from '@material-ui/core';
-import Carrier from '../model/Carrier';
 import RouteSearchFilter from './RouteSearchFilter';
 import Carriers from '../contexts/Carriers';
 
@@ -25,7 +23,14 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
 
-  const filter = only ? (carrier: Carrier) => only.indexOf(carrier.name) !== -1 : identity;
+  const filtered = useMemo(() => {
+    if (only) {
+      const allowed = only.map(i => i.toLowerCase());
+      return (carriers || []).filter(carrier => allowed.indexOf(carrier.name.toLowerCase()) !== -1);
+    } else {
+      return carriers || [];
+    }
+  }, [only, carriers]);
 
   return (
     <Fragment>
@@ -38,17 +43,14 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
           selected={value === undefined}
           onSelect={callback => onChange(undefined, callback)}
         />
-        {carriers &&
-          carriers
-            .filter(filter)
-            .map(carrier => (
-              <RouteSearchFilter
-                key={carrier.id}
-                label={carrier.name}
-                selected={value === carrier?.id}
-                onSelect={callback => onChange(carrier.id, callback)}
-              />
-            ))}
+        {filtered.map(carrier => (
+          <RouteSearchFilter
+            key={carrier.id}
+            label={carrier.name.toUpperCase()}
+            selected={value === carrier?.id}
+            onSelect={callback => onChange(carrier.id, callback)}
+          />
+        ))}
       </List>
     </Fragment>
   );
