@@ -1,8 +1,11 @@
 import React, { Fragment, useContext } from 'react';
 import {
+  Box,
   // Box,
   Button,
   Container,
+  Divider,
+  Grid,
   // ExpansionPanel,
   // ExpansionPanelDetails,
   // ExpansionPanelSummary,
@@ -24,12 +27,21 @@ import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
 import toPairs from 'lodash/fp/toPairs';
 // import sortBy from 'lodash/sortBy';
-import { QuoteHeader /*QuoteItemNormalized, TermTerm*/ } from '../model/quotes/QuotesResult';
+import { QuoteHeader, Term /*QuoteItemNormalized, TermTerm*/ } from '../model/quotes/QuotesResult';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 // import QuoteItem from './quotes/QuoteItem';
 // import asArray from '../utilities/asArray';
 // import useTestData from '../utilities/useTestData';
 import { Link as RouterLink } from 'react-router-dom';
+import QuoteItem from './quotes/QuoteItem';
+import Page from './quotes/Page';
+import QuoteItemHeader from './quotes/QuoteItemHeader';
+import QuoteItemCargoDetail from './quotes/QuoteItemCargoDetail';
+import QuoteItemTerms from './quotes/QuoteItemTerms';
+import QuoteItemQuoteDetails from './quotes/QuoteItemQuoteDetails';
+import QuoteItemCostDetailsRemark from './quotes/QuoteItemCostDetailsRemark';
+import QuoteItemServiceDetail from './quotes/QuoteItemServiceDetail';
+import QuoteItemRemarks from './quotes/QuoteItemRemarks';
 
 interface Props {
   id: string;
@@ -46,79 +58,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 // const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
 const Quote: React.FC<Props> = ({ id }) => {
-  const { result } = useContext(QuotesEndpointContext);
   const classes = useStyles();
-  const quotes = (result as any)?.find((quotes: QuoteHeader[]) => quotes[0].idRequest === id);
 
-  if (!quotes) {
+  const { result } = useContext(QuotesEndpointContext);
+
+  const quoteGroup = (result || []).find(group => Boolean(group.quotes.find(quote => quote.QuoteNumber === id)));
+
+  if (!quoteGroup) {
     return null;
   }
 
-  const carrierQuotes = flow(groupBy('CarrierID'), toPairs)(quotes);
+  const quote = quoteGroup.quotes.find(quote => quote.QuoteNumber === id);
 
-  return (
-    <Fragment>
-      {carrierQuotes.map(([carrierId, quotes]) => (
-        <Container id={carrierId} maxWidth="lg">
-          <Paper className={classes.root}>
-            <Typography variant="h4" gutterBottom>
-              {carrierId}
-            </Typography>
-            <Table size="small" aria-label="a dense table">
-              <TableHead>
-                <TableRow>
-                  <TableCell></TableCell>
-                  {quotes.map((quote: any) => (
-                    <TableCell key={quote.QuoteNumber}>{quote.QuoteValidity}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {[...Array(quotes[0].QuoteDetails.length)].map((_, i) => {
-                  return (
-                    <TableRow key={i}>
-                      <TableCell component="th" scope="row">
-                        {quotes[0].QuoteDetails[i].description}
-                      </TableCell>
-                      {quotes.map((quote: any) => (
-                        <TableCell key={quote.QuoteNumber}>
-                          <Typography>
-                            {quote.QuoteDetails[i].CostValue} {quote.QuoteDetails[i].Currency}{' '}
-                            {quote.QuoteDetails[i].CostUnit}
-                          </Typography>
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell></TableCell>
-                  {quotes.map((quote: any) => (
-                    <TableCell key={quote.QuoteNumber}>
-                      <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.QuoteNumber}`}>
-                        View more
-                      </Button>
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        component={RouterLink}
-                        size="small"
-                        to={`/quotes/${quote.QuoteNumber}`}
-                      >
-                        Request Booking
-                      </Button>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </Paper>
-        </Container>
-      ))}
-    </Fragment>
-  );
+  if (!quote) {
+    return null;
+  }
 
   // const asArray = (item: any) => (item === null ? [] : Array.isArray(item) ? item : [item]);
   // const normalizeQuoteHeaderProps = flow(
@@ -151,18 +105,54 @@ const Quote: React.FC<Props> = ({ id }) => {
   //   };
   // }
   // console.log('Normalized ', normalizedQuoteItems);
-  //
-  // return (
-  //   <Container maxWidth="lg">
-  //     <Paper className={classes.root}>
-  //       {quoteHeader[0].map((quoteItem: QuoteHeader) => (
-  //         <Grid item xs={12}>
-  //           <QuoteItem quoteItemNormalized={quoteItem} />
-  //         </Grid>
-  //       ))}
-  //     </Paper>
-  //   </Container>
-  // );
+
+  console.log('quote', quote);
+
+  // TODO
+
+  return (
+    <Container maxWidth="lg">
+      <Paper className={classes.root}>
+        <Grid item xs={12}>
+          <Page title="Quotation">
+            <Grid container spacing={2}>
+              {/*<Grid item xs={6}>*/}
+              {/*<QuoteItemHeader quoteHeader={quote} termsHeader={quote.Terms} />*/}
+              {/*</Grid>*/}
+              {/*<Grid item xs={6}>*/}
+              {/*<QuoteItemCargoDetail cargoDetails={quote.CargoDetail} />*/}
+              {/*</Grid>*/}
+              {/*<Grid item xs={12}>*/}
+              {/*<Divider />*/}
+              {/*</Grid>*/}
+              {/*<QuoteItemTerms terms={quote.Terms.Term} />*/}
+              {/*<QuoteItemQuoteDetails quoteDetails={quote.QuoteDetails} />*/}
+              {/*<QuoteItemCostDetailsRemark costDetailRemarks={quote.CostDetailsRemarks} />*/}
+              {/*<QuoteItemServiceDetail serviceDetailElement={quote.ServiceDetail} />*/}
+              {/*<QuoteItemRemarks remarks={quote.Remarks} />*/}
+            </Grid>
+
+            <Box displayPrint="block" display="none" marginTop="4em">
+              <Divider />
+              <Typography variant="body1">
+                Bei Fragen oder für weitere Informationen stehen wir Ihnen gerne zur Verfügung. Mit Freude sehen wir
+                Ihrem Feedback entgegen.
+                <br />
+                <br />
+                Freundliche Grüsse
+                <br />
+                Fabio Manuzzi
+                <br />
+                f.manuzzi@brunoni.ch
+                <br />
+                Tel. +41 44 455 58 91
+              </Typography>
+            </Box>
+          </Page>
+        </Grid>
+      </Paper>
+    </Container>
+  );
 };
 
 export default Quote;
