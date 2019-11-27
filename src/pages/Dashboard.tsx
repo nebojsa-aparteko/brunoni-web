@@ -6,8 +6,6 @@ import Quotes from '../components/Quotes';
 import ClientPerformance from '../components/ClientPerformance';
 import Footer from '../components/Footer';
 
-interface Props {}
-
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
@@ -19,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const Dashboard: React.FC<Props> = ({}) => {
+const Dashboard: React.FC = () => {
   const classes = useStyles();
 
   return (

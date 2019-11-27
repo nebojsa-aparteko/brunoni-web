@@ -50,7 +50,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
       datasets,
       labels: carriers,
     };
-  }, [clientPerformance, cs]);
+  }, [clientPerformance, cs, theme.palette.common.white]);
 
   const options = {
     responsive: true,

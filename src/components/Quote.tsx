@@ -1,12 +1,12 @@
 import React, { Fragment, useContext } from 'react';
 import {
-  Box,
+  // Box,
   Button,
   Container,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Grid,
+  // ExpansionPanel,
+  // ExpansionPanelDetails,
+  // ExpansionPanelSummary,
+  // Grid,
   makeStyles,
   Paper,
   Table,
@@ -19,16 +19,16 @@ import {
   Typography,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
-import map from 'lodash/fp/map';
-import update from 'lodash/fp/update';
+// import map from 'lodash/fp/map';
+// import update from 'lodash/fp/update';
 import groupBy from 'lodash/fp/groupBy';
 import toPairs from 'lodash/fp/toPairs';
-import sortBy from 'lodash/sortBy';
-import { QuoteHeader, QuoteItemNormalized, TermTerm } from '../model/quotes/QuotesResult';
+// import sortBy from 'lodash/sortBy';
+import { QuoteHeader /*QuoteItemNormalized, TermTerm*/ } from '../model/quotes/QuotesResult';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
-import QuoteItem from './quotes/QuoteItem';
-import asArray from '../utilities/asArray';
-import useTestData from '../utilities/useTestData';
+// import QuoteItem from './quotes/QuoteItem';
+// import asArray from '../utilities/asArray';
+// import useTestData from '../utilities/useTestData';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface Props {
@@ -43,10 +43,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
+// const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
 const Quote: React.FC<Props> = ({ id }) => {
-  const { busy, error, result, refresh } = useContext(QuotesEndpointContext);
+  const { result } = useContext(QuotesEndpointContext);
   const classes = useStyles();
   const quotes = (result as any)?.find((quotes: QuoteHeader[]) => quotes[0].idRequest === id);
 

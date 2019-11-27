@@ -146,6 +146,7 @@ const GetQuotes: React.FC<Props> = () => {
     return () => {
       controller.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, busy]);
 
   const handleOriginPortChange = (port: Port) => {

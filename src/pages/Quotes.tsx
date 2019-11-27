@@ -3,9 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import QuotesView from '../components/Quotes';
 
-interface Props {}
-
-const Quotes: React.FC<Props> = ({}) => (
+const Quotes: React.FC = () => (
   <Fragment>
     <Navbar />
     <QuotesView />

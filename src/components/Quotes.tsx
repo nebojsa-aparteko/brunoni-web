@@ -5,10 +5,8 @@ import QuotesList from './quotes/index';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import Link from './Link';
 
-interface Props {}
-
-const Quotes: React.FC<Props> = ({}) => {
-  const { busy, error, result, refresh } = useContext(QuotesEndpointContext);
+const Quotes: React.FC = () => {
+  const { result } = useContext(QuotesEndpointContext);
 
   return (
     <Box>

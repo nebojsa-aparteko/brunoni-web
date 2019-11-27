@@ -55,6 +55,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
     return () => {
       controller.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, uri, request]);
 
   const refresh = () => setRequest(request + 1);

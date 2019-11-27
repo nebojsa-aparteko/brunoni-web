@@ -12,7 +12,6 @@ import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
 import Container from './Container';
 import Typography from '@material-ui/core/Typography';
-import { Skeleton } from '@material-ui/lab';
 import { useSnackbar } from 'notistack';
 import Route from './routeSearch/Route';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
@@ -113,8 +112,8 @@ const RouteSearch: React.FC<Props> = () => {
         setResults(update('Routes', sorting.sort)(body as RouteSearchResults));
         setAction(undefined);
       } catch (e) {
-        console.error('Failed to load routes', e);
         if (e.code !== e.ABORT_ERR) {
+          console.error('Failed to load routes', e);
           setAction(undefined);
           enqueueSnackbar(<Typography>Failed to load routes.</Typography>, { variant: 'error' });
         }

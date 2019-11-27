@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { QuoteHeader } from '../../model/quotes/QuotesResult';
 import {
   Button,
@@ -27,7 +27,6 @@ interface Props {
 }
 
 const QuotesList: React.FC<Props> = ({ quoteHeaders }) => {
-  const history = useHistory();
   const classes = useStyles();
 
   return (

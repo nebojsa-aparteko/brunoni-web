@@ -1,5 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
-import isArray from 'lodash/fp/isArray';
+import React, { Fragment } from 'react';
 import {
   Theme,
   makeStyles,

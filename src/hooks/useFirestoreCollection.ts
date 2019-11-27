@@ -28,7 +28,7 @@ export default function useFirestoreCollection(name: string) {
         console.error('useFirestoreCollection', name, 'threw an error', error);
       }
     })();
-  }, []);
+  }, [name]);
 
   return snapshot;
 }

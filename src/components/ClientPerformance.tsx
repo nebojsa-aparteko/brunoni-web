@@ -18,8 +18,6 @@ import Top5PortsPerformance from './dashboard/Top5PortsPerformance';
 import asArray from '../utilities/asArray';
 import useTestData from '../utilities/useTestData';
 
-interface Props {}
-
 const updateClientPerformanceBody = get('idStat_011.Statistics');
 
 const normalizeClientPerformance = flow(
@@ -48,8 +46,8 @@ const normalizeClientPerformance = flow(
   ),
 );
 
-const ClientPerformance: React.FC<Props> = ({}) => {
-  const { busy, error, result, refresh } = useEndpoint(
+const ClientPerformance: React.FC = () => {
+  const { busy, error, result } = useEndpoint(
     '/clientPerformance',
     updateClientPerformanceBody,
     useTestData('clientPerformance', updateClientPerformanceBody),
@@ -65,7 +63,7 @@ const ClientPerformance: React.FC<Props> = ({}) => {
     }
 
     return normalizeClientPerformance(result);
-  }, [result]);
+  }, [result, busy, error]);
 
   return (
     <Page title="Analytics Dashboard">
