@@ -81,7 +81,7 @@ const Route: React.FC<Props> = ({ route }) => {
                 IconComponent={ChevronRightIcon}
                 title="Departure"
                 label1={`ETS ${formatDateString(route.OriginInfo.DepartureDate)}`}
-                label2={`${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land}`}
+                label2={`${route.OriginInfo.Port.city}, ${route.OriginInfo.Port.country}`}
               />
             </Grid>
             <Grid item md={3} sm={12}>
@@ -89,7 +89,7 @@ const Route: React.FC<Props> = ({ route }) => {
                 IconComponent={LastPageIcon}
                 title="Arrival"
                 label1={`ETA ${formatDateString(route.DestinationInfo.ArrivalDate)}`}
-                label2={`${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land}`}
+                label2={`${route.DestinationInfo.Port.city}, ${route.DestinationInfo.Port.country}`}
               />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>

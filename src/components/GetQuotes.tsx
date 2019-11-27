@@ -7,13 +7,13 @@ import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
 import GetQuotesParams from '../model/get-quotes/GetQuotesParams';
-import { Container as ContainerModel } from '../model/get-quotes/Container';
+import ContainerModel from '../model/Container';
 import ListInput from './inputs/ListInput';
 import ContainerInput from './inputs/ContainerInput';
 import Container from './Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
-import QuotesContext from '../contexts/Quotes';
+import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
 
 interface Props {}
@@ -47,7 +47,7 @@ const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const user = useUser();
   const history = useHistory();
-  const { refresh } = useContext(QuotesContext);
+  const { refresh } = useContext(QuotesEndpointContext);
   const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });
   const [busy, setBusy] = useState(false);
   const ports = useContext(Ports);
@@ -88,14 +88,14 @@ const GetQuotes: React.FC<Props> = () => {
     }
 
     console.log('Quoteationaksdjfh', 'requesting', {
-      origin: originPort!.ID,
-      destination: destinationPort!.ID,
+      origin: originPort!.id,
+      destination: destinationPort!.id,
       date: date.toISOString(),
       weeks: Number(weeks),
       containers: containers.map(container => ({
-        type: container.containerType!.CtypID,
-        commodity: container.commodityType!.CommodityID,
-        location: container.location?.AdrID,
+        type: container.containerType!.id,
+        commodity: container.commodityType!.id,
+        location: container.location?.id,
         quantity: container.quantity,
       })),
     });
@@ -118,14 +118,14 @@ const GetQuotes: React.FC<Props> = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            origin: originPort!.ID,
-            destination: destinationPort!.ID,
+            origin: originPort!.id,
+            destination: destinationPort!.id,
             date: date.toISOString(),
             weeks: Number(weeks),
             containers: containers.map(container => ({
-              type: container.containerType!.CtypID,
-              commodity: container.commodityType!.CommodityID,
-              location: container.location?.AdrID,
+              type: container.containerType!.id,
+              commodity: container.commodityType!.id,
+              location: container.location?.id,
               quantity: container.quantity,
             })),
           }),

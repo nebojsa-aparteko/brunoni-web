@@ -1,3 +1,3 @@
-export interface UserRecord {
+export default interface UserRecord {
   alphacomId?: string;
 }

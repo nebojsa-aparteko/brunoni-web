@@ -13,7 +13,7 @@ interface Props {
 
 const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => {
   const carriers = React.useContext(CarriersContext);
-  const carrier = ((carrierID: string) => carriers && carriers.find(item => item.ID === carrierID))(
+  const carrier = ((carrierID: string) => carriers && carriers.find(item => item.id === carrierID))(
     quoteHeader.CarrierID,
   );
   console.debug('Carriers', carriers);
@@ -33,7 +33,7 @@ const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => {
 
       {carrier && (
         <Grid item xs={12}>
-          <InfoBoxItemHorizontal title="Carrier" label1={carrier.CarrierName} />
+          <InfoBoxItemHorizontal title="Carrier" label1={carrier.name} />
         </Grid>
       )}
 

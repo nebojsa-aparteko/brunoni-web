@@ -5,7 +5,7 @@ import { Box, Chip, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import firebase from '../firebase';
-import UserInfo from '../contexts/UserInfo';
+import UserInfoEndpointContext from '../contexts/UserInfoEndpoint';
 import useUser from '../hooks/useUser';
 
 interface Props {
@@ -16,7 +16,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
   const user = useUser();
-  const { result: userInfo } = useContext(UserInfo);
+  const { result: userInfo } = useContext(UserInfoEndpointContext);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 

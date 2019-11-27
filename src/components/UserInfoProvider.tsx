@@ -1,6 +1,6 @@
 import React from 'react';
 import get from 'lodash/fp/get';
-import Context from '../contexts/UserInfo';
+import Context from '../contexts/UserInfoEndpoint';
 import useEndpoint from '../hooks/useEndpoint';
 
 interface Props {

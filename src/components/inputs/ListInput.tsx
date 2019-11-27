@@ -3,7 +3,7 @@ import set from 'lodash/fp/set';
 import { Box, Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { InputProps } from '../../model/InputProps';
+import InputProps from '../../model/InputProps';
 
 interface Props<T> extends InputProps<T[]> {
   listRef?: React.Ref<unknown>;

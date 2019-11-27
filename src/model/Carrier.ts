@@ -1,5 +1,5 @@
 export default interface Carrier {
-  ID: string;
-  CarrierName: string;
-  Color: string;
+  id: string;
+  name: string;
+  color: string;
 }

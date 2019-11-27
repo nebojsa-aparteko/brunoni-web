@@ -1,5 +1,5 @@
 import Port from '../Port';
-import { Container } from './Container';
+import Container from '../Container';
 
 export default interface GetQuotesParams {
   originPort?: Port;

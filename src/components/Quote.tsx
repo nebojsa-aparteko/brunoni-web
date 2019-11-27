@@ -25,7 +25,7 @@ import groupBy from 'lodash/fp/groupBy';
 import toPairs from 'lodash/fp/toPairs';
 import sortBy from 'lodash/sortBy';
 import { QuoteHeader, QuoteItemNormalized, TermTerm } from '../model/quotes/QuotesResult';
-import QuotesContext from '../contexts/Quotes';
+import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import QuoteItem from './quotes/QuoteItem';
 import asArray from '../utilities/asArray';
 import useTestData from '../utilities/useTestData';
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const updateQuoteResults = (quotes: QuoteHeader[]) => sortBy(quotes, (quote: QuoteHeader) => quote.QuoteDate);
 
 const Quote: React.FC<Props> = ({ id }) => {
-  const { busy, error, result, refresh } = useContext(QuotesContext);
+  const { busy, error, result, refresh } = useContext(QuotesEndpointContext);
   const classes = useStyles();
   const quotes = (result as any)?.find((quotes: QuoteHeader[]) => quotes[0].idRequest === id);
 
@@ -78,7 +78,7 @@ const Quote: React.FC<Props> = ({ id }) => {
                   return (
                     <TableRow key={i}>
                       <TableCell component="th" scope="row">
-                        {quotes[0].QuoteDetails[i].Description}
+                        {quotes[0].QuoteDetails[i].description}
                       </TableCell>
                       {quotes.map((quote: any) => (
                         <TableCell key={quote.QuoteNumber}>

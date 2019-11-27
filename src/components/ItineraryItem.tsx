@@ -54,7 +54,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
             ? formatDateString(itineraryItem.DepartureDate!)
             : formatDateString(itineraryItem.ArrivalDate!)}
           <div>
-            {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
+            {itineraryItem.Port.city}, {itineraryItem.Port.country}
           </div>
         </Box>
       </StepLabel>
@@ -73,8 +73,8 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
             <InfoBoxItem
               IconComponent={DirectionsPortIcon}
               title="Port"
-              label1={itineraryItem.Port.HarbourName}
-              label2={itineraryItem.Port.Land}
+              label1={itineraryItem.Port.city}
+              label2={itineraryItem.Port.country}
               gutterBottom
             />
           </Grid>
@@ -83,7 +83,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
               <InfoBoxItem
                 IconComponent={FlagIcon}
                 title="Receiving Address"
-                label1HTML={createMarkup(itineraryItem.Port.PortName)}
+                label1HTML={createMarkup(itineraryItem.Port.id)}
               />
               {/*<span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)}/>*/}
             </Grid>

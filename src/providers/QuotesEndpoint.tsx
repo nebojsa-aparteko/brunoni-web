@@ -7,7 +7,7 @@ import map from 'lodash/fp/map';
 import groupBy from 'lodash/fp/groupBy';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
-import Context from '../contexts/Quotes';
+import Context from '../contexts/QuotesEndpoint';
 import { QuoteHeader } from '../model/quotes/QuotesResult';
 
 import useEndpoint from '../hooks/useEndpoint';
@@ -42,10 +42,10 @@ const normalizeQuotes = flow(
   sortBy((quotes: QuoteHeader[]) => quotes[0].QuoteDate),
 );
 
-const QuotesProvider: React.FC<Props> = ({ children }) => {
+const QuotesEndpoint: React.FC<Props> = ({ children }) => {
   const quotes = useEndpoint('/quotes', normalizeQuotes, useTestData('quotes', normalizeQuotes));
 
   return <Context.Provider value={quotes}>{children}</Context.Provider>;
 };
 
-export default QuotesProvider;
+export default QuotesEndpoint;

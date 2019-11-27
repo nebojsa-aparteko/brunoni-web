@@ -2,7 +2,7 @@ import React, { ChangeEvent, Fragment } from 'react';
 import { Theme, makeStyles, Box, TextField, InputAdornment, IconButton } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { InputProps } from '../../model/InputProps';
+import InputProps from '../../model/InputProps';
 
 interface Props extends InputProps<number> {}
 

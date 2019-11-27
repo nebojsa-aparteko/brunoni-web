@@ -1,6 +1,5 @@
 export default interface Port {
-  ID: string;
-  HarbourName: string;
-  PortName?: string;
-  Land: string;
+  id: string;
+  city: string;
+  country: string;
 }

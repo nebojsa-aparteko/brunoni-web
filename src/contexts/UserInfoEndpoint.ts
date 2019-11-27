@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserInfo } from '../model/UserInfo';
+import UserInfo from '../model/UserInfo';
 
 type Type = {
   busy: boolean;

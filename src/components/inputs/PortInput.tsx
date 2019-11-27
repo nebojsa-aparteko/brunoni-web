@@ -6,7 +6,7 @@ import Port from '../../model/Port';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 
-const getOptionLabel = (option: Port) => `${option.HarbourName} - ${option.Land} (${option.ID})`;
+const getOptionLabel = (option: Port) => `${option.city} - ${option.country} (${option.id})`;
 
 interface Props {
   label: string;

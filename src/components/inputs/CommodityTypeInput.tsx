@@ -1,13 +1,12 @@
 import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
-import { InputProps } from '../../model/InputProps';
+import InputProps from '../../model/InputProps';
 import CommodityTypes from '../../contexts/CommodityTypes';
-import { CommodityType } from '../../model/get-quotes/CommodityType';
+import CommodityType from '../../model/CommodityType';
 import SelectInput from './SelectInput';
 
 interface Props extends InputProps<CommodityType | undefined> {}
 
-const getCommodityTypeLabel = (commodityType: CommodityType | undefined) =>
-  commodityType ? commodityType.CommodityText : '';
+const getCommodityTypeLabel = (commodityType: CommodityType | undefined) => (commodityType ? commodityType.name : '');
 
 const focusAndSelect = (input: HTMLInputElement) => {
   input.focus();

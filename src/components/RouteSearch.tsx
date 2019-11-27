@@ -100,8 +100,8 @@ const RouteSearch: React.FC<Props> = () => {
       setSearchInProgress(true);
       try {
         const search = querySting.stringify({
-          origin: params.originPort!.ID,
-          destination: params.destinationPort!.ID,
+          origin: params.originPort!.id,
+          destination: params.destinationPort!.id,
           date: formatDate(params.date, 'yyyy-MM-dd'),
           weeks: params.weeks.toString(),
           carrier: params.carrier,

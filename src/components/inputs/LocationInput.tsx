@@ -1,13 +1,13 @@
 import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
-import { InputProps } from '../../model/InputProps';
-import Locations from '../../contexts/Locations';
-import { Location } from '../../model/get-quotes/Location';
+import InputProps from '../../model/InputProps';
+import Locations from '../../contexts/PickupLocations';
+import PickupLocation from '../../model/PickupLocation';
 import SelectInput from './SelectInput';
 
-interface Props extends InputProps<Location | undefined> {}
+interface Props extends InputProps<PickupLocation | undefined> {}
 
-const getLocationLabel = (location: Location | undefined) =>
-  location ? `${location.AdrName} - ${location.AdrCity} - ${location.AdrISOCountry}` : '';
+const getLocationLabel = (location: PickupLocation | undefined) =>
+  location ? `${location.name} - ${location.city} - ${location.countryCode}` : '';
 
 const focusAndSelect = (input: HTMLInputElement) => {
   input.focus();
@@ -34,7 +34,7 @@ const LocationInput: React.FC<Props> = ({ value, onChange }, ref) => {
       open={open}
       setOpen={setOpen}
       value={value}
-      onChange={(location: Location | undefined) => onChange(location)}
+      onChange={(location: PickupLocation | undefined) => onChange(location)}
     />
   );
 };

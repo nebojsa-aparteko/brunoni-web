@@ -2,13 +2,13 @@ import React, { useContext } from 'react';
 import { Box, Button } from '@material-ui/core';
 import Container from './Container';
 import QuotesList from './quotes/index';
-import QuotesContext from '../contexts/Quotes';
+import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import Link from './Link';
 
 interface Props {}
 
 const Quotes: React.FC<Props> = ({}) => {
-  const { busy, error, result, refresh } = useContext(QuotesContext);
+  const { busy, error, result, refresh } = useContext(QuotesEndpointContext);
 
   return (
     <Box>

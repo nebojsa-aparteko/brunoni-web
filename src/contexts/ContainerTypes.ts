@@ -1,4 +1,4 @@
 import React from 'react';
-import { ContainerType } from '../model/get-quotes/ContainerType';
+import ContainerType from '../model/ContainerType';
 
 export default React.createContext<ContainerType[] | undefined>(undefined);

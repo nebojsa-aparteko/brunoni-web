@@ -1,4 +1,4 @@
-export interface UserInfo {
+export default interface UserInfo {
   AdrID: string;
   AdrTyp: string;
   AdrName: string;

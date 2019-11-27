@@ -25,7 +25,7 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
 
-  const filter = only ? (carrier: Carrier) => only.indexOf(carrier.CarrierName) !== -1 : identity;
+  const filter = only ? (carrier: Carrier) => only.indexOf(carrier.name) !== -1 : identity;
 
   return (
     <Fragment>
@@ -43,10 +43,10 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
             .filter(filter)
             .map(carrier => (
               <RouteSearchFilter
-                key={carrier.ID}
-                label={carrier.CarrierName}
-                selected={value === (carrier || {}).ID}
-                onSelect={callback => onChange(carrier.ID, callback)}
+                key={carrier.id}
+                label={carrier.name}
+                selected={value === carrier?.id}
+                onSelect={callback => onChange(carrier.id, callback)}
               />
             ))}
       </List>

@@ -17,9 +17,9 @@ const QuoteItemCargoDetail: React.FC<Props> = ({ cargoDetails }) => {
 
   // helpers to find commodity type text for display
   const commType = (cargoDetail: CargoDetailCargoDetail) =>
-    commodityTypes && commodityTypes.find(item => item.CommodityID === cargoDetail.CommodityID);
+    commodityTypes && commodityTypes.find(item => item.id === cargoDetail.CommodityID);
   const containerType = (cargoDetail: CargoDetailCargoDetail) =>
-    containerTypes && containerTypes.find(item => item.CtypID === cargoDetail.CtypID);
+    containerTypes && containerTypes.find(item => item.id === cargoDetail.CtypID);
 
   console.debug('Commodity Types', commodityTypes);
   console.debug('Container Types', containerTypes);
@@ -35,8 +35,8 @@ const QuoteItemCargoDetail: React.FC<Props> = ({ cargoDetails }) => {
           {cargoDetails.map((cargoDetail: CargoDetailCargoDetail) => {
             const foundContainerType = containerType(cargoDetail);
             const foundCommType = commType(cargoDetail);
-            const commodityText = foundCommType ? ` - ${foundCommType.CommodityText}` : '';
-            const cargoTypeDetailText = foundContainerType ? foundContainerType.Description : cargoDetail.CtypID;
+            const commodityText = foundCommType ? ` - ${foundCommType.name}` : '';
+            const cargoTypeDetailText = foundContainerType ? foundContainerType.description : cargoDetail.CtypID;
             return (
               <ListItem>
                 <ListItemText primary={`${cargoDetail.Quantity} – ${cargoTypeDetailText}${commodityText}`} />

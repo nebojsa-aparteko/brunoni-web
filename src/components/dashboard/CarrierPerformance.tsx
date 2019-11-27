@@ -31,7 +31,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
     })(carriers);
 
     const backgroundColors = map((carrier: string) => {
-      return cs?.find(c => c.ID === carrier)?.Color || colors.indigo[400];
+      return cs?.find(c => c.id === carrier)?.color || colors.indigo[400];
     })(carriers);
 
     const total = sum(performance);

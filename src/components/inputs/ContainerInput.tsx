@@ -1,15 +1,15 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import { Grid } from '@material-ui/core';
-import { InputProps } from '../../model/InputProps';
-import { Container } from '../../model/get-quotes/Container';
+import InputProps from '../../model/InputProps';
+import Container from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
 import CommodityTypeInput from './CommodityTypeInput';
 import QuantityInput from './QuantityInput';
 import LocationInput from './LocationInput';
-import { ContainerType } from '../../model/get-quotes/ContainerType';
-import { CommodityType } from '../../model/get-quotes/CommodityType';
-import { Location as LocationModel } from '../../model/get-quotes/Location';
+import ContainerType from '../../model/ContainerType';
+import CommodityType from '../../model/CommodityType';
+import PickupLocation from '../../model/PickupLocation';
 
 interface Props extends InputProps<Container> {}
 
@@ -42,7 +42,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
     (locationInput.current! as { focus: () => void }).focus();
   };
 
-  const handleLocationChange = (v: LocationModel | undefined) => {
+  const handleLocationChange = (v: PickupLocation | undefined) => {
     onChange(set('location', v)(value));
   };
 

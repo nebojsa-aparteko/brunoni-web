@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Context from '../contexts/UserRecord';
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
-import { UserRecord } from '../model/UserRecord';
+import UserRecord from '../model/UserRecord';
 
 interface Props {
   children: React.ReactNode;
