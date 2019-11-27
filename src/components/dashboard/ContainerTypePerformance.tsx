@@ -14,25 +14,26 @@ import keys from 'lodash/fp/keys';
 
 interface Props {
   clientPerformance: any;
+  year: number;
 }
 
-const extractContainerAggregatedData = flow(
-  get('Equipment'),
-  values,
-  map(get(new Date().getFullYear().toString())),
-  flatten,
-  map(get('Details')),
-  flatten,
-  groupBy('Unit'),
-  mapValues(flow(map(flow(get('Amount'), Number)), sum)),
-);
+const extractContainerAggregatedData = (year: number) =>
+  flow(
+    get('Equipment'),
+    values,
+    map(get(String(year))),
+    flatten,
+    map(get('Details')),
+    flatten,
+    groupBy('Unit'),
+    mapValues(flow(map(flow(get('Amount'), Number)), sum)),
+  );
 
-const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
+const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
 
-  const data1 = useMemo(() => {
-    const containerData = extractContainerAggregatedData(clientPerformance);
-    console.log('Cer', containerData);
+  const data = useMemo(() => {
+    const containerData = extractContainerAggregatedData(year)(clientPerformance);
 
     const datasets = [
       {
@@ -82,7 +83,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
           const label = data['labels'][tooltipItem['index']];
           const value = data['datasets'][0]['data'][tooltipItem['index']];
 
-          return `${label}: ${value} (${Math.round((value / data1.total) * 100)}%)`;
+          return `${label}: ${value} (${Math.round((value / data.total) * 100)}%)`;
         },
       },
     },
@@ -93,7 +94,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
       <Divider />
       <CardContent>
         <PerfectScrollbar>
-          <Pie data={data1} options={options} />
+          <Pie data={data} options={options} />
         </PerfectScrollbar>
       </CardContent>
     </Card>

@@ -47,6 +47,8 @@ const normalizeClientPerformance = flow(
 );
 
 const ClientPerformance: React.FC = () => {
+  const currentYear = new Date().getFullYear();
+
   const { busy, error, result } = useEndpoint(
     '/clientPerformance',
     updateClientPerformanceBody,
@@ -72,10 +74,10 @@ const ClientPerformance: React.FC = () => {
           <TEUPerformance clientPerformance={clientPerformance} />
         </Grid>
         <Grid item xs={4}>
-          <CarrierPerformance clientPerformance={clientPerformance} />
+          <CarrierPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
         <Grid item xs={4}>
-          <ContainerTypePerformance clientPerformance={clientPerformance} />
+          <ContainerTypePerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
         <Grid item xs={8}>
           <Top5PortsPerformance clientPerformance={clientPerformance} />

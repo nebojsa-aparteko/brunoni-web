@@ -25,8 +25,8 @@ const useStyles = makeStyles((theme: Theme) =>
         ({
           brunoni: {
             position: 'relative',
-            top: 38,
-            width: 153,
+            top: 6,
+            width: 80,
           },
           allmarine: {
             height: 80,

@@ -11,20 +11,19 @@ import Carriers from '../../contexts/Carriers';
 
 interface Props {
   clientPerformance: any;
+  year: number;
 }
 
-const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
+const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
   const cs = useContext(Carriers);
 
   const data = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-
     const carriers = flow(get('TEU'), keys)(clientPerformance);
 
     const performance = map((carrier: string) => {
       return flow(
-        get(['TEU', carrier, String(currentYear)]),
+        get(['TEU', carrier, String(year)]),
         map(flow(get(['Details', 'Amount']), Number)),
         sum,
       )(clientPerformance);
@@ -38,7 +37,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
 
     const datasets = [
       {
-        data: map((value: number) => (100 * value) / total)(performance),
+        data: performance,
         backgroundColor: backgroundColors,
         borderWidth: 2,
         borderColor: theme.palette.common.white,
@@ -49,6 +48,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
     return {
       datasets,
       labels: carriers,
+      total: total,
     };
   }, [clientPerformance, cs, theme.palette.common.white]);
 
@@ -81,7 +81,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
           const label = data['labels'][tooltipItem['index']];
           const value = data['datasets'][0]['data'][tooltipItem['index']];
 
-          return `${label}: ${value}%`;
+          return `${label}: ${value} (${Math.round((value / data.total) * 100)}%)`;
         },
       },
     },
