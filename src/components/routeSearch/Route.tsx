@@ -11,6 +11,8 @@ import {
   ExpansionPanelActions,
   Typography,
   Chip,
+  IconButton,
+  Popover,
   useTheme,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -23,6 +25,9 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
 import InfoBoxItem from '../InfoBoxItem';
 import TextSkeleton from '../TextSkeleton';
+import CopyToClipboard from 'react-copy-to-clipboard';
+
+import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 
 interface Props {
   route?: RouteSearchResult;
@@ -39,6 +44,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   stepper: {
     paddingLeft: theme.spacing(0),
     paddingRight: theme.spacing(0),
+  },
+  popover: {
+    margin: '1em',
   },
 }));
 
@@ -57,6 +65,32 @@ const Route: React.FC<Props> = ({ route }) => {
   const expansionPanelSummaryStyle: React.CSSProperties = {
     opacity: disabled ? 1 : undefined,
   };
+
+  const textToBeCopied = () => {
+    return (
+      `${route!.OriginInfo.VoyageInfo.VesselName} ${route!.OriginInfo.VoyageInfo.VoyageNr}\n` +
+      `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land} ETS ${formatDateString(
+        route!.OriginInfo.DepartureDate,
+      )}\n` +
+      `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land} ETA ${formatDateString(
+        route!.DestinationInfo.ArrivalDate,
+      )}\n`.concat(route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'))
+    );
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCopyToClipboardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+    setTimeout(handlePopoverClose, 1500);
+  };
+
+  const popoverOpen = Boolean(anchorEl);
+  const popoverId = popoverOpen ? 'simple-popover' : undefined;
 
   return (
     <Box>
@@ -153,6 +187,29 @@ const Route: React.FC<Props> = ({ route }) => {
                       <InfoBoxItem title={`${deadline.Typ} closing`} label1={deadline.Time} />
                     </Grid>
                   ))}
+                  <Grid item md={3} sm={3}>
+                    <CopyToClipboard text={textToBeCopied()}>
+                      <IconButton aria-label="delete" onClick={handleCopyToClipboardClick}>
+                        <CopyToClipboardIcon />
+                      </IconButton>
+                    </CopyToClipboard>
+                    <Popover
+                      id={popoverId}
+                      open={popoverOpen}
+                      anchorEl={anchorEl}
+                      onClose={handlePopoverClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                    >
+                      <Typography className={classes.popover}>Schedule info copied to clipboard.</Typography>
+                    </Popover>
+                  </Grid>
                 </Grid>
                 {/* Itinerary */}
                 <Grid item xs={12}>

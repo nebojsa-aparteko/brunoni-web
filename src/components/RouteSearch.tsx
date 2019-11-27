@@ -189,13 +189,7 @@ const RouteSearch: React.FC<Props> = () => {
                 <Paper className={classes.sorting}>
                   <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
                 </Paper>
-                {results ? (
-                  results.Routes.map((route, i) => <Route key={i} route={route} />)
-                ) : (
-                  <Fragment>
-                    <Route />
-                  </Fragment>
-                )}
+                {results ? results.Routes.map((route, i) => <Route key={i} route={route} />) : <Route />}
               </Grid>
             </Grid>
           )
