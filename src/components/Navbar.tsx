@@ -72,7 +72,7 @@ const Navbar: React.FC = () => {
                   </Button>
                 </div>
                 <div className={classes.item}>
-                  <Button component={Link} to="/quotes">
+                  <Button component={Link} to="/quotes/groups">
                     Quotes
                   </Button>
                 </div>

@@ -5,7 +5,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
   const [user] = useUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [result, setResult] = useState(initialResults);
+  const [result, setResult] = useState();
   const [request, setRequest] = useState(0);
 
   useEffect(() => {
@@ -60,5 +60,5 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
 
   const refresh = () => setRequest(request + 1);
 
-  return { busy: busy, error: error, result: result, refresh: refresh };
+  return { busy, error, result: result || initialResults, refresh };
 }

@@ -26,6 +26,8 @@ export interface QuoteHeader {
   QuoteNumber: string;
   QuoteDate: string;
   QuoteValidity: string;
+  POL: string;
+  POD: string;
   CargoDetails: CargoDetail[] | CargoDetail;
   Terms: Term[] | Term;
   QuoteDetails: QuoteDetailsQuoteDetailClass[] | QuoteDetailsClass;

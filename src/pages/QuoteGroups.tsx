@@ -1,14 +1,14 @@
 import React, { Fragment } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import QuotesView from '../components/Quotes';
+import QuoteGroupsView from '../components/QuoteGroups';
 
-const Quotes: React.FC = () => (
+const QuoteGroups: React.FC = () => (
   <Fragment>
     <Navbar />
-    <QuotesView />
+    <QuoteGroupsView />
     <Footer />
   </Fragment>
 );
 
-export default Quotes;
+export default QuoteGroups;

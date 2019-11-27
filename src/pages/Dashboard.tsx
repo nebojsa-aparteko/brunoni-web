@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Theme, makeStyles, Grid, Paper, Typography, Button } from '@material-ui/core';
 import Navbar from '../components/Navbar';
 import Container from '../components/Container';
-import Quotes from '../components/Quotes';
+import QuoteGroups from '../components/QuoteGroups';
 import ClientPerformance from '../components/ClientPerformance';
 import Footer from '../components/Footer';
 
@@ -36,7 +36,7 @@ const Dashboard: React.FC = () => {
               <Button>Get Quote</Button>
             </Grid>
           </Grid>
-          <Quotes />
+          <QuoteGroups />
         </Paper>
       </Container>
       <Footer />
