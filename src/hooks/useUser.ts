@@ -1,5 +1,10 @@
 import { useContext } from 'react';
 
-import User from '../contexts/User';
+import firebase from '../firebase';
 
-export default () => useContext(User);
+import User from '../contexts/User';
+import UserRecordContext from '../contexts/UserRecord';
+
+import UserRecord from '../model/UserRecord';
+
+export default (): [firebase.User, UserRecord] => [useContext(User)!, useContext(UserRecordContext)!];

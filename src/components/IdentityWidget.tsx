@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const IdentityWidget: React.FC<Props> = () => {
   const classes = useStyles();
-  const user = useUser();
+  const [user] = useUser();
 
   if (user === undefined) {
     return <CircularProgress size={24} className={classes.progress} />;

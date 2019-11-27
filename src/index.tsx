@@ -8,7 +8,6 @@ import { CssBaseline } from '@material-ui/core';
 import App from './App';
 import LoginDialogProvider from './components/LoginDialogProvider';
 import CookiesNotification from './components/CookiesNotification';
-import UserInfoProvider from './components/UserInfoProvider';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
 import UserRecordProvider from './providers/UserRecord';
 import QuotesEndpointProvider from './providers/QuotesEndpoint';
@@ -40,21 +39,19 @@ const render = (user: firebase.User | null) => {
           <LoginDialogProvider>
             <UserContext.Provider value={user}>
               <UserRecordProvider>
-                <UserInfoProvider>
-                  <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                    <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                      <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                        <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                          <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                            <QuotesEndpointProvider>
-                              <App />
-                            </QuotesEndpointProvider>
-                          </FirestoreCollectionProvider>
+                <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+                  <FirestoreCollectionProvider name="ports" context={PortsContext}>
+                    <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                      <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                        <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                          <QuotesEndpointProvider>
+                            <App />
+                          </QuotesEndpointProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
-                </UserInfoProvider>
+                </FirestoreCollectionProvider>
               </UserRecordProvider>
             </UserContext.Provider>
           </LoginDialogProvider>

@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Navbar: React.FC = () => {
   const classes = useStyles();
-  const user = useUser();
+  const [user] = useUser();
 
   return (
     <AppBar position="relative" className={classes.appBar}>

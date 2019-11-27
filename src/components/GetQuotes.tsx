@@ -45,7 +45,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
 
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
-  const user = useUser();
+  const [user] = useUser();
   const history = useHistory();
   const { refresh } = useContext(QuotesEndpointContext);
   const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });

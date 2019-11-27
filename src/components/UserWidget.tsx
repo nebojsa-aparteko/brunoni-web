@@ -1,11 +1,10 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment } from 'react';
 import { useId } from 'react-id-generator';
 import { useSnackbar } from 'notistack';
 import { Box, Chip, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import firebase from '../firebase';
-import UserInfoEndpointContext from '../contexts/UserInfoEndpoint';
 import useUser from '../hooks/useUser';
 
 interface Props {
@@ -15,8 +14,7 @@ interface Props {
 const UserWidget: React.FC<Props> = ({ active }) => {
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
-  const user = useUser();
-  const { result: userInfo } = useContext(UserInfoEndpointContext);
+  const [user, userData] = useUser();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -57,16 +55,17 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        {userInfo && (
+        {userData?.company?.name && (
           <MenuItem disabled style={{ opacity: 'initial' }}>
-            {console.log('userInfo', userInfo) as any}
             <Box>
               <Box>
-                <Typography>{userInfo.AdrName}</Typography>
+                <Typography>{userData.company.name}</Typography>
               </Box>
-              <Box>
-                <Typography>{userInfo.AdrName2}</Typography>
-              </Box>
+              {userData.company.nameSup && (
+                <Box>
+                  <Typography>{userData.company.nameSup}</Typography>
+                </Box>
+              )}
             </Box>
           </MenuItem>
         )}

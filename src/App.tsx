@@ -14,7 +14,7 @@ const switchUser = <P extends RouteComponentProps<any> | any>(
   ComponentA: React.ComponentType<P>,
   ComponentB: React.ComponentType<P>,
 ) => (props: P) => {
-  const user = useUser();
+  const [user] = useUser();
 
   switch (user) {
     case undefined:
@@ -27,7 +27,7 @@ const switchUser = <P extends RouteComponentProps<any> | any>(
 };
 
 const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.ComponentType<P>) => (props: P) => {
-  const user = useUser();
+  const [user] = useUser();
 
   switch (user) {
     case undefined:

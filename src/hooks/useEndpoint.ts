@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import useUser from './useUser';
 
 export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) => T, initialResults: T) {
-  const user = useUser();
+  const [user] = useUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [result, setResult] = useState(initialResults);

@@ -10,7 +10,7 @@ interface Props {
 }
 
 const UserProvider: React.FC<Props> = ({ children }) => {
-  const user = useUser();
+  const [user] = useUser();
   const [userRecord, setUserRecord] = useState<UserRecord | null | undefined>();
 
   useEffect(() => {
