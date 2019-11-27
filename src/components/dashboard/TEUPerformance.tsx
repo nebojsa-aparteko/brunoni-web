@@ -13,6 +13,7 @@ import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@mater
 
 interface Props {
   clientPerformance: any;
+  year: number;
 }
 
 const normalizeByYear = (year: number) =>
@@ -27,34 +28,32 @@ const normalizeByYear = (year: number) =>
     values,
   );
 
-const TEUPerformance: React.FC<Props> = ({ clientPerformance }) => {
+const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
 
   const data = useMemo(() => {
-    const currentYear = new Date().getFullYear();
-
     const dataProp = {
-      [currentYear]: normalizeByYear(currentYear)(clientPerformance),
-      [currentYear - 1]: normalizeByYear(currentYear - 1)(clientPerformance),
-      [currentYear - 2]: normalizeByYear(currentYear - 2)(clientPerformance),
+      [year]: normalizeByYear(year)(clientPerformance),
+      [year - 1]: normalizeByYear(year - 1)(clientPerformance),
+      [year - 2]: normalizeByYear(year - 2)(clientPerformance),
     };
 
     const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     const datasets = [
       {
-        label: currentYear - 2,
+        label: year - 2,
         backgroundColor: colors.grey[200],
-        data: dataProp[currentYear - 2],
+        data: dataProp[year - 2],
         barThickness: 12,
         maxBarThickness: 10,
         barPercentage: 0.5,
         categoryPercentage: 0.5,
       },
       {
-        label: currentYear - 1,
+        label: year - 1,
         backgroundColor: colors.grey[400],
-        data: dataProp[currentYear - 1],
+        data: dataProp[year - 1],
         barThickness: 12,
         maxBarThickness: 10,
         barPercentage: 0.5,
@@ -63,7 +62,7 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance }) => {
       {
         label: 'YTD',
         backgroundColor: theme.palette.primary.main,
-        data: dataProp[currentYear],
+        data: dataProp[year],
         barThickness: 12,
         maxBarThickness: 10,
         barPercentage: 0.5,

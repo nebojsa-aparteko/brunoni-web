@@ -71,7 +71,7 @@ const ClientPerformance: React.FC = () => {
     <Page title="Analytics Dashboard">
       <Grid container spacing={2}>
         <Grid item xs={8}>
-          <TEUPerformance clientPerformance={clientPerformance} />
+          <TEUPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
         <Grid item xs={4}>
           <CarrierPerformance clientPerformance={clientPerformance} year={currentYear} />
@@ -80,7 +80,7 @@ const ClientPerformance: React.FC = () => {
           <ContainerTypePerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
         <Grid item xs={8}>
-          <Top5PortsPerformance clientPerformance={clientPerformance} />
+          <Top5PortsPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
       </Grid>
     </Page>
