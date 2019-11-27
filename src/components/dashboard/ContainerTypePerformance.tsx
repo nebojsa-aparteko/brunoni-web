@@ -1,27 +1,57 @@
-import React from 'react';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
+import React, { useMemo } from 'react';
+import { Card, CardHeader, Divider, CardContent, useTheme, colors, Color } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Pie } from 'react-chartjs-2';
+import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
+import sum from 'lodash/fp/sum';
+import values from 'lodash/fp/values';
+import map from 'lodash/fp/map';
+import flatten from 'lodash/fp/flatten';
+import groupBy from 'lodash/fp/groupBy';
+import mapValues from 'lodash/fp/mapValues';
+import keys from 'lodash/fp/keys';
 
 interface Props {
   clientPerformance: any;
 }
 
+const extractContainerAggregatedData = flow(
+  get('Equipment'),
+  values,
+  map(get(new Date().getFullYear().toString())),
+  flatten,
+  map(get('Details')),
+  flatten,
+  groupBy('Unit'),
+  mapValues(flow(map(flow(get('Amount'), Number)), sum)),
+);
+
 const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
   const theme = useTheme();
 
-  const data = {
-    datasets: [
+  const data1 = useMemo(() => {
+    const containerData = extractContainerAggregatedData(clientPerformance);
+    console.log('Cer', containerData);
+
+    const datasets = [
       {
-        data: [12, 24],
-        backgroundColor: [colors.indigo[500], colors.indigo[300]],
-        borderWidth: 8,
+        data: values(containerData),
+        backgroundColor: colors.indigo[500],
+        borderWidth: 2,
         borderColor: theme.palette.common.white,
         hoverBorderColor: theme.palette.common.white,
       },
-    ],
-    labels: ['45G1', '22G1'],
-  };
+    ];
+
+    const total = sum(values(containerData));
+
+    return {
+      datasets,
+      labels: keys(containerData),
+      total: total,
+    };
+  }, [clientPerformance, theme.palette.common.white]);
 
   const options = {
     responsive: true,
@@ -52,7 +82,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
           const label = data['labels'][tooltipItem['index']];
           const value = data['datasets'][0]['data'][tooltipItem['index']];
 
-          return `${label}: ${value}%`;
+          return `${label}: ${value} (${Math.round((value / data1.total) * 100)}%)`;
         },
       },
     },
@@ -63,7 +93,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance }) => {
       <Divider />
       <CardContent>
         <PerfectScrollbar>
-          <Pie data={data} options={options} />
+          <Pie data={data1} options={options} />
         </PerfectScrollbar>
       </CardContent>
     </Card>

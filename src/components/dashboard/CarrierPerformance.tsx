@@ -40,7 +40,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance }) => {
       {
         data: map((value: number) => (100 * value) / total)(performance),
         backgroundColor: backgroundColors,
-        borderWidth: 8,
+        borderWidth: 2,
         borderColor: theme.palette.common.white,
         hoverBorderColor: theme.palette.common.white,
       },
