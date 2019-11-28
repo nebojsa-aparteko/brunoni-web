@@ -37,7 +37,10 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
 
     const total = sum(performance);
 
-    const labels = carriers.map(key => filter((element: any) => element.id === key)(cs)[0]?.name);
+    const labels = carriers.map(key => {
+      const carrierInfo = filter((element: any) => element.id === key)(cs)[0];
+      return carrierInfo ? carrierInfo.name : '';
+    });
 
     const datasets = [
       {
