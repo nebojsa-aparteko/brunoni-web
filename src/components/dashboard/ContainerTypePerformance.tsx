@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors, Color } from '@material-ui/core';
+import { Card, CardHeader, Divider, CardContent, useTheme, colors, makeStyles } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Pie } from 'react-chartjs-2';
 import flow from 'lodash/fp/flow';
@@ -29,8 +29,18 @@ const extractContainerAggregatedData = (year: number) =>
     mapValues(flow(map(flow(get('Amount'), Number)), sum)),
   );
 
+const useStyles = makeStyles(theme => ({
+  root: {
+    [theme.breakpoints.up('md')]: {
+      paddingTop: '3.2em',
+      paddingBottom: '1em',
+    },
+  },
+}));
+
 const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
+  const classes = useStyles();
 
   const data = useMemo(() => {
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
@@ -38,7 +48,14 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
     const datasets = [
       {
         data: values(containerData),
-        backgroundColor: colors.indigo[500],
+        backgroundColor: [
+          colors.indigo[500],
+          colors.indigo[100],
+          colors.indigo[300],
+          colors.indigo[400],
+          colors.indigo[800],
+          colors.indigo[600],
+        ],
         borderWidth: 2,
         borderColor: theme.palette.common.white,
         hoverBorderColor: theme.palette.common.white,
@@ -90,9 +107,9 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
   };
   return (
     <Card>
-      <CardHeader title="Container Types Performance" />
+      <CardHeader title="Container Types" />
       <Divider />
-      <CardContent>
+      <CardContent className={classes.root}>
         <PerfectScrollbar>
           <Pie data={data} options={options} />
         </PerfectScrollbar>

@@ -9,14 +9,14 @@ import groupBy from 'lodash/fp/groupBy';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
 import head from 'lodash/fp/head';
-import useEndpoint from '../hooks/useEndpoint';
-import Page from './quotes/Page';
-import TEUPerformance from './dashboard/TEUPerformance';
-import CarrierPerformance from './dashboard/CarrierPerformance';
-import ContainerTypePerformance from './dashboard/ContainerTypePerformance';
-import Top5PortsPerformance from './dashboard/Top5PortsPerformance';
-import asArray from '../utilities/asArray';
-import useTestData from '../utilities/useTestData';
+import useEndpoint from '../../hooks/useEndpoint';
+import Page from '../quotes/Page';
+import TEUPerformance from './TEUPerformance';
+import CarrierPerformance from './CarrierPerformance';
+import ContainerTypePerformance from './ContainerTypePerformance';
+import Top5PortsPerformance from './Top5PortsPerformance';
+import asArray from '../../utilities/asArray';
+import useTestData from '../../utilities/useTestData';
 
 const updateClientPerformanceBody = get('idStat_011.Statistics');
 
@@ -46,7 +46,7 @@ const normalizeClientPerformance = flow(
   ),
 );
 
-const ClientPerformance: React.FC = () => {
+const DashboardCharts: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   const { busy, error, result } = useEndpoint(
@@ -70,16 +70,16 @@ const ClientPerformance: React.FC = () => {
   return (
     <Page title="Analytics Dashboard">
       <Grid container spacing={2}>
-        <Grid item xs={8}>
+        <Grid item md={8} xs={12}>
           <TEUPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item md={4} xs={6}>
           <CarrierPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item md={4} xs={6}>
           <ContainerTypePerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
-        <Grid item xs={8}>
+        <Grid item md={8} xs={12}>
           <Top5PortsPerformance clientPerformance={clientPerformance} year={currentYear} />
         </Grid>
       </Grid>
@@ -87,4 +87,4 @@ const ClientPerformance: React.FC = () => {
   );
 };
 
-export default ClientPerformance;
+export default DashboardCharts;

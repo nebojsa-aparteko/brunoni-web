@@ -68,68 +68,103 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const data = extractPortsAggregatedData(year)(clientPerformance);
   const classes = useStyles();
 
-  return (
-    <Card>
-      <CardHeader title="Top 5 Ports" />
-      <Divider />
-      <CardContent>
-        <PerfectScrollbar>
-          <Grid container spacing={2}>
-            <Grid item md={6}>
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Top 5 Origins:
-                </Typography>
-                <Table size="small" aria-label="a dense table">
-                  <colgroup>
-                    <col style={{ width: '10%' }} />
-                    <col style={{ width: '90%' }} />
-                  </colgroup>
-                  <TableHead></TableHead>
-                  <TableBody>
-                    {Object.entries(data['POL']).map(([key, value], index) => (
-                      <TableRow key={key}>
-                        <TableCell className={classes.tableCell} component="th" scope="row">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell component="th" scope="row">{`${key} (${value})`}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </Grid>
+  const top5TableRendeder = (data: any) => (
+    <Table size="small" aria-label="a dense table">
+      <colgroup>
+        <col style={{ width: '10%' }} />
+        <col style={{ width: '90%' }} />
+      </colgroup>
+      <TableBody>
+        {Object.entries(data).map(([key, value], index) => (
+          <TableRow key={key}>
+            <TableCell className={classes.tableCell} component="th" scope="row">
+              {index + 1}
+            </TableCell>
+            <TableCell component="th" scope="row">{`${key} (${value})`}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 
-            <Grid item md={6}>
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Top 5 Destinations:
-                </Typography>
-                <Table size="small" aria-label="a dense table">
-                  <colgroup>
-                    <col style={{ width: '10%' }} />
-                    <col style={{ width: '90%' }} />
-                  </colgroup>
-                  <TableHead></TableHead>
-                  <TableBody>
-                    {Object.entries(data['POD']).map(([key, value], index) => (
-                      <TableRow key={key}>
-                        <TableCell component="th" scope="row">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          {`${key} (${value})`}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </Grid>
-          </Grid>
-        </PerfectScrollbar>
-      </CardContent>
-    </Card>
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={6}>
+        <Card>
+          <CardHeader title="Top 5 Origins" />
+          <Divider />
+          <CardContent>{top5TableRendeder(data['POL'])}</CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={6}>
+        <Card>
+          <CardHeader title="Top 5 Destinations" />
+          <Divider />
+          <CardContent>{top5TableRendeder(data['POD'])}</CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+    // <Card>
+    //   <CardHeader title="Top 5 Ports" />
+    //   <Divider />
+    //   <CardContent>
+    //     <PerfectScrollbar>
+    //       <Grid container spacing={2}>
+    //         <Grid item md={6}>
+    //           <Box>
+    //             <Typography variant="subtitle2" gutterBottom>
+    //               Top 5 Origins:
+    //             </Typography>
+    //             <Table size="small" aria-label="a dense table">
+    //               <colgroup>
+    //                 <col style={{ width: '10%' }} />
+    //                 <col style={{ width: '90%' }} />
+    //               </colgroup>
+    //               <TableHead></TableHead>
+    //               <TableBody>
+    //                 {Object.entries(data['POL']).map(([key, value], index) => (
+    //                   <TableRow key={key}>
+    //                     <TableCell className={classes.tableCell} component="th" scope="row">
+    //                       {index + 1}
+    //                     </TableCell>
+    //                     <TableCell component="th" scope="row">{`${key} (${value})`}</TableCell>
+    //                   </TableRow>
+    //                 ))}
+    //               </TableBody>
+    //             </Table>
+    //           </Box>
+    //         </Grid>
+    //
+    //         <Grid item md={6}>
+    //           <Box>
+    //             <Typography variant="subtitle2" gutterBottom>
+    //               Top 5 Destinations:
+    //             </Typography>
+    //             <Table size="small" aria-label="a dense table">
+    //               <colgroup>
+    //                 <col style={{ width: '10%' }} />
+    //                 <col style={{ width: '90%' }} />
+    //               </colgroup>
+    //               <TableHead></TableHead>
+    //               <TableBody>
+    //                 {Object.entries(data['POD']).map(([key, value], index) => (
+    //                   <TableRow key={key}>
+    //                     <TableCell component="th" scope="row">
+    //                       {index + 1}
+    //                     </TableCell>
+    //                     <TableCell component="th" scope="row">
+    //                       {`${key} (${value})`}
+    //                     </TableCell>
+    //                   </TableRow>
+    //                 ))}
+    //               </TableBody>
+    //             </Table>
+    //           </Box>
+    //         </Grid>
+    //       </Grid>
+    //     </PerfectScrollbar>
+    //   </CardContent>
+    // </Card>
   );
 };
 

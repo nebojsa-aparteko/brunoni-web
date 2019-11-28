@@ -3,7 +3,7 @@ import { Theme, makeStyles, Grid, Paper, Typography, Button } from '@material-ui
 import Navbar from '../components/Navbar';
 import Container from '../components/Container';
 import QuoteGroups from '../components/QuoteGroups';
-import ClientPerformance from '../components/ClientPerformance';
+import DashboardCharts from '../components/dashboard/DashboardCharts';
 import Footer from '../components/Footer';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
     <Fragment>
       <Navbar />
       <Container className={classes.root}>
-        <ClientPerformance />
+        <DashboardCharts />
         <Paper className={classes.paper}>
           <Grid container spacing={2} justify="space-between">
             <Grid item>
