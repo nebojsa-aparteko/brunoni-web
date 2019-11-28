@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
   },
+  content: {
+    marginTop: theme.spacing(2),
+  },
   sidebar: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
@@ -170,7 +173,7 @@ const RouteSearch: React.FC<Props> = () => {
           </Paper>
         </Sticky>
       </Box>
-      <Container>
+      <Container className={classes.content}>
         {results !== undefined ? (
           results?.Routes.length === 0 ? (
             <SearchEmptyResults />
@@ -186,10 +189,17 @@ const RouteSearch: React.FC<Props> = () => {
                 </Paper>
               </Grid>
               <Grid item md={9}>
-                <Paper className={classes.sorting}>
-                  <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
-                </Paper>
-                {results ? results.Routes.map((route, i) => <Route key={i} route={route} />) : <Route />}
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Paper className={classes.sorting}>
+                      <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    {results ? results.Routes.map((route, i) => <Route key={i} route={route} />) : <Route />}
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           )

@@ -104,17 +104,13 @@ const Route: React.FC<Props> = ({ route }) => {
   return (
     <Box>
       <ExpansionPanel TransitionProps={{ unmountOnExit: true }} disabled={disabled} style={expansionPanelStyle}>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1c-content"
-          style={expansionPanelSummaryStyle}
-        >
+        <ExpansionPanelSummary aria-controls="panel1c-content" style={expansionPanelSummaryStyle}>
           <Grid container spacing={2}>
-            <Grid item md={9} sm={12}>
-              <Typography variant="subtitle2" display="block">
+            <Grid item md={6} sm={12}>
+              <Typography variant="subtitle2" display="block" gutterBottom>
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
-              <Typography variant="h6" display="block">
+              <Typography variant="h5" display="block">
                 {carrier ? (
                   <Fragment>
                     <Avatar style={{ backgroundColor: carrier!.color }} />
@@ -129,7 +125,7 @@ const Route: React.FC<Props> = ({ route }) => {
               </Typography>
             </Grid>
             {route?.SpaceInfo && (
-              <Grid item md={3} sm={12}>
+              <Grid item md={6} sm={12}>
                 <Typography variant="subtitle2" display="block" gutterBottom>
                   <Box fontWeight="fontWeightBold">Space Availability</Box>
                 </Typography>
@@ -143,7 +139,7 @@ const Route: React.FC<Props> = ({ route }) => {
             )}
 
             <Grid item xs={12}>
-              <Divider light />
+              <Divider />
             </Grid>
 
             <Grid item md={3} sm={12}>
