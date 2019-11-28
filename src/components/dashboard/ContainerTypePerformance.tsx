@@ -47,8 +47,6 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
 
   const containerTypes = useContext(ContainerTypes);
 
-  const [loading, setLoading] = useState(true);
-
   const data = useMemo(() => {
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
     const labels = keys(containerData).map(
@@ -72,8 +70,6 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
     ];
 
     const total = sum(values(containerData));
-
-    setLoading(prevLoading => !prevLoading);
 
     return {
       datasets,
@@ -122,7 +118,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
       <CardHeader title="Container Types" />
       <Divider />
       <CardContent className={classes.root}>
-        {loading ? (
+        {!data ? (
           <ChartsCircularProgress />
         ) : (
           <PerfectScrollbar>

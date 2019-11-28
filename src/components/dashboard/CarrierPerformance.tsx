@@ -20,8 +20,6 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
   const cs = useContext(Carriers);
 
-  const [loading, setLoading] = useState(true);
-
   const data = useMemo(() => {
     const carriers = flow(get('TEU'), keys)(clientPerformance);
 
@@ -50,8 +48,6 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         hoverBorderColor: theme.palette.common.white,
       },
     ];
-
-    setLoading(prevLoading => !prevLoading);
 
     return {
       datasets,
@@ -100,7 +96,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       <CardHeader title="Share per Carrier" />
       <Divider />
       <CardContent>
-        {loading ? (
+        {!data ? (
           <ChartsCircularProgress />
         ) : (
           <PerfectScrollbar>

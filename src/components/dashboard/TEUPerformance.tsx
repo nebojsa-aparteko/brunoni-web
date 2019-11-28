@@ -32,8 +32,6 @@ const normalizeByYear = (year: number) =>
 const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
 
-  const [loading, setLoading] = useState(true);
-
   const data = useMemo(() => {
     const dataProp = {
       [year]: normalizeByYear(year)(clientPerformance),
@@ -52,8 +50,6 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         categoryPercentage: 0.5,
       },
     ];
-
-    setLoading(false);
 
     return {
       datasets,
@@ -135,7 +131,7 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       <CardHeader title="TEU Performance" />
       <Divider />
       <CardContent>
-        {loading ? (
+        {!data ? (
           <ChartsCircularProgress />
         ) : (
           <PerfectScrollbar>
