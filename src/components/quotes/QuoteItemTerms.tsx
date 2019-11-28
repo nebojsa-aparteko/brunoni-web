@@ -10,15 +10,17 @@ interface Props {
 const QuoteItemTerms: React.FC<Props> = ({ terms }) => (
   <Fragment>
     <Grid item xs={12}>
-      {terms.map(term => (
-        <Typography variant="body2">
-          {term.TermValue} - {term.TermDetail}
-          <br />
-          <Link href={term.TermURL || ''} target="_blank" rel="noreferrer">
-            {term.TermURL}
-          </Link>
-        </Typography>
-      ))}
+      {terms
+        .filter(term => term.TermLabel !== 'TERMS & CONDITIONS')
+        .map(term => (
+          <Typography variant="body2">
+            {term.TermValue} - {term.TermDetail}
+            <br />
+            <Link href={term.TermURL || ''} target="_blank" rel="noreferrer">
+              {term.TermURL}
+            </Link>
+          </Typography>
+        ))}
     </Grid>
     <Divider />
   </Fragment>

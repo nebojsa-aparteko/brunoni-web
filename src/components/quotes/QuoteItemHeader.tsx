@@ -24,14 +24,14 @@ const QuoteItemHeader: React.FC<Props> = ({ quote }) => (
     </Grid>
 
     <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Carrier" label1={quote.carrier.name} />
+      <InfoBoxItemHorizontal title="Carrier" label1={quote.carrier.name || quote.carrier.id} />
     </Grid>
 
     {quote.terms
-      .filter(term => term.TermLabel !== 'TERMS & CONDITIONS')
+      .filter(term => term.TermLabel === 'TERMS & CONDITIONS')
       .map(term => (
         <Grid item xs={12}>
-          <InfoBoxItemHorizontal title={term.TermLabel} label1={term.TermValue} />
+          <InfoBoxItemHorizontal title="Terms & Conditions" label1={term.TermValue} />
         </Grid>
       ))}
 
