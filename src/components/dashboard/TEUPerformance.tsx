@@ -9,7 +9,7 @@ import values from 'lodash/fp/values';
 import flatten from 'lodash/fp/flatten';
 import groupBy from 'lodash/fp/groupBy';
 import sum from 'lodash/fp/sum';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
+import { Card, CardHeader, Divider, CardContent, useTheme } from '@material-ui/core';
 
 interface Props {
   clientPerformance: any;

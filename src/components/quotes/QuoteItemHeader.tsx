@@ -1,53 +1,50 @@
-import { CargoDetailCargoDetail, QuoteHeader, TermTerm } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
-import { Grid, Typography, Link } from '@material-ui/core';
+import formatDate from 'date-fns/format';
+import { Grid } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItemHorizontal from '../InfoBoxItemHorizontal';
-import CarriersContext from '../../contexts/Carriers';
-import Carrier from '../../model/Carrier';
+import { Quote } from '../../providers/QuotesEndpoint';
 
 interface Props {
-  termsHeader: TermTerm[];
-  quoteHeader: QuoteHeader;
+  quote: Quote;
 }
 
-const QuoteItemHeader: React.FC<Props> = ({ quoteHeader, termsHeader }) => {
-  const carriers = React.useContext(CarriersContext);
-  const carrier = ((carrierID: string) => carriers && carriers.find(item => item.id === carrierID))(
-    quoteHeader.CarrierID,
-  );
-  console.debug('Carriers', carriers);
-  return (
-    <Fragment>
-      <Grid item xs={12}>
-        <InfoBoxItemHorizontal title="Quote Number" label1={quoteHeader.QuoteNumber} />
-      </Grid>
-      <Grid item xs={12}>
-        <InfoBoxItemHorizontal title="Quote Date" label1={quoteHeader.QuoteDate} />
-        <Divider />
-      </Grid>
+const QuoteItemHeader: React.FC<Props> = ({ quote }) => (
+  <Fragment>
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal title="Quote Number" label1={quote.id} />
+    </Grid>
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal title="Quote Date" label1={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
+      <Divider />
+    </Grid>
 
-      <Grid item xs={12}>
-        <InfoBoxItemHorizontal title="Quote Reference" label1={quoteHeader.AdrId} />
-      </Grid>
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal title="Quote Reference" label1={quote.clientId} />
+    </Grid>
 
-      {carrier && (
-        <Grid item xs={12}>
-          <InfoBoxItemHorizontal title="Carrier" label1={carrier.name} />
-        </Grid>
-      )}
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal title="Carrier" label1={quote.carrier.name} />
+    </Grid>
 
-      {termsHeader.map((term: TermTerm) => (
+    {quote.terms
+      .filter(term => term.TermLabel !== 'TERMS & CONDITIONS')
+      .map(term => (
         <Grid item xs={12}>
           <InfoBoxItemHorizontal title={term.TermLabel} label1={term.TermValue} />
         </Grid>
       ))}
 
-      <Grid item xs={12}>
-        <InfoBoxItemHorizontal title="Quote Validity" label1={quoteHeader.QuoteValidity} />
-      </Grid>
-    </Fragment>
-  );
-};
+    <Grid item xs={12}>
+      <InfoBoxItemHorizontal
+        title="Quote Validity"
+        label1={`${formatDate(quote.validityPeriod.from, 'd. MMMM')} – ${formatDate(
+          quote.validityPeriod.to,
+          'd. MMMM',
+        )}`}
+      />
+    </Grid>
+  </Fragment>
+);
 
 export default QuoteItemHeader;

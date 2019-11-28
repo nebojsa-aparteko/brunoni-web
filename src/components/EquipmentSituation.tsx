@@ -32,6 +32,7 @@ import ContainerType from '../model/ContainerType';
 import Carriers from '../contexts/Carriers';
 import Carrier from '../model/Carrier';
 import Container from './Container';
+import pickAndRename from '../utilities/pickAndRename';
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -55,9 +56,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingRight: 6,
   },
 }));
-
-const pickAndRename = (map: { [key: string]: any }) => (value: { [key: string]: any }) =>
-  Object.entries(map).reduce((acc, [name, newName]) => ({ ...acc, [newName]: value[name] }), {});
 
 const updateEquipmentSituationBody = (carriers?: Carrier[] | null, containerTypes?: ContainerType[] | null) =>
   flow(

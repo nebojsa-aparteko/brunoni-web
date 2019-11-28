@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Card,
-  CardHeader,
-  Divider,
-  CardContent,
-  Table,
-  TableRow,
-  TableCell,
-  createStyles,
-  Theme,
-} from '@material-ui/core';
+import { Card, CardHeader, Divider, CardContent, Theme, Table, TableRow, TableCell } from "@material-ui/core";
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
@@ -31,13 +21,11 @@ interface Props {
   year: number;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    tableCell: {
-      maxWidth: '1em',
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  tableCell: {
+    maxWidth: '1em',
+  },
+}));
 
 const extractPortsAggregatedData = (year: number) =>
   flow(

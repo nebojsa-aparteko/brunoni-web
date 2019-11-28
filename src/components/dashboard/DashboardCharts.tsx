@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Box, FormControl, Grid, InputLabel, makeStyles, MenuItem, Theme } from '@material-ui/core';
+import { Box, FormControl, Grid, makeStyles, MenuItem, Theme } from '@material-ui/core';
 import get from 'lodash/fp/get';
 import update from 'lodash/fp/update';
 import omit from 'lodash/fp/omit';

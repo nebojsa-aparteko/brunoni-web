@@ -1,18 +1,18 @@
-import { RemarkRemark } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
-import { Box, Grid } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
+import { Remark } from '../../providers/QuotesEndpoint';
 
 interface Props {
-  remarks: RemarkRemark[];
+  remarks: Remark[];
 }
 
 const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => (
   <Fragment>
     <Divider />
-    {remarks.map((remark: RemarkRemark) => (
-      <Fragment>
+    {remarks.map((remark, i) => (
+      <Fragment key={i}>
         <Grid item md={3} sm={4} xs={4}>
           <InfoBoxItem title={remark.RemarkTitle} label1={remark.RemarkLabel} />
         </Grid>

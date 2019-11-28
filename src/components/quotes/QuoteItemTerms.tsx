@@ -1,16 +1,16 @@
-import { TermTerm } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
 import { Typography, Link, Grid } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
+import { Term } from '../../providers/QuotesEndpoint';
 
 interface Props {
-  terms: TermTerm[];
+  terms: Term[];
 }
 
 const QuoteItemTerms: React.FC<Props> = ({ terms }) => (
   <Fragment>
     <Grid item xs={12}>
-      {terms.map((term: TermTerm) => (
+      {terms.map(term => (
         <Typography variant="body2">
           {term.TermValue} - {term.TermDetail}
           <br />

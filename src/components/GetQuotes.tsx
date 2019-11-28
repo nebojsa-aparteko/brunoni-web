@@ -81,8 +81,6 @@ const GetQuotes: React.FC<Props> = () => {
   }, [originInput]);
 
   useEffect(() => {
-    console.log('Quoteationaksdjfh', 'about to request');
-
     if (!busy || !user) {
       return;
     }
@@ -136,7 +134,6 @@ const GetQuotes: React.FC<Props> = () => {
 
         refresh();
 
-        console.log('Quoteationaksdjfh', 'response', response);
         history.push(`/quotes/${json.QuoteHeader[0].idRequest}`);
       } finally {
         setBusy(false);

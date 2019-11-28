@@ -1,4 +1,3 @@
-import { QuoteDetailQuoteDetail } from '../../model/quotes/QuotesResult';
 import React, { Fragment } from 'react';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
@@ -7,9 +6,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
+import { QuoteDetail } from '../../providers/QuotesEndpoint';
 
 interface Props {
-  quoteDetails: QuoteDetailQuoteDetail[];
+  quoteDetails: QuoteDetail[];
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -49,7 +49,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {quoteDetails.map((quoteDetail: QuoteDetailQuoteDetail, index) => (
+            {quoteDetails.map((quoteDetail, index) => (
               <TableRow key={quoteDetail.Pos} selected={index % 2 === 0}>
                 <TableCell component="th" scope="row">
                   {quoteDetail.Description}

@@ -1,4 +1,5 @@
-import React, { Fragment, useContext } from 'react';
+import React, { useContext } from 'react';
+import formatDate from 'date-fns/format';
 import {
   Box,
   Button,
@@ -21,7 +22,7 @@ import toPairs from 'lodash/fp/toPairs';
 import get from 'lodash/fp/get';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
-import { QuoteDetailQuoteDetail, QuoteHeader } from '../model/quotes/QuotesResult';
+import { Quote } from '../providers/QuotesEndpoint';
 
 interface Props {
   id: string;
@@ -46,15 +47,13 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     return null;
   }
 
-  const quotesByCarrier = flow(get('quotes'), groupBy('CarrierID'), toPairs)(quoteGroup) as Array<
-    [string, Array<QuoteHeader>]
-  >;
+  const quotesByCarrier = flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>;
 
   console.log('quotesByCarrier', quotesByCarrier);
 
   return (
     <Container maxWidth="lg" className={classes.root}>
-      <Box>{quoteGroup.date.toString()}</Box>
+      <Box>{formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}</Box>
       <Box>{quoteGroup.origin.id}</Box>
       <Box>{quoteGroup.destination.id}</Box>
       <Grid container spacing={2}>
@@ -79,35 +78,36 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
             <TableHead>
               <TableRow>
                 <TableCell />
-                {quotes.map((quote: any) => (
-                  <TableCell key={quote.QuoteNumber}>{quote.QuoteValidity}</TableCell>
+                {quotes.map(quote => (
+                  <TableCell key={quote.id}>
+                    {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
+                    {formatDate(quote.validityPeriod.to, 'd. MMMM')}
+                  </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {((quotes[0].QuoteDetails as unknown) as QuoteDetailQuoteDetail[]).map((quoteDetail, i) => {
-                return (
-                  <TableRow key={i}>
-                    <TableCell component="th" scope="row">
-                      {quoteDetail.Description}
+              {quotes[0].quoteDetails.map((quoteDetail, i) => (
+                <TableRow key={i}>
+                  <TableCell component="th" scope="row">
+                    {quoteDetail.Description}
+                  </TableCell>
+                  {quotes.map((quote: any) => (
+                    <TableCell key={quote.QuoteNumber}>
+                      <Typography>
+                        {quoteDetail.CostValue} {quoteDetail.Currency} {quoteDetail.CostUnit}
+                      </Typography>
                     </TableCell>
-                    {quotes.map((quote: any) => (
-                      <TableCell key={quote.QuoteNumber}>
-                        <Typography>
-                          {quoteDetail.CostValue} {quoteDetail.Currency} {quoteDetail.CostUnit}
-                        </Typography>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
             <TableFooter>
               <TableRow>
                 <TableCell />
-                {quotes.map((quote: any) => (
-                  <TableCell key={quote.QuoteNumber}>
-                    <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.QuoteNumber}`}>
+                {quotes.map(quote => (
+                  <TableCell key={quote.id}>
+                    <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
                       View more
                     </Button>
                     <Button
@@ -115,7 +115,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                       variant="contained"
                       component={RouterLink}
                       size="small"
-                      to={`/quotes/${quote.QuoteNumber}`}
+                      to={`/quotes/${quote.id}`}
                     >
                       Request Booking
                     </Button>

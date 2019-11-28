@@ -1,7 +1,5 @@
 import React from 'react';
-import Container from '../model/Container';
-import Port from '../model/Port';
-import { QuoteHeader } from '../model/quotes/QuotesResult';
+import { QuoteGroup } from '../providers/QuotesEndpoint';
 
 export default React.createContext<Endpoint>({
   busy: false,
@@ -13,15 +11,6 @@ export default React.createContext<Endpoint>({
 interface Endpoint {
   busy: boolean;
   error: string | undefined;
-  result: Result[] | null | undefined;
+  result: QuoteGroup[] | null | undefined;
   refresh: () => void;
-}
-
-interface Result {
-  id: string;
-  date: Date;
-  origin: Port;
-  destination: Port;
-  containers: Container[];
-  quotes: QuoteHeader[];
 }

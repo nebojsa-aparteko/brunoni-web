@@ -5,7 +5,6 @@ import Container from '../components/Container';
 import QuoteGroups from '../components/QuoteGroups';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 import Footer from '../components/Footer';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

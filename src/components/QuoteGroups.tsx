@@ -15,7 +15,6 @@ import {
 import Container from './Container';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import Link from './Link';
-import { QuoteHeader } from '../model/quotes/QuotesResult';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 
@@ -63,7 +62,7 @@ const QuoteGroups: React.FC = () => {
                         {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                         {quoteGroup.destination.city || quoteGroup.destination.id}
                       </TableCell>
-                      <TableCell>{formatDate(quoteGroup.date, 'd. MMMM')}</TableCell>
+                      <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
                       <TableCell align="right">
                         <Button
                           color="primary"
