@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   notAvailable: {
     backgroundColor: colors.red[600],
   },
+  enableHorizontalScroll: {
+    overflowX: 'auto',
+  },
 }));
 
 const pickAndRename = (map: { [key: string]: any }) => (value: { [key: string]: any }) =>
@@ -132,7 +135,7 @@ const EquipmentSituation: React.FC = () => {
               <Typography variant="h4" gutterBottom>
                 {carrier.name || carrier.id}
               </Typography>
-              <Paper>
+              <Paper className={classes.enableHorizontalScroll}>
                 <Table size="small" aria-label="a dense table">
                   <TableHead>
                     <TableRow>
