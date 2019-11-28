@@ -83,7 +83,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
               <InfoBoxItem
                 IconComponent={FlagIcon}
                 title="Receiving Address"
-                label1HTML={createMarkup(itineraryItem.Port.ID)}
+                label1HTML={createMarkup(itineraryItem.Port.PortName)}
               />
               {/*<span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)}/>*/}
             </Grid>

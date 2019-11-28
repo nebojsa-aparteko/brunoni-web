@@ -26,6 +26,7 @@ type Port = {
   ID: string;
   HarbourName: string;
   Land: string;
+  PortName: string;
 };
 
 export interface ItineraryItem {

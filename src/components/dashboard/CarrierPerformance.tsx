@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';

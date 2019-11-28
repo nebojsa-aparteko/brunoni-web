@@ -16,7 +16,6 @@ import {
   useTheme,
   Avatar,
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import formatDate from 'date-fns/format';
 import ItineraryItem from '../ItineraryItem';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
@@ -58,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
+const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
 
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
@@ -70,6 +69,7 @@ const Route: React.FC<Props> = ({ route }) => {
     carriers,
   ]);
 
+  console.log('route', route);
   const disabled = !route;
 
   const expansionPanelStyle: React.CSSProperties = {
@@ -86,9 +86,16 @@ const Route: React.FC<Props> = ({ route }) => {
       `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land} ETS ${formatDateString(
         route!.OriginInfo.DepartureDate,
       )}\n` +
+      'Address:\n' +
+      `${route!.OriginInfo.Port.PortName.split('<br/> ').join('\n')}\n\n` +
       `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land} ETA ${formatDateString(
         route!.DestinationInfo.ArrivalDate,
-      )}\n`.concat(route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'))
+      )}\n` +
+      'Address:\n' +
+      `${route!.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}\n\n`.concat(
+        route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'),
+      ) +
+      '\n\nSource: mybrunoni.ch'
     );
   };
 
@@ -210,7 +217,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     </Grid>
                   ))}
                   <Grid item md={3} sm={3}>
-                    <CopyToClipboard text={textToBeCopied()}>
+                    <CopyToClipboard text={textToBeCopied()} options={{ format: 'text/plain' }}>
                       <IconButton aria-label="delete" onClick={handleCopyToClipboardClick}>
                         <CopyToClipboardIcon />
                       </IconButton>

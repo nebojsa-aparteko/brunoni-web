@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Bar } from 'react-chartjs-2';
 import flow from 'lodash/fp/flow';
