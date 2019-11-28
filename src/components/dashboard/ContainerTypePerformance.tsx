@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { Card, CardHeader, Divider, CardContent, useTheme, colors, makeStyles } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Pie } from 'react-chartjs-2';
@@ -13,6 +13,7 @@ import mapValues from 'lodash/fp/mapValues';
 import keys from 'lodash/fp/keys';
 import filter from 'lodash/fp/filter';
 import ContainerTypes from '../../contexts/ContainerTypes';
+import ChartsCircularProgress from './ChartsCircularProgress';
 
 interface Props {
   clientPerformance: any;
@@ -46,11 +47,12 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
 
   const containerTypes = useContext(ContainerTypes);
 
+  const [loading, setLoading] = useState(true);
+
   const data = useMemo(() => {
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
-    console.log('CD', containerTypes);
     const labels = keys(containerData).map(
-      key => filter((element: any) => element.id === key)(containerTypes)[0]['description'],
+      key => filter((element: any) => element.id === key)(containerTypes)[0]?.description,
     );
     const datasets = [
       {
@@ -70,6 +72,8 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
     ];
 
     const total = sum(values(containerData));
+
+    setLoading(prevLoading => !prevLoading);
 
     return {
       datasets,
@@ -118,9 +122,13 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
       <CardHeader title="Container Types" />
       <Divider />
       <CardContent className={classes.root}>
-        <PerfectScrollbar>
-          <Pie data={data} options={options} />
-        </PerfectScrollbar>
+        {loading ? (
+          <ChartsCircularProgress />
+        ) : (
+          <PerfectScrollbar>
+            <Pie data={data} options={options} />
+          </PerfectScrollbar>
+        )}
       </CardContent>
     </Card>
   );

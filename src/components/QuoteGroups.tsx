@@ -21,8 +21,6 @@ interface Props {
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
   const classes = useStyles();
 
-  console.log('show', showGetQuoteButton);
-
   const { result } = useContext(QuotesEndpointContext);
 
   return (
@@ -49,7 +47,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                       {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                       {quoteGroup.destination.city || quoteGroup.destination.id}
                     </TableCell>
-                      <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
+                    <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
                     <TableCell align="right">
                       <Button
                         color="primary"

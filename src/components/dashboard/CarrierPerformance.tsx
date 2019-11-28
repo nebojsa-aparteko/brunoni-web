@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';
@@ -8,6 +8,8 @@ import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@mater
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Doughnut } from 'react-chartjs-2';
 import Carriers from '../../contexts/Carriers';
+import ChartsCircularProgress from './ChartsCircularProgress';
+import filter from 'lodash/fp/filter';
 
 interface Props {
   clientPerformance: any;
@@ -17,6 +19,8 @@ interface Props {
 const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
   const cs = useContext(Carriers);
+
+  const [loading, setLoading] = useState(true);
 
   const data = useMemo(() => {
     const carriers = flow(get('TEU'), keys)(clientPerformance);
@@ -35,6 +39,8 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
 
     const total = sum(performance);
 
+    const labels = carriers.map(key => filter((element: any) => element.id === key)(cs)[0]?.name);
+
     const datasets = [
       {
         data: performance,
@@ -45,9 +51,11 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       },
     ];
 
+    setLoading(prevLoading => !prevLoading);
+
     return {
       datasets,
-      labels: carriers,
+      labels: labels,
       total: total,
     };
   }, [clientPerformance, cs, theme.palette.common.white, year]);
@@ -92,9 +100,13 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       <CardHeader title="Share per Carrier" />
       <Divider />
       <CardContent>
-        <PerfectScrollbar>
-          <Doughnut data={data} options={options} />
-        </PerfectScrollbar>
+        {loading ? (
+          <ChartsCircularProgress />
+        ) : (
+          <PerfectScrollbar>
+            <Doughnut data={data} options={options} />
+          </PerfectScrollbar>
+        )}
       </CardContent>
     </Card>
   );

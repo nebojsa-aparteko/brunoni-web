@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardHeader, Divider, CardContent, Theme, Table, TableRow, TableCell } from "@material-ui/core";
+import React, { useContext, useMemo } from 'react';
+import { Card, CardHeader, Divider, CardContent, Theme, Table, TableRow, TableCell } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
@@ -10,12 +10,15 @@ import mapValues from 'lodash/fp/mapValues';
 import sum from 'lodash/fp/sum';
 import slice from 'lodash/fp/slice';
 import toPairs from 'lodash/fp/toPairs';
-import fromPairs from 'lodash/fp/fromPairs';
 import orderBy from 'lodash/fp/orderBy';
 import TableBody from '@material-ui/core/TableBody';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { Skeleton } from '@material-ui/lab';
+import Ports from '../../contexts/Ports';
+import filter from 'lodash/fp/filter';
+import Port from '../../model/Port';
+import logAs from '../../utilities/logAs';
 
 interface Props {
   clientPerformance: any;
@@ -28,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const extractPortsAggregatedData = (year: number) =>
+const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
   flow(
     get('Locations'),
     values,
@@ -44,16 +47,26 @@ const extractPortsAggregatedData = (year: number) =>
         toPairs,
         orderBy(1, 'desc'),
         slice(0, 5),
-        fromPairs,
+        logAs('ports12'),
+        map(([key, value]) => {
+          if (ports) {
+            const portDetails: Port = filter((element: any) => element.id === key)(ports)[0];
+            return [`${portDetails.city}, ${portDetails.country}`, value];
+          } else return [key, value];
+        }),
       ),
     ),
   );
 
 const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
-  const data = extractPortsAggregatedData(year)(clientPerformance);
+  const ports = useContext(Ports);
 
-  const dataPOL = data['POL'];
-  const dataPOD = data['POD'];
+  const data = useMemo(() => {
+    const topPorts = extractPortsAggregatedData(year, ports)(clientPerformance);
+    console.log('topPORTS', topPorts);
+    return topPorts;
+  }, [year, clientPerformance, ports]);
+
   const classes = useStyles();
 
   const top5TableRendeder = (data: any) => (
@@ -64,14 +77,16 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       </colgroup>
       <TableBody>
         {data
-          ? Object.entries(data).map(([key, value], index) => (
-              <TableRow key={index}>
-                <TableCell className={classes.tableCell} component="th" scope="row">
-                  {index + 1}
-                </TableCell>
-                <TableCell component="th" scope="row">{`${key} (${value})`}</TableCell>
-              </TableRow>
-            ))
+          ? data.map((item: any, index: number) => {
+              return (
+                <TableRow key={index}>
+                  <TableCell className={classes.tableCell} component="th" scope="row">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell component="th" scope="row">{`${item[0]} (${item[1]})`}</TableCell>
+                </TableRow>
+              );
+            })
           : [...Array(5)].map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
@@ -92,14 +107,14 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         <Card>
           <CardHeader title="Top 5 Origins" />
           <Divider />
-          <CardContent>{top5TableRendeder(dataPOL)}</CardContent>
+          <CardContent>{top5TableRendeder(data['POL'])}</CardContent>
         </Card>
       </Grid>
       <Grid item xs={6}>
         <Card>
           <CardHeader title="Top 5 Destinations" />
           <Divider />
-          <CardContent>{top5TableRendeder(dataPOD)}</CardContent>
+          <CardContent>{top5TableRendeder(data['POD'])}</CardContent>
         </Card>
       </Grid>
     </Grid>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Bar } from 'react-chartjs-2';
 import flow from 'lodash/fp/flow';
@@ -10,6 +10,7 @@ import flatten from 'lodash/fp/flatten';
 import groupBy from 'lodash/fp/groupBy';
 import sum from 'lodash/fp/sum';
 import { Card, CardHeader, Divider, CardContent, useTheme } from '@material-ui/core';
+import ChartsCircularProgress from './ChartsCircularProgress';
 
 interface Props {
   clientPerformance: any;
@@ -31,6 +32,8 @@ const normalizeByYear = (year: number) =>
 const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
 
+  const [loading, setLoading] = useState(true);
+
   const data = useMemo(() => {
     const dataProp = {
       [year]: normalizeByYear(year)(clientPerformance),
@@ -49,6 +52,8 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         categoryPercentage: 0.5,
       },
     ];
+
+    setLoading(false);
 
     return {
       datasets,
@@ -130,9 +135,13 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       <CardHeader title="TEU Performance" />
       <Divider />
       <CardContent>
-        <PerfectScrollbar>
-          <Bar data={data} options={options} />
-        </PerfectScrollbar>
+        {loading ? (
+          <ChartsCircularProgress />
+        ) : (
+          <PerfectScrollbar>
+            <Bar data={data} options={options} />
+          </PerfectScrollbar>
+        )}
       </CardContent>
     </Card>
   );
