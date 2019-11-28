@@ -84,7 +84,13 @@ const Navbar: React.FC = () => {
               </Fragment>
             )}
             <div className={classes.spacer} />
-            {process.env.REACT_APP_BRAND === 'brunoni' ? (
+            {user !== undefined && user !== null ? (
+              <div className={classes.item}>
+                <Button component={Link} to="/quotes/get" variant="outlined">
+                  Get Quote
+                </Button>
+              </div>
+            ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
               <div className={classes.item}>
                 <Button component="a" href="https://brunoni.ch">
                   Visit brunoni.ch
