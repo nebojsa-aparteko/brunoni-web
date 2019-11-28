@@ -4,15 +4,12 @@ import {
   CardHeader,
   Divider,
   CardContent,
-  Typography,
-  Box,
   Table,
   TableRow,
   TableCell,
   createStyles,
   Theme,
 } from '@material-ui/core';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
@@ -26,7 +23,6 @@ import toPairs from 'lodash/fp/toPairs';
 import fromPairs from 'lodash/fp/fromPairs';
 import orderBy from 'lodash/fp/orderBy';
 import TableBody from '@material-ui/core/TableBody';
-import TableHead from '@material-ui/core/TableHead';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
 

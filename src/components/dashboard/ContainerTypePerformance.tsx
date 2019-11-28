@@ -69,7 +69,7 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
       labels: keys(containerData),
       total: total,
     };
-  }, [clientPerformance, theme.palette.common.white]);
+  }, [clientPerformance, theme.palette.common.white, year]);
 
   const options = {
     responsive: true,

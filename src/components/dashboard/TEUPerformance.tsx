@@ -74,7 +74,7 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       datasets,
       labels,
     };
-  }, [clientPerformance, theme.palette.primary.main]);
+  }, [clientPerformance, theme.palette.primary.main, year]);
 
   const options = {
     responsive: true,
