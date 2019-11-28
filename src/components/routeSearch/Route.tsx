@@ -51,6 +51,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   popover: {
     margin: '1em',
   },
+  carrierAvatar: {
+    width: '.75em',
+    height: '.75em',
+    marginRight: theme.spacing(1),
+  },
 }));
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
@@ -111,17 +116,19 @@ const Route: React.FC<Props> = ({ route }) => {
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
               <Typography variant="h5" display="block">
-                {carrier ? (
-                  <Fragment>
-                    <Avatar style={{ backgroundColor: carrier!.color }} />
-                    {carrier.name.toUpperCase()}
-                  </Fragment>
-                ) : (
-                  <Fragment>
-                    <Skeleton variant="circle" />
-                    <TextSkeleton width={[60, 90]} />
-                  </Fragment>
-                )}
+                <Box display="flex" alignItems="center" lineHeight="normal">
+                  {carrier ? (
+                    <Fragment>
+                      <Avatar className={classes.carrierAvatar} style={{ backgroundColor: carrier!.color }} />
+                      <span>{carrier.name.toUpperCase()}</span>
+                    </Fragment>
+                  ) : (
+                    <Fragment>
+                      <Skeleton variant="circle" className={classes.carrierAvatar} />
+                      <TextSkeleton width={[60, 90]} />
+                    </Fragment>
+                  )}
+                </Box>
               </Typography>
             </Grid>
             {route?.SpaceInfo && (
