@@ -34,33 +34,13 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const data = useMemo(() => {
     const dataProp = {
       [year]: normalizeByYear(year)(clientPerformance),
-      [year - 1]: normalizeByYear(year - 1)(clientPerformance),
-      [year - 2]: normalizeByYear(year - 2)(clientPerformance),
     };
 
     const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     const datasets = [
       {
-        label: year - 2,
-        backgroundColor: colors.grey[200],
-        data: dataProp[year - 2],
-        barThickness: 12,
-        maxBarThickness: 10,
-        barPercentage: 0.5,
-        categoryPercentage: 0.5,
-      },
-      {
-        label: year - 1,
-        backgroundColor: colors.grey[400],
-        data: dataProp[year - 1],
-        barThickness: 12,
-        maxBarThickness: 10,
-        barPercentage: 0.5,
-        categoryPercentage: 0.5,
-      },
-      {
-        label: 'YTD',
+        label: 'TEU',
         backgroundColor: theme.palette.primary.main,
         data: dataProp[year],
         barThickness: 12,

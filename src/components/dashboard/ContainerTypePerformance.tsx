@@ -75,9 +75,10 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
-    cutoutPercentage: 80,
+    cutoutPercentage: 0,
     legend: {
-      display: false,
+      display: true,
+      position: 'right',
     },
     layout: {
       padding: 0,

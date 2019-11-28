@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Grid } from '@material-ui/core';
+import React, { useMemo, useState } from 'react';
+import { Box, FormControl, Grid, InputLabel, makeStyles, MenuItem, Theme } from '@material-ui/core';
 import get from 'lodash/fp/get';
 import update from 'lodash/fp/update';
 import omit from 'lodash/fp/omit';
@@ -17,6 +17,8 @@ import ContainerTypePerformance from './ContainerTypePerformance';
 import Top5PortsPerformance from './Top5PortsPerformance';
 import asArray from '../../utilities/asArray';
 import useTestData from '../../utilities/useTestData';
+import { Select } from '@material-ui/core';
+import TodayIcon from '@material-ui/icons/Today';
 
 const updateClientPerformanceBody = get('idStat_011.Statistics');
 
@@ -46,9 +48,26 @@ const normalizeClientPerformance = flow(
   ),
 );
 
+const useStyles = makeStyles((theme: Theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    display: 'inline-block',
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  inline: {
+    display: 'inline-block',
+    marginLeft: '1em',
+  },
+}));
 const DashboardCharts: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
+  const classes = useStyles();
+
+  const [year, setYear] = useState(currentYear);
   const { busy, error, result } = useEndpoint(
     '/clientPerformance',
     updateClientPerformanceBody,
@@ -67,20 +86,44 @@ const DashboardCharts: React.FC = () => {
     return normalizeClientPerformance(result);
   }, [result, busy, error]);
 
+  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setYear(event.target.value as number);
+  };
+
   return (
     <Page title="Analytics Dashboard">
+      <Box display="flex" flexDirection="row-reverse">
+        <FormControl className={classes.formControl}>
+          <Box display="inline-block">
+            <TodayIcon />
+          </Box>
+          <Select
+            labelId="year-select-label"
+            id="year-select"
+            value={year}
+            onChange={handleYearChange}
+            className={classes.inline}
+          >
+            <MenuItem value={currentYear} selected>
+              Current Year
+            </MenuItem>
+            <MenuItem value={currentYear - 1}>{currentYear - 1}</MenuItem>
+            <MenuItem value={currentYear - 2}>{currentYear - 2}</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       <Grid container spacing={2}>
         <Grid item md={8} xs={12}>
-          <TEUPerformance clientPerformance={clientPerformance} year={currentYear} />
+          <TEUPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
         <Grid item md={4} xs={6}>
-          <CarrierPerformance clientPerformance={clientPerformance} year={currentYear} />
+          <CarrierPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
         <Grid item md={4} xs={6}>
-          <ContainerTypePerformance clientPerformance={clientPerformance} year={currentYear} />
+          <ContainerTypePerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
         <Grid item md={8} xs={12}>
-          <Top5PortsPerformance clientPerformance={clientPerformance} year={currentYear} />
+          <Top5PortsPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
       </Grid>
     </Page>
