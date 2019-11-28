@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 100,
     },
     appBar: {
-      background: theme.palette.background.default,
+      background: theme.palette.background.paper,
     },
     toolbar: {
       height: 100,
