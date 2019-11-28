@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import {
   Theme,
   makeStyles,
@@ -14,6 +14,7 @@ import {
   IconButton,
   Popover,
   useTheme,
+  Avatar,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import formatDate from 'date-fns/format';
@@ -28,6 +29,8 @@ import TextSkeleton from '../TextSkeleton';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
+import Carriers from '../../contexts/Carriers';
+import { Skeleton } from '@material-ui/lab';
 
 interface Props {
   route?: RouteSearchResult;
@@ -55,6 +58,12 @@ const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM')
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
   const theme = useTheme();
+  const carriers = useContext(Carriers);
+  const carrierName = route?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
+  const carrier = useMemo(() => carriers?.find(carrier => carrier.name.toLowerCase() === carrierName), [
+    carrierName,
+    carriers,
+  ]);
 
   const disabled = !route;
 
@@ -106,7 +115,17 @@ const Route: React.FC<Props> = ({ route }) => {
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
               <Typography variant="h6" display="block">
-                {route ? route!.OriginInfo.VoyageInfo.Carrier : <TextSkeleton width={[60, 90]} />}
+                {carrier ? (
+                  <Fragment>
+                    <Avatar style={{ backgroundColor: carrier!.color }} />
+                    {carrier.name.toUpperCase()}
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <Skeleton variant="circle" />
+                    <TextSkeleton width={[60, 90]} />
+                  </Fragment>
+                )}
               </Typography>
             </Grid>
             {route?.SpaceInfo && (
