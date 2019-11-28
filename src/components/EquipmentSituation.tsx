@@ -50,6 +50,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   enableHorizontalScroll: {
     overflowX: 'auto',
   },
+  narrowCells: {
+    paddingLeft: 6,
+    paddingRight: 6,
+  },
 }));
 
 const pickAndRename = (map: { [key: string]: any }) => (value: { [key: string]: any }) =>
@@ -141,7 +145,9 @@ const EquipmentSituation: React.FC = () => {
                     <TableRow>
                       <TableCell>Equipment</TableCell>
                       {containerTypes.map(containerType => (
-                        <TableCell key={containerType.id}>{containerType.name || containerType.id}</TableCell>
+                        <TableCell key={containerType.id} className={classes.narrowCells}>
+                          {containerType.name || containerType.id}
+                        </TableCell>
                       ))}
                     </TableRow>
                   </TableHead>
