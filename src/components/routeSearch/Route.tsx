@@ -69,7 +69,6 @@ const Route: React.FC<Props> = ({ route }) => {
     carriers,
   ]);
 
-  console.log('route', route);
   const disabled = !route;
 
   const expansionPanelStyle: React.CSSProperties = {
@@ -80,24 +79,21 @@ const Route: React.FC<Props> = ({ route }) => {
     opacity: disabled ? 1 : undefined,
   };
 
-  const textToBeCopied = () => {
-    return (
-      `${route!.OriginInfo.VoyageInfo.VesselName} ${route!.OriginInfo.VoyageInfo.VoyageNr}\n` +
-      `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land} ETS ${formatDateString(
-        route!.OriginInfo.DepartureDate,
-      )}\n` +
-      'Address:\n' +
-      `${route!.OriginInfo.Port.PortName.split('<br/> ').join('\n')}\n\n` +
-      `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land} ETA ${formatDateString(
-        route!.DestinationInfo.ArrivalDate,
-      )}\n` +
-      'Address:\n' +
-      `${route!.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}\n\n`.concat(
-        route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'),
-      ) +
-      '\n\nSource: mybrunoni.ch'
-    );
-  };
+  const textToBeCopied = () =>
+    `${route!.OriginInfo.VoyageInfo.VesselName} ${route!.OriginInfo.VoyageInfo.VoyageNr}\n` +
+    `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land} ETS ${formatDateString(
+      route!.OriginInfo.DepartureDate,
+    )}\n` +
+    'Address:\n' +
+    `${route!.OriginInfo.Port.PortName.split('<br/> ').join('\n')}\n\n` +
+    `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land} ETA ${formatDateString(
+      route!.DestinationInfo.ArrivalDate,
+    )}\n` +
+    'Address:\n' +
+    `${route!.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}\n\n`.concat(
+      route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'),
+    ) +
+    '\n\nSource: mybrunoni.ch';
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -128,6 +124,11 @@ const Route: React.FC<Props> = ({ route }) => {
                     <Fragment>
                       <Avatar className={classes.carrierAvatar} style={{ backgroundColor: carrier!.color }} />
                       <span>{carrier.name.toUpperCase()}</span>
+                    </Fragment>
+                  ) : route ? (
+                    <Fragment>
+                      <Skeleton variant="circle" className={classes.carrierAvatar} />
+                      <span>{route!.OriginInfo.VoyageInfo.Carrier}</span>
                     </Fragment>
                   ) : (
                     <Fragment>
