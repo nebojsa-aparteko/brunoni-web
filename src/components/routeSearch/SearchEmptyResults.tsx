@@ -4,7 +4,11 @@ import Image from 'material-ui-image';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
-export default () => (
+interface Props {
+  message?: string;
+}
+
+const SearchEmptyResults: React.FC<Props> = ({ message }) => (
   <Container>
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
@@ -18,12 +22,16 @@ export default () => (
           <Typography variant="h5" gutterBottom>
             <Box fontWeight="fontWeightBold">No Results :(</Box>
           </Typography>
-          <Typography variant="subtitle1">
-            There are no results for the port combination selected. Please try searching for different
-            origin/destination combination.
-          </Typography>
+          <Typography variant="subtitle1">{message}</Typography>
         </Box>
       </Grid>
     </Grid>
   </Container>
 );
+
+SearchEmptyResults.defaultProps = {
+  message:
+    'There are no results for the port combination selected. Please try searching for different origin/destination combination.',
+};
+
+export default SearchEmptyResults;

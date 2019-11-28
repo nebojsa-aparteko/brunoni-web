@@ -1,50 +1,72 @@
 import React, { Fragment } from 'react';
 import formatDate from 'date-fns/format';
-import { Grid } from '@material-ui/core';
-import Divider from '@material-ui/core/Divider';
+import { Grid, Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import InfoBoxItemHorizontal from '../InfoBoxItemHorizontal';
 import { Quote } from '../../providers/QuotesEndpoint';
+import TableBody from '@material-ui/core/TableBody';
 
 interface Props {
   quote: Quote;
 }
 
-const QuoteItemHeader: React.FC<Props> = ({ quote }) => (
-  <Fragment>
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Quote Number" label1={quote.id} />
-    </Grid>
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Quote Date" label1={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
-      <Divider />
-    </Grid>
+const useStyles = makeStyles(theme => ({
+  tableCellLabel: {
+    paddingLeft: 0,
+    border: 'none',
+    fontWeight: 700,
+  },
+  tableCell: {
+    border: 'none',
+  },
+}));
 
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Quote Reference" label1={quote.clientId} />
-    </Grid>
+interface TableRowProps {
+  label: string;
+  content: string;
+}
 
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal title="Carrier" label1={quote.carrier.name || quote.carrier.id} />
-    </Grid>
+const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
+  const classes = useStyles();
+  return (
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>{label}</TableCell>
+      <TableCell className={classes.tableCell}>{content}</TableCell>
+    </TableRow>
+  );
+};
 
-    {quote.terms
-      .filter(term => term.TermLabel === 'TERMS & CONDITIONS')
-      .map(term => (
-        <Grid item xs={12}>
-          <InfoBoxItemHorizontal title="Terms & Conditions" label1={term.TermValue} />
-        </Grid>
-      ))}
+const QuoteItemHeader: React.FC<Props> = ({ quote }) => {
+  return (
+    <Table size="small" aria-label="a dense table">
+      <colgroup>
+        <col style={{ width: '40%' }} />
+        <col style={{ width: '60%' }} />
+      </colgroup>
+      <TableBody>
+        <TableRowData label="Quote Date" content={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
+        <TableRowData label="Quote Number" content={quote.id} />
+        <TableRowData label="Quote Reference" content={quote.clientId} />
 
-    <Grid item xs={12}>
-      <InfoBoxItemHorizontal
-        title="Quote Validity"
-        label1={`${formatDate(quote.validityPeriod.from, 'd. MMMM')} – ${formatDate(
-          quote.validityPeriod.to,
-          'd. MMMM',
-        )}`}
-      />
-    </Grid>
-  </Fragment>
-);
+        <TableRowData label="Port of Loading" content={`${quote.origin.city}, ${quote.origin.country}`} />
+        <TableRowData label="Port of Discharge" content={`${quote.destination.city}, ${quote.destination.country}`} />
+        <TableRowData label="Carrier" content={quote.carrier.name || quote.carrier.id} />
+
+        {quote.terms
+          .filter(term => term.TermLabel === 'TERMS & CONDITIONS')
+          .map(term => (
+            <TableRowData label="Terms & Conditions" content={term.TermValue} />
+          ))}
+
+        <TableRowData
+          label="Quote Validity"
+          content={`${formatDate(quote.validityPeriod.from, 'd. MMMM')} – ${formatDate(
+            quote.validityPeriod.to,
+            'd. MMMM',
+          )}`}
+        />
+      </TableBody>
+    </Table>
+  );
+};
 
 export default QuoteItemHeader;
