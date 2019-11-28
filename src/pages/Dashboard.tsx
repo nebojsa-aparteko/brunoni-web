@@ -5,6 +5,7 @@ import Container from '../components/Container';
 import QuoteGroups from '../components/QuoteGroups';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 import Footer from '../components/Footer';
+import GetQuotesButton from '../components/GetQuotesButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -25,10 +26,10 @@ const Dashboard: React.FC = () => {
       <Container className={classes.root}>
         <DashboardCharts />
         <Card className={classes.quoteDetails}>
-          <CardHeader title="Quotes" />
+          <CardHeader title="Quotes" action={<GetQuotesButton />} />
           <Divider />
           <CardContent>
-            <QuoteGroups />
+            <QuoteGroups showGetQuoteButton={false} />
           </CardContent>
         </Card>
       </Container>

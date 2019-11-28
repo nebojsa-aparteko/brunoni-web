@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Card, CardHeader, Divider, CardContent, useTheme, colors, makeStyles } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Pie } from 'react-chartjs-2';
@@ -11,6 +11,8 @@ import flatten from 'lodash/fp/flatten';
 import groupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/fp/mapValues';
 import keys from 'lodash/fp/keys';
+import filter from 'lodash/fp/filter';
+import ContainerTypes from '../../contexts/ContainerTypes';
 
 interface Props {
   clientPerformance: any;
@@ -42,9 +44,14 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
   const theme = useTheme();
   const classes = useStyles();
 
+  const containerTypes = useContext(ContainerTypes);
+
   const data = useMemo(() => {
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
-
+    console.log('CD', containerTypes);
+    const labels = keys(containerData).map(
+      key => filter((element: any) => element.id === key)(containerTypes)[0]['description'],
+    );
     const datasets = [
       {
         data: values(containerData),
@@ -66,10 +73,10 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
 
     return {
       datasets,
-      labels: keys(containerData),
+      labels: labels,
       total: total,
     };
-  }, [clientPerformance, theme.palette.common.white, year]);
+  }, [clientPerformance, theme.palette.common.white, year, containerTypes]);
 
   const options = {
     responsive: true,
