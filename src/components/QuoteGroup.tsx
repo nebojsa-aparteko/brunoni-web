@@ -61,7 +61,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
           <Grid item key={i} xs={2}>
             <Paper>
               <Box p={1}>
-                <Box>{container?.containerType?.displayId || container?.containerType?.id || '?'}</Box>
+                <Box>{container?.containerType?.name || container?.containerType?.id || '?'}</Box>
                 <Box>{container?.commodityType?.name || container?.commodityType?.id || '?'}</Box>
                 <Box>{container?.quantity || '?'}</Box>
               </Box>

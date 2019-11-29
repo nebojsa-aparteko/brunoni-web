@@ -1,6 +1,6 @@
 export default interface ContainerType {
   id: string;
-  displayId: string;
+  name: string;
   description: string;
   reefer: boolean;
   group: string;

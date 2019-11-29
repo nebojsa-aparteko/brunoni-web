@@ -1,6 +1,18 @@
 import React, { useContext } from 'react';
 import formatDate from 'date-fns/format';
-import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow, Theme } from '@material-ui/core';
+import {
+  Button,
+  makeStyles,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Theme,
+  Grid,
+  Chip,
+} from '@material-ui/core';
 import Container from './Container';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
@@ -30,8 +42,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Reference Number</TableCell>
               <TableCell>Route</TableCell>
+              <TableCell>Cargo</TableCell>
+              <TableCell>Commodities</TableCell>
               <TableCell>Issue Date</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
@@ -40,12 +53,37 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
             {result
               ? result.map(quoteGroup => (
                   <TableRow key={quoteGroup.id}>
-                    <TableCell component="th" scope="row">
-                      #{quoteGroup.id}
-                    </TableCell>
                     <TableCell>
                       {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                       {quoteGroup.destination.city || quoteGroup.destination.id}
+                    </TableCell>
+                    <TableCell>
+                      <Grid container spacing={1}>
+                        {/*TODO handle the flash of undefined text*/}
+                        {quoteGroup.containers &&
+                          quoteGroup.containers.map(container => (
+                            <Grid item>
+                              {container && (
+                                <Chip
+                                  label={
+                                    (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                                    container!.containerType?.name
+                                  }
+                                />
+                              )}
+                            </Grid>
+                          ))}
+                      </Grid>
+                    </TableCell>
+                    <TableCell>
+                      <Grid container spacing={1}>
+                        {quoteGroup.containers && (
+                          <Grid item>
+                            {/*TODO check all commodity types not just the first one but don’t display duplicates :)*/}
+                            <Chip label={quoteGroup.containers[0].commodityType?.name} />
+                          </Grid>
+                        )}
+                      </Grid>
                     </TableCell>
                     <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
                     <TableCell align="right">
