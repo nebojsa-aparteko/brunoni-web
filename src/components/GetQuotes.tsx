@@ -134,7 +134,7 @@ const GetQuotes: React.FC<Props> = () => {
 
         refresh();
 
-        history.push(`/quotes/${json.QuoteHeader[0].idRequest}`);
+        history.push(`/quotes/groups/${json.QuoteHeader[0].idRequest}`);
       } finally {
         setBusy(false);
       }
@@ -189,7 +189,7 @@ const GetQuotes: React.FC<Props> = () => {
     } else {
       for (let i = 0, n = containers.length; i < n; i++) {
         const container = containers[i];
-        if (!container.containerType || !container.commodityType) {
+        if (!container.containerType || !container.commodityType || !container.location) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         }
@@ -202,7 +202,7 @@ const GetQuotes: React.FC<Props> = () => {
     <Container className={classes.root}>
       <Paper className={classes.paper}>
         <Typography variant="h4" gutterBottom>
-          Request Quotes
+          Get Quote
         </Typography>
         <Grid container spacing={2}>
           <Grid item sm={3} xs={12}>
