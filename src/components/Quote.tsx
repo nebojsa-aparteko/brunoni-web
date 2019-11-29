@@ -100,9 +100,16 @@ const Quote: React.FC<Props> = ({ id }) => {
               >
                 Request Booking
               </Button>
-              <IconButton aria-label="print" onClick={handlePrint}>
-                <PrintIcon />
-              </IconButton>
+              <Button
+                aria-label="print"
+                variant="outlined"
+                size="small"
+                startIcon={<PrintIcon />}
+                onClick={handlePrint}
+                style={{ marginLeft: '4px' }}
+              >
+                Print
+              </Button>
             </Box>
           }
           title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}`}

@@ -135,6 +135,20 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                           ))}
                         </TableRow>
                       ))}
+                      <TableRow>
+                        <TableCell component="th" scope="row">
+                          Service Details
+                        </TableCell>
+                        {quotes.map((quote: any) => (
+                          <Fragment>
+                            <TableCell className={classes.currencyCell}></TableCell>
+                            <TableCell key={quote.QuoteNumber}>
+                              {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
+                              {quote.serviceDetails[0].TransitTime} days
+                            </TableCell>
+                          </Fragment>
+                        ))}
+                      </TableRow>
                     </TableBody>
                     <TableFooter>
                       <TableRow>
@@ -144,7 +158,13 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                           <Fragment>
                             <TableCell />
                             <TableCell key={quote.id}>
-                              <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
+                              <Button
+                                color="primary"
+                                variant="outlined"
+                                component={RouterLink}
+                                size="small"
+                                to={`/quotes/${quote.id}`}
+                              >
                                 View more
                               </Button>
                               <Button
@@ -153,6 +173,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 component={RouterLink}
                                 size="small"
                                 to={`/quotes/${quote.id}`}
+                                style={{ marginLeft: '4px' }}
                               >
                                 Request Booking
                               </Button>
