@@ -1,14 +1,6 @@
-import React, { Fragment } from 'react';
-import Navbar from '../components/Navbar';
+import React from 'react';
 import RouteSearch from '../components/RouteSearch';
-import Footer from '../components/Footer';
 
-const Routes: React.FC = () => (
-  <Fragment>
-    <Navbar />
-    <RouteSearch />
-    <Footer />
-  </Fragment>
-);
+const Routes: React.FC = () => <RouteSearch />;
 
 export default Routes;

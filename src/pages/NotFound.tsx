@@ -1,22 +1,10 @@
 import React from 'react';
-import { makeStyles, Typography, Grid, createStyles } from '@material-ui/core';
+import { Typography, Grid, Box } from '@material-ui/core';
 import Link from '../components/Link';
 import { Error } from '../components/Illustrations';
 
-const useStyles = makeStyles(
-  createStyles({
-    '@global': {
-      '#root': {
-        justifyContent: 'center',
-      },
-    },
-  }),
-);
-
-const NotFound: React.FC = () => {
-  useStyles();
-
-  return (
+const NotFound: React.FC = () => (
+  <Box flex={4} display="flex">
     <Grid container justify="center" alignItems="center">
       <Grid item xs={2}>
         <Error />
@@ -26,7 +14,7 @@ const NotFound: React.FC = () => {
         </Link>
       </Grid>
     </Grid>
-  );
-};
+  </Box>
+);
 
 export default NotFound;
