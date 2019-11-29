@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import formatDate from 'date-fns/format';
 import {
-  Button,
   makeStyles,
   Paper,
   Table,
@@ -12,6 +11,8 @@ import {
   Theme,
   Grid,
   Chip,
+  Box,
+  Button,
 } from '@material-ui/core';
 import Container from './Container';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
@@ -77,12 +78,18 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                     </TableCell>
                     <TableCell>
                       <Grid container spacing={1}>
-                        {quoteGroup.containers && (
-                          <Grid item>
-                            {/*TODO check all commodity types not just the first one but don’t display duplicates :)*/}
-                            <Chip label={quoteGroup.containers[0].commodityType?.name} />
-                          </Grid>
-                        )}
+                        {quoteGroup.containers &&
+                          quoteGroup.containers.map(container => (
+                            <Grid item>
+                              <Chip
+                                label={
+                                  container.commodityType?.name
+                                    ? container.commodityType?.name
+                                    : container.commodityType?.id
+                                }
+                              />
+                            </Grid>
+                          ))}
                       </Grid>
                     </TableCell>
                     <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
