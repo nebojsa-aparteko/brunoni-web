@@ -3,8 +3,13 @@ import formatDate from 'date-fns/format';
 import {
   Box,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
   Container,
   Grid,
+  IconButton,
   makeStyles,
   Paper,
   Table,
@@ -23,6 +28,7 @@ import get from 'lodash/fp/get';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
 import { Quote } from '../providers/QuotesEndpoint';
+import PrintIcon from '@material-ui/icons/Print';
 
 interface Props {
   id: string;
@@ -53,79 +59,88 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   return (
     <Container maxWidth="lg" className={classes.root}>
-      <Box>{formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}</Box>
-      <Box>{quoteGroup.origin.id}</Box>
-      <Box>{quoteGroup.destination.id}</Box>
-      <Grid container spacing={2}>
-        {quoteGroup.containers.map((container, i) => (
-          <Grid item key={i} xs={2}>
-            <Paper>
-              <Box p={1}>
-                <Box>{container?.containerType?.name || container?.containerType?.id || '?'}</Box>
-                <Box>{container?.commodityType?.name || container?.commodityType?.id || '?'}</Box>
-                <Box>{container?.quantity || '?'}</Box>
-              </Box>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
-      {quotesByCarrier.map(([carrierId, quotes]) => (
-        <Paper id={carrierId}>
-          <Typography variant="h4" gutterBottom>
-            {carrierId}
-          </Typography>
-          <Table size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                {quotes.map(quote => (
-                  <TableCell key={quote.id}>
-                    {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
-                    {formatDate(quote.validityPeriod.to, 'd. MMMM')}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {quotes[0].quoteDetails.map((quoteDetail, i) => (
-                <TableRow key={i}>
-                  <TableCell component="th" scope="row">
-                    {quoteDetail.Description}
-                  </TableCell>
-                  {quotes.map((quote: any) => (
-                    <TableCell key={quote.QuoteNumber}>
-                      <Typography>
-                        {quoteDetail.CostValue} {quoteDetail.Currency} {quoteDetail.CostUnit}
-                      </Typography>
-                    </TableCell>
-                  ))}
-                </TableRow>
+      <Card className={classes.root}>
+        <CardHeader
+          title={`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}
+          subheader={formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}
+        />
+        <CardContent>
+          <Box m={2}>
+            <Grid container spacing={2}>
+              {quoteGroup.containers.map((container, i) => (
+                <Grid item>
+                  <Chip
+                    key={i}
+                    label={
+                      (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                      container!.containerType?.name +
+                      ', ' +
+                      container?.commodityType?.name
+                    }
+                  />
+                </Grid>
               ))}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell />
-                {quotes.map(quote => (
-                  <TableCell key={quote.id}>
-                    <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
-                      View more
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      component={RouterLink}
-                      size="small"
-                      to={`/quotes/${quote.id}`}
-                    >
-                      Request Booking
-                    </Button>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </Paper>
-      ))}
+            </Grid>
+          </Box>
+          {quotesByCarrier.map(([carrierId, quotes]) => (
+            <Paper id={carrierId}>
+              <Typography variant="h4" gutterBottom>
+                {carrierId}
+              </Typography>
+              <Table size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell />
+                    {quotes.map(quote => (
+                      <TableCell key={quote.id}>
+                        {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
+                        {formatDate(quote.validityPeriod.to, 'd. MMMM')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {quotes[0].quoteDetails.map((quoteDetail, i) => (
+                    <TableRow key={i}>
+                      <TableCell component="th" scope="row">
+                        {quoteDetail.Description}
+                      </TableCell>
+                      {quotes.map((quote: any) => (
+                        <TableCell key={quote.QuoteNumber}>
+                          <Typography>
+                            {quoteDetail.CostValue} {quoteDetail.Currency} {quoteDetail.CostUnit}
+                          </Typography>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell />
+                    {quotes.map(quote => (
+                      <TableCell key={quote.id}>
+                        <Button color="primary" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
+                          View more
+                        </Button>
+                        <Button
+                          color="primary"
+                          variant="contained"
+                          component={RouterLink}
+                          size="small"
+                          to={`/quotes/${quote.id}`}
+                        >
+                          Request Booking
+                        </Button>
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </Paper>
+          ))}
+        </CardContent>
+      </Card>
     </Container>
   );
 };
