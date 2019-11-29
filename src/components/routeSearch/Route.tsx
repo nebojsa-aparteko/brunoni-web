@@ -1,21 +1,21 @@
 import React, { Fragment, useContext, useMemo } from 'react';
 import { renderToString } from 'react-dom/server';
 import {
-  Theme,
-  makeStyles,
+  Avatar,
+  Box,
+  Chip,
+  Divider,
   ExpansionPanel,
+  ExpansionPanelActions,
+  ExpansionPanelDetails,
   ExpansionPanelSummary,
   Grid,
-  Box,
-  Divider,
-  ExpansionPanelDetails,
-  ExpansionPanelActions,
-  Typography,
-  Chip,
   IconButton,
+  makeStyles,
   Popover,
+  Theme,
+  Typography,
   useTheme,
-  Avatar,
 } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import ItineraryItem from '../ItineraryItem';
@@ -31,7 +31,8 @@ import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 import Carriers from '../../contexts/Carriers';
 import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
-import copy from 'copy-to-clipboard';
+import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
+import { url } from 'inspector';
 
 interface Props {
   route?: RouteSearchResult;
@@ -132,8 +133,74 @@ const Route: React.FC<Props> = ({ route }) => {
     opacity: disabled ? 1 : undefined,
   };
 
-  const textToBeCopied = (route: RouteSearchResult) => {
-    return renderToString(<ClipboardCopyBody route={route} />);
+  const rtfOrTextualLineBreak = (isRtf: boolean) => {
+    return isRtf ? '\\uc0\\u8232' : '\n';
+  };
+
+  const rtfParagraphOpt = (isRtf: boolean) => {
+    return isRtf ? '\\ ' : '';
+  };
+
+  const rtfNewLineOpt = (isRtf: boolean) => {
+    return isRtf ? '\\uc0\\u8232' : '';
+  };
+
+  const rtfOrTextualParagraphBreak = (isRtf: boolean) => {
+    return isRtf ? '\\ ' : '\n\n';
+  };
+
+  const rtfOrTextualFieldLink = (label: string, urlString: string, isRtf: boolean = false) => {
+    return isRtf ? `{\\field{\\*\\fldinst{HYPERLINK "${urlString}"}}\\fldrslt \\cf3 \\ul \\ulc3 ${label}}` : urlString;
+  };
+
+  const rtfHeader = `{\\rtf1\\ansi\\ansicpg1252\\cocoartf2511
+\\cocoatextscaling0\\cocoaplatform0{\\fonttbl\\f0\\froman\\fcharset0 Calibri;}
+{\\colortbl;\\red255\\green255\\blue255;\\red0\\green0\\blue0;\\red0\\green0\\blue233;}
+{\\*\\expandedcolortbl;;\\cssrgb\\c0\\c0\\c0;\\cssrgb\\c0\\c0\\c93333;}
+\\deftab720
+\\pard\\pardeftab720\\sl280\\sa240\\partightenfactor0
+
+\\f0\\fs22 \\cf2 \\expnd0\\expndtw0\\kerning0
+\\up0 \\nosupersub \\ulnone `;
+
+  const prepareCopyBody = (route: RouteSearchResult, isRtf: boolean = false) => {
+    const plainTextOutput = (isRtf: boolean) => {
+      return `
+${isRtf ? rtfHeader : ''} ${rtfNewLineOpt(isRtf)}
+${route.OriginInfo.VoyageInfo.VesselName} ${route.OriginInfo.VoyageInfo.VoyageNr} ${rtfNewLineOpt(isRtf)}
+${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land} ETS{' '} ${formatDateString(
+        route.OriginInfo.DepartureDate,
+      )} ${rtfNewLineOpt(isRtf)}
+${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ETA{' '} ${formatDateString(
+        route.DestinationInfo.ArrivalDate,
+      )} ${rtfParagraphOpt(isRtf)}
+
+${route.Deadlines.flatMap(deadline => {
+  return `${deadline.Typ} closing - ${deadline.Time}`;
+})
+  .toString()
+  .split(',')
+  .join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+
+Origin Address: ${rtfNewLineOpt(isRtf)}
+${route.OriginInfo.Port.PortName.split('<br/> ').join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+
+Destination Address: ${rtfNewLineOpt(isRtf)}
+${route.OriginInfo.Port.PortName.split('<br/> ').join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+
+Source: ${
+        process.env.REACT_APP_BRAND === 'brunoni'
+          ? rtfOrTextualFieldLink('myBrunoni.ch', 'https://mybrunoni.ch', isRtf)
+          : rtfOrTextualFieldLink('myallmarine.ch', 'https://myallmarine.ch', isRtf)
+      }
+${isRtf ? '}' : ''}
+    `;
+    };
+    return [
+      { body: renderToString(<ClipboardCopyBody route={route} />), format: ClipboardFormat.HTML },
+      { body: plainTextOutput(false), format: ClipboardFormat.PLAINTEXT },
+      { body: plainTextOutput(true), format: ClipboardFormat.RTF },
+    ];
   };
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -143,11 +210,7 @@ const Route: React.FC<Props> = ({ route }) => {
   };
 
   const handleCopyToClipboardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    copy(textToBeCopied(route!), {
-      debug: true,
-      message: 'Your browser is not supported',
-      format: 'text/html',
-    });
+    copyToClipboard(prepareCopyBody(route!));
 
     setAnchorEl(event.currentTarget);
     setTimeout(handlePopoverClose, 1500);
@@ -189,8 +252,8 @@ const Route: React.FC<Props> = ({ route }) => {
             <Grid item md={3} sm={12}>
               <InfoBoxItem
                 title="Vessel"
-                label1={route?.OriginInfo.VoyageInfo.VesselName}
-                label2={route?.OriginInfo.VoyageInfo.VoyageNr}
+                label1={route!.OriginInfo.VoyageInfo.VesselName}
+                label2={route!.OriginInfo.VoyageInfo.VoyageNr}
                 gutterBottom
               />
             </Grid>
