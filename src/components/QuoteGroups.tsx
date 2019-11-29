@@ -63,16 +63,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                         {/*TODO handle the flash of undefined text*/}
                         {quoteGroup.containers &&
                           quoteGroup.containers.map(container => (
-                            <Grid item>
-                              {container && (
-                                <Chip
-                                  label={
-                                    (container.quantity > 1 ? container.quantity + ' x ' : '') +
-                                    container!.containerType?.name
-                                  }
-                                />
-                              )}
-                            </Grid>
+                            <Grid item>{container && <Chip label={container!.containerType?.name} />}</Grid>
                           ))}
                       </Grid>
                     </TableCell>
