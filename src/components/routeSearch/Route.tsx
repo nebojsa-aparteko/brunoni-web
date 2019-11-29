@@ -70,11 +70,12 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
   return (
     <Fragment>
       <p style={paragraphStyles}>
-        {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr} <br />
-        {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land} ETS
+        {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr}
+        <br />
+        {route.OriginInfo.Port.HarbourName},{route.OriginInfo.Port.Land} ETS{' '}
         {formatDateString(route.OriginInfo.DepartureDate)}
         <br />
-        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA
+        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA{' '}
         {formatDateString(route.DestinationInfo.ArrivalDate)}
         <br />
       </p>
