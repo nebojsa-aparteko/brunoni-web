@@ -36,7 +36,7 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: theme.spacing(5),
+    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
     padding: theme.spacing(3),
   },

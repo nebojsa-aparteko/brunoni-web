@@ -42,7 +42,7 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
     padding: theme.spacing(3),
   },
@@ -69,7 +69,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
   console.log('quotesByCarrier', quotesByCarrier);
 
   return (
-    <Container maxWidth="lg" className={classes.root}>
+    <Container maxWidth="lg">
       <Card className={classes.root}>
         <CardHeader
           avatar={

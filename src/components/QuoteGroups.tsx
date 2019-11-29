@@ -22,8 +22,9 @@ import GetQuotesButton from './GetQuotesButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
+    padding: theme.spacing(3),
   },
 }));
 
@@ -63,7 +64,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                         {/*TODO handle the flash of undefined text*/}
                         {quoteGroup.containers &&
                           quoteGroup.containers.map((container, index) => (
-                            <Grid item key={index}>{container && <Chip label={container!.containerType?.name} />}</Grid>
+                            <Grid item key={index}>
+                              {container && <Chip label={container!.containerType?.name} />}
+                            </Grid>
                           ))}
                       </Grid>
                     </TableCell>
