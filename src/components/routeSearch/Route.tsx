@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const paragraphStyles = {
   fontFamily: 'Calibri, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  fontSize: '11px',
+  fontSize: '11pt',
 };
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
