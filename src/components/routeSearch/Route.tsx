@@ -30,6 +30,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 import Carriers from '../../contexts/Carriers';
 import { Skeleton } from '@material-ui/lab';
+import ShareIcon from '@material-ui/icons/Share';
 
 interface Props {
   route?: RouteSearchResult;
@@ -139,8 +140,16 @@ const Route: React.FC<Props> = ({ route }) => {
                 </Box>
               </Typography>
             </Grid>
+            <Grid item md={3} sm={12}>
+              <InfoBoxItem
+                title="Vessel"
+                label1={route!.OriginInfo.VoyageInfo.VesselName}
+                label2={route!.OriginInfo.VoyageInfo.VoyageNr}
+                gutterBottom
+              />
+            </Grid>
             {route?.SpaceInfo && (
-              <Grid item md={6} sm={12}>
+              <Grid item md={3} sm={12}>
                 <Typography variant="subtitle2" display="block" gutterBottom>
                   <Box fontWeight="fontWeightBold">Space Availability</Box>
                 </Typography>
@@ -198,7 +207,7 @@ const Route: React.FC<Props> = ({ route }) => {
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
               <InfoBoxItem
-                IconComponent={WavesIcon}
+                IconComponent={ShareIcon}
                 title="Routing"
                 label1={route ? route!.Routing : <TextSkeleton width={[50, 80]} />}
               />
