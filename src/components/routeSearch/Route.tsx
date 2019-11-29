@@ -32,7 +32,6 @@ import Carriers from '../../contexts/Carriers';
 import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
-import { url } from 'inspector';
 
 interface Props {
   route?: RouteSearchResult;
@@ -60,31 +59,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const clipboardCopyBodyStyles = makeStyles(() => ({
-  paragraph: {
-    fontFamily: 'Calibry, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
-    fontSize: '11px',
-  },
-}));
-
 const paragraphStyles = {
-  fontFamily: 'Calibry, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: 'Calibri, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
   fontSize: '11px',
 };
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
 
 const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) => {
-  const classes = clipboardCopyBodyStyles();
-
   return (
     <Fragment>
       <p style={paragraphStyles}>
         {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr} <br />
-        {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land} ETS{' '}
+        {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land} ETS
         {formatDateString(route.OriginInfo.DepartureDate)}
         <br />
-        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA{' '}
+        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA
         {formatDateString(route.DestinationInfo.ArrivalDate)}
         <br />
       </p>
@@ -138,73 +128,34 @@ const Route: React.FC<Props> = ({ route }) => {
     opacity: disabled ? 1 : undefined,
   };
 
-  const rtfOrTextualLineBreak = (isRtf: boolean) => {
-    return isRtf ? '\\uc0\\u8232' : '\n';
-  };
-
-  const rtfParagraphOpt = (isRtf: boolean) => {
-    return isRtf ? '\\ ' : '';
-  };
-
-  const rtfNewLineOpt = (isRtf: boolean) => {
-    return isRtf ? '\\uc0\\u8232' : '';
-  };
-
-  const rtfOrTextualParagraphBreak = (isRtf: boolean) => {
-    return isRtf ? '\\ ' : '\n\n';
-  };
-
-  const rtfOrTextualFieldLink = (label: string, urlString: string, isRtf: boolean = false) => {
-    return isRtf ? `{\\field{\\*\\fldinst{HYPERLINK "${urlString}"}}\\fldrslt \\cf3 \\ul \\ulc3 ${label}}` : urlString;
-  };
-
-  const rtfHeader = `{\\rtf1\\ansi\\ansicpg1252\\cocoartf2511
-\\cocoatextscaling0\\cocoaplatform0{\\fonttbl\\f0\\froman\\fcharset0 Calibri;}
-{\\colortbl;\\red255\\green255\\blue255;\\red0\\green0\\blue0;\\red0\\green0\\blue233;}
-{\\*\\expandedcolortbl;;\\cssrgb\\c0\\c0\\c0;\\cssrgb\\c0\\c0\\c93333;}
-\\deftab720
-\\pard\\pardeftab720\\sl280\\sa240\\partightenfactor0
-
-\\f0\\fs22 \\cf2 \\expnd0\\expndtw0\\kerning0
-\\up0 \\nosupersub \\ulnone `;
-
-  const prepareCopyBody = (route: RouteSearchResult, isRtf: boolean = false) => {
-    const plainTextOutput = (isRtf: boolean) => {
-      return `
-${isRtf ? rtfHeader : ''} ${rtfNewLineOpt(isRtf)}
-${route.OriginInfo.VoyageInfo.VesselName} ${route.OriginInfo.VoyageInfo.VoyageNr} ${rtfNewLineOpt(isRtf)}
-${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land} ETS{' '} ${formatDateString(
-        route.OriginInfo.DepartureDate,
-      )} ${rtfNewLineOpt(isRtf)}
-${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ETA{' '} ${formatDateString(
-        route.DestinationInfo.ArrivalDate,
-      )} ${rtfParagraphOpt(isRtf)}
+  const prepareCopyBody = (route: RouteSearchResult) => {
+    const plainTextOutput = `
+${route.OriginInfo.VoyageInfo.VesselName} ${route.OriginInfo.VoyageInfo.VoyageNr}
+${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land} ETS ${formatDateString(
+      route.OriginInfo.DepartureDate,
+    )}
+${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ETA ${formatDateString(
+      route.DestinationInfo.ArrivalDate,
+    )}
 
 ${route.Deadlines.flatMap(deadline => {
   return `${deadline.Typ} closing - ${deadline.Time}`;
 })
   .toString()
   .split(',')
-  .join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+  .join('\n')}
 
-Origin Address: ${rtfNewLineOpt(isRtf)}
-${route.OriginInfo.Port.PortName.split('<br/> ').join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+Origin Address:
+${route.OriginInfo.Port.PortName.split('<br/> ').join('\n')}
 
-Destination Address: ${rtfNewLineOpt(isRtf)}
-${route.OriginInfo.Port.PortName.split('<br/> ').join(rtfOrTextualLineBreak(isRtf))} ${rtfParagraphOpt(isRtf)}
+Destination Address:
+${route.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}
 
-Source: ${
-        process.env.REACT_APP_BRAND === 'brunoni'
-          ? rtfOrTextualFieldLink('myBrunoni.ch', 'https://mybrunoni.ch', isRtf)
-          : rtfOrTextualFieldLink('myallmarine.ch', 'https://myallmarine.ch', isRtf)
-      }
-${isRtf ? '}' : ''}
+Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
     `;
-    };
     return [
       { body: renderToString(<ClipboardCopyBody route={route} />), format: ClipboardFormat.HTML },
-      { body: plainTextOutput(false), format: ClipboardFormat.PLAINTEXT },
-      { body: plainTextOutput(true), format: ClipboardFormat.RTF },
+      { body: plainTextOutput, format: ClipboardFormat.PLAINTEXT },
     ];
   };
 
