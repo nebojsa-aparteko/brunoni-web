@@ -54,6 +54,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   tableScroll: {
     overflowX: 'auto',
   },
+  title: {
+    fontSize: '1.4em',
+  },
 }));
 
 const QuoteGroup: React.FC<Props> = ({ id }) => {
@@ -75,6 +78,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     <Container maxWidth="lg">
       <Card className={classes.root}>
         <CardHeader
+          classes={{ title: classes.title }}
           avatar={
             <IconButton
               aria-label="back button"
@@ -93,9 +97,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
           <Box m={2}>
             <Grid container spacing={2}>
               {quoteGroup.containers.map((container, i) => (
-                <Grid item>
+                <Grid item key={i}>
                   <Chip
-                    key={i}
                     label={
                       (container.quantity > 1 ? container.quantity + ' x ' : '') +
                       container!.containerType?.description +

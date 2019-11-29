@@ -40,6 +40,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(4),
     padding: theme.spacing(3),
   },
+  title: {
+    fontSize: '1.4em',
+  },
 }));
 
 const handlePrint = () => {
@@ -99,16 +102,19 @@ const Quote: React.FC<Props> = ({ id }) => {
       <ScrollToTopOnMount />
       <Card className={classes.root}>
         <CardHeader
+          classes={{ title: classes.title }}
           avatar={
-            <IconButton
-              aria-label="back button"
-              color="primary"
-              component={RouterLink}
-              size="small"
-              to={`/quotes/groups/${quote.groupId}`}
-            >
-              <ArrowBackIcon />
-            </IconButton>
+            <Box displayPrint="none">
+              <IconButton
+                aria-label="back button"
+                color="primary"
+                component={RouterLink}
+                size="small"
+                to={`/quotes/groups/${quote.groupId}`}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            </Box>
           }
           action={
             <Box display="flex" displayPrint="none">

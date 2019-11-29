@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, ListItem, Box } from '@material-ui/core';
+import { Grid, Typography, ListItem, Box, Chip } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import Container from '../../model/Container';
@@ -17,10 +17,15 @@ const QuoteItemContainers: React.FC<Props> = ({ containers }) => (
     </Typography>
     <Typography variant="body2">
       <List dense={true}>
-        {containers.map(container => (
-          <ListItem>
-            <ListItemText
-              primary={`${container.quantity} – ${container.containerType?.description}${container.commodityType?.name}`}
+        {containers.map((container, i) => (
+          <ListItem key={i} disableGutters>
+            <Chip
+              label={
+                (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                container!.containerType?.description +
+                ', ' +
+                container?.commodityType?.name
+              }
             />
           </ListItem>
         ))}
