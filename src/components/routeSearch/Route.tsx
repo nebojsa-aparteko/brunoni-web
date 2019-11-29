@@ -1,4 +1,5 @@
 import React, { Fragment, useContext, useMemo } from 'react';
+import { renderToString } from 'react-dom/server';
 import {
   Theme,
   makeStyles,
@@ -25,12 +26,12 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
 import InfoBoxItem from '../InfoBoxItem';
 import TextSkeleton from '../TextSkeleton';
-import CopyToClipboard from 'react-copy-to-clipboard';
 
 import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 import Carriers from '../../contexts/Carriers';
 import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
+import copy from 'copy-to-clipboard';
 
 interface Props {
   route?: RouteSearchResult;
@@ -58,7 +59,58 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const clipboardCopyBodyStyles = makeStyles(() => ({
+  paragraph: {
+    fontFamily: 'Calibry, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    fontSize: '11px',
+  },
+}));
+
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
+
+const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) => {
+  const classes = clipboardCopyBodyStyles();
+
+  return (
+    <Fragment>
+      <p className={classes.paragraph}>
+        {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr} <br />
+        {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land} ETS{' '}
+        {formatDateString(route.OriginInfo.DepartureDate)}
+        <br />
+        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA{' '}
+        {formatDateString(route.DestinationInfo.ArrivalDate)}
+        <br />
+      </p>
+      <p className={classes.paragraph}>
+        {route.Deadlines.flatMap(deadline => (
+          <Fragment>
+            {deadline.Typ} closing - {deadline.Time}
+            <br />
+          </Fragment>
+        ))}
+      </p>
+      <p className={classes.paragraph}>
+        Origin Address:
+        <br />
+        <span dangerouslySetInnerHTML={{ __html: route.OriginInfo.Port.PortName }} />
+      </p>
+      <p className={classes.paragraph}>
+        Destination Address:
+        <br />
+        <span dangerouslySetInnerHTML={{ __html: route.DestinationInfo.Port.PortName }} />
+      </p>
+      <p className={classes.paragraph}>
+        Source:{' '}
+        {process.env.REACT_APP_BRAND === 'brunoni' ? (
+          <a href="https://mybrunoni.ch">mybrunoni.ch</a>
+        ) : (
+          <a href="https://myallmarine.ch">myallmarine.ch</a>
+        )}
+      </p>
+    </Fragment>
+  );
+};
 
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
@@ -80,21 +132,9 @@ const Route: React.FC<Props> = ({ route }) => {
     opacity: disabled ? 1 : undefined,
   };
 
-  const textToBeCopied = () =>
-    `${route!.OriginInfo.VoyageInfo.VesselName} ${route!.OriginInfo.VoyageInfo.VoyageNr}\n` +
-    `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land} ETS ${formatDateString(
-      route!.OriginInfo.DepartureDate,
-    )}\n` +
-    'Address:\n' +
-    `${route!.OriginInfo.Port.PortName.split('<br/> ').join('\n')}\n\n` +
-    `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land} ETA ${formatDateString(
-      route!.DestinationInfo.ArrivalDate,
-    )}\n` +
-    'Address:\n' +
-    `${route!.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}\n\n`.concat(
-      route!.Deadlines.flatMap(deadline => `${deadline.Typ} closing - ${deadline.Time}`).join('\n'),
-    ) +
-    '\n\nSource: mybrunoni.ch';
+  const textToBeCopied = (route: RouteSearchResult) => {
+    return renderToString(<ClipboardCopyBody route={route} />);
+  };
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -103,6 +143,12 @@ const Route: React.FC<Props> = ({ route }) => {
   };
 
   const handleCopyToClipboardClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    copy(textToBeCopied(route!), {
+      debug: true,
+      message: 'Your browser is not supported',
+      format: 'text/html',
+    });
+
     setAnchorEl(event.currentTarget);
     setTimeout(handlePopoverClose, 1500);
   };
@@ -171,7 +217,12 @@ const Route: React.FC<Props> = ({ route }) => {
                 IconComponent={ChevronRightIcon}
                 title="Departure"
                 label1={
-                  route ? `ETS ${formatDateString(route!.OriginInfo.DepartureDate)}` : <TextSkeleton width={100} />
+                  route ? (
+                    `
+  ETS ${formatDateString(route!.OriginInfo.DepartureDate)}`
+                  ) : (
+                    <TextSkeleton width={100} />
+                  )
                 }
                 label2={
                   route ? (
@@ -187,7 +238,12 @@ const Route: React.FC<Props> = ({ route }) => {
                 IconComponent={LastPageIcon}
                 title="Arrival"
                 label1={
-                  route ? `ETA ${formatDateString(route!.DestinationInfo.ArrivalDate)}` : <TextSkeleton width={100} />
+                  route ? (
+                    `
+  ETA ${formatDateString(route!.DestinationInfo.ArrivalDate)}`
+                  ) : (
+                    <TextSkeleton width={100} />
+                  )
                 }
                 label2={
                   route ? (
@@ -202,7 +258,14 @@ const Route: React.FC<Props> = ({ route }) => {
               <InfoBoxItem
                 IconComponent={WavesIcon}
                 title="TransitTime"
-                label1={route ? `${route!.TransitTime} DAYS` : <TextSkeleton width={70} />}
+                label1={
+                  route ? (
+                    `${route!.TransitTime}
+  DAYS`
+                  ) : (
+                    <TextSkeleton width={70} />
+                  )
+                }
               />
             </Grid>
             <Grid item md={3} sm={6} xs={6}>
@@ -223,15 +286,17 @@ const Route: React.FC<Props> = ({ route }) => {
                 <Grid item container xs={12} spacing={2} className={classes.deadlines}>
                   {route!.Deadlines.map((deadline, i) => (
                     <Grid key={i} item md={3} sm={3}>
-                      <InfoBoxItem title={`${deadline.Typ} closing`} label1={deadline.Time} />
+                      <InfoBoxItem
+                        title={`${deadline.Typ}
+  closing`}
+                        label1={deadline.Time}
+                      />
                     </Grid>
                   ))}
                   <Grid item md={3} sm={3}>
-                    <CopyToClipboard text={textToBeCopied()} options={{ format: 'text/plain' }}>
-                      <IconButton aria-label="delete" onClick={handleCopyToClipboardClick}>
-                        <CopyToClipboardIcon />
-                      </IconButton>
-                    </CopyToClipboard>
+                    <IconButton aria-label="delete" onClick={handleCopyToClipboardClick}>
+                      <CopyToClipboardIcon />
+                    </IconButton>
                     <Popover
                       id={popoverId}
                       open={popoverOpen}
