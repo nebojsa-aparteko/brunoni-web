@@ -16,7 +16,7 @@ import CarrierPerformance from './CarrierPerformance';
 import ContainerTypePerformance from './ContainerTypePerformance';
 import Top5PortsPerformance from './Top5PortsPerformance';
 import asArray from '../../utilities/asArray';
-import useTestData from '../../utilities/useTestData';
+import withTestData from '../../utilities/withTestData';
 import { Select } from '@material-ui/core';
 import TodayIcon from '@material-ui/icons/Today';
 
@@ -71,7 +71,7 @@ const DashboardCharts: React.FC = () => {
   const { busy, error, result } = useEndpoint(
     '/clientPerformance',
     updateClientPerformanceBody,
-    useTestData('clientPerformance', updateClientPerformanceBody),
+    withTestData('clientPerformance', updateClientPerformanceBody),
   );
 
   const clientPerformance = useMemo(() => {

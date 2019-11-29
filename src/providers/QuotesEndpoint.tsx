@@ -12,7 +12,7 @@ import partialRight from 'lodash/fp/partialRight';
 import Context from '../contexts/QuotesEndpoint';
 import QuotesResult from '../model/quotes/QuotesResult';
 import useEndpoint from '../hooks/useEndpoint';
-import useTestData from '../utilities/useTestData';
+import withTestData from '../utilities/withTestData';
 import asArray from '../utilities/asArray';
 import PickupLocation from '../model/PickupLocation';
 import ContainerType from '../model/ContainerType';
@@ -209,7 +209,7 @@ const QuotesEndpoint: React.FC<Props> = ({ children }) => {
     return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const initialResults = useTestData('quotes', normalize);
+  const initialResults = withTestData('quotes', normalize);
 
   const quotes = useEndpoint('/quotes', normalize, initialResults);
 

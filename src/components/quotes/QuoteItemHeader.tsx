@@ -1,7 +1,6 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import formatDate from 'date-fns/format';
-import { Grid, Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
-import InfoBoxItemHorizontal from '../InfoBoxItemHorizontal';
+import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import { Quote } from '../../providers/QuotesEndpoint';
 import TableBody from '@material-ui/core/TableBody';
 

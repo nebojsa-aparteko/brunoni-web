@@ -48,6 +48,10 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
   const containerTypes = useContext(ContainerTypes);
 
   const data = useMemo(() => {
+    if (!clientPerformance) {
+      return undefined;
+    }
+
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
     const labels = keys(containerData).map(
       key => filter((element: any) => element.id === key)(containerTypes)[0]?.description,

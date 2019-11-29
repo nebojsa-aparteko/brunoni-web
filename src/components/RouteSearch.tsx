@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -11,13 +11,13 @@ import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
 import Container from './Container';
-import Typography from '@material-ui/core/Typography';
-import { useSnackbar } from 'notistack';
 import Route from './routeSearch/Route';
 import RouteSearchResults from '../model/route-search/RouteSearchResults';
 import SearchHowTo from './routeSearch/SearchHowTo';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
-import useTestData from '../utilities/useTestData';
+import withTestData from '../utilities/withTestData';
+import useRequest, { Callback, RequestError } from '../hooks/useRequest';
+import useErrorMessage from '../utilities/useErrorMessage';
 
 interface Props {}
 
@@ -73,76 +73,39 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
   const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
-  const [results, setResults] = useState<RouteSearchResults | null | undefined>(
-    useTestData('routesSearch', update('Routes', sortingOptions[0].sort)),
-  );
-  const [action, setAction] = useState<{ callback?: () => void } | undefined>();
   const [visibility, setVisibility] = useState(false);
 
-  useEffect(() => {
-    if (!action) {
-      return undefined;
-    }
+  const [busy, error, result, search] = useRequest(() => {
+    const search = querySting.stringify({
+      origin: params.originPort?.id,
+      destination: params.destinationPort?.id,
+      date: formatDate(params.date, 'yyyy-MM-dd'),
+      weeks: params.weeks.toString(),
+      carrier: params.carrier,
+    });
 
-    if (!params.originPort || !params.destinationPort || !params.date || !params.weeks) {
-      if (action && action.callback) {
-        action.callback();
-      }
-      return undefined;
-    }
+    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
+  }, [params]);
 
-    if (results === undefined) {
-      setResults(null);
-    }
+  useErrorMessage(error, error =>
+    error instanceof RequestError && error.response.status === 504
+      ? 'Service is unavailable at the moment. Please try again later.'
+      : 'Unexpected error occurred.',
+  );
 
-    const controller = new AbortController();
-    const signal = controller.signal;
+  const results = useMemo(
+    () =>
+      result
+        ? update('Routes', sorting.sort)(result)
+        : withTestData('routesSearch', update('Routes', sortingOptions[0].sort)),
+    [result, sorting.sort],
+  ) as RouteSearchResults;
 
-    (async () => {
-      try {
-        const search = querySting.stringify({
-          origin: params.originPort!.id,
-          destination: params.destinationPort!.id,
-          date: formatDate(params.date, 'yyyy-MM-dd'),
-          weeks: params.weeks.toString(),
-          carrier: params.carrier,
-        });
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/routes?${search}`, { signal });
-        const body = await response.json();
-        setResults(update('Routes', sorting.sort)(body as RouteSearchResults));
-        setAction(undefined);
-      } catch (e) {
-        if (e.code !== e.ABORT_ERR) {
-          console.error('Failed to load routes', e);
-          setAction(undefined);
-          enqueueSnackbar(<Typography>Failed to load routes.</Typography>, { variant: 'error' });
-        }
-      } finally {
-        if (action.callback) {
-          action.callback();
-        }
-      }
-    })();
-
-    return () => {
-      controller.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params, action]);
-
-  const handleFiltersChange = (carrier: string | undefined, callback: () => void) => {
+  const handleFiltersChange = (carrier: string | undefined, callback: Callback) => {
     setParams(set('carrier', carrier)(params));
-    setAction({ callback });
-  };
-
-  const handleSortingChange = (s: Sorting) => {
-    setSorting(s);
-    if (results) {
-      setResults(update('Routes', s.sort)(results!));
-    }
+    search(callback);
   };
 
   const handleVisibility = (isVisible: boolean) => {
@@ -166,7 +129,7 @@ const RouteSearch: React.FC<Props> = () => {
               <RouteSearchBar
                 value={params}
                 onChange={setParams}
-                onSearch={callback => setAction({ callback })}
+                onSearch={search}
                 paperVisibility={handleVisibility(!visibility)}
               />
             </Container>
@@ -174,7 +137,7 @@ const RouteSearch: React.FC<Props> = () => {
         </Sticky>
       </Box>
       <Container className={classes.content}>
-        {results !== undefined ? (
+        {busy || results ? (
           results?.Routes.length === 0 ? (
             <SearchEmptyResults />
           ) : (
@@ -192,7 +155,7 @@ const RouteSearch: React.FC<Props> = () => {
                 <Grid container>
                   <Grid item xs={12}>
                     <Paper className={classes.sorting}>
-                      <RouteSearchSorting value={sorting} onChange={handleSortingChange} />
+                      <RouteSearchSorting value={sorting} onChange={setSorting} />
                     </Paper>
                   </Grid>
 

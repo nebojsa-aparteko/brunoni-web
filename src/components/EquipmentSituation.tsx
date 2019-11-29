@@ -25,7 +25,7 @@ import {
   colors,
 } from '@material-ui/core';
 import useEndpoint from '../hooks/useEndpoint';
-import useTestData from '../utilities/useTestData';
+import withTestData from '../utilities/withTestData';
 import asArray from '../utilities/asArray';
 import ContainerTypes from '../contexts/ContainerTypes';
 import ContainerType from '../model/ContainerType';
@@ -123,7 +123,7 @@ const EquipmentSituation: React.FC = () => {
   const { result } = useEndpoint(
     '/equipmentSituation',
     bodyTransform,
-    useTestData('equipmentSituation', bodyTransform),
+    withTestData('equipmentSituation', bodyTransform),
   );
 
   const data = result as NormalizedData;
