@@ -5,6 +5,7 @@ import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
+import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
@@ -26,6 +27,7 @@ import pickAndRename from '../utilities/pickAndRename';
 import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
+import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
@@ -174,6 +176,7 @@ const normalizeQuoteGroups = (
         origin: normalizedQuote.origin,
         destination: normalizedQuote.destination,
         containers: normalizedQuote.containers,
+        commodityTypes: normalizedQuote.containers,
         quotes: normalizedQuotes,
       };
     },

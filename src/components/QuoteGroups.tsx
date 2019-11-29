@@ -78,18 +78,20 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                     </TableCell>
                     <TableCell>
                       <Grid container spacing={1}>
-                        {quoteGroup.containers &&
-                          quoteGroup.containers.map(container => (
-                            <Grid item>
-                              <Chip
-                                label={
-                                  container.commodityType?.name
-                                    ? container.commodityType?.name
-                                    : container.commodityType?.id
-                                }
-                              />
-                            </Grid>
-                          ))}
+                        {quoteGroup.containers && (
+                          // quoteGroup.containers.map(container => (
+                          <Grid item>
+                            <Chip
+                              label={
+                                quoteGroup.containers[0].commodityType?.name
+                                  ? quoteGroup.containers[0].commodityType?.name
+                                  : quoteGroup.containers[0].commodityType?.id
+                              }
+                            />
+                          </Grid>
+                        )
+                        // ))}
+                        }
                       </Grid>
                     </TableCell>
                     <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
@@ -113,6 +115,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                     </TableCell>
                     <TableCell>
                       <Skeleton width={65} height={16} style={{ margin: 0 }} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton width={140} height={16} style={{ margin: 0 }} />
                     </TableCell>
                     <TableCell>
                       <Skeleton width={140} height={16} style={{ margin: 0 }} />
