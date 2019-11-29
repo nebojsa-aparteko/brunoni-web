@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, Fragment } from 'react';
 import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -23,6 +23,7 @@ import {
   TableBody,
   Avatar,
   colors,
+  Tooltip,
 } from '@material-ui/core';
 import useEndpoint from '../hooks/useEndpoint';
 import withTestData from '../utilities/withTestData';
@@ -33,6 +34,7 @@ import Carriers from '../contexts/Carriers';
 import Carrier from '../model/Carrier';
 import Container from './Container';
 import pickAndRename from '../utilities/pickAndRename';
+import TextSkeleton from './TextSkeleton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -54,6 +56,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   narrowCells: {
     paddingLeft: 6,
     paddingRight: 6,
+  },
+  tableRow: {
+    '&:hover': {
+      backgroundColor: theme.palette.background.default,
+    },
+  },
+  rowTitle: {
+    whiteSpace: 'nowrap',
   },
 }));
 
@@ -130,13 +140,13 @@ const EquipmentSituation: React.FC = () => {
 
   return (
     <Container>
-      <Box py={3}>
+      <Box my={3}>
         {data &&
           data.map(({ carrier, containerTypes, locations }) => (
-            <Box key={carrier.id} my={1}>
-              <Typography variant="h4" gutterBottom>
-                {carrier.name || carrier.id}
-              </Typography>
+            <Box key={carrier.id} my={5}>
+              <Box p={2}>
+                <Typography variant="h4">{carrier.name || carrier.id}</Typography>
+              </Box>
               <Paper className={classes.enableHorizontalScroll}>
                 <Table size="small" aria-label="a dense table">
                   <TableHead>
@@ -151,8 +161,8 @@ const EquipmentSituation: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {locations.map((location, i) => (
-                      <TableRow key={i}>
-                        <TableCell component="th" scope="row">
+                      <TableRow key={i} className={classes.tableRow}>
+                        <TableCell component="th" scope="row" className={classes.rowTitle}>
                           {location.name}
                         </TableCell>
                         {containerTypes.map(containerType => {
@@ -167,7 +177,9 @@ const EquipmentSituation: React.FC = () => {
 
                           return (
                             <TableCell key={containerType.id}>
-                              <Avatar className={className} />
+                              <Tooltip title={status}>
+                                <Avatar className={className} />
+                              </Tooltip>
                             </TableCell>
                           );
                         })}
