@@ -11,7 +11,10 @@ export interface ClipboardData {
   body: string;
 }
 
-const copyToClipboard = (data: ClipboardData[], failoverFormat: ClipboardFormat = ClipboardFormat.HTML): boolean => {
+const copyToClipboard = (
+  data: ClipboardData[],
+  failoverFormat: ClipboardFormat = ClipboardFormat.PLAINTEXT,
+): boolean => {
   const clipboardCopyFunction = (evt: any) => {
     evt.preventDefault();
     data.map(clipboardData => {
