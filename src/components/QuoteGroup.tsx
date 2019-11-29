@@ -51,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '30px',
     textAlign: 'right',
   },
+  tableScroll: {
+    overflowX: 'auto',
+  },
 }));
 
 const QuoteGroup: React.FC<Props> = ({ id }) => {
@@ -114,7 +117,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                     </Typography>
                   </ExpansionPanelSummary>
 
-                  <ExpansionPanelDetails>
+                  <ExpansionPanelDetails className={classes.tableScroll}>
                     <Table size="small" aria-label="a dense table">
                       <TableHead>
                         <TableRow>
@@ -122,7 +125,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                           {quotes.map(quote => (
                             <Fragment>
                               <TableCell className={classes.currencyCell}>Currency</TableCell>
-                              <TableCell key={quote.id}>
+                              <TableCell key={quote.id} style={{ minWidth: '282px' }}>
                                 {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
                                 {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                               </TableCell>
@@ -165,7 +168,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                           </TableCell>
                           {quotes.map((quote: any) => (
                             <Fragment>
-                              <TableCell className={classes.currencyCell}></TableCell>
+                              <TableCell className={classes.currencyCell} />
                               <TableCell key={quote.QuoteNumber}>
                                 {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                 {quote.serviceDetails[0].TransitTime} days
