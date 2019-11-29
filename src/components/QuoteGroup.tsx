@@ -31,8 +31,10 @@ import toPairs from 'lodash/fp/toPairs';
 import get from 'lodash/fp/get';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
-import { Quote } from '../providers/QuotesEndpoint';
+import { Quote, QuoteDetail } from '../providers/QuotesEndpoint';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 interface Props {
   id: string;
@@ -70,6 +72,17 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     <Container maxWidth="lg" className={classes.root}>
       <Card className={classes.root}>
         <CardHeader
+          avatar={
+            <IconButton
+              aria-label="back button"
+              color="primary"
+              component={RouterLink}
+              size="small"
+              to={`/quotes/groups`}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          }
           title={`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}
           subheader={formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}
         />
@@ -82,7 +95,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                     key={i}
                     label={
                       (container.quantity > 1 ? container.quantity + ' x ' : '') +
-                      container!.containerType?.name +
+                      container!.containerType?.description +
                       ', ' +
                       container?.commodityType?.name
                     }
@@ -91,102 +104,114 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
               ))}
             </Grid>
           </Box>
-          {quotesByCarrier.map(([carrierId, quotes]) => (
-            <Paper id={carrierId}>
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary aria-controls="panel1c-content" expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h4" gutterBottom>
-                    {carrierId}
-                  </Typography>
-                </ExpansionPanelSummary>
+          {quotesByCarrier.map(([carrierId, quotes]) => {
+            return (
+              <Paper id={carrierId}>
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary aria-controls="panel1c-content" expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="h4" gutterBottom>
+                      {carrierId}
+                    </Typography>
+                  </ExpansionPanelSummary>
 
-                <ExpansionPanelDetails>
-                  <Table size="small" aria-label="a dense table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell />
-                        {quotes.map(quote => (
-                          <Fragment>
-                            <TableCell className={classes.currencyCell}>Currency</TableCell>
-                            <TableCell key={quote.id}>
-                              {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
-                              {formatDate(quote.validityPeriod.to, 'd. MMMM')}
-                            </TableCell>
-                          </Fragment>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {quotes[0].quoteDetails.map((quoteDetail, i) => (
-                        <TableRow key={i}>
-                          <TableCell component="th" scope="row">
-                            {quoteDetail.Description}
-                          </TableCell>
-                          {quotes.map((quote: any) => (
+                  <ExpansionPanelDetails>
+                    <Table size="small" aria-label="a dense table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell />
+                          {quotes.map(quote => (
                             <Fragment>
-                              <TableCell className={classes.currencyCell}>
-                                {quoteDetail.Currency !== 'incl.' ? quoteDetail.Currency : ''}
-                              </TableCell>
-                              <TableCell key={quote.QuoteNumber}>
-                                {quoteDetail.Currency === 'incl.' ? quoteDetail.Currency : ''} {quoteDetail.CostValue}{' '}
-                                {quoteDetail.CostUnit}
+                              <TableCell className={classes.currencyCell}>Currency</TableCell>
+                              <TableCell key={quote.id}>
+                                {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
+                                {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                               </TableCell>
                             </Fragment>
                           ))}
                         </TableRow>
-                      ))}
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Service Details
-                        </TableCell>
-                        {quotes.map((quote: any) => (
-                          <Fragment>
-                            <TableCell className={classes.currencyCell}></TableCell>
-                            <TableCell key={quote.QuoteNumber}>
-                              {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
-                              {quote.serviceDetails[0].TransitTime} days
-                            </TableCell>
-                          </Fragment>
-                        ))}
-                      </TableRow>
-                    </TableBody>
-                    <TableFooter>
-                      <TableRow>
-                        <TableCell />
+                      </TableHead>
+                      <TableBody>
+                        {quotes[0].quoteDetails
+                          .filter(quoteDetail => quoteDetailFilterList.includes(quoteDetail.Description))
+                          .map((quoteDetail, i) => (
+                            <TableRow key={i}>
+                              <TableCell component="th" scope="row">
+                                {quoteDetail.Description}
+                              </TableCell>
+                              {quotes.map((quote: any) => {
+                                return quote.quoteDetails
+                                  .filter(
+                                    (item: QuoteDetail) =>
+                                      quoteDetail.Description === item.Description &&
+                                      quoteDetail.CostUnit === item.CostUnit,
+                                  )
+                                  .map((quoteDetailInstance: QuoteDetail, i: number) => (
+                                    <Fragment key={i}>
+                                      <TableCell className={classes.currencyCell}>
+                                        {quoteDetailInstance.Currency !== 'incl.' ? quoteDetailInstance.Currency : ''}
+                                      </TableCell>
+                                      <TableCell>
+                                        {quoteDetailInstance.Currency === 'incl.' ? quoteDetailInstance.Currency : ''}{' '}
+                                        {quoteDetailInstance.CostValue} {quoteDetailInstance.CostUnit}
+                                      </TableCell>
+                                    </Fragment>
+                                  ));
+                              })}
+                            </TableRow>
+                          ))}
+                        <TableRow>
+                          <TableCell component="th" scope="row">
+                            Service Details
+                          </TableCell>
+                          {quotes.map((quote: any) => (
+                            <Fragment>
+                              <TableCell className={classes.currencyCell}></TableCell>
+                              <TableCell key={quote.QuoteNumber}>
+                                {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
+                                {quote.serviceDetails[0].TransitTime} days
+                              </TableCell>
+                            </Fragment>
+                          ))}
+                        </TableRow>
+                      </TableBody>
+                      <TableFooter>
+                        <TableRow>
+                          <TableCell />
 
-                        {quotes.map(quote => (
-                          <Fragment>
-                            <TableCell />
-                            <TableCell key={quote.id}>
-                              <Button
-                                color="primary"
-                                variant="outlined"
-                                component={RouterLink}
-                                size="small"
-                                to={`/quotes/${quote.id}`}
-                              >
-                                View more
-                              </Button>
-                              <Button
-                                color="primary"
-                                variant="contained"
-                                component={RouterLink}
-                                size="small"
-                                to={`/quotes/${quote.id}`}
-                                style={{ marginLeft: '4px' }}
-                              >
-                                Request Booking
-                              </Button>
-                            </TableCell>
-                          </Fragment>
-                        ))}
-                      </TableRow>
-                    </TableFooter>
-                  </Table>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-            </Paper>
-          ))}
+                          {quotes.map(quote => (
+                            <Fragment>
+                              <TableCell />
+                              <TableCell key={quote.id}>
+                                <Button
+                                  color="primary"
+                                  variant="outlined"
+                                  component={RouterLink}
+                                  size="small"
+                                  to={`/quotes/${quote.id}`}
+                                >
+                                  View more
+                                </Button>
+                                <Button
+                                  color="primary"
+                                  variant="contained"
+                                  component={RouterLink}
+                                  size="small"
+                                  to={`/quotes/${quote.id}`}
+                                  style={{ marginLeft: '4px' }}
+                                >
+                                  Request Booking
+                                </Button>
+                              </TableCell>
+                            </Fragment>
+                          ))}
+                        </TableRow>
+                      </TableFooter>
+                    </Table>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              </Paper>
+            );
+          })}
         </CardContent>
       </Card>
     </Container>

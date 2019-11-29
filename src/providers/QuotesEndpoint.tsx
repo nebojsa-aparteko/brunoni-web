@@ -5,8 +5,11 @@ import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
+import set from 'lodash/fp/set';
 import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
+import mapValues from 'lodash/fp/mapValues';
+import keys from 'lodash/fp/keys';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
 import partialRight from 'lodash/fp/partialRight';
@@ -39,6 +42,7 @@ export interface QuoteGroup {
   origin: Port;
   destination: Port;
   containers: Container[];
+  commodityTypes: CommodityType[];
   quotes: Quote[];
 }
 
@@ -52,6 +56,7 @@ export interface Quote {
   origin: Port;
   destination: Port;
   containers: Container[];
+  commodityTypes?: CommodityType[];
   quoteDetails: QuoteDetail[];
   costDetailRemarks: CostDetailRemark[];
   serviceDetails: ServiceDetail[];
@@ -126,6 +131,9 @@ const normalizeQuoteGroups = (
   );
 
   const normalizeContainers = flow(asArray, map(normalizeContainer));
+  const uniqueCommodityTypes = flow(map(get('commodityType')), uniqBy('id'));
+
+  // commodityTypes: uniqBy('id') ( values(mapValues(get('commodityType')) (normalizedQuote.containers)  )),
 
   const normalizeQuote = flow(
     pickAndRename({
@@ -152,6 +160,8 @@ const normalizeQuoteGroups = (
     update('containers', normalizeContainers),
   );
 
+  // const uniqueCommTypes
+  // (quote) => uniqBy('id')(values(mapValues(get('commodityType'))(get('containers', quote))));
   const normalizeQuotes = flow(map(normalizeQuote), orderBy(get('validityPeriod.from'), 'asc'));
 
   const normalizeQuoteGroup = flow(
@@ -166,7 +176,9 @@ const normalizeQuoteGroups = (
       ),
     ),
     quotes => {
-      const normalizedQuotes = normalizeQuotes(quotes) as Quote[];
+      const normalizedQuotes = (normalizeQuotes(quotes) as Quote[]).map(quote => {
+        return set('commodityTypes', uniqueCommodityTypes(quote.containers))(quote);
+      });
 
       const normalizedQuote = normalizedQuotes[0];
 
@@ -176,7 +188,7 @@ const normalizeQuoteGroups = (
         origin: normalizedQuote.origin,
         destination: normalizedQuote.destination,
         containers: normalizedQuote.containers,
-        commodityTypes: normalizedQuote.containers,
+        commodityTypes: normalizedQuote.commodityTypes,
         quotes: normalizedQuotes,
       };
     },

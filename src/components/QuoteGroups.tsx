@@ -62,27 +62,19 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                       <Grid container spacing={1}>
                         {/*TODO handle the flash of undefined text*/}
                         {quoteGroup.containers &&
-                          quoteGroup.containers.map(container => (
-                            <Grid item>{container && <Chip label={container!.containerType?.name} />}</Grid>
+                          quoteGroup.containers.map((container, index) => (
+                            <Grid item key={index}>{container && <Chip label={container!.containerType?.name} />}</Grid>
                           ))}
                       </Grid>
                     </TableCell>
                     <TableCell>
                       <Grid container spacing={1}>
-                        {quoteGroup.containers && (
-                          // quoteGroup.containers.map(container => (
-                          <Grid item>
-                            <Chip
-                              label={
-                                quoteGroup.containers[0].commodityType?.name
-                                  ? quoteGroup.containers[0].commodityType?.name
-                                  : quoteGroup.containers[0].commodityType?.id
-                              }
-                            />
-                          </Grid>
-                        )
-                        // ))}
-                        }
+                        {quoteGroup.commodityTypes &&
+                          quoteGroup.commodityTypes.map((commodityType, index) => (
+                            <Grid item key={index}>
+                              <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id} />
+                            </Grid>
+                          ))}
                       </Grid>
                     </TableCell>
                     <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>

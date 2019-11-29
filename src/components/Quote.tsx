@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -28,6 +28,7 @@ import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import PrintIcon from '@material-ui/icons/Print';
 import { Link as RouterLink } from 'react-router-dom';
 import formatDate from 'date-fns/format';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 interface Props {
   id: string;
@@ -44,6 +45,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 const handlePrint = () => {
   window.print();
 };
+
+function ScrollToTopOnMount() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return null;
+}
 
 const Quote: React.FC<Props> = ({ id }) => {
   const classes = useStyles();
@@ -87,8 +96,20 @@ const Quote: React.FC<Props> = ({ id }) => {
 
   return (
     <Container maxWidth="lg">
+      <ScrollToTopOnMount />
       <Card className={classes.root}>
         <CardHeader
+          avatar={
+            <IconButton
+              aria-label="back button"
+              color="primary"
+              component={RouterLink}
+              size="small"
+              to={`/quotes/groups/${quote.groupId}`}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          }
           action={
             <Box display="flex" displayPrint="none">
               <Button
