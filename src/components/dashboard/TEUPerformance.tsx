@@ -7,8 +7,11 @@ import mapValues from 'lodash/fp/mapValues';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
 import flatten from 'lodash/fp/flatten';
-import groupBy from 'lodash/fp/groupBy';
+import filter from 'lodash/fp/filter';
 import sum from 'lodash/fp/sum';
+import range from 'lodash/fp/range';
+import fromPairs from 'lodash/fp/fromPairs';
+import identity from 'lodash/fp/identity';
 import { Card, CardHeader, Divider, CardContent, useTheme, Box } from '@material-ui/core';
 import ChartsCircularProgress from './ChartsCircularProgress';
 
@@ -17,15 +20,28 @@ interface Props {
   year: number;
 }
 
+const mergeCarrierMonthlyPerformances = (carrierMonthlyPerformances: Array<{ [key: number]: any[] }>) =>
+  flow(
+    map((month: number) => [
+      month,
+      flow(
+        map((carrierMonthlyPerformance?: { [key: number]: any[] }) => (carrierMonthlyPerformance || {})[month]),
+        flatten,
+      )(carrierMonthlyPerformances),
+    ]),
+    fromPairs,
+    mapValues(filter(identity)),
+  )(range(1, 13));
+
 const normalizeByYear = (year: number) =>
   flow(
     get('TEU'),
     values,
     flatten,
     map(get(String(year))),
-    flatten,
-    groupBy('Month'),
-    mapValues(flow(map(flow(get('Details.Amount'), Number)), sum)),
+    mergeCarrierMonthlyPerformances,
+    values,
+    mapValues(flow(map(flow(get('Amount'), Number)), sum)),
     values,
   );
 

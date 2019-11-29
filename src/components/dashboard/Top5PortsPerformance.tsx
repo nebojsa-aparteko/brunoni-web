@@ -17,7 +17,6 @@ import makeStyles from '@material-ui/styles/makeStyles';
 import Ports from '../../contexts/Ports';
 import filter from 'lodash/fp/filter';
 import Port from '../../model/Port';
-import logAs from '../../utilities/logAs';
 import TextSkeleton from '../TextSkeleton';
 
 interface Props {
@@ -37,7 +36,8 @@ const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
     values,
     map(get(String(year))),
     flatten,
-    map(get('Details')),
+    map(values),
+    flatten,
     flatten,
     groupBy('LocationType'),
     mapValues(
@@ -47,8 +47,7 @@ const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
         toPairs,
         orderBy(1, 'desc'),
         slice(0, 5),
-        logAs('ports12'),
-        map(([key, value]) => {
+        map(([key, value]: [any, any]) => {
           if (ports) {
             const portDetails: Port = filter((element: any) => element.id === key)(ports)[0];
             return [`${portDetails.city}, ${portDetails.country}`, value];
@@ -69,16 +68,14 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
       </colgroup>
       <TableBody>
         {data
-          ? data.map((item, index) => {
-              return (
-                <TableRow key={index}>
-                  <TableCell className={classes.tableCell} component="th" scope="row">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell component="th" scope="row">{`${item[0]} (${item[1]})`}</TableCell>
-                </TableRow>
-              );
-            })
+          ? data.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell className={classes.tableCell} component="th" scope="row">
+                  {index + 1}
+                </TableCell>
+                <TableCell component="th" scope="row">{`${item[0]} (${item[1]})`}</TableCell>
+              </TableRow>
+            ))
           : [...Array(5)].map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
@@ -97,11 +94,11 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
 const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const ports = useContext(Ports);
 
-  const data = useMemo(() => {
-    const topPorts = extractPortsAggregatedData(year, ports)(clientPerformance);
-    console.log('topPORTS', topPorts);
-    return topPorts;
-  }, [year, clientPerformance, ports]);
+  const data = useMemo(() => extractPortsAggregatedData(year, ports)(clientPerformance), [
+    year,
+    clientPerformance,
+    ports,
+  ]);
 
   return (
     <Grid container spacing={2}>

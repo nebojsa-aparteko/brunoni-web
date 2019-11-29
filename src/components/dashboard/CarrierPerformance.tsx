@@ -4,6 +4,8 @@ import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';
 import keys from 'lodash/fp/keys';
 import sum from 'lodash/fp/sum';
+import values from 'lodash/fp/values';
+import flatten from 'lodash/fp/flatten';
 import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Doughnut } from 'react-chartjs-2';
@@ -26,7 +28,9 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     const performance = map((carrier: string) => {
       return flow(
         get(['TEU', carrier, String(year)]),
-        map(flow(get(['Details', 'Amount']), Number)),
+        values,
+        flatten,
+        map(flow(get('Amount'), Number)),
         sum,
       )(clientPerformance);
     })(carriers);

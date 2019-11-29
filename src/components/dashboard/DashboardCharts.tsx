@@ -9,6 +9,7 @@ import groupBy from 'lodash/fp/groupBy';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
 import head from 'lodash/fp/head';
+import flatten from 'lodash/fp/flatten';
 import useEndpoint from '../../hooks/useEndpoint';
 import Page from '../quotes/Page';
 import TEUPerformance from './TEUPerformance';
@@ -37,8 +38,15 @@ const normalizeClientPerformance = flow(
             flow(
               head,
               get('Data'),
+              asArray,
               groupBy('Year'),
-              mapValues(map(flow(pick(['Month', 'Details']), update('Month', Number)))),
+              mapValues(
+                flow(
+                  map(flow(pick(['Month', 'Details']), update('Month', Number))),
+                  groupBy('Month'),
+                  mapValues(flow(map(flow(get('Details'), asArray)), flatten)),
+                ),
+              ),
             ),
           ),
         ),
