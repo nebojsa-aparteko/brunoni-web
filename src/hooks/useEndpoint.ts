@@ -46,7 +46,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
         }
       } catch (e) {
         setError('Something went wrong. Please try again later.');
-        console.error('Failed to request the login email', e);
+        console.error('Failed to perform request', e);
       } finally {
         setBusy(false);
       }
