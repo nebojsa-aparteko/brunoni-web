@@ -14,6 +14,12 @@ interface Props<T> extends InputProps<T> {
   setOpen: (open: boolean) => void;
 }
 
+const useStyles = makeStyles({
+  input: {
+    flexWrap: 'nowrap',
+  },
+});
+
 export default function SelectInput<T>({
   label,
   options,
@@ -24,6 +30,7 @@ export default function SelectInput<T>({
   value,
   onChange,
 }: Props<T>) {
+  const classes = useStyles();
   const loading = open && !options;
 
   return (
@@ -53,6 +60,7 @@ export default function SelectInput<T>({
                 {params.InputProps.endAdornment}
               </React.Fragment>
             ),
+            className: classes.input,
           }}
         />
       )}
