@@ -67,6 +67,11 @@ const clipboardCopyBodyStyles = makeStyles(() => ({
   },
 }));
 
+const paragraphStyles = {
+  fontFamily: 'Calibry, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '11px',
+};
+
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
 
 const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) => {
@@ -74,7 +79,7 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
 
   return (
     <Fragment>
-      <p className={classes.paragraph}>
+      <p style={paragraphStyles}>
         {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr} <br />
         {route.OriginInfo.Port.HarbourName}, {route.OriginInfo.Port.Land} ETS{' '}
         {formatDateString(route.OriginInfo.DepartureDate)}
@@ -83,7 +88,7 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
         {formatDateString(route.DestinationInfo.ArrivalDate)}
         <br />
       </p>
-      <p className={classes.paragraph}>
+      <p style={paragraphStyles}>
         {route.Deadlines.flatMap(deadline => (
           <Fragment>
             {deadline.Typ} closing - {deadline.Time}
@@ -91,17 +96,17 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
           </Fragment>
         ))}
       </p>
-      <p className={classes.paragraph}>
+      <p style={paragraphStyles}>
         Origin Address:
         <br />
         <span dangerouslySetInnerHTML={{ __html: route.OriginInfo.Port.PortName }} />
       </p>
-      <p className={classes.paragraph}>
+      <p style={paragraphStyles}>
         Destination Address:
         <br />
         <span dangerouslySetInnerHTML={{ __html: route.DestinationInfo.Port.PortName }} />
       </p>
-      <p className={classes.paragraph}>
+      <p style={paragraphStyles}>
         Source:{' '}
         {process.env.REACT_APP_BRAND === 'brunoni' ? (
           <a href="https://mybrunoni.ch">mybrunoni.ch</a>
