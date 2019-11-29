@@ -73,7 +73,9 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
                 <TableCell className={classes.tableCell} component="th" scope="row">
                   {index + 1}
                 </TableCell>
-                <TableCell component="th" scope="row">{`${item[0]} (${item[1]})`}</TableCell>
+                <TableCell component="th" scope="row">{`${item[0]} (${
+                  item[1] === 'UNITED ARAB EMIRATES' ? 'UAE' : item[1]
+                })`}</TableCell>
               </TableRow>
             ))
           : [...Array(5)].map((_, i) => (
