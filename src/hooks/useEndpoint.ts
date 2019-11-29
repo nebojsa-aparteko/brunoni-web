@@ -38,7 +38,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
 
         if (response.ok) {
           const body = await response.json();
-          // setResult(bodyTransform(body as B));
+          setResult(bodyTransform(body as B));
         } else {
           const body = await response.json();
           setError(body.error);
