@@ -32,6 +32,7 @@ import Carriers from '../../contexts/Carriers';
 import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 interface Props {
   route?: RouteSearchResult;
@@ -179,7 +180,11 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
   return (
     <Box>
       <ExpansionPanel TransitionProps={{ unmountOnExit: true }} disabled={disabled} style={expansionPanelStyle}>
-        <ExpansionPanelSummary aria-controls="panel1c-content" style={expansionPanelSummaryStyle}>
+        <ExpansionPanelSummary
+          aria-controls="panel1c-content"
+          style={expansionPanelSummaryStyle}
+          expandIcon={<ExpandMoreIcon />}
+        >
           <Grid container spacing={2}>
             <Grid item md={6} sm={12}>
               <Typography variant="subtitle2" display="block" gutterBottom>

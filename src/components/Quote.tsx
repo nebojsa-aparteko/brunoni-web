@@ -112,7 +112,9 @@ const Quote: React.FC<Props> = ({ id }) => {
               </Button>
             </Box>
           }
-          title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}`}
+          title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}, ${
+            quote.destination.country
+          }`}
           subheader={formatDate(quote.dateIssued, 'd. MMMM yyyy')}
         />
         <CardContent>
