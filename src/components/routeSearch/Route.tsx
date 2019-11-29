@@ -189,8 +189,8 @@ const Route: React.FC<Props> = ({ route }) => {
             <Grid item md={3} sm={12}>
               <InfoBoxItem
                 title="Vessel"
-                label1={route!.OriginInfo.VoyageInfo.VesselName}
-                label2={route!.OriginInfo.VoyageInfo.VoyageNr}
+                label1={route?.OriginInfo.VoyageInfo.VesselName}
+                label2={route?.OriginInfo.VoyageInfo.VoyageNr}
                 gutterBottom
               />
             </Grid>
