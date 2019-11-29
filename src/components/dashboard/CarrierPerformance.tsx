@@ -39,7 +39,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
 
     const labels = carriers.map(key => {
       const carrierInfo = filter((element: any) => element.id === key)(cs)[0];
-      return carrierInfo ? carrierInfo.name : '';
+      return carrierInfo ? carrierInfo.name.toUpperCase() : '';
     });
 
     const datasets = [

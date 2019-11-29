@@ -9,7 +9,7 @@ import values from 'lodash/fp/values';
 import flatten from 'lodash/fp/flatten';
 import groupBy from 'lodash/fp/groupBy';
 import sum from 'lodash/fp/sum';
-import { Card, CardHeader, Divider, CardContent, useTheme } from '@material-ui/core';
+import { Card, CardHeader, Divider, CardContent, useTheme, Box } from '@material-ui/core';
 import ChartsCircularProgress from './ChartsCircularProgress';
 
 interface Props {
@@ -56,6 +56,10 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       labels,
     };
   }, [clientPerformance, theme.palette.primary.main, year]);
+
+  const dataByMonth = get('datasets.0.data')(data);
+
+  const total = useMemo(() => (dataByMonth.length > 0 ? sum(dataByMonth) : undefined), [dataByMonth]);
 
   const options = {
     responsive: true,
@@ -126,9 +130,19 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       },
     },
   };
+
+  const header = (
+    <Box component="span" display="flex">
+      <Box component="span" flex={1}>
+        TEU Performance
+      </Box>
+      {total !== undefined && <Box component="span">Total: {total}</Box>}
+    </Box>
+  );
+
   return (
     <Card>
-      <CardHeader title="TEU Performance" />
+      <CardHeader title={header} />
       <Divider />
       <CardContent>
         {!data ? (

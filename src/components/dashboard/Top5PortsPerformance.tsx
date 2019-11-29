@@ -14,11 +14,11 @@ import orderBy from 'lodash/fp/orderBy';
 import TableBody from '@material-ui/core/TableBody';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
-import { Skeleton } from '@material-ui/lab';
 import Ports from '../../contexts/Ports';
 import filter from 'lodash/fp/filter';
 import Port from '../../model/Port';
 import logAs from '../../utilities/logAs';
+import TextSkeleton from '../TextSkeleton';
 
 interface Props {
   clientPerformance: any;
@@ -58,18 +58,10 @@ const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
     ),
   );
 
-const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
-  const ports = useContext(Ports);
-
-  const data = useMemo(() => {
-    const topPorts = extractPortsAggregatedData(year, ports)(clientPerformance);
-    console.log('topPORTS', topPorts);
-    return topPorts;
-  }, [year, clientPerformance, ports]);
-
+const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | React.ReactNode]> }> = ({ data }) => {
   const classes = useStyles();
 
-  const top5TableRendeder = (data: any) => (
+  return (
     <Table size="small" aria-label="a dense table">
       <colgroup>
         <col style={{ width: '10%' }} />
@@ -77,7 +69,7 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       </colgroup>
       <TableBody>
         {data
-          ? data.map((item: any, index: number) => {
+          ? data.map((item, index) => {
               return (
                 <TableRow key={index}>
                   <TableCell className={classes.tableCell} component="th" scope="row">
@@ -90,16 +82,26 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           : [...Array(5)].map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
-                  <Skeleton width={12} height={20} style={{ margin: 0 }} />
+                  <TextSkeleton width={12} />
                 </TableCell>
                 <TableCell>
-                  <Skeleton width={80} height={20} style={{ margin: 0 }} />
+                  <TextSkeleton width={[60, 90]} />
                 </TableCell>
               </TableRow>
             ))}
       </TableBody>
     </Table>
   );
+};
+
+const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
+  const ports = useContext(Ports);
+
+  const data = useMemo(() => {
+    const topPorts = extractPortsAggregatedData(year, ports)(clientPerformance);
+    console.log('topPORTS', topPorts);
+    return topPorts;
+  }, [year, clientPerformance, ports]);
 
   return (
     <Grid container spacing={2}>
@@ -107,14 +109,18 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         <Card>
           <CardHeader title="Top 5 Origins" />
           <Divider />
-          <CardContent>{top5TableRendeder(data['POL'])}</CardContent>
+          <CardContent>
+            <Top5Ports data={data['POL']} />
+          </CardContent>
         </Card>
       </Grid>
       <Grid item xs={6}>
         <Card>
           <CardHeader title="Top 5 Destinations" />
           <Divider />
-          <CardContent>{top5TableRendeder(data['POD'])}</CardContent>
+          <CardContent>
+            <Top5Ports data={data['POD']} />
+          </CardContent>
         </Card>
       </Grid>
     </Grid>
