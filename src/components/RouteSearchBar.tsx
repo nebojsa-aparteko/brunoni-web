@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
-import set from 'lodash/set';
+import set from 'lodash/fp/set';
 import { Theme, makeStyles, Grid, Button, Paper, CircularProgress } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
@@ -54,10 +54,10 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
   const searchButton = useRef<HTMLButtonElement>();
 
   const { originPort, destinationPort, date, weeks } = value;
-  const setOriginPort = (port: Port) => onChange(set(value, 'originPort', port));
-  const setDestinationPort = (port: Port) => onChange(set(value, 'destinationPort', port));
-  const setDate = (date: Date) => onChange(set(value, 'date', date));
-  const setWeeks = (weeks: number) => onChange(set(value, 'weeks', weeks));
+  const setOriginPort = (port: Port) => onChange(set('originPort', port)(value));
+  const setDestinationPort = (port: Port) => onChange(set('destinationPort', port)(value));
+  const setDate = (date: Date) => onChange(set('date', date)(value));
+  const setWeeks = (weeks: number) => onChange(set('weeks', weeks)(value));
 
   useEffect(() => {
     const focusSearch = () =>
