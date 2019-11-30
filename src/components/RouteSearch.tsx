@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -6,7 +6,6 @@ import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import { Box, Grid, makeStyles, Paper, Theme } from '@material-ui/core';
-import RouteSearchParams from '../model/route-search/RouteSearchParams';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
@@ -18,6 +17,7 @@ import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import withTestData from '../utilities/withTestData';
 import useRequest, { Callback, RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
+import { RouteSearchContext } from '../contexts/RouteSearchContext';
 
 interface Props {}
 
@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   content: {
     marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   sidebar: {
     marginTop: theme.spacing(2),
@@ -73,9 +74,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
-  const [params, setParams] = useState<RouteSearchParams>({ date: new Date(), weeks: 4 });
+
+  const [params, setParams] = useContext(RouteSearchContext);
+  console.log('remembered search', params);
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
   const [visibility, setVisibility] = useState(false);
+
+  useEffect(() => {
+    console.log('params', params);
+  });
 
   const [busy, error, result, search] = useRequest(() => {
     const search = querySting.stringify({

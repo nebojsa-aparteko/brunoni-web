@@ -20,6 +20,8 @@ import UserContext from './contexts/User';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
+import RouteSearch from './components/RouteSearch';
+import { RouteSearchProvider } from './contexts/RouteSearchContext';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -45,7 +47,9 @@ const render = (user: firebase.User | null) => {
                       <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
                         <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
                           <QuotesEndpointProvider>
-                            <App />
+                            <RouteSearchProvider>
+                              <App />
+                            </RouteSearchProvider>
                           </QuotesEndpointProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>

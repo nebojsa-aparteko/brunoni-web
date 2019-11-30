@@ -1,20 +1,23 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
+import merge from 'lodash/fp/merge';
 import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box, Paper } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
-import GetQuotesParams from '../model/get-quotes/GetQuotesParams';
+import DetailedRouteSearchParams from '../model/get-quotes/DetailedRouteSearchParams';
 import ContainerModel from '../model/Container';
 import ListInput from './inputs/ListInput';
 import ContainerInput from './inputs/ContainerInput';
 import Container from './Container';
+import ContainerType from '../model/Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
+import { RouteSearchContext } from '../contexts/RouteSearchContext';
 
 interface Props {}
 
@@ -48,7 +51,8 @@ const GetQuotes: React.FC<Props> = () => {
   const [user] = useUser();
   const history = useHistory();
   const { refresh } = useContext(QuotesEndpointContext);
-  const [value, onChange] = useState<GetQuotesParams>({ date: new Date(), weeks: 4, containers: [] });
+
+  const [value, onChange] = useContext(RouteSearchContext);
   const [busy, setBusy] = useState(false);
   const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
@@ -61,6 +65,7 @@ const GetQuotes: React.FC<Props> = () => {
   const addButton = useRef<HTMLButtonElement>();
 
   const { originPort, destinationPort, date, weeks, containers } = value;
+  console.log('value', value);
   const setOriginPort = (port: Port) => onChange(set('originPort', port)(value));
   const setDestinationPort = (port: Port) => onChange(set('destinationPort', port)(value));
   const setDate = (date: Date) => onChange(set('date', date)(value));
@@ -90,7 +95,7 @@ const GetQuotes: React.FC<Props> = () => {
       destination: destinationPort!.id,
       date: date.toISOString(),
       weeks: Number(weeks),
-      containers: containers.map(container => ({
+      containers: containers.map((container: ContainerType) => ({
         type: container.containerType!.id,
         commodity: container.commodityType!.id,
         location: container.location?.id,
@@ -120,7 +125,7 @@ const GetQuotes: React.FC<Props> = () => {
             destination: destinationPort!.id,
             date: date.toISOString(),
             weeks: Number(weeks),
-            containers: containers.map(container => ({
+            containers: containers.map((container: ContainerType) => ({
               type: container.containerType!.id,
               commodity: container.commodityType!.id,
               location: container.location?.id,

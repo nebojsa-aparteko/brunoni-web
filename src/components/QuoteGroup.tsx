@@ -29,12 +29,19 @@ import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
 import toPairs from 'lodash/fp/toPairs';
 import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
+import merge from 'lodash/fp/merge';
+import flatten from 'lodash/fp/flatten';
+import uniqBy from 'lodash/fp/uniqBy';
+import uniqWith from 'lodash/fp/uniqWith';
+import values from 'lodash/fp/values';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
 import { Quote, QuoteDetail } from '../providers/QuotesEndpoint';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import logAs from '../utilities/logAs';
 
 interface Props {
   id: string;
@@ -55,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflowX: 'auto',
   },
   title: {
-    fontSize: '1.4em',
+    fontSize: '1.2em',
   },
 }));
 
@@ -111,6 +118,15 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
             </Grid>
           </Box>
           {quotesByCarrier.map(([carrierId, quotes]) => {
+            // need to find all of the quoteDetail items across provided quotes
+            const quoteDetailItemsMerged = flow(
+              map(get('quoteDetails')),
+              flatten,
+              uniqWith(
+                (arrVal: QuoteDetail, othVal: QuoteDetail) =>
+                  arrVal.Description === othVal.Description && arrVal.CostValue === othVal.CostValue,
+              ),
+            )(quotes) as QuoteDetail[];
             return (
               <Paper id={carrierId}>
                 <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
@@ -137,8 +153,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {quotes[0].quoteDetails
-                          .filter(quoteDetail => quoteDetailFilterList.includes(quoteDetail.Description))
+                        {quoteDetailItemsMerged
+                          .filter(quoteDetail => quoteDetailFilterList.includes(quoteDetail.Description.toLowerCase()))
                           .map((quoteDetail, i) => (
                             <TableRow key={i}>
                               <TableCell component="th" scope="row">

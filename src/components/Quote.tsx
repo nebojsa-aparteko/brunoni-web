@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(3),
   },
   title: {
-    fontSize: '1.4em',
+    fontSize: '1.2em',
   },
 }));
 

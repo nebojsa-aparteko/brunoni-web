@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server';
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   Divider,
   ExpansionPanel,
@@ -33,6 +34,9 @@ import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Link as RouterLink } from 'react-router-dom';
+import parseDate from 'date-fns/parse';
+import { addDays } from 'date-fns';
 
 interface Props {
   route?: RouteSearchResult;
@@ -57,6 +61,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '.75em',
     height: '.75em',
     marginRight: theme.spacing(1),
+  },
+  scheduleDetailsActionButtonContainer: {
+    display: 'flex',
+    flexDirection: 'column-reverse',
   },
 }));
 
@@ -354,7 +362,7 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
             </ExpansionPanelDetails>
             <ExpansionPanelActions>
               <Grid container>
-                <Grid item>
+                <Grid item md={9} xs={12}>
                   <Box p={2}>
                     <Typography variant="subtitle2">
                       <Box paddingBottom={1}>SERVICE {route!.Service}</Box>
@@ -367,6 +375,15 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
                       </Box>
                     </Typography>
                   </Box>
+                </Grid>
+                <Grid item md={3} xs={12} className={classes.scheduleDetailsActionButtonContainer}>
+                  {parseDate(route?.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 6) && (
+                    <Box display="flex" flexDirection="row-reverse" m={2}>
+                      <Button component={RouterLink} to="/quotes/get" color="primary" variant="contained">
+                        Get Quote
+                      </Button>
+                    </Box>
+                  )}
                 </Grid>
               </Grid>
             </ExpansionPanelActions>
