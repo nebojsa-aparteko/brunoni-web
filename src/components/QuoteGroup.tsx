@@ -235,7 +235,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                     to={`/quotes/${quote.id}`}
                                     style={{ marginLeft: '4px' }}
                                   >
-                                    Request Booking
+                                    Book Now
                                   </Button>
                                 </TableCell>
                               </Fragment>

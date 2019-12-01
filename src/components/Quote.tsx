@@ -125,7 +125,7 @@ const Quote: React.FC<Props> = ({ id }) => {
                 size="small"
                 to={`/quotes/${quote.id}`}
               >
-                Request Booking
+                Book Now
               </Button>
               <Button
                 aria-label="print"
