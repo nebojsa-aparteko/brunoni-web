@@ -28,6 +28,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   tableCell: {
     maxWidth: '1em',
   },
+  tableCellFont: {
+    [theme.breakpoints.up('sm')]: {
+      fontSize: 10,
+    },
+    [theme.breakpoints.up('md')]: {
+      fontSize: 12,
+    },
+    [theme.breakpoints.up('lg')]: {
+      fontSize: 14,
+    },
+  },
 }));
 
 const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
@@ -73,7 +84,7 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
                 <TableCell className={classes.tableCell} component="th" scope="row">
                   {index + 1}
                 </TableCell>
-                <TableCell component="th" scope="row">{`${item[0]} (${
+                <TableCell component="th" scope="row" className={classes.tableCellFont}>{`${item[0]} (${
                   item[1] === 'UNITED ARAB EMIRATES' ? 'UAE' : item[1]
                 })`}</TableCell>
               </TableRow>
