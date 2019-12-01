@@ -73,7 +73,9 @@ const render = (user: firebase.User | null) => {
               <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                 <FirestoreCollectionProvider name="ports" context={PortsContext}>
                   <QuotesEndpointProvider>
-                    <App />
+                    <RouteSearchProvider>
+                      <App />
+                    </RouteSearchProvider>
                   </QuotesEndpointProvider>
                 </FirestoreCollectionProvider>
               </FirestoreCollectionProvider>

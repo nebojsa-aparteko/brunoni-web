@@ -377,7 +377,7 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
                   </Box>
                 </Grid>
                 <Grid item md={3} xs={12} className={classes.scheduleDetailsActionButtonContainer}>
-                  {parseDate(route?.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 7) && (
+                  {parseDate(route?.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), -6) && (
                     <Box display="flex" flexDirection="row-reverse" m={2}>
                       <Button component={RouterLink} to="/quotes/get" color="primary" variant="contained">
                         Request Booking
