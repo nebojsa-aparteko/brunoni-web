@@ -64,6 +64,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   title: {
     fontSize: '1.2em',
   },
+  buttonContainer: {
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3),
+    border: 'none',
+  },
+  noBorder: {
+    border: 'none',
+  },
 }));
 
 const QuoteGroup: React.FC<Props> = ({ id }) => {
@@ -124,7 +132,9 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
               flatten,
               uniqWith(
                 (arrVal: QuoteDetail, othVal: QuoteDetail) =>
-                  arrVal.Description === othVal.Description && arrVal.CostValue === othVal.CostValue,
+                  arrVal.Description === othVal.Description &&
+                  arrVal.CostUnit === othVal.CostUnit &&
+                  arrVal.Currency === othVal.Currency,
               ),
             )(quotes) as QuoteDetail[];
             return (
@@ -137,98 +147,103 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                   </ExpansionPanelSummary>
 
                   <ExpansionPanelDetails className={classes.tableScroll}>
-                    <Table size="small" aria-label="a dense table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell />
-                          {quotes.map(quote => (
-                            <Fragment>
-                              <TableCell className={classes.currencyCell}>Currency</TableCell>
-                              <TableCell key={quote.id} style={{ minWidth: '282px' }}>
-                                {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
-                                {formatDate(quote.validityPeriod.to, 'd. MMMM')}
-                              </TableCell>
-                            </Fragment>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {quoteDetailItemsMerged
-                          .filter(quoteDetail => quoteDetailFilterList.includes(quoteDetail.Description.toLowerCase()))
-                          .map((quoteDetail, i) => (
-                            <TableRow key={i}>
-                              <TableCell component="th" scope="row">
-                                {quoteDetail.Description}
-                              </TableCell>
-                              {quotes.map((quote: any) => {
-                                return quote.quoteDetails
-                                  .filter(
-                                    (item: QuoteDetail) =>
-                                      quoteDetail.Description === item.Description &&
-                                      quoteDetail.CostUnit === item.CostUnit,
-                                  )
-                                  .map((quoteDetailInstance: QuoteDetail, i: number) => (
-                                    <Fragment key={i}>
-                                      <TableCell className={classes.currencyCell}>
-                                        {quoteDetailInstance.Currency !== 'incl.' ? quoteDetailInstance.Currency : ''}
-                                      </TableCell>
-                                      <TableCell>
-                                        {quoteDetailInstance.Currency === 'incl.' ? quoteDetailInstance.Currency : ''}{' '}
-                                        {quoteDetailInstance.CostValue} {quoteDetailInstance.CostUnit}
-                                      </TableCell>
-                                    </Fragment>
-                                  ));
-                              })}
-                            </TableRow>
-                          ))}
-                        <TableRow>
-                          <TableCell component="th" scope="row">
-                            Service Details
-                          </TableCell>
-                          {quotes.map((quote: any) => (
-                            <Fragment>
-                              <TableCell className={classes.currencyCell} />
-                              <TableCell key={quote.QuoteNumber}>
-                                {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
-                                {quote.serviceDetails[0].TransitTime} days
-                              </TableCell>
-                            </Fragment>
-                          ))}
-                        </TableRow>
-                      </TableBody>
-                      <TableFooter>
-                        <TableRow>
-                          <TableCell />
+                    <Container>
+                      <Table size="small" aria-label="a dense table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell />
+                            {quotes.map((quote, index) => (
+                              <Fragment key={index}>
+                                <TableCell className={classes.currencyCell}>Currency</TableCell>
+                                <TableCell key={quote.id} style={{ minWidth: '282px' }}>
+                                  {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
+                                  {formatDate(quote.validityPeriod.to, 'd. MMMM')}
+                                </TableCell>
+                              </Fragment>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {quoteDetailItemsMerged
+                            .filter(quoteDetail =>
+                              quoteDetailFilterList.includes(quoteDetail.Description.toLowerCase()),
+                            )
+                            .map((quoteDetail, i) => (
+                              <TableRow key={i}>
+                                <TableCell component="th" scope="row">
+                                  {quoteDetail.Description}
+                                </TableCell>
+                                {quotes.map((quote: any) => {
+                                  return quote.quoteDetails
+                                    .filter(
+                                      (item: QuoteDetail) =>
+                                        quoteDetail.Description === item.Description &&
+                                        quoteDetail.CostUnit === item.CostUnit,
+                                    )
+                                    .map((quoteDetailInstance: QuoteDetail, i: number) => (
+                                      <Fragment key={i}>
+                                        <TableCell className={classes.currencyCell}>
+                                          {quoteDetailInstance.Currency !== 'incl.' ? quoteDetailInstance.Currency : ''}
+                                        </TableCell>
+                                        <TableCell>
+                                          {quoteDetailInstance.Currency === 'incl.' ? quoteDetailInstance.Currency : ''}{' '}
+                                          {quoteDetailInstance.CostValue} {quoteDetailInstance.CostUnit}
+                                        </TableCell>
+                                      </Fragment>
+                                    ));
+                                })}
+                              </TableRow>
+                            ))}
 
-                          {quotes.map(quote => (
-                            <Fragment>
-                              <TableCell />
-                              <TableCell key={quote.id}>
-                                <Button
-                                  color="primary"
-                                  variant="outlined"
-                                  component={RouterLink}
-                                  size="small"
-                                  to={`/quotes/${quote.id}`}
-                                >
-                                  View more
-                                </Button>
-                                <Button
-                                  color="primary"
-                                  variant="contained"
-                                  component={RouterLink}
-                                  size="small"
-                                  to={`/quotes/${quote.id}`}
-                                  style={{ marginLeft: '4px' }}
-                                >
-                                  Request Booking
-                                </Button>
-                              </TableCell>
-                            </Fragment>
-                          ))}
-                        </TableRow>
-                      </TableFooter>
-                    </Table>
+                          <TableRow>
+                            <TableCell component="th" scope="row">
+                              Service Details
+                            </TableCell>
+                            {quotes.map((quote: any) => (
+                              <Fragment>
+                                <TableCell className={classes.currencyCell} />
+                                <TableCell key={quote.QuoteNumber}>
+                                  {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
+                                  {quote.serviceDetails[0].TransitTime} days
+                                </TableCell>
+                              </Fragment>
+                            ))}
+                          </TableRow>
+                        </TableBody>
+                        <TableFooter>
+                          <TableRow>
+                            <TableCell className={classes.noBorder} />
+
+                            {quotes.map(quote => (
+                              <Fragment key={quote.id}>
+                                <TableCell className={classes.noBorder} />
+                                <TableCell className={classes.buttonContainer}>
+                                  <Button
+                                    color="primary"
+                                    variant="outlined"
+                                    component={RouterLink}
+                                    size="small"
+                                    to={`/quotes/${quote.id}`}
+                                  >
+                                    View more
+                                  </Button>
+                                  <Button
+                                    color="primary"
+                                    variant="contained"
+                                    component={RouterLink}
+                                    size="small"
+                                    to={`/quotes/${quote.id}`}
+                                    style={{ marginLeft: '4px' }}
+                                  >
+                                    Request Booking
+                                  </Button>
+                                </TableCell>
+                              </Fragment>
+                            ))}
+                          </TableRow>
+                        </TableFooter>
+                      </Table>
+                    </Container>
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
               </Paper>
