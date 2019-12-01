@@ -18,6 +18,7 @@ import withTestData from '../utilities/withTestData';
 import useRequest, { Callback, RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
+import ScrollToTop from './ScrollToTop';
 
 interface Props {}
 
@@ -69,6 +70,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   wrapper: {
     position: 'relative',
+  },
+  goTop: {
+    position: 'fixed',
+    bottom: '30px',
+    right: '30px',
   },
 }));
 
@@ -168,6 +174,7 @@ const RouteSearch: React.FC<Props> = () => {
 
                   <Grid item xs={12}>
                     {results ? results.Routes.map((route, i) => <Route key={i} route={route} />) : <Route />}
+                    <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
                   </Grid>
                 </Grid>
               </Grid>
