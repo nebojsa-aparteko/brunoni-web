@@ -17,8 +17,7 @@ import {
   Theme,
   Typography,
   useTheme,
-  Menu,
-  MenuItem,
+  ListItemText,
 } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import ItineraryItem from '../ItineraryItem';
@@ -36,12 +35,17 @@ import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link as RouterLink, Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import parseDate from 'date-fns/parse';
 import { addDays } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { RouteInfoBodyHTML, routeInfoBodyPlainText, routeInfoEmailBody } from './RouteBodyTextSharePrep';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 interface Props {
   route?: RouteSearchResult;
@@ -305,15 +309,17 @@ const Route: React.FC<Props> = ({ route }) => {
                     open={Boolean(moreAnchorEl)}
                     onClose={handleClose}
                   >
-                    <MenuItem onClick={handleClose}>
-                      <Button color="primary" variant="contained" href={buildMailToLink(route)} target="_blank">
-                        Book Now
-                      </Button>
+                    <MenuItem component="a" href={buildMailToLink(route)}>
+                      <ListItemIcon>
+                        <DirectionsBoatIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary="Book Now" />
                     </MenuItem>
-                    <MenuItem onClick={handleClose}>
-                      <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/get`}>
-                        Request Quote
-                      </Button>
+                    <MenuItem component={RouterLink} to={`/quotes/get`}>
+                      <ListItemIcon>
+                        <ListAltIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary="Request Quote" />
                     </MenuItem>
                   </Menu>
                 </Box>
