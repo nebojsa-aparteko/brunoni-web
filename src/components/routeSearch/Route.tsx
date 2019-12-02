@@ -37,6 +37,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link as RouterLink } from 'react-router-dom';
 import parseDate from 'date-fns/parse';
 import { addDays } from 'date-fns';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 interface Props {
   route?: RouteSearchResult;
@@ -118,6 +119,10 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
   );
 };
 
+const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault();
+};
+
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -194,7 +199,7 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
           expandIcon={<ExpandMoreIcon />}
         >
           <Grid container spacing={2}>
-            <Grid item md={6} sm={12}>
+            <Grid item md={5} sm={12}>
               <Typography variant="subtitle2" display="block" gutterBottom>
                 <Box fontWeight="fontWeightBold">Carrier</Box>
               </Typography>
@@ -240,6 +245,11 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
                 />
               </Grid>
             )}
+            <Grid item md={1} sm={2}>
+              <IconButton aria-label="settings" onClick={onMoreButtonClick}>
+                <MoreVertIcon />
+              </IconButton>
+            </Grid>
 
             <Grid item xs={12}>
               <Divider />
