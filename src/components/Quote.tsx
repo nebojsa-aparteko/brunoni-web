@@ -143,10 +143,12 @@ const Quote: React.FC<Props> = ({ id }) => {
               </Button>
             </Box>
           }
-          title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}, ${
-            quote.destination.country
-          }`}
-          subheader={formatDate(quote.dateIssued, 'd. MMMM yyyy')}
+          title={
+            <Typography variant="h5">{`Quotation - ${quote.carrier.name || quote.carrier.id} - ${
+              quote.destination.city
+            }, ${quote.destination.country}`}</Typography>
+          }
+          subheader={<Typography variant="subtitle2">{`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}</Typography>}
         />
         <CardContent>
           <Grid item xs={12}>

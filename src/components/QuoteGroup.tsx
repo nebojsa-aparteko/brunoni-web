@@ -1,12 +1,8 @@
-import React, { useContext, Fragment, useState, RefObject } from 'react';
+import React, { useContext, Fragment, useState } from 'react';
 import formatDate from 'date-fns/format';
 import {
-  Avatar,
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Chip,
   Container,
   ExpansionPanel,
@@ -31,19 +27,14 @@ import groupBy from 'lodash/fp/groupBy';
 import toPairs from 'lodash/fp/toPairs';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
-import merge from 'lodash/fp/merge';
 import flatten from 'lodash/fp/flatten';
-import uniqBy from 'lodash/fp/uniqBy';
 import uniqWith from 'lodash/fp/uniqWith';
-import values from 'lodash/fp/values';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
 import { Quote, QuoteDetail } from '../providers/QuotesEndpoint';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import logAs from '../utilities/logAs';
-import { Action } from 'material-table';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -199,19 +190,20 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
           ),
         )(quotes) as QuoteDetail[];
 
-            const handlePanelClick = () => {
-              setSelectedPanel(carrierId);
-              window.scrollTo(0, 150);
-            };
+        const handlePanelClick = () => {
+          setSelectedPanel(carrierId);
+          window.scrollTo(0, 150);
+        };
 
         return (
           <Box id={carrierId} mb={5}>
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel == carrierId}>
-                  <ExpansionPanelSummary
-                    aria-controls="panel1c-content"
-                    expandIcon={<ExpandMoreIcon />}
-                    onClick={handlePanelClick}
-                  >
+            <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel == carrierId}>
+              <ExpansionPanelSummary
+                aria-controls="panel1c-content"
+                expandIcon={<ExpandMoreIcon />}
+                onClick={handlePanelClick}
+              >
+                <Typography variant="h4">{carrierId}</Typography>
               </ExpansionPanelSummary>
 
               <ExpansionPanelDetails className={classes.tableScroll}>
