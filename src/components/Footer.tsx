@@ -111,7 +111,8 @@ const Footer: React.FC<Props> = () => {
               <Box mb={4}>
                 <Typography variant="body2" style={{ opacity: 0.65 }}>
                   Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
-                  represent foreign shipping lines in Switzerland.
+                  represent foreign shipping lines in Switzerland.{' '}
+                  <Link href="https://www.brunoni.ch/index.php/company/history">Read more…</Link>
                 </Typography>
               </Box>
             </Grid>
