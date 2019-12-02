@@ -157,71 +157,67 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   return (
     <Container maxWidth="lg">
-      <Card className={classes.root}>
-        <CardHeader
-          classes={{ title: classes.title }}
-          avatar={
-            <IconButton
-              aria-label="back button"
-              color="primary"
-              component={RouterLink}
-              size="small"
-              to={`/quotes/groups`}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-          }
-          title={`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}
-          subheader={formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}
-        />
-        <CardContent>
-          <Box m={2}>
-            <Grid container spacing={2}>
-              {quoteGroup.containers.map((container, i) => (
-                <Grid item key={i}>
-                  <Chip
-                    label={
-                      (container.quantity > 1 ? container.quantity + ' x ' : '') +
-                      container!.containerType?.description +
-                      ', ' +
-                      container?.commodityType?.name
-                    }
-                  />
-                </Grid>
-              ))}
+      <Box display="flex" mt={6}>
+        <Box flexShrink="0">
+          <IconButton aria-label="back button" color="primary" component={RouterLink} to={`/quotes/groups`}>
+            <ArrowBackIcon />
+          </IconButton>
+        </Box>
+
+        <Box ml={2} display="flex" flexDirection="column" justifyContent="center">
+          <Typography variant="h5">{`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}</Typography>
+          <Typography variant="subtitle2">{`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}</Typography>
+        </Box>
+      </Box>
+
+      <Box mx={2} mt={2} mb={6}>
+        <Grid container spacing={2}>
+          {quoteGroup.containers.map((container, i) => (
+            <Grid item key={i}>
+              <Chip
+                label={
+                  (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                  container!.containerType?.description +
+                  ', ' +
+                  container?.commodityType?.name
+                }
+              />
             </Grid>
-          </Box>
-          {quotesByCarrier.map(([carrierId, quotes]) => {
-            // need to find all of the quoteDetail items across provided quotes
-            const quoteDetailItemsMerged = flow(
-              map(get('quoteDetails')),
-              flatten,
-              uniqWith(
-                (arrVal: QuoteDetail, othVal: QuoteDetail) =>
-                  arrVal.Description === othVal.Description &&
-                  arrVal.CostUnit === othVal.CostUnit &&
-                  arrVal.Currency === othVal.Currency,
-              ),
-            )(quotes) as QuoteDetail[];
+          ))}
+        </Grid>
+      </Box>
+      {quotesByCarrier.map(([carrierId, quotes]) => {
+        // need to find all of the quoteDetail items across provided quotes
+        const quoteDetailItemsMerged = flow(
+          map(get('quoteDetails')),
+          flatten,
+          uniqWith(
+            (arrVal: QuoteDetail, othVal: QuoteDetail) =>
+              arrVal.Description === othVal.Description &&
+              arrVal.CostUnit === othVal.CostUnit &&
+              arrVal.Currency === othVal.Currency,
+          ),
+        )(quotes) as QuoteDetail[];
 
             const handlePanelClick = () => {
               setSelectedPanel(carrierId);
               window.scrollTo(0, 150);
             };
 
-            return (
-              <Paper id={carrierId}>
+        return (
+          <Box id={carrierId} mb={5}>
                 <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel == carrierId}>
                   <ExpansionPanelSummary
                     aria-controls="panel1c-content"
                     expandIcon={<ExpandMoreIcon />}
                     onClick={handlePanelClick}
                   >
-                    <Typography variant="h4">{carrierId}</Typography>
-                  </ExpansionPanelSummary>
+              </ExpansionPanelSummary>
 
-                  <ExpansionPanelDetails className={classes.tableScroll}>
-                    <Container>
+              <ExpansionPanelDetails className={classes.tableScroll}>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Paper>
                       <Table size="small" aria-label="a dense table">
                         <TableHead>
                           <TableRow>
@@ -316,14 +312,14 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                           </TableRow>
                         </TableFooter>
                       </Table>
-                    </Container>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              </Paper>
-            );
-          })}
-        </CardContent>
-      </Card>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          </Box>
+        );
+      })}
     </Container>
   );
 };
