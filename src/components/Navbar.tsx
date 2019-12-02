@@ -62,22 +62,22 @@ const Navbar: React.FC = () => {
             {user !== undefined && user !== null && (
               <Fragment>
                 <div className={classes.item}>
-                  <Button component={Link} to="/">
+                  <Button component={Link} to="/" underline="none">
                     Dashboard
                   </Button>
                 </div>
                 <div className={classes.item}>
-                  <Button component={Link} to="/schedule">
+                  <Button component={Link} to="/schedule" underline="none">
                     Schedule
                   </Button>
                 </div>
                 <div className={classes.item}>
-                  <Button component={Link} to="/quotes/groups">
+                  <Button component={Link} to="/quotes/groups" underline="none">
                     Quotes
                   </Button>
                 </div>
                 <div className={classes.item}>
-                  <Button component={Link} to="/equipment">
+                  <Button component={Link} to="/equipment" underline="none">
                     Equipment Situation
                   </Button>
                 </div>
@@ -86,7 +86,7 @@ const Navbar: React.FC = () => {
             <div className={classes.spacer} />
             {user !== undefined && user !== null ? (
               <div className={classes.item}>
-                <Button component={Link} to="/quotes/get" variant="outlined">
+                <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
                   Get Quote
                 </Button>
               </div>
