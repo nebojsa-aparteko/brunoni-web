@@ -35,6 +35,7 @@ import Carrier from '../model/Carrier';
 import Container from './Container';
 import pickAndRename from '../utilities/pickAndRename';
 import TextSkeleton from './TextSkeleton';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -140,6 +141,35 @@ const EquipmentSituation: React.FC = () => {
 
   return (
     <Container>
+      <Box p={2} mt={5} mb={3}>
+        <Typography variant="h3" gutterBottom>
+          Equipment Situation
+        </Typography>
+        <Typography variant="subtitle2">
+          Find below the overview of all equipment available in Switzerland for export bookings
+        </Typography>
+
+        <Box display="flex" my={3}>
+          <Box display="flex">
+            <Avatar className={`${classes.avatar} ${classes.good}`} />
+            <Box ml={1}>
+              <Typography variant="body1">Good</Typography>
+            </Box>
+          </Box>
+          <Box display="flex" ml={3}>
+            <Avatar className={`${classes.avatar} ${classes.onRequest}`} />
+            <Box ml={1}>
+              <Typography variant="body1">On request</Typography>
+            </Box>
+          </Box>
+          <Box display="flex" ml={3}>
+            <Avatar className={`${classes.avatar} ${classes.notAvailable}`} />
+            <Box ml={1}>
+              <Typography variant="body1">Not available</Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
       <Box my={3}>
         {data &&
           data.map(({ carrier, containerTypes, locations }) => (
