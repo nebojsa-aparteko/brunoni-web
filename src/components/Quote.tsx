@@ -156,7 +156,7 @@ const Quote: React.FC<Props> = ({ id }) => {
                   <QuoteItemHeader quote={quote} />
                 </Grid>
                 <Grid item xs={6}>
-                  <QuoteItemContainers containers={quote.containers} />
+                  <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
                 </Grid>
                 <Grid item xs={12}>
                   <Divider />

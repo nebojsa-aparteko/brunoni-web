@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from 'react';
+import React, { useContext, Fragment, useState, RefObject } from 'react';
 import formatDate from 'date-fns/format';
 import {
   Avatar,
@@ -143,6 +143,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   const { result } = useContext(QuotesEndpointContext);
 
+  const [selectedPanel, setSelectedPanel] = useState('');
+
   const quoteGroup = result?.find(quoteGroup => quoteGroup.id === id);
 
   if (!quoteGroup) {
@@ -201,10 +203,20 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                   arrVal.Currency === othVal.Currency,
               ),
             )(quotes) as QuoteDetail[];
+
+            const handlePanelClick = () => {
+              setSelectedPanel(carrierId);
+              window.scrollTo(0, 150);
+            };
+
             return (
               <Paper id={carrierId}>
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary aria-controls="panel1c-content" expandIcon={<ExpandMoreIcon />}>
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel == carrierId}>
+                  <ExpansionPanelSummary
+                    aria-controls="panel1c-content"
+                    expandIcon={<ExpandMoreIcon />}
+                    onClick={handlePanelClick}
+                  >
                     <Typography variant="h4">{carrierId}</Typography>
                   </ExpansionPanelSummary>
 

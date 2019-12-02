@@ -1,14 +1,15 @@
 import React from 'react';
 import { Grid, Typography, ListItem, Box, Chip } from '@material-ui/core';
 import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
 import Container from '../../model/Container';
+import CommodityType from '../../model/CommodityType';
 
 interface Props {
   containers: Container[];
+  commodityTypes?: CommodityType[];
 }
 
-const QuoteItemContainers: React.FC<Props> = ({ containers }) => (
+const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) => (
   <Grid item xs={12}>
     <Typography variant="subtitle2">
       <Box display="inline" alignItems="center" fontWeight="fontWeightBold">
@@ -31,6 +32,14 @@ const QuoteItemContainers: React.FC<Props> = ({ containers }) => (
         ))}
       </List>
     </Typography>
+    {commodityTypes && (
+      <Box display="block" alignItems="center">
+        <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>
+          Commodity:
+        </Typography>
+        <Typography variant="body1">{commodityTypes.map(commodityType => commodityType.name)}</Typography>
+      </Box>
+    )}
   </Grid>
 );
 
