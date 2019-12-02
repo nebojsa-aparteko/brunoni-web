@@ -13,6 +13,16 @@ import Unauthorized from './pages/Unauthorized';
 import useUser from './hooks/useUser';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
+import { makeStyles, Theme } from '@material-ui/core';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  goTop: {
+    position: 'fixed',
+    bottom: '30px',
+    right: '30px',
+  },
+}));
 
 const switchUser = <P extends RouteComponentProps<any> | any>(
   ComponentA: React.ComponentType<P>,
@@ -43,23 +53,27 @@ const requireUser = <P extends RouteComponentProps<any> | any>(Component: React.
   }
 };
 
-const App: React.FC = () => (
-  <Fragment>
-    <Navbar />
-    <Switch>
-      <Route exact path="/" component={switchUser(Dashboard, Routes)} />
-      <Route exact path="/schedule" component={requireUser(Routes)} />
-      <Route exact path="/quotes/groups" component={requireUser(QuoteGroups)} />
-      <Route exact path="/quotes/groups/:id" component={requireUser(QuoteGroup)} />
-      <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
-      <Route exact path="/quotes/:id" component={requireUser(Quote)} />
-      <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
-      {/** TODO Remove temporary route /dashboard */}
-      <Route exact path="/dashboard" component={Dashboard} />
-      <Route component={NotFound} />
-    </Switch>
-    <Footer />
-  </Fragment>
-);
+const App: React.FC = () => {
+  const classes = useStyles();
+  return (
+    <Fragment>
+      <Navbar />
+      <Switch>
+        <Route exact path="/" component={switchUser(Dashboard, Routes)} />
+        <Route exact path="/schedule" component={requireUser(Routes)} />
+        <Route exact path="/quotes/groups" component={requireUser(QuoteGroups)} />
+        <Route exact path="/quotes/groups/:id" component={requireUser(QuoteGroup)} />
+        <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
+        <Route exact path="/quotes/:id" component={requireUser(Quote)} />
+        <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
+        {/** TODO Remove temporary route /dashboard */}
+        <Route exact path="/dashboard" component={Dashboard} />
+        <Route component={NotFound} />
+      </Switch>
+      <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
+      <Footer />
+    </Fragment>
+  );
+};
 
 export default App;
