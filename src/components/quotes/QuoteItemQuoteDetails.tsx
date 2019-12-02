@@ -29,6 +29,10 @@ const useStyles = makeStyles((theme: Theme) =>
     tableHead: {
       fontWeight: theme.typography.fontWeightBold,
     },
+    costUnitCell: {
+      paddingLeft: 0,
+      minWidth: '150px',
+    },
   }),
 );
 
@@ -42,8 +46,8 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
           <TableHead className={classes.tableHead}>
             <TableRow>
               <TableCell>Description</TableCell>
-              <TableCell>Currency</TableCell>
-              <TableCell>Cost Value</TableCell>
+              <TableCell align="right">Currency</TableCell>
+              <TableCell align="right">Cost Value</TableCell>
               <TableCell>Cost Unit</TableCell>
               <TableCell>Remark</TableCell>
             </TableRow>
@@ -55,7 +59,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
                   {quoteDetail.Description}
                 </TableCell>
                 <TableCell align="right">{quoteDetail.Currency}</TableCell>
-                <TableCell>{quoteDetail.CostValue}</TableCell>
+                <TableCell align="right">{quoteDetail.CostValue}</TableCell>
                 <TableCell>{quoteDetail.CostUnit}</TableCell>
                 <TableCell>
                   {quoteDetail.RemarkRef || ''}
