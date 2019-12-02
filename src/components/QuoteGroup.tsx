@@ -49,7 +49,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
-import ListAltIcon from '@material-ui/icons/ListAlt';
+import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
 
 interface Props {
   id: string;
@@ -111,7 +111,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         variant="contained"
         size="small"
         style={{ marginLeft: '4px' }}
-        href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Booking Request`}
+        href={buildMailToLink(quote)}
         target="_blank"
       >
         Book Now

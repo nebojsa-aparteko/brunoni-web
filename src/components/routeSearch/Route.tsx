@@ -137,15 +137,22 @@ const Route: React.FC<Props> = ({ route }) => {
 
   const buildMailToLink = (route: RouteSearchResult | undefined) => {
     if (route) {
-      console.log('html output ', renderToString(<RouteInfoBodyHTML route={route} />).replace(/\r?\n|\r/g, ''));
-      return 'mailto:platform@mybrunoni.ch?'.concat(
-        [
-          'subject=' +
-            encodeURI(
-              'Request booking - ' + route.OriginInfo.Port.HarbourName + ' → ' + route.DestinationInfo.Port.HarbourName,
-            ),
-          'body=' + encodeURI(routeInfoEmailBody(route)),
-        ].join('&'),
+      const mailtoAddress =
+        process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+      return (
+        mailtoAddress +
+        '?'.concat(
+          [
+            'subject=' +
+              encodeURI(
+                'Request booking - ' +
+                  route.OriginInfo.Port.HarbourName +
+                  ' → ' +
+                  route.DestinationInfo.Port.HarbourName,
+              ),
+            'body=' + encodeURI(routeInfoEmailBody(route)),
+          ].join('&'),
+        )
       );
     } else return 'mailto:platform@mybrunoni.ch';
   };

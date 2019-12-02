@@ -29,6 +29,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import { Link as RouterLink } from 'react-router-dom';
 import formatDate from 'date-fns/format';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
 
 interface Props {
   id: string;
@@ -118,13 +119,7 @@ const Quote: React.FC<Props> = ({ id }) => {
           }
           action={
             <Box display="flex" displayPrint="none">
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Booking Request`}
-                target="_blank"
-              >
+              <Button color="primary" variant="contained" size="small" href={buildMailToLink(quote)} target="_blank">
                 Book Now
               </Button>
 
