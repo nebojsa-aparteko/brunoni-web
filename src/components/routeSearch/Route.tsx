@@ -309,7 +309,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     open={Boolean(moreAnchorEl)}
                     onClose={handleClose}
                   >
-                    <MenuItem component="a" href={buildMailToLink(route)}>
+                    <MenuItem component="a" href={buildMailToLink(route)} target="_blank">
                       <ListItemIcon>
                         <DirectionsBoatIcon fontSize="small" />
                       </ListItemIcon>

@@ -121,12 +121,13 @@ const Quote: React.FC<Props> = ({ id }) => {
               <Button
                 color="primary"
                 variant="contained"
-                component={RouterLink}
                 size="small"
-                to={`/quotes/${quote.id}`}
+                href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Booking Request`}
+                target="_blank"
               >
                 Book Now
               </Button>
+
               <Button
                 aria-label="print"
                 variant="outlined"

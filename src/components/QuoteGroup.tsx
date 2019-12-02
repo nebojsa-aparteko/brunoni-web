@@ -14,6 +14,7 @@ import {
   ExpansionPanelSummary,
   Grid,
   IconButton,
+  ListItemText,
   makeStyles,
   Paper,
   Table,
@@ -42,6 +43,13 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import logAs from '../utilities/logAs';
+import { Action } from 'material-table';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 
 interface Props {
   id: string;
@@ -77,6 +85,55 @@ const useStyles = makeStyles((theme: Theme) => ({
     minWidth: '150px',
   },
 }));
+
+interface ActionButtonsProps {
+  quote: Quote;
+}
+
+const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
+  const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMoreAnchorEl(null);
+  };
+
+  return (
+    <Fragment>
+      <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
+        View more
+      </Button>
+      <Button
+        color="primary"
+        variant="contained"
+        size="small"
+        style={{ marginLeft: '4px' }}
+        href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Booking Request`}
+        target="_blank"
+      >
+        Book Now
+      </Button>
+      <IconButton aria-label="actions" onClick={onMoreButtonClick}>
+        <MoreVertIcon />
+      </IconButton>
+      <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
+        <MenuItem
+          component="a"
+          href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Feedback`}
+          target="_blank"
+        >
+          <ListItemIcon>
+            <DirectionsBoatIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Feedback" />
+        </MenuItem>
+      </Menu>
+    </Fragment>
+  );
+};
 
 const QuoteGroup: React.FC<Props> = ({ id }) => {
   const classes = useStyles();
@@ -237,25 +294,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                               <Fragment key={quote.id}>
                                 <TableCell className={classes.noBorder} />
                                 <TableCell className={classes.buttonContainer} colSpan={2}>
-                                  <Button
-                                    color="primary"
-                                    variant="outlined"
-                                    component={RouterLink}
-                                    size="small"
-                                    to={`/quotes/${quote.id}`}
-                                  >
-                                    View more
-                                  </Button>
-                                  <Button
-                                    color="primary"
-                                    variant="contained"
-                                    component={RouterLink}
-                                    size="small"
-                                    to={`/quotes/${quote.id}`}
-                                    style={{ marginLeft: '4px' }}
-                                  >
-                                    Book Now
-                                  </Button>
+                                  <QuoteItemActionButtons quote={quote} />
                                 </TableCell>
                               </Fragment>
                             ))}
