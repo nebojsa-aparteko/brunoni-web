@@ -13,6 +13,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   quoteDetails: {
     marginTop: theme.spacing(2),
   },
+  cardContent: {
+    padding: theme.spacing(0),
+  },
 }));
 
 const Dashboard: React.FC = () => {
@@ -24,7 +27,7 @@ const Dashboard: React.FC = () => {
       <Card className={classes.quoteDetails}>
         <CardHeader title="Quotes" action={<GetQuotesButton />} />
         <Divider />
-        <CardContent>
+        <CardContent className={classes.cardContent}>
           <QuoteGroups showGetQuoteButton={false} />
         </CardContent>
       </Card>

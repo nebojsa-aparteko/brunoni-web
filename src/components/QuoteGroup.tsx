@@ -145,9 +145,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
               <Paper id={carrierId}>
                 <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
                   <ExpansionPanelSummary aria-controls="panel1c-content" expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h4" gutterBottom>
-                      {carrierId}
-                    </Typography>
+                    <Typography variant="h4">{carrierId}</Typography>
                   </ExpansionPanelSummary>
 
                   <ExpansionPanelDetails className={classes.tableScroll}>
