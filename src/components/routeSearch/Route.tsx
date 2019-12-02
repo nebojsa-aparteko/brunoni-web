@@ -41,6 +41,7 @@ import parseDate from 'date-fns/parse';
 import { addDays } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import { RouteInfoBodyHTML, routeInfoBodyPlainText, routeInfoEmailBody } from './RouteBodyTextSharePrep';
 
 interface Props {
   route?: RouteSearchResult;
@@ -76,67 +77,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const paragraphStyles = {
-  fontFamily: 'Calibri, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  fontSize: '11pt',
-};
-
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
-
-const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) => {
-  return (
-    <Fragment>
-      <p style={paragraphStyles}>
-        {route.OriginInfo.VoyageInfo.VesselName} {route.OriginInfo.VoyageInfo.VoyageNr}
-        <br />
-        {route.OriginInfo.Port.HarbourName},{route.OriginInfo.Port.Land} ETS{' '}
-        {formatDateString(route.OriginInfo.DepartureDate)}
-        {route.IntermediatePortInfos.map((intermediatePort, index) => (
-          <Fragment key={index}>
-            <br />
-            {intermediatePort.Port.HarbourName}, {intermediatePort.Port.Land} ETA{' '}
-            {formatDateString(intermediatePort.ArrivalDate)}
-            <br />
-            {intermediatePort.VoyageInfo.VesselName} {intermediatePort.VoyageInfo.VoyageNr}
-            <br />
-            {intermediatePort.Port.HarbourName}, {intermediatePort.Port.Land} ETS{' '}
-            {formatDateString(intermediatePort.DepartureDate)}
-          </Fragment>
-        ))}
-        <br />
-        {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA{' '}
-        {formatDateString(route.DestinationInfo.ArrivalDate)}
-        <br />
-      </p>
-      <p style={paragraphStyles}>
-        {route.Deadlines.flatMap(deadline => (
-          <Fragment>
-            {deadline.Typ} closing - {deadline.Time}
-            <br />
-          </Fragment>
-        ))}
-      </p>
-      <p style={paragraphStyles}>
-        Origin Address:
-        <br />
-        <span dangerouslySetInnerHTML={{ __html: route.OriginInfo.Port.PortName }} />
-      </p>
-      <p style={paragraphStyles}>
-        Destination Address:
-        <br />
-        <span dangerouslySetInnerHTML={{ __html: route.DestinationInfo.Port.PortName }} />
-      </p>
-      <p style={paragraphStyles}>
-        Source:{' '}
-        {process.env.REACT_APP_BRAND === 'brunoni' ? (
-          <a href="https://mybrunoni.ch">mybrunoni.ch</a>
-        ) : (
-          <a href="https://myallmarine.ch">myallmarine.ch</a>
-        )}
-      </p>
-    </Fragment>
-  );
-};
 
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
@@ -160,43 +101,9 @@ const Route: React.FC<Props> = ({ route }) => {
   };
 
   const prepareCopyBody = (route: RouteSearchResult) => {
-    const plainTextOutput = `
-${route.OriginInfo.VoyageInfo.VesselName} ${route.OriginInfo.VoyageInfo.VoyageNr}
-${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land} ETS ${formatDateString(
-      route.OriginInfo.DepartureDate,
-    )}
-${route.IntermediatePortInfos.map(
-  (intermediatePort, index) =>
-    `${intermediatePort.Port.HarbourName}, ${intermediatePort.Port.Land} ETA ${formatDateString(
-      intermediatePort.ArrivalDate,
-    )}
-${intermediatePort.VoyageInfo.VesselName} ${intermediatePort.VoyageInfo.VoyageNr}
-${intermediatePort.Port.HarbourName}, ${intermediatePort.Port.Land} ETS ${formatDateString(
-      intermediatePort.DepartureDate,
-    )}`,
-)}
-${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ETA ${formatDateString(
-      route.DestinationInfo.ArrivalDate,
-    )}
-
-${route.Deadlines.flatMap(deadline => {
-  return `${deadline.Typ} closing - ${deadline.Time}`;
-})
-  .toString()
-  .split(',')
-  .join('\n')}
-
-Origin Address:
-${route.OriginInfo.Port.PortName.split('<br/> ').join('\n')}
-
-Destination Address:
-${route.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}
-
-Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
-    `;
     return [
-      { body: renderToString(<ClipboardCopyBody route={route} />), format: ClipboardFormat.HTML },
-      { body: plainTextOutput, format: ClipboardFormat.PLAINTEXT },
+      { body: renderToString(<RouteInfoBodyHTML route={route} />), format: ClipboardFormat.HTML },
+      { body: routeInfoBodyPlainText(route), format: ClipboardFormat.PLAINTEXT },
     ];
   };
 
@@ -222,6 +129,21 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
 
   const handleClose = () => {
     setMoreAnchorEl(null);
+  };
+
+  const buildMailToLink = (route: RouteSearchResult | undefined) => {
+    if (route) {
+      console.log('html output ', renderToString(<RouteInfoBodyHTML route={route} />).replace(/\r?\n|\r/g, ''));
+      return 'mailto:platform@mybrunoni.ch?'.concat(
+        [
+          'subject=' +
+            encodeURI(
+              'Request booking - ' + route.OriginInfo.Port.HarbourName + ' → ' + route.DestinationInfo.Port.HarbourName,
+            ),
+          'body=' + encodeURI(routeInfoEmailBody(route)),
+        ].join('&'),
+      );
+    } else return 'mailto:platform@mybrunoni.ch';
   };
 
   const toggleExpansion = () => {
@@ -383,11 +305,15 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
                     open={Boolean(moreAnchorEl)}
                     onClose={handleClose}
                   >
-                    <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
-                      Book Now
+                    <MenuItem onClick={handleClose}>
+                      <Button color="primary" variant="contained" href={buildMailToLink(route)} target="_blank">
+                        Book Now
+                      </Button>
                     </MenuItem>
-                    <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
-                      Request Quote
+                    <MenuItem onClick={handleClose}>
+                      <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/get`}>
+                        Request Quote
+                      </Button>
                     </MenuItem>
                   </Menu>
                 </Box>
