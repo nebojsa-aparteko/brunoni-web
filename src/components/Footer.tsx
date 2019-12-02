@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: 'rgba(255,255,255,.35)',
     textAlign: 'center',
     fontWeigh: theme.typography.fontWeightMedium,
+    fontFamily: theme.typography.fontFamily, // TODO set font family to <body> rather than each individual component
   },
   list: {
     listStyle: 'none',
@@ -27,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       color: theme.palette.common.white,
       opacity: 0.65,
       fontSize: '1.25em',
+      fontFamily: theme.typography.fontFamily,
 
       '&:hover': {
         opacity: 1,
