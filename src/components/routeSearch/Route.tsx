@@ -86,6 +86,18 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
         <br />
         {route.OriginInfo.Port.HarbourName},{route.OriginInfo.Port.Land} ETS{' '}
         {formatDateString(route.OriginInfo.DepartureDate)}
+        {route.IntermediatePortInfos.map((intermediatePort, index) => (
+          <Fragment key={index}>
+            <br />
+            {intermediatePort.Port.HarbourName}, {intermediatePort.Port.Land} ETA{' '}
+            {formatDateString(intermediatePort.ArrivalDate)}
+            <br />
+            {intermediatePort.VoyageInfo.VesselName} {intermediatePort.VoyageInfo.VoyageNr}
+            <br />
+            {intermediatePort.Port.HarbourName}, {intermediatePort.Port.Land} ETS{' '}
+            {formatDateString(intermediatePort.DepartureDate)}
+          </Fragment>
+        ))}
         <br />
         {route.DestinationInfo.Port.HarbourName}, {route.DestinationInfo.Port.Land} ETA{' '}
         {formatDateString(route.DestinationInfo.ArrivalDate)}
@@ -147,6 +159,16 @@ ${route.OriginInfo.VoyageInfo.VesselName} ${route.OriginInfo.VoyageInfo.VoyageNr
 ${route.OriginInfo.Port.HarbourName}, ${route.OriginInfo.Port.Land} ETS ${formatDateString(
       route.OriginInfo.DepartureDate,
     )}
+${route.IntermediatePortInfos.map(
+  (intermediatePort, index) =>
+    `${intermediatePort.Port.HarbourName}, ${intermediatePort.Port.Land} ETA ${formatDateString(
+      intermediatePort.ArrivalDate,
+    )}
+${intermediatePort.VoyageInfo.VesselName} ${intermediatePort.VoyageInfo.VoyageNr}
+${intermediatePort.Port.HarbourName}, ${intermediatePort.Port.Land} ETS ${formatDateString(
+      intermediatePort.DepartureDate,
+    )}`,
+)}
 ${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ETA ${formatDateString(
       route.DestinationInfo.ArrivalDate,
     )}
