@@ -32,57 +32,53 @@ const appFont = new FontFaceObserver('Montserrat');
 const fontLoaded = appFont.load();
 
 const render = (user: firebase.User | null) => {
-  const app = user ? (
+  const app = (
     <Router>
       <CookiesNotification />
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
-          <LoginDialogProvider>
-            <UserContext.Provider value={user}>
-              <UserRecordProvider>
-                <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                  <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                    <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                      <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                        <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                          <QuotesEndpointProvider>
-                            <RouteSearchProvider>
-                              <App />
-                            </RouteSearchProvider>
-                          </QuotesEndpointProvider>
+      <RouteSearchProvider>
+        {user ? (
+          <ThemeProvider theme={theme}>
+            <SnackbarProvider>
+              <LoginDialogProvider>
+                <UserContext.Provider value={user}>
+                  <UserRecordProvider>
+                    <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+                      <FirestoreCollectionProvider name="ports" context={PortsContext}>
+                        <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                          <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                            <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                              <QuotesEndpointProvider>
+                                <App />
+                              </QuotesEndpointProvider>
+                            </FirestoreCollectionProvider>
+                          </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>
+                  </UserRecordProvider>
+                </UserContext.Provider>
+              </LoginDialogProvider>
+            </SnackbarProvider>
+          </ThemeProvider>
+        ) : (
+          <ThemeProvider theme={theme}>
+            <SnackbarProvider>
+              <LoginDialogProvider>
+                <UserContext.Provider value={null}>
+                  <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+                    <FirestoreCollectionProvider name="ports" context={PortsContext}>
+                      <QuotesEndpointProvider>
+                        <App />
+                      </QuotesEndpointProvider>
+                    </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
-                </FirestoreCollectionProvider>
-              </UserRecordProvider>
-            </UserContext.Provider>
-          </LoginDialogProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
-    </Router>
-  ) : (
-    <Router>
-      <CookiesNotification />
-      <CssBaseline />
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
-          <LoginDialogProvider>
-            <UserContext.Provider value={null}>
-              <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                  <QuotesEndpointProvider>
-                    <RouteSearchProvider>
-                      <App />
-                    </RouteSearchProvider>
-                  </QuotesEndpointProvider>
-                </FirestoreCollectionProvider>
-              </FirestoreCollectionProvider>
-            </UserContext.Provider>
-          </LoginDialogProvider>
-        </SnackbarProvider>
-      </ThemeProvider>
+                </UserContext.Provider>
+              </LoginDialogProvider>
+            </SnackbarProvider>
+          </ThemeProvider>
+        )}
+      </RouteSearchProvider>
     </Router>
   );
 

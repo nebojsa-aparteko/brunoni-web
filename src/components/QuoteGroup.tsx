@@ -157,10 +157,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             {quotes.map((quote, index) => (
                               <Fragment key={index}>
                                 <TableCell className={classes.currencyCell}>Currency</TableCell>
-                                <TableCell key={quote.id} colSpan={2} align="center">
-                                  {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
-                                  {formatDate(quote.validityPeriod.to, 'd. MMMM')}
-                                </TableCell>
+                                <TableCell align="right">Cost Value</TableCell>
+                                <TableCell>Cost Unit</TableCell>
                               </Fragment>
                             ))}
                           </TableRow>
@@ -176,24 +174,29 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                   {quoteDetail.Description}
                                 </TableCell>
                                 {quotes.map((quote: any) => {
-                                  return quote.quoteDetails
-                                    .filter(
-                                      (item: QuoteDetail) =>
-                                        quoteDetail.Description === item.Description &&
-                                        quoteDetail.CostUnit === item.CostUnit,
-                                    )
-                                    .map((quoteDetailInstance: QuoteDetail, i: number) => (
+                                  const matchingQuoteDetail = quote.quoteDetails.filter(
+                                    (item: QuoteDetail) =>
+                                      quoteDetail.Description === item.Description &&
+                                      quoteDetail.CostUnit === item.CostUnit &&
+                                      quoteDetail.Currency === item.Currency,
+                                  );
+
+                                  if (matchingQuoteDetail.length == 0) {
+                                    return <TableCell colSpan={3} />;
+                                  } else {
+                                    return matchingQuoteDetail.map((quoteDetailInstance: QuoteDetail, i: number) => (
                                       <Fragment key={i}>
                                         <TableCell className={classes.currencyCell}>
                                           {quoteDetailInstance.Currency !== 'incl.' ? quoteDetailInstance.Currency : ''}
                                         </TableCell>
                                         <TableCell align="right">{quoteDetailInstance.CostValue}</TableCell>
-                                        <TableCell className={classes.costUnitCell}>
+                                        <TableCell>
                                           {quoteDetailInstance.Currency === 'incl.' ? quoteDetailInstance.Currency : ''}{' '}
                                           {quoteDetailInstance.CostUnit}
                                         </TableCell>
                                       </Fragment>
                                     ));
+                                  }
                                 })}
                               </TableRow>
                             ))}
@@ -204,10 +207,23 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             </TableCell>
                             {quotes.map((quote: any) => (
                               <Fragment>
-                                <TableCell className={classes.currencyCell} />
-                                <TableCell key={quote.QuoteNumber} colSpan={2} align="left">
+                                <TableCell key={quote.QuoteNumber} colSpan={3} align="center">
                                   {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                   {quote.serviceDetails[0].TransitTime} days
+                                </TableCell>
+                              </Fragment>
+                            ))}
+                          </TableRow>
+
+                          <TableRow>
+                            <TableCell component="th" scope="row">
+                              Quote Validity
+                            </TableCell>
+                            {quotes.map((quote, index) => (
+                              <Fragment key={index}>
+                                <TableCell colSpan={3} align="center">
+                                  {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
+                                  {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                                 </TableCell>
                               </Fragment>
                             ))}

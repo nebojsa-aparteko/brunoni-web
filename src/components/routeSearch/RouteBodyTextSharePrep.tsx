@@ -112,6 +112,12 @@ export const routeInfoEmailBody = (route: RouteSearchResult) => {
     'Dear Sirs,',
     'I want to book the following route with this cargo specification:',
     '<< PLEASE TYPE HERE YOUR CARGO INFORMATION>>',
+    'EQUIPMENT TYPE: \n' +
+      'COMMODITY: \n' +
+      'WEIGHT: \n' +
+      'PICK UP DEPOT: \n' +
+      'PICK UP DATE: \n' +
+      'AGREEMENT NO.: ',
     'Schedule data follows: ',
     routeInfoBodyPlainText(route),
   ].join('\n\n');
