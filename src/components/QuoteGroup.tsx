@@ -72,6 +72,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   noBorder: {
     border: 'none',
   },
+  costUnitCell: {
+    paddingLeft: 0,
+    minWidth: '150px',
+  },
 }));
 
 const QuoteGroup: React.FC<Props> = ({ id }) => {
@@ -155,7 +159,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             {quotes.map((quote, index) => (
                               <Fragment key={index}>
                                 <TableCell className={classes.currencyCell}>Currency</TableCell>
-                                <TableCell key={quote.id} style={{ minWidth: '282px' }}>
+                                <TableCell key={quote.id} colSpan={2} align="center">
                                   {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
                                   {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                                 </TableCell>
@@ -185,9 +189,10 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                         <TableCell className={classes.currencyCell}>
                                           {quoteDetailInstance.Currency !== 'incl.' ? quoteDetailInstance.Currency : ''}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell align="right">{quoteDetailInstance.CostValue}</TableCell>
+                                        <TableCell className={classes.costUnitCell}>
                                           {quoteDetailInstance.Currency === 'incl.' ? quoteDetailInstance.Currency : ''}{' '}
-                                          {quoteDetailInstance.CostValue} {quoteDetailInstance.CostUnit}
+                                          {quoteDetailInstance.CostUnit}
                                         </TableCell>
                                       </Fragment>
                                     ));
@@ -202,7 +207,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             {quotes.map((quote: any) => (
                               <Fragment>
                                 <TableCell className={classes.currencyCell} />
-                                <TableCell key={quote.QuoteNumber}>
+                                <TableCell key={quote.QuoteNumber} colSpan={2} align="left">
                                   {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                   {quote.serviceDetails[0].TransitTime} days
                                 </TableCell>
@@ -217,7 +222,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             {quotes.map(quote => (
                               <Fragment key={quote.id}>
                                 <TableCell className={classes.noBorder} />
-                                <TableCell className={classes.buttonContainer}>
+                                <TableCell className={classes.buttonContainer} colSpan={2}>
                                   <Button
                                     color="primary"
                                     variant="outlined"

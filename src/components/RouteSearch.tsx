@@ -82,13 +82,8 @@ const RouteSearch: React.FC<Props> = () => {
   const classes = useStyles();
 
   const [params, setParams] = useContext(RouteSearchContext);
-  console.log('remembered search', params);
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
   const [visibility, setVisibility] = useState(false);
-
-  useEffect(() => {
-    console.log('params', params);
-  });
 
   const [busy, error, result, search] = useRequest(() => {
     const search = querySting.stringify({

@@ -54,7 +54,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
                 <TableCell component="th" scope="row">
                   {quoteDetail.Description}
                 </TableCell>
-                <TableCell>{quoteDetail.Currency}</TableCell>
+                <TableCell align="right">{quoteDetail.Currency}</TableCell>
                 <TableCell>{quoteDetail.CostValue}</TableCell>
                 <TableCell>{quoteDetail.CostUnit}</TableCell>
                 <TableCell>
