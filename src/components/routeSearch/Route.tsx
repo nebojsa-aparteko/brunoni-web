@@ -17,6 +17,8 @@ import {
   Theme,
   Typography,
   useTheme,
+  Menu,
+  MenuItem,
 } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import ItineraryItem from '../ItineraryItem';
@@ -34,7 +36,7 @@ import { Skeleton } from '@material-ui/lab';
 import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, Link } from 'react-router-dom';
 import parseDate from 'date-fns/parse';
 import { addDays } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -119,10 +121,6 @@ const ClipboardCopyBody: React.FC<{ route: RouteSearchResult }> = ({ route }) =>
   );
 };
 
-const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-  event.preventDefault();
-};
-
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -175,6 +173,7 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
   };
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handlePopoverClose = () => {
     setAnchorEl(null);
@@ -185,6 +184,16 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
 
     setAnchorEl(event.currentTarget);
     setTimeout(handlePopoverClose, 1500);
+  };
+
+  const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMoreAnchorEl(null);
   };
 
   const popoverOpen = Boolean(anchorEl);
@@ -246,9 +255,14 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
               </Grid>
             )}
             <Grid item md={1} sm={2}>
-              <IconButton aria-label="settings" onClick={onMoreButtonClick}>
+              <IconButton aria-label="actions" onClick={onMoreButtonClick}>
                 <MoreVertIcon />
               </IconButton>
+              <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
+                <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
+                  Book Now
+                </MenuItem>
+              </Menu>
             </Grid>
 
             <Grid item xs={12}>
