@@ -47,7 +47,7 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
             Accept: 'application/json',
           },
           body: JSON.stringify({
-            emailAddress,
+            emailAddress: emailAddress.toLowerCase(),
             nextPath: `${location.pathname}?${location.search}`,
           }),
           signal,
@@ -86,7 +86,7 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
     }
 
     const looksLikeEmailAddress = emailAddress.match(
-      /.+@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/,
+      /.+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9]$/,
     );
 
     if (!looksLikeEmailAddress) {
