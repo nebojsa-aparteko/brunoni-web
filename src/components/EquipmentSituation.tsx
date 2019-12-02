@@ -149,7 +149,7 @@ const EquipmentSituation: React.FC = () => {
           Find below the overview of all equipment available in Switzerland for export bookings
         </Typography>
 
-        <Box display="flex" my={3}>
+        <Box display="flex" mt={3}>
           <Box display="flex">
             <Avatar className={`${classes.avatar} ${classes.good}`} />
             <Box ml={1}>
