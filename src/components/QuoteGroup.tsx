@@ -50,6 +50,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import useUser from '../hooks/useUser';
 
 interface Props {
   id: string;
@@ -93,6 +94,8 @@ interface ActionButtonsProps {
 const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
+  const [user, userData] = useUser();
+
   const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMoreAnchorEl(event.currentTarget);
   };
@@ -111,7 +114,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         variant="contained"
         size="small"
         style={{ marginLeft: '4px' }}
-        href={buildMailToLink(quote)}
+        href={buildMailToLink(quote, [user, userData])}
         target="_blank"
       >
         Book Now

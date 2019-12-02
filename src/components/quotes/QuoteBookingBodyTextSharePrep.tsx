@@ -1,5 +1,7 @@
 import formatDate from 'date-fns/format';
 import { Quote } from '../../providers/QuotesEndpoint';
+import firebase from '../../firebase';
+import UserRecord from '../../model/UserRecord';
 
 export const quoteInfoEmailBody = (quote: Quote): string => {
   const cargoDetailsString: string = quote.containers
@@ -32,7 +34,7 @@ export const quoteInfoEmailBody = (quote: Quote): string => {
   ].join('\n\n');
 };
 
-export const buildMailToLink = (quote: Quote | undefined) => {
+export const buildMailToLink = (quote: Quote | undefined, [user, userData]: [firebase.User, UserRecord]) => {
   const mailtoAddress =
     process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
   if (quote) {

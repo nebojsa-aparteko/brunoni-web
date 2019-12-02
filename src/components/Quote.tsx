@@ -30,6 +30,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import formatDate from 'date-fns/format';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import useUser from '../hooks/useUser';
 
 interface Props {
   id: string;
@@ -62,6 +63,7 @@ const Quote: React.FC<Props> = ({ id }) => {
   const classes = useStyles();
 
   const { result } = useContext(QuotesEndpointContext);
+  const [user, userData] = useUser();
 
   if (!result) {
     return (
@@ -119,7 +121,13 @@ const Quote: React.FC<Props> = ({ id }) => {
           }
           action={
             <Box display="flex" displayPrint="none">
-              <Button color="primary" variant="contained" size="small" href={buildMailToLink(quote)} target="_blank">
+              <Button
+                color="primary"
+                variant="contained"
+                size="small"
+                href={buildMailToLink(quote, [user, userData])}
+                target="_blank"
+              >
                 Book Now
               </Button>
 
