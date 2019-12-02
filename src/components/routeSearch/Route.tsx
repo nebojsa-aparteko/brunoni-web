@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import {
   Avatar,
@@ -40,6 +40,7 @@ import { Link as RouterLink, Link } from 'react-router-dom';
 import parseDate from 'date-fns/parse';
 import { addDays } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 interface Props {
   route?: RouteSearchResult;
@@ -68,6 +69,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   scheduleDetailsActionButtonContainer: {
     display: 'flex',
     flexDirection: 'column-reverse',
+  },
+  actionBarGridItem: {
+    marginRight: 0,
+    textAlign: 'right',
   },
 }));
 
@@ -137,6 +142,7 @@ const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();
   const theme = useTheme();
   const carriers = useContext(Carriers);
+  const [expanded, setExpanded] = useState(false);
   const carrierName = route?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
   const carrier = useMemo(() => carriers?.find(carrier => carrier.name.toLowerCase() === carrierName), [
     carrierName,
@@ -218,141 +224,179 @@ Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : '
     setMoreAnchorEl(null);
   };
 
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
+
   const popoverOpen = Boolean(anchorEl);
   const popoverId = popoverOpen ? 'simple-popover' : undefined;
 
   return (
     <Box>
-      <ExpansionPanel TransitionProps={{ unmountOnExit: true }} disabled={disabled} style={expansionPanelStyle}>
+      <ExpansionPanel
+        TransitionProps={{ unmountOnExit: true }}
+        disabled={disabled}
+        style={expansionPanelStyle}
+        expanded={expanded}
+      >
         <ExpansionPanelSummary
           aria-controls="panel1c-content"
           style={expansionPanelSummaryStyle}
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={null}
+          onClick={toggleExpansion}
         >
           <Grid container spacing={2}>
-            <Grid item md={5} sm={12}>
-              <Typography variant="subtitle2" display="block" gutterBottom>
-                <Box fontWeight="fontWeightBold">Carrier</Box>
-              </Typography>
-              <Typography variant="h5" display="block">
-                <Box display="flex" alignItems="center" lineHeight="normal">
-                  {carrier ? (
-                    <Fragment>
-                      <Avatar className={classes.carrierAvatar} style={{ backgroundColor: carrier!.color }} />
-                      <span>{carrier.name.toUpperCase()}</span>
-                    </Fragment>
-                  ) : route ? (
-                    <Fragment>
-                      <Skeleton variant="circle" className={classes.carrierAvatar} />
-                      <span>{route!.OriginInfo.VoyageInfo.Carrier}</span>
-                    </Fragment>
-                  ) : (
-                    <Fragment>
-                      <Skeleton variant="circle" className={classes.carrierAvatar} />
-                      <TextSkeleton width={[60, 90]} />
-                    </Fragment>
-                  )}
-                </Box>
-              </Typography>
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem
-                title="Vessel"
-                label1={route?.OriginInfo.VoyageInfo.VesselName}
-                label2={route?.OriginInfo.VoyageInfo.VoyageNr}
-                gutterBottom
-              />
-            </Grid>
-            {route?.SpaceInfo && (
-              <Grid item md={3} sm={12}>
-                <Typography variant="subtitle2" display="block" gutterBottom>
-                  <Box fontWeight="fontWeightBold">Space Availability</Box>
-                </Typography>
-                <Chip
-                  size="small"
-                  label={route?.SpaceInfo}
-                  style={{ backgroundColor: route?.SpaceInfoColor }}
-                  className={classes.chip}
-                />
-              </Grid>
-            )}
-            <Grid item md={1} sm={2}>
-              <IconButton aria-label="actions" onClick={onMoreButtonClick}>
-                <MoreVertIcon />
-              </IconButton>
-              <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-                <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
-                  Book Now
-                </MenuItem>
-              </Menu>
-            </Grid>
+            <Grid item xs={11}>
+              <Grid container spacing={2}>
+                <Grid item md={6} sm={12}>
+                  <Typography variant="subtitle2" display="block" gutterBottom>
+                    <Box fontWeight="fontWeightBold">Carrier</Box>
+                  </Typography>
+                  <Typography variant="h5" display="block">
+                    <Box display="flex" alignItems="center" lineHeight="normal">
+                      {carrier ? (
+                        <Fragment>
+                          <Avatar className={classes.carrierAvatar} style={{ backgroundColor: carrier!.color }} />
+                          <span>{carrier.name.toUpperCase()}</span>
+                        </Fragment>
+                      ) : route ? (
+                        <Fragment>
+                          <Skeleton variant="circle" className={classes.carrierAvatar} />
+                          <span>{route!.OriginInfo.VoyageInfo.Carrier}</span>
+                        </Fragment>
+                      ) : (
+                        <Fragment>
+                          <Skeleton variant="circle" className={classes.carrierAvatar} />
+                          <TextSkeleton width={[60, 90]} />
+                        </Fragment>
+                      )}
+                    </Box>
+                  </Typography>
+                </Grid>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem
+                    title="Vessel"
+                    label1={route?.OriginInfo.VoyageInfo.VesselName}
+                    label2={route?.OriginInfo.VoyageInfo.VoyageNr}
+                    gutterBottom
+                  />
+                </Grid>
+                {route?.SpaceInfo && (
+                  <Grid item md={3} sm={12}>
+                    <Typography variant="subtitle2" display="block" gutterBottom>
+                      <Box fontWeight="fontWeightBold">Space Availability</Box>
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={route?.SpaceInfo}
+                      style={{ backgroundColor: route?.SpaceInfoColor }}
+                      className={classes.chip}
+                    />
+                  </Grid>
+                )}
 
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
 
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem
-                IconComponent={ChevronRightIcon}
-                title="Departure"
-                label1={
-                  route ? (
-                    `
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem
+                    IconComponent={ChevronRightIcon}
+                    title="Departure"
+                    label1={
+                      route ? (
+                        `
   ETS ${formatDateString(route!.OriginInfo.DepartureDate)}`
-                  ) : (
-                    <TextSkeleton width={100} />
-                  )
-                }
-                label2={
-                  route ? (
-                    `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land}`
-                  ) : (
-                    <TextSkeleton width={[80, 120]} />
-                  )
-                }
-              />
-            </Grid>
-            <Grid item md={3} sm={12}>
-              <InfoBoxItem
-                IconComponent={LastPageIcon}
-                title="Arrival"
-                label1={
-                  route ? (
-                    `
+                      ) : (
+                        <TextSkeleton width={100} />
+                      )
+                    }
+                    label2={
+                      route ? (
+                        `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land}`
+                      ) : (
+                        <TextSkeleton width={[80, 120]} />
+                      )
+                    }
+                  />
+                </Grid>
+                <Grid item md={3} sm={12}>
+                  <InfoBoxItem
+                    IconComponent={LastPageIcon}
+                    title="Arrival"
+                    label1={
+                      route ? (
+                        `
   ETA ${formatDateString(route!.DestinationInfo.ArrivalDate)}`
-                  ) : (
-                    <TextSkeleton width={100} />
-                  )
-                }
-                label2={
-                  route ? (
-                    `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land}`
-                  ) : (
-                    <TextSkeleton width={[80, 120]} />
-                  )
-                }
-              />
-            </Grid>
-            <Grid item md={3} sm={6} xs={6}>
-              <InfoBoxItem
-                IconComponent={WavesIcon}
-                title="TransitTime"
-                label1={
-                  route ? (
-                    `${route!.TransitTime}
+                      ) : (
+                        <TextSkeleton width={100} />
+                      )
+                    }
+                    label2={
+                      route ? (
+                        `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land}`
+                      ) : (
+                        <TextSkeleton width={[80, 120]} />
+                      )
+                    }
+                  />
+                </Grid>
+                <Grid item md={3} sm={6} xs={6}>
+                  <InfoBoxItem
+                    IconComponent={WavesIcon}
+                    title="TransitTime"
+                    label1={
+                      route ? (
+                        `${route!.TransitTime}
   DAYS`
-                  ) : (
-                    <TextSkeleton width={70} />
-                  )
-                }
-              />
+                      ) : (
+                        <TextSkeleton width={70} />
+                      )
+                    }
+                  />
+                </Grid>
+                <Grid item md={3} sm={6} xs={6}>
+                  <InfoBoxItem
+                    IconComponent={ShareIcon}
+                    title="Routing"
+                    label1={route ? route!.Routing : <TextSkeleton width={[50, 80]} />}
+                  />
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid item md={3} sm={6} xs={6}>
-              <InfoBoxItem
-                IconComponent={ShareIcon}
-                title="Routing"
-                label1={route ? route!.Routing : <TextSkeleton width={[50, 80]} />}
-              />
+            <Grid item xs={1} className={classes.actionBarGridItem}>
+              <Box
+                alignContent="right"
+                display="flex"
+                justifyContent="space-between"
+                flexDirection="column"
+                height="100%"
+              >
+                <Box>
+                  <IconButton aria-label="actions" onClick={onMoreButtonClick}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id="actions"
+                    anchorEl={moreAnchorEl}
+                    keepMounted
+                    open={Boolean(moreAnchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
+                      Book Now
+                    </MenuItem>
+                    <MenuItem onClick={handleClose} component={Link} to="/quotes/get">
+                      Request Quote
+                    </MenuItem>
+                  </Menu>
+                </Box>
+                <Box>
+                  <IconButton onClick={toggleExpansion}>
+                    {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
