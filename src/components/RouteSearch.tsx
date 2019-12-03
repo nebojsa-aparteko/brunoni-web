@@ -115,6 +115,10 @@ const RouteSearch: React.FC<Props> = () => {
       : withTestData('routesSearch', update('Routes', sortingOptions[0].sort));
   }, [result, sorting.sort, carrierFilter]) as RouteSearchResults;
 
+  const carriers = useMemo(() => {
+    return uniq(result?.Routes.map((route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier)) as string[];
+  }, [result]);
+
   const handleVisibility = (isVisible: boolean) => {
     return isVisible ? '' : classes.hideSearch;
   };
@@ -155,11 +159,7 @@ const RouteSearch: React.FC<Props> = () => {
             <Grid container spacing={4}>
               <Grid item md={3}>
                 <Paper className={classes.sidebar}>
-                  <RouteSearchFilters
-                    only={uniq(results?.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
-                    value={carrierFilter}
-                    onChange={setCarrierFilter}
-                  />
+                  <RouteSearchFilters only={carriers} value={carrierFilter} onChange={setCarrierFilter} />
                 </Paper>
               </Grid>
               <Grid item md={9}>
