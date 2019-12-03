@@ -24,7 +24,9 @@ import {
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
+import orderBy from 'lodash/fp/orderBy';
 import toPairs from 'lodash/fp/toPairs';
+import padStart from 'lodash/fp/padStart';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
@@ -201,6 +203,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                   arrVal.CostUnit === othVal.CostUnit &&
                   arrVal.Currency === othVal.Currency,
               ),
+              orderBy(flow(get('Pos'), padStart(3)), 'asc'),
             )(quotes) as QuoteDetail[];
 
             const handlePanelClick = (carrierID: string) => {
