@@ -81,6 +81,7 @@ const RouteSearch: React.FC<Props> = () => {
   const [visibility, setVisibility] = useState(false);
 
   const [busy, error, result, search] = useRequest(() => {
+    console.log('Params date', params.date);
     const search = querySting.stringify({
       origin: params.originPort?.id,
       destination: params.destinationPort?.id,
