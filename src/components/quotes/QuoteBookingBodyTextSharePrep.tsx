@@ -3,7 +3,7 @@ import { Quote } from '../../providers/QuotesEndpoint';
 import firebase from '../../firebase';
 import UserRecord from '../../model/UserRecord';
 
-export const quoteInfoEmailBody = (quote: Quote): string => {
+export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
   const cargoDetailsString: string = quote.containers
     .flatMap(
       (container, i) =>
@@ -18,7 +18,7 @@ export const quoteInfoEmailBody = (quote: Quote): string => {
 
   return [
     'Dear Sirs,',
-    'I want to request a booking based on the following quote received:',
+    firstLine,
     `Quote Date: ${formatDate(quote.dateIssued, 'dd.MM.yyyy')} \n` +
       `Quote Number: ${quote.id} \n` +
       `Quote Reference: ${quote.clientId} \n` +
@@ -51,7 +51,38 @@ export const buildMailToLink = (quote: Quote | undefined, [user, userData]: [fir
                 ' → ' +
                 quote.destination.city,
             ),
-          'body=' + encodeURI(quoteInfoEmailBody(quote)),
+          'body=' +
+            encodeURI(quoteInfoEmailBody(quote, 'I want to request a booking based on the following quote received:')),
+        ].join('&'),
+      )
+    );
+  } else return mailtoAddress;
+};
+
+export const buildSpecialRequestLink = (quote: Quote | undefined, [user, userData]: [firebase.User, UserRecord]) => {
+  const mailtoAddress =
+    process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+  if (quote) {
+    return (
+      mailtoAddress +
+      '?'.concat(
+        [
+          'subject=' +
+            encodeURI(
+              'Special request for quote - ' +
+                (quote.carrier.name || quote.carrier.id) +
+                ', ' +
+                quote.origin.city +
+                ' → ' +
+                quote.destination.city,
+            ),
+          'body=' +
+            encodeURI(
+              quoteInfoEmailBody(
+                quote,
+                'I want to file a special request for the following quote received:\n\n<<TYPE IN YOUR SPECIAL REQUEST HERE>>',
+              ),
+            ),
         ].join('&'),
       )
     );

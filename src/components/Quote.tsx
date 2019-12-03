@@ -29,8 +29,9 @@ import PrintIcon from '@material-ui/icons/Print';
 import { Link as RouterLink } from 'react-router-dom';
 import formatDate from 'date-fns/format';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
+import FlareIcon from '@material-ui/icons/Flare';
 
 interface Props {
   id: string;
@@ -140,6 +141,17 @@ const Quote: React.FC<Props> = ({ id }) => {
                 style={{ marginLeft: '4px' }}
               >
                 Print
+              </Button>
+              <Button
+                aria-label="special request"
+                variant="outlined"
+                size="small"
+                startIcon={<FlareIcon />}
+                href={buildSpecialRequestLink(quote, [user, userData])}
+                target="_blank"
+                style={{ marginLeft: '4px' }}
+              >
+                SPECIAL REQUEST
               </Button>
             </Box>
           }

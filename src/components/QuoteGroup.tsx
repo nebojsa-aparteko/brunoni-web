@@ -39,10 +39,10 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
-import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
+import FlareIcon from '@material-ui/icons/Flare';
 
 interface Props {
   id: string;
@@ -115,15 +115,11 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         <MoreVertIcon />
       </IconButton>
       <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-        <MenuItem
-          component="a"
-          href={`mailto:platform@mybrunoni.ch?subject=Quote: ${quote.id} - Feedback`}
-          target="_blank"
-        >
+        <MenuItem component="a" href={buildSpecialRequestLink(quote, [user, userData])} target="_blank">
           <ListItemIcon>
-            <DirectionsBoatIcon fontSize="small" />
+            <FlareIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Feedback" />
+          <ListItemText primary="SPECIAL REQUEST?" />
         </MenuItem>
       </Menu>
     </Fragment>
