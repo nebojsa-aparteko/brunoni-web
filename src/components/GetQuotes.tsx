@@ -233,7 +233,7 @@ const GetQuotes: React.FC<Props> = () => {
           Get Quote
         </Typography>
         <Grid container spacing={2}>
-          <Grid item sm={3} xs={12}>
+          <Grid item sm={4} xs={12}>
             <PortInput
               label="Origin"
               ports={ports}
@@ -245,7 +245,7 @@ const GetQuotes: React.FC<Props> = () => {
               onClose={() => setOriginPortOpen(false)}
             />
           </Grid>
-          <Grid item sm={3} xs={12}>
+          <Grid item sm={4} xs={12}>
             <PortInput
               label="Destination"
               ports={ports}
@@ -257,7 +257,7 @@ const GetQuotes: React.FC<Props> = () => {
               onClose={() => setDestinationPortOpen(false)}
             />
           </Grid>
-          <Grid item sm="auto" xs={6}>
+          <Grid item sm={2} xs={6}>
             <DateInput
               value={date}
               onChange={handleDateChange}
@@ -266,7 +266,7 @@ const GetQuotes: React.FC<Props> = () => {
               onClose={() => setDateOpen(false)}
             />
           </Grid>
-          <Grid item sm="auto" xs={6}>
+          <Grid item sm={2} xs={6}>
             <WeeksInput
               value={weeks}
               onChange={handleWeeksChange}

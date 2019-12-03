@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     marginBottom: theme.spacing(1),
   },
+  actionSection: {
+    backgroundColor: theme.palette.grey['50'],
+  },
 }));
 
 function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, value, onChange }: Props<T>) {
@@ -55,21 +58,30 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
     <Box>
       {value.map((item, i) => (
         <Paper key={i} className={classes.paper}>
-          <Box display="flex" p={2}>
-            <Box flex="1">
+          <Box display="flex">
+            <Box flex="1" p={2}>
               <ItemInput ref={ref => (refs.current[i] = ref)} value={item} onChange={v => onChange(set(i, v)(value))} />
             </Box>
-            <Box ml={2} alignSelf="center">
-              <IconButton onClick={handleRemove(i)} aria-label="delete">
+            <Box
+              py={2}
+              px={1}
+              display="flex"
+              alignContent="center"
+              alignItems="center"
+              className={classes.actionSection}
+            >
+              <IconButton onClick={handleRemove(i)} aria-label="delete" size="small">
                 <DeleteForeverIcon />
               </IconButton>
             </Box>
           </Box>
         </Paper>
       ))}
-      <Button buttonRef={addButtonRef} variant="contained" size="small" startIcon={<AddIcon />} onClick={handleAdd}>
-        Add
-      </Button>
+      <Box pt={1}>
+        <Button buttonRef={addButtonRef} variant="contained" size="small" startIcon={<AddIcon />} onClick={handleAdd}>
+          Add
+        </Button>
+      </Box>
     </Box>
   );
 }
