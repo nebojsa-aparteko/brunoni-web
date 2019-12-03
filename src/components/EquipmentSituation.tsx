@@ -146,7 +146,7 @@ const EquipmentSituation: React.FC = () => {
           Equipment Situation
         </Typography>
         <Typography variant="subtitle2">
-          Find below the overview of all equipment available in Switzerland for export bookings
+          Find below the overview of all equipment available in Switzerland for your export bookings
         </Typography>
 
         <Box display="flex" mt={3}>
