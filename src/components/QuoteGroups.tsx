@@ -1,20 +1,6 @@
 import React, { useContext, Fragment } from 'react';
 import formatDate from 'date-fns/format';
-import {
-  makeStyles,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Theme,
-  Grid,
-  Chip,
-  Box,
-  Button,
-} from '@material-ui/core';
-import Container from './Container';
+import { Table, TableBody, TableCell, TableHead, TableRow, Grid, Chip, Button } from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';

@@ -10,6 +10,7 @@ import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/fp/mapValues';
 import keys from 'lodash/fp/keys';
+import padStart from 'lodash/fp/padStart';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
 import partialRight from 'lodash/fp/partialRight';
@@ -31,6 +32,7 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import logAs from '../utilities/logAs';
+import { log } from 'util';
 
 interface Props {
   children: React.ReactNode;
@@ -199,7 +201,7 @@ const normalizeQuoteGroups = (
     groupBy('idRequest'),
     values,
     map(normalizeQuoteGroup),
-    orderBy(get('dateIssued'), 'desc'),
+    orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
   ) as (result: QuotesResult) => QuoteGroup[];
 };
 
