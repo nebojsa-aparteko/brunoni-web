@@ -1,5 +1,8 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
+import unset from 'lodash/fp/unset';
+import flow from 'lodash/fp/flow';
+import identity from 'lodash/fp/identity';
 import { Box, Grid } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container from '../../model/Container';
@@ -40,7 +43,13 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
   }));
 
   const handleContainerTypeChange = (v: ContainerType | undefined) => {
-    onChange(set('containerType', v)(value));
+    onChange(
+      flow(
+        set('containerType', v),
+        (v || {}).couldBeOversize ? identity : set('oog', [false]),
+        (v || {}).description?.endsWith('S.O.') ? unset('location') : identity,
+      )(value) as Container & ContainerDetails,
+    );
     (commodityTypeInput.current! as { focus: () => void }).focus();
   };
 
@@ -82,9 +91,11 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
             onChange={handleCommodityTypeChange}
           />
         </Grid>
-        <Grid item xs={4}>
-          <LocationInput ref={locationInput} value={value.location} onChange={handleLocationChange} />
-        </Grid>
+        {!value.containerType?.description?.endsWith('S.O.') && (
+          <Grid item xs={4}>
+            <LocationInput ref={locationInput} value={value.location} onChange={handleLocationChange} />
+          </Grid>
+        )}
         <Grid item xs={2}>
           <QuantityInput value={value.quantity} onChange={handleQuantityChange} />
         </Grid>
@@ -96,13 +107,15 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
         value={value.imo}
         onChange={handleIMOChange}
       />
-      <OptionalInput
-        label="This container is out of gauge"
-        ItemInput={props => <ListInput ItemInput={OOGInput} defaultItemValue={{}} {...props} />}
-        defaultItemValue={[]}
-        value={value.oog}
-        onChange={handleOOGChange}
-      />
+      {(value.containerType || {}).couldBeOversize && (
+        <OptionalInput
+          label="This container is out of gauge"
+          ItemInput={props => <ListInput ItemInput={OOGInput} defaultItemValue={{}} {...props} />}
+          defaultItemValue={[]}
+          value={value.oog}
+          onChange={handleOOGChange}
+        />
+      )}
     </Box>
   );
 };
