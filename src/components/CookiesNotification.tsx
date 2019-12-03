@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { makeStyles, Theme, Card, CardMedia, CardContent, CardActionArea } from '@material-ui/core';
-import cookieLove from '../assets/undraw_cookie_love_ulvn.svg';
+import { makeStyles, Theme, Card, CardMedia, CardContent } from '@material-ui/core';
+import cookieLove from '../assets/cookies.svg';
 import { Typography, Link, Button } from '@material-ui/core';
 import CardActions from '@material-ui/core/CardActions';
 
