@@ -255,7 +255,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                     <TableCell component="th" scope="row" style={{ minWidth: '250px' }}>
                                       {quoteDetail.Description}
                                     </TableCell>
-                                    {quotes.map((quote: any) => {
+                                    {quotes.map((quote: any, index) => {
                                       const matchingQuoteDetail = quote.quoteDetails.find(
                                         (item: QuoteDetail) =>
                                           quoteDetail.Description === item.Description &&
@@ -263,7 +263,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                           quoteDetail.Currency === item.Currency,
                                       );
                                       return matchingQuoteDetail ? (
-                                        <Fragment>
+                                        <Fragment key={index}>
                                           <TableCell className={classes.currencyCell}>
                                             {matchingQuoteDetail.Currency !== 'incl.'
                                               ? matchingQuoteDetail.Currency

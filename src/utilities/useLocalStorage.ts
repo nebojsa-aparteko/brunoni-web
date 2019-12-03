@@ -17,7 +17,8 @@ const stringifyReplacer = (key: string, value: any) => {
 const clearLocalStorageAfter = (lastSavedKey: string, minutes: number) => {
   const lastSavedKeyValue = localStorage.getItem(lastSavedKey);
   let saved = lastSavedKeyValue ? parseInt(lastSavedKeyValue) : new Date().getTime();
-  if (saved && new Date().getTime() - saved > minutes * 60 * 60 * 1000) {
+  console.log('saved', saved);
+  if (saved && new Date().getTime() - saved > minutes * 60 * 1000) {
     console.log('clearing local storage');
     localStorage.clear();
   }
@@ -33,6 +34,7 @@ const useLocalStorage = (key: any, initialValue: DetailedRouteSearchParams, useR
           key,
           useRawValues ? String(initialValue) : JSON.stringify(initialValue, stringifyReplacer),
         );
+        localStorage.setItem(key + '_saved', new Date().getTime().toString());
         return initialValue;
       } else {
         return useRawValues
