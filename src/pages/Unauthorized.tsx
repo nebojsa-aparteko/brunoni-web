@@ -1,29 +1,33 @@
 import React from 'react';
-import { Typography, Grid, Box } from '@material-ui/core';
+import { Container, Typography, Grid, Box, Button } from '@material-ui/core';
 import Link from '../components/Link';
-import { Error } from '../components/Illustrations';
 import LoginWidget from '../components/LoginWidget';
+import Image from 'material-ui-image/lib/components/Image/Image';
 
 const NotFound: React.FC = () => (
-  <Box flex={4}>
+  <Container>
     <Grid container justify="center" alignItems="center">
-      <Grid item xs={2}>
-        <Error />
-        <Typography variant="h6">401 Unauthorized</Typography>
-        <Typography gutterBottom>You have to be logged in to view this page.</Typography>
-        <Grid container spacing={2} alignItems="baseline">
-          <Grid item>
-            <LoginWidget />
-          </Grid>
-          <Grid item>
-            <Link to="/" replace>
-              Go Home
-            </Link>
-          </Grid>
-        </Grid>
+      <Grid item md={6}>
+        <Box p={6} textAlign="center">
+          <Image src={require(`../assets/state.error.svg`)} aspectRatio={16 / 9} color="transparent" disableSpinner />
+          <Typography variant="h5" gutterBottom>
+            <Box fontWeight="fontWeightBold">401 Unauthorized</Box>
+          </Typography>
+          <Typography variant="subtitle1">You have to be logged in to view this page.</Typography>
+          <Box p={2} display="flex" justifyContent="center">
+            <Box mr={2}>
+              <LoginWidget />
+            </Box>
+            <Box>
+              <Button component={Link} to="/" replace>
+                Go to Homepage
+              </Button>
+            </Box>
+          </Box>
+        </Box>
       </Grid>
     </Grid>
-  </Box>
+  </Container>
 );
 
 export default NotFound;
