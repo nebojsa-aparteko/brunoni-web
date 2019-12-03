@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import { Box, Button } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
@@ -43,6 +43,7 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
     v.splice(i, 1);
     onChange(v);
   };
+
   return (
     <Box>
       {value.map((item, i) => (

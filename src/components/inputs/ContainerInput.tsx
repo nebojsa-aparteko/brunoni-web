@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
@@ -22,6 +22,24 @@ import OOG from '../../model/OOG';
 import ContainerDetails from '../../model/ContainerDetails';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
+
+const OOGListInput = forwardRef((props: InputProps<OOG[]>, ref) => (
+  <ListInput
+    ref={ref}
+    ItemInput={OOGInput}
+    defaultItemValue={{ width: '', height: '', length: '', weight: '' }}
+    {...props}
+  />
+));
+
+const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
+  <ListInput
+    ref={ref}
+    ItemInput={IMOInput}
+    defaultItemValue={{ IMOClass: '', UNNumber: '', PGNumber: '' }}
+    {...props}
+  />
+));
 
 const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
   const containerTypeInput = useRef();
@@ -55,7 +73,9 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
 
   const handleCommodityTypeChange = (v: CommodityType | undefined) => {
     onChange(set('commodityType', v)(value));
-    (locationInput.current! as { focus: () => void }).focus();
+    if (locationInput.current) {
+      (locationInput.current! as { focus: () => void }).focus();
+    }
   };
 
   const handleLocationChange = (v: PickupLocation | undefined) => {
@@ -102,7 +122,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
       </Grid>
       <OptionalInput
         label="This container contains IMO"
-        ItemInput={props => <ListInput ItemInput={IMOInput} defaultItemValue={{}} {...props} />}
+        ItemInput={IMOListInput}
         defaultItemValue={[]}
         value={value.imo}
         onChange={handleIMOChange}
@@ -110,7 +130,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
       {(value.containerType || {}).couldBeOversize && (
         <OptionalInput
           label="This container is out of gauge"
-          ItemInput={props => <ListInput ItemInput={OOGInput} defaultItemValue={{}} {...props} />}
+          ItemInput={OOGListInput}
           defaultItemValue={[]}
           value={value.oog}
           onChange={handleOOGChange}

@@ -105,6 +105,16 @@ const GetQuotes: React.FC<Props> = () => {
       return;
     }
 
+    const hasOversizeCargo = containers.some(container => container.oog[0]);
+    const hasHazardousCargo = containers.some(container => container.imo[0]);
+
+    if (hasOversizeCargo || hasHazardousCargo) {
+      // TODO
+      alert('This request should send an email because it contains special requirements.');
+      setBusy(false);
+      return;
+    }
+
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -201,7 +211,10 @@ const GetQuotes: React.FC<Props> = () => {
     } else {
       for (let i = 0, n = containers.length; i < n; i++) {
         const container = containers[i];
-        if (!container.containerType || !container.commodityType || !container.location) {
+        if (!container.containerType || !container.commodityType) {
+          (listInput.current! as { focus: (i: number) => void }).focus(i);
+          return;
+        } else if (!(container.containerType?.description || '').endsWith('S.O.') && !container.location) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         }

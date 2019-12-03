@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import { Box, Checkbox, FormControlLabel } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 
