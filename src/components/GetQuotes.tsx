@@ -29,6 +29,7 @@ import useUser from '../hooks/useUser';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
+import { useSnackbar } from 'notistack';
 
 interface Props {}
 
@@ -62,6 +63,8 @@ const GetQuotes: React.FC<Props> = () => {
   const [user] = useUser();
   const history = useHistory();
   const { refresh } = useContext(QuotesEndpointContext);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const [value, onChange] = useContext(RouteSearchContext);
   const [busy, setBusy] = useState(false);
@@ -138,6 +141,11 @@ const GetQuotes: React.FC<Props> = () => {
         refresh();
 
         history.push(`/quotes/groups/${json.QuoteHeader[0].idRequest}`);
+      } catch (error) {
+        enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
+          variant: 'error',
+        });
+        console.error(error);
       } finally {
         setBusy(false);
       }

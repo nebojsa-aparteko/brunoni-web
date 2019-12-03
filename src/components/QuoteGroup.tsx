@@ -143,7 +143,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   console.log('quotesByCarrier', quotesByCarrier);
 
-  return !result ? (
+  return !quotesByCarrier ? (
     <Container maxWidth="lg">
       <ChartsCircularProgress />
     </Container>
@@ -275,8 +275,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                               <TableCell component="th" scope="row">
                                 Service Details
                               </TableCell>
-                              {quotes.map((quote: any) => (
-                                <Fragment>
+                              {quotes.map((quote: any, index) => (
+                                <Fragment key={index}>
                                   <TableCell key={quote.QuoteNumber} colSpan={3} align="center">
                                     {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                     {quote.serviceDetails[0].TransitTime} days
