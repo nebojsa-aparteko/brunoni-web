@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { makeStyles, Theme } from '@material-ui/core';
-import { ReactComponent as CookieLove } from '../assets/undraw_cookie_love_ulvn.svg';
-import { Paper, Typography, Link, Button } from '@material-ui/core';
+import { makeStyles, Theme, Card, CardMedia, CardContent, CardActionArea } from '@material-ui/core';
+import cookieLove from '../assets/undraw_cookie_love_ulvn.svg';
+import { Typography, Link, Button } from '@material-ui/core';
+import CardActions from '@material-ui/core/CardActions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -14,20 +15,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     outline: 'none',
     zIndex: 2000,
   },
-  media: {
-    padding: theme.spacing(1, 2),
-    height: 180,
-    textAlign: 'center',
-    '& > img': {
-      height: '100%',
-      width: 'auto',
-    },
-  },
-  content: {
-    padding: theme.spacing(1, 2),
-  },
-  actions: {
-    padding: theme.spacing(2),
+  cardMedia: {
+    objectFit: 'contain',
   },
 }));
 
@@ -55,11 +44,16 @@ const CookiesNotification: React.FC<Props> = () => {
   }
 
   return (
-    <Paper className={classes.root} elevation={3}>
-      <div className={classes.media}>
-        <CookieLove />
-      </div>
-      <div className={classes.content}>
+    <Card className={classes.root} elevation={3}>
+      <CardMedia
+        component="img"
+        alt="Contemplative Reptile"
+        height="140"
+        image={cookieLove}
+        title="Contemplative Reptile"
+        className={classes.cardMedia}
+      />
+      <CardContent>
         <Typography variant="body1">
           We use Cookies to ensure that we give you the best experience on our website. Read our{' '}
           <Link component="a" href="https://www.brunoni.ch/2-uncategorised/116-data-protection" target="_blank">
@@ -67,13 +61,13 @@ const CookiesNotification: React.FC<Props> = () => {
           </Link>
           .
         </Typography>
-      </div>
-      <div className={classes.actions}>
-        <Button color="primary" onClick={handleClose} variant="contained">
+      </CardContent>
+      <CardActions>
+        <Button onClick={handleClose} size="small" color="primary" variant="contained">
           I Agree
         </Button>
-      </div>
-    </Paper>
+      </CardActions>
+    </Card>
   );
 };
 
