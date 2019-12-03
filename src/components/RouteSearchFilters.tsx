@@ -6,7 +6,7 @@ import Carriers from '../contexts/Carriers';
 interface Props {
   only?: string[];
   value?: string;
-  onChange: (carrier: string | undefined, callback: () => void) => void;
+  onChange: (carrier: string | undefined) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -38,17 +38,13 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
         Carrier
       </Typography>
       <List dense className={classes.root}>
-        <RouteSearchFilter
-          label="ANY"
-          selected={value === undefined}
-          onSelect={callback => onChange(undefined, callback)}
-        />
+        <RouteSearchFilter label="ANY" selected={value === undefined} onSelect={callback => onChange(undefined)} />
         {filtered.map(carrier => (
           <RouteSearchFilter
             key={carrier.id}
             label={carrier.name.toUpperCase()}
-            selected={value === carrier?.id}
-            onSelect={callback => onChange(carrier.id, callback)}
+            selected={value === carrier?.name}
+            onSelect={() => onChange(carrier.name)}
           />
         ))}
       </List>

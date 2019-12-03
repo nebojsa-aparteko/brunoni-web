@@ -6,7 +6,9 @@ const TextSkeleton: React.FC<{ width: number | [number, number] }> = ({ width })
   const actualWidth = useMemo(() => (isArray(width) ? Math.random() * (width[1] - width[0]) + width[1] : width), [
     width,
   ]);
-  return <Skeleton width={actualWidth} height={16} style={{ margin: 0, marginTop: 2, marginBottom: 2 }} />;
+  return (
+    <Skeleton component="span" width={actualWidth} height={16} style={{ margin: 0, marginTop: 2, marginBottom: 2 }} />
+  );
 };
 
 export default TextSkeleton;

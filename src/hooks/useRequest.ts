@@ -29,7 +29,10 @@ export default function useRequest<T>(
 
   const request = useMemo(requestProvider, deps);
 
-  const invoke = (callback: Callback) => setAction({ callback });
+  const invoke = (callback: Callback) => {
+    setResult(null);
+    setAction({ callback });
+  };
 
   useEffect(() => {
     if (!action) {

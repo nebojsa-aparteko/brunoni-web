@@ -23,7 +23,7 @@ const RouteSearchFilter: React.FC<Props> = ({ label, selected, onSelect }) => {
   const [busy, setBusy] = useState(false);
 
   const handleClick = () => {
-    setBusy(true);
+    // setBusy(true);
     onSelect(() => setBusy(false));
   };
 

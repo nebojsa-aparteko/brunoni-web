@@ -2,23 +2,24 @@ import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
-import set from 'lodash/fp/set';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
+import flow from 'lodash/fp/flow';
 import { Box, Grid, makeStyles, Paper, Theme } from '@material-ui/core';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
 import Container from './Container';
 import Route from './routeSearch/Route';
-import RouteSearchResults from '../model/route-search/RouteSearchResults';
+import RouteSearchResults, { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import SearchHowTo from './routeSearch/SearchHowTo';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import withTestData from '../utilities/withTestData';
 import useRequest, { Callback, RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
-import ScrollToTop from './ScrollToTop';
+import filter from 'lodash/filter';
+import get from 'lodash/get';
 
 interface Props {}
 
@@ -78,16 +79,16 @@ const RouteSearch: React.FC<Props> = () => {
 
   const [params, setParams] = useContext(RouteSearchContext);
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
+  const [carrierFilter, setCarrierFilter] = useState(params.carrier);
   const [visibility, setVisibility] = useState(false);
 
   const [busy, error, result, search] = useRequest(() => {
-    console.log('Params date', params.date);
     const search = querySting.stringify({
       origin: params.originPort?.id,
       destination: params.destinationPort?.id,
       date: formatDate(params.date, 'yyyy-MM-dd'),
       weeks: params.weeks.toString(),
-      carrier: params.carrier,
+      carrier: carrierFilter,
     });
 
     return `${process.env.REACT_APP_API_URL}/routes?${search}`;
@@ -98,19 +99,21 @@ const RouteSearch: React.FC<Props> = () => {
       ? 'Service is unavailable at the moment. Please try again later.'
       : 'Unexpected error occurred.',
   );
+  //sorting.sort(
 
-  const results = useMemo(
-    () =>
-      result
-        ? update('Routes', sorting.sort)(result)
-        : withTestData('routesSearch', update('Routes', sortingOptions[0].sort)),
-    [result, sorting.sort],
-  ) as RouteSearchResults;
+  const carrierFilterFn = (carrierId?: string) => (routes: RouteSearchResult[]) =>
+    carrierId
+      ? routes &&
+        routes.filter(
+          (route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier.toLowerCase() === carrierId.toLowerCase(),
+        )
+      : routes;
 
-  const handleFiltersChange = (carrier: string | undefined, callback: Callback) => {
-    setParams(set('carrier', carrier)(params));
-    search(callback);
-  };
+  const results = useMemo(() => {
+    return result
+      ? update('Routes', flow(carrierFilterFn(carrierFilter), sorting.sort))(result)
+      : withTestData('routesSearch', update('Routes', sortingOptions[0].sort));
+  }, [result, sorting.sort, carrierFilter]) as RouteSearchResults;
 
   const handleVisibility = (isVisible: boolean) => {
     return isVisible ? '' : classes.hideSearch;
@@ -123,6 +126,10 @@ const RouteSearch: React.FC<Props> = () => {
       setVisibility(false);
     }
   };
+
+  // const handleFiltersChange = (carrier: string | undefined) => {
+  //   setCarrierFilter(carrierFilterFn(carrier));
+  // };
 
   return (
     <Fragment>
@@ -150,8 +157,8 @@ const RouteSearch: React.FC<Props> = () => {
                 <Paper className={classes.sidebar}>
                   <RouteSearchFilters
                     only={uniq(results?.Routes.map(route => route.OriginInfo.VoyageInfo.Carrier))}
-                    value={params.carrier}
-                    onChange={handleFiltersChange}
+                    value={carrierFilter}
+                    onChange={setCarrierFilter}
                   />
                 </Paper>
               </Grid>
