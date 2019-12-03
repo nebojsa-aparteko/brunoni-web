@@ -199,12 +199,10 @@ const normalizeQuoteGroups = (
     get('QuoteHeader'),
     values,
     filter(get('QuoteDetails')), // filters out quotes with empty quotedetails
-    logAs('After Filter'),
     groupBy('idRequest'),
     values,
     map(normalizeQuoteGroup),
     orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
-    logAs('Final Group'),
   ) as (result: QuotesResult) => QuoteGroup[];
 };
 
