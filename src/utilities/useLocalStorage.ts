@@ -1,0 +1,50 @@
+import { useState, useEffect } from 'react';
+import formatDate from 'date-fns/format';
+import parseDate from 'date-fns/parse';
+import addDays from 'date-fns/addDays';
+
+const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean) => {
+  const [value, setValue] = useState(() => {
+    try {
+      const localStorageValue = localStorage.getItem(key);
+      if (typeof localStorageValue !== 'string') {
+        localStorage.setItem(
+          key,
+          useRawValues
+            ? String(initialValue)
+            : JSON.stringify(initialValue, (key, value) => {
+                if (key === 'date') {
+                  return formatDate(value, 'yyyy-MM-dd');
+                } else {
+                  return value;
+                }
+              }),
+        );
+        return initialValue;
+      } else {
+        return useRawValues
+          ? localStorageValue
+          : JSON.parse(localStorageValue || 'null', (key, value) => {
+              if (key === 'date') {
+                return parseDate(value, 'yyyy-MM-dd', addDays(new Date(), 2));
+              } else {
+                return value;
+              }
+            });
+      }
+    } catch (e) {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      const serializedState = useRawValues ? String(value) : JSON.stringify(value);
+      localStorage.setItem(key, serializedState);
+    } catch (e) {}
+  });
+
+  return [value, setValue];
+};
+
+export default useLocalStorage;

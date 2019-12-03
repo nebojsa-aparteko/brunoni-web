@@ -146,6 +146,8 @@ const Route: React.FC<Props> = ({ route }) => {
             'subject=' +
               encodeURI(
                 'Request booking - ' +
+                  carrier?.name +
+                  ' - ' +
                   route.OriginInfo.Port.HarbourName +
                   ' → ' +
                   route.DestinationInfo.Port.HarbourName,
@@ -306,30 +308,36 @@ const Route: React.FC<Props> = ({ route }) => {
                 height="100%"
               >
                 <Box>
-                  <IconButton aria-label="actions" onClick={onMoreButtonClick}>
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    id="actions"
-                    anchorEl={moreAnchorEl}
-                    keepMounted
-                    open={Boolean(moreAnchorEl)}
-                    onClose={handleClose}
-                  >
-                    <MenuItem component="a" href={buildMailToLink(route)} target="_blank">
-                      <ListItemIcon>
-                        <DirectionsBoatIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary="Book Now" />
-                    </MenuItem>
-                    <MenuItem component={RouterLink} to={`/quotes/get`}>
-                      <ListItemIcon>
-                        <ListAltIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary="Request Quote" />
-                    </MenuItem>
-                  </Menu>
+                  {route &&
+                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 7) && (
+                      <Fragment>
+                        <IconButton aria-label="actions" onClick={onMoreButtonClick}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          id="actions"
+                          anchorEl={moreAnchorEl}
+                          keepMounted
+                          open={Boolean(moreAnchorEl)}
+                          onClose={handleClose}
+                        >
+                          <MenuItem component="a" href={buildMailToLink(route)} target="_blank">
+                            <ListItemIcon>
+                              <DirectionsBoatIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary="Book Now" />
+                          </MenuItem>
+                          <MenuItem component={RouterLink} to={`/quotes/get`}>
+                            <ListItemIcon>
+                              <ListAltIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary="Request Quote" />
+                          </MenuItem>
+                        </Menu>
+                      </Fragment>
+                    )}
                 </Box>
+
                 <Box>
                   <IconButton onClick={toggleExpansion}>
                     {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -391,7 +399,7 @@ const Route: React.FC<Props> = ({ route }) => {
             </ExpansionPanelDetails>
             <ExpansionPanelActions>
               <Grid container>
-                <Grid item md={9} xs={12}>
+                <Grid item xs={12}>
                   <Box p={2}>
                     <Typography variant="subtitle2">
                       <Box paddingBottom={1}>SERVICE {route!.Service}</Box>
@@ -404,15 +412,6 @@ const Route: React.FC<Props> = ({ route }) => {
                       </Box>
                     </Typography>
                   </Box>
-                </Grid>
-                <Grid item md={3} xs={12} className={classes.scheduleDetailsActionButtonContainer}>
-                  {parseDate(route?.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), -6) && (
-                    <Box display="flex" flexDirection="row-reverse" m={2}>
-                      <Button component={RouterLink} to="/quotes/get" color="primary" variant="contained">
-                        Book Now
-                      </Button>
-                    </Box>
-                  )}
                 </Grid>
               </Grid>
             </ExpansionPanelActions>
