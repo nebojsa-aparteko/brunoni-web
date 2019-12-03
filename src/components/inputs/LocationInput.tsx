@@ -8,7 +8,7 @@ interface Props extends InputProps<PickupLocation | undefined> {
   margin?: any;
 }
 
-const getLocationLabel = (location: PickupLocation | undefined) =>
+export const getLocationLabel = (location: PickupLocation | undefined) =>
   location ? `${location.name} - ${location.city} - ${location.countryCode}` : '';
 
 const focusAndSelect = (input: HTMLInputElement) => {

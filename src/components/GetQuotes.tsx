@@ -1,7 +1,6 @@
 import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
-import merge from 'lodash/fp/merge';
 import {
   Theme,
   makeStyles,
@@ -10,15 +9,16 @@ import {
   CircularProgress,
   Typography,
   Box,
-  Paper,
-  Checkbox,
-  FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
-import DetailedRouteSearchParams from '../model/get-quotes/DetailedRouteSearchParams';
 import ContainerModel from '../model/Container';
 import ListInput from './inputs/ListInput';
 import ContainerInput from './inputs/ContainerInput';
@@ -31,6 +31,8 @@ import { useHistory } from 'react-router';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
 import Helmet from 'react-helmet';
+import { buildMailToLink } from '../utilities/quoteRequestEmail';
+import MenuItem from './QuoteGroup';
 
 interface Props {}
 
@@ -69,6 +71,7 @@ const GetQuotes: React.FC<Props> = () => {
 
   const [value, onChange] = useContext(RouteSearchContext);
   const [busy, setBusy] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
@@ -86,6 +89,8 @@ const GetQuotes: React.FC<Props> = () => {
   const setDate = (date: Date) => onChange(set('date', date)(value));
   const setWeeks = (weeks: number) => onChange(set('weeks', weeks)(value));
   const setContainers = (containers: ContainerModel[]) => onChange(set('containers', containers)(value));
+
+  const closeDialog = () => setDialogOpen(false);
 
   useEffect(() => {
     const focusSearch = () =>
@@ -109,8 +114,7 @@ const GetQuotes: React.FC<Props> = () => {
     const hasHazardousCargo = containers.some(container => container.imo[0]);
 
     if (hasOversizeCargo || hasHazardousCargo) {
-      // TODO
-      alert('This request should send an email because it contains special requirements.');
+      setDialogOpen(true);
       setBusy(false);
       return;
     }
@@ -223,6 +227,11 @@ const GetQuotes: React.FC<Props> = () => {
     }
   };
 
+  const sendEmail = () => {
+    window.open(buildMailToLink(value));
+    closeDialog();
+  };
+
   return (
     <Fragment>
       <Helmet>
@@ -263,7 +272,7 @@ const GetQuotes: React.FC<Props> = () => {
               onChange={handleDateChange}
               open={dateOpen}
               onOpen={() => setDateOpen(true)}
-              onClose={() => setDateOpen(false)}
+              onClose={closeDialog}
             />
           </Grid>
           <Grid item sm={2} xs={6}>
@@ -284,7 +293,7 @@ const GetQuotes: React.FC<Props> = () => {
               addButtonRef={addButton}
               ItemInput={ContainerInput}
               addText="Add Cargo"
-              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
+                defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
               value={containers}
               onChange={setContainers}
             />
@@ -343,6 +352,28 @@ const GetQuotes: React.FC<Props> = () => {
           </Box>
         )}
       </Container>
+      <Dialog
+        open={dialogOpen}
+        keepMounted
+        onClose={closeDialog}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">Special Quote Request</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            This quote is available via email only. Press Send Email to proceed.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={sendEmail} variant="contained" color="primary">
+            Send Email
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Fragment>
   );
 };
