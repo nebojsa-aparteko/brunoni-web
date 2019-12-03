@@ -16,6 +16,8 @@ import {
   DialogActions,
 } from '@material-ui/core';
 import Port from '../model/Port';
+import update from 'lodash/fp/update';
+import flow from 'lodash/fp/flow';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
@@ -33,6 +35,7 @@ import { useSnackbar } from 'notistack';
 import Helmet from 'react-helmet';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
 import MenuItem from './QuoteGroup';
+import asArray from '../utilities/asArray';
 
 interface Props {}
 
@@ -153,9 +156,15 @@ const GetQuotes: React.FC<Props> = () => {
 
         const json = await response.json();
 
+        const normalizedJson = update('QuoteHeader', asArray)(json);
+        console.log('got quote response ', normalizedJson);
         refresh();
 
-        history.push(`/quotes/groups/${json.QuoteHeader[0].idRequest}`);
+        if (normalizedJson.QuoteHeader[0].QuoteDetails) {
+          history.push(`/quotes/groups/${normalizedJson.QuoteHeader[0].idRequest}`);
+        } else {
+          setDialogOpen(true);
+        }
       } catch (error) {
         enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
           variant: 'error',
@@ -293,7 +302,7 @@ const GetQuotes: React.FC<Props> = () => {
               addButtonRef={addButton}
               ItemInput={ContainerInput}
               addText="Add Cargo"
-                defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
+              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
               value={containers}
               onChange={setContainers}
             />

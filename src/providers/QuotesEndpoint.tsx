@@ -8,11 +8,10 @@ import map from 'lodash/fp/map';
 import set from 'lodash/fp/set';
 import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
-import mapValues from 'lodash/fp/mapValues';
-import keys from 'lodash/fp/keys';
 import padStart from 'lodash/fp/padStart';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
+import filter from 'lodash/fp/filter';
 import partialRight from 'lodash/fp/partialRight';
 import Context from '../contexts/QuotesEndpoint';
 import QuotesResult from '../model/quotes/QuotesResult';
@@ -32,7 +31,6 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import logAs from '../utilities/logAs';
-import { log } from 'util';
 
 interface Props {
   children: React.ReactNode;
@@ -134,6 +132,7 @@ const normalizeQuoteGroups = (
 
   const normalizeContainers = flow(asArray, map(normalizeContainer));
   const uniqueCommodityTypes = flow(map(get('commodityType')), uniqBy('id'));
+  // const carriers= map(get(''))
 
   // commodityTypes: uniqBy('id') ( values(mapValues(get('commodityType')) (normalizedQuote.containers)  )),
 
@@ -198,10 +197,14 @@ const normalizeQuoteGroups = (
 
   return flow(
     get('QuoteHeader'),
+    values,
+    filter(get('QuoteDetails')), // filters out quotes with empty quotedetails
+    logAs('After Filter'),
     groupBy('idRequest'),
     values,
     map(normalizeQuoteGroup),
     orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
+    logAs('Final Group'),
   ) as (result: QuotesResult) => QuoteGroup[];
 };
 

@@ -192,7 +192,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
           </Grid>
         </Box>
         <Box mb={6}>
-          {quotesByCarrier.map(([carrierId, quotes]) => {
+          {quotesByCarrier.map(([carrierId, quotes], index) => {
             // need to find all of the quoteDetail items across provided quotes
             const quoteDetailItemsMerged = flow(
               map(get('quoteDetails')),
@@ -216,7 +216,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
             };
 
             return (
-              <Box id={carrierId} mb={1}>
+              <Box id={carrierId} mb={1} key={index}>
                 <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel === carrierId}>
                   <ExpansionPanelSummary
                     aria-controls="panel1c-content"

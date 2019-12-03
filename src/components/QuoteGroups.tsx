@@ -1,5 +1,6 @@
 import React, { useContext, Fragment } from 'react';
 import formatDate from 'date-fns/format';
+import uniq from 'lodash/fp/uniq';
 import { Table, TableBody, TableCell, TableHead, TableRow, Grid, Chip, Button } from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
@@ -20,6 +21,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
         <TableHead>
           <TableRow>
             <TableCell>Route</TableCell>
+            <TableCell>Carriers</TableCell>
             <TableCell>Cargo</TableCell>
             <TableCell>Commodities</TableCell>
             <TableCell>Issue Date</TableCell>
@@ -33,6 +35,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                   <TableCell>
                     {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                     {quoteGroup.destination.city || quoteGroup.destination.id}
+                  </TableCell>
+                  <TableCell>
+                    {uniq(quoteGroup.quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(',')}
                   </TableCell>
                   <TableCell>
                     <Grid container spacing={1}>
@@ -73,6 +78,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                 <TableRow key={i}>
                   <TableCell>
                     <Skeleton width={50} height={16} style={{ margin: 0 }} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton width={140} height={16} style={{ margin: 0 }} />
                   </TableCell>
                   <TableCell>
                     <Skeleton width={65} height={16} style={{ margin: 0 }} />

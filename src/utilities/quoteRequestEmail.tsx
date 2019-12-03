@@ -51,14 +51,7 @@ export const buildMailToLink = (searchParams: DetailedRouteSearchParams) => {
     '?'.concat(
       [
         'subject=' +
-          encodeURI(
-            'Request quote - ' +
-              searchParams.carrier +
-              ', ' +
-              searchParams.originPort!.city +
-              ' → ' +
-              searchParams.destinationPort!.city,
-          ),
+          encodeURI('Request quote - ' + searchParams.originPort!.city + ' → ' + searchParams.destinationPort!.city),
         'body=' + encodeURI(createEmailBody(searchParams)),
       ].join('&'),
     )
