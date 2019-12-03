@@ -38,6 +38,7 @@ const OOGListInput = forwardRef((props: InputProps<OOG[]>, ref) => (
   <ListInput
     ref={ref}
     ItemInput={OOGInput}
+    addText="Add container info"
     defaultItemValue={{ width: '', height: '', length: '', weight: '' }}
     {...props}
   />
@@ -47,6 +48,7 @@ const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
   <ListInput
     ref={ref}
     ItemInput={IMOInput}
+    addText="Add new IMO"
     defaultItemValue={{ IMOClass: '', UNNumber: '', PGNumber: '' }}
     {...props}
   />

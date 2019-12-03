@@ -283,6 +283,7 @@ const GetQuotes: React.FC<Props> = () => {
               listRef={listInput}
               addButtonRef={addButton}
               ItemInput={ContainerInput}
+              addText="Add Cargo"
               defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
               value={containers}
               onChange={setContainers}
