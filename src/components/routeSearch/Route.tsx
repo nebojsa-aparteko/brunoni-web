@@ -309,7 +309,7 @@ const Route: React.FC<Props> = ({ route }) => {
               >
                 <Box>
                   {route &&
-                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 7) && (
+                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 4) && (
                       <Fragment>
                         <IconButton aria-label="actions" onClick={onMoreButtonClick}>
                           <MoreVertIcon />
