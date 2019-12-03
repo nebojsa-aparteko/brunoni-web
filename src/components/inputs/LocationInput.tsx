@@ -1,15 +1,17 @@
-import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useContext, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import InputProps from '../../model/InputProps';
 import Locations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import SelectInput from './SelectInput';
+import orderBy from 'lodash/fp/orderBy';
+import get from 'lodash/fp/get';
 
 interface Props extends InputProps<PickupLocation | undefined> {
   margin?: any;
 }
 
 export const getLocationLabel = (location: PickupLocation | undefined) =>
-  location ? `${location.name} - ${location.city} - ${location.countryCode}` : '';
+  location ? `${location.name} - ${location.city} - ${location.countryCode}`.toUpperCase() : '';
 
 const focusAndSelect = (input: HTMLInputElement) => {
   input.focus();
@@ -20,6 +22,10 @@ const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);
+
+  const sortedLocations = useMemo(() => orderBy([get('countryCode'), get('city'), get('name')], 'asc')(locations), [
+    locations,
+  ]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -32,7 +38,7 @@ const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
       inputRef={input}
       label="Pickup/Dropoff Location in EUROPE"
       margin={margin}
-      options={locations}
+      options={sortedLocations}
       getOptionLabel={getLocationLabel}
       open={open}
       setOpen={setOpen}
