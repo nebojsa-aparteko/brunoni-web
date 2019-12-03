@@ -42,6 +42,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import { buildMailToLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
+import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 
 interface Props {
   id: string;
@@ -146,7 +147,11 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   console.log('quotesByCarrier', quotesByCarrier);
 
-  return (
+  return !result ? (
+    <Container maxWidth="lg">
+      <ChartsCircularProgress />
+    </Container>
+  ) : (
     <Container maxWidth="lg">
       <Box display="flex" mt={6}>
         <Box flexShrink="0">
@@ -191,18 +196,22 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
             ),
           )(quotes) as QuoteDetail[];
 
-          const handlePanelClick = () => {
-            setSelectedPanel(carrierId);
-            window.scrollTo(0, 150);
+          const handlePanelClick = (carrierID: string) => {
+            if (selectedPanel === carrierID) {
+              setSelectedPanel('');
+            } else {
+              setSelectedPanel(carrierId);
+              window.scrollTo(0, 150);
+            }
           };
 
           return (
             <Box id={carrierId} mb={1}>
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel == carrierId}>
+              <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel === carrierId}>
                 <ExpansionPanelSummary
                   aria-controls="panel1c-content"
                   expandIcon={<ExpandMoreIcon />}
-                  onClick={handlePanelClick}
+                  onClick={() => handlePanelClick(carrierId)}
                 >
                   <Typography variant="h4">{carrierId}</Typography>
                 </ExpansionPanelSummary>
