@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
 import merge from 'lodash/fp/merge';
@@ -30,6 +30,7 @@ import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
+import Helmet from 'react-helmet';
 
 interface Props {}
 
@@ -210,122 +211,127 @@ const GetQuotes: React.FC<Props> = () => {
   };
 
   return (
-    <Container className={classes.root}>
-      <Paper className={classes.paper}>
-        <Typography variant="h4" gutterBottom>
-          Get Quote
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item sm={3} xs={12}>
-            <PortInput
-              label="Origin"
-              ports={ports}
-              inputRef={originInput}
-              value={originPort}
-              onChange={handleOriginPortChange}
-              open={originPortOpen}
-              onOpen={() => setOriginPortOpen(true)}
-              onClose={() => setOriginPortOpen(false)}
-            />
-          </Grid>
-          <Grid item sm={3} xs={12}>
-            <PortInput
-              label="Destination"
-              ports={ports}
-              inputRef={destinationInput}
-              value={destinationPort}
-              onChange={handleDestinationPortChange}
-              open={destinationPortOpen}
-              onOpen={() => setDestinationPortOpen(true)}
-              onClose={() => setDestinationPortOpen(false)}
-            />
-          </Grid>
-          <Grid item sm="auto" xs={6}>
-            <DateInput
-              value={date}
-              onChange={handleDateChange}
-              open={dateOpen}
-              onOpen={() => setDateOpen(true)}
-              onClose={() => setDateOpen(false)}
-            />
-          </Grid>
-          <Grid item sm="auto" xs={6}>
-            <WeeksInput
-              value={weeks}
-              onChange={handleWeeksChange}
-              open={weeksOpen}
-              onOpen={() => setWeeksOpen(true)}
-              onClose={() => setWeeksOpen(false)}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Containers
-            </Typography>
-            <ListInput
-              listRef={listInput}
-              addButtonRef={addButton}
-              ItemInput={ContainerInput}
-              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
-              value={containers}
-              onChange={setContainers}
-            />
-          </Grid>
-          <Grid item sm="auto" xs={12}>
-            <Button
-              variant="contained"
-              size="large"
-              color="primary"
-              className={classes.button}
-              onClick={handleSearch}
-              fullWidth
-            >
-              <CircularProgress
-                size={20}
-                color="inherit"
-                className={classes.progress}
-                style={{ visibility: busy ? 'visible' : 'hidden' }}
+    <Fragment>
+      <Helmet>
+        <title>{`Get Quote | ${process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND.toUpperCase() : ''}`}</title>
+      </Helmet>
+      <Container className={classes.root}>
+        <Paper className={classes.paper}>
+          <Typography variant="h4" gutterBottom>
+            Get Quote
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item sm={3} xs={12}>
+              <PortInput
+                label="Origin"
+                ports={ports}
+                inputRef={originInput}
+                value={originPort}
+                onChange={handleOriginPortChange}
+                open={originPortOpen}
+                onOpen={() => setOriginPortOpen(true)}
+                onClose={() => setOriginPortOpen(false)}
               />
-              <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
-            </Button>
+            </Grid>
+            <Grid item sm={3} xs={12}>
+              <PortInput
+                label="Destination"
+                ports={ports}
+                inputRef={destinationInput}
+                value={destinationPort}
+                onChange={handleDestinationPortChange}
+                open={destinationPortOpen}
+                onOpen={() => setDestinationPortOpen(true)}
+                onClose={() => setDestinationPortOpen(false)}
+              />
+            </Grid>
+            <Grid item sm="auto" xs={6}>
+              <DateInput
+                value={date}
+                onChange={handleDateChange}
+                open={dateOpen}
+                onOpen={() => setDateOpen(true)}
+                onClose={() => setDateOpen(false)}
+              />
+            </Grid>
+            <Grid item sm="auto" xs={6}>
+              <WeeksInput
+                value={weeks}
+                onChange={handleWeeksChange}
+                open={weeksOpen}
+                onOpen={() => setWeeksOpen(true)}
+                onClose={() => setWeeksOpen(false)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Containers
+              </Typography>
+              <ListInput
+                listRef={listInput}
+                addButtonRef={addButton}
+                ItemInput={ContainerInput}
+              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
+                value={containers}
+                onChange={setContainers}
+              />
+            </Grid>
+            <Grid item sm="auto" xs={12}>
+              <Button
+                variant="contained"
+                size="large"
+                color="primary"
+                className={classes.button}
+                onClick={handleSearch}
+                fullWidth
+              >
+                <CircularProgress
+                  size={20}
+                  color="inherit"
+                  className={classes.progress}
+                  style={{ visibility: busy ? 'visible' : 'hidden' }}
+                />
+                <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
-      {process.env.NODE_ENV !== 'production' && (
-        <Box mt={4}>
-          <Typography variant="subtitle2">This is visible in development only.</Typography>
-          <Typography variant="h5">For testing purposes please use following options:</Typography>
-          <Box display="flex" flexDirection="column" my={1}>
-            <Box my={1}>
-              <Typography variant="h6">Hamburg Süd</Typography>
-              <Box display="flex" mx={-1}>
-                <Box mx={1}>
-                  <Typography>Rotterdam to Santos</Typography>
-                  <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
-                </Box>
-                <Box mx={1}>
-                  <Typography>Rotterdam to Santos</Typography>
-                  <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+        </Paper>
+        {process.env.NODE_ENV !== 'production' && (
+          <Box mt={4}>
+            <Typography variant="subtitle2">This is visible in development only.</Typography>
+            <Typography variant="h5">For testing purposes please use following options:</Typography>
+            <Box display="flex" flexDirection="column" my={1}>
+              <Box my={1}>
+                <Typography variant="h6">Hamburg Süd</Typography>
+                <Box display="flex" mx={-1}>
+                  <Box mx={1}>
+                    <Typography>Rotterdam to Santos</Typography>
+                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                  </Box>
+                  <Box mx={1}>
+                    <Typography>Rotterdam to Santos</Typography>
+                    <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-            <Box my={1}>
-              <Typography variant="h6">Hyundai</Typography>
-              <Box display="flex" mx={-1}>
-                <Box mx={1}>
-                  <Typography>Rotterdam to Shanghai</Typography>
-                  <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
-                </Box>
-                <Box mx={1}>
-                  <Typography>Rotterdam to Shanghai</Typography>
-                  <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+              <Box my={1}>
+                <Typography variant="h6">Hyundai</Typography>
+                <Box display="flex" mx={-1}>
+                  <Box mx={1}>
+                    <Typography>Rotterdam to Shanghai</Typography>
+                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                  </Box>
+                  <Box mx={1}>
+                    <Typography>Rotterdam to Shanghai</Typography>
+                    <Typography>20‘Reefer & 40‘& 40‘High Cube Reefer Container</Typography>
+                  </Box>
                 </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-      )}
-    </Container>
+        )}
+      </Container>
+    </Fragment>
   );
 };
 
