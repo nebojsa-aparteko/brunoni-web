@@ -1,5 +1,6 @@
 import Port from '../Port';
 import Container from '../Container';
+import ContainerDetails from '../ContainerDetails';
 
 export default interface DetailedRouteSearchParams {
   originPort?: Port;
@@ -7,5 +8,5 @@ export default interface DetailedRouteSearchParams {
   date: Date;
   weeks: number;
   carrier?: string;
-  containers: Container[];
+  containers: Array<Container & ContainerDetails>;
 }

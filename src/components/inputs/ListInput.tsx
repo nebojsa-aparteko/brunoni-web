@@ -31,7 +31,10 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
   const handleAdd = () => {
     onChange([...value, defaultItemValue]);
     setTimeout(() => {
-      (refs.current[refs.current.length - 1] as { focus: () => void }).focus();
+      const ref = refs.current[refs.current.length - 1] as { focus: () => void };
+      if (ref && ref.focus) {
+        ref.focus();
+      }
     });
   };
 

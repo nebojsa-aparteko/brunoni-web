@@ -2,7 +2,18 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import set from 'lodash/fp/set';
 import merge from 'lodash/fp/merge';
-import { Theme, makeStyles, Grid, Button, CircularProgress, Typography, Box, Paper } from '@material-ui/core';
+import {
+  Theme,
+  makeStyles,
+  Grid,
+  Button,
+  CircularProgress,
+  Typography,
+  Box,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+} from '@material-ui/core';
 import Port from '../model/Port';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
@@ -65,7 +76,7 @@ const GetQuotes: React.FC<Props> = () => {
   const addButton = useRef<HTMLButtonElement>();
 
   const { originPort, destinationPort, date, weeks, containers } = value;
-  console.log('value', value);
+
   const setOriginPort = (port: Port) => onChange(set('originPort', port)(value));
   const setDestinationPort = (port: Port) => onChange(set('destinationPort', port)(value));
   const setDate = (date: Date) => onChange(set('date', date)(value));
@@ -89,19 +100,6 @@ const GetQuotes: React.FC<Props> = () => {
     if (!busy || !user) {
       return;
     }
-
-    console.log('Quoteationaksdjfh', 'requesting', {
-      origin: originPort!.id,
-      destination: destinationPort!.id,
-      date: date.toISOString(),
-      weeks: Number(weeks),
-      containers: containers.map((container: ContainerType) => ({
-        type: container.containerType!.id,
-        commodity: container.commodityType!.id,
-        location: container.location?.id,
-        quantity: container.quantity,
-      })),
-    });
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -260,7 +258,7 @@ const GetQuotes: React.FC<Props> = () => {
               listRef={listInput}
               addButtonRef={addButton}
               ItemInput={ContainerInput}
-              defaultItemValue={{ quantity: 1 }}
+              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
               value={containers}
               onChange={setContainers}
             />
