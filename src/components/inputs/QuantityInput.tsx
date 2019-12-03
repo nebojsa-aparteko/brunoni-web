@@ -4,7 +4,9 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import InputProps from '../../model/InputProps';
 
-interface Props extends InputProps<number> {}
+interface Props extends InputProps<number> {
+  margin?: any;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   adornment: {
@@ -12,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const QuantityInput: React.FC<Props> = ({ value, onChange }) => {
+const QuantityInput: React.FC<Props> = ({ value, onChange, margin }) => {
   const classes = useStyles();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +25,7 @@ const QuantityInput: React.FC<Props> = ({ value, onChange }) => {
     <Box>
       <TextField
         label="Quantity"
+        margin={margin}
         variant="outlined"
         value={String(value)}
         onChange={handleChange}

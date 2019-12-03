@@ -2,9 +2,20 @@ import React, { ChangeEvent, forwardRef, useEffect, useImperativeHandle, useRef 
 import set from 'lodash/fp/set';
 import InputProps from '../../model/InputProps';
 import IMO from '../../model/IMO';
-import { Box, TextField } from '@material-ui/core';
+import { Box, makeStyles, TextField, Theme } from '@material-ui/core';
 
 interface Props extends InputProps<IMO> {}
+
+export const inlineFormStyles = makeStyles((theme: Theme) => ({
+  formControl: {
+    '& > *': {
+      flex: 1,
+    },
+    '& > * + *': {
+      marginLeft: theme.spacing(2),
+    },
+  },
+}));
 
 const focusAndSelect = (input: HTMLInputElement) => {
   input.focus();
@@ -12,6 +23,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
 };
 
 const IMOInput: React.FC<Props> = ({ value, onChange }, ref) => {
+  const classes = inlineFormStyles();
   const input = useRef<HTMLInputElement>();
 
   useImperativeHandle(ref, () => ({
@@ -25,16 +37,17 @@ const IMOInput: React.FC<Props> = ({ value, onChange }, ref) => {
   const handlePGNumberChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('PGNumber', e.target.value)(value));
 
   return (
-    <Box>
+    <Box display="flex" className={classes.formControl}>
       <TextField
         inputRef={input}
         label="IMO Class"
+        margin="dense"
         variant="outlined"
         value={value.IMOClass}
         onChange={handleIMOClassChange}
       />
-      <TextField label="UN Number" variant="outlined" value={value.UNNumber} onChange={handleUNNumberChange} />
-      <TextField label="PG Number" variant="outlined" value={value.PGNumber} onChange={handlePGNumberChange} />
+      <TextField label="UN Number" variant="outlined" value={value.UNNumber} onChange={handleUNNumberChange} margin="dense" />
+      <TextField label="PG Number" variant="outlined" value={value.PGNumber} onChange={handlePGNumberChange} margin="dense" />
     </Box>
   );
 };

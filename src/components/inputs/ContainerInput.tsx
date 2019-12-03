@@ -1,9 +1,9 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, Fragment } from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
 import identity from 'lodash/fp/identity';
-import { Box, Grid } from '@material-ui/core';
+import { Box, Grid, makeStyles, TextField, Theme, Paper } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
@@ -20,8 +20,19 @@ import OOGInput from './OOGInput';
 import IMO from '../../model/IMO';
 import OOG from '../../model/OOG';
 import ContainerDetails from '../../model/ContainerDetails';
+import FormControl from '@material-ui/core/FormControl';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
+
+const useStyles = makeStyles((theme: Theme) => ({
+  containerFormGroup: {
+    backgroundColor: theme.palette.grey['100'],
+    padding: theme.spacing(2),
+  },
+  inlineForm: {
+    display: 'flex',
+  },
+}));
 
 const OOGListInput = forwardRef((props: InputProps<OOG[]>, ref) => (
   <ListInput
@@ -42,6 +53,7 @@ const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
 ));
 
 const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
+  const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
   const locationInput = useRef();
@@ -95,11 +107,12 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
   };
 
   return (
-    <Box>
+    <Fragment>
       <Grid container spacing={2}>
         <Grid item xs={3}>
           <ContainerTypeInput
             ref={containerTypeInput}
+            margin="dense"
             value={value.containerType}
             onChange={handleContainerTypeChange}
           />
@@ -107,36 +120,39 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
         <Grid item xs={3}>
           <CommodityTypeInput
             ref={commodityTypeInput}
+            margin="dense"
             value={value.commodityType}
             onChange={handleCommodityTypeChange}
           />
         </Grid>
         {!value.containerType?.description?.endsWith('S.O.') && (
           <Grid item xs={4}>
-            <LocationInput ref={locationInput} value={value.location} onChange={handleLocationChange} />
+            <LocationInput ref={locationInput} margin="dense" value={value.location} onChange={handleLocationChange} />
           </Grid>
         )}
         <Grid item xs={2}>
-          <QuantityInput value={value.quantity} onChange={handleQuantityChange} />
+          <QuantityInput value={value.quantity} margin="dense" onChange={handleQuantityChange} />
         </Grid>
       </Grid>
-      <OptionalInput
-        label="This container contains IMO"
-        ItemInput={IMOListInput}
-        defaultItemValue={[]}
-        value={value.imo}
-        onChange={handleIMOChange}
-      />
-      {(value.containerType || {}).couldBeOversize && (
+      <FormControl margin="dense" className={classes.inlineForm}>
         <OptionalInput
-          label="This container is out of gauge"
-          ItemInput={OOGListInput}
+          label="This container contains IMO"
+          ItemInput={IMOListInput}
           defaultItemValue={[]}
-          value={value.oog}
-          onChange={handleOOGChange}
+          value={value.imo}
+          onChange={handleIMOChange}
         />
-      )}
-    </Box>
+        {(value.containerType || {}).couldBeOversize && (
+          <OptionalInput
+            label="This container is out of gauge"
+            ItemInput={OOGListInput}
+            defaultItemValue={[]}
+            value={value.oog}
+            onChange={handleOOGChange}
+          />
+        )}
+      </FormControl>
+    </Fragment>
   );
 };
 

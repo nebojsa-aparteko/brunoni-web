@@ -229,86 +229,84 @@ const GetQuotes: React.FC<Props> = () => {
         <title>{`Get Quote | ${process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND.toUpperCase() : ''}`}</title>
       </Helmet>
       <Container className={classes.root}>
-        <Paper className={classes.paper}>
-          <Typography variant="h4" gutterBottom>
-            Get Quote
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item sm={3} xs={12}>
-              <PortInput
-                label="Origin"
-                ports={ports}
-                inputRef={originInput}
-                value={originPort}
-                onChange={handleOriginPortChange}
-                open={originPortOpen}
-                onOpen={() => setOriginPortOpen(true)}
-                onClose={() => setOriginPortOpen(false)}
-              />
-            </Grid>
-            <Grid item sm={3} xs={12}>
-              <PortInput
-                label="Destination"
-                ports={ports}
-                inputRef={destinationInput}
-                value={destinationPort}
-                onChange={handleDestinationPortChange}
-                open={destinationPortOpen}
-                onOpen={() => setDestinationPortOpen(true)}
-                onClose={() => setDestinationPortOpen(false)}
-              />
-            </Grid>
-            <Grid item sm="auto" xs={6}>
-              <DateInput
-                value={date}
-                onChange={handleDateChange}
-                open={dateOpen}
-                onOpen={() => setDateOpen(true)}
-                onClose={() => setDateOpen(false)}
-              />
-            </Grid>
-            <Grid item sm="auto" xs={6}>
-              <WeeksInput
-                value={weeks}
-                onChange={handleWeeksChange}
-                open={weeksOpen}
-                onOpen={() => setWeeksOpen(true)}
-                onClose={() => setWeeksOpen(false)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Containers
-              </Typography>
-              <ListInput
-                listRef={listInput}
-                addButtonRef={addButton}
-                ItemInput={ContainerInput}
-              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
-                value={containers}
-                onChange={setContainers}
-              />
-            </Grid>
-            <Grid item sm="auto" xs={12}>
-              <Button
-                variant="contained"
-                size="large"
-                color="primary"
-                className={classes.button}
-                onClick={handleSearch}
-                fullWidth
-              >
-                <CircularProgress
-                  size={20}
-                  color="inherit"
-                  className={classes.progress}
-                  style={{ visibility: busy ? 'visible' : 'hidden' }}
-                />
-                <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
-              </Button>
-            </Grid>
+        <Typography variant="h4" gutterBottom>
+          Get Quote
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item sm={3} xs={12}>
+            <PortInput
+              label="Origin"
+              ports={ports}
+              inputRef={originInput}
+              value={originPort}
+              onChange={handleOriginPortChange}
+              open={originPortOpen}
+              onOpen={() => setOriginPortOpen(true)}
+              onClose={() => setOriginPortOpen(false)}
+            />
           </Grid>
-        </Paper>
+          <Grid item sm={3} xs={12}>
+            <PortInput
+              label="Destination"
+              ports={ports}
+              inputRef={destinationInput}
+              value={destinationPort}
+              onChange={handleDestinationPortChange}
+              open={destinationPortOpen}
+              onOpen={() => setDestinationPortOpen(true)}
+              onClose={() => setDestinationPortOpen(false)}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={6}>
+            <DateInput
+              value={date}
+              onChange={handleDateChange}
+              open={dateOpen}
+              onOpen={() => setDateOpen(true)}
+              onClose={() => setDateOpen(false)}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={6}>
+            <WeeksInput
+              value={weeks}
+              onChange={handleWeeksChange}
+              open={weeksOpen}
+              onOpen={() => setWeeksOpen(true)}
+              onClose={() => setWeeksOpen(false)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Containers
+            </Typography>
+            <ListInput
+              listRef={listInput}
+              addButtonRef={addButton}
+              ItemInput={ContainerInput}
+              defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
+              value={containers}
+              onChange={setContainers}
+            />
+          </Grid>
+          <Grid item sm="auto" xs={12}>
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              className={classes.button}
+              onClick={handleSearch}
+              fullWidth
+            >
+              <CircularProgress
+                size={20}
+                color="inherit"
+                className={classes.progress}
+                style={{ visibility: busy ? 'visible' : 'hidden' }}
+              />
+              <span style={{ visibility: busy ? 'hidden' : 'visible' }}>Request</span>
+            </Button>
+          </Grid>
+        </Grid>
         {process.env.NODE_ENV !== 'production' && (
           <Box mt={4}>
             <Typography variant="subtitle2">This is visible in development only.</Typography>

@@ -4,7 +4,9 @@ import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
 import SelectInput from './SelectInput';
 
-interface Props extends InputProps<ContainerType | undefined> {}
+interface Props extends InputProps<ContainerType | undefined> {
+  margin?: any;
+}
 
 const getContainerTypeLabel = (containerType: ContainerType | undefined) =>
   containerType ? containerType.description : '';
@@ -14,7 +16,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const ContainerTypeInput: React.FC<Props> = ({ value, onChange }, ref) => {
+const ContainerTypeInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const containerTypes = useContext(ContainerTypes);
   const [open, setOpen] = useState(false);
@@ -29,6 +31,7 @@ const ContainerTypeInput: React.FC<Props> = ({ value, onChange }, ref) => {
     <SelectInput
       inputRef={input}
       label="Container Type"
+      margin={margin}
       options={containerTypes}
       getOptionLabel={getContainerTypeLabel}
       open={open}

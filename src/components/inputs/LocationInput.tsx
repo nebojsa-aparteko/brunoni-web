@@ -4,7 +4,9 @@ import Locations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import SelectInput from './SelectInput';
 
-interface Props extends InputProps<PickupLocation | undefined> {}
+interface Props extends InputProps<PickupLocation | undefined> {
+  margin?: any;
+}
 
 const getLocationLabel = (location: PickupLocation | undefined) =>
   location ? `${location.name} - ${location.city} - ${location.countryCode}` : '';
@@ -14,7 +16,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const LocationInput: React.FC<Props> = ({ value, onChange }, ref) => {
+const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);
@@ -29,6 +31,7 @@ const LocationInput: React.FC<Props> = ({ value, onChange }, ref) => {
     <SelectInput
       inputRef={input}
       label="Pickup/Dropoff Location in EUROPE"
+      margin={margin}
       options={locations}
       getOptionLabel={getLocationLabel}
       open={open}

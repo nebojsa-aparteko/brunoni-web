@@ -1,8 +1,8 @@
 import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
-import { Box, Button } from '@material-ui/core';
+import { Box, Button, Paper, IconButton, makeStyles, Theme } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputProps from '../../model/InputProps';
 
 interface Props<T> extends InputProps<T[]> {
@@ -14,7 +14,14 @@ interface Props<T> extends InputProps<T[]> {
   onChange: (value: T[]) => void;
 }
 
+const useStyles = makeStyles((theme: Theme) => ({
+  paper: {
+    marginBottom: theme.spacing(1),
+  },
+}));
+
 function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, value, onChange }: Props<T>) {
+  const classes = useStyles();
   const refs = useRef<unknown[]>([]);
 
   useImperativeHandle(listRef, () => ({
@@ -47,16 +54,18 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, defaultItemValue, valu
   return (
     <Box>
       {value.map((item, i) => (
-        <Box key={i} display="flex" mb={2}>
-          <Box flex="1">
-            <ItemInput ref={ref => (refs.current[i] = ref)} value={item} onChange={v => onChange(set(i, v)(value))} />
+        <Paper key={i} className={classes.paper}>
+          <Box display="flex" p={2}>
+            <Box flex="1">
+              <ItemInput ref={ref => (refs.current[i] = ref)} value={item} onChange={v => onChange(set(i, v)(value))} />
+            </Box>
+            <Box ml={2} alignSelf="center">
+              <IconButton onClick={handleRemove(i)} aria-label="delete">
+                <DeleteForeverIcon />
+              </IconButton>
+            </Box>
           </Box>
-          <Box ml={2} alignSelf="center">
-            <Button variant="contained" size="small" startIcon={<RemoveIcon />} onClick={handleRemove(i)}>
-              Remove
-            </Button>
-          </Box>
-        </Box>
+        </Paper>
       ))}
       <Button buttonRef={addButtonRef} variant="contained" size="small" startIcon={<AddIcon />} onClick={handleAdd}>
         Add

@@ -7,6 +7,7 @@ import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
 
 interface Props<T> extends InputProps<T> {
   label: string;
+  margin?: any;
   options: T[] | undefined;
   getOptionLabel: (value: T) => string;
   inputRef?: React.Ref<any>;
@@ -22,6 +23,7 @@ const useStyles = makeStyles({
 
 export default function SelectInput<T>({
   label,
+  margin,
   options,
   getOptionLabel,
   inputRef,
@@ -50,6 +52,7 @@ export default function SelectInput<T>({
           {...params}
           inputRef={inputRef}
           label={label}
+          margin={margin}
           fullWidth
           variant="outlined"
           InputProps={{

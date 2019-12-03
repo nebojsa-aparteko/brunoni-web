@@ -3,6 +3,7 @@ import set from 'lodash/fp/set';
 import InputProps from '../../model/InputProps';
 import OOG from '../../model/OOG';
 import { Box, TextField } from '@material-ui/core';
+import { inlineFormStyles } from './IMOInput';
 
 interface Props extends InputProps<OOG> {}
 
@@ -12,6 +13,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
 };
 
 const OOGInput: React.FC<Props> = ({ value, onChange }, ref) => {
+  const classes = inlineFormStyles();
   const input = useRef();
 
   useImperativeHandle(ref, () => ({
@@ -26,17 +28,18 @@ const OOGInput: React.FC<Props> = ({ value, onChange }, ref) => {
   const handleWeightChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('weight', e.target.value)(value));
 
   return (
-    <Box>
+    <Box display="flex" className={classes.formControl}>
       <TextField
         inputRef={input}
         label="Width [cm]"
+        margin="dense"
         variant="outlined"
         value={value.width}
         onChange={handleWidthChange}
       />
-      <TextField label="Height [cm]" variant="outlined" value={value.height} onChange={handleHeightChange} />
-      <TextField label="Length [cm]" variant="outlined" value={value.length} onChange={handleLengthChange} />
-      <TextField label="Weight [kg]" variant="outlined" value={value.weight} onChange={handleWeightChange} />
+      <TextField label="Height [cm]" variant="outlined" value={value.height} onChange={handleHeightChange} margin="dense" />
+      <TextField label="Length [cm]" variant="outlined" value={value.length} onChange={handleLengthChange} margin="dense" />
+      <TextField label="Weight [kg]" variant="outlined" value={value.weight} onChange={handleWeightChange} margin="dense" />
     </Box>
   );
 };
