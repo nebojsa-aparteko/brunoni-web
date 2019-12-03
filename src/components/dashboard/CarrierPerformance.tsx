@@ -39,8 +39,6 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     const carriers = flow(get('TEU'), keys)(clientPerformance);
 
     const performanceCarrierYear = performanceByCarrierByYear(year)(clientPerformance);
-    console.log('perf', performanceCarrierYear);
-
     // handle odd case where the carrier can have a total sum of zero TEUs
     // eliminate him from the list
     let nonZeroTEUCarriers: string[] = [];

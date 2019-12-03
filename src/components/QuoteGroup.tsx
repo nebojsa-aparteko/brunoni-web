@@ -137,7 +137,11 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
   const quoteGroup = result?.find(quoteGroup => quoteGroup.id === id);
 
   if (!quoteGroup) {
-    return null;
+    return (
+      <Container maxWidth="lg">
+        <ChartsCircularProgress />
+      </Container>
+    );
   }
 
   const quotesByCarrier = flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>;
@@ -219,10 +223,10 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                     <Typography variant="h4">{carrierId}</Typography>
                   </ExpansionPanelSummary>
 
-                  <ExpansionPanelDetails className={classes.tableScroll}>
+                  <ExpansionPanelDetails>
                     <Grid container>
                       <Grid item xs={12}>
-                        <Paper>
+                        <Paper className={classes.tableScroll}>
                           <Table size="small" aria-label="a dense table">
                             <TableHead>
                               <TableRow>
@@ -230,8 +234,10 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 {quotes.map((quote, index) => (
                                   <Fragment key={index}>
                                     <TableCell className={classes.currencyCell}>Currency</TableCell>
-                                    <TableCell align="right">Cost Value</TableCell>
-                                    <TableCell>Cost Unit</TableCell>
+                                    <TableCell align="right" style={{ minWidth: '120px' }}>
+                                      Cost Value
+                                    </TableCell>
+                                    <TableCell style={{ minWidth: '120px' }}>Cost Unit</TableCell>
                                   </Fragment>
                                 ))}
                               </TableRow>
@@ -243,39 +249,34 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 )
                                 .map((quoteDetail, i) => (
                                   <TableRow key={i}>
-                                    <TableCell component="th" scope="row">
+                                    <TableCell component="th" scope="row" style={{ minWidth: '250px' }}>
                                       {quoteDetail.Description}
                                     </TableCell>
                                     {quotes.map((quote: any) => {
-                                      const matchingQuoteDetail = quote.quoteDetails.filter(
+                                      const matchingQuoteDetail = quote.quoteDetails.find(
                                         (item: QuoteDetail) =>
                                           quoteDetail.Description === item.Description &&
                                           quoteDetail.CostUnit === item.CostUnit &&
                                           quoteDetail.Currency === item.Currency,
                                       );
-
-                                      if (matchingQuoteDetail.length == 0) {
-                                        return <TableCell colSpan={3} />;
-                                      } else {
-                                        return matchingQuoteDetail.map(
-                                          (quoteDetailInstance: QuoteDetail, i: number) => (
-                                            <Fragment key={i}>
-                                              <TableCell className={classes.currencyCell}>
-                                                {quoteDetailInstance.Currency !== 'incl.'
-                                                  ? quoteDetailInstance.Currency
-                                                  : ''}
-                                              </TableCell>
-                                              <TableCell align="right">{quoteDetailInstance.CostValue}</TableCell>
-                                              <TableCell>
-                                                {quoteDetailInstance.Currency === 'incl.'
-                                                  ? quoteDetailInstance.Currency
-                                                  : ''}{' '}
-                                                {quoteDetailInstance.CostUnit}
-                                              </TableCell>
-                                            </Fragment>
-                                          ),
-                                        );
-                                      }
+                                      return matchingQuoteDetail ? (
+                                        <Fragment>
+                                          <TableCell className={classes.currencyCell}>
+                                            {matchingQuoteDetail.Currency !== 'incl.'
+                                              ? matchingQuoteDetail.Currency
+                                              : ''}
+                                          </TableCell>
+                                          <TableCell align="right"> {matchingQuoteDetail.CostValue}</TableCell>
+                                          <TableCell>
+                                            {matchingQuoteDetail.Currency === 'incl.'
+                                              ? matchingQuoteDetail.Currency
+                                              : ''}{' '}
+                                            {matchingQuoteDetail.CostUnit}
+                                          </TableCell>
+                                        </Fragment>
+                                      ) : (
+                                        <TableCell colSpan={3} />
+                                      );
                                     })}
                                   </TableRow>
                                 ))}
@@ -284,8 +285,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 <TableCell component="th" scope="row">
                                   Service Details
                                 </TableCell>
-                              {quotes.map((quote: any, index) => (
-                                <Fragment key={index}>
+                                {quotes.map((quote: any, index) => (
+                                  <Fragment key={index}>
                                     <TableCell key={quote.QuoteNumber} colSpan={3} align="center">
                                       {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                       {quote.serviceDetails[0].TransitTime} days
