@@ -181,9 +181,9 @@ const Route: React.FC<Props> = ({ route }) => {
           onClick={toggleExpansion}
         >
           <Grid container spacing={2}>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <Grid container spacing={2}>
-                <Grid item md={6} sm={12}>
+                <Grid item md={6} xs={12}>
                   <Typography variant="subtitle2" display="block" gutterBottom>
                     <Box fontWeight="fontWeightBold">Carrier</Box>
                   </Typography>
@@ -208,7 +208,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     </Box>
                   </Typography>
                 </Grid>
-                <Grid item md={3} sm={12}>
+                <Grid item md={3} xs={12}>
                   <InfoBoxItem
                     title="Vessel"
                     label1={route?.OriginInfo.VoyageInfo.VesselName}
@@ -217,7 +217,7 @@ const Route: React.FC<Props> = ({ route }) => {
                   />
                 </Grid>
                 {route?.SpaceInfo && (
-                  <Grid item md={3} sm={12}>
+                  <Grid item md={3} xs={12}>
                     <Typography variant="subtitle2" display="block" gutterBottom>
                       <Box fontWeight="fontWeightBold">Space Availability</Box>
                     </Typography>
@@ -234,7 +234,7 @@ const Route: React.FC<Props> = ({ route }) => {
                   <Divider />
                 </Grid>
 
-                <Grid item md={3} sm={12}>
+                <Grid item md={3} sm={12} xs={12}>
                   <InfoBoxItem
                     IconComponent={ChevronRightIcon}
                     title="Departure"
@@ -255,7 +255,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     }
                   />
                 </Grid>
-                <Grid item md={3} sm={12}>
+                <Grid item md={3} sm={12} xs={12}>
                   <InfoBoxItem
                     IconComponent={LastPageIcon}
                     title="Arrival"
@@ -276,10 +276,10 @@ const Route: React.FC<Props> = ({ route }) => {
                     }
                   />
                 </Grid>
-                <Grid item md={3} sm={6} xs={6}>
+                <Grid item md={3} sm={6} xs={12}>
                   <InfoBoxItem
                     IconComponent={WavesIcon}
-                    title="TransitTime"
+                    title="Transit Time"
                     label1={
                       route ? (
                         `${route!.TransitTime}
@@ -290,7 +290,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     }
                   />
                 </Grid>
-                <Grid item md={3} sm={6} xs={6}>
+                <Grid item md={3} sm={6} xs={12}>
                   <InfoBoxItem
                     IconComponent={ShareIcon}
                     title="Routing"
@@ -299,7 +299,7 @@ const Route: React.FC<Props> = ({ route }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={1} className={classes.actionBarGridItem}>
+            <Grid item xs={2} className={classes.actionBarGridItem}>
               <Box
                 alignContent="right"
                 display="flex"
