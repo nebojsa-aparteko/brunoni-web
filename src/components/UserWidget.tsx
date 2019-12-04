@@ -59,11 +59,11 @@ const UserWidget: React.FC<Props> = ({ active }) => {
           <MenuItem disabled style={{ opacity: 'initial' }}>
             <Box>
               <Box>
-                <Typography>{userData.company.name}</Typography>
+                <Typography>{userData.company.name.toUpperCase()}</Typography>
               </Box>
-              {userData.company.nameSup && (
+              {userData.company.city && (
                 <Box>
-                  <Typography>{userData.company.nameSup}</Typography>
+                  <Typography>{userData.company.city.toUpperCase()}</Typography>
                 </Box>
               )}
             </Box>
