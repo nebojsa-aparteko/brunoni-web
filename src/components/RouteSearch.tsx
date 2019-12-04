@@ -157,7 +157,7 @@ const RouteSearch: React.FC<Props> = () => {
             <SearchEmptyResults />
           ) : (
             <Grid container spacing={4}>
-              <Grid item md={3}>
+              <Grid item md={3} xs={12}>
                 <Paper className={classes.sidebar}>
                   <RouteSearchFilters only={carriers} value={carrierFilter} onChange={setCarrierFilter} />
                 </Paper>
