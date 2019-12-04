@@ -185,17 +185,25 @@ const Quote: React.FC<Props> = ({ id }) => {
               <Box displayPrint="block" display="none" marginTop="4em">
                 <Divider />
                 <Typography variant="body1">
-                  Bei Fragen oder für weitere Informationen stehen wir Ihnen gerne zur Verfügung. Mit Freude sehen wir
-                  Ihrem Feedback entgegen.
                   <br />
                   <br />
-                  Freundliche Grüsse
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>Your Brunoni-Team</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>Your Allmarine-Team</span>
+                  ) : null}
                   <br />
-                  Fabio Manuzzi
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>Tel. 044 455 58 58</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>Tel. 044 533 38 48</span>
+                  ) : null}
                   <br />
-                  f.manuzzi@brunoni.ch
-                  <br />
-                  Tel. +41 44 455 58 91
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>info@brunoni.ch</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>info@allmarine.ch</span>
+                  ) : null}
                 </Typography>
               </Box>
             </Page>
