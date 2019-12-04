@@ -245,7 +245,7 @@ const QuotesEndpoint: React.FC<Props> = ({ children }) => {
     ),
   );
 
-  const initialResults = withTestData('quotes', newTransform);
+  const initialResults = withTestData('quotes', normalize);
 
   const quotes = useEndpoint('/quotes', newTransform, initialResults);
 

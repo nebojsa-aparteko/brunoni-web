@@ -167,7 +167,7 @@ const Quote: React.FC<Props> = ({ id }) => {
             <Page title="Quotation">
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <QuoteItemHeader quote={quote} />
+                  <QuoteItemHeader quote={quote} userData={userData} />
                 </Grid>
                 <Grid item xs={6}>
                   <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
