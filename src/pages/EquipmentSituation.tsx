@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import EquipmentSituationView from '../components/EquipmentSituation';
 import Helmet from 'react-helmet';
 
-const GetQuotes: React.FC = () => (
+const EquipmentSituation: React.FC = () => (
   <Fragment>
     <Helmet>
       <title>{`Equipment Situation | ${
@@ -13,4 +13,4 @@ const GetQuotes: React.FC = () => (
   </Fragment>
 );
 
-export default GetQuotes;
+export default EquipmentSituation;

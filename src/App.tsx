@@ -15,6 +15,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import { makeStyles, Theme } from '@material-ui/core';
+import SideCharges from './pages/SideCharges';
 
 const useStyles = makeStyles((theme: Theme) => ({
   goTop: {
@@ -72,6 +73,7 @@ const App: React.FC = () => {
           <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
           <Route exact path="/quotes/:id" component={requireUser(Quote)} />
           <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
+          <Route exact path="/charges" component={requireUser(SideCharges)} />
           {/** TODO Remove temporary route /dashboard */}
           <Route exact path="/dashboard" component={Dashboard} />
           <Route component={NotFound} />

@@ -145,6 +145,11 @@ const Navbar: React.FC = () => {
                         Equipment Situation
                       </Button>
                     </div>
+                    <div className={classes.item}>
+                      <Button component={Link} to="/charges" underline="none">
+                        Side Charges
+                      </Button>
+                    </div>
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
