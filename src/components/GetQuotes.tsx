@@ -156,12 +156,11 @@ const GetQuotes: React.FC<Props> = () => {
 
         const json = await response.json();
 
-        const normalizedJson = update('QuoteHeader', asArray)(json);
-        console.log('got quote response ', normalizedJson);
+        console.log('got quote response ', json);
         refresh();
 
-        if (normalizedJson.QuoteHeader[0].QuoteDetails) {
-          history.push(`/quotes/groups/${normalizedJson.QuoteHeader[0].idRequest}`);
+        if (json[0].quotes[0].quoteDetails) {
+          history.push(`/quotes/groups/${json[0].id}`);
         } else {
           setDialogOpen(true);
         }
