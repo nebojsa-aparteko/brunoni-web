@@ -10,24 +10,31 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   info: {
     background: '#2c3c50',
-    color: theme.palette.common.white,
+    color: 'rgba(215, 227, 243, 0.5)',
+  },
+  title: {
+    textTransform: 'uppercase',
+    color: '#d7e3f3', // TODO move this to theme
   },
   copyright: {
     background: '#273546',
-    color: 'rgba(255,255,255,.35)',
+    color: 'rgba(215, 227, 243, 0.5)', // TODO move this to theme
     textAlign: 'center',
     fontWeigh: theme.typography.fontWeightMedium,
     fontFamily: theme.typography.fontFamily, // TODO set font family to <body> rather than each individual component
+  },
+  link: {
+    color: '#d7e3f3', // TODO move this to theme
   },
   list: {
     listStyle: 'none',
     padding: 0,
     margin: 0,
+    lineHeight: 1.65,
 
     '& li > a': {
-      color: theme.palette.common.white,
-      opacity: 0.65,
-      fontSize: '1.25em',
+      color: '#d7e3f3', // TODO move this to theme
+      fontSize: theme.typography.body1,
       fontFamily: theme.typography.fontFamily,
 
       '&:hover': {
@@ -49,7 +56,9 @@ const Footer: React.FC<Props> = () => {
           <Grid container spacing={2}>
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="subtitle2">Company</Typography>
+                <Typography variant="h4" className={classes.title}>
+                  Company
+                </Typography>
               </Box>
               <Box mb={4}>
                 <ul className={classes.list}>
@@ -74,23 +83,37 @@ const Footer: React.FC<Props> = () => {
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="subtitle2">Office Hours</Typography>
+                <Typography variant="h4" className={classes.title}>
+                  Office Hours
+                </Typography>
               </Box>
-              <Box mb={2} style={{ opacity: 0.65 }}>
-                <Typography variant="body2">Mon-Fri</Typography>
-                <Typography variant="body2">08:00 - 12:00</Typography>
-                <Typography variant="body2">13:00 - 17:30</Typography>
+              <Box mb={2}>
+                <Typography variant="body1" color="inherit">
+                  Mon-Fri
+                </Typography>
+                <Typography variant="body1" color="inherit">
+                  08:00 - 12:00
+                </Typography>
+                <Typography variant="body1" color="inherit">
+                  13:00 - 17:30
+                </Typography>
               </Box>
 
-              <Box mb={4} style={{ opacity: 0.65 }}>
-                <Typography variant="body2">Phone +41 44 455 58 58</Typography>
-                <Typography variant="body2">Fax +41 44 455 58 55</Typography>
+              <Box mb={4}>
+                <Typography variant="body1" color="inherit">
+                  Phone +41 44 455 58 58
+                </Typography>
+                <Typography variant="body1" color="inherit">
+                  Fax +41 44 455 58 55
+                </Typography>
               </Box>
             </Grid>
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="subtitle2">Follow Us</Typography>
+                <Typography variant="h4" className={classes.title}>
+                  Follow Us
+                </Typography>
               </Box>
               <Box mb={4}>
                 <ul className={classes.list}>
@@ -108,21 +131,29 @@ const Footer: React.FC<Props> = () => {
 
             <Grid item md={3} sm={6} xs={12}>
               <Box mb={4}>
-                <Typography variant="subtitle2">About Us</Typography>
+                <Typography variant="h4" className={classes.title}>
+                  About Us
+                </Typography>
               </Box>
               <Box mb={4}>
-                <Typography variant="body2" style={{ opacity: 0.65 }}>
+                <Typography variant="body1" color="inherit">
                   Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
                   represent foreign shipping lines in Switzerland.{' '}
-                  <Link href="https://www.brunoni.ch/index.php/company/history">Read more…</Link>
+                  <Link href="https://www.brunoni.ch/index.php/company/history" className={classes.link}>
+                    Read more…
+                  </Link>
                 </Typography>
               </Box>
             </Grid>
           </Grid>
         </Container>
       </Box>
-      <Box className={classes.copyright} py={4} displayPrint="none">
-        <Container>Copyright © {new Date().getFullYear()} O. Brunoni S.A. Agence Maritime</Container>
+      <Box className={classes.copyright} py={5} displayPrint="none">
+        <Container>
+          <Typography variant="body1" color="inherit">
+            Copyright © {new Date().getFullYear()} O. Brunoni S.A. Agence Maritime
+          </Typography>
+        </Container>
       </Box>
     </Fragment>
   );
