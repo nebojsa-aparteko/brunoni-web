@@ -24,6 +24,7 @@ import {
   Avatar,
   colors,
   Tooltip,
+  CircularProgress,
 } from '@material-ui/core';
 import useEndpoint from '../hooks/useEndpoint';
 import withTestData from '../utilities/withTestData';
@@ -168,6 +169,10 @@ const EquipmentSituation: React.FC = () => {
               <Typography variant="body1">Not available</Typography>
             </Box>
           </Box>
+        </Box>
+
+        <Box mt={3}>
+          <Typography variant="body2">Last Updated: {data ? 'Today' : <CircularProgress size={13} />}</Typography>
         </Box>
       </Box>
       <Box my={3}>
