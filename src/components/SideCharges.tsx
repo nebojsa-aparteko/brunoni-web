@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '& td': {
       whiteSpace: 'nowrap',
+      width: '50%',
     },
   },
   expansionPanelSummary: {
