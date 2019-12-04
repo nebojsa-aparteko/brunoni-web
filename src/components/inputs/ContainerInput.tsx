@@ -111,7 +111,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
   return (
     <Fragment>
       <Grid container spacing={2}>
-        <Grid item xs={3}>
+        <Grid item md={3} xs={12}>
           <ContainerTypeInput
             ref={containerTypeInput}
             margin="dense"
@@ -119,7 +119,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
             onChange={handleContainerTypeChange}
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item md={3} xs={12}>
           <CommodityTypeInput
             ref={commodityTypeInput}
             margin="dense"
@@ -128,11 +128,11 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
           />
         </Grid>
         {!value.containerType?.description?.endsWith('S.O.') && (
-          <Grid item xs={4}>
+          <Grid item md={4} xs={12}>
             <LocationInput ref={locationInput} margin="dense" value={value.location} onChange={handleLocationChange} />
           </Grid>
         )}
-        <Grid item xs={2}>
+        <Grid item md={2} xs={12}>
           <QuantityInput value={value.quantity} margin="dense" onChange={handleQuantityChange} />
         </Grid>
       </Grid>

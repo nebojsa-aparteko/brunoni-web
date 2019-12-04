@@ -14,6 +14,13 @@ export const inlineFormStyles = makeStyles((theme: Theme) => ({
     '& > * + *': {
       marginLeft: theme.spacing(2),
     },
+    [theme.breakpoints.down('md')]: {
+      flexDirection: 'column',
+
+      '& > * + *': {
+        marginLeft: theme.spacing(0),
+      },
+    },
   },
 }));
 
@@ -46,8 +53,20 @@ const IMOInput: React.FC<Props> = ({ value, onChange }, ref) => {
         value={value.IMOClass}
         onChange={handleIMOClassChange}
       />
-      <TextField label="UN Number" variant="outlined" value={value.UNNumber} onChange={handleUNNumberChange} margin="dense" />
-      <TextField label="PG Number" variant="outlined" value={value.PGNumber} onChange={handlePGNumberChange} margin="dense" />
+      <TextField
+        label="UN Number"
+        variant="outlined"
+        value={value.UNNumber}
+        onChange={handleUNNumberChange}
+        margin="dense"
+      />
+      <TextField
+        label="PG Number"
+        variant="outlined"
+        value={value.PGNumber}
+        onChange={handlePGNumberChange}
+        margin="dense"
+      />
     </Box>
   );
 };

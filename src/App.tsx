@@ -22,6 +22,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     bottom: '30px',
     right: '30px',
   },
+  deviceControl: {
+    [theme.breakpoints.down('sm')]: {
+      paddingTop: theme.spacing(7),
+    },
+  },
 }));
 
 const switchUser = <P extends RouteComponentProps<any> | any>(
@@ -58,18 +63,20 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <Navbar />
-      <Switch>
-        <Route exact path="/" component={switchUser(Dashboard, Routes)} />
-        <Route exact path="/schedule" component={requireUser(Routes)} />
-        <Route exact path="/quotes/groups" component={requireUser(QuoteGroups)} />
-        <Route exact path="/quotes/groups/:id" component={requireUser(QuoteGroup)} />
-        <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
-        <Route exact path="/quotes/:id" component={requireUser(Quote)} />
-        <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
-        {/** TODO Remove temporary route /dashboard */}
-        <Route exact path="/dashboard" component={Dashboard} />
-        <Route component={NotFound} />
-      </Switch>
+      <div className={classes.deviceControl}>
+        <Switch>
+          <Route exact path="/" component={switchUser(Dashboard, Routes)} />
+          <Route exact path="/schedule" component={requireUser(Routes)} />
+          <Route exact path="/quotes/groups" component={requireUser(QuoteGroups)} />
+          <Route exact path="/quotes/groups/:id" component={requireUser(QuoteGroup)} />
+          <Route exact path="/quotes/get" component={requireUser(GetQuotes)} />
+          <Route exact path="/quotes/:id" component={requireUser(Quote)} />
+          <Route exact path="/equipment" component={requireUser(EquipmentSituation)} />
+          {/** TODO Remove temporary route /dashboard */}
+          <Route exact path="/dashboard" component={Dashboard} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
       <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
       <Footer />
     </Fragment>

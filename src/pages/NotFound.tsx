@@ -1,20 +1,36 @@
 import React from 'react';
-import { Typography, Grid, Box } from '@material-ui/core';
+import { Typography, Grid, Box, Button, Container } from '@material-ui/core';
 import Link from '../components/Link';
 import { Error } from '../components/Illustrations';
+import Image from 'material-ui-image/lib/components/Image/Image';
+import LoginWidget from '../components/LoginWidget';
 
 const NotFound: React.FC = () => (
-  <Box flex={4} display="flex">
+  <Container>
     <Grid container justify="center" alignItems="center">
-      <Grid item xs={2}>
-        <Error />
-        <Typography variant="h6">404 Page Not Found</Typography>
-        <Link to="/" replace>
-          Go Home
-        </Link>
+      <Grid item md={6}>
+        <Box p={6} textAlign="center">
+          <Image
+            src={require(`../assets/state.notfound.svg`)}
+            aspectRatio={16 / 9}
+            color="transparent"
+            disableSpinner
+          />
+          <Typography variant="h5" gutterBottom>
+            <Box fontWeight="fontWeightBold">404 Page Not Found</Box>
+          </Typography>
+          <Typography variant="subtitle1">Make sure you have the right address or visit home page.</Typography>
+          <Box p={2} display="flex" justifyContent="center">
+            <Box>
+              <Button component={Link} to="/" replace>
+                Go to Homepage
+              </Button>
+            </Box>
+          </Box>
+        </Box>
       </Grid>
     </Grid>
-  </Box>
+  </Container>
 );
 
 export default NotFound;
