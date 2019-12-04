@@ -172,7 +172,7 @@ const EquipmentSituation: React.FC = () => {
         </Box>
 
         <Box mt={3}>
-          <Typography variant="body2">Last Updated: {data ? 'Today' : <CircularProgress size={13} />}</Typography>
+          <Typography variant="body2">Last Update: {data ? 'Today' : <CircularProgress size={13} />}</Typography>
         </Box>
       </Box>
       <Box my={3}>
