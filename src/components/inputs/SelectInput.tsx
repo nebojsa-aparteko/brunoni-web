@@ -9,6 +9,7 @@ interface Props<T> extends InputProps<T> {
   label: string;
   margin?: any;
   options: T[] | undefined;
+  filterOptions?: any;
   getOptionLabel: (value: T) => string;
   inputRef?: React.Ref<any>;
   open: boolean;
@@ -25,6 +26,7 @@ export default function SelectInput<T>({
   label,
   margin,
   options,
+  filterOptions,
   getOptionLabel,
   inputRef,
   open,
@@ -45,6 +47,7 @@ export default function SelectInput<T>({
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
       getOptionLabel={getOptionLabel}
+      filterOptions={filterOptions}
       options={options}
       loading={loading}
       renderInput={params => (
