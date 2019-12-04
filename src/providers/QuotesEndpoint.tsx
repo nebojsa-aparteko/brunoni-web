@@ -1,5 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import parseDate from 'date-fns/parse';
+import parseISODate from 'date-fns/parseISO';
+import identity from 'lodash/fp/identity';
 import update from 'lodash/fp/update';
 import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
@@ -11,6 +13,7 @@ import groupBy from 'lodash/fp/groupBy';
 import padStart from 'lodash/fp/padStart';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
+import mapValues from 'lodash/fp/mapValues';
 import filter from 'lodash/fp/filter';
 import partialRight from 'lodash/fp/partialRight';
 import Context from '../contexts/QuotesEndpoint';
@@ -30,7 +33,6 @@ import pickAndRename from '../utilities/pickAndRename';
 import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
-import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
@@ -227,9 +229,25 @@ const QuotesEndpoint: React.FC<Props> = ({ children }) => {
     return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const initialResults = withTestData('quotes', normalize);
+  const newTransform = map(
+    flow(
+      update('dateIssued', parseISODate),
+      update(
+        'quotes',
+        map(
+          flow(
+            update('dateIssued', parseISODate),
+            update('validityPeriod.from', parseISODate),
+            update('validityPeriod.to', parseISODate),
+          ),
+        ),
+      ),
+    ),
+  );
 
-  const quotes = useEndpoint('/quotes', normalize, initialResults);
+  const initialResults = withTestData('quotes', newTransform);
+
+  const quotes = useEndpoint('/quotes', newTransform, initialResults);
 
   return <Context.Provider value={quotes}>{children}</Context.Provider>;
 };
