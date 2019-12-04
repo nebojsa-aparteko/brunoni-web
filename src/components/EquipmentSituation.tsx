@@ -1,6 +1,7 @@
 import React, { useContext, useMemo, Fragment } from 'react';
 import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
+import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 import groupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/fp/mapValues';
@@ -35,8 +36,8 @@ import Carriers from '../contexts/Carriers';
 import Carrier from '../model/Carrier';
 import Container from './Container';
 import pickAndRename from '../utilities/pickAndRename';
-import TextSkeleton from './TextSkeleton';
-import Grid from '@material-ui/core/Grid';
+
+const containerIdsToHide = ['22P1', '22P3', '22P5', '42P1', '42P3', '42P5', '45P3'];
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -99,6 +100,7 @@ const updateEquipmentSituationBody = (carriers?: Carrier[] | null, containerType
             map(flow(get('containers'), keys)),
             flatten,
             uniq,
+            filter(containerId => containerIdsToHide.indexOf(containerId) < 0),
             map(ct => containerTypes?.find(_ => _.id === ct) || { id: ct }),
           )(locations);
 
@@ -128,9 +130,10 @@ const EquipmentSituation: React.FC = () => {
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
 
-  const bodyTransform = useMemo(() => {
-    return updateEquipmentSituationBody(carriers, containerTypes);
-  }, [carriers, containerTypes]);
+  const bodyTransform = useMemo(() => updateEquipmentSituationBody(carriers, containerTypes), [
+    carriers,
+    containerTypes,
+  ]);
 
   const { result } = useEndpoint(
     '/equipmentSituation',
