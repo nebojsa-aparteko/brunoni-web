@@ -19,7 +19,7 @@ export const createEmailBody = (searchParams: DetailedRouteSearchParams): string
         ', ' +
         container?.commodityType?.name +
         '\n' +
-        (container.location ? `   Pickup Location: ${getLocationLabel(container.location)}\n` : '') +
+        (container.location ? `   Depot Location: ${getLocationLabel(container.location)}\n` : '') +
         ((container.imo[1] || []).map(renderIMO).join('\n') + '\n') +
         ((container.oog[1] || []).map(renderOOG).join('\n') + '\n')
       );
