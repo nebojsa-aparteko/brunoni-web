@@ -185,14 +185,16 @@ const Navbar: React.FC = () => {
           {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
-              <IconButton
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                className={classes.menuButton}
-              >
-                <MenuIcon />
-              </IconButton>
+              <Box displayPrint="none">
+                <IconButton
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  className={classes.menuButton}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Box>
               <Link className={classes.logo} to="/">
                 <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
