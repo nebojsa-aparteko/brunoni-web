@@ -45,7 +45,7 @@ import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingB
 import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
-import Helmet from 'react-helmet';
+import Meta from './Meta';
 
 interface Props {
   id: string;
@@ -178,11 +178,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     </Container>
   ) : (
     <Fragment>
-      <Helmet>
-        <title>{`${quoteGroup?.origin.city} - ${quoteGroup.destination.city} | ${
-          process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND.toUpperCase() : ''
-        }`}</title>
-      </Helmet>
+      <Meta title={`${quoteGroup?.origin.city} - ${quoteGroup.destination.city}`} />
       <Container maxWidth="lg">
         <Box display="flex" mt={6}>
           <Box flexShrink="0">

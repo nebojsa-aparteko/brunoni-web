@@ -33,10 +33,9 @@ import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
-import Helmet from 'react-helmet';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
-import MenuItem from './QuoteGroup';
 import asArray from '../utilities/asArray';
+import Meta from '../components/Meta';
 
 interface Props {}
 
@@ -244,9 +243,7 @@ const GetQuotes: React.FC<Props> = () => {
 
   return (
     <Fragment>
-      <Helmet>
-        <title>{`Get Quote | ${process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND.toUpperCase() : ''}`}</title>
-      </Helmet>
+      <Meta title="Get Quote" />
       <Container className={classes.root}>
         <Paper>
           <Box p={2}>

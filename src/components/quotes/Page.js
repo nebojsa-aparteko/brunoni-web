@@ -1,17 +1,13 @@
 /* eslint-disable no-undef */
 import React, { useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
+import Meta from '../Meta';
 
 const { NODE_ENV, REACT_APP_GA_MEASUREMENT_ID: GA_MEASUREMENT_ID } = process.env;
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
-  },
   divider: {
     margin: theme.spacing(2, 0),
   },
@@ -37,10 +33,8 @@ function Page({ title, children, ...rest }) {
   }, []);
 
   return (
-    <div classes={classes.root} {...rest}>
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
+    <div {...rest}>
+      <Meta title={title} />
       {children}
     </div>
   );

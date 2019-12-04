@@ -4,6 +4,7 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles, Theme } from '@material-ui/core';
 import Helmet from 'react-helmet';
+import Meta from '../components/Meta';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -17,9 +18,7 @@ const QuoteGroups: React.FC = () => {
 
   return (
     <Fragment>
-      <Helmet>
-        <title>{`Quotes | ${process.env.REACT_APP_BRAND ? process.env.REACT_APP_BRAND.toUpperCase() : ''}`}</title>
-      </Helmet>
+      <Meta title="Quotes" />
       <Container maxWidth="lg">
         <Paper className={classes.root}>
           <QuoteGroupsView showGetQuoteButton={false} />
