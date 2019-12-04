@@ -30,6 +30,13 @@ const OOGInput: React.FC<Props> = ({ value, onChange }, ref) => {
   return (
     <Box display="flex" className={classes.formControl}>
       <TextField
+        label="Length [cm]"
+        variant="outlined"
+        value={value.length}
+        onChange={handleLengthChange}
+        margin="dense"
+      />
+      <TextField
         inputRef={input}
         label="Width [cm]"
         margin="dense"
@@ -37,9 +44,20 @@ const OOGInput: React.FC<Props> = ({ value, onChange }, ref) => {
         value={value.width}
         onChange={handleWidthChange}
       />
-      <TextField label="Height [cm]" variant="outlined" value={value.height} onChange={handleHeightChange} margin="dense" />
-      <TextField label="Length [cm]" variant="outlined" value={value.length} onChange={handleLengthChange} margin="dense" />
-      <TextField label="Weight [kg]" variant="outlined" value={value.weight} onChange={handleWeightChange} margin="dense" />
+      <TextField
+        label="Height [cm]"
+        variant="outlined"
+        value={value.height}
+        onChange={handleHeightChange}
+        margin="dense"
+      />
+      <TextField
+        label="Weight [kg]"
+        variant="outlined"
+        value={value.weight}
+        onChange={handleWeightChange}
+        margin="dense"
+      />
     </Box>
   );
 };
