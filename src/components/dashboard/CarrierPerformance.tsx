@@ -9,7 +9,7 @@ import upperCase from 'lodash/fp/upperCase';
 import defaultTo from 'lodash/fp/defaultTo';
 import flatten from 'lodash/fp/flatten';
 import toPairs from 'lodash/fp/toPairs';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors } from '@material-ui/core';
+import { Card, CardHeader, Divider, CardContent, useTheme, colors, useMediaQuery } from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Doughnut } from 'react-chartjs-2';
 import Carriers from '../../contexts/Carriers';
@@ -30,6 +30,8 @@ const performanceByCarrierByYear = (year: number) =>
 const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const theme = useTheme();
   const carriers = useContext(Carriers);
+
+  const isSmAndUp = useMediaQuery(theme.breakpoints.up('sm'));
 
   const data = useMemo(() => {
     const values = flow(
@@ -62,7 +64,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     animation: false,
     cutoutPercentage: 60,
     legend: {
-      display: true,
+      display: isSmAndUp && data?.datasets && data.datasets[0].data.length < 6,
       position: 'right',
     },
     layout: {

@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   cardContent: {
     padding: theme.spacing(0),
+    overflowX: 'auto',
   },
 }));
 

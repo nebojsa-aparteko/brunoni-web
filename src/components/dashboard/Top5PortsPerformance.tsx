@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { Card, CardHeader, Divider, CardContent, Theme, Table, TableRow, TableCell } from '@material-ui/core';
+import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
@@ -25,12 +26,10 @@ interface Props {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  tableCell: {
-    maxWidth: '1em',
-  },
   tableCellFont: {
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.down('md')]: {
       fontSize: 10,
+      padding: '2px',
     },
     [theme.breakpoints.up('md')]: {
       fontSize: 12,
@@ -38,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.up('lg')]: {
       fontSize: 14,
     },
+  },
+  tableCell: {
+    maxWidth: '1em',
   },
 }));
 
@@ -81,7 +83,7 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
         {data
           ? data.map((item, index) => (
               <TableRow key={index}>
-                <TableCell className={classes.tableCell} component="th" scope="row">
+                <TableCell className={classNames(classes.tableCell, classes.tableCellFont)} component="th" scope="row">
                   {index + 1}
                 </TableCell>
                 <TableCell component="th" scope="row" className={classes.tableCellFont}>{`${item[0]} (${
