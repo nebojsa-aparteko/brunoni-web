@@ -7,6 +7,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { QuoteDetail } from '../../providers/QuotesEndpoint';
+import Box from '@material-ui/core/Box';
 
 interface Props {
   quoteDetails: QuoteDetail[];
@@ -25,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     table: {
       minWidth: 650,
+      overflowX: 'auto',
     },
     tableHead: {
       fontWeight: theme.typography.fontWeightBold,
@@ -32,6 +34,19 @@ const useStyles = makeStyles((theme: Theme) =>
     costUnitCell: {
       paddingLeft: 0,
       minWidth: '150px',
+    },
+    tableRow: {
+      '& td': {
+        whiteSpace: 'nowrap',
+      },
+      ['@media print']: {
+        '& td': {
+          padding: theme.spacing(0),
+        },
+      },
+    },
+    tableWrapper: {
+      overflowX: 'auto',
     },
   }),
 );
@@ -42,33 +57,35 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
   return (
     <Fragment>
       <Grid item xs={12}>
-        <Table aria-label="simple table" className={classes.table} size="small">
-          <TableHead className={classes.tableHead}>
-            <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell align="right">Currency</TableCell>
-              <TableCell align="right">Cost Value</TableCell>
-              <TableCell>Cost Unit</TableCell>
-              <TableCell>Remark</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {quoteDetails.map((quoteDetail, index) => (
-              <TableRow key={quoteDetail.Pos} selected={(index + 1) % 2 === 0}>
-                <TableCell component="th" scope="row">
-                  {quoteDetail.Description}
-                </TableCell>
-                <TableCell align="right">{quoteDetail.Currency}</TableCell>
-                <TableCell align="right">{quoteDetail.CostValue}</TableCell>
-                <TableCell>{quoteDetail.CostUnit}</TableCell>
-                <TableCell>
-                  {quoteDetail.RemarkRef || ''}
-                  {quoteDetail.Remark}
-                </TableCell>
+        <Box className={classes.tableWrapper}>
+          <Table aria-label="simple table" className={classes.table} size="small">
+            <TableHead className={classes.tableHead}>
+              <TableRow className={classes.tableRow}>
+                <TableCell>Description</TableCell>
+                <TableCell align="right">Currency</TableCell>
+                <TableCell align="right">Cost Value</TableCell>
+                <TableCell>Cost Unit</TableCell>
+                <TableCell>Remark</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {quoteDetails.map((quoteDetail, index) => (
+                <TableRow key={quoteDetail.Pos} selected={(index + 1) % 2 === 0} className={classes.tableRow}>
+                  <TableCell component="th" scope="row">
+                    {quoteDetail.Description}
+                  </TableCell>
+                  <TableCell align="right">{quoteDetail.Currency}</TableCell>
+                  <TableCell align="right">{quoteDetail.CostValue}</TableCell>
+                  <TableCell>{quoteDetail.CostUnit}</TableCell>
+                  <TableCell>
+                    {quoteDetail.RemarkRef || ''}
+                    {quoteDetail.Remark}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
       </Grid>
     </Fragment>
   );

@@ -9,4 +9,9 @@ export default {
       fontSize: '10px',
     },
   },
+  sizeSmall: {
+    '@media print': {
+      padding: 0,
+    },
+  },
 };

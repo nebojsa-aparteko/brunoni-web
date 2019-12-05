@@ -46,6 +46,7 @@ import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
+import QuoteNav from './quotes/QuoteItemNav';
 
 interface Props {
   id: string;
@@ -183,17 +184,12 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     <Fragment>
       <Meta title={`${quoteGroup?.origin.city} - ${quoteGroup.destination.city}`} />
       <Container maxWidth="lg">
-        <Box display="flex" mt={6}>
-          <Box flexShrink="0">
-            <IconButton aria-label="back button" color="primary" component={RouterLink} to={`/quotes/groups`}>
-              <ArrowBackIcon />
-            </IconButton>
-          </Box>
-
-          <Box ml={2} display="flex" flexDirection="column" justifyContent="center">
-            <Typography variant="h5">{`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}</Typography>
-            <Typography variant="subtitle2">{`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}</Typography>
-          </Box>
+        <Box mt={6}>
+          <QuoteNav
+            backTo="/quotes/groups"
+            title={`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}
+            subtitle={`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}
+          />
         </Box>
 
         <Box mx={2} mt={2} mb={6}>

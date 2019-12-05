@@ -1,19 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardHeader,
-  CardContent,
-  Container,
-  Divider,
-  Grid,
-  makeStyles,
-  Paper,
-  Theme,
-  Typography,
-  IconButton,
-  Button,
-} from '@material-ui/core';
+import { Box, Container, Divider, Grid, makeStyles, Paper, Theme, Typography, Button } from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
@@ -26,12 +12,11 @@ import QuoteItemRemarks from './quotes/QuoteItemRemarks';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import PrintIcon from '@material-ui/icons/Print';
-import { Link as RouterLink } from 'react-router-dom';
 import formatDate from 'date-fns/format';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
+import QuoteNav from './quotes/QuoteItemNav';
 
 interface Props {
   id: string;
@@ -41,10 +26,33 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
-    padding: theme.spacing(3),
+    padding: theme.spacing(5),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
   },
   title: {
     fontSize: '1.2em',
+  },
+  actionBar: {
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+    },
+    ['@media print']: {
+      marginBottom: theme.spacing(0),
+    },
+  },
+  actions: {
+    '& > *': {
+      marginLeft: theme.spacing(1),
+    },
+  },
+  hidePrint: {
+    ['@media print']: {
+      display: 'none',
+    },
   },
 }));
 
@@ -99,117 +107,106 @@ const Quote: React.FC<Props> = ({ id }) => {
       />
     );
   }
-  console.log('Quote', quote);
 
   return (
     <Container maxWidth="lg">
       <ScrollToTopOnMount />
-      <Card className={classes.root}>
-        <CardHeader
-          classes={{ title: classes.title }}
-          avatar={
-            <Box displayPrint="none">
-              <IconButton
-                aria-label="back button"
-                color="primary"
-                component={RouterLink}
-                size="small"
-                to={`/quotes/groups/${quote.groupId}`}
-              >
-                <ArrowBackIcon />
-              </IconButton>
-            </Box>
-          }
-          action={
-            <Box display="flex" displayPrint="none">
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                href={buildMailToLink(quote, [user, userData])}
-                target="_blank"
-              >
-                Book Now
-              </Button>
+      <Paper className={classes.root}>
+        <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+          <QuoteNav
+            backTo={`/quotes/groups/${quote.groupId}`}
+            title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}, ${
+              quote.destination.country
+            }`}
+            subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
+          />
 
-              <Button
-                aria-label="print"
-                variant="outlined"
-                size="small"
-                startIcon={<PrintIcon />}
-                onClick={handlePrint}
-                style={{ marginLeft: '4px' }}
-              >
-                Print
-              </Button>
-              <Button
-                aria-label="special request"
-                variant="outlined"
-                size="small"
-                startIcon={<FlareIcon />}
-                href={buildSpecialRequestLink(quote, [user, userData])}
-                target="_blank"
-                style={{ marginLeft: '4px' }}
-              >
-                SPECIAL REQUEST
-              </Button>
-            </Box>
-          }
-          title={
-            <Typography variant="h5">{`Quotation - ${quote.carrier.name || quote.carrier.id} - ${
-              quote.destination.city
-            }, ${quote.destination.country}`}</Typography>
-          }
-          subheader={<Typography variant="subtitle2">{`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}</Typography>}
-        />
-        <CardContent>
-          <Grid item xs={12}>
-            <Page title="Quotation">
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <QuoteItemHeader quote={quote} userData={userData} />
-                </Grid>
-                <Grid item xs={6}>
-                  <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <QuoteItemTerms terms={quote.terms} />
-                <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
-                <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
-                <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
-                <QuoteItemRemarks remarks={quote.remarks} />
+          <Box className={classes.actions} displayPrint="none">
+            <Button
+              color="primary"
+              variant="contained"
+              size="small"
+              href={buildMailToLink(quote, [user, userData])}
+              target="_blank"
+            >
+              Book Now
+            </Button>
+
+            <Button aria-label="print" variant="outlined" size="small" startIcon={<PrintIcon />} onClick={handlePrint}>
+              Print
+            </Button>
+            <Button
+              aria-label="special request"
+              variant="outlined"
+              size="small"
+              startIcon={<FlareIcon />}
+              href={buildSpecialRequestLink(quote, [user, userData])}
+              target="_blank"
+            >
+              SPECIAL REQUEST
+            </Button>
+          </Box>
+        </Box>
+        <Grid item xs={12}>
+          <Page title="Quotation">
+            <Grid container spacing={2}>
+              <Grid item md={6} xs={12} className={classes.hidePrint}>
+                <QuoteItemHeader quote={quote} userData={userData} />
+              </Grid>
+              <Grid item md={6} xs={12} className={classes.hidePrint}>
+                <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
               </Grid>
 
-              <Box displayPrint="block" display="none" marginTop="4em">
+              <Grid item xs={12}>
+                <Box display="none" displayPrint="block" width="100%">
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <QuoteItemHeader quote={quote} userData={userData} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
                 <Divider />
-                <Typography variant="body1">
-                  <br />
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>Your Brunoni-Team</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>Your Allmarine-Team</span>
-                  ) : null}
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>Tel. 044 455 58 58</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>Tel. 044 533 38 48</span>
-                  ) : null}
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>info@brunoni.ch</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>info@allmarine.ch</span>
-                  ) : null}
-                </Typography>
-              </Box>
-            </Page>
-          </Grid>
-        </CardContent>
-      </Card>
+              </Grid>
+              <QuoteItemTerms terms={quote.terms} />
+              <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
+              <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
+              <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
+              <QuoteItemRemarks remarks={quote.remarks} />
+            </Grid>
+
+            <Box displayPrint="block" display="none" marginTop="4em">
+              <Divider />
+              <Typography variant="body1">
+                <br />
+                <br />
+                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                  <span>Your Brunoni-Team</span>
+                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                  <span>Your Allmarine-Team</span>
+                ) : null}
+                <br />
+                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                  <span>Tel. 044 455 58 58</span>
+                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                  <span>Tel. 044 533 38 48</span>
+                ) : null}
+                <br />
+                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                  <span>info@brunoni.ch</span>
+                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                  <span>info@allmarine.ch</span>
+                ) : null}
+              </Typography>
+            </Box>
+          </Page>
+        </Grid>
+      </Paper>
     </Container>
   );
 };

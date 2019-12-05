@@ -16,6 +16,25 @@ const useStyles = makeStyles(theme => ({
     border: 'none',
     fontWeight: 700,
   },
+  tableRow: {
+    ['@media not print']: {
+      [theme.breakpoints.down('sm')]: {
+        display: 'block',
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+
+        '& td': {
+          display: 'block',
+          padding: theme.spacing(0),
+        },
+      },
+    },
+    ['@media print']: {
+      '& td': {
+        padding: theme.spacing(0),
+      },
+    },
+  },
   tableCell: {
     border: 'none',
   },
@@ -35,7 +54,7 @@ interface TableRowProps {
 const TableRowData: React.FC<TableRowProps> = ({ label, content, className }) => {
   const classes = useStyles();
   return (
-    <TableRow className={className}>
+    <TableRow className={classes.tableRow}>
       <TableCell className={classes.tableCellLabel}>{label}</TableCell>
       <TableCell className={classes.tableCell}>{content}</TableCell>
     </TableRow>

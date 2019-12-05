@@ -13,10 +13,10 @@ const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => (
     <Divider />
     {remarks.map((remark, i) => (
       <Fragment key={i}>
-        <Grid item md={3} sm={4} xs={4}>
+        <Grid item md={3} sm={4} xs={12}>
           <InfoBoxItem title={remark.RemarkTitle} label1={remark.RemarkLabel} />
         </Grid>
-        <Grid item md={9} sm={8} xs={8}>
+        <Grid item md={9} sm={8} xs={12}>
           <InfoBoxItem label1={remark.RemarkText} />
         </Grid>
       </Fragment>

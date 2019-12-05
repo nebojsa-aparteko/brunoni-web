@@ -13,13 +13,13 @@ const QuoteItemServiceDetail: React.FC<Props> = ({ serviceDetails }) => (
     {serviceDetails.map((serviceDetail, i) => (
       <Fragment key={i}>
         <Divider />
-        <Grid item xs={4}>
+        <Grid item md={4} xs={12}>
           <InfoBoxItem title="Frequency" label1={serviceDetail.Frequency} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item md={4} xs={12}>
           <InfoBoxItem title="Routing" label1={serviceDetail.Routing} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item md={4} xs={12}>
           <InfoBoxItem title="Transit Time" label1={serviceDetail.TransitTime} />
         </Grid>
       </Fragment>
