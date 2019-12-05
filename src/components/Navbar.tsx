@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbarItem: {},
     logo: {
-      marginRight: theme.spacing(2),
+      marginRight: 'auto',
       '& > img':
         ({
           brunoni: {
@@ -63,9 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
     item: {
       display: 'flex',
       marginLeft: theme.spacing(2),
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
     },
     drawer: {
       [theme.breakpoints.up('sm')]: {
@@ -185,16 +182,6 @@ const Navbar: React.FC = () => {
           {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
-              <Box displayPrint="none">
-                <IconButton
-                  aria-label="open drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  className={classes.menuButton}
-                >
-                  <MenuIcon />
-                </IconButton>
-              </Box>
               <Link className={classes.logo} to="/">
                 <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
@@ -203,11 +190,16 @@ const Navbar: React.FC = () => {
                   style={{ width: '4rem' }}
                 />
               </Link>
+              <Box displayPrint="none">
+                <IconButton aria-label="open drawer" edge="end" onClick={handleDrawerToggle}>
+                  <MenuIcon />
+                </IconButton>
+              </Box>
             </Toolbar>
           </AppBar>
           <Drawer
             variant="temporary"
-            anchor="left"
+            anchor="right"
             open={mobileOpen}
             onClose={handleDrawerToggle}
             classes={{
@@ -231,6 +223,9 @@ const Navbar: React.FC = () => {
                   </ListItem>
                   <ListItem component={props => <Link {...props} to="/equipment" />}>
                     <ListItemText primary="Equipment Situation" />
+                  </ListItem>
+                  <ListItem component={props => <Link {...props} to="/charges" />}>
+                    <ListItemText primary="Side Charges" />
                   </ListItem>
                 </Fragment>
               )}
