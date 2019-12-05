@@ -154,15 +154,43 @@ const GetQuotes: React.FC<Props> = () => {
           signal,
         });
 
-        const json = await response.json();
+        if (response.status === 504) {
+          enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
+            variant: 'error',
+          });
+          console.error('API error', response.status, response.statusText);
+        } else if (response.status === 500) {
+          enqueueSnackbar(<Typography>The could not answer your request at the moment. Please try again.</Typography>, {
+            variant: 'error',
+          });
+          console.error('API error', response.status, response.statusText);
+        } else if (response.status === 200 || response.status === 201) {
+          const json = await response.json();
 
-        console.log('got quote response ', json);
-        refresh();
+          console.log('got quote response ', json);
+          refresh();
 
-        if (json[0].quotes[0].quoteDetails) {
-          history.push(`/quotes/groups/${json[0].id}`);
+          if (Array.isArray(json) && json.length > 0) {
+            history.push(`/quotes/groups/${json[0].id}`);
+          } else if (Array.isArray(json) && json.length === 0) {
+            setDialogOpen(true);
+          } else {
+            enqueueSnackbar(
+              <Typography>Failed to fetch the quote for the combination you requested. Please try again.</Typography>,
+              {
+                variant: 'error',
+              },
+            );
+            console.error('Returned json was not an array', json);
+          }
         } else {
-          setDialogOpen(true);
+          enqueueSnackbar(
+            <Typography>Whoops our system is experiencing difficulties at the moment. Please try again.</Typography>,
+            {
+              variant: 'error',
+            },
+          );
+          console.error('Unexpected error response', response.status, response.statusText);
         }
       } catch (error) {
         enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
