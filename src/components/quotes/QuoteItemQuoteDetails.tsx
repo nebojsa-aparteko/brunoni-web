@@ -6,7 +6,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
-import { QuoteDetail } from '../../providers/QuotesEndpoint';
+import { QuoteDetail } from '../../providers/QuoteGroups';
 import Box from '@material-ui/core/Box';
 
 interface Props {

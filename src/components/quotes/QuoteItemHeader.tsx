@@ -1,9 +1,9 @@
 import React from 'react';
 import formatDate from 'date-fns/format';
 import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
-import { Quote } from '../../providers/QuotesEndpoint';
 import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
+import { Quote } from '../../providers/QuoteGroups';
 
 interface Props {
   quote: Quote;

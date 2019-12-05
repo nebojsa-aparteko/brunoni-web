@@ -1,7 +1,11 @@
 import React, { useContext, useMemo, useState, Fragment } from 'react';
-import { CardContent, CardHeader, Card, makeStyles, CardActions, TablePagination } from '@material-ui/core';
-import QuotesEndpointContext from '../contexts/QuotesEndpoint';
+import {
+  Container,
+  makeStyles,
+  CardContent, CardHeader, Card, makeStyles, CardActions, TablePagination
+} from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
+import QuoteGroupsContext from '../contexts/QuoteGroups';
 import QuoteGroupsTable from './quotes/QuoteGroupsTable';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
@@ -9,9 +13,9 @@ import filter from 'lodash/fp/filter';
 import reduce from 'lodash/fp/reduce';
 import find from 'lodash/fp/find';
 import Search from './SearchBar/Search';
-import { Quote, QuoteGroup } from '../providers/QuotesEndpoint';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
+import { Quote, QuoteGroup } from "../providers/QuoteGroups";
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -50,7 +54,7 @@ const containsString = (prop: string, searchString: string) => {
 
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
   const classes = useStyles();
-  const { result } = useContext(QuotesEndpointContext);
+  const quoteGroups = useContext(QuoteGroupsContext);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -78,12 +82,12 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
                 return quote.carrier ? containsString(quote.carrier.id, searchString) : false;
               })(quoteGroup.quotes) !== undefined
             );
-          })(result)
-        : result;
+          })(quoteGroups)
+        : quoteGroups;
 
     setFilteredResults(filteredResults);
     return chunk(rowsPerPage)(filteredResults);
-  }, [result, searchString, page, rowsPerPage]);
+  }, [quoteGroups, searchString, page, rowsPerPage]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setPage(page);
@@ -110,7 +114,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
           <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
         </CardContent>
         <CardActions className={classes.actions}>
-          {result && result.length > 0 && (
+          {quoteGroups && quoteGroups.length > 0 && (
             <TablePagination
               component="div"
               count={filteredResults ? filteredResults.length : 0}

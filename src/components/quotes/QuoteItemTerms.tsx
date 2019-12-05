@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Typography, Link, Grid, makeStyles } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
-import { Term } from '../../providers/QuotesEndpoint';
+import { Term } from '../../providers/QuoteGroups';
 
 interface Props {
   terms: Term[];

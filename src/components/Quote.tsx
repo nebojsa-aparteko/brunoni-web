@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
 import { Box, Container, Divider, Grid, makeStyles, Paper, Theme, Typography, Button } from '@material-ui/core';
-import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
 import QuoteItemContainers from './quotes/QuoteItemContainers';
@@ -16,6 +15,7 @@ import formatDate from 'date-fns/format';
 import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
+import QuoteGroups from '../contexts/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 
 interface Props {
@@ -71,10 +71,10 @@ function ScrollToTopOnMount() {
 const Quote: React.FC<Props> = ({ id }) => {
   const classes = useStyles();
 
-  const { result } = useContext(QuotesEndpointContext);
+  const quoteGroups = useContext(QuoteGroups);
   const [user, userData] = useUser();
 
-  if (!result) {
+  if (!quoteGroups) {
     return (
       <Container maxWidth="lg">
         <Paper className={classes.root}>
@@ -84,7 +84,7 @@ const Quote: React.FC<Props> = ({ id }) => {
     );
   }
 
-  const quoteGroup = (result || []).find(group => Boolean(group.quotes.find(quote => quote.id === id)));
+  const quoteGroup = (quoteGroups || []).find(group => Boolean(group.quotes.find(quote => quote.id === id)));
 
   if (!quoteGroup) {
     return (

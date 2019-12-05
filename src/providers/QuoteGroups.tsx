@@ -1,25 +1,21 @@
 import React, { useContext, useMemo } from 'react';
 import parseDate from 'date-fns/parse';
 import parseISODate from 'date-fns/parseISO';
-import identity from 'lodash/fp/identity';
 import update from 'lodash/fp/update';
 import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
-import set from 'lodash/fp/set';
+import invoke from 'lodash/fp/invoke';
 import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
 import padStart from 'lodash/fp/padStart';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
-import mapValues from 'lodash/fp/mapValues';
 import filter from 'lodash/fp/filter';
 import partialRight from 'lodash/fp/partialRight';
-import Context from '../contexts/QuotesEndpoint';
+import Context from '../contexts/QuoteGroups';
 import QuotesResult from '../model/quotes/QuotesResult';
-import useEndpoint from '../hooks/useEndpoint';
-import withTestData from '../utilities/withTestData';
 import asArray from '../utilities/asArray';
 import PickupLocation from '../model/PickupLocation';
 import ContainerType from '../model/ContainerType';
@@ -33,6 +29,8 @@ import pickAndRename from '../utilities/pickAndRename';
 import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
+import Quotes from '../contexts/Quotes';
+import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
@@ -103,14 +101,9 @@ export interface Remark {
 
 const flattenEntity = (name: string) => flow(asArray, map(flow(update(name, asArray), get(name))), flatten);
 
-const normalizeDateRange = (value: string) => {
-  const [from, to] = value.split(' - ');
+const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
 
-  return {
-    from: parseDate(from, 'dd.MM.yyyy', 0),
-    to: parseDate(to, 'dd.MM.yyyy', 0),
-  };
-};
+const uniqueCommodityTypes = flow(map(get('commodityType')), uniqBy('id'));
 
 const normalizeQuoteGroups = (
   getContainerType: (id: string) => ContainerType | null,
@@ -120,100 +113,61 @@ const normalizeQuoteGroups = (
   getCarrier: (name: string) => Carrier | null,
 ) => {
   const normalizeContainer = flow(
-    pickAndRename({
-      CtypID: 'containerType',
-      CommodityID: 'commodityType',
-      PickupAdrID: 'pickupLocation',
-      Quantity: 'quantity',
-    }),
     update('containerType', getContainerType),
     update('commodityType', getCommodityType),
     update('pickupLocation', getPickupLocation),
-    update('quantity', Number),
   );
 
   const normalizeContainers = flow(asArray, map(normalizeContainer));
-  const uniqueCommodityTypes = flow(map(get('commodityType')), uniqBy('id'));
-  // const carriers= map(get(''))
-
-  // commodityTypes: uniqBy('id') ( values(mapValues(get('commodityType')) (normalizedQuote.containers)  )),
 
   const normalizeQuote = flow(
-    pickAndRename({
-      AdrId: 'clientId',
-      idRequest: 'groupId',
-      QuoteNumber: 'id',
-      CarrierID: 'carrier',
-      QuoteDate: 'dateIssued',
-      QuoteValidity: 'validityPeriod',
-      POL: 'origin',
-      POD: 'destination',
-      CargoDetails: 'containers',
-      QuoteDetails: 'quoteDetails',
-      CostDetailsRemarks: 'costDetailRemarks',
-      ServiceDetail: 'serviceDetails',
-      Remarks: 'remarks',
-      Terms: 'terms',
-    }),
     update('carrier', getCarrier),
-    update('dateIssued', partialRight(parseDate, ['dd.MM.yyyy', 0])),
+    update('dateIssued', invoke('toDate')),
     update('validityPeriod', normalizeDateRange),
     update('origin', getPort),
     update('destination', getPort),
     update('containers', normalizeContainers),
   );
 
-  // const uniqueCommTypes
-  // (quote) => uniqBy('id')(values(mapValues(get('commodityType'))(get('containers', quote))));
   const normalizeQuotes = flow(map(normalizeQuote), orderBy(get('validityPeriod.from'), 'asc'));
 
-  const normalizeQuoteGroup = flow(
-    map(
-      flow(
-        update('QuoteDetails', flattenEntity('QuoteDetail')),
-        update('CostDetailsRemarks', flattenEntity('CostDetailRemark')),
-        update('ServiceDetail', asArray),
-        update('CargoDetails', flattenEntity('CargoDetail')),
-        update('Remarks', flattenEntity('Remark')),
-        update('Terms', flattenEntity('Term')),
-      ),
-    ),
-    quotes => {
-      const normalizedQuotes = (normalizeQuotes(quotes) as Quote[]).map(quote => {
-        return set('commodityTypes', uniqueCommodityTypes(quote.containers))(quote);
-      });
+  const normalizeQuoteGroup = flow(quotes => {
+    const normalizedQuotes = normalizeQuotes(quotes) as Quote[];
 
-      const normalizedQuote = normalizedQuotes[0];
+    const normalizedQuote = normalizedQuotes[0];
 
-      return {
-        id: normalizedQuote.groupId,
-        dateIssued: normalizedQuote.dateIssued,
-        origin: normalizedQuote.origin,
-        destination: normalizedQuote.destination,
-        containers: normalizedQuote.containers,
-        commodityTypes: normalizedQuote.commodityTypes,
-        quotes: normalizedQuotes,
-      };
-    },
-  );
+    return {
+      id: normalizedQuote.groupId,
+      dateIssued: normalizedQuote.dateIssued,
+      origin: normalizedQuote.origin,
+      destination: normalizedQuote.destination,
+      containers: normalizedQuote.containers,
+      commodityTypes: uniqueCommodityTypes(get('containers')(normalizedQuote)),
+      quotes: normalizedQuotes,
+    };
+  });
 
   return flow(
-    get('QuoteHeader'),
-    values,
-    filter(get('QuoteDetails')), // filters out quotes with empty quotedetails
-    groupBy('idRequest'),
+    groupBy('groupId'),
     values,
     map(normalizeQuoteGroup),
     orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
   ) as (result: QuotesResult) => QuoteGroup[];
 };
 
-const QuotesEndpoint: React.FC<Props> = ({ children }) => {
+const QuoteGroups: React.FC<Props> = ({ children }) => {
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
+  const quotes = useContext(Quotes);
+
+  console.debug('containerTypes', containerTypes);
+  console.debug('commodityTypes', commodityTypes);
+  console.debug('pickupLocations', pickupLocations);
+  console.debug('ports', ports);
+  console.debug('carriers', carriers);
 
   const normalize = useMemo(() => {
     const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
@@ -229,27 +183,46 @@ const QuotesEndpoint: React.FC<Props> = ({ children }) => {
     return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const newTransform = map(
-    flow(
-      update('dateIssued', parseISODate),
-      update(
-        'quotes',
-        map(
-          flow(
-            update('dateIssued', parseISODate),
-            update('validityPeriod.from', parseISODate),
-            update('validityPeriod.to', parseISODate),
-          ),
-        ),
-      ),
-    ),
-  );
+  const quoteGroups = useMemo(() => flow(logAs('quotes'), normalize, logAs('quoteGroups'))(quotes), [
+    quotes,
+    normalize,
+  ]);
 
-  const initialResults = withTestData('quotes', normalize);
+  // const normalize = useMemo(() => {
+  //   const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
+  //     id: string | null | undefined,
+  //   ) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
+  //
+  //   const getContainerType = getEntity(containerTypes, containerType => containerType.id);
+  //   const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
+  //   const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
+  //   const getPort = getEntity(ports, port => port.id);
+  //   const getCarrier = getEntity(carriers, carrier => carrier.name);
+  //
+  //   return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
+  // }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
+  //
+  // const newTransform = map(
+  //   flow(
+  //     update('dateIssued', parseISODate),
+  //     update(
+  //       'quotes',
+  //       map(
+  //         flow(
+  //           update('dateIssued', parseISODate),
+  //           update('validityPeriod.from', parseISODate),
+  //           update('validityPeriod.to', parseISODate),
+  //         ),
+  //       ),
+  //     ),
+  //   ),
+  // );
+  //
+  // const initialResults = withTestData('quotes', normalize);
+  //
+  // const quotes = useEndpoint('/quotes', newTransform, initialResults);
 
-  const quotes = useEndpoint('/quotes', newTransform, initialResults);
-
-  return <Context.Provider value={quotes}>{children}</Context.Provider>;
+  return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
 };
 
-export default QuotesEndpoint;
+export default QuoteGroups;

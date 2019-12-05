@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Grid } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
-import { Remark } from '../../providers/QuotesEndpoint';
+import { Remark } from '../../providers/QuoteGroups';
 
 interface Props {
   remarks: Remark[];

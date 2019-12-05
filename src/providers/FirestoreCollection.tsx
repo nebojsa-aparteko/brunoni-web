@@ -1,15 +1,16 @@
 import React, { useMemo } from 'react';
-import useFirestoreCollection from '../hooks/useFirestoreCollection';
+import useFirestoreCollection, { QueryFunction } from '../hooks/useFirestoreCollection';
 
 interface Props<T> {
   name: string;
+  query?: QueryFunction | null;
   context: React.Context<T[] | undefined>;
   children: React.ReactNode;
 }
 
-function firestoreCollection<T>({ name, context, children }: Props<T>) {
+function firestoreCollection<T>({ name, query, context, children }: Props<T>) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const snapshot = useFirestoreCollection(name);
+  const snapshot = useFirestoreCollection(name, query);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const value = useMemo(() => {

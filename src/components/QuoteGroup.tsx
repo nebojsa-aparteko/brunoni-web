@@ -31,9 +31,7 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
 import uniqWith from 'lodash/fp/uniqWith';
-import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
-import { Quote, QuoteDetail } from '../providers/QuotesEndpoint';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -46,6 +44,8 @@ import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
+import QuoteGroups from '../contexts/QuoteGroups';
+import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 
 interface Props {
@@ -158,11 +158,11 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
 const QuoteGroup: React.FC<Props> = ({ id }) => {
   const classes = useStyles();
 
-  const { result } = useContext(QuotesEndpointContext);
+  const quoteGroups = useContext(QuoteGroups);
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
-  const quoteGroup = result?.find(quoteGroup => quoteGroup.id === id);
+  const quoteGroup = quoteGroups?.find(quoteGroup => quoteGroup.id === id);
 
   if (!quoteGroup) {
     return (
@@ -173,8 +173,6 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
   }
 
   const quotesByCarrier = flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>;
-
-  console.log('quotesByCarrier', quotesByCarrier);
 
   return !quotesByCarrier ? (
     <Container maxWidth="lg">
@@ -265,7 +263,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                             <TableBody>
                               {quoteDetailItemsMerged
                                 .filter(quoteDetail =>
-                                  quoteDetailFilterList.includes(quoteDetail.Description.toLowerCase()),
+                                  quoteDetailFilterList.includes((quoteDetail.Description || '').toLowerCase()),
                                 )
                                 .map((quoteDetail, i) => (
                                   <TableRow key={i} className={classes.tableRow} selected={(i + 1) % 2 === 0}>
@@ -316,8 +314,8 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                       align="center"
                                       className={classes.borderCell}
                                     >
-                                      {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
-                                      {quote.serviceDetails[0].TransitTime} days
+                                      {quote.serviceDetails[0]?.Frequency} {quote.serviceDetails[0]?.Routing}{' '}
+                                      {quote.serviceDetails[0]?.TransitTime} days
                                     </TableCell>
                                   </Fragment>
                                 ))}

@@ -29,12 +29,10 @@ import Container from './Container';
 import ContainerType from '../model/Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
-import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { useHistory } from 'react-router';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
-import asArray from '../utilities/asArray';
 import Meta from '../components/Meta';
 
 interface Props {}
@@ -68,7 +66,6 @@ const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const [user] = useUser();
   const history = useHistory();
-  const { refresh } = useContext(QuotesEndpointContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -166,9 +163,6 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 200 || response.status === 201) {
           const json = await response.json();
-
-          console.log('got quote response ', json);
-          refresh();
 
           if (Array.isArray(json) && json.length > 0) {
             history.push(`/quotes/groups/${json[0].id}`);

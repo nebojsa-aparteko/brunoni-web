@@ -1,7 +1,7 @@
 import formatDate from 'date-fns/format';
-import { Quote } from '../../providers/QuotesEndpoint';
 import firebase from '../../firebase';
 import UserRecord from '../../model/UserRecord';
+import { Quote } from '../../providers/QuoteGroups';
 
 export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
   const cargoDetailsString: string = quote.containers

@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Grid } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
-import { ServiceDetail } from '../../providers/QuotesEndpoint';
+import { ServiceDetail } from '../../providers/QuoteGroups';
 
 interface Props {
   serviceDetails: ServiceDetail[];

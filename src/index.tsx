@@ -10,7 +10,8 @@ import LoginDialogProvider from './components/LoginDialogProvider';
 import CookiesNotification from './components/CookiesNotification';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
 import UserRecordProvider from './providers/UserRecord';
-import QuotesEndpointProvider from './providers/QuotesEndpoint';
+import QuotesProvider from './providers/Quotes';
+import QuoteGroupsProvider from './providers/QuoteGroups';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
 import PickupLocationsContext from './contexts/PickupLocations';
@@ -20,7 +21,6 @@ import UserContext from './contexts/User';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
-import RouteSearch from './components/RouteSearch';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -48,9 +48,11 @@ const render = (user: firebase.User | null) => {
                         <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
                           <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
                             <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                              <QuotesEndpointProvider>
-                                <App />
-                              </QuotesEndpointProvider>
+                              <QuotesProvider>
+                                <QuoteGroupsProvider>
+                                  <App />
+                                </QuoteGroupsProvider>
+                              </QuotesProvider>
                             </FirestoreCollectionProvider>
                           </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
@@ -68,9 +70,7 @@ const render = (user: firebase.User | null) => {
                 <UserContext.Provider value={null}>
                   <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                     <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                      <QuotesEndpointProvider>
-                        <App />
-                      </QuotesEndpointProvider>
+                      <App />
                     </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
                 </UserContext.Provider>

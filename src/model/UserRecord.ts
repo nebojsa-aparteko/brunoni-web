@@ -1,4 +1,5 @@
 export default interface UserRecord {
+  alphacomClientId: string;
   alphacomId: string;
   company: {
     id: string;
