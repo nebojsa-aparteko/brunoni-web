@@ -23,10 +23,10 @@ const clearLocalStorageAfter = (lastSavedKey: string, minutes: number) => {
   }
 };
 
-const useLocalStorage = (key: any, initialValue: DetailedRouteSearchParams, useRawValues: boolean) => {
+const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, timeoutMinutes: number = 5) => {
   const [value, setValue] = useState(() => {
     try {
-      clearLocalStorageAfter(key + '_saved', 5);
+      clearLocalStorageAfter(key + '_saved', timeoutMinutes);
       const localStorageValue = localStorage.getItem(key);
       if (typeof localStorageValue !== 'string') {
         localStorage.setItem(
@@ -54,7 +54,7 @@ const useLocalStorage = (key: any, initialValue: DetailedRouteSearchParams, useR
   useEffect(() => {
     try {
       const serializedState = useRawValues ? String(value) : JSON.stringify(value, stringifyReplacer);
-      clearLocalStorageAfter(key + '_saved', 5);
+      clearLocalStorageAfter(key + '_saved', timeoutMinutes);
       localStorage.setItem(key, serializedState);
       localStorage.setItem(key + '_saved', new Date().getTime().toString());
     } catch (e) {}

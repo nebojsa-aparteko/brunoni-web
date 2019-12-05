@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const containsString = (prop: string, searchString: string) => {
-  return prop.toLowerCase().indexOf(searchString.toLowerCase()) != -1;
+  return prop?.toLowerCase().indexOf(searchString?.toLowerCase()) != -1;
 };
 
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
@@ -58,7 +58,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
 
   const resultChunks = useMemo(() => {
     const filteredResults =
-      searchString && searchString.length > 0
+      searchString && searchString.length > 0 && result
         ? filter((quoteGroup: QuoteGroup) => {
             return (
               containsString(quoteGroup.id, searchString) ||
@@ -99,8 +99,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
 
   return (
     <Fragment>
-      <Search onSearch={handleSearch} className={classes.searchBar} />
-
+      {result && result.length > 0 && <Search onSearch={handleSearch} className={classes.searchBar} />}
       <Card>
         <CardHeader action={showGetQuoteButton && <GetQuotesButton />} title="Quotes" />
         <CardContent className={classes.content}>

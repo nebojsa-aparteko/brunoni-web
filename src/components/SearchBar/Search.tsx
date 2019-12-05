@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/styles';
 import { Input, Theme, Box, InputAdornment, IconButton, FormControl } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import ClearIcon from '@material-ui/icons/Clear';
 import debounce from 'lodash/fp/debounce';
+import useLocalStorage from '../../utilities/useLocalStorage';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -51,13 +52,16 @@ interface Props {
 const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
   const classes = useStyles();
 
-  const [searchString, setSearchString] = useState('');
+  const [searchString, setSearchString] = useLocalStorage('quoteSearchQuery', '', false, 15);
 
   const startSearch = useMemo(() => debounce(150, onSearch), [onSearch]);
 
+  useEffect(() => {
+    startSearch(searchString);
+  });
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(event.target.value);
-    onSearch(event.target.value);
   };
 
   const handleClearButton = () => {
@@ -71,6 +75,7 @@ const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
         disableUnderline
         placeholder="Search"
         onChange={handleChange}
+        value={searchString}
         startAdornment={
           <InputAdornment position="start">
             <SearchIcon />
