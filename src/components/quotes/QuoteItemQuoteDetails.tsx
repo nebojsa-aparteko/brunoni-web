@@ -54,7 +54,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
           </TableHead>
           <TableBody>
             {quoteDetails.map((quoteDetail, index) => (
-              <TableRow key={quoteDetail.Pos} selected={index % 2 === 0}>
+              <TableRow key={quoteDetail.Pos} selected={(index + 1) % 2 === 0}>
                 <TableCell component="th" scope="row">
                   {quoteDetail.Description}
                 </TableCell>
