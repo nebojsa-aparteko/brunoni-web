@@ -22,7 +22,7 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
           <ListItem key={i} disableGutters>
             <Chip
               label={
-                (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                (container.quantity > 1 ? container.quantity + ' × ' : '') +
                 container!.containerType?.description +
                 ', ' +
                 container?.commodityType?.name

@@ -8,7 +8,7 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
     .flatMap(
       (container, i) =>
         ' - ' +
-        (container.quantity > 1 ? container.quantity + ' x ' : '') +
+        (container.quantity > 1 ? container.quantity + ' × ' : '') +
         container!.containerType?.description +
         ', ' +
         container?.commodityType?.name +

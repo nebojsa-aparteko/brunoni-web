@@ -11,19 +11,18 @@ const renderOOG = (oog: OOG) =>
 
 export const createEmailBody = (searchParams: DetailedRouteSearchParams): string => {
   const cargoDetailsString: string = searchParams.containers
-    .flatMap((container, i) => {
-      return (
+    .flatMap(
+      container =>
         ' - ' +
-        (container.quantity > 1 ? container.quantity + ' x ' : '') +
+        (container.quantity > 1 ? container.quantity + ' × ' : '') +
         container!.containerType?.description +
         ', ' +
         container?.commodityType?.name +
         '\n' +
         (container.location ? `   Depot Location: ${getLocationLabel(container.location)}\n` : '') +
         ((container.imo[1] || []).map(renderIMO).join('\n') + '\n') +
-        ((container.oog[1] || []).map(renderOOG).join('\n') + '\n')
-      );
-    })
+        ((container.oog[1] || []).map(renderOOG).join('\n') + '\n'),
+    )
     .join('\n');
 
   return `Dear Sirs,

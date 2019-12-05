@@ -199,7 +199,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
               <Grid item key={i}>
                 <Chip
                   label={
-                    (container.quantity > 1 ? container.quantity + ' x ' : '') +
+                    (container.quantity > 1 ? container.quantity + ' × ' : '') +
                     container!.containerType?.description +
                     ', ' +
                     container?.commodityType?.name

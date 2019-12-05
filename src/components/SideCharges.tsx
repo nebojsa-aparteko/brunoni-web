@@ -76,36 +76,38 @@ const EquipmentSituation: React.FC<Props> = () => {
                 {console.log(sideCharges)}
                 <Typography variant="h4">{name || id}</Typography>
               </Box>
-              {sideCharges!.groups.map(({ prefix, statements }, i) => (
-                <ExpansionPanel>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                    className={classes.expansionPanelSummary}
-                  >
-                    <Typography className={classes.heading}>{prefix ? prefix : 'Other'}</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <Box mt={2} width="100%">
-                      <Paper className={classes.overflowTable}>
-                        <Table size="small" aria-label="a dense table">
-                          <TableBody>
-                            {statements.map(({ label, amount, currency, per }, i) => (
-                              <TableRow key={i} className={classes.tableRow}>
-                                <TableCell>{[label].filter(identity).join(' ')}</TableCell>
-                                <TableCell>
-                                  {currency} {amount} PER {per}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </Paper>
-                    </Box>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              ))}
+              <Box>
+                {sideCharges!.groups.map(({ prefix, statements }, i) => (
+                  <ExpansionPanel>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                      className={classes.expansionPanelSummary}
+                    >
+                      <Typography className={classes.heading}>{prefix ? prefix : 'Other'}</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <Box mt={2} width="100%">
+                        <Paper className={classes.overflowTable}>
+                          <Table size="small" aria-label="a dense table">
+                            <TableBody>
+                              {statements.map(({ label, amount, currency, per }, i) => (
+                                <TableRow key={i} className={classes.tableRow}>
+                                  <TableCell>{[label].filter(identity).join(' ')}</TableCell>
+                                  <TableCell>
+                                    {currency} {amount} PER {per}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </Paper>
+                      </Box>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+                ))}
+              </Box>
             </Box>
           ))}
       </Box>
