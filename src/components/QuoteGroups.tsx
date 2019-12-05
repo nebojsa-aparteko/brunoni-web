@@ -1,129 +1,129 @@
-import React, { useContext, Fragment } from 'react';
-import formatDate from 'date-fns/format';
-import uniq from 'lodash/fp/uniq';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Grid,
-  Chip,
-  Button,
-  Container,
-  makeStyles,
-  Theme,
-  createStyles,
-} from '@material-ui/core';
+import React, { useContext, useMemo, useState, Fragment } from 'react';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import { CardContent, CardHeader, Card, makeStyles, CardActions, TablePagination } from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
-import { Link as RouterLink } from 'react-router-dom';
-import { Skeleton } from '@material-ui/lab';
 import GetQuotesButton from './GetQuotesButton';
-import { CSSProperties } from '@material-ui/styles';
+import QuoteGroupsTable from './quotes/QuoteGroupsTable';
+import chunk from 'lodash/fp/chunk';
+import get from 'lodash/fp/get';
+import filter from 'lodash/fp/filter';
+import find from 'lodash/fp/find';
+import Search from './SearchBar/Search';
+import { Quote, QuoteGroup } from '../providers/QuotesEndpoint';
+import Container from '../model/Container';
+import CommodityType from '../model/CommodityType';
+import Carrier from '../model/Carrier';
 
 interface Props {
   showGetQuoteButton?: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    tableRow: {
-      '& td': {
-        whiteSpace: 'nowrap',
-      },
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  searchBar: {
+    marginBottom: theme.spacing(2),
+  },
+  content: {
+    padding: 0,
+  },
+  inner: {
+    minWidth: 700,
+  },
+  nameCell: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  avatar: {
+    height: 42,
+    width: 42,
+    marginRight: theme.spacing(1),
+  },
+  actions: {
+    padding: theme.spacing(1),
+    justifyContent: 'flex-end',
+  },
+}));
+
+const containsString = (prop: string, searchString: string) => {
+  return prop.toLowerCase().indexOf(searchString.toLowerCase()) != -1;
+};
 
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
   const classes = useStyles();
   const { result } = useContext(QuotesEndpointContext);
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchString, setSearchString] = useState('');
+
+  const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
+
+  const resultChunks = useMemo(() => {
+    const filteredResults =
+      searchString && searchString.length > 0
+        ? filter((quoteGroup: QuoteGroup) => {
+            return (
+              containsString(quoteGroup.id, searchString) ||
+              containsString(quoteGroup.origin.id, searchString) ||
+              containsString(quoteGroup.origin.city, searchString) ||
+              containsString(quoteGroup.destination.id, searchString) ||
+              containsString(quoteGroup.destination.city, searchString) ||
+              find((container: Container) => {
+                return container.containerType ? containsString(container.containerType.id, searchString) : false;
+              })(quoteGroup.containers) !== undefined ||
+              find((commodityType: CommodityType) => {
+                return containsString(commodityType.name, searchString);
+              })(quoteGroup.commodityTypes) !== undefined ||
+              find((quote: Quote) => {
+                return quote.carrier ? containsString(quote.carrier.id, searchString) : false;
+              })(quoteGroup.quotes) !== undefined
+            );
+          })(result)
+        : result;
+
+    setFilteredResults(filteredResults);
+    return chunk(rowsPerPage)(filteredResults);
+  }, [result, searchString, page, rowsPerPage]);
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+    setPage(page);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value));
+  };
+
+  const handleSearch = (searchString: string) => {
+    setPage(0);
+    setSearchString(searchString);
+  };
+
   return (
-    <Container maxWidth="lg" style={{ overflowX: 'auto', padding: 0 }}>
-      {showGetQuoteButton && <GetQuotesButton />}
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow className={classes.tableRow}>
-            <TableCell>Route</TableCell>
-            <TableCell>Carriers</TableCell>
-            <TableCell>Cargo</TableCell>
-            <TableCell>Commodities</TableCell>
-            <TableCell>Issue Date</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {result
-            ? result.map(quoteGroup => (
-                <TableRow key={quoteGroup.id} className={classes.tableRow}>
-                  <TableCell>
-                    {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
-                    {quoteGroup.destination.city || quoteGroup.destination.id}
-                  </TableCell>
-                  <TableCell>
-                    {uniq(quoteGroup.quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(',')}
-                  </TableCell>
-                  <TableCell>
-                    <Grid container spacing={1}>
-                      {/*TODO handle the flash of undefined text*/}
-                      {quoteGroup.containers &&
-                        quoteGroup.containers.map((container, index) => (
-                          <Grid item key={index}>
-                            {container && <Chip label={container!.containerType?.name} />}
-                          </Grid>
-                        ))}
-                    </Grid>
-                  </TableCell>
-                  <TableCell>
-                    <Grid container spacing={1}>
-                      {quoteGroup.commodityTypes &&
-                        quoteGroup.commodityTypes.map((commodityType, index) => (
-                          <Grid item key={index}>
-                            <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id} />
-                          </Grid>
-                        ))}
-                    </Grid>
-                  </TableCell>
-                  <TableCell>{formatDate(quoteGroup.dateIssued, 'd. MMMM')}</TableCell>
-                  <TableCell align="right">
-                    <Button
-                      color="primary"
-                      component={RouterLink}
-                      size="small"
-                      to={`/quotes/groups/${quoteGroup.id}`}
-                      variant="outlined"
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            : [...Array(3)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Skeleton width={50} height={16} style={{ margin: 0 }} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton width={140} height={16} style={{ margin: 0 }} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton width={65} height={16} style={{ margin: 0 }} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton width={140} height={16} style={{ margin: 0 }} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton width={140} height={16} style={{ margin: 0 }} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Skeleton width={64} height={29} style={{ margin: 0, float: 'right' }} />
-                  </TableCell>
-                </TableRow>
-              ))}
-        </TableBody>
-      </Table>
-    </Container>
+    <Fragment>
+      <Search onSearch={handleSearch} className={classes.searchBar} />
+
+      <Card>
+        <CardHeader action={showGetQuoteButton && <GetQuotesButton />} title="Quotes" />
+        <CardContent className={classes.content}>
+          <PerfectScrollbar>
+            <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
+          </PerfectScrollbar>
+        </CardContent>
+        <CardActions className={classes.actions}>
+          {result && result.length > 0 && (
+            <TablePagination
+              component="div"
+              count={filteredResults ? filteredResults.length : 0}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
+          )}
+        </CardActions>
+      </Card>
+    </Fragment>
   );
 };
 
