@@ -102,6 +102,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: '#f1f6f8', // TODO figure out why theme overrides from ./theme
     // are in collision with the default Material UI theme.
   },
+  borderCell: {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
 }));
 
 interface ActionButtonsProps {
@@ -254,22 +257,11 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 <TableCell />
                                 {quotes.map((quote, index) => (
                                   <Fragment key={index}>
-                                    <TableCell
-                                      className={`${classes.currencyCell} ${
-                                        index % 2 === 0 ? classes.alternateCell : null
-                                      }`}
-                                    >
+                                    <TableCell align="right" className={classes.borderCell}>
                                       Currency
                                     </TableCell>
-                                    <TableCell
-                                      className={`${index % 2 === 0 ? classes.alternateCell : null}`}
-                                      align="right"
-                                    >
-                                      Cost Value
-                                    </TableCell>
-                                    <TableCell className={`${index % 2 === 0 ? classes.alternateCell : null}`}>
-                                      Cost Unit
-                                    </TableCell>
+                                    <TableCell align="right">Cost Value</TableCell>
+                                    <TableCell>Cost Unit</TableCell>
                                   </Fragment>
                                 ))}
                               </TableRow>
@@ -280,7 +272,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                   quoteDetailFilterList.includes(quoteDetail.Description.toLowerCase()),
                                 )
                                 .map((quoteDetail, i) => (
-                                  <TableRow key={i} className={classes.tableRow}>
+                                  <TableRow key={i} className={classes.tableRow} selected={(i + 1) % 2 === 0}>
                                     <TableCell component="th" scope="row">
                                       {quoteDetail.Description}
                                     </TableCell>
@@ -293,24 +285,16 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                       );
                                       return matchingQuoteDetail ? (
                                         <Fragment key={index}>
-                                          <TableCell
-                                            className={`${classes.currencyCell} ${
-                                              index % 2 === 0 ? classes.alternateCell : null
-                                            }`}
-                                          >
+                                          <TableCell className={`${classes.currencyCell} ${classes.borderCell}`}>
                                             {matchingQuoteDetail.Currency !== 'incl.'
                                               ? matchingQuoteDetail.Currency
                                               : ''}
                                           </TableCell>
-                                          <TableCell
-                                            className={`${index % 2 === 0 ? classes.alternateCell : null}`}
-                                            align="right"
-                                            style={{ width: '3em' }}
-                                          >
+                                          <TableCell align="right" style={{ width: '3em' }}>
                                             {' '}
                                             {matchingQuoteDetail.CostValue}
                                           </TableCell>
-                                          <TableCell className={`${index % 2 === 0 ? classes.alternateCell : null}`}>
+                                          <TableCell>
                                             {matchingQuoteDetail.Currency === 'incl.'
                                               ? matchingQuoteDetail.Currency
                                               : ''}{' '}
@@ -318,13 +302,13 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                           </TableCell>
                                         </Fragment>
                                       ) : (
-                                        <TableCell colSpan={3} />
+                                        <TableCell colSpan={3} className={classes.borderCell} />
                                       );
                                     })}
                                   </TableRow>
                                 ))}
 
-                              <TableRow>
+                              <TableRow className={classes.tableRow}>
                                 <TableCell component="th" scope="row">
                                   Service Details
                                 </TableCell>
@@ -332,9 +316,9 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                   <Fragment key={index}>
                                     <TableCell
                                       key={quote.QuoteNumber}
-                                      className={`${index % 2 === 0 ? classes.alternateCell : null}`}
                                       colSpan={3}
                                       align="center"
+                                      className={classes.borderCell}
                                     >
                                       {quote.serviceDetails[0].Frequency} {quote.serviceDetails[0].Routing}{' '}
                                       {quote.serviceDetails[0].TransitTime} days
@@ -343,17 +327,13 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                                 ))}
                               </TableRow>
 
-                              <TableRow>
+                              <TableRow selected className={classes.tableRow}>
                                 <TableCell component="th" scope="row">
                                   Quote Validity
                                 </TableCell>
                                 {quotes.map((quote, index) => (
                                   <Fragment key={index}>
-                                    <TableCell
-                                      className={`${index % 2 === 0 ? classes.alternateCell : null}`}
-                                      colSpan={3}
-                                      align="center"
-                                    >
+                                    <TableCell colSpan={3} align="center" className={classes.borderCell}>
                                       {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
                                       {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                                     </TableCell>
@@ -362,15 +342,13 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                               </TableRow>
                             </TableBody>
                             <TableFooter>
-                              <TableRow>
+                              <TableRow className={classes.tableRow}>
                                 <TableCell className={classes.noBorder} />
 
                                 {quotes.map((quote, index) => (
                                   <Fragment key={quote.id}>
                                     <TableCell
-                                      className={`${classes.buttonContainer} ${
-                                        index % 2 === 0 ? classes.alternateCell : null
-                                      }`}
+                                      className={`${classes.buttonContainer} ${classes.borderCell}`}
                                       colSpan={3}
                                     >
                                       <QuoteItemActionButtons quote={quote} />

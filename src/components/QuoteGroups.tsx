@@ -1,17 +1,42 @@
 import React, { useContext, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
-import { Table, TableBody, TableCell, TableHead, TableRow, Grid, Chip, Button, Container } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Grid,
+  Chip,
+  Button,
+  Container,
+  makeStyles,
+  Theme,
+  createStyles,
+} from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import GetQuotesButton from './GetQuotesButton';
+import { CSSProperties } from '@material-ui/styles';
 
 interface Props {
   showGetQuoteButton?: boolean;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    tableRow: {
+      '& td': {
+        whiteSpace: 'nowrap',
+      },
+    },
+  }),
+);
+
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
+  const classes = useStyles();
   const { result } = useContext(QuotesEndpointContext);
 
   return (
@@ -19,7 +44,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
       {showGetQuoteButton && <GetQuotesButton />}
       <Table aria-label="simple table">
         <TableHead>
-          <TableRow>
+          <TableRow className={classes.tableRow}>
             <TableCell>Route</TableCell>
             <TableCell>Carriers</TableCell>
             <TableCell>Cargo</TableCell>
@@ -31,7 +56,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
         <TableBody>
           {result
             ? result.map(quoteGroup => (
-                <TableRow key={quoteGroup.id}>
+                <TableRow key={quoteGroup.id} className={classes.tableRow}>
                   <TableCell>
                     {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                     {quoteGroup.destination.city || quoteGroup.destination.id}
