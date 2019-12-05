@@ -1,5 +1,4 @@
 import React, { useContext, useMemo, useState, Fragment } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import { CardContent, CardHeader, Card, makeStyles, CardActions, TablePagination } from '@material-ui/core';
 import QuotesEndpointContext from '../contexts/QuotesEndpoint';
 import GetQuotesButton from './GetQuotesButton';
@@ -12,7 +11,6 @@ import Search from './SearchBar/Search';
 import { Quote, QuoteGroup } from '../providers/QuotesEndpoint';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
-import Carrier from '../model/Carrier';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -24,6 +22,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     padding: 0,
+    overflowX: 'auto',
   },
   inner: {
     minWidth: 700,
@@ -105,9 +104,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
       <Card>
         <CardHeader action={showGetQuoteButton && <GetQuotesButton />} title="Quotes" />
         <CardContent className={classes.content}>
-          <PerfectScrollbar>
-            <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
-          </PerfectScrollbar>
+          <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
         </CardContent>
         <CardActions className={classes.actions}>
           {result && result.length > 0 && (

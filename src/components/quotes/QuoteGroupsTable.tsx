@@ -1,10 +1,32 @@
 import React, { Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
-import { Table, TableBody, TableCell, TableHead, TableRow, Grid, Chip, Button } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Grid,
+  Chip,
+  Button,
+  createStyles,
+  makeStyles,
+  Theme,
+} from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuotesEndpoint';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    tableRow: {
+      '& td': {
+        whiteSpace: 'nowrap',
+      },
+    },
+  }),
+);
 
 interface Props {
   quoteGroups?: QuoteGroup[] | null;
@@ -38,7 +60,7 @@ const QuoteGroupsBodySekeleton: React.FC = () => (
 );
 
 const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
-  console.log('Got chunk', quoteGroups);
+  const classes = useStyles();
   return (
     <Fragment>
       <Table aria-label="simple table">
@@ -57,7 +79,7 @@ const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
             <QuoteGroupsBodySekeleton />
           ) : (
             quoteGroups.map(quoteGroup => (
-              <TableRow key={quoteGroup.id}>
+              <TableRow key={quoteGroup.id} className={classes.tableRow}>
                 <TableCell>
                   {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
                   {quoteGroup.destination.city || quoteGroup.destination.id}
