@@ -29,6 +29,10 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700&display=swap" rel="stylesheet">
 
     <style>
+      html, body {
+        height: 100%;
+      }
+
       #root {
         display: flex;
         flex-direction: column;
@@ -92,6 +96,55 @@
           min-width: 768px;
         }
       }
+
+      .page {
+        display: table;
+        width: 100%;
+        height: 100%;
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .content {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+      }
+
+      .inside-content {
+        width: 600px;
+        margin: 0 auto;
+      }
+
+      .lead {
+        margin-top: 2em;
+        font-size: 1.5em;
+      }
+
+      .browser-list {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 1em;
+      }
+
+      .browser-list li {
+        display: inline-block;
+      }
+
+      .browser-list li img {
+        width: 48px;
+      }
+
+      .browser-list li + li {
+        margin-left: 1em;
+      }
+
+      .logo {
+        width: 120px;
+      }
+
+      .hidden {
+        display: none;
+      }
     </style>
 
     <script>
@@ -110,6 +163,22 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <div id="unsupportedBrowser" class="page hidden">
+      <div class="content">
+        <div class="inside-content">
+          <img class="logo" src="./images/%REACT_APP_BRAND%/logo.png" />
+          <p class="lead">You are using Internet Explorer browser which cannot support Ospitek View application. Please download a newer browser to be able to use this app.</P>
+          <p>Here are some supported browsers</p>
+          <ul class="browser-list">
+            <li><a href="https://www.google.com/chrome/"><img src="./images/chrome_logo.svg" alt="Chrome browser logo"/></a></li>
+            <li><a href="https://www.mozilla.org/en-US/firefox/new/"><img src="./images/firefox_logo.png" alt="Firefox browser logo"/></a></li>
+            <li><a href="https://www.opera.com/"><img src="./images/opera_logo.svg" alt="Opera browser logo"/></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div id="root">
       <div id="rootspinner" class="loader">
         <div class="loader-static"></div>
@@ -117,6 +186,7 @@
         <div class="loader-text">Loading…</div>
       </div>
     </div>
+
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -127,5 +197,29 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <script>
+      (function msieversion() {
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        var unsupportedBrowser = document.querySelector('#unsupportedBrowser');
+        var regularContent = document.querySelector('#root');
+
+        console.log(navigator.userAgent);
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))  // If Internet Explorer, return version number
+        {
+          if (regularContent.parentNode) {
+            regularContent.parentNode.removeChild(regularContent);
+          }
+
+          unsupportedBrowser.className = 'page';
+        }
+        return false;
+      })();
+    </script>
+
   </body>
 </html>
