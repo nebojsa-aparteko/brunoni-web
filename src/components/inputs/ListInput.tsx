@@ -9,6 +9,7 @@ interface Props<T> extends InputProps<T[]> {
   listRef?: React.Ref<unknown>;
   addButtonRef?: React.Ref<unknown>;
   ItemInput: React.ComponentType<InputProps<T>>;
+  ItemInputProps?: { [key: string]: any };
   addText?: string;
   defaultItemValue: T;
   value: T[];
@@ -24,7 +25,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-function ListInput<T>({ listRef, addButtonRef, ItemInput, addText, defaultItemValue, value, onChange }: Props<T>) {
+function ListInput<T>({
+  listRef,
+  addButtonRef,
+  ItemInput,
+  ItemInputProps,
+  addText,
+  defaultItemValue,
+  value,
+  onChange,
+}: Props<T>) {
   const classes = useStyles();
   const refs = useRef<unknown[]>([]);
 
@@ -61,7 +71,12 @@ function ListInput<T>({ listRef, addButtonRef, ItemInput, addText, defaultItemVa
         <Paper key={i} className={classes.paper}>
           <Box display="flex">
             <Box flex="1" p={2}>
-              <ItemInput ref={ref => (refs.current[i] = ref)} value={item} onChange={v => onChange(set(i, v)(value))} />
+              <ItemInput
+                ref={ref => (refs.current[i] = ref)}
+                value={item}
+                onChange={v => onChange(set(i, v)(value))}
+                {...(ItemInputProps || {})}
+              />
             </Box>
             <Box
               py={2}

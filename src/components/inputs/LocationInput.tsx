@@ -8,9 +8,11 @@ import get from 'lodash/fp/get';
 import CommodityType from '../../model/CommodityType';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
+import includes from 'lodash/fp/includes';
 import intersectionWith from 'lodash/fp/intersectionWith';
 import isEqual from 'lodash/fp/isEqual';
 import flatten from 'lodash/fp/flatten';
+import { adrNameToFilterOut, doNotShowCities } from '../../utilities/pickupDropOffHelperData';
 
 interface Props extends InputProps<PickupLocation | undefined> {
   margin?: any;
@@ -49,9 +51,20 @@ const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);
 
-  const sortedLocations = useMemo(() => orderBy([get('countryCode'), get('city'), get('name')], 'asc')(locations), [
-    locations,
-  ]);
+  const sortedLocations = useMemo(
+    () =>
+      orderBy(
+        [get('countryCode'), get('city'), get('name')],
+        'asc',
+      )(
+        filter((location: PickupLocation) => {
+          const adrNameFiltered = includes(location.name.toLowerCase())(adrNameToFilterOut);
+          const shouldNotBeShown = includes(location.city.toLowerCase())(doNotShowCities);
+          return !(adrNameFiltered || shouldNotBeShown); // || !portOnlyLocation;
+        })(locations),
+      ),
+    [locations],
+  );
 
   useImperativeHandle(ref, () => ({
     focus: () => {

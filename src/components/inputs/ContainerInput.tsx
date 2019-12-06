@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useEffect, Fragment } f
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
 import { Box, Grid, makeStyles, TextField, Theme, Paper } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
@@ -54,7 +55,7 @@ const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
   />
 ));
 
-const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
+const ContainerInput: React.FC<Props> = ({ value, onChange, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
@@ -67,7 +68,11 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
       } else if (!value.commodityType) {
         (commodityTypeInput.current! as { focus: () => void }).focus();
       } else if (!value.location) {
-        (locationInput.current! as { focus: () => void }).focus();
+        try {
+          (locationInput.current! as { focus: () => void }).focus();
+        } catch (e) {
+          // ignore, cannot focus the field that is not there
+        }
       } else {
         (containerTypeInput.current! as { focus: () => void }).focus();
       }
@@ -127,7 +132,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange }, ref) => {
             onChange={handleCommodityTypeChange}
           />
         </Grid>
-        {!value.containerType?.description?.endsWith('S.O.') && (
+        {get('showLocations')(rest) && !value.containerType?.description?.endsWith('S.O.') && (
           <Grid item md={4} xs={12}>
             <LocationInput ref={locationInput} margin="dense" value={value.location} onChange={handleLocationChange} />
           </Grid>

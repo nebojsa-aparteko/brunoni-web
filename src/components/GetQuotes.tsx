@@ -18,7 +18,7 @@ import {
   Paper,
 } from '@material-ui/core';
 import Port from '../model/Port';
-import isString from 'lodash/fp/isString';
+import includes from 'lodash/fp/includes';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
@@ -34,6 +34,7 @@ import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
 import Meta from '../components/Meta';
+import { europeanCountries } from '../utilities/pickupDropOffHelperData';
 
 interface Props {}
 
@@ -62,6 +63,13 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
+const checkIfPortsInEurope = (originPort: Port | undefined, destinationPort: Port | undefined) => {
+  return (
+    includes(originPort?.country.toLowerCase())(europeanCountries) ||
+    includes(destinationPort?.country.toLowerCase())(europeanCountries)
+  );
+};
+
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const [user] = useUser();
@@ -72,6 +80,7 @@ const GetQuotes: React.FC<Props> = () => {
   const [value, onChange] = useContext(RouteSearchContext);
   const [busy, setBusy] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showContainerLocations, setShowContainerLocations] = useState(false);
   const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
@@ -91,6 +100,10 @@ const GetQuotes: React.FC<Props> = () => {
   const setContainers = (containers: ContainerModel[]) => onChange(set('containers', containers)(value));
 
   const closeDialog = () => setDialogOpen(false);
+
+  useEffect(() => {
+    setShowContainerLocations(checkIfPortsInEurope(originPort, destinationPort));
+  }, [originInput, destinationInput, originPort, destinationPort]);
 
   useEffect(() => {
     const focusSearch = () =>
@@ -151,6 +164,7 @@ const GetQuotes: React.FC<Props> = () => {
           signal,
         });
 
+        console.log('get quote response', response);
         if (response.status === 504) {
           enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
             variant: 'error',
@@ -241,7 +255,10 @@ const GetQuotes: React.FC<Props> = () => {
         if (!container.containerType || !container.commodityType) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
-        } else if (!(container.containerType?.description || '').endsWith('S.O.') && !container.location) {
+        } else if (
+          !container.location &&
+          !((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)
+        ) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         }
@@ -317,6 +334,7 @@ const GetQuotes: React.FC<Props> = () => {
                   listRef={listInput}
                   addButtonRef={addButton}
                   ItemInput={ContainerInput}
+                  ItemInputProps={{ showLocations: showContainerLocations }}
                   addText="Add Cargo"
                   defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
                   value={containers}
