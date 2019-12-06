@@ -63,7 +63,7 @@ const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
   const classes = useStyles();
   return (
     <Fragment>
-      <Table aria-label="simple table">
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Route</TableCell>

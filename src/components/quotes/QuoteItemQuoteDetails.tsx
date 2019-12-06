@@ -58,7 +58,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
     <Fragment>
       <Grid item xs={12}>
         <Box className={classes.tableWrapper}>
-          <Table aria-label="simple table" className={classes.table} size="small">
+          <Table className={classes.table} size="small">
             <TableHead className={classes.tableHead}>
               <TableRow className={classes.tableRow}>
                 <TableCell>Description</TableCell>

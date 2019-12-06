@@ -33,12 +33,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.common.white,
     marginLeft: theme.spacing(2),
   },
-  margin: {
-    marginLeft: theme.spacing(3),
-  },
-  withoutLabel: {
-    marginTop: theme.spacing(3),
-  },
   textField: {
     width: 200,
   },
@@ -46,10 +40,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   className?: string;
+  style?: React.CSSProperties;
   onSearch: (searchString: string) => void;
 }
 
-const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
+const Search: React.FC<Props> = ({ onSearch, className, style, ...rest }) => {
   const classes = useStyles();
   const input = useRef<HTMLInputElement>();
   const [searchString, setSearchString] = useLocalStorage('quoteSearchQuery', '', false, 15);
@@ -72,7 +67,7 @@ const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
   };
 
   return (
-    <FormControl className={classNames(classes.margin, classes.withoutLabel, classes.textField, className)}>
+    <FormControl className={classNames(classes.textField, className)} style={style}>
       <Input
         className={classes.searchInput}
         disableUnderline

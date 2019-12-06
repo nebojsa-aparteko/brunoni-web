@@ -1,5 +1,14 @@
 import React, { useContext, useMemo, useState, Fragment } from 'react';
-import { Card, CardActions, CardContent, CardHeader, makeStyles, TablePagination } from '@material-ui/core';
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  makeStyles,
+  TablePagination,
+  Typography,
+} from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroups';
 import QuoteGroupsTable from './quotes/QuoteGroupsTable';
@@ -18,9 +27,6 @@ interface Props {
 }
 
 const useStyles = makeStyles(theme => ({
-  searchBar: {
-    marginBottom: theme.spacing(2),
-  },
   content: {
     padding: 0,
     overflowX: 'auto',
@@ -102,28 +108,39 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
   };
 
   return (
-    <Fragment>
-      {quoteGroups && quoteGroups.length > 0 && <Search onSearch={handleSearch} className={classes.searchBar} />}
-      <Card>
-        <CardHeader action={showGetQuoteButton && <GetQuotesButton />} title="Quotes" />
-        <CardContent className={classes.content}>
-          <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
-        </CardContent>
-        <CardActions className={classes.actions}>
-          {quoteGroups && quoteGroups.length > 0 && (
-            <TablePagination
-              component="div"
-              count={filteredResults ? filteredResults.length : 0}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25]}
+    <Card>
+      <CardHeader
+        action={showGetQuoteButton && <GetQuotesButton />}
+        title={
+          <Box display="flex">
+            <Typography variant="subtitle1" display="inline">
+              Quotes
+            </Typography>
+            <Box flex={1} />
+            <Search
+              onSearch={handleSearch}
+              style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
             />
-          )}
-        </CardActions>
-      </Card>
-    </Fragment>
+          </Box>
+        }
+      />
+      <CardContent className={classes.content}>
+        <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
+      </CardContent>
+      <CardActions className={classes.actions}>
+        {quoteGroups && quoteGroups.length > 0 && (
+          <TablePagination
+            component="div"
+            count={filteredResults ? filteredResults.length : 0}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+        )}
+      </CardActions>
+    </Card>
   );
 };
 

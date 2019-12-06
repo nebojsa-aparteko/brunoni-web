@@ -174,44 +174,10 @@ const QuoteGroups: React.FC<Props> = ({ children }) => {
     return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const quoteGroups = useMemo(() => flow(logAs('quotes'), normalize, logAs('quoteGroups'))(quotes), [
-    quotes,
-    normalize,
-  ]);
-
-  // const normalize = useMemo(() => {
-  //   const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
-  //     id: string | null | undefined,
-  //   ) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
-  //
-  //   const getContainerType = getEntity(containerTypes, containerType => containerType.id);
-  //   const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
-  //   const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
-  //   const getPort = getEntity(ports, port => port.id);
-  //   const getCarrier = getEntity(carriers, carrier => carrier.name);
-  //
-  //   return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
-  // }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
-  //
-  // const newTransform = map(
-  //   flow(
-  //     update('dateIssued', parseISODate),
-  //     update(
-  //       'quotes',
-  //       map(
-  //         flow(
-  //           update('dateIssued', parseISODate),
-  //           update('validityPeriod.from', parseISODate),
-  //           update('validityPeriod.to', parseISODate),
-  //         ),
-  //       ),
-  //     ),
-  //   ),
-  // );
-  //
-  // const initialResults = withTestData('quotes', normalize);
-  //
-  // const quotes = useEndpoint('/quotes', newTransform, initialResults);
+  const quoteGroups = useMemo(
+    () => (quotes === undefined ? undefined : flow(logAs('quotes'), normalize, logAs('quoteGroups'))(quotes)),
+    [quotes, normalize],
+  );
 
   return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
 };
