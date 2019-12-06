@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Box, FormControl, Grid, makeStyles, MenuItem, Theme } from '@material-ui/core';
+import { Box, FormControl, Grid, IconButton, InputLabel, makeStyles, MenuItem, Theme } from '@material-ui/core';
 import get from 'lodash/fp/get';
 import update from 'lodash/fp/update';
 import omit from 'lodash/fp/omit';
@@ -56,25 +56,10 @@ const normalizeClientPerformance = flow(
   ),
 );
 
-const useStyles = makeStyles((theme: Theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-    display: 'inline-block',
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-  inline: {
-    display: 'inline-block',
-    marginLeft: '1em',
-  },
-}));
 const DashboardCharts: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
-  const classes = useStyles();
-
+  const [open, setOpen] = React.useState(false);
   const [year, setYear] = useState(currentYear);
   const { busy, error, result } = useEndpoint(
     '/clientPerformance',
@@ -100,25 +85,35 @@ const DashboardCharts: React.FC = () => {
 
   return (
     <Page title="Analytics Dashboard">
-      <Box display="flex" flexDirection="row-reverse">
-        <FormControl className={classes.formControl}>
-          <Box display="inline-block">
-            <TodayIcon />
-          </Box>
-          <Select
-            labelId="year-select-label"
-            id="year-select"
-            value={year}
-            onChange={handleYearChange}
-            className={classes.inline}
-          >
-            <MenuItem value={currentYear} selected>
-              Current Year
-            </MenuItem>
-            <MenuItem value={currentYear - 1}>{currentYear - 1}</MenuItem>
-            <MenuItem value={currentYear - 2}>{currentYear - 2}</MenuItem>
-          </Select>
-        </FormControl>
+      <Box my={2}>
+        <Grid container justify="flex-end">
+          <Grid item xs={5} sm={4} md={3} lg={2}>
+            <Box display="flex" alignItems="flex-end">
+              <Box my={-1}>
+                <IconButton color="inherit" component="span" onClick={() => setOpen(true)}>
+                  <TodayIcon />
+                </IconButton>
+              </Box>
+              <FormControl fullWidth>
+                <Select
+                  labelId="year-select-label"
+                  id="year-select"
+                  open={open}
+                  onOpen={() => setOpen(true)}
+                  onClose={() => setOpen(false)}
+                  value={year}
+                  onChange={handleYearChange}
+                >
+                  <MenuItem value={currentYear} selected>
+                    Current Year
+                  </MenuItem>
+                  <MenuItem value={currentYear - 1}>{currentYear - 1}</MenuItem>
+                  <MenuItem value={currentYear - 2}>{currentYear - 2}</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
       <Grid container spacing={2}>
         <Grid item md={8} xs={12}>
