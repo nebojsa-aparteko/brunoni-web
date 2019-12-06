@@ -5,10 +5,36 @@ import PickupLocation from '../../model/PickupLocation';
 import SelectInput from './SelectInput';
 import orderBy from 'lodash/fp/orderBy';
 import get from 'lodash/fp/get';
+import CommodityType from '../../model/CommodityType';
+import map from 'lodash/fp/map';
+import filter from 'lodash/fp/filter';
+import intersectionWith from 'lodash/fp/intersectionWith';
+import isEqual from 'lodash/fp/isEqual';
+import flatten from 'lodash/fp/flatten';
 
 interface Props extends InputProps<PickupLocation | undefined> {
   margin?: any;
 }
+
+const filterFlow = (parts: string[], options: PickupLocation[], findIntersection: boolean = false) => {
+  const filteredItems = map((part: string) =>
+    filter(
+      (option: PickupLocation) =>
+        getLocationLabel(option)
+          .toLowerCase()
+          .indexOf(part.toLowerCase()) > -1,
+    )(options),
+  )(parts);
+
+  return findIntersection
+    ? ((intersectionWith(isEqual) as any)(...filteredItems) as PickupLocation[])
+    : flatten(filteredItems);
+};
+
+const filterOptions = (options: PickupLocation[], { inputValue }: { inputValue: string }) => {
+  const searchWords = inputValue.split(' ');
+  return filterFlow(searchWords, options, searchWords.length > 1);
+};
 
 export const getLocationLabel = (location: PickupLocation | undefined) =>
   location ? `${location.name} - ${location.city} - ${location.countryCode}`.toUpperCase() : '';
@@ -40,6 +66,7 @@ const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
       margin={margin}
       options={sortedLocations}
       getOptionLabel={getLocationLabel}
+      filterOptions={filterOptions}
       open={open}
       setOpen={setOpen}
       value={value}
