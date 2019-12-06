@@ -25,13 +25,7 @@ const Dashboard: React.FC = () => {
   return (
     <Container className={classes.root}>
       <DashboardCharts />
-      <Card className={classes.quoteDetails}>
-        <CardHeader title="Quotes" action={<GetQuotesButton />} />
-        <Divider />
-        <CardContent className={classes.cardContent}>
-          <QuoteGroups showGetQuoteButton={false} />
-        </CardContent>
-      </Card>
+      <QuoteGroups showGetQuoteButton={false} className={classes.quoteDetails} />
     </Container>
   );
 };

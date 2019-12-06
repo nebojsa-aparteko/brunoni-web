@@ -24,6 +24,7 @@ import { Quote, QuoteGroup } from '../providers/QuoteGroups';
 
 interface Props {
   showGetQuoteButton?: boolean;
+  className?: string;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -54,7 +55,7 @@ const containsString = (prop: string, searchString: string) => {
   return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
 };
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
+const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }) => {
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
@@ -108,7 +109,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
   };
 
   return (
-    <Card>
+    <Card className={className} {...rest}>
       <CardHeader
         action={showGetQuoteButton && <GetQuotesButton />}
         title={
