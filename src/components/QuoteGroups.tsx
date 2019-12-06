@@ -94,9 +94,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
     setRowsPerPage(parseInt(event.target.value));
   };
 
-  const handleSearch = (searchString: string) => {
-    setPage(0);
-    setSearchString(searchString);
+  const handleSearch = (searchStringNew: string) => {
+    if (searchStringNew !== searchString) {
+      setPage(0);
+      setSearchString(searchStringNew);
+    }
   };
 
   return (
