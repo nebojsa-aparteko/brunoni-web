@@ -41,8 +41,7 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
                 label={
                   (container.quantity > 1 ? container.quantity + ' × ' : '') +
                   container!.containerType?.description +
-                  ', ' +
-                  container?.commodityType?.name
+                  (container?.commodityType?.name ? `, ${container.commodityType.name}` : '')
                 }
                 className={classes.chip}
               />
@@ -50,7 +49,7 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
           ))}
         </List>
       </Typography>
-      {commodityTypes && (
+      {commodityTypes && commodityTypes.length > 0 && (
         <Box display="block" alignItems="center">
           <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>
             Commodity:

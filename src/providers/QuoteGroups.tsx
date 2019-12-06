@@ -5,11 +5,13 @@ import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import map from 'lodash/fp/map';
+import filter from 'lodash/fp/filter';
+import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
 import padStart from 'lodash/fp/padStart';
-import flatten from 'lodash/fp/flatten';
+import flatMap from 'lodash/fp/flatMap';
 import values from 'lodash/fp/values';
 import Context from '../contexts/QuoteGroups';
 import QuotesResult from '../model/quotes/QuotesResult';
@@ -95,11 +97,9 @@ export interface Remark {
   RemarkTitle: string;
 }
 
-const flattenEntity = (name: string) => flow(asArray, map(flow(update(name, asArray), get(name))), flatten);
-
 const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
 
-const uniqueCommodityTypes = flow(map(get('commodityType')), uniqBy('id'));
+const uniqueCommodityTypes = flow(map(get('commodityType')), filter(identity), uniqBy('id'));
 
 const normalizeQuoteGroups = (
   getContainerType: (id: string) => ContainerType | null,
@@ -110,7 +110,7 @@ const normalizeQuoteGroups = (
 ) => {
   const normalizeContainer = flow(
     update('containerType', getContainerType),
-    update('commodityType', getCommodityType),
+    update('commodityType', commodityType => (commodityType.trim() === '0' ? null : getCommodityType(commodityType))),
     update('pickupLocation', getPickupLocation),
   );
 
@@ -147,6 +147,9 @@ const normalizeQuoteGroups = (
   return flow(
     groupBy('groupId'),
     values,
+    logAs('groups'),
+    flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [item]))),
+    logAs('groups.next'),
     map(normalizeQuoteGroup),
     orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
   ) as (result: QuotesResult) => QuoteGroup[];

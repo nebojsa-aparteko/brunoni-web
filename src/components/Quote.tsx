@@ -114,7 +114,7 @@ const Quote: React.FC<Props> = ({ id }) => {
       <Paper className={classes.root}>
         <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
           <QuoteNav
-            backTo={`/quotes/groups/${quote.groupId}`}
+            backTo={quote.groupId ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
             title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${quote.destination.city}, ${
               quote.destination.country
             }`}
