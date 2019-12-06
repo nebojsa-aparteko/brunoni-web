@@ -6,6 +6,7 @@ import QuoteGroupsTable from './quotes/QuoteGroupsTable';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
+import reduce from 'lodash/fp/reduce';
 import find from 'lodash/fp/find';
 import Search from './SearchBar/Search';
 import { Quote, QuoteGroup } from '../providers/QuotesEndpoint';
@@ -43,7 +44,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const containsString = (prop: string, searchString: string) => {
-  return prop?.toLowerCase().indexOf(searchString?.toLowerCase()) != -1;
+  const byMultiple = searchString.split(' ').flatMap(value => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+  return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
 };
 
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {

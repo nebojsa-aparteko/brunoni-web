@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/styles';
 import { Input, Theme, Box, InputAdornment, IconButton, FormControl } from '@material-ui/core';
@@ -51,10 +51,10 @@ interface Props {
 
 const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
   const classes = useStyles();
-
+  const input = useRef<HTMLInputElement>();
   const [searchString, setSearchString] = useLocalStorage('quoteSearchQuery', '', false, 15);
 
-  const startSearch = useMemo(() => debounce(150, onSearch), [onSearch]);
+  const startSearch = useMemo(() => debounce(250, onSearch), [onSearch]);
 
   useEffect(() => {
     startSearch(searchString);
@@ -66,6 +66,9 @@ const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
 
   const handleClearButton = () => {
     setSearchString('');
+    if (input && input.current) {
+      input.current.focus();
+    }
   };
 
   return (
@@ -73,6 +76,7 @@ const Search: React.FC<Props> = ({ onSearch, className, ...rest }) => {
       <Input
         className={classes.searchInput}
         disableUnderline
+        inputRef={input}
         placeholder="Search"
         onChange={handleChange}
         value={searchString}
