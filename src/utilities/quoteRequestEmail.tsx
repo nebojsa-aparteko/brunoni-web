@@ -7,7 +7,7 @@ import OOG from '../model/OOG';
 const renderIMO = (imo: IMO) => `   IMO Class ${imo.IMOClass}, UN Number: ${imo.UNNumber}, PG Number: ${imo.PGNumber}`;
 
 const renderOOG = (oog: OOG) =>
-  `   Out of gauge item ${oog.width}×${oog.height}×${oog.length} [cm] (W×H×L), ${oog.weight} [kg]`;
+  `   Out of gauge item ${oog.length}×${oog.width}×${oog.height} [cm] (W×H×L), ${oog.weight} [kg]`;
 
 export const createEmailBody = (searchParams: DetailedRouteSearchParams): string => {
   const cargoDetailsString: string = searchParams.containers
