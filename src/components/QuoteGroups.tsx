@@ -60,7 +60,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
 
   const resultChunks = useMemo(() => {
     const filteredResults =
-      searchString && searchString.length > 0 && result
+      searchString && searchString.length > 0 && quoteGroups
         ? filter((quoteGroup: QuoteGroup) => {
             return (
               containsString(quoteGroup.id, searchString) ||
@@ -103,7 +103,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton }) => {
 
   return (
     <Fragment>
-      {result && result.length > 0 && <Search onSearch={handleSearch} className={classes.searchBar} />}
+      {quoteGroups && quoteGroups.length > 0 && <Search onSearch={handleSearch} className={classes.searchBar} />}
       <Card>
         <CardHeader action={showGetQuoteButton && <GetQuotesButton />} title="Quotes" />
         <CardContent className={classes.content}>
