@@ -212,34 +212,50 @@ const Navbar: React.FC = () => {
             <List>
               {user !== undefined && user !== null && (
                 <Fragment>
-                  <ListItem component={props => <Link {...props} to="/" />}>
+                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/" />}>
                     <ListItemText primary="Dashboard" />
                   </ListItem>
-                  <ListItem component={props => <Link {...props} to="/schedule" />}>
+                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/schedule" />}>
                     <ListItemText primary="Schedule" />
                   </ListItem>
-                  <ListItem component={props => <Link {...props} to="/quotes/groups" />}>
+                  <ListItem
+                    button
+                    onClick={handleDrawerToggle}
+                    component={props => <Link {...props} to="/quotes/groups" />}
+                  >
                     <ListItemText primary="Quotes" />
                   </ListItem>
-                  <ListItem component={props => <Link {...props} to="/equipment" />}>
+                  <ListItem
+                    button
+                    onClick={handleDrawerToggle}
+                    component={props => <Link {...props} to="/equipment" />}
+                  >
                     <ListItemText primary="Equipment Situation" />
                   </ListItem>
-                  <ListItem component={props => <Link {...props} to="/charges" />}>
+                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/charges" />}>
                     <ListItemText primary="Side Charges" />
                   </ListItem>
                 </Fragment>
               )}
 
               {user !== undefined && user !== null ? (
-                <ListItem component={props => <Link {...props} to="/quotes/get" />}>
+                <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/quotes/get" />}>
                   <ListItemText primary="Get Quote" />
                 </ListItem>
               ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <ListItem component={props => <a {...props} href="https://brunoni.ch" />}>
+                <ListItem
+                  button
+                  onClick={handleDrawerToggle}
+                  component={props => <a {...props} href="https://brunoni.ch" />}
+                >
                   <ListItemText primary="Visit brunoni.ch" />
                 </ListItem>
               ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <ListItem component={props => <a {...props} href="https://allmarine.ch" />}>
+                <ListItem
+                  button
+                  onClick={handleDrawerToggle}
+                  component={props => <a {...props} href="https://allmarine.ch" />}
+                >
                   <ListItemText primary="Visit allmarine.ch" />
                 </ListItem>
               ) : null}
