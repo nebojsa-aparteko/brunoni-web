@@ -52,7 +52,9 @@ firebase.initializeApp(firebaseConfig);
 
 firebase
   .firestore()
-  .enablePersistence()
+  .enablePersistence({
+    synchronizeTabs: true,
+  })
   .catch(function(err) {
     console.warn('Failed to enable firestore persistence', err);
   });
