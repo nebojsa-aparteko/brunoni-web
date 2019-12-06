@@ -1,9 +1,5 @@
 import React, { useContext, useMemo, useState, Fragment } from 'react';
-import {
-  Container,
-  makeStyles,
-  CardContent, CardHeader, Card, makeStyles, CardActions, TablePagination
-} from '@material-ui/core';
+import { Card, CardActions, CardContent, CardHeader, makeStyles, TablePagination } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroups';
 import QuoteGroupsTable from './quotes/QuoteGroupsTable';
@@ -15,7 +11,7 @@ import find from 'lodash/fp/find';
 import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
-import { Quote, QuoteGroup } from "../providers/QuoteGroups";
+import { Quote, QuoteGroup } from '../providers/QuoteGroups';
 
 interface Props {
   showGetQuoteButton?: boolean;

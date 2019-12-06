@@ -1,10 +1,9 @@
 import React, { useContext, useMemo } from 'react';
-import parseDate from 'date-fns/parse';
-import parseISODate from 'date-fns/parseISO';
 import update from 'lodash/fp/update';
 import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
+import set from 'lodash/fp/set';
 import map from 'lodash/fp/map';
 import invoke from 'lodash/fp/invoke';
 import uniqBy from 'lodash/fp/uniqBy';
@@ -12,8 +11,6 @@ import groupBy from 'lodash/fp/groupBy';
 import padStart from 'lodash/fp/padStart';
 import flatten from 'lodash/fp/flatten';
 import values from 'lodash/fp/values';
-import filter from 'lodash/fp/filter';
-import partialRight from 'lodash/fp/partialRight';
 import Context from '../contexts/QuoteGroups';
 import QuotesResult from '../model/quotes/QuotesResult';
 import asArray from '../utilities/asArray';
@@ -25,7 +22,6 @@ import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
 import Port from '../model/Port';
-import pickAndRename from '../utilities/pickAndRename';
 import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
@@ -127,6 +123,7 @@ const normalizeQuoteGroups = (
     update('origin', getPort),
     update('destination', getPort),
     update('containers', normalizeContainers),
+    quote => set('commodityTypes', uniqueCommodityTypes(get('containers')(quote)))(quote),
   );
 
   const normalizeQuotes = flow(map(normalizeQuote), orderBy(get('validityPeriod.from'), 'asc'));
@@ -142,7 +139,7 @@ const normalizeQuoteGroups = (
       origin: normalizedQuote.origin,
       destination: normalizedQuote.destination,
       containers: normalizedQuote.containers,
-      commodityTypes: uniqueCommodityTypes(get('containers')(normalizedQuote)),
+      commodityTypes: normalizedQuote.commodityTypes,
       quotes: normalizedQuotes,
     };
   });
@@ -162,12 +159,6 @@ const QuoteGroups: React.FC<Props> = ({ children }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const quotes = useContext(Quotes);
-
-  console.debug('containerTypes', containerTypes);
-  console.debug('commodityTypes', commodityTypes);
-  console.debug('pickupLocations', pickupLocations);
-  console.debug('ports', ports);
-  console.debug('carriers', carriers);
 
   const normalize = useMemo(() => {
     const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (

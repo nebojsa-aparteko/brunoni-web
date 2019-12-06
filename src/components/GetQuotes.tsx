@@ -1,5 +1,6 @@
 import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
+import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import {
   Theme,
@@ -17,8 +18,7 @@ import {
   Paper,
 } from '@material-ui/core';
 import Port from '../model/Port';
-import update from 'lodash/fp/update';
-import flow from 'lodash/fp/flow';
+import isString from 'lodash/fp/isString';
 import PortInput from './inputs/PortInput';
 import DateInput from './inputs/DateInput';
 import WeeksInput from './inputs/WeeksInput';
@@ -163,19 +163,12 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 200 || response.status === 201) {
           const json = await response.json();
+          const groupId = get('groupId')(json);
 
-          if (Array.isArray(json) && json.length > 0) {
-            history.push(`/quotes/groups/${json[0].id}`);
-          } else if (Array.isArray(json) && json.length === 0) {
-            setDialogOpen(true);
+          if (groupId) {
+            history.push(`/quotes/groups/${groupId}`);
           } else {
-            enqueueSnackbar(
-              <Typography>Failed to fetch the quote for the combination you requested. Please try again.</Typography>,
-              {
-                variant: 'error',
-              },
-            );
-            console.error('Returned json was not an array', json);
+            setDialogOpen(true);
           }
         } else {
           enqueueSnackbar(

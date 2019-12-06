@@ -50,4 +50,11 @@ const firebaseConfig =
 
 firebase.initializeApp(firebaseConfig);
 
+firebase
+  .firestore()
+  .enablePersistence()
+  .catch(function(err) {
+    console.warn('Failed to enable firestore persistence', err);
+  });
+
 export default firebase;

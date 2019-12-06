@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
-import { QuoteGroup } from '../../providers/QuotesEndpoint';
+import { QuoteGroup } from '../../providers/QuoteGroups';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
