@@ -1,4 +1,4 @@
-import React, { useContext, Fragment, useState } from 'react';
+import React, { useContext, Fragment, useState, useEffect, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import {
   Box,
@@ -164,6 +164,20 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
 
   const quoteGroup = quoteGroups?.find(quoteGroup => quoteGroup.id === id);
 
+  const quotesByCarrier = useMemo(
+    () =>
+      quoteGroup
+        ? (flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>)
+        : undefined,
+    [quoteGroup],
+  );
+
+  useEffect(() => {
+    if (quotesByCarrier && quotesByCarrier.length === 1) {
+      setSelectedPanel(quotesByCarrier[0][0]);
+    }
+  }, [quoteGroup]);
+
   if (!quoteGroup) {
     return (
       <Container maxWidth="lg">
@@ -171,8 +185,6 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
       </Container>
     );
   }
-
-  const quotesByCarrier = flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>;
 
   return !quotesByCarrier ? (
     <Container maxWidth="lg">
