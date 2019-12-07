@@ -15,12 +15,14 @@ import QuoteGroupsTable from './quotes/QuoteGroupsTable';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
+import set from 'lodash/fp/set';
 import reduce from 'lodash/fp/reduce';
 import find from 'lodash/fp/find';
 import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
+import { QuoteListContext } from '../contexts/QuoteListContext';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -59,9 +61,12 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchString, setSearchString] = useState('');
+  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
+
+  const { searchString, page, rowsPerPage } = quoteListContextData;
+  // const [page, setPage] = useState(0);
+  // const [rowsPerPage, setRowsPerPage] = useState(10);
+  // const [searchString, setSearchString] = useState('');
 
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
@@ -92,19 +97,23 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
     return chunk(rowsPerPage)(filteredResults);
   }, [quoteGroups, searchString, page, rowsPerPage]);
 
+  const setPage = (page: number) => {
+    setQuoteListContextData(set('page', page)(quoteListContextData));
+  };
+
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setPage(page);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setPage(0);
-    setRowsPerPage(parseInt(event.target.value));
+    setQuoteListContextData(set('rowsPerPage', parseInt(event.target.value))(quoteListContextData));
   };
 
   const handleSearch = (searchStringNew: string) => {
     if (searchStringNew !== searchString) {
       setPage(0);
-      setSearchString(searchStringNew);
+      setQuoteListContextData(set('searchString', searchStringNew)(quoteListContextData));
     }
   };
 

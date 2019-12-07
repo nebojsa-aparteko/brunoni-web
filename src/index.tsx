@@ -22,6 +22,7 @@ import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
+import { QuoteListProvider } from './contexts/QuoteListContext';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -50,7 +51,9 @@ const render = (user: firebase.User | null) => {
                             <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
                               <QuotesProvider>
                                 <QuoteGroupsProvider>
-                                  <App />
+                                  <QuoteListProvider>
+                                    <App />
+                                  </QuoteListProvider>
                                 </QuoteGroupsProvider>
                               </QuotesProvider>
                             </FirestoreCollectionProvider>
