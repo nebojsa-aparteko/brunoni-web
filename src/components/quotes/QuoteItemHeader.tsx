@@ -76,9 +76,9 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData }) => {
           className={classes.tableCellQuoteUserData}
         />
         <TableRowData label="" content="" />
-        <TableRowData label="Quote Date" content={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
         <TableRowData label="Quote Number" content={quote.id} />
-        <TableRowData label="Quote Reference" content={quote.clientId} />
+        <TableRowData label="Quote Date" content={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
+        {/*<TableRowData label="Quote Reference" content={quote.clientId} />*/}
 
         <TableRowData label="Port of Loading" content={`${quote.origin.city}, ${quote.origin.country}`} />
         <TableRowData label="Port of Discharge" content={`${quote.destination.city}, ${quote.destination.country}`} />

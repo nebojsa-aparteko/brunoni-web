@@ -180,7 +180,7 @@ const Quote: React.FC<Props> = ({ id }) => {
               <QuoteItemRemarks remarks={quote.remarks} />
             </Grid>
 
-            <Box displayPrint="block" display="none" marginTop="4em">
+            <Box displayPrint="block" display="none" marginTop="1em">
               <Divider />
               <Typography variant="body1">
                 <br />

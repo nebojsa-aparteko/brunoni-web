@@ -1,6 +1,6 @@
 import React from 'react';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { IconButton, Fab } from '@material-ui/core';
+import { Box, Fab } from '@material-ui/core';
 
 interface Props {
   scrollStepInPx: number;
@@ -40,9 +40,11 @@ class ScrollToTop extends React.Component<Props> {
   renderGoTopIcon = () => {
     if (this.state.thePosition) {
       return (
-        <Fab onClick={this.scrollToTop} color="primary" className={this.props.className}>
-          <KeyboardArrowUpIcon />
-        </Fab>
+        <Box displayPrint="none">
+          <Fab onClick={this.scrollToTop} color="primary" className={this.props.className}>
+            <KeyboardArrowUpIcon />
+          </Fab>
+        </Box>
       );
     }
   };
