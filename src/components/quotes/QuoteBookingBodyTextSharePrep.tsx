@@ -1,20 +1,20 @@
 import formatDate from 'date-fns/format';
+import flatMap from 'lodash/fp/flatMap';
 import firebase from '../../firebase';
 import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
+import Container from '../../model/Container';
 
 export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
-  const cargoDetailsString: string = quote.containers
-    .flatMap(
-      (container, i) =>
-        ' - ' +
-        (container.quantity > 1 ? container.quantity + ' × ' : '') +
-        container!.containerType?.description +
-        ', ' +
-        container?.commodityType?.name +
-        '\n',
-    )
-    .join('');
+  const cargoDetailsString: string = flatMap(
+    (container: Container) =>
+      ' - ' +
+      (container.quantity > 1 ? container.quantity + ' × ' : '') +
+      container!.containerType?.description +
+      ', ' +
+      container?.commodityType?.name +
+      '\n',
+  )(quote.containers).join('');
 
   return [
     'Dear Sirs,',

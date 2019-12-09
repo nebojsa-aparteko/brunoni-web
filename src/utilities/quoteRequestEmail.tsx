@@ -1,8 +1,11 @@
 import formatDate from 'date-fns/format';
+import flatMap from 'lodash/fp/flatMap';
 import DetailedRouteSearchParams from '../model/get-quotes/DetailedRouteSearchParams';
 import { getLocationLabel } from '../components/inputs/LocationInput';
 import IMO from '../model/IMO';
 import OOG from '../model/OOG';
+import Container from '../model/Container';
+import ContainerDetails from '../model/ContainerDetails';
 
 const renderIMO = (imo: IMO) => `   IMO Class ${imo.IMOClass}, UN Number: ${imo.UNNumber}, PG Number: ${imo.PGNumber}`;
 
@@ -10,20 +13,18 @@ const renderOOG = (oog: OOG) =>
   `   Out of gauge item ${oog.length}×${oog.width}×${oog.height} [cm] (W×H×L), ${oog.weight} [kg]`;
 
 export const createEmailBody = (searchParams: DetailedRouteSearchParams): string => {
-  const cargoDetailsString: string = searchParams.containers
-    .flatMap(
-      container =>
-        ' - ' +
-        (container.quantity > 1 ? container.quantity + ' × ' : '') +
-        container!.containerType?.description +
-        ', ' +
-        container?.commodityType?.name +
-        '\n' +
-        (container.location ? `   Depot Location: ${getLocationLabel(container.location)}\n` : '') +
-        ((container.imo[1] || []).map(renderIMO).join('\n') + '\n') +
-        ((container.oog[1] || []).map(renderOOG).join('\n') + '\n'),
-    )
-    .join('\n');
+  const cargoDetailsString: string = flatMap(
+    (container: Container & ContainerDetails) =>
+      ' - ' +
+      (container.quantity > 1 ? container.quantity + ' × ' : '') +
+      container!.containerType?.description +
+      ', ' +
+      container?.commodityType?.name +
+      '\n' +
+      (container.location ? `   Depot Location: ${getLocationLabel(container.location)}\n` : '') +
+      ((container.imo[1] || []).map(renderIMO).join('\n') + '\n') +
+      ((container.oog[1] || []).map(renderOOG).join('\n') + '\n'),
+  )(searchParams.containers).join('\n');
 
   return `Dear Sirs,
 
