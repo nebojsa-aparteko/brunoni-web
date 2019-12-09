@@ -340,6 +340,32 @@ const Route: React.FC<Props> = ({ route }) => {
                             </ListItemIcon>
                             <ListItemText primary="Request Quote" />
                           </MenuItem>
+                          <MenuItem
+                            component={Button}
+                            onClick={handleCopyToClipboardClick}
+                            style={{ width: '100%', textTransform: 'none' }}
+                          >
+                            <ListItemIcon>
+                              <CopyToClipboardIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary="Copy Data" />
+                            <Popover
+                              id={popoverId}
+                              open={popoverOpen}
+                              anchorEl={anchorEl}
+                              onClose={handlePopoverClose}
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                              }}
+                              transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                              }}
+                            >
+                              <Typography className={classes.popover}>Schedule info copied to clipboard.</Typography>
+                            </Popover>
+                          </MenuItem>
                         </Menu>
                       </Fragment>
                     )}
@@ -362,7 +388,7 @@ const Route: React.FC<Props> = ({ route }) => {
               <Grid container>
                 <Grid item container xs={12} spacing={2} className={classes.deadlines}>
                   {route!.Deadlines.map((deadline, i) => (
-                    <Grid key={i} item md={3} sm={3}>
+                    <Grid key={i} item md={4} sm={4}>
                       <InfoBoxItem
                         title={`${deadline.Typ}
   closing`}
@@ -370,27 +396,6 @@ const Route: React.FC<Props> = ({ route }) => {
                       />
                     </Grid>
                   ))}
-                  <Grid item md={3} sm={3}>
-                    <IconButton aria-label="delete" onClick={handleCopyToClipboardClick}>
-                      <CopyToClipboardIcon />
-                    </IconButton>
-                    <Popover
-                      id={popoverId}
-                      open={popoverOpen}
-                      anchorEl={anchorEl}
-                      onClose={handlePopoverClose}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                      }}
-                    >
-                      <Typography className={classes.popover}>Schedule info copied to clipboard.</Typography>
-                    </Popover>
-                  </Grid>
                 </Grid>
                 {/* Itinerary */}
                 <Grid item xs={12}>
