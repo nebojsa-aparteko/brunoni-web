@@ -119,10 +119,10 @@ const DashboardCharts: React.FC = () => {
         <Grid item md={8} xs={12}>
           <TEUPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
-        <Grid item md={4} xs={6}>
+        <Grid item md={4} xs={12}>
           <CarrierPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
-        <Grid item md={4} xs={6}>
+        <Grid item md={4} xs={12}>
           <ContainerTypePerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
         <Grid item md={8} xs={12}>

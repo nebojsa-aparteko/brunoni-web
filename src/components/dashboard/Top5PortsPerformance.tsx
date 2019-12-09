@@ -117,7 +117,7 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}>
+      <Grid item xs={12}>
         <Card>
           <CardHeader title="Top 5 Origins" />
           <Divider />
@@ -126,7 +126,7 @@ const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={12}>
         <Card>
           <CardHeader title="Top 5 Destinations" />
           <Divider />
