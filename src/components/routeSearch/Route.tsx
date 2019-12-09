@@ -79,6 +79,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: 0,
     textAlign: 'right',
   },
+  expansionPanel: {
+    [theme.breakpoints.down('sm')]: {
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
+    },
+  },
 }));
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
@@ -179,6 +185,7 @@ const Route: React.FC<Props> = ({ route }) => {
           style={expansionPanelSummaryStyle}
           expandIcon={null}
           onClick={toggleExpansion}
+          className={classes.expansionPanel}
         >
           <Grid container spacing={2}>
             <Grid item xs={10}>
@@ -350,7 +357,7 @@ const Route: React.FC<Props> = ({ route }) => {
 
         {route && (
           <Fragment>
-            <ExpansionPanelDetails>
+            <ExpansionPanelDetails className={classes.expansionPanel}>
               {/* Deadlines Display */}
               <Grid container>
                 <Grid item container xs={12} spacing={2} className={classes.deadlines}>
