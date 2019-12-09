@@ -9,12 +9,14 @@ import App from './App';
 import LoginDialogProvider from './components/LoginDialogProvider';
 import CookiesNotification from './components/CookiesNotification';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
+import FirestoreDocumentProvider from './providers/FirestoreDocument';
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
 import PickupLocationsContext from './contexts/PickupLocations';
+import StatisticsContext from './contexts/Statistics';
 import CarriersContext from './contexts/Carriers';
 import PortsContext from './contexts/Ports';
 import UserContext from './contexts/User';
@@ -49,13 +51,15 @@ const render = (user: firebase.User | null) => {
                         <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
                           <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
                             <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                              <QuotesProvider>
-                                <QuoteGroupsProvider>
-                                  <QuoteListProvider>
-                                    <App />
-                                  </QuoteListProvider>
-                                </QuoteGroupsProvider>
-                              </QuotesProvider>
+                              <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+                                <QuotesProvider>
+                                  <QuoteGroupsProvider>
+                                    <QuoteListProvider>
+                                      <App />
+                                    </QuoteListProvider>
+                                  </QuoteGroupsProvider>
+                                </QuotesProvider>
+                              </FirestoreDocumentProvider>
                             </FirestoreCollectionProvider>
                           </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
