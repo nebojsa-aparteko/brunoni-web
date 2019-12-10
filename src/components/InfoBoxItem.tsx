@@ -9,6 +9,7 @@ interface Props {
   label1HTML?: any;
   label2?: React.ReactNode;
   gutterBottom?: boolean;
+  occupySpaceForTitle?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -17,9 +18,20 @@ const useStyles = makeStyles((theme: Theme) => ({
       fontSize: '10px',
     },
   },
+  titleBox: {
+    minHeight: '29px', // theme.typography.subtitle2.lineHeight + '8',
+  },
 }));
 
-const InfoBoxItem: React.FC<Props> = ({ IconComponent, title, label1, label1HTML, label2, gutterBottom }) => {
+const InfoBoxItem: React.FC<Props> = ({
+  IconComponent,
+  title,
+  label1,
+  label1HTML,
+  label2,
+  gutterBottom,
+  occupySpaceForTitle = false,
+}) => {
   const classes = useStyles();
   const hasLabel1 = label1 || label1HTML;
   return (
@@ -32,6 +44,7 @@ const InfoBoxItem: React.FC<Props> = ({ IconComponent, title, label1, label1HTML
           </Box>
         </Typography>
       )}
+      {occupySpaceForTitle && <Box className={classes.titleBox} />}
       {hasLabel1 && (
         <Typography variant="body1" display="block" className={classes.printText}>
           {label1HTML ? <span dangerouslySetInnerHTML={label1HTML} /> : <span>{label1}</span>}

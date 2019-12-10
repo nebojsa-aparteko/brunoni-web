@@ -21,7 +21,7 @@ const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => {
             <InfoBoxItem title={remark.RemarkTitle} label1={remark.RemarkLabel} />
           </Grid>
           <Grid item md={9} sm={8} xs={isSmAndDown ? 12 : 8}>
-            <InfoBoxItem label1={remark.RemarkText} />
+            <InfoBoxItem label1={remark.RemarkText} occupySpaceForTitle={remark.RemarkTitle !== null} />
           </Grid>
         </Fragment>
       ))}
