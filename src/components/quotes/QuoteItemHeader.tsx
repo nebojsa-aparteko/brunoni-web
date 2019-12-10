@@ -92,8 +92,8 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData }) => {
 
         {quote.terms
           .filter(term => term.TermLabel === 'TERMS & CONDITIONS')
-          .map(term => (
-            <TableRowData label="Terms & Conditions" content={term.TermValue} />
+          .map((term, i) => (
+            <TableRowData key={i} label="Terms & Conditions" content={term.TermValue} />
           ))}
 
         <TableRowData

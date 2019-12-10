@@ -3,6 +3,7 @@ import { Grid, Typography, ListItem, Box, Chip, makeStyles } from '@material-ui/
 import List from '@material-ui/core/List';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
+import identity from 'lodash/fp/identity';
 import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';
 import uniqBy from 'lodash/fp/uniqBy';
@@ -37,6 +38,7 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
     () =>
       flow(
         map(get('pickupLocation')),
+        filter(identity),
         filter(location => location.countryCode.trim() !== '0'),
         uniqBy('id'),
       )(containers),

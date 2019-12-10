@@ -28,7 +28,6 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import Quotes from '../contexts/Quotes';
-import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
@@ -147,12 +146,10 @@ const normalizeQuoteGroups = (
   return flow(
     groupBy('groupId'),
     values,
-    logAs('groups'),
     flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [item]))),
-    logAs('groups.next'),
     map(normalizeQuoteGroup),
     orderBy([flow(get('id'), padStart(10)), get('dateIssued')], 'desc'),
-  ) as (result: QuotesResult) => QuoteGroup[];
+  ) as (result: Quote[]) => QuoteGroup[];
 };
 
 const QuoteGroups: React.FC<Props> = ({ children }) => {
@@ -177,10 +174,7 @@ const QuoteGroups: React.FC<Props> = ({ children }) => {
     return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const quoteGroups = useMemo(
-    () => (quotes === undefined ? undefined : flow(logAs('quotes'), normalize, logAs('quoteGroups'))(quotes)),
-    [quotes, normalize],
-  );
+  const quoteGroups = useMemo(() => (quotes === undefined ? undefined : normalize(quotes)), [quotes, normalize]);
 
   return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
 };
