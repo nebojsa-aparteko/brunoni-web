@@ -24,12 +24,14 @@ const InfoBoxItem: React.FC<Props> = ({ IconComponent, title, label1, label1HTML
   const hasLabel1 = label1 || label1HTML;
   return (
     <Fragment>
-      <Typography variant="subtitle2" display="block" gutterBottom className={classes.printText}>
-        <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
-          {IconComponent && <IconComponent fontSize="small" color="secondary" />}
-          <Box ml={IconComponent && '.5em'}>{title}</Box>
-        </Box>
-      </Typography>
+      {title && (
+        <Typography variant="subtitle2" display="block" gutterBottom className={classes.printText}>
+          <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
+            {IconComponent && <IconComponent fontSize="small" color="secondary" />}
+            <Box ml={IconComponent && '.5em'}>{title}</Box>
+          </Box>
+        </Typography>
+      )}
       {hasLabel1 && (
         <Typography variant="body1" display="block" className={classes.printText}>
           {label1HTML ? <span dangerouslySetInnerHTML={label1HTML} /> : <span>{label1}</span>}
