@@ -99,10 +99,12 @@ const Navbar: React.FC = () => {
   const handleLogOut = async () => {
     try {
       await firebase.auth().signOut();
-      enqueueSnackbar(<Typography>You are now signed out.</Typography>, { variant: 'info' });
+      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, { variant: 'info' });
     } catch (e) {
       console.error('Unable to sign out', e);
-      enqueueSnackbar(<Typography>Error occurred while trying to sign you out.</Typography>, { variant: 'error' });
+      enqueueSnackbar(<Typography color="inherit">Error occurred while trying to sign you out.</Typography>, {
+        variant: 'error',
+      });
     }
   };
 

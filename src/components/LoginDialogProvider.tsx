@@ -64,10 +64,10 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
         history.replace({ ...location, search });
         await firebase.auth().signInWithCustomToken(token);
         setOpen(false);
-        enqueueSnackbar(<Typography>Sign in successful!</Typography>, { variant: 'success' });
+        enqueueSnackbar(<Typography color="inherit">Sign in successful!</Typography>, { variant: 'success' });
       } catch (e) {
         setOpen(false);
-        enqueueSnackbar(<Typography>Unable to sign you in.</Typography>, { variant: 'error' });
+        enqueueSnackbar(<Typography color="inherit">Unable to sign you in.</Typography>, { variant: 'error' });
         console.error(e);
       }
     })();

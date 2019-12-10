@@ -8,6 +8,7 @@ import CarrierPerformance from './CarrierPerformance';
 import ContainerTypePerformance from './ContainerTypePerformance';
 import Top5PortsPerformance from './Top5PortsPerformance';
 import StatisticsContext from '../../contexts/Statistics';
+import SynchronizeButton from '../SynchronizeButton';
 
 const DashboardCharts: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -24,7 +25,7 @@ const DashboardCharts: React.FC = () => {
     <Page title="Analytics Dashboard">
       <Box my={2}>
         <Grid container justify="flex-end">
-          <Grid item xs={5} sm={4} md={3} lg={2}>
+          <Grid item xs={6} sm={5} md={4} lg={3}>
             <Box display="flex" alignItems="flex-end">
               <Box my={-1}>
                 <IconButton color="inherit" component="span" onClick={() => setOpen(true)}>
@@ -48,6 +49,9 @@ const DashboardCharts: React.FC = () => {
                   <MenuItem value={currentYear - 2}>{currentYear - 2}</MenuItem>
                 </Select>
               </FormControl>
+              <Box my={-1}>
+                <SynchronizeButton collection="clientPerformance" />
+              </Box>
             </Box>
           </Grid>
         </Grid>

@@ -33,14 +33,16 @@ const useStyles = makeStyles(theme => ({
 const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) => {
   const classes = useStyles();
 
-  const locations = useMemo(() => {
-    return flow(
-      map(get('pickupLocation')),
-      filter(location => location.countryCode.trim() !== '0'),
-      uniqBy('id'),
-    )(containers);
-  }, [containers]);
-  console.log('locations', locations);
+  const locations = useMemo(
+    () =>
+      flow(
+        map(get('pickupLocation')),
+        filter(location => location.countryCode.trim() !== '0'),
+        uniqBy('id'),
+      )(containers),
+    [containers],
+  );
+
   return (
     <Grid item xs={12}>
       <Typography variant="subtitle2">

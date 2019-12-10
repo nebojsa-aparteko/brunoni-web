@@ -164,16 +164,21 @@ const GetQuotes: React.FC<Props> = () => {
           signal,
         });
 
-        console.log('get quote response', response);
         if (response.status === 504) {
-          enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            {
+              variant: 'error',
+            },
+          );
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 500) {
-          enqueueSnackbar(<Typography>The could not answer your request at the moment. Please try again.</Typography>, {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            <Typography color="inherit">The could not answer your request at the moment. Please try again.</Typography>,
+            {
+              variant: 'error',
+            },
+          );
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 200 || response.status === 201) {
           const json = await response.json();
@@ -194,10 +199,15 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('Unexpected error response', response.status, response.statusText);
         }
       } catch (error) {
-        enqueueSnackbar(<Typography>The API timed out trying to fetch quotes. Please try again.</Typography>, {
-          variant: 'error',
-        });
-        console.error(error);
+        if (error.name !== 'AbortError') {
+          enqueueSnackbar(
+            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            {
+              variant: 'error',
+            },
+          );
+          console.error(error);
+        }
       } finally {
         setBusy(false);
       }

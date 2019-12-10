@@ -27,10 +27,12 @@ const UserWidget: React.FC<Props> = ({ active }) => {
     try {
       await firebase.auth().signOut();
       setAnchorEl(null);
-      enqueueSnackbar(<Typography>You are now signed out.</Typography>, { variant: 'info' });
+      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, { variant: 'info' });
     } catch (e) {
       console.error('Unable to sign out', e);
-      enqueueSnackbar(<Typography>Error occurred while trying to sign you out.</Typography>, { variant: 'error' });
+      enqueueSnackbar(<Typography color="inherit">Error occurred while trying to sign you out.</Typography>, {
+        variant: 'error',
+      });
     }
   };
 

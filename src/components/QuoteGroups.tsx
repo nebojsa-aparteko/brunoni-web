@@ -5,6 +5,8 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  IconButton,
+  InputAdornment,
   makeStyles,
   TablePagination,
   Typography,
@@ -23,6 +25,7 @@ import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
 import { QuoteListContext } from '../contexts/QuoteListContext';
+import SynchronizeButton from './SynchronizeButton';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -122,10 +125,13 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
       <CardHeader
         action={showGetQuoteButton && <GetQuotesButton />}
         title={
-          <Box display="flex">
+          <Box display="flex" alignItems="center">
             <Typography variant="subtitle1" display="inline">
               Quotes
             </Typography>
+            <Box mx={1} my={-1}>
+              <SynchronizeButton collection="quotes" />
+            </Box>
             <Box flex={1} />
             <Search
               onSearch={handleSearch}
