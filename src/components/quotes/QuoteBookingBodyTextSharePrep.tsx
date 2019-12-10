@@ -22,8 +22,8 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
     `Quote Date: ${formatDate(quote.dateIssued, 'dd.MM.yyyy')} \n` +
       `Quote Number: ${quote.id} \n` +
       `Quote Reference: ${quote.clientId} \n` +
-      `Port of Loading: ${quote.origin.city}, ${quote.origin.country} \n` +
-      `Port of Discharge: ${quote.destination.city}, ${quote.destination.country} \n` +
+      `Port of Loading: ${quote.origin?.city || '?'}, ${quote.origin?.country || '?'} \n` +
+      `Port of Discharge: ${quote.destination?.city || '?'}, ${quote.destination?.country || '?'} \n` +
       `Carrier: ${quote.carrier.name || quote.carrier.id} \n` +
       `Quote Validity: ${formatDate(quote.validityPeriod.from, 'd. MMMM')} – ${formatDate(
         quote.validityPeriod.to,
@@ -47,9 +47,9 @@ export const buildMailToLink = (quote: Quote | undefined, [user, userData]: [fir
               'Request booking - ' +
                 (quote.carrier.name || quote.carrier.id) +
                 ', ' +
-                quote.origin.city +
+                (quote.origin?.city || '?') +
                 ' → ' +
-                quote.destination.city,
+                (quote.destination?.city || '?'),
             ),
           'body=' +
             encodeURI(quoteInfoEmailBody(quote, 'I want to request a booking based on the following quote received:')),
@@ -72,9 +72,9 @@ export const buildSpecialRequestLink = (quote: Quote | undefined, [user, userDat
               'Special request for quote - ' +
                 (quote.carrier.name || quote.carrier.id) +
                 ', ' +
-                quote.origin.city +
+                (quote.origin?.city || '?') +
                 ' → ' +
-                quote.destination.city,
+                (quote.destination?.city || '?'),
             ),
           'body=' +
             encodeURI(

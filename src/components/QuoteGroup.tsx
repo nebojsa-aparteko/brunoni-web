@@ -192,12 +192,12 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     </Container>
   ) : (
     <Fragment>
-      <Meta title={`${quoteGroup?.origin.city} - ${quoteGroup.destination.city}`} />
+      <Meta title={`${quoteGroup.origin?.city} - ${quoteGroup.destination?.city || '?'}`} />
       <Container maxWidth="lg">
         <Box mt={6}>
           <QuoteNav
             backTo="/quotes/groups"
-            title={`Quotations - ${quoteGroup?.origin.city}, ${quoteGroup?.origin.country} - ${quoteGroup.destination.city}, ${quoteGroup.destination.country}`}
+            title={`Quotations - ${quoteGroup?.origin?.city}, ${quoteGroup?.origin?.country} - ${quoteGroup.destination?.city}, ${quoteGroup.destination?.country}`}
             subtitle={`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}
           />
         </Box>

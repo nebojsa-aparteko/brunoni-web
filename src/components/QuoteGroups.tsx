@@ -76,13 +76,13 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
   const resultChunks = useMemo(() => {
     const filteredResults =
       searchString && searchString.length > 0 && quoteGroups
-        ? filter((quoteGroup: QuoteGroup) => {
-            return (
+        ? filter(
+            (quoteGroup: QuoteGroup) =>
               containsString(quoteGroup.id, searchString) ||
-              containsString(quoteGroup.origin.id, searchString) ||
-              containsString(quoteGroup.origin.city, searchString) ||
-              containsString(quoteGroup.destination.id, searchString) ||
-              containsString(quoteGroup.destination.city, searchString) ||
+              containsString(quoteGroup.origin?.id || '', searchString) ||
+              containsString(quoteGroup.origin?.city || '', searchString) ||
+              containsString(quoteGroup.destination?.id || '', searchString) ||
+              containsString(quoteGroup.destination?.city || '', searchString) ||
               find((container: Container) => {
                 return container.containerType ? containsString(container.containerType.id, searchString) : false;
               })(quoteGroup.containers) !== undefined ||
@@ -91,9 +91,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
               })(quoteGroup.commodityTypes) !== undefined ||
               find((quote: Quote) => {
                 return quote.carrier ? containsString(quote.carrier.id, searchString) : false;
-              })(quoteGroup.quotes) !== undefined
-            );
-          })(quoteGroups)
+              })(quoteGroup.quotes) !== undefined,
+          )(quoteGroups)
         : quoteGroups;
 
     setFilteredResults(filteredResults);

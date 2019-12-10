@@ -37,8 +37,8 @@ interface Props {
 export interface QuoteGroup {
   id: string;
   dateIssued: Date;
-  origin: Port;
-  destination: Port;
+  origin?: Port;
+  destination?: Port;
   containers: Container[];
   commodityTypes: CommodityType[];
   quotes: Quote[];

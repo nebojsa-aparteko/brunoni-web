@@ -81,8 +81,8 @@ const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
             quoteGroups.map(quoteGroup => (
               <TableRow key={quoteGroup.id} className={classes.tableRow}>
                 <TableCell>
-                  {quoteGroup.origin.city || quoteGroup.origin.id} →{' '}
-                  {quoteGroup.destination.city || quoteGroup.destination.id}
+                  {quoteGroup.origin?.city || quoteGroup.origin?.id || '?'} →{' '}
+                  {quoteGroup.destination?.city || quoteGroup.destination?.id || '?'}
                 </TableCell>
                 <TableCell>
                   {uniq(quoteGroup.quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}
