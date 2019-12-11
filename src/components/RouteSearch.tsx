@@ -19,6 +19,7 @@ import useRequest, { RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import SpecialOffer from './SpecialOffer';
+import SpecialOffers from './SpecialOffers';
 
 interface Props {}
 
@@ -178,56 +179,7 @@ const RouteSearch: React.FC<Props> = () => {
           )
         ) : (
           <Fragment>
-            <Box py={3} mb={2}>
-              <Box mb={0.5}>
-                <Typography variant="h2">SAVE WITH SHIPPING</Typography>
-              </Box>
-              <Typography variant="subtitle1" style={{ opacity: 0.5 }}>
-                CHECK OUT THESE SPECIAL OFFERS BY OUR PARTNER CARRIERS.
-              </Typography>
-            </Box>
-            <Grid container spacing={3}>
-              <Grid item md={4}>
-                <SpecialOffer
-                  carrier="HAMBURG SÜD"
-                  origin="Rotterdam"
-                  destination="Shanghai"
-                  cargo="20’BOXCONTAINER"
-                  validUntil="31. December 2019"
-                  price="1,100 USD"
-                />
-              </Grid>
-              <Grid item md={4}>
-                <SpecialOffer
-                  carrier="HAMBURG SÜD"
-                  origin="Rotterdam"
-                  destination="Shanghai"
-                  cargo="20’BOXCONTAINER"
-                  validUntil="31. December 2019"
-                  price="1,100 USD"
-                />
-              </Grid>
-              <Grid item md={4}>
-                <SpecialOffer
-                  carrier="HAMBURG SÜD"
-                  origin="Rotterdam"
-                  destination="Shanghai"
-                  cargo="20’BOXCONTAINER"
-                  validUntil="31. December 2019"
-                  price="1,100 USD"
-                />
-              </Grid>
-              {/*<Grid item md={3}>*/}
-              {/*  <SpecialOffer*/}
-              {/*    carrier="HAMBURG SÜD"*/}
-              {/*    origin="Rotterdam"*/}
-              {/*    destination="Shanghai"*/}
-              {/*    cargo="20’BOXCONTAINER"*/}
-              {/*    validUntil="31. December 2019"*/}
-              {/*    price="1,100 USD"*/}
-              {/*  />*/}
-              {/*</Grid>*/}
-            </Grid>
+            <SpecialOffers />
             <SearchHowTo />
           </Fragment>
         )}

@@ -1,8 +1,9 @@
-import Container from '../Container';
+import React from 'react';
 import { Box, Grid } from '@material-ui/core';
 import Image from 'material-ui-image';
 import Typography from '@material-ui/core/Typography';
-import React from 'react';
+
+import Container from '../Container';
 
 export default () => (
   <Container>
