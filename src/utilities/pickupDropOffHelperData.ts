@@ -4,9 +4,6 @@
 export const europeanCountries = [
   'germany',
   'denmark',
-  'finland',
-  'norway',
-  'sweden',
   'spain',
   'netherlands',
   'italy',
