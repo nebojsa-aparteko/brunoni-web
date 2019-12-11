@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import formatDate from 'date-fns/format';
-import { makeStyles, Theme, Button, Card, CardActionArea, CardMedia, CardContent } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import addDays from 'date-fns/addDays';
+import {
+  makeStyles,
+  Box,
+  Typography,
+  Theme,
+  Button,
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent,
+} from '@material-ui/core';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Carrier from '../model/Carrier';
 import ContainerType from '../model/ContainerType';
 import Port from '../model/Port';
 import firebase from '../firebase';
+import { RouteSearchContext } from '../contexts/RouteSearchContext';
 
 interface Props {
   id: string;
@@ -62,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, image, origin, validUntil }) => {
   const classes = useStyles();
+  const setParams = useContext(RouteSearchContext)[1];
 
   const [imageURL, setImageURL] = useState<string | undefined>(undefined);
 
@@ -75,9 +86,20 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
       ))();
   }, [image]);
 
+  const handleClick = () => {
+    setParams({
+      originPort: origin,
+      destinationPort: destination,
+      date: addDays(new Date(), 2),
+      weeks: 4,
+      carrier: carrier,
+      containers: [{ containerType, quantity: 1, imo: [false], oog: [false] }],
+    });
+  };
+
   return (
     <Card className={classes.card}>
-      <CardActionArea>
+      <CardActionArea href="/quotes/get" onClick={handleClick}>
         <CardMedia className={classes.media} image={imageURL} title="Contemplative Reptile" />
         <CardContent className={classes.content}>
           <Typography variant="h5" className={classes.title}>
@@ -93,7 +115,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
             {`Valid until ${formatDate(validUntil, 'dd.MM.yyyy')}`}
           </Typography>
           <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
-            {`Book now for `}
+            {`Book now for`}&nbsp;
             <strong>SECRET PRICE**</strong>
           </Button>
           <Typography variant="body2" color="textSecondary" component="p" className={classes.finePrint}>
