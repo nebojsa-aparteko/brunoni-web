@@ -9,5 +9,9 @@ export default interface SpecialOffer {
   destination: Port;
   image: string;
   origin: Port;
+  price: {
+    amount: string;
+    currency: string;
+  };
   validUntil: Date;
 }

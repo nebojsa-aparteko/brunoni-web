@@ -29,6 +29,10 @@ interface Props {
   destination: Port;
   image: string;
   origin: Port;
+  price: {
+    amount: string;
+    currency: string;
+  };
   validUntil: Date;
 }
 
@@ -73,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, image, origin, validUntil }) => {
+const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, image, origin, price, validUntil }) => {
   const classes = useStyles();
   const history = useHistory();
   const user = useContext(UserContext);
@@ -93,15 +97,6 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
   }, [image]);
 
   const handleClick = () => {
-    console.log({
-      originPort: origin,
-      destinationPort: destination,
-      date: addDays(new Date(), 2),
-      weeks: 4,
-      carrier: carrier,
-      containers: [{ containerType, quantity: 1, imo: [false], oog: [false] }],
-    });
-
     setParams({
       originPort: origin,
       destinationPort: destination,
@@ -139,8 +134,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
             {`Valid until ${formatDate(validUntil, 'dd.MM.yyyy')}`}
           </Typography>
           <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
-            {`Book now for`}&nbsp;
-            <strong>SECRET PRICE**</strong>
+            Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
           </Button>
           <Typography variant="body2" color="textSecondary" component="p" className={classes.finePrint}>
             **subject to other charges
