@@ -44,7 +44,7 @@ interface Props {
   onSearch: (searchString: string) => void;
 }
 
-const Search: React.FC<Props> = ({ onSearch, className, style, ...rest }) => {
+const Search: React.FC<Props> = ({ onSearch, className, style }) => {
   const classes = useStyles();
   const input = useRef<HTMLInputElement>();
   const [searchString, setSearchString] = useLocalStorage('quoteSearchQuery', '', false, 15);
@@ -53,7 +53,7 @@ const Search: React.FC<Props> = ({ onSearch, className, style, ...rest }) => {
 
   useEffect(() => {
     startSearch(searchString);
-  });
+  }, [searchString]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(event.target.value);
