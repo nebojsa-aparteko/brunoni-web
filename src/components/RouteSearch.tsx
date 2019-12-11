@@ -1,11 +1,11 @@
-import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import flow from 'lodash/fp/flow';
-import { Box, Grid, makeStyles, Paper, Theme } from '@material-ui/core';
+import { Box, Grid, Typography, makeStyles, Paper, Theme } from '@material-ui/core';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
@@ -15,11 +15,10 @@ import RouteSearchResults, { RouteSearchResult } from '../model/route-search/Rou
 import SearchHowTo from './routeSearch/SearchHowTo';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import withTestData from '../utilities/withTestData';
-import useRequest, { Callback, RequestError } from '../hooks/useRequest';
+import useRequest, { RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
-import filter from 'lodash/filter';
-import get from 'lodash/get';
+import SpecialOffer from './SpecialOffer';
 
 interface Props {}
 
@@ -178,7 +177,59 @@ const RouteSearch: React.FC<Props> = () => {
             </Grid>
           )
         ) : (
-          <SearchHowTo />
+          <Fragment>
+            <Box py={3} mb={2}>
+              <Box mb={0.5}>
+                <Typography variant="h2">SAVE WITH SHIPPING</Typography>
+              </Box>
+              <Typography variant="subtitle1" style={{ opacity: 0.5 }}>
+                CHECK OUT THESE SPECIAL OFFERS BY OUR PARTNER CARRIERS.
+              </Typography>
+            </Box>
+            <Grid container spacing={3}>
+              <Grid item md={4}>
+                <SpecialOffer
+                  carrier="HAMBURG SÜD"
+                  origin="Rotterdam"
+                  destination="Shanghai"
+                  cargo="20’BOXCONTAINER"
+                  validUntil="31. December 2019"
+                  price="1,100 USD"
+                />
+              </Grid>
+              <Grid item md={4}>
+                <SpecialOffer
+                  carrier="HAMBURG SÜD"
+                  origin="Rotterdam"
+                  destination="Shanghai"
+                  cargo="20’BOXCONTAINER"
+                  validUntil="31. December 2019"
+                  price="1,100 USD"
+                />
+              </Grid>
+              <Grid item md={4}>
+                <SpecialOffer
+                  carrier="HAMBURG SÜD"
+                  origin="Rotterdam"
+                  destination="Shanghai"
+                  cargo="20’BOXCONTAINER"
+                  validUntil="31. December 2019"
+                  price="1,100 USD"
+                />
+              </Grid>
+              {/*<Grid item md={3}>*/}
+              {/*  <SpecialOffer*/}
+              {/*    carrier="HAMBURG SÜD"*/}
+              {/*    origin="Rotterdam"*/}
+              {/*    destination="Shanghai"*/}
+              {/*    cargo="20’BOXCONTAINER"*/}
+              {/*    validUntil="31. December 2019"*/}
+              {/*    price="1,100 USD"*/}
+              {/*  />*/}
+              {/*</Grid>*/}
+            </Grid>
+            <SearchHowTo />
+          </Fragment>
         )}
       </Container>
     </Fragment>
