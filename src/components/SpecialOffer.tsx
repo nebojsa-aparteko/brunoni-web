@@ -18,6 +18,9 @@ import ContainerType from '../model/ContainerType';
 import Port from '../model/Port';
 import firebase from '../firebase';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
+import LoginDialogContext from '../contexts/LoginDialog';
+import UserContext from '../contexts/User';
+import { useHistory } from 'react-router';
 
 interface Props {
   id: string;
@@ -72,6 +75,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, image, origin, validUntil }) => {
   const classes = useStyles();
+  const history = useHistory();
+  const user = useContext(UserContext);
+  const loginDialog = useContext(LoginDialogContext);
   const setParams = useContext(RouteSearchContext)[1];
 
   const [imageURL, setImageURL] = useState<string | undefined>(undefined);
@@ -87,6 +93,15 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
   }, [image]);
 
   const handleClick = () => {
+    console.log({
+      originPort: origin,
+      destinationPort: destination,
+      date: addDays(new Date(), 2),
+      weeks: 4,
+      carrier: carrier,
+      containers: [{ containerType, quantity: 1, imo: [false], oog: [false] }],
+    });
+
     setParams({
       originPort: origin,
       destinationPort: destination,
@@ -95,11 +110,20 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
       carrier: carrier,
       containers: [{ containerType, quantity: 1, imo: [false], oog: [false] }],
     });
+
+    if (user) {
+      history.push('/quotes/get');
+    } else {
+      loginDialog.open({
+        message: 'Log in first to claim special offer.',
+        next: '/quotes/get',
+      });
+    }
   };
 
   return (
     <Card className={classes.card}>
-      <CardActionArea href="/quotes/get" onClick={handleClick}>
+      <CardActionArea onClick={handleClick}>
         <CardMedia className={classes.media} image={imageURL} title="Contemplative Reptile" />
         <CardContent className={classes.content}>
           <Typography variant="h5" className={classes.title}>

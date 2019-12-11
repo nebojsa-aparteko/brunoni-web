@@ -16,10 +16,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
+  next?: string;
   onComplete: () => void;
 }
 
-const LoginForm: React.FC<Props> = ({ onComplete }) => {
+const LoginForm: React.FC<Props> = ({ next, onComplete }) => {
   const classes = useStyles();
   const inputRef = useRef<HTMLInputElement>();
   const location = useLocation();
@@ -48,7 +49,7 @@ const LoginForm: React.FC<Props> = ({ onComplete }) => {
           },
           body: JSON.stringify({
             emailAddress: emailAddress.toLowerCase(),
-            nextPath: `${location.pathname}?${location.search}`,
+            nextPath: next || `${location.pathname}?${location.search}`,
           }),
           signal,
         });

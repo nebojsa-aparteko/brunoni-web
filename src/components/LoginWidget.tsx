@@ -7,7 +7,7 @@ const LoginWidget: React.FC = () => {
   const { open } = useContext(LoginDialog);
 
   return (
-    <Button variant="outlined" onClick={open}>
+    <Button variant="outlined" onClick={() => open()}>
       Login
     </Button>
   );

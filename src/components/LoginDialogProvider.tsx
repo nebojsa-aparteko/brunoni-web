@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 
 import LoginForm from './LoginForm';
-import Context from '../contexts/LoginDialog';
+import Context, { Params } from '../contexts/LoginDialog';
 import firebase from '../firebase';
 
 interface Props {
@@ -39,53 +39,54 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const history = useHistory();
-  const params = location.search ? queryString.parse(location.search.slice(1)) : {};
-  const token = params.logIn as string;
+  const queryParams = location.search ? queryString.parse(location.search.slice(1)) : {};
+  const token = queryParams.logIn as string;
 
-  const [open, setOpen] = useState(false);
+  const [params, setParams] = useState<Params | null>(null);
   const [activeStep, setActiveStep] = useState(0);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = (params?: Params) => setParams(params || {});
+  const handleClose = () => setParams(null);
 
   const handleFormComplete = () => setActiveStep(1);
 
   useEffect(() => {
-    if (!token || open) {
+    if (!token || params) {
       return;
     }
 
     setActiveStep(2);
-    setOpen(true);
+    setParams({});
 
     (async () => {
       try {
-        const search = queryString.stringify(omit(params, 'logIn'));
+        const search = queryString.stringify(omit(queryParams, 'logIn'));
         history.replace({ ...location, search });
         await firebase.auth().signInWithCustomToken(token);
-        setOpen(false);
+        setParams(null);
         enqueueSnackbar(<Typography color="inherit">Sign in successful!</Typography>, { variant: 'success' });
       } catch (e) {
-        setOpen(false);
+        setParams(null);
         enqueueSnackbar(<Typography color="inherit">Unable to sign you in.</Typography>, { variant: 'error' });
         console.error(e);
       }
     })();
-  }, [token, history, location, open, params, enqueueSnackbar]);
+  }, [token, history, location, params, queryParams, enqueueSnackbar]);
 
   return (
     <Context.Provider value={{ open: handleOpen }}>
       {children}
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="xs" fullWidth>
+      <Dialog open={Boolean(params)} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="xs" fullWidth>
         <DialogTitle id="form-dialog-title">Log in</DialogTitle>
         <DialogContent>
+          {params?.message && <Typography variant="subtitle1">{params!.message!}</Typography>}
           <div className={classes.root}>
             <Stepper activeStep={activeStep} orientation="vertical">
               <Step>
                 <StepLabel>Enter Email Address</StepLabel>
                 <StepContent>
                   <Typography className={classes.instructions}>Type in your email address to log in.</Typography>
-                  <LoginForm onComplete={handleFormComplete} />
+                  <LoginForm next={params?.next} onComplete={handleFormComplete} />
                 </StepContent>
               </Step>
               <Step>

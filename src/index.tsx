@@ -21,7 +21,6 @@ import StatisticsContext from './contexts/Statistics';
 import CarriersContext from './contexts/Carriers';
 import PortsContext from './contexts/Ports';
 import UserContext from './contexts/User';
-import SpecialOffersContext from './contexts/SpecialOffers';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
@@ -51,10 +50,10 @@ const render = (user: firebase.User | null) => {
                     <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                       <FirestoreCollectionProvider name="ports" context={PortsContext}>
                         <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                          <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                            <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                              <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
-                                <SpecialOffersProvider>
+                          <SpecialOffersProvider>
+                            <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                              <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                                <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
                                   <QuotesProvider>
                                     <QuoteGroupsProvider>
                                       <QuoteListProvider>
@@ -62,10 +61,10 @@ const render = (user: firebase.User | null) => {
                                       </QuoteListProvider>
                                     </QuoteGroupsProvider>
                                   </QuotesProvider>
-                                </SpecialOffersProvider>
-                              </FirestoreDocumentProvider>
+                                </FirestoreDocumentProvider>
+                              </FirestoreCollectionProvider>
                             </FirestoreCollectionProvider>
-                          </FirestoreCollectionProvider>
+                          </SpecialOffersProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>
@@ -81,9 +80,11 @@ const render = (user: firebase.User | null) => {
                 <UserContext.Provider value={null}>
                   <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                     <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                      <SpecialOffersContext.Provider value={[]}>
-                        <App />
-                      </SpecialOffersContext.Provider>
+                      <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                        <SpecialOffersProvider>
+                          <App />
+                        </SpecialOffersProvider>
+                      </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
                 </UserContext.Provider>

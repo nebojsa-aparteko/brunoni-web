@@ -281,7 +281,7 @@ const Navbar: React.FC = () => {
                   </Collapse>
                 </Fragment>
               ) : (
-                <ListItem button onClick={open}>
+                <ListItem button onClick={() => open()}>
                   <ListItemIcon>
                     <AccountCircleIcon />
                   </ListItemIcon>
