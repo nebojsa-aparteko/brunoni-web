@@ -1,20 +1,28 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { useId } from 'react-id-generator';
+import changeCase from 'change-case';
+import identity from 'lodash/fp/identity';
+
 import { useSnackbar } from 'notistack';
 import { Box, Chip, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
+import ActingAs from '../contexts/ActingAs';
+import { useHistory } from 'react-router';
 
 interface Props {
   active: boolean;
 }
 
 const UserWidget: React.FC<Props> = ({ active }) => {
+  const history = useHistory();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
   const [user, userData] = useUser();
+  const [actingAs, setActingAs] = useContext(ActingAs);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -22,6 +30,17 @@ const UserWidget: React.FC<Props> = ({ active }) => {
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+
+  const handleSwitch = () => {
+    setAnchorEl(null);
+    if (actingAs) {
+      history.push('/admin');
+      setActingAs(null);
+    } else {
+      history.push('/');
+      setActingAs(user.uid);
+    }
+  };
 
   const handleLogOut = async () => {
     try {
@@ -40,7 +59,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
     <Fragment>
       {active && (
         <Chip
-          avatar={<AccountCircle />}
+          avatar={userData?.isAdmin ? <SupervisedUserCircle /> : <AccountCircle />}
           aria-label="User menu"
           aria-controls={menuId}
           aria-haspopup="true"
@@ -57,14 +76,41 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        {userData?.company?.name && (
-          <MenuItem disabled style={{ opacity: 'initial' }}>
-            <Box>
-              <Typography>{userData.company.name.toUpperCase()}</Typography>
-              {userData.company.city && <Typography>{userData.company.city.toUpperCase()}</Typography>}
-            </Box>
-          </MenuItem>
-        )}
+        {actingAs ? (
+          actingAs!.company?.name && (
+            <Fragment>
+              <MenuItem disabled style={{ opacity: 'initial' }}>
+                <Box>
+                  <Typography variant="subtitle1">{actingAs!.company.name.toUpperCase()}</Typography>
+                  {actingAs!.company.city && (
+                    <Typography variant="subtitle2">{actingAs!.company.city.toUpperCase()}</Typography>
+                  )}
+                </Box>
+              </MenuItem>
+              {actingAs!.isAdmin && (
+                <MenuItem onClick={handleSwitch}>
+                  Switch to{' '}
+                  {[changeCase.titleCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                    .filter(identity)
+                    .join(' ')}
+                </MenuItem>
+              )}
+            </Fragment>
+          )
+        ) : actingAs === null ? (
+          <Fragment>
+            <MenuItem disabled style={{ opacity: 'initial' }}>
+              <Box>
+                <Typography variant="subtitle1">
+                  {[changeCase.titleCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                    .filter(identity)
+                    .join(' ')}
+                </Typography>
+              </Box>
+            </MenuItem>
+            {userData?.company && <MenuItem onClick={handleSwitch}>Switch to {userData?.company.name}</MenuItem>}
+          </Fragment>
+        ) : null}
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
       </Menu>
     </Fragment>

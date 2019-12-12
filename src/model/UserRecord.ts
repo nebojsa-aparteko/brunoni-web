@@ -10,4 +10,5 @@ export default interface UserRecord {
     zip?: string;
     countryCode: string;
   };
+  isAdmin?: boolean;
 }

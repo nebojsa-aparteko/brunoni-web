@@ -8,6 +8,7 @@ import { CssBaseline } from '@material-ui/core';
 import App from './App';
 import LoginDialogProvider from './components/LoginDialogProvider';
 import CookiesNotification from './components/CookiesNotification';
+import ActingAsProvider from './providers/ActingAs';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
 import FirestoreDocumentProvider from './providers/FirestoreDocument';
 import UserRecordProvider from './providers/UserRecord';
@@ -53,15 +54,17 @@ const render = (user: firebase.User | null) => {
                           <SpecialOffersProvider>
                             <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
                               <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                                <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
-                                  <QuotesProvider>
-                                    <QuoteGroupsProvider>
-                                      <QuoteListProvider>
-                                        <App />
-                                      </QuoteListProvider>
-                                    </QuoteGroupsProvider>
-                                  </QuotesProvider>
-                                </FirestoreDocumentProvider>
+                                <ActingAsProvider>
+                                  <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+                                    <QuotesProvider>
+                                      <QuoteGroupsProvider>
+                                        <QuoteListProvider>
+                                          <App />
+                                        </QuoteListProvider>
+                                      </QuoteGroupsProvider>
+                                    </QuotesProvider>
+                                  </FirestoreDocumentProvider>
+                                </ActingAsProvider>
                               </FirestoreCollectionProvider>
                             </FirestoreCollectionProvider>
                           </SpecialOffersProvider>
@@ -82,7 +85,9 @@ const render = (user: firebase.User | null) => {
                     <FirestoreCollectionProvider name="ports" context={PortsContext}>
                       <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
                         <SpecialOffersProvider>
-                          <App />
+                          <ActingAsProvider anonymous>
+                            <App />
+                          </ActingAsProvider>
                         </SpecialOffersProvider>
                       </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>

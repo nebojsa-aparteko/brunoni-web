@@ -30,6 +30,8 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import firebase from '../firebase';
 import { useSnackbar } from 'notistack';
 import LoginDialog from '../contexts/LoginDialog';
+import IOSSwitch from './IOSSwitch';
+import ActingAs from '../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,6 +84,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
+  const [userRecord] = useContext(ActingAs);
   const { open } = useContext(LoginDialog);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -122,7 +125,7 @@ const Navbar: React.FC = () => {
                 />
               </Link>
               <Box displayPrint="none" width="100%" display="flex">
-                {user !== undefined && user !== null && (
+                {user !== undefined && user !== null && userRecord && (
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/" underline="none">
@@ -153,11 +156,13 @@ const Navbar: React.FC = () => {
                 )}
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
-                  <div className={classes.item}>
-                    <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
-                      Get Quote
-                    </Button>
-                  </div>
+                  userRecord ? (
+                    <div className={classes.item}>
+                      <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
+                        Get Quote
+                      </Button>
+                    </div>
+                  ) : null
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">
@@ -263,6 +268,7 @@ const Navbar: React.FC = () => {
               ) : null}
 
               <Divider />
+
               {user !== undefined && user !== null ? (
                 <Fragment>
                   <ListItem button onClick={handleClick}>

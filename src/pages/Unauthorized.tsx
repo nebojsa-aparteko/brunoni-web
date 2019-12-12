@@ -4,7 +4,7 @@ import Link from '../components/Link';
 import LoginWidget from '../components/LoginWidget';
 import Image from 'material-ui-image/lib/components/Image/Image';
 
-const NotFound: React.FC = () => (
+const Unauthorized: React.FC = () => (
   <Container>
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
@@ -30,4 +30,4 @@ const NotFound: React.FC = () => (
   </Container>
 );
 
-export default NotFound;
+export default Unauthorized;

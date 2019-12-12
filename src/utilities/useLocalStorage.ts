@@ -3,7 +3,6 @@ import formatDate from 'date-fns/format';
 import parseDate from 'date-fns/parse';
 import addDays from 'date-fns/addDays';
 import parseISO from 'date-fns/parseISO';
-import DetailedRouteSearchParams from '../model/get-quotes/DetailedRouteSearchParams';
 
 const stringifyReplacer = (key: string, value: any) => {
   if (key === 'date') {
