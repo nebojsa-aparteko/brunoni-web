@@ -2,6 +2,7 @@ import React, { Fragment, useContext, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
+import isObject from 'lodash/fp/isObject';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import flow from 'lodash/fp/flow';
@@ -18,7 +19,6 @@ import withTestData from '../utilities/withTestData';
 import useRequest, { RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
-import SpecialOffer from './SpecialOffer';
 import SpecialOffers from './SpecialOffers';
 
 interface Props {}
@@ -79,7 +79,9 @@ const RouteSearch: React.FC<Props> = () => {
 
   const [params, setParams] = useContext(RouteSearchContext);
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
-  const [carrierFilter, setCarrierFilter] = useState(params.carrier);
+  const [carrierFilter, setCarrierFilter] = useState(
+    isObject(params.carrier) ? (params.carrier as any).name : params.carrier,
+  );
   const [visibility, setVisibility] = useState(false);
 
   const [busy, error, result, search] = useRequest(() => {
