@@ -5,7 +5,7 @@ import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
 import Container from '../../model/Container';
 
-export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
+export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: UserRecord): string => {
   const cargoDetailsString: string = flatMap(
     (container: Container) =>
       ' - ' +
@@ -21,7 +21,7 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string): string => {
     firstLine,
     `Quote Date: ${formatDate(quote.dateIssued, 'dd.MM.yyyy')} \n` +
       `Quote Number: ${quote.id} \n` +
-      `Quote Reference: ${quote.clientId} \n` +
+      `Company: ${userData.company.name}, ${userData.company.city} \n\n` +
       `Port of Loading: ${quote.origin?.city || '?'}, ${quote.origin?.country || '?'} \n` +
       `Port of Discharge: ${quote.destination?.city || '?'}, ${quote.destination?.country || '?'} \n` +
       `Carrier: ${quote.carrier.name || quote.carrier.id} \n` +
@@ -52,7 +52,9 @@ export const buildMailToLink = (quote: Quote | undefined, [user, userData]: [fir
                 (quote.destination?.city || '?'),
             ),
           'body=' +
-            encodeURI(quoteInfoEmailBody(quote, 'I want to request a booking based on the following quote received:')),
+            encodeURI(
+              quoteInfoEmailBody(quote, 'I want to request a booking based on the following quote received:', userData),
+            ),
         ].join('&'),
       )
     );
@@ -81,6 +83,7 @@ export const buildSpecialRequestLink = (quote: Quote | undefined, [user, userDat
               quoteInfoEmailBody(
                 quote,
                 'I want to file a special request for the following quote received:\n\n<<TYPE IN YOUR SPECIAL REQUEST HERE>>',
+                userData,
               ),
             ),
         ].join('&'),
