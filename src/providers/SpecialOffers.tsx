@@ -40,22 +40,19 @@ const SpecialOffers: React.FC<Props> = ({ children }) => {
 
     const getContainerType = getEntity(containerTypes, containerType => containerType.id);
     const getPort = getEntity(ports, port => port.id);
-    const getCarrier = getEntity(carriers, carrier => carrier.name);
+    const getCarrier = getEntity(carriers, carrier => carrier.id);
 
-    (async () =>
-      setSpecialOffers(
-        await Promise.all(
-          map(
-            flow(
-              update('carrier', getCarrier),
-              update('containerType', getContainerType),
-              update('destination', getPort),
-              update('origin', getPort),
-              update('validUntil', invoke('toDate')),
-            ),
-          )(offers),
+    setSpecialOffers(
+      map(
+        flow(
+          update('carrier', getCarrier),
+          update('containerType', getContainerType),
+          update('destination', getPort),
+          update('origin', getPort),
+          update('validUntil', invoke('toDate')),
         ),
-      ))();
+      )(offers),
+    );
   }, [offers, containerTypes, ports, carriers]);
 
   return <SpecialOffersContext.Provider value={specialOffers}>{children}</SpecialOffersContext.Provider>;
