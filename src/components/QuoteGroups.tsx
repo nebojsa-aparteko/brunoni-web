@@ -5,8 +5,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  IconButton,
-  InputAdornment,
   makeStyles,
   TablePagination,
   Typography,
@@ -19,6 +17,7 @@ import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
 import set from 'lodash/fp/set';
 import reduce from 'lodash/fp/reduce';
+import orderBy from 'lodash/fp/orderBy';
 import find from 'lodash/fp/find';
 import Search from './SearchBar/Search';
 import Container from '../model/Container';
@@ -95,8 +94,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
           )(quoteGroups)
         : quoteGroups;
 
-    setFilteredResults(filteredResults);
-    return chunk(rowsPerPage)(filteredResults);
+    const sortedFiltered = orderBy([get('dateIssued'), get('id')], 'desc')(filteredResults);
+    setFilteredResults(sortedFiltered);
+    return chunk(rowsPerPage)(sortedFiltered);
   }, [quoteGroups, searchString, page, rowsPerPage]);
 
   const setPage = (page: number) => {
