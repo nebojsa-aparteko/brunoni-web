@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import formatDate from 'date-fns/format';
 import addDays from 'date-fns/addDays';
+import subDays from 'date-fns/subDays';
 import {
   makeStyles,
   Box,
@@ -131,7 +132,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
           </Box>
           <Typography gutterBottom variant="body1" color="textSecondary" component="p" className={classes.body}>
             {containerType.description || null} <br />
-            {`Valid until ${formatDate(validUntil, 'dd.MM.yyyy')}`}
+            {`Valid until ${formatDate(subDays(validUntil, 1), 'dd.MM.yyyy')}`}
           </Typography>
           <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
             Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
