@@ -146,7 +146,7 @@ const normalizeQuoteGroups = (
   return flow(
     groupBy('groupId'),
     values,
-    flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [item]))),
+    flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [set('groupId', item.id)(item)]))),
     map(normalizeQuoteGroup),
     orderBy([get('dateIssued'), flow(get('id'), padStart(10))], 'desc'),
   ) as (result: Quote[]) => QuoteGroup[];

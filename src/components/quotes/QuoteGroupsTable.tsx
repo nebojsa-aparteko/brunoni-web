@@ -114,7 +114,11 @@ const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
                     color="primary"
                     component={RouterLink}
                     size="small"
-                    to={quoteGroup.id ? `/quotes/groups/${quoteGroup.id}` : `/quotes/${quoteGroup.quotes[0].id}`}
+                    to={
+                      quoteGroup.quotes?.length !== 1
+                        ? `/quotes/groups/${quoteGroup.id}`
+                        : `/quotes/${quoteGroup.quotes[0].id}`
+                    }
                     variant="outlined"
                   >
                     View
