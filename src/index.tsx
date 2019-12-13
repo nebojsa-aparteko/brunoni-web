@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
@@ -14,6 +14,8 @@ import FirestoreDocumentProvider from './providers/FirestoreDocument';
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
+import AdminQuotesProvider from './providers/AdminQuotes';
+import AdminQuoteGroupsProvider from './providers/AdminQuoteGroups';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
@@ -22,11 +24,14 @@ import StatisticsContext from './contexts/Statistics';
 import CarriersContext from './contexts/Carriers';
 import PortsContext from './contexts/Ports';
 import UserContext from './contexts/User';
+import UserRecordsContext from './contexts/UserRecords';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
 import { QuoteListProvider } from './contexts/QuoteListContext';
+import ActingAs from './contexts/ActingAs';
+import UserRecord from './contexts/UserRecord';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -45,6 +50,59 @@ export default function ScrollToTop() {
 const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
+
+const UserApp: React.FC = () => {
+  const userRecord = useContext(UserRecord);
+  const [actingAs] = useContext(ActingAs);
+
+  switch (actingAs) {
+    case undefined:
+      return <App />;
+    case null:
+      switch (userRecord) {
+        case undefined:
+          return <App />;
+        case null:
+          return (
+            <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+              <QuotesProvider>
+                <QuoteGroupsProvider>
+                  <QuoteListProvider>
+                    <App />
+                  </QuoteListProvider>
+                </QuoteGroupsProvider>
+              </QuotesProvider>
+            </FirestoreDocumentProvider>
+          );
+        default:
+          return userRecord.isAdmin ? (
+            <AdminQuotesProvider>
+              <AdminQuoteGroupsProvider>
+                <QuoteListProvider>
+                  <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
+                    <App />
+                  </FirestoreCollectionProvider>
+                </QuoteListProvider>
+              </AdminQuoteGroupsProvider>
+            </AdminQuotesProvider>
+          ) : (
+            <App />
+          );
+      }
+    default:
+      return (
+        <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+          <QuotesProvider>
+            <QuoteGroupsProvider>
+              <QuoteListProvider>
+                <App />
+              </QuoteListProvider>
+            </QuoteGroupsProvider>
+          </QuotesProvider>
+        </FirestoreDocumentProvider>
+      );
+  }
+};
 
 const render = (user: firebase.User | null) => {
   const app = (
@@ -66,15 +124,7 @@ const render = (user: firebase.User | null) => {
                             <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
                               <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
                                 <ActingAsProvider>
-                                  <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
-                                    <QuotesProvider>
-                                      <QuoteGroupsProvider>
-                                        <QuoteListProvider>
-                                          <App />
-                                        </QuoteListProvider>
-                                      </QuoteGroupsProvider>
-                                    </QuotesProvider>
-                                  </FirestoreDocumentProvider>
+                                  <UserApp />
                                 </ActingAsProvider>
                               </FirestoreCollectionProvider>
                             </FirestoreCollectionProvider>

@@ -31,6 +31,7 @@ import padStart from 'lodash/fp/padStart';
 
 interface Props {
   showGetQuoteButton?: boolean;
+  showCompanyInfo?: boolean;
   className?: string;
 }
 
@@ -64,7 +65,7 @@ const containsString = (prop: string, searchString: string) => {
   return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
 };
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }) => {
+const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, className, ...rest }) => {
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
@@ -149,7 +150,10 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
         }
       />
       <CardContent className={classes.content}>
-        <QuoteGroupsTable quoteGroups={resultChunks && (get(page)(resultChunks) || [])} />
+        <QuoteGroupsTable
+          showCompanyInfo={showCompanyInfo}
+          quoteGroups={resultChunks && (get(page)(resultChunks) || [])}
+        />
       </CardContent>
       <CardActions className={classes.actions}>
         {quoteGroups && quoteGroups.length > 0 && (

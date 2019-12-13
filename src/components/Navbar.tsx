@@ -161,6 +161,15 @@ const Navbar: React.FC = () => {
                     </div>
                   </Fragment>
                 )}
+                {userRecord === null && (
+                  <Fragment>
+                    <div className={classes.item}>
+                      <Button component={Link} to="/quotes/groups" underline="none">
+                        Quotes
+                      </Button>
+                    </div>
+                  </Fragment>
+                )}
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
                   userRecord ? (

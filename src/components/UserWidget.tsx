@@ -34,12 +34,11 @@ const UserWidget: React.FC<Props> = ({ active }) => {
   const handleSwitch = () => {
     setAnchorEl(null);
     if (actingAs) {
-      history.push('/admin');
       setActingAs(null);
     } else {
-      history.push('/');
       setActingAs(user.uid);
     }
+    history.push('/');
   };
 
   const handleLogOut = async () => {
