@@ -98,7 +98,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange, ...rest }, ref) => {
   };
 
   const handleLocationChange = (v: PickupLocation | undefined) => {
-    onChange(set('location', v)(value));
+    onChange(set('pickupLocation', v)(value));
   };
 
   const handleQuantityChange = (v: number) => {

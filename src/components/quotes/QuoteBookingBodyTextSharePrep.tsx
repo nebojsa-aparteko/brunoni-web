@@ -4,6 +4,7 @@ import firebase from '../../firebase';
 import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
 import Container from '../../model/Container';
+import { portLongFormatLabel, portShortFormatLabel } from '../../utilities/formattedPortDisplay';
 
 export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: UserRecord): string => {
   const cargoDetailsString: string = flatMap(
@@ -22,8 +23,8 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: Us
     `Quote Date: ${formatDate(quote.dateIssued, 'dd.MM.yyyy')} \n` +
       `Quote Number: ${quote.id} \n` +
       `Company: ${userData.company.name}, ${userData.company.city} \n\n` +
-      `Port of Loading: ${quote.origin?.city || '?'}, ${quote.origin?.country || '?'} \n` +
-      `Port of Discharge: ${quote.destination?.city || '?'}, ${quote.destination?.country || '?'} \n` +
+      `Port of Loading: ${portLongFormatLabel(quote.origin)} \n` +
+      `Port of Discharge: ${portLongFormatLabel(quote.destination)} \n` +
       `Carrier: ${quote.carrier.name || quote.carrier.id} \n` +
       `Quote Validity: ${formatDate(quote.validityPeriod.from, 'd. MMMM')} – ${formatDate(
         quote.validityPeriod.to,
@@ -47,9 +48,9 @@ export const buildMailToLink = (quote: Quote | undefined, [user, userData]: [fir
               'Request booking - ' +
                 (quote.carrier.name || quote.carrier.id) +
                 ', ' +
-                (quote.origin?.city || '?') +
+                portShortFormatLabel(quote.origin) +
                 ' → ' +
-                (quote.destination?.city || '?'),
+                portShortFormatLabel(quote.destination),
             ),
           'body=' +
             encodeURI(
@@ -74,9 +75,9 @@ export const buildSpecialRequestLink = (quote: Quote | undefined, [user, userDat
               'Special request for quote - ' +
                 (quote.carrier.name || quote.carrier.id) +
                 ', ' +
-                (quote.origin?.city || '?') +
+                portShortFormatLabel(quote.origin) +
                 ' → ' +
-                (quote.destination?.city || '?'),
+                portShortFormatLabel(quote.destination),
             ),
           'body=' +
             encodeURI(

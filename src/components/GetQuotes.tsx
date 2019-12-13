@@ -72,7 +72,7 @@ const checkIfPortsInEurope = (originPort: Port | undefined, destinationPort: Por
 
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
-  const [user] = useUser();
+  const [user, userData] = useUser();
   const history = useHistory();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -265,12 +265,11 @@ const GetQuotes: React.FC<Props> = () => {
         if (!container.containerType || !container.commodityType) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
-        } else if (
-          !container.pickupLocation &&
-          !((container.containerType?.description || '').endsWith('S.O.') || showContainerLocations)
-        ) {
-          (listInput.current! as { focus: (i: number) => void }).focus(i);
-          return;
+        } else if (!container.pickupLocation) {
+          if (!((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)) {
+            (listInput.current! as { focus: (i: number) => void }).focus(i);
+            return;
+          }
         }
       }
       setBusy(true);
@@ -278,7 +277,7 @@ const GetQuotes: React.FC<Props> = () => {
   };
 
   const sendEmail = () => {
-    window.open(buildMailToLink(value));
+    window.open(buildMailToLink(value, userData));
     closeDialog();
   };
 
