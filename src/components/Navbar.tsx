@@ -40,6 +40,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     appBar: {
       background: theme.palette.background.paper,
+
+      ['@media print']: {
+        display: 'none',
+      },
     },
     toolbar: {
       height: 100,

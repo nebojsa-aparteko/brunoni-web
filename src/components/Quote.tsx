@@ -30,6 +30,7 @@ import FlareIcon from '@material-ui/icons/Flare';
 import QuoteGroups from '../contexts/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 import { portLongFormatLabel, portShortFormatLabel } from '../utilities/formattedPortDisplay';
+import changeCase from 'change-case';
 
 interface Props {
   id: string;
@@ -44,6 +45,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(2),
       paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
     },
   },
   title: {
@@ -128,6 +134,16 @@ const Quote: React.FC<Props> = ({ id }) => {
     <Container maxWidth="lg">
       <ScrollToTopOnMount />
       <Paper className={classes.root}>
+        <Box display="none" displayPrint="block" mb={2}>
+          <Box mb={2}>
+            <img
+              src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+              alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+              style={{ width: '5em' }}
+            />
+          </Box>
+          <Divider />
+        </Box>
         <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
           <QuoteNav
             backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
