@@ -1,5 +1,17 @@
-import React, { useMemo } from 'react';
-import { Grid, Typography, ListItem, Box, Chip, makeStyles } from '@material-ui/core';
+import React, { useMemo, Fragment } from 'react';
+import {
+  Grid,
+  Typography,
+  ListItem,
+  Box,
+  Chip,
+  makeStyles,
+  ListItemIcon,
+  ListItemText,
+  SvgIcon,
+  Icon,
+  Divider,
+} from '@material-ui/core';
 import List from '@material-ui/core/List';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
@@ -11,6 +23,9 @@ import Container from '../../model/Container';
 import CommodityType from '../../model/CommodityType';
 import { getLocationLabel } from '../inputs/LocationInput';
 import PickupLocation from '../../model/PickupLocation';
+import DepotLocationIcon from '@material-ui/icons/LocalShipping';
+import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
+import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
 
 interface Props {
   containers: Container[];
@@ -29,6 +44,10 @@ const useStyles = makeStyles(theme => ({
       },
     },
   },
+  cargoDetails: {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
 }));
 
 const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) => {
@@ -37,7 +56,7 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
   const locations = useMemo(
     () =>
       flow(
-        map(get('pickupLocation')),
+        map(get('location')),
         filter(identity),
         filter(location => location.countryCode.trim() !== '0'),
         uniqBy('id'),
@@ -48,48 +67,70 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
   return (
     <Grid item xs={12}>
       <Typography variant="subtitle2">
-        <Box display="inline" alignItems="center" fontWeight="fontWeightBold">
+        <Box display="inline" alignItems="center" component="span" fontWeight="fontWeightBold">
           Cargo details:
         </Box>
       </Typography>
       <Typography variant="body2">
-        <List dense={true}>
+        <List dense>
           {containers.map((container, i) => (
-            <ListItem key={i} disableGutters>
-              <Chip
-                label={
-                  (container.quantity > 1 ? container.quantity + ' × ' : '') +
-                  container!.containerType?.description +
-                  (container?.commodityType?.name ? `, ${container.commodityType.name}` : '')
-                }
-                className={classes.chip}
-              />
-            </ListItem>
+            <Fragment key={i}>
+              <ListItem disableGutters>
+                <ListItemIcon>
+                  <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    (container.quantity > 1 ? container.quantity + ' × ' : '') + container!.containerType?.description
+                  }
+                  primaryTypographyProps={{ variant: 'body1' }}
+                />
+              </ListItem>
+
+              {container?.commodityType?.name && (
+                <ListItem disableGutters className={classes.cargoDetails}>
+                  <ListItemIcon>
+                    <SvgIcon component={PackageIconSVG} viewBox="0 0 473.8 473.8" />
+                  </ListItemIcon>
+                  <ListItemText secondary={container.commodityType.name} />
+                </ListItem>
+              )}
+
+              {container.pickupLocation && (
+                <ListItem disableGutters className={classes.cargoDetails}>
+                  <ListItemIcon>
+                    <DepotLocationIcon />
+                  </ListItemIcon>
+                  <ListItemText secondary={getLocationLabel(container.pickupLocation)} />
+                </ListItem>
+              )}
+              <ListItem />
+            </Fragment>
           ))}
         </List>
       </Typography>
-      {commodityTypes && commodityTypes.length > 0 && (
-        <Box display="block" alignItems="center" mt={2}>
-          <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>
-            Commodity:
-          </Typography>
-          <Typography variant="body1">{commodityTypes.map(commodityType => commodityType.name).join(', ')}</Typography>
-        </Box>
-      )}
-      {locations && locations.length > 0 && (
-        <Box display="block" alignItems="center" mt={2}>
-          <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>
-            Depot Location:
-          </Typography>
-          <Box>
-            {locations.map((location: PickupLocation) => (
-              <Box>
-                <Typography variant="body1">{getLocationLabel(location)}</Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-      )}
+      {/*{commodityTypes && commodityTypes.length > 0 && (*/}
+      {/*  <Box display="block" alignItems="center" mt={2}>*/}
+      {/*    <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>*/}
+      {/*      Commodity:*/}
+      {/*    </Typography>*/}
+      {/*    <Typography variant="body1">{commodityTypes.map(commodityType => commodityType.name).join(', ')}</Typography>*/}
+      {/*  </Box>*/}
+      {/*)}*/}
+      {/*{locations && locations.length > 0 && (*/}
+      {/*  <Box display="block" alignItems="center" mt={2}>*/}
+      {/*    <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>*/}
+      {/*      Depot Location:*/}
+      {/*    </Typography>*/}
+      {/*    <Box>*/}
+      {/*      {locations.map((location: PickupLocation, index:number) => (*/}
+      {/*        <Box key={index}>*/}
+      {/*          <Typography variant="body1">{getLocationLabel(location)}</Typography>*/}
+      {/*        </Box>*/}
+      {/*      ))}*/}
+      {/*    </Box>*/}
+      {/*  </Box>*/}
+      {/*)}*/}
     </Grid>
   );
 };

@@ -67,7 +67,7 @@ const ContainerInput: React.FC<Props> = ({ value, onChange, ...rest }, ref) => {
         (containerTypeInput.current! as { focus: () => void }).focus();
       } else if (!value.commodityType) {
         (commodityTypeInput.current! as { focus: () => void }).focus();
-      } else if (!value.location) {
+      } else if (!value.pickupLocation) {
         try {
           (locationInput.current! as { focus: () => void }).focus();
         } catch (e) {
@@ -134,7 +134,12 @@ const ContainerInput: React.FC<Props> = ({ value, onChange, ...rest }, ref) => {
         </Grid>
         {get('showLocations')(rest) && !value.containerType?.description?.endsWith('S.O.') && (
           <Grid item md={4} xs={12}>
-            <LocationInput ref={locationInput} margin="dense" value={value.location} onChange={handleLocationChange} />
+            <LocationInput
+              ref={locationInput}
+              margin="dense"
+              value={value.pickupLocation}
+              onChange={handleLocationChange}
+            />
           </Grid>
         )}
         <Grid item md={2} xs={12}>

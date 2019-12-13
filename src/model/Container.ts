@@ -5,6 +5,6 @@ import PickupLocation from './PickupLocation';
 export default interface Container {
   containerType?: ContainerType;
   commodityType?: CommodityType;
-  location?: PickupLocation;
+  pickupLocation?: PickupLocation;
   quantity: number;
 }

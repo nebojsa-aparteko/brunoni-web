@@ -157,7 +157,7 @@ const GetQuotes: React.FC<Props> = () => {
             containers: containers.map((container: ContainerType) => ({
               type: container.containerType!.id,
               commodity: container.commodityType!.id,
-              location: container.location?.id,
+              location: container.pickupLocation?.id,
               quantity: container.quantity,
             })),
           }),
@@ -266,7 +266,7 @@ const GetQuotes: React.FC<Props> = () => {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         } else if (
-          !container.location &&
+          !container.pickupLocation &&
           !((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)
         ) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);

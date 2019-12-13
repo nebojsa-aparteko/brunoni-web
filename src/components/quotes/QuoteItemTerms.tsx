@@ -21,8 +21,8 @@ const QuoteItemTerms: React.FC<Props> = ({ terms }) => {
       <Grid item xs={12}>
         {terms
           .filter(term => term.TermLabel !== 'TERMS & CONDITIONS')
-          .map(term => (
-            <Typography variant="body2">
+          .map((term, index: number) => (
+            <Typography variant="body2" key={index}>
               {term.TermValue} - {term.TermDetail}
               <br />
               <Link href={term.TermURL || ''} className={classes.link} target="_blank" rel="noreferrer">
