@@ -99,7 +99,10 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
           )(quoteGroups)
         : quoteGroups;
 
-    const sortedFiltered = orderBy([get('dateIssued'), flow(get('id'), padStart(10))], 'desc')(filteredResults);
+    const sortedFiltered = orderBy(
+      [get('dateIssued'), flow(get('id'), padStart(10))],
+      ['desc', 'desc'],
+    )(filteredResults);
     setFilteredResults(sortedFiltered);
     return chunk(rowsPerPage)(sortedFiltered);
   }, [quoteGroups, searchString, page, rowsPerPage]);
