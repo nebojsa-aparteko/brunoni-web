@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import addDays from 'date-fns/addDays';
 import subDays from 'date-fns/subDays';
@@ -131,11 +131,21 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
             <Typography>{destination.city}</Typography>
           </Box>
           <Typography gutterBottom variant="body1" color="textSecondary" component="p" className={classes.body}>
-            {containerType.description || null} <br />
+            {containerType.description ? (
+              <Fragment>
+                {containerType.description} <br />
+              </Fragment>
+            ) : null}
             {`Valid until ${formatDate(subDays(validUntil, 1), 'dd.MM.yyyy')}`}
           </Typography>
           <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
-            Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
+            {user ? (
+              <Fragment>
+                Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
+              </Fragment>
+            ) : (
+              <Fragment>Book now</Fragment>
+            )}
           </Button>
           <Typography variant="body2" color="textSecondary" component="p" className={classes.finePrint}>
             **subject to other charges
