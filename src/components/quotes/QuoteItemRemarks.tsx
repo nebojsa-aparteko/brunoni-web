@@ -10,18 +10,18 @@ interface Props {
 
 const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => {
   const theme = useTheme();
-  const isSmAndDown = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const isPrint = window.matchMedia ? window.matchMedia('print').matches : false;
   return (
     <Fragment>
       <Divider />
       {remarks.map((remark, i) => (
         <Fragment key={i}>
-          <Grid item md={3} sm={4} xs={isSmAndDown ? 12 : 4}>
+          <Grid item md={3} sm={4} xs={isPrint ? 4 : 12}>
             <InfoBoxItem title={remark.RemarkTitle} label1={remark.RemarkLabel} />
           </Grid>
-          <Grid item md={9} sm={8} xs={isSmAndDown ? 12 : 8}>
-            <InfoBoxItem label1={remark.RemarkText} occupySpaceForTitle={remark.RemarkTitle !== null} />
+          <Grid item md={9} sm={8} xs={isPrint ? 8 : 12}>
+            <InfoBoxItem label1={remark.RemarkText} occupySpaceForTitle={isXS ? false : remark.RemarkTitle !== null} />
           </Grid>
         </Fragment>
       ))}

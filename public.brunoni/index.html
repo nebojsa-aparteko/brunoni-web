@@ -29,6 +29,22 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700&display=swap" rel="stylesheet">
 
     <style>
+      @media print {
+        header {
+          display: none;
+        }
+
+        @page {
+          margin: 1cm;
+        }
+
+        @page:first header { display:block; }
+
+
+        body {
+          margin: 1cm;
+        }
+      }
       html, body {
         height: 100%;
       }
