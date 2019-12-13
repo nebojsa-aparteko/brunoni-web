@@ -130,10 +130,11 @@ const normalizeQuoteGroups = (
   const normalizeQuoteGroup = flow(quotes => {
     const normalizedQuotes = normalizeQuotes(quotes) as Quote[];
 
-    const normalizedQuote = normalizedQuotes[0];
+    const normalizedQuote = normalizedQuotes[normalizedQuotes.length - 1];
 
     return {
       id: normalizedQuote.groupId,
+      sortingId: normalizedQuote.id,
       dateIssued: normalizedQuote.dateIssued,
       origin: normalizedQuote.origin,
       destination: normalizedQuote.destination,
@@ -148,7 +149,7 @@ const normalizeQuoteGroups = (
     values,
     flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [set('groupId', item.id)(item)]))),
     map(normalizeQuoteGroup),
-    orderBy([get('dateIssued'), flow(get('id'), padStart(10))], ['desc', 'desc']),
+    //orderBy([get('dateIssued'), flow(get('id'), padStart(10))], ['desc', 'desc']),
   ) as (result: Quote[]) => QuoteGroup[];
 };
 

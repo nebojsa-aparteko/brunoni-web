@@ -100,7 +100,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
         : quoteGroups;
 
     const sortedFiltered = orderBy(
-      [get('dateIssued'), flow(get('id'), padStart(10))],
+      [get('dateIssued'), flow(get('sortingId'), padStart(10))],
       ['desc', 'desc'],
     )(filteredResults);
     setFilteredResults(sortedFiltered);
