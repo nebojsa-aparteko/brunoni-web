@@ -19,6 +19,7 @@ import set from 'lodash/fp/set';
 import reduce from 'lodash/fp/reduce';
 import orderBy from 'lodash/fp/orderBy';
 import find from 'lodash/fp/find';
+import flatMap from 'lodash/fp/flatMap';
 import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
@@ -55,7 +56,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const containsString = (prop: string, searchString: string) => {
-  const byMultiple = searchString.split(' ').flatMap(value => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+  const byMultiple = flatMap((value: string) => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1)(
+    searchString.split(' '),
+  );
   return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
 };
 
