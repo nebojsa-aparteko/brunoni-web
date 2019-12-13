@@ -83,6 +83,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
         ? filter(
             (quoteGroup: QuoteGroup) =>
               containsString(quoteGroup.id, searchString) ||
+              find((quote: Quote) => containsString(quote.id, searchString))(quoteGroup.quotes) !== undefined || // search through the quotes for online quotes
               containsString(quoteGroup.origin?.id || '', searchString) ||
               containsString(quoteGroup.origin?.city || '', searchString) ||
               containsString(quoteGroup.destination?.id || '', searchString) ||
