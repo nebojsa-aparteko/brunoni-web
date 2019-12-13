@@ -1,5 +1,17 @@
 import React, { useContext, useEffect } from 'react';
-import { Box, Container, Divider, Grid, makeStyles, Paper, Theme, Typography, Button } from '@material-ui/core';
+import {
+  Box,
+  Container,
+  Divider,
+  Grid,
+  makeStyles,
+  Paper,
+  Theme,
+  Typography,
+  Button,
+  useMediaQuery,
+  useTheme,
+} from '@material-ui/core';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
 import QuoteItemContainers from './quotes/QuoteItemContainers';
@@ -75,6 +87,9 @@ const Quote: React.FC<Props> = ({ id }) => {
   const quoteGroups = useContext(QuoteGroups);
   const [user, userData] = useUser();
 
+  const theme = useTheme();
+  const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
+
   if (!quoteGroups) {
     return (
       <Container maxWidth="lg">
@@ -142,7 +157,7 @@ const Quote: React.FC<Props> = ({ id }) => {
               href={buildSpecialRequestLink(quote, [user, userData])}
               target="_blank"
             >
-              SPECIAL REQUEST
+              {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
             </Button>
           </Box>
         </Box>
