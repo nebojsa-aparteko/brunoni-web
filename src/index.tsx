@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
@@ -32,6 +32,16 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+export default function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
@@ -40,6 +50,7 @@ const render = (user: firebase.User | null) => {
   const app = (
     <Router>
       <CookiesNotification />
+      <ScrollToTop />
       <CssBaseline />
       <RouteSearchProvider>
         {user ? (
