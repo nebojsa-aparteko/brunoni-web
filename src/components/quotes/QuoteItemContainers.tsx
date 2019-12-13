@@ -71,44 +71,42 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
           Cargo details:
         </Box>
       </Typography>
-      <Typography variant="body2">
-        <List dense>
-          {containers.map((container, i) => (
-            <Fragment key={i}>
-              <ListItem disableGutters>
+      <List dense>
+        {containers.map((container, i) => (
+          <Fragment key={i}>
+            <ListItem disableGutters>
+              <ListItemIcon>
+                <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  (container.quantity > 1 ? container.quantity + ' × ' : '') + container!.containerType?.description
+                }
+                primaryTypographyProps={{ variant: 'body1' }}
+              />
+            </ListItem>
+
+            {container?.commodityType?.name && (
+              <ListItem disableGutters className={classes.cargoDetails}>
                 <ListItemIcon>
-                  <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
+                  <SvgIcon component={PackageIconSVG} viewBox="0 0 473.8 473.8" />
                 </ListItemIcon>
-                <ListItemText
-                  primary={
-                    (container.quantity > 1 ? container.quantity + ' × ' : '') + container!.containerType?.description
-                  }
-                  primaryTypographyProps={{ variant: 'body1' }}
-                />
+                <ListItemText secondary={container.commodityType.name} />
               </ListItem>
+            )}
 
-              {container?.commodityType?.name && (
-                <ListItem disableGutters className={classes.cargoDetails}>
-                  <ListItemIcon>
-                    <SvgIcon component={PackageIconSVG} viewBox="0 0 473.8 473.8" />
-                  </ListItemIcon>
-                  <ListItemText secondary={container.commodityType.name} />
-                </ListItem>
-              )}
-
-              {container.pickupLocation && (
-                <ListItem disableGutters className={classes.cargoDetails}>
-                  <ListItemIcon>
-                    <DepotLocationIcon />
-                  </ListItemIcon>
-                  <ListItemText secondary={getLocationLabel(container.pickupLocation)} />
-                </ListItem>
-              )}
-              <ListItem />
-            </Fragment>
-          ))}
-        </List>
-      </Typography>
+            {container.pickupLocation && (
+              <ListItem disableGutters className={classes.cargoDetails}>
+                <ListItemIcon>
+                  <DepotLocationIcon />
+                </ListItemIcon>
+                <ListItemText secondary={getLocationLabel(container.pickupLocation)} />
+              </ListItem>
+            )}
+            <ListItem />
+          </Fragment>
+        ))}
+      </List>
       {/*{commodityTypes && commodityTypes.length > 0 && (*/}
       {/*  <Box display="block" alignItems="center" mt={2}>*/}
       {/*    <Typography variant="subtitle2" style={{ fontWeight: 'bold' }}>*/}

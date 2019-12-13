@@ -267,7 +267,7 @@ const GetQuotes: React.FC<Props> = () => {
           return;
         } else if (
           !container.pickupLocation &&
-          !((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)
+          !((container.containerType?.description || '').endsWith('S.O.') || showContainerLocations)
         ) {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
