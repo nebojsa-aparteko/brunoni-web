@@ -13,7 +13,7 @@ const renderIMO = (imo: IMO) =>
   `\n   IMO Class ${imo.IMOClass}, UN Number: ${imo.UNNumber}, PG Number: ${imo.PGNumber}`;
 
 const renderOOG = (oog: OOG) =>
-  `\n   Out of gauge item ${oog.length}×${oog.width}×${oog.height} [cm] (W×H×L), ${oog.weight} [kg]`;
+  `\n   Out of gauge item ${oog.length}×${oog.width}×${oog.height} [cm] (L×W×H), ${oog.weight} [kg]`;
 
 export const createEmailBody = (searchParams: DetailedRouteSearchParams, userData: UserRecord): string => {
   const cargoDetailsString: string = flatMap(
