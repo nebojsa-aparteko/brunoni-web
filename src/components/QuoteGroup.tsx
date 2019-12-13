@@ -47,6 +47,7 @@ import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroups';
 import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
+import { portLongFormatLabel, portShortFormatLabel } from '../utilities/formattedPortDisplay';
 
 interface Props {
   id: string;
@@ -192,12 +193,14 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
     </Container>
   ) : (
     <Fragment>
-      <Meta title={`${quoteGroup.origin?.city} - ${quoteGroup.destination?.city || '?'}`} />
+      <Meta title={`${portShortFormatLabel(quoteGroup.origin)} - ${portShortFormatLabel(quoteGroup.destination)}`} />
       <Container maxWidth="lg">
         <Box mt={6}>
           <QuoteNav
             backTo="/quotes/groups"
-            title={`Quotations - ${quoteGroup?.origin?.city}, ${quoteGroup?.origin?.country} - ${quoteGroup.destination?.city}, ${quoteGroup.destination?.country}`}
+            title={`Quotations - ${portLongFormatLabel(quoteGroup.origin)} - ${portLongFormatLabel(
+              quoteGroup.destination,
+            )}`}
             subtitle={`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}
           />
         </Box>
@@ -210,8 +213,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
                   label={
                     (container.quantity > 1 ? container.quantity + ' × ' : '') +
                     container!.containerType?.description +
-                    ', ' +
-                    container?.commodityType?.name
+                    (container?.commodityType?.name ? ', ' + container?.commodityType?.name : '')
                   }
                 />
               </Grid>

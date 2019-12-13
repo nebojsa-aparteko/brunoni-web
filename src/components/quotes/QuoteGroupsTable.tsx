@@ -17,6 +17,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
+import { portLongFormatLabel, portShortFormatLabel } from '../../utilities/formattedPortDisplay';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -81,8 +82,7 @@ const QuoteGroupsTable: React.FC<Props> = ({ quoteGroups }) => {
             quoteGroups.map(quoteGroup => (
               <TableRow key={quoteGroup.id} className={classes.tableRow}>
                 <TableCell>
-                  {quoteGroup.origin?.city || quoteGroup.origin?.id || '?'} →{' '}
-                  {quoteGroup.destination?.city || quoteGroup.destination?.id || '?'}
+                  {portShortFormatLabel(quoteGroup.origin)} → {portShortFormatLabel(quoteGroup.destination)}
                 </TableCell>
                 <TableCell>
                   {uniq(quoteGroup.quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}
