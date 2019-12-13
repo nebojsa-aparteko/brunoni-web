@@ -26,6 +26,8 @@ import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
 import { QuoteListContext } from '../contexts/QuoteListContext';
 import SynchronizeButton from './SynchronizeButton';
+import flow from 'lodash/fp/flow';
+import padStart from 'lodash/fp/padStart';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -86,7 +88,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
               containsString(quoteGroup.destination?.id || '', searchString) ||
               containsString(quoteGroup.destination?.city || '', searchString) ||
               find((container: Container) => {
-                return container.containerType ? containsString(container.containerType.id, searchString) : false;
+                return container.containerType ? containsString(container.containerType.name, searchString) : false;
               })(quoteGroup.containers) !== undefined ||
               find((commodityType: CommodityType) => {
                 return containsString(commodityType.name, searchString);
@@ -97,7 +99,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, className, ...rest }
           )(quoteGroups)
         : quoteGroups;
 
-    const sortedFiltered = orderBy([get('dateIssued'), get('id')], 'desc')(filteredResults);
+    const sortedFiltered = orderBy([get('dateIssued'), flow(get('id'), padStart(10))], 'desc')(filteredResults);
     setFilteredResults(sortedFiltered);
     return chunk(rowsPerPage)(sortedFiltered);
   }, [quoteGroups, searchString, page, rowsPerPage]);
