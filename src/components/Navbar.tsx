@@ -65,6 +65,9 @@ const useStyles = makeStyles((theme: Theme) =>
     item: {
       display: 'flex',
       marginLeft: theme.spacing(2),
+      [theme.breakpoints.down('sm')]: {
+        marginTop: theme.spacing(2),
+      },
     },
     drawer: {
       [theme.breakpoints.up('sm')]: {
@@ -270,22 +273,9 @@ const Navbar: React.FC = () => {
               <Divider />
 
               {user !== undefined && user !== null ? (
-                <Fragment>
-                  <ListItem button onClick={handleClick}>
-                    <ListItemIcon>
-                      <AccountCircleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={user?.email || '???'} />
-                    {openDrawer ? <ExpandLess /> : <ExpandMore />}
-                  </ListItem>
-                  <Collapse in={openDrawer} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                      <ListItem button onClick={handleLogOut} className={classes.nested}>
-                        <ListItemText primary="Log out" />
-                      </ListItem>
-                    </List>
-                  </Collapse>
-                </Fragment>
+                <div className={classes.item}>
+                  <IdentityWidget />
+                </div>
               ) : (
                 <ListItem button onClick={() => open()}>
                   <ListItemIcon>

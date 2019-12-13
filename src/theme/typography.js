@@ -3,6 +3,8 @@ import palette from './palette';
 export default {
   fontFamily: 'Montserrat,Helvetica,Arial,sans-serif',
   fontSize: 13,
+  textSizeAdjust: 'none',
+  // '-webkit-text-size-adjust': 'none',
   h1: {
     color: palette.text.primary,
     fontWeight: 500,
