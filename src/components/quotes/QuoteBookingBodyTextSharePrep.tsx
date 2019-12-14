@@ -5,6 +5,7 @@ import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
 import Container from '../../model/Container';
 import { portLongFormatLabel, portShortFormatLabel } from '../../utilities/formattedPortDisplay';
+import { getLocationLabel } from '../inputs/LocationInput';
 
 export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: UserRecord): string => {
   const cargoDetailsString: string = flatMap(
@@ -14,8 +15,10 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: Us
       container!.containerType?.description +
       ', ' +
       container?.commodityType?.name +
-      '\n',
-  )(quote.containers).join('');
+      (container.pickupLocation ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}` : '') +
+      '\n   WEIGHT:' +
+      '\n   PICK UP DATE:\n',
+  )(quote.containers).join('\n');
 
   return [
     'Dear Sirs,',
