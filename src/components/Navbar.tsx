@@ -1,5 +1,6 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useRef } from 'react';
 import changeCase from 'change-case';
+import { useHistory } from 'react-router';
 import {
   makeStyles,
   Theme,
@@ -14,6 +15,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  InputAdornment,
+  Input,
+  FormControl,
+  InputLabel,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -32,6 +37,7 @@ import { useSnackbar } from 'notistack';
 import LoginDialog from '../contexts/LoginDialog';
 import IOSSwitch from './IOSSwitch';
 import ActingAs from '../contexts/ActingAs';
+import LaunchIcon from '@material-ui/icons/Launch';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,6 +79,9 @@ const useStyles = makeStyles((theme: Theme) =>
         marginTop: theme.spacing(2),
       },
     },
+    input: {
+      margin: theme.spacing(1),
+    },
     drawer: {
       [theme.breakpoints.up('sm')]: {
         width: 240,
@@ -98,6 +107,10 @@ const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
 
+  const gotQuoteInputRef = useRef<HTMLInputElement>();
+
+  const history = useHistory();
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -116,6 +129,17 @@ const Navbar: React.FC = () => {
         variant: 'error',
       });
     }
+  };
+
+  const handleGoToQuoteOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.keyCode == 13) {
+      console.log(gotQuoteInputRef.current?.value);
+      history.push(`/quotes/${gotQuoteInputRef.current?.value}`);
+    }
+  };
+
+  const handleGoToQuoteButtonClick = () => {
+    history.push(`/quotes/${gotQuoteInputRef.current?.value}`);
   };
 
   return (
@@ -178,7 +202,28 @@ const Navbar: React.FC = () => {
                         Get Quote
                       </Button>
                     </div>
-                  ) : null
+                  ) : (
+                    <FormControl>
+                      <Input
+                        id="gotoquoteinput"
+                        placeholder="Type in Quote # "
+                        onKeyDown={handleGoToQuoteOnKeyDown}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton aria-label="toggle password visibility" onClick={handleGoToQuoteButtonClick}>
+                              <LaunchIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        aria-describedby="gotoquoteinput-helper-text"
+                        inputRef={gotQuoteInputRef}
+                        inputProps={{
+                          'aria-label': 'Go to quote',
+                        }}
+                        margin="dense"
+                      />
+                    </FormControl>
+                  )
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">

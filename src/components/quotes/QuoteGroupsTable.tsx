@@ -18,6 +18,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
 import UserRecords from '../../contexts/UserRecords';
+import { useHistory } from 'react-router';
 import { portShortFormatLabel } from '../../utilities/formattedPortDisplay';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -45,8 +46,8 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   quotes,
 }) => {
   const classes = useStyles();
-
   const users = useContext(UserRecords);
+  const history = useHistory();
 
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
@@ -62,8 +63,20 @@ const QuoteGroupRow: React.FC<RowProps> = ({
     return <TableCell>{user.company.name}</TableCell>;
   }, [showCompanyInfo, users, quotes[0].clientId]);
 
+  const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
+    history.push(pathToNavigate);
+  };
+
   return (
-    <TableRow className={classes.tableRow}>
+    <TableRow
+      hover
+      tabIndex={-1}
+      className={classes.tableRow}
+      onClick={event =>
+        handleRowClick(event, quotes?.length !== 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`)
+      }
+      key={id}
+    >
       {clientInfo}
       <TableCell>
         {portShortFormatLabel(origin)} → {portShortFormatLabel(destination)}
@@ -91,17 +104,6 @@ const QuoteGroupRow: React.FC<RowProps> = ({
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
-      <TableCell align="right">
-        <Button
-          color="primary"
-          component={RouterLink}
-          size="small"
-          to={quotes?.length !== 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`}
-          variant="outlined"
-        >
-          View
-        </Button>
-      </TableCell>
     </TableRow>
   );
 };
@@ -149,7 +151,6 @@ const QuoteGroupsTable: React.FC<Props> = ({ showCompanyInfo, quoteGroups }) => 
           <TableCell>Cargo</TableCell>
           <TableCell>Commodities</TableCell>
           <TableCell>Issue Date</TableCell>
-          <TableCell align="right">Actions</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>

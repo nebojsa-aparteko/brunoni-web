@@ -8,6 +8,7 @@ export default {
     '&$hover': {
       '&:hover': {
         backgroundColor: palette.background.default,
+        cursor: 'pointer',
       },
     },
   },
