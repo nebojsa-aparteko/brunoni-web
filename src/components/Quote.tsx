@@ -108,19 +108,9 @@ const Quote: React.FC<Props> = ({ id }) => {
 
   const quoteGroup = (quoteGroups || []).find(group => Boolean(group.quotes.find(quote => quote.id === id)));
 
-  if (!quoteGroup) {
-    return (
-      <SearchEmptyResults
-        message={
-          'Quote group that you are trying to get cannot be found. Please try going back to quotes page and selecting the quote form there.'
-        }
-      />
-    );
-  }
+  const quote = quoteGroup?.quotes.find(quote => quote.id === id);
 
-  const quote = quoteGroup.quotes.find(quote => quote.id === id);
-
-  if (!quote) {
+  if (!quoteGroup || !quote) {
     return (
       <SearchEmptyResults
         message={
