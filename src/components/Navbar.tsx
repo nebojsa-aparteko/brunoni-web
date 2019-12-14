@@ -79,6 +79,10 @@ const useStyles = makeStyles((theme: Theme) =>
         marginTop: theme.spacing(2),
       },
     },
+    goToQuote: {
+      marginTop: theme.spacing(0.5),
+      width: 120,
+    },
     input: {
       margin: theme.spacing(1),
     },
@@ -195,6 +199,27 @@ const Navbar: React.FC = () => {
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
+                <FormControl>
+                  <Input
+                    id="gotoquoteinput"
+                    placeholder="Quote # "
+                    onKeyDown={handleGoToQuoteOnKeyDown}
+                    className={classes.goToQuote}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton aria-label="toggle password visibility" onClick={handleGoToQuoteButtonClick}>
+                          <LaunchIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    aria-describedby="gotoquoteinput-helper-text"
+                    inputRef={gotQuoteInputRef}
+                    inputProps={{
+                      'aria-label': 'Go to quote',
+                    }}
+                    margin="dense"
+                  />
+                </FormControl>
                 {user !== undefined && user !== null ? (
                   userRecord ? (
                     <div className={classes.item}>
@@ -202,28 +227,7 @@ const Navbar: React.FC = () => {
                         Get Quote
                       </Button>
                     </div>
-                  ) : (
-                    <FormControl>
-                      <Input
-                        id="gotoquoteinput"
-                        placeholder="Type in Quote # "
-                        onKeyDown={handleGoToQuoteOnKeyDown}
-                        endAdornment={
-                          <InputAdornment position="end">
-                            <IconButton aria-label="toggle password visibility" onClick={handleGoToQuoteButtonClick}>
-                              <LaunchIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        }
-                        aria-describedby="gotoquoteinput-helper-text"
-                        inputRef={gotQuoteInputRef}
-                        inputProps={{
-                          'aria-label': 'Go to quote',
-                        }}
-                        margin="dense"
-                      />
-                    </FormControl>
-                  )
+                  ) : null
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">
