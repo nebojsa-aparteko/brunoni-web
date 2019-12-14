@@ -6,6 +6,7 @@ export const europeanCountries = ['germany', 'netherlands', 'italy', 'belgium', 
 // for some cities there should be only <<CITY_NAME>> PORT displayed as available option and other options filtered
 export const doNotShowCities = [
   'antwerp',
+  'basel',
   'antwerpen',
   'beveren - verrebroek',
   'doel',
