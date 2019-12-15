@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useRef } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import changeCase from 'change-case';
 import { useHistory } from 'react-router';
 import {
@@ -29,15 +29,14 @@ import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Divider from '@material-ui/core/Divider';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
-import Collapse from '@material-ui/core/Collapse';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import firebase from '../firebase';
 import { useSnackbar } from 'notistack';
 import LoginDialog from '../contexts/LoginDialog';
-import IOSSwitch from './IOSSwitch';
 import ActingAs from '../contexts/ActingAs';
 import LaunchIcon from '@material-ui/icons/Launch';
+import Mousetrap from 'mousetrap';
+import focusAndSelect from '../utilities/focusAndSelect';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,12 +107,24 @@ const Navbar: React.FC = () => {
   const { open } = useContext(LoginDialog);
 
   const { enqueueSnackbar } = useSnackbar();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
-  const gotQuoteInputRef = useRef<HTMLInputElement>();
+  const gotoQuoteInputRef = useRef<HTMLInputElement>();
 
   const history = useHistory();
+
+  useEffect(() => {
+    const focusGoToQuote = () => {
+      focusAndSelect(gotoQuoteInputRef.current!);
+    };
+
+    Mousetrap.bind(['ctrl+g', 'command+k'], focusGoToQuote);
+
+    return () => {
+      Mousetrap.unbind(['ctrl+g', 'command+k']);
+    };
+  }, [gotoQuoteInputRef]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -137,13 +148,12 @@ const Navbar: React.FC = () => {
 
   const handleGoToQuoteOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.keyCode == 13) {
-      console.log(gotQuoteInputRef.current?.value);
-      history.push(`/quotes/${gotQuoteInputRef.current?.value}`);
+      history.push(`/quotes/${gotoQuoteInputRef.current?.value}`);
     }
   };
 
   const handleGoToQuoteButtonClick = () => {
-    history.push(`/quotes/${gotQuoteInputRef.current?.value}`);
+    history.push(`/quotes/${gotoQuoteInputRef.current?.value}`);
   };
 
   return (
@@ -213,7 +223,7 @@ const Navbar: React.FC = () => {
                       </InputAdornment>
                     }
                     aria-describedby="gotoquoteinput-helper-text"
-                    inputRef={gotQuoteInputRef}
+                    inputRef={gotoQuoteInputRef}
                     inputProps={{
                       'aria-label': 'Go to quote',
                     }}

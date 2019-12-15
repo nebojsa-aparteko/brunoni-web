@@ -35,6 +35,7 @@ import { useSnackbar } from 'notistack';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
 import Meta from '../components/Meta';
 import { europeanCountries } from '../utilities/pickupDropOffHelperData';
+import focusAndSelect from '../utilities/focusAndSelect';
 
 interface Props {}
 
@@ -57,11 +58,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(2),
   },
 }));
-
-const focusAndSelect = (input: HTMLInputElement) => {
-  input.focus();
-  input.setSelectionRange(0, input.value.length);
-};
 
 const checkIfPortsInEurope = (originPort: Port | undefined, destinationPort: Port | undefined) => {
   return (
@@ -106,10 +102,9 @@ const GetQuotes: React.FC<Props> = () => {
   }, [originInput, destinationInput, originPort, destinationPort]);
 
   useEffect(() => {
-    const focusSearch = () =>
-      setTimeout(() => {
-        focusAndSelect(originInput.current!);
-      });
+    const focusSearch = () => {
+      focusAndSelect(originInput.current!);
+    };
 
     Mousetrap.bind('g s', focusSearch);
 
