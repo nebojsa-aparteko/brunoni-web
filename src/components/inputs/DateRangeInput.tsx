@@ -1,10 +1,10 @@
 import 'date-fns';
 import React, { useState, Fragment, useEffect } from 'react';
-import { DateRangePicker, DateRange } from '@matharumanpreet00/react-daterange-picker';
+import { DateRangePicker } from '../DateRangePicker';
+import { DateRange, DefinedRange } from '../DateRangePicker/types';
 import { ClickAwayListener, FormControl, Input, InputAdornment, Popover, useTheme } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import DateRangeIcon from '@material-ui/icons/DateRange';
-import { DefinedRange } from '@matharumanpreet00/react-daterange-picker/build';
 import subDays from 'date-fns/subDays';
 import startOfMonth from 'date-fns/startOfMonth';
 import startOfYear from 'date-fns/startOfYear';

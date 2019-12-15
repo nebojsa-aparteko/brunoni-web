@@ -30,7 +30,7 @@ import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
 import DateRangeInput from './inputs/DateRangeInput';
 import ContainerWrapper from './Container';
-import { DateRange } from '@matharumanpreet00/react-daterange-picker/build';
+import { DateRange } from '../components/DateRangePicker/types';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 
