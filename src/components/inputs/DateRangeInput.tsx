@@ -12,7 +12,6 @@ import lastDayOfMonth from 'date-fns/lastDayOfMonth';
 import subMonths from 'date-fns/subMonths';
 import get from 'lodash/fp/get';
 import formatDate from 'date-fns/format';
-import addDays from 'date-fns/addDays';
 
 interface Props {
   value?: DateRange;
@@ -120,7 +119,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
       >
         <ClickAwayListener onClickAway={handleClickAway}>
           <DateRangePicker
-            open
+            open={open}
             initialDateRange={dateRangeValue}
             onChange={range => onRangeChange(range)}
             definedRanges={rangePredefinedValues}
