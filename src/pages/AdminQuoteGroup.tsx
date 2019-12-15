@@ -8,7 +8,7 @@ interface Props extends RouteComponentProps<{ id: string }> {}
 const AdminQuoteGroup: React.FC<Props> = ({ match }) => (
   <Fragment>
     <Meta title="Quotes" />
-    <QuoteGroupView id={match.params.id} />
+    <QuoteGroupView id={match.params.id} showCompanyInfo />
   </Fragment>
 );
 

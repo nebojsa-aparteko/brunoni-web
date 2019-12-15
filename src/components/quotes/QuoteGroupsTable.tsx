@@ -132,9 +132,6 @@ const QuoteGroupsBodySekeleton: React.FC = () => (
         <TableCell>
           <Skeleton width={140} height={16} style={{ margin: 0 }} />
         </TableCell>
-        <TableCell align="right">
-          <Skeleton width={64} height={29} style={{ margin: 0, float: 'right' }} />
-        </TableCell>
       </TableRow>
     ))}
   </Fragment>

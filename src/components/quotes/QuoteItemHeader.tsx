@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useContext, useMemo, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
+import UserRecords from '../../contexts/UserRecords';
 
 interface Props {
   quote: Quote;
   userData: UserRecord;
+  showCompanyInfo?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -50,9 +52,10 @@ interface TableRowProps {
   label: string;
   content: string;
   className?: any;
+  showCompanyInfo?: boolean;
 }
 
-const TableRowData: React.FC<TableRowProps> = ({ label, content, className }) => {
+const TableRowData: React.FC<TableRowProps> = ({ label, content, className, showCompanyInfo }) => {
   const classes = useStyles();
   return (
     <TableRow className={classes.tableRow}>
@@ -62,8 +65,33 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content, className }) =>
   );
 };
 
-const QuoteItemHeader: React.FC<Props> = ({ quote, userData }) => {
+const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) => {
   const classes = useStyles();
+  const users = useContext(UserRecords);
+
+  const clientInfo = useMemo(() => {
+    if (!showCompanyInfo) {
+      return (
+        <TableRowData
+          label="Quote For"
+          content={userData?.company.name.toUpperCase() + ', ' + userData?.company.city.toUpperCase()}
+          className={classes.tableCellQuoteUserData}
+        />
+      );
+    }
+    const user = users?.find(user => user.alphacomClientId === quote.clientId);
+
+    return (
+      <Fragment>
+        <TableRowData
+          label="Quote For"
+          content={user ? user.company.name + ', ' + user.company.city : quote.clientId}
+        />
+        <TableRowData label="" content="" />
+      </Fragment>
+    );
+  }, [showCompanyInfo, users, quote]);
+
   return (
     <Table size="small" aria-label="a dense table">
       <colgroup>
@@ -71,11 +99,8 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData }) => {
         <col style={{ width: '60%' }} />
       </colgroup>
       <TableBody>
-        <TableRowData
-          label="Quote For"
-          content={userData?.company.name.toUpperCase() + ', ' + userData?.company.city.toUpperCase()}
-          className={classes.tableCellQuoteUserData}
-        />
+        {clientInfo}
+
         <TableRowData label="" content="" />
         <TableRowData label="Quote Number" content={quote.id} />
         <TableRowData label="Quote Date" content={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />

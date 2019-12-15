@@ -48,9 +48,12 @@ import QuoteGroups from '../contexts/QuoteGroups';
 import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 import { portLongFormatLabel, portShortFormatLabel } from '../utilities/formattedPortDisplay';
+import UserRecords from '../contexts/UserRecords';
+import { useHistory } from 'react-router';
 
 interface Props {
   id: string;
+  showCompanyInfo?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -156,7 +159,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   );
 };
 
-const QuoteGroup: React.FC<Props> = ({ id }) => {
+const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
   const quoteGroups = useContext(QuoteGroups);
@@ -178,6 +181,25 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
       setSelectedPanel(quotesByCarrier[0][0]);
     }
   }, [quoteGroup]);
+
+  const users = useContext(UserRecords);
+
+  const clientInfo = useMemo(() => {
+    if (!showCompanyInfo) {
+      return null;
+    }
+
+    const user = users?.find(user => user.alphacomClientId === quoteGroup?.quotes[0].clientId);
+
+    return (
+      <Box mt={2} mb={2}>
+        <Typography variant="body2">
+          <span style={{ fontWeight: 700 }}>Quote for: </span>{' '}
+          {user ? user.company.name + ', ' + user.company.city : quoteGroup?.quotes[0].clientId}
+        </Typography>
+      </Box>
+    );
+  }, [showCompanyInfo, users, quoteGroup]);
 
   if (!quoteGroup) {
     return (
@@ -206,6 +228,7 @@ const QuoteGroup: React.FC<Props> = ({ id }) => {
         </Box>
 
         <Box mx={2} mt={2} mb={6}>
+          {clientInfo}
           <Grid container spacing={2}>
             {quoteGroup.containers.map((container, i) => (
               <Grid item key={i}>

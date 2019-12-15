@@ -34,6 +34,7 @@ import changeCase from 'change-case';
 
 interface Props {
   id: string;
+  showCompanyInfo?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -87,7 +88,7 @@ function ScrollToTopOnMount() {
   return null;
 }
 
-const Quote: React.FC<Props> = ({ id }) => {
+const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
   const quoteGroups = useContext(QuoteGroups);
@@ -171,7 +172,7 @@ const Quote: React.FC<Props> = ({ id }) => {
           <Page title="Quotation">
             <Grid container spacing={2}>
               <Grid item md={6} xs={12} className={classes.hidePrint}>
-                <QuoteItemHeader quote={quote} userData={userData} />
+                <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
               </Grid>
               <Grid item md={6} xs={12} className={classes.hidePrint}>
                 <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
