@@ -87,6 +87,7 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
           label="Quote For"
           content={user ? user.company.name + ', ' + user.company.city : quote.clientId}
         />
+        <TableRowData label="Requested By" content={user ? user.alphacomId : quote.clientId} />
         <TableRowData label="" content="" />
       </Fragment>
     );

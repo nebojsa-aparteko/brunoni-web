@@ -1,7 +1,7 @@
 import 'date-fns';
 import React, { useState, Fragment, useEffect } from 'react';
 import { DateRangePicker, DateRange } from '@matharumanpreet00/react-daterange-picker';
-import { FormControl, Input, InputAdornment, Popover, useTheme } from '@material-ui/core';
+import { ClickAwayListener, FormControl, Input, InputAdornment, Popover, useTheme } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import { DefinedRange } from '@matharumanpreet00/react-daterange-picker/build';
@@ -76,11 +76,15 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
 
   const handleOpenButton = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setAnchorEl(event.currentTarget);
-    setOpen(!open);
+    setOpen(true);
   };
 
   const onRangeChange = (range: DateRange) => {
     setDateRangeValue(range);
+    setOpen(!open);
+  };
+
+  const handleClickAway = () => {
     setOpen(false);
   };
 
@@ -99,6 +103,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
           value={labelValue}
         />
       </FormControl>
+
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -113,13 +118,15 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
         onClose={handlePopoverClose}
         disableRestoreFocus
       >
-        <DateRangePicker
-          open={true}
-          initialDateRange={dateRangeValue}
-          onChange={range => onRangeChange(range)}
-          definedRanges={rangePredefinedValues}
-          maxDate={new Date()}
-        />
+        <ClickAwayListener onClickAway={handleClickAway}>
+          <DateRangePicker
+            open
+            initialDateRange={dateRangeValue}
+            onChange={range => onRangeChange(range)}
+            definedRanges={rangePredefinedValues}
+            maxDate={new Date()}
+          />
+        </ClickAwayListener>
       </Popover>
     </Fragment>
   );
