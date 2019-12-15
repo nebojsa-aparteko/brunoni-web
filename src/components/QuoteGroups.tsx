@@ -28,6 +28,11 @@ import { QuoteListContext } from '../contexts/QuoteListContext';
 import SynchronizeButton from './SynchronizeButton';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
+import DateRangeInput from './inputs/DateRangeInput';
+import ContainerWrapper from './Container';
+import { DateRange } from '@matharumanpreet00/react-daterange-picker/build';
+import compareAsc from 'date-fns/compareAsc';
+import compareDesc from 'date-fns/compareDesc';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -69,6 +74,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
+  const [dateRange, setDateRange] = useState<DateRange>();
+
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
 
   const { searchString, page, rowsPerPage } = quoteListContextData;
@@ -79,8 +86,13 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
+    const dateFilteredQuoteGroups = filter(
+      (quoteGroup: QuoteGroup) =>
+        compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
+        compareDesc(quoteGroup.dateIssued, dateRange?.endDate || new Date()) !== -1,
+    )(quoteGroups);
     const filteredResults =
-      searchString && searchString.length > 0 && quoteGroups
+      searchString && searchString.length > 0 && dateFilteredQuoteGroups
         ? filter(
             (quoteGroup: QuoteGroup) =>
               containsString(quoteGroup.id, searchString) ||
@@ -98,8 +110,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               find((quote: Quote) => {
                 return quote.carrier ? containsString(quote.carrier.id, searchString) : false;
               })(quoteGroup.quotes) !== undefined,
-          )(quoteGroups)
-        : quoteGroups;
+          )(dateFilteredQuoteGroups)
+        : dateFilteredQuoteGroups;
 
     const sortedFiltered = orderBy(
       [get('dateIssued'), flow(get('sortingId'), padStart(10))],
@@ -107,7 +119,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     )(filteredResults);
     setFilteredResults(sortedFiltered);
     return chunk(rowsPerPage)(sortedFiltered);
-  }, [quoteGroups, searchString, page, rowsPerPage]);
+  }, [quoteGroups, searchString, page, rowsPerPage, dateRange]);
 
   const setPage = (page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));
@@ -129,46 +141,56 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     }
   };
 
+  const handleDateRangeChange = (dateRange: DateRange) => {
+    setDateRange(dateRange);
+  };
+
   return (
-    <Card className={className} {...rest}>
-      <CardHeader
-        action={showGetQuoteButton && <GetQuotesButton />}
-        title={
-          <Box display="flex" alignItems="center">
-            <Typography variant="subtitle1" display="inline">
-              Quotes
-            </Typography>
-            <Box mx={1} my={-1}>
-              <SynchronizeButton collection="quotes" />
+    <ContainerWrapper>
+      <Box display="flex" flexDirection="row-reverse" mb={2}>
+        <DateRangeInput onChange={handleDateRangeChange} />
+      </Box>
+
+      <Card className={className} {...rest}>
+        <CardHeader
+          action={showGetQuoteButton && <GetQuotesButton />}
+          title={
+            <Box display="flex" alignItems="center">
+              <Typography variant="subtitle1" display="inline">
+                Quotes
+              </Typography>
+              <Box mx={1} my={-1}>
+                <SynchronizeButton collection="quotes" />
+              </Box>
+              <Box flex={1} />
+              <Search
+                onSearch={handleSearch}
+                style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
+              />
             </Box>
-            <Box flex={1} />
-            <Search
-              onSearch={handleSearch}
-              style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
-            />
-          </Box>
-        }
-      />
-      <CardContent className={classes.content}>
-        <QuoteGroupsTable
-          showCompanyInfo={showCompanyInfo}
-          quoteGroups={resultChunks && (get(page)(resultChunks) || [])}
+          }
         />
-      </CardContent>
-      <CardActions className={classes.actions}>
-        {quoteGroups && quoteGroups.length > 0 && (
-          <TablePagination
-            component="div"
-            count={filteredResults ? filteredResults.length : 0}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[5, 10, 25]}
+        <CardContent className={classes.content}>
+          <QuoteGroupsTable
+            showCompanyInfo={showCompanyInfo}
+            quoteGroups={resultChunks && (get(page)(resultChunks) || [])}
           />
-        )}
-      </CardActions>
-    </Card>
+        </CardContent>
+        <CardActions className={classes.actions}>
+          {quoteGroups && quoteGroups.length > 0 && (
+            <TablePagination
+              component="div"
+              count={filteredResults ? filteredResults.length : 0}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
+          )}
+        </CardActions>
+      </Card>
+    </ContainerWrapper>
   );
 };
 
