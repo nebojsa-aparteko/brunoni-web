@@ -105,13 +105,13 @@ const EquipmentSituation: React.FC<Props> = () => {
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
                 <Grid container spacing={3}>
-                  <Grid item xs={6}>
+                  <Grid item sm={12} xs={12} md={6}>
                     <Typography variant="h5" gutterBottom>
                       Import
                     </Typography>
                     {sideCharges!.importCharges.map(renderCharges)}
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item sm={12} xs={12} md={6}>
                     <Typography variant="h5" gutterBottom>
                       Export
                     </Typography>
