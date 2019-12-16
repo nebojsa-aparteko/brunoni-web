@@ -1,6 +1,4 @@
 import React, { ChangeEvent } from 'react';
-import { useLocation } from 'react-router';
-import queryString from 'querystring';
 import classNames from 'classnames';
 import {
   Theme,
@@ -62,9 +60,6 @@ function removeAt(index: number) {
 const TableInput: React.FC<Props> = ({ value, onChange }) => {
   const classes = useStyles();
 
-  const location = useLocation();
-  const allowFlexibleColumns = queryString.parse(location.search.slice(1)).su === 'true';
-
   const { columns, rows } = value;
 
   const handleAddColumn = () =>
@@ -102,24 +97,20 @@ const TableInput: React.FC<Props> = ({ value, onChange }) => {
                   value={column || ''}
                   onChange={handleUpdateColumn(j)}
                 />
-                {allowFlexibleColumns && (
-                  <Tooltip title="Remove column">
-                    <IconButton aria-label="Remove column" onClick={handleRemoveColumn(j)} className={classes.button}>
-                      <RemoveCircleOutlineIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                <Tooltip title="Remove column">
+                  <IconButton aria-label="Remove column" onClick={handleRemoveColumn(j)} className={classes.button}>
+                    <RemoveCircleOutlineIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </TableCell>
           ))}
           <TableCell className={classNames(classes.tableCell, classes.lastTableCell)}>
-            {allowFlexibleColumns && (
-              <Tooltip title="Add column">
-                <IconButton aria-label="Add column" onClick={handleAddColumn} className={classes.button}>
-                  <ArrowForwardIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+            <Tooltip title="Add column">
+              <IconButton aria-label="Add column" onClick={handleAddColumn} className={classes.button}>
+                <ArrowForwardIcon />
+              </IconButton>
+            </Tooltip>
           </TableCell>
         </TableRow>
       </TableHead>
