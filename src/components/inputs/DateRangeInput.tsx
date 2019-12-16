@@ -12,6 +12,7 @@ import lastDayOfMonth from 'date-fns/lastDayOfMonth';
 import subMonths from 'date-fns/subMonths';
 import get from 'lodash/fp/get';
 import formatDate from 'date-fns/format';
+import useLocalStorage from '../../utilities/useLocalStorage';
 
 interface Props {
   value?: DateRange;
@@ -55,7 +56,12 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
 };
 
 const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
-  const [dateRangeValue, setDateRangeValue] = useState<DateRange | undefined>(value || rangePredefinedValues[0]);
+  const [dateRangeValue, setDateRangeValue] = useLocalStorage(
+    'dateRangeInput',
+    value || rangePredefinedValues[0],
+    false,
+    -1,
+  );
 
   const [labelValue, setLabelValue] = useState(getLabelValue(value || rangePredefinedValues[0]));
 
