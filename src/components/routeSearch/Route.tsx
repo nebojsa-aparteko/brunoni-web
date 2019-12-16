@@ -173,7 +173,7 @@ const Route: React.FC<Props> = ({ route }) => {
   const popoverId = popoverOpen ? 'simple-popover' : undefined;
 
   return (
-    <Box>
+    <Box mb={2}>
       <ExpansionPanel
         TransitionProps={{ unmountOnExit: true }}
         disabled={disabled}
