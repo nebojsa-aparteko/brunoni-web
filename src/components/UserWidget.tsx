@@ -4,7 +4,7 @@ import changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 
 import { useSnackbar } from 'notistack';
-import { Box, Chip, Menu, MenuItem, Typography } from '@material-ui/core';
+import { Box, Chip, makeStyles, Menu, MenuItem, Theme, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 
@@ -17,7 +17,20 @@ interface Props {
   active: boolean;
 }
 
+const useStyles = makeStyles((theme: Theme) => ({
+  chip: {
+    '& > span': {
+      display: 'block',
+      maxWidth: '10em',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+  },
+}));
+
 const UserWidget: React.FC<Props> = ({ active }) => {
+  const classes = useStyles();
   const history = useHistory();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
@@ -64,6 +77,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
           aria-haspopup="true"
           label={user?.email || '???'}
           onClick={handleProfileMenuOpen}
+          className={classes.chip}
         />
       )}
       <Menu
