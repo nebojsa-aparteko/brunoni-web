@@ -99,6 +99,9 @@ const useStyles = makeStyles((theme: Theme) =>
     nested: {
       paddingLeft: theme.spacing(4),
     },
+    menu: {
+      textTransform: 'uppercase',
+    },
   }),
 );
 
@@ -200,6 +203,7 @@ const Navbar: React.FC = () => {
                       keepMounted
                       open={Boolean(anchorEl)}
                       onClose={handleMenuClose}
+                      className={classes.menu}
                     >
                       <MenuItem onClick={handleMenuClose} component={props => <Link {...props} to="/equipment" />}>
                         Equipment Situation
