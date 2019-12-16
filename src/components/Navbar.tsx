@@ -18,7 +18,7 @@ import {
   InputAdornment,
   Input,
   FormControl,
-  InputLabel,
+  Menu,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -37,6 +37,8 @@ import ActingAs from '../contexts/ActingAs';
 import LaunchIcon from '@material-ui/icons/Launch';
 import Mousetrap from 'mousetrap';
 import focusAndSelect from '../utilities/focusAndSelect';
+import MenuItem from '@material-ui/core/MenuItem';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -106,6 +108,7 @@ const Navbar: React.FC = () => {
   const [userRecord] = useContext(ActingAs);
   const { open } = useContext(LoginDialog);
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -130,20 +133,12 @@ const Navbar: React.FC = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleClick = () => {
-    setOpenDrawer(!openDrawer);
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const handleLogOut = async () => {
-    try {
-      await firebase.auth().signOut();
-      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, { variant: 'info' });
-    } catch (e) {
-      console.error('Unable to sign out', e);
-      enqueueSnackbar(<Typography color="inherit">Error occurred while trying to sign you out.</Typography>, {
-        variant: 'error',
-      });
-    }
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   const handleGoToQuoteOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -187,16 +182,32 @@ const Navbar: React.FC = () => {
                         Quotes
                       </Button>
                     </div>
+
                     <div className={classes.item}>
-                      <Button component={Link} to="/equipment" underline="none">
+                      <Button
+                        endIcon={<KeyboardArrowDownIcon />}
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={handleMenuClick}
+                      >
+                        Other
+                      </Button>
+                    </div>
+
+                    <Menu
+                      id="simple-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleMenuClose} component={props => <Link {...props} to="/equipment" />}>
                         Equipment Situation
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/charges" underline="none">
+                      </MenuItem>
+                      <MenuItem onClick={handleMenuClose} component={props => <Link {...props} to="/charges" />}>
                         Side Charges
-                      </Button>
-                    </div>
+                      </MenuItem>
+                    </Menu>
                   </Fragment>
                 )}
                 {userRecord === null && (
