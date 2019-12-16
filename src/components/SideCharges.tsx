@@ -1,7 +1,5 @@
-import React, { Fragment, useCallback, useContext, useMemo } from 'react';
-import classNames from 'classnames';
+import React, { useCallback, useContext } from 'react';
 import get from 'lodash/fp/get';
-import identity from 'lodash/fp/identity';
 import {
   Theme,
   makeStyles,
@@ -13,9 +11,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Avatar,
-  colors,
-  Tooltip,
   Grid,
   ExpansionPanel,
   ExpansionPanelSummary,
@@ -32,8 +27,6 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
     textTransform: 'uppercase',
   },
   tableRow: {
@@ -58,28 +51,36 @@ const EquipmentSituation: React.FC<Props> = () => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
 
+  const [expanded, setExpanded] = React.useState<string | false>(false);
+
+  const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => {
+    setExpanded(newExpanded ? panel : false);
+  };
+
   const renderCharges = useCallback(
     (charges: SideCharge, i: number) => (
-      <Paper key={i} className={classes.overflowTable}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              {charges.columns.map((column, j) => (
-                <TableCell key={j}>{column}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {charges.rows.map((row, i) => (
-              <TableRow key={i} className={classes.tableRow}>
-                {charges.columns.map((_, j) => (
-                  <TableCell key={j}>{row.values[j]}</TableCell>
+      <Box my={2}>
+        <Paper key={i} className={classes.overflowTable}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                {charges.columns.map((column, j) => (
+                  <TableCell key={j}>{column}</TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableHead>
+            <TableBody>
+              {charges.rows.map((row, i) => (
+                <TableRow key={i} className={classes.tableRow}>
+                  {charges.columns.map((_, j) => (
+                    <TableCell key={j}>{row.values[j]}</TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Box>
     ),
     [classes],
   );
@@ -91,26 +92,34 @@ const EquipmentSituation: React.FC<Props> = () => {
           Side Charges
         </Typography>
       </Box>
-      <Box mb={12}>
+      <Box my={4}>
         {carriers &&
           carriers.filter(get('sideCharges')).map(({ id, name, sideCharges }) => (
-            <Box key={id} my={5}>
-              <Box p={2}>
-                <Typography variant="h4">{name || id}</Typography>
-              </Box>
-              <Box>
-                <Grid container spacing={2}>
+            <ExpansionPanel expanded={expanded === (name || id)} onChange={handleChange(name || id)}>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography className={classes.heading}>{name || id}</Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <Grid container spacing={3}>
                   <Grid item xs={6}>
-                    <Typography variant="h5">Import</Typography>
+                    <Typography variant="h5" gutterBottom>
+                      Import
+                    </Typography>
                     {sideCharges!.importCharges.map(renderCharges)}
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="h5">Export</Typography>
+                    <Typography variant="h5" gutterBottom>
+                      Export
+                    </Typography>
                     {sideCharges!.exportCharges.map(renderCharges)}
                   </Grid>
                 </Grid>
-              </Box>
-            </Box>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
           ))}
       </Box>
     </Container>
