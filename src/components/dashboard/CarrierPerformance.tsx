@@ -37,7 +37,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     const values = flow(
       performanceByCarrierByYear(year),
       toPairs,
-      map(update(0, carrierId => carriers?.find(carrier => carrier.id === carrierId))),
+      map(update(0, carrierId => carriers?.find(carrier => carrier.id === carrierId) || { name: carrierId })),
       filter(get(1)),
     )(clientPerformance);
 
@@ -89,7 +89,7 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           const value = data['datasets'][0]['data'][tooltipItem['index']];
 
           return `${label}: ${value} (${
-            value / data.total < 0.5 ? (value / data.total).toFixed(3) : Math.round((value / data.total) * 100)
+            value / data.total < 0.005 ? (value / data.total).toFixed(3) : Math.round((value / data.total) * 100)
           }%)`;
         },
       },
