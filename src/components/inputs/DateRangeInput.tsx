@@ -2,7 +2,7 @@ import 'date-fns';
 import React, { useState, Fragment, useEffect } from 'react';
 import { DateRangePicker } from '../DateRangePicker';
 import { DateRange, DefinedRange } from '../DateRangePicker/types';
-import { ClickAwayListener, FormControl, Input, InputAdornment, Popover, useTheme } from '@material-ui/core';
+import { ClickAwayListener, FormControl, Input, InputAdornment, Popover } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import subDays from 'date-fns/subDays';
@@ -39,8 +39,8 @@ const rangePredefinedValues: DefinedRange[] = [
     endDate: lastDayOfMonth(subMonths(new Date(), 1)),
   },
   {
-    label: 'Last 90 Days',
-    startDate: startOfMonth(subMonths(new Date(), 3)),
+    label: 'Last 3 Months',
+    startDate: startOfMonth(subMonths(new Date(), 2)),
     endDate: new Date(),
   },
   {
