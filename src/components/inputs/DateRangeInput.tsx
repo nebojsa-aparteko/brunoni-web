@@ -39,6 +39,11 @@ const rangePredefinedValues: DefinedRange[] = [
     endDate: lastDayOfMonth(subMonths(new Date(), 1)),
   },
   {
+    label: 'Last 90 Days',
+    startDate: startOfMonth(subMonths(new Date(), 3)),
+    endDate: new Date(),
+  },
+  {
     label: 'This Year',
     startDate: startOfYear(new Date()),
     endDate: new Date(),
