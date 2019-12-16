@@ -119,10 +119,10 @@ const Navbar: React.FC = () => {
       focusAndSelect(gotoQuoteInputRef.current!);
     };
 
-    Mousetrap.bind(['ctrl+g', 'command+k'], focusGoToQuote);
+    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], focusGoToQuote);
 
     return () => {
-      Mousetrap.unbind(['ctrl+g', 'command+k']);
+      Mousetrap.unbind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q']);
     };
   }, [gotoQuoteInputRef]);
 
