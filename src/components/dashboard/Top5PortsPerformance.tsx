@@ -22,6 +22,7 @@ import filter from 'lodash/fp/filter';
 import Port from '../../model/Port';
 import TextSkeleton from '../TextSkeleton';
 import match from 'autosuggest-highlight/match';
+import logAs from '../../utilities/logAs';
 
 interface Props {
   clientPerformance: any;
@@ -88,10 +89,14 @@ const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
         toPairs,
         orderBy(1, 'desc'),
         slice(0, 5),
+        logAs('ports'),
         map(([key, value]: [any, any]) => {
           if (ports) {
             const portDetails: Port = filter((element: any) => element.id === key)(ports)[0];
-            return [`${portDetails.city}, ${replaceAll(portDetails.country, shortenedCountries)}`, value];
+            return [
+              portDetails ? `${portDetails.city}, ${replaceAll(portDetails.country, shortenedCountries)}` : key,
+              value,
+            ];
           } else return [key, value];
         }),
       ),

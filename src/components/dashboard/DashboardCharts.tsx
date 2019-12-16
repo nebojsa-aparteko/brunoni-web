@@ -21,7 +21,7 @@ const DashboardCharts: React.FC = () => {
     setYear(event.target.value as number);
   };
 
-  return (
+  return clientPerformance ? (
     <Page title="Analytics Dashboard">
       <Box my={2}>
         <Grid container justify="flex-end">
@@ -71,7 +71,7 @@ const DashboardCharts: React.FC = () => {
         </Grid>
       </Grid>
     </Page>
-  );
+  ) : null;
 };
 
 export default DashboardCharts;
