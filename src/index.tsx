@@ -107,14 +107,14 @@ const UserApp: React.FC = () => {
 const render = (user: firebase.User | null) => {
   const app = (
     <Router>
-      <CookiesNotification />
-      <ScrollToTop />
-      <CssBaseline />
-      <RouteSearchProvider>
-        {user ? (
-          <ThemeProvider theme={theme}>
-            <SnackbarProvider>
-              <LoginDialogProvider>
+      <ThemeProvider theme={theme}>
+        <SnackbarProvider>
+          <LoginDialogProvider>
+            <ScrollToTop />
+            <CssBaseline />
+            <CookiesNotification />
+            <RouteSearchProvider>
+              {user ? (
                 <UserContext.Provider value={user}>
                   <UserRecordProvider>
                     <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
@@ -134,13 +134,7 @@ const render = (user: firebase.User | null) => {
                     </FirestoreCollectionProvider>
                   </UserRecordProvider>
                 </UserContext.Provider>
-              </LoginDialogProvider>
-            </SnackbarProvider>
-          </ThemeProvider>
-        ) : (
-          <ThemeProvider theme={theme}>
-            <SnackbarProvider>
-              <LoginDialogProvider>
+              ) : (
                 <UserContext.Provider value={null}>
                   <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                     <FirestoreCollectionProvider name="ports" context={PortsContext}>
@@ -154,11 +148,11 @@ const render = (user: firebase.User | null) => {
                     </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
                 </UserContext.Provider>
-              </LoginDialogProvider>
-            </SnackbarProvider>
-          </ThemeProvider>
-        )}
-      </RouteSearchProvider>
+              )}
+            </RouteSearchProvider>
+          </LoginDialogProvider>
+        </SnackbarProvider>
+      </ThemeProvider>
     </Router>
   );
 
