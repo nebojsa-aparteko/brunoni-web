@@ -35,7 +35,7 @@ const anonymousRoutes = (
     <Route exact path="/quotes/get" component={Unauthorized} />
     <Route exact path="/quotes/:id" component={Unauthorized} />
     <Route exact path="/equipment" component={Unauthorized} />
-    <Route exact path="/charges" component={Unauthorized} />
+    <Route path="/charges" component={Unauthorized} />
     <Route component={NotFound} />
   </Switch>
 );
@@ -48,7 +48,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
     <Route exact path="/equipment" component={Unauthorized} />
-    <Route exact path="/charges" component={AdminSideCharges} />
+    <Route path="/charges" component={AdminSideCharges} />
     <Route component={NotFound} />
   </Switch>
 );
@@ -62,7 +62,7 @@ const userRoutes = (
     <Route exact path="/quotes/get" component={GetQuotes} />
     <Route exact path="/quotes/:id" component={Quote} />
     <Route exact path="/equipment" component={EquipmentSituation} />
-    <Route exact path="/charges" component={SideCharges} />
+    <Route path="/charges" component={SideCharges} />
     <Route component={NotFound} />
   </Switch>
 );

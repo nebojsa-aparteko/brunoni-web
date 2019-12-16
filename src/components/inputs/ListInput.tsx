@@ -93,7 +93,7 @@ function ListInput<T>({
           </Box>
         </Paper>
       ))}
-      <Box pt={1}>
+      <Box pt={value.length > 0 ? 1 : 0}>
         <Button buttonRef={addButtonRef} variant="contained" size="small" startIcon={<AddIcon />} onClick={handleAdd}>
           {addText ? addText : 'Add'}
         </Button>

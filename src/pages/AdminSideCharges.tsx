@@ -1,15 +1,83 @@
 import React, { Fragment, useContext } from 'react';
-import SideChargesView from '../components/SideCharges';
 import Carriers from '../contexts/Carriers';
 import Meta from '../components/Meta';
+import {
+  Avatar,
+  Box,
+  Grid,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
+import Container from '../components/Container';
+import { makeStyles } from '@material-ui/styles';
+import { Route, RouteComponentProps, Switch } from 'react-router';
+import SideCharges from '../components/admin/SideCharges';
 
-const AdminSideCharges: React.FC = () => {
+const GetStarted: React.FC = () => {
+  return <Typography>Start by selecting one of the carriers</Typography>;
+};
+
+const useStyles = makeStyles((theme: Theme) => ({
+  avatarContainer: {
+    minWidth: 'initial',
+  },
+  avatar: {
+    width: '.75em',
+    height: '.75em',
+    marginRight: theme.spacing(1),
+  },
+}));
+
+const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, match }) => {
+  const classes = useStyles();
   const carriers = useContext(Carriers);
 
   return (
     <Fragment>
       <Meta title="Side Charges" />
-      <SideChargesView carriers={carriers} />
+      <Container>
+        <Box my={2}>
+          <Grid container spacing={2}>
+            <Grid item xs={3}>
+              <Paper>
+                <List dense>
+                  {carriers &&
+                    carriers.map(carrier => {
+                      const path = `/charges/${carrier.id}`;
+                      const selected = location.pathname.startsWith(path);
+                      return (
+                        <ListItem
+                          key={carrier.id}
+                          button
+                          selected={selected}
+                          onClick={() => (selected ? history.push('/charges') : history.push(path))}
+                        >
+                          <ListItemAvatar className={classes.avatarContainer}>
+                            <Avatar className={classes.avatar} style={{ backgroundColor: carrier.color }} />
+                          </ListItemAvatar>
+                          <ListItemText primary={carrier.name.toUpperCase()} />
+                        </ListItem>
+                      );
+                    })}
+                </List>
+              </Paper>
+            </Grid>
+            <Grid item xs={9}>
+              <Paper>
+                <Switch>
+                  <Route path={`${match.path}/:id`} component={SideCharges} />
+                  <Route component={GetStarted} />
+                </Switch>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Box>
+      </Container>
     </Fragment>
   );
 };
