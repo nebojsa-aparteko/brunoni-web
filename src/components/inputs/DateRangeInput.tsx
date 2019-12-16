@@ -54,8 +54,7 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
     : '';
 };
 
-const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false, onOpen, onClose }) => {
-  const [open, setOpen] = useState(isOpen);
+const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
   const [dateRangeValue, setDateRangeValue] = useState<DateRange | undefined>(value || rangePredefinedValues[0]);
 
   const [labelValue, setLabelValue] = useState(getLabelValue(value || rangePredefinedValues[0]));
@@ -75,16 +74,15 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
 
   const handleOpenButton = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setAnchorEl(event.currentTarget);
-    setOpen(true);
   };
 
   const onRangeChange = (range: DateRange) => {
     setDateRangeValue(range);
-    setOpen(!open);
+    setAnchorEl(null);
   };
 
   const handleClickAway = () => {
-    setOpen(false);
+    setAnchorEl(null);
   };
 
   return (
@@ -104,7 +102,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
       </FormControl>
 
       <Popover
-        open={open}
+        open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         anchorOrigin={{
           vertical: 'bottom',
@@ -119,7 +117,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange, open: isOpen = false
       >
         <ClickAwayListener onClickAway={handleClickAway}>
           <DateRangePicker
-            open={open}
+            open
             initialDateRange={dateRangeValue}
             onChange={range => onRangeChange(range)}
             definedRanges={rangePredefinedValues}

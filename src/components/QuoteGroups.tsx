@@ -29,8 +29,7 @@ import SynchronizeButton from './SynchronizeButton';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
 import DateRangeInput from './inputs/DateRangeInput';
-import ContainerWrapper from './Container';
-import { DateRange } from '../components/DateRangePicker/types';
+import { DateRange } from './DateRangePicker/types';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 
@@ -146,8 +145,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   };
 
   return (
-    <ContainerWrapper>
-      <Box display="flex" flexDirection="row-reverse" mb={2}>
+    <Fragment>
+      <Box display="flex" flexDirection="row-reverse" my={2}>
         <DateRangeInput onChange={handleDateRangeChange} />
       </Box>
 
@@ -190,7 +189,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
           )}
         </CardActions>
       </Card>
-    </ContainerWrapper>
+    </Fragment>
   );
 };
 

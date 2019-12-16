@@ -6,7 +6,7 @@ import Meta from '../components/Meta';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: theme.spacing(4),
+    marginTop: theme.spacing(2),
     marginBottom: theme.spacing(4),
   },
 }));
