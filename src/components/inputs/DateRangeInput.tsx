@@ -68,7 +68,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
     -1,
   );
 
-  const [labelValue, setLabelValue] = useState(getLabelValue(value || rangePredefinedValues[0]));
+  const [labelValue, setLabelValue] = useState(getLabelValue(value || rangePredefinedValues[3]));
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
