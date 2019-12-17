@@ -120,23 +120,19 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     return chunk(rowsPerPage)(sortedFiltered);
   }, [quoteGroups, searchString, page, rowsPerPage, dateRange]);
 
-  const setPage = (page: number) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));
   };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-    setPage(page);
-  };
-
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setPage(0);
-    setQuoteListContextData(set('rowsPerPage', parseInt(event.target.value))(quoteListContextData));
+    setQuoteListContextData(
+      flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(quoteListContextData),
+    );
   };
 
   const handleSearch = (searchStringNew: string) => {
     if (searchStringNew !== searchString) {
-      setPage(0);
-      setQuoteListContextData(set('searchString', searchStringNew)(quoteListContextData));
+      setQuoteListContextData(flow(set('searchString', searchStringNew), set('page', 0))(quoteListContextData));
     }
   };
 
