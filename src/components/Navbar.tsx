@@ -214,7 +214,7 @@ const Navbar: React.FC = () => {
                     </Menu>
                   </Fragment>
                 )}
-                {userRecord === null && (
+                {user !== undefined && user !== null && userRecord === null && (
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/quotes/groups" underline="none">
