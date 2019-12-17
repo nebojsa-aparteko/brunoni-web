@@ -31,7 +31,7 @@ const extractContainerAggregatedData = (year: number) =>
     flatten,
     flatten,
     groupBy('Unit'),
-    mapValues(flow(map(flow(get('Amount'), Number)), sum)),
+    mapValues(flow(map(flow(get('AmountTEU'), Number)), sum)),
   );
 
 const useStyles = makeStyles(theme => ({
