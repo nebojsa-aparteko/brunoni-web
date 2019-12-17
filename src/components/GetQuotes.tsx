@@ -36,6 +36,7 @@ import { buildMailToLink } from '../utilities/quoteRequestEmail';
 import Meta from '../components/Meta';
 import { europeanCountries } from '../utilities/pickupDropOffHelperData';
 import focusAndSelect from '../utilities/focusAndSelect';
+import { QuoteListContext } from '../contexts/QuoteListContext';
 
 interface Props {}
 
@@ -96,6 +97,8 @@ const GetQuotes: React.FC<Props> = () => {
   const setContainers = (containers: ContainerModel[]) => onChange(set('containers', containers)(value));
 
   const closeDialog = () => setDialogOpen(false);
+
+  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
 
   useEffect(() => {
     setShowContainerLocations(checkIfPortsInEurope(originPort, destinationPort));
@@ -181,6 +184,7 @@ const GetQuotes: React.FC<Props> = () => {
 
           if (groupId) {
             history.push(`/quotes/groups/${groupId}`);
+            setQuoteListContextData(set('page', 0)(quoteListContextData));
           } else {
             setDialogOpen(true);
           }
