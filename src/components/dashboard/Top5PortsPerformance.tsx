@@ -84,21 +84,11 @@ const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
     groupBy('LocationType'),
     mapValues(
       flow(
-        groupBy('LocationCode'),
+        groupBy('LocationName'),
         mapValues(flow(map(flow(get('Amount'), Number)), sum)),
         toPairs,
         orderBy(1, 'desc'),
         slice(0, 5),
-        logAs('ports'),
-        map(([key, value]: [any, any]) => {
-          if (ports) {
-            const portDetails: Port = filter((element: any) => element.id === key)(ports)[0];
-            return [
-              portDetails ? `${portDetails.city}, ${replaceAll(portDetails.country, shortenedCountries)}` : key,
-              value,
-            ];
-          } else return [key, value];
-        }),
       ),
     ),
   );
