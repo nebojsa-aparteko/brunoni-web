@@ -17,7 +17,7 @@ const AdminQuoteGroups: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Quotes" />
-      <Container maxWidth="lg" className={classes.root}>
+      <Container maxWidth="xl" className={classes.root}>
         <QuoteGroupsView showGetQuoteButton={false} showCompanyInfo />
       </Container>
     </Fragment>

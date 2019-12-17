@@ -11,7 +11,7 @@ import flatten from 'lodash/fp/flatten';
 import groupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/fp/mapValues';
 import keys from 'lodash/fp/keys';
-import filter from 'lodash/fp/filter';
+import find from 'lodash/fp/find';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ChartsCircularProgress from './ChartsCircularProgress';
 
@@ -57,9 +57,10 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
     }
 
     const containerData = extractContainerAggregatedData(year)(clientPerformance);
-    const labels = keys(containerData).map(
-      key => filter((element: any) => element.id === key)(containerTypes)[0]?.description,
-    );
+    const labels = keys(containerData).map(key => {
+      const containerType = find((element: any) => element.id === key)(containerTypes);
+      return containerType ? containerType.description : key;
+    });
     const datasets = [
       {
         data: values(containerData),
@@ -70,6 +71,15 @@ const ContainerTypePerformance: React.FC<Props> = ({ clientPerformance, year }) 
           colors.indigo[400],
           colors.indigo[800],
           colors.indigo[600],
+          colors.red[500],
+          colors.red[100],
+          colors.green[500],
+          colors.green[100],
+          colors.green[800],
+          colors.red[800],
+          colors.blue[100],
+          colors.blue[500],
+          colors.blue[800],
         ],
         borderWidth: 2,
         borderColor: theme.palette.common.white,
