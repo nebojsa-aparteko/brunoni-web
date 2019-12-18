@@ -77,7 +77,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
           {containers &&
             containers.map((container, index) => (
               <Grid item key={index}>
-                {container && <Chip label={container!.containerType?.name} />}
+                {container && <Chip label={container.containerType?.name || container.containerType?.id} />}
               </Grid>
             ))}
         </Grid>
