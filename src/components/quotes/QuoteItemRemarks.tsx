@@ -18,7 +18,7 @@ const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => {
       {remarks.map((remark, i) => (
         <Fragment key={i}>
           <Grid item md={3} sm={4} xs={isPrint ? 4 : 12}>
-            <InfoBoxItem title={remark.RemarkTitle} label1={remark.RemarkLabel} />
+            <InfoBoxItem title={remark.RemarkTitle} label1={{ __html: remark.RemarkLabel }} />
           </Grid>
           <Grid item md={9} sm={8} xs={isPrint ? 8 : 12}>
             <InfoBoxItem
