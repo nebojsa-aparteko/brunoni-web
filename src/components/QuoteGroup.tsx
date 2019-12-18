@@ -47,7 +47,7 @@ import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroups';
 import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
-import { portLongFormatLabel, portShortFormatLabel } from '../utilities/formattedPortDisplay';
+import { portLongFormatLabel, portShortFormatLabel, quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import UserRecords from '../contexts/UserRecords';
 import { useHistory } from 'react-router';
 
@@ -215,14 +215,12 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
     </Container>
   ) : (
     <Fragment>
-      <Meta title={`${portShortFormatLabel(quoteGroup.origin)} - ${portShortFormatLabel(quoteGroup.destination)}`} />
+      <Meta title={quoteRouteLabelDisplay(quoteGroup) || ''} />
       <Container maxWidth="lg">
         <Box mt={6}>
           <QuoteNav
             backTo="/quotes/groups"
-            title={`Quotations - ${portLongFormatLabel(quoteGroup.origin)} - ${portLongFormatLabel(
-              quoteGroup.destination,
-            )}`}
+            title={`Quotations - ${quoteRouteLabelDisplay(quoteGroup)}`}
             subtitle={`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}
           />
         </Box>

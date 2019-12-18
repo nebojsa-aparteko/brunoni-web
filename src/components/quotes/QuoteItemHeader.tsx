@@ -107,8 +107,10 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
         <TableRowData label="Quote Date" content={formatDate(quote.dateIssued, 'd. MMMM yyyy')} />
         {/*<TableRowData label="Quote Reference" content={quote.clientId} />*/}
 
+        {quote.placeOfReceiptName && <TableRowData label="Place of Receipt" content={quote.placeOfReceiptName} />}
         <TableRowData label="Port of Loading" content={portLongFormatLabel(quote.origin)} />
         <TableRowData label="Port of Discharge" content={portLongFormatLabel(quote.destination)} />
+        {quote.placeOfDeliveryName && <TableRowData label="Place of Delivery" content={quote.placeOfDeliveryName} />}
         <TableRowData label="Carrier" content={quote.carrier.name || quote.carrier.id} />
 
         {quote.terms

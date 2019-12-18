@@ -19,7 +19,7 @@ import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
 import UserRecords from '../../contexts/UserRecords';
 import { useHistory } from 'react-router';
-import { portShortFormatLabel } from '../../utilities/formattedPortDisplay';
+import { portShortFormatLabel, quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,16 +35,7 @@ interface RowProps extends QuoteGroup {
   showCompanyInfo?: boolean;
 }
 
-const QuoteGroupRow: React.FC<RowProps> = ({
-  showCompanyInfo,
-  id,
-  dateIssued,
-  origin,
-  destination,
-  containers,
-  commodityTypes,
-  quotes,
-}) => {
+const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, containers, commodityTypes, quotes }) => {
   const classes = useStyles();
   const users = useContext(UserRecords);
   const history = useHistory();
@@ -78,9 +69,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({
       key={id}
     >
       {clientInfo}
-      <TableCell>
-        {portShortFormatLabel(origin)} → {portShortFormatLabel(destination)}
-      </TableCell>
+      <TableCell>{quoteRouteLabelDisplay(quotes[0], true)}</TableCell>
       <TableCell>{uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}</TableCell>
       <TableCell>
         <Grid container spacing={1}>

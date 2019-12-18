@@ -138,7 +138,9 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
         <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
           <QuoteNav
             backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
-            title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${portLongFormatLabel(quote.destination)}`}
+            title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${
+              quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
+            }`}
             subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
           />
 
