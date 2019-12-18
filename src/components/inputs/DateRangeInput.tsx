@@ -76,6 +76,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
   useEffect(() => {
     setLabelValue(getLabelValue(dateRangeValue));
     if (dateRangeValue) {
+      if (dateRangeValue.endDate) dateRangeValue.endDate = endOfDay(dateRangeValue.endDate);
       onChange(dateRangeValue);
     }
   }, [dateRangeValue]);
