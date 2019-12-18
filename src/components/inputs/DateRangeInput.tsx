@@ -63,7 +63,7 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
 const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
   const [dateRangeValue, setDateRangeValue] = useLocalStorage(
     'dateRangeInput',
-    value || rangePredefinedValues[0],
+    value || rangePredefinedValues[3],
     false,
     -1,
   );
