@@ -12,6 +12,7 @@ import MuiOutlinedInput from './MuiOutlinedInput';
 import MuiPaper from './MuiPaper';
 import MuiTableCell from './MuiTableCell';
 import MuiTableHead from './MuiTableHead';
+import MuiTablePagination from './MuiTablePagination';
 import MuiTableRow from './MuiTableRow';
 import MuiToggleButton from './MuiToggleButton';
 import MuiTypography from './MuiTypography';
@@ -32,6 +33,7 @@ export default {
   MuiPaper,
   MuiTableCell,
   MuiTableHead,
+  MuiTablePagination,
   MuiTableRow,
   MuiToggleButton,
   MuiTypography,
