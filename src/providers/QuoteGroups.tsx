@@ -37,7 +37,9 @@ export interface QuoteGroup {
   id: string;
   dateIssued: Date;
   origin?: Port;
+  placeOfDeliveryName?: string;
   destination?: Port;
+  placeOfReceiptName?: string;
   containers: Container[];
   commodityTypes: CommodityType[];
   quotes: Quote[];
@@ -51,7 +53,9 @@ export interface Quote {
   dateIssued: Date;
   validityPeriod: { from: Date; to: Date };
   origin: Port;
+  placeOfDeliveryName?: string;
   destination: Port;
+  placeOfReceiptName?: string;
   containers: Container[];
   commodityTypes?: CommodityType[];
   quoteDetails: QuoteDetail[];

@@ -6,7 +6,7 @@ import isObject from 'lodash/fp/isObject';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import flow from 'lodash/fp/flow';
-import { Box, Grid, Typography, makeStyles, Paper, Theme } from '@material-ui/core';
+import { Box, Grid, makeStyles, Paper, Theme } from '@material-ui/core';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
 import RouteSearchSorting, { Sorting, sortingOptions } from './RouteSearchSorting';
