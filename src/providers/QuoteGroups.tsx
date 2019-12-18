@@ -10,11 +10,9 @@ import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
-import padStart from 'lodash/fp/padStart';
 import flatMap from 'lodash/fp/flatMap';
 import values from 'lodash/fp/values';
 import Context from '../contexts/QuoteGroups';
-import QuotesResult from '../model/quotes/QuotesResult';
 import asArray from '../utilities/asArray';
 import PickupLocation from '../model/PickupLocation';
 import ContainerType from '../model/ContainerType';
@@ -143,6 +141,8 @@ const normalizeQuoteGroups = (
       origin: normalizedQuote.origin,
       destination: normalizedQuote.destination,
       containers: normalizedQuote.containers,
+      placeOfDeliveryName: normalizedQuote.placeOfDeliveryName,
+      placeOfReceiptName: normalizedQuote.placeOfReceiptName,
       commodityTypes: normalizedQuote.commodityTypes,
       quotes: normalizedQuotes,
     };

@@ -93,6 +93,12 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
         ? filter(
             (quoteGroup: QuoteGroup) =>
               containsString(quoteGroup.id, searchString) ||
+              (quoteGroup.quotes[0].placeOfReceiptName
+                ? containsString(quoteGroup.quotes[0].placeOfReceiptName!, searchString)
+                : false) ||
+              (quoteGroup.quotes[0].placeOfDeliveryName
+                ? containsString(quoteGroup.quotes[0].placeOfDeliveryName!, searchString)
+                : false) ||
               find((quote: Quote) => containsString(quote.id, searchString))(quoteGroup.quotes) !== undefined || // search through the quotes for online quotes
               containsString(quoteGroup.origin?.id || '', searchString) ||
               containsString(quoteGroup.origin?.city || '', searchString) ||
