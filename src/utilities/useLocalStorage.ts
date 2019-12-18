@@ -26,7 +26,7 @@ const clearLocalStorageAfter = (lastSavedKey: string, minutes: number) => {
 };
 
 const fixUpDateValue = (value: string, startOfDay: boolean = false) => {
-  return value.length === 10 ? (startOfDay ? value.concat(' 23:59:59') : value.concat(' 00:00:00')) : value;
+  return value.length === 10 ? (startOfDay ? value.concat(' 00:00:00') : value.concat(' 23:59:59')) : value;
 };
 
 const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, timeoutMinutes: number = 5) => {
