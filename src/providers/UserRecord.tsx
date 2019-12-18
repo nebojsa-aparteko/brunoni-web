@@ -22,15 +22,24 @@ const UserProvider: React.FC<Props> = ({ children }) => {
         setUserRecord(null);
         break;
       default:
-        (async () => {
-          setUserRecord(undefined);
-          const userSnapshot = await firebase
-            .firestore()
-            .collection('users')
-            .doc(user.uid)
-            .get();
-          setUserRecord(userSnapshot.data() as UserRecord);
-        })();
+        setUserRecord(undefined);
+        return firebase
+          .firestore()
+          .collection('users')
+          .doc(user.uid)
+          .onSnapshot(
+            {},
+            (snapshot: firebase.firestore.DocumentSnapshot) => {
+              console.debug('userRecord updated with', snapshot);
+              setUserRecord(snapshot.data() as UserRecord);
+            },
+            (error: Error) => {
+              console.error('userRecord threw an error', error);
+            },
+            () => {
+              console.log('userRecord completed');
+            },
+          );
     }
   }, [user, setUserRecord]);
 
