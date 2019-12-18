@@ -12,6 +12,7 @@ import lastDayOfMonth from 'date-fns/lastDayOfMonth';
 import subMonths from 'date-fns/subMonths';
 import get from 'lodash/fp/get';
 import formatDate from 'date-fns/format';
+import endOfDay from 'date-fns/endOfDay';
 import useLocalStorage from '../../utilities/useLocalStorage';
 
 interface Props {
@@ -26,12 +27,12 @@ const rangePredefinedValues: DefinedRange[] = [
   {
     label: 'Last 7 Days',
     startDate: subDays(new Date(), 7),
-    endDate: new Date(),
+    endDate: endOfDay(new Date()),
   },
   {
     label: 'This Month',
     startDate: startOfMonth(new Date()),
-    endDate: new Date(),
+    endDate: endOfDay(new Date()),
   },
   {
     label: 'Last Month',
@@ -41,12 +42,12 @@ const rangePredefinedValues: DefinedRange[] = [
   {
     label: 'Last 3 Months',
     startDate: startOfMonth(subMonths(new Date(), 2)),
-    endDate: new Date(),
+    endDate: endOfDay(new Date()),
   },
   {
     label: 'This Year',
     startDate: startOfYear(new Date()),
-    endDate: new Date(),
+    endDate: endOfDay(new Date()),
   },
 ];
 
@@ -88,6 +89,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
   };
 
   const onRangeChange = (range: DateRange) => {
+    if (range.endDate) range.endDate = endOfDay(range.endDate);
     setDateRangeValue(range);
     setAnchorEl(null);
   };

@@ -32,6 +32,7 @@ import DateRangeInput from './inputs/DateRangeInput';
 import { DateRange } from './DateRangePicker/types';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
+import addDays from 'date-fns/addDays';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -78,9 +79,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
 
   const { searchString, page, rowsPerPage } = quoteListContextData;
-  // const [page, setPage] = useState(0);
-  // const [rowsPerPage, setRowsPerPage] = useState(10);
-  // const [searchString, setSearchString] = useState('');
 
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
@@ -88,7 +86,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     const dateFilteredQuoteGroups = filter(
       (quoteGroup: QuoteGroup) =>
         compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(quoteGroup.dateIssued, dateRange?.endDate || new Date()) !== -1,
+        compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(quoteGroups);
     const filteredResults =
       searchString && searchString.length > 0 && dateFilteredQuoteGroups

@@ -10,7 +10,7 @@ import parseISO from 'date-fns/parseISO';
 const stringifyReplacer = (key: string, value: any) => {
   if (key === 'date' || key === 'startDate' || key === 'endDate') {
     const dateToParse = value ? (typeof value === 'string' ? parseISO(value) : value) : addDays(new Date(), 2);
-    return formatDate(dateToParse, 'yyyy-MM-dd');
+    return formatDate(dateToParse, 'yyyy-MM-dd HH:mm:ss');
   } else {
     return value;
   }
@@ -23,6 +23,10 @@ const clearLocalStorageAfter = (lastSavedKey: string, minutes: number) => {
   if (saved && new Date().getTime() - saved > minutes * 60 * 1000) {
     localStorage.clear();
   }
+};
+
+const fixUpDateValue = (value: string, startOfDay: boolean = false) => {
+  return value.length === 10 ? (startOfDay ? value.concat(' 23:59:59') : value.concat(' 00:00:00')) : value;
 };
 
 const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, timeoutMinutes: number = 5) => {
@@ -42,7 +46,9 @@ const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, tim
           ? localStorageValue
           : JSON.parse(localStorageValue || 'null', (key, value) => {
               if (key === 'date' || key === 'startDate' || key === 'endDate') {
-                return value ? parseDate(value, 'yyyy-MM-dd', addDays(new Date(), 2)) : value;
+                return value
+                  ? parseDate(fixUpDateValue(value, key !== 'endDate'), 'yyyy-MM-dd HH:mm:ss', addDays(new Date(), 2))
+                  : value;
               } else {
                 return value;
               }
