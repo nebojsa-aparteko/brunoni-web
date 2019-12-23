@@ -229,34 +229,41 @@ const Navbar: React.FC = () => {
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
-                <FormControl>
-                  <Input
-                    id="gotoquoteinput"
-                    placeholder="Quote # "
-                    onKeyDown={handleGoToQuoteOnKeyDown}
-                    className={classes.goToQuote}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton aria-label="toggle password visibility" onClick={handleGoToQuoteButtonClick}>
-                          <LaunchIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    aria-describedby="gotoquoteinput-helper-text"
-                    inputRef={gotoQuoteInputRef}
-                    inputProps={{
-                      'aria-label': 'Go to quote',
-                    }}
-                    margin="dense"
-                  />
-                </FormControl>
                 {user !== undefined && user !== null ? (
                   userRecord ? (
-                    <div className={classes.item}>
-                      <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
-                        Get Quote
-                      </Button>
-                    </div>
+                    <Fragment>
+                      {userRecord.isAdmin && (
+                        <FormControl>
+                          <Input
+                            id="gotoquoteinput"
+                            placeholder="Quote # "
+                            onKeyDown={handleGoToQuoteOnKeyDown}
+                            className={classes.goToQuote}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="toggle password visibility"
+                                  onClick={handleGoToQuoteButtonClick}
+                                >
+                                  <LaunchIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                            aria-describedby="gotoquoteinput-helper-text"
+                            inputRef={gotoQuoteInputRef}
+                            inputProps={{
+                              'aria-label': 'Go to quote',
+                            }}
+                            margin="dense"
+                          />
+                        </FormControl>
+                      )}
+                      <div className={classes.item}>
+                        <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
+                          Get Quote
+                        </Button>
+                      </div>
+                    </Fragment>
                   ) : null
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
