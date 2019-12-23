@@ -1,6 +1,6 @@
 import React, { Fragment, useContext } from 'react';
 import { Route, Switch } from 'react-router';
-import { makeStyles, Theme } from '@material-ui/core';
+import { Button, makeStyles, Theme } from '@material-ui/core';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -20,7 +20,8 @@ import Unauthorized from './pages/Unauthorized';
 
 import useUser from './hooks/useUser';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import AllmarineFooter from './components/AllmarineFooter';
+import BrunoniFooter from './components/BrunoniFooter';
 import ScrollToTop from './components/ScrollToTop';
 import ActingAs from './contexts/ActingAs';
 import UserRecord from './contexts/UserRecord';
@@ -112,7 +113,11 @@ const App: React.FC = () => {
         {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
       </div>
       <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
-      <Footer />
+      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+        <BrunoniFooter />
+      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+        <AllmarineFooter />
+      ) : null}
     </Fragment>
   );
 };

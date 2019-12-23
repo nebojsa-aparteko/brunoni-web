@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const Footer: React.FC<Props> = () => {
+const BrunoniFooter: React.FC<Props> = () => {
   const classes = useStyles();
 
   return (
@@ -63,19 +63,10 @@ const Footer: React.FC<Props> = () => {
               <Box mb={4}>
                 <ul className={classes.list}>
                   <li>
-                    <Link href="https://www.brunoni.ch/company/history">History</Link>
+                    <Link href="https://allmarine.ch/company">About Us</Link>
                   </li>
                   <li>
-                    <Link href="https://www.brunoni.ch/company/philosophy">Philosophy</Link>
-                  </li>
-                  <li>
-                    <Link href="https://www.brunoni.ch/company/management">Management</Link>
-                  </li>
-                  <li>
-                    <Link href="https://www.brunoni.ch/company/team">Team</Link>
-                  </li>
-                  <li>
-                    <Link href="https://www.brunoni.ch/company/careers">Careers</Link>
+                    <Link href="https://allmarine.ch/contact/address">Team</Link>
                   </li>
                 </ul>
               </Box>
@@ -95,16 +86,16 @@ const Footer: React.FC<Props> = () => {
                   08:00 - 12:00
                 </Typography>
                 <Typography variant="body1" color="inherit">
-                  13:00 - 17:30
+                  13:00 - 17:00
                 </Typography>
               </Box>
 
               <Box mb={4}>
                 <Typography variant="body1" color="inherit">
-                  Phone +41 44 455 58 58
+                  Phone +41 44 533 38 48
                 </Typography>
                 <Typography variant="body1" color="inherit">
-                  Fax +41 44 455 58 55
+                  Fax +41 44 533 38 49
                 </Typography>
               </Box>
             </Grid>
@@ -118,12 +109,7 @@ const Footer: React.FC<Props> = () => {
               <Box mb={4}>
                 <ul className={classes.list}>
                   <li>
-                    <Link href="https://www.linkedin.com/in/nenad-milutinovic-3aa677b0?originalSubdomain=ch">
-                      LinkedIn
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="https://www.brunoni.ch/newsletter-abo/user/modify">Newsletter ABO</Link>
+                    <Link href="https://www.linkedin.com/company/allmarine-ag/">LinkedIn</Link>
                   </li>
                 </ul>
               </Box>
@@ -137,9 +123,9 @@ const Footer: React.FC<Props> = () => {
               </Box>
               <Box mb={4}>
                 <Typography variant="body1" color="inherit">
-                  Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
-                  represent foreign shipping lines in Switzerland.{' '}
-                  <Link href="https://www.brunoni.ch/index.php/company/history" className={classes.link}>
+                  Allmarine AG was founded in 2017 and is a privately owned company, which acts as an independent
+                  shipping agency in Switzerland.{' '}
+                  <Link href="https://allmarine.ch/company" className={classes.link}>
                     Read more…
                   </Link>
                 </Typography>
@@ -151,7 +137,7 @@ const Footer: React.FC<Props> = () => {
       <Box className={classes.copyright} py={5} displayPrint="none">
         <Container>
           <Typography variant="body1" color="inherit">
-            Copyright © {new Date().getFullYear()} O. Brunoni S.A. Agence Maritime
+            Copyright © {new Date().getFullYear()} ALLMARINE AG.
           </Typography>
         </Container>
       </Box>
@@ -159,4 +145,4 @@ const Footer: React.FC<Props> = () => {
   );
 };
 
-export default Footer;
+export default BrunoniFooter;
