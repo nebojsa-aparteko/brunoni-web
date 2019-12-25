@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
     toolbarItem: {},
     logo: {
       marginRight: 'auto',
+      display: 'flex',
       '& > img':
         ({
           brunoni: {
@@ -66,9 +67,17 @@ const useStyles = makeStyles((theme: Theme) =>
             width: 80,
           },
           allmarine: {
-            height: 80,
+            maxHeight: 80,
+            width: 'auto',
           },
         } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
+      [theme.breakpoints.down('sm')]: {
+        '& > img': {
+          top: 0,
+          maxHeight: '4em',
+          width: 'auto',
+        },
+      },
     },
     spacer: {
       flex: 1,
@@ -297,7 +306,6 @@ const Navbar: React.FC = () => {
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
                   alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
                   className={classes.logo}
-                  style={{ width: '4rem' }}
                 />
               </Link>
               <Box displayPrint="none">
