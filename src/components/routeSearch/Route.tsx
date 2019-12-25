@@ -95,10 +95,12 @@ const Route: React.FC<Props> = ({ route }) => {
   const carriers = useContext(Carriers);
   const [expanded, setExpanded] = useState(false);
   const carrierName = route?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
-  const carrier = useMemo(() => carriers?.find(carrier => carrier.name.toLowerCase() === carrierName), [
-    carrierName,
-    carriers,
-  ]);
+  const carrier = useMemo(
+    () =>
+      carriers?.find(carrier => carrier.name.toLowerCase() === carrierName) ||
+      carriers?.find(carrier => carrier.id.toLowerCase() === carrierName),
+    [carrierName, carriers],
+  );
 
   const disabled = !route;
 
