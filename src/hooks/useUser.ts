@@ -6,5 +6,11 @@ import User from '../contexts/User';
 import UserRecordContext from '../contexts/UserRecord';
 
 import UserRecord from '../model/UserRecord';
+import Client from '../model/Client';
+import useClient from './useClient';
 
-export default (): [firebase.User, UserRecord] => [useContext(User)!, useContext(UserRecordContext)!];
+export default (): [firebase.User, UserRecord, Client] => [
+  useContext(User)!,
+  useContext(UserRecordContext)!,
+  useClient()!,
+];

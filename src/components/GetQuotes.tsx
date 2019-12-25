@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Mousetrap from 'mousetrap';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
@@ -37,6 +37,7 @@ import Meta from '../components/Meta';
 import { europeanCountries } from '../utilities/pickupDropOffHelperData';
 import focusAndSelect from '../utilities/focusAndSelect';
 import { QuoteListContext } from '../contexts/QuoteListContext';
+import useClients from '../hooks/useClients';
 
 interface Props {}
 
@@ -78,6 +79,7 @@ const GetQuotes: React.FC<Props> = () => {
   const [busy, setBusy] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showContainerLocations, setShowContainerLocations] = useState(false);
+  const clients = useClients();
   const ports = useContext(Ports);
   const [originPortOpen, setOriginPortOpen] = useState<boolean>(false);
   const [destinationPortOpen, setDestinationPortOpen] = useState<boolean>(false);
@@ -87,6 +89,10 @@ const GetQuotes: React.FC<Props> = () => {
   const destinationInput = useRef<HTMLInputElement>();
   const listInput = useRef<unknown>();
   const addButton = useRef<HTMLButtonElement>();
+
+  const client = useMemo(() => {
+    return clients?.find(client => client.id === userData?.alphacomClientId);
+  }, [userData, clients]);
 
   const { originPort, destinationPort, date, weeks, containers } = value;
 
@@ -276,7 +282,7 @@ const GetQuotes: React.FC<Props> = () => {
   };
 
   const sendEmail = () => {
-    window.open(buildMailToLink(value, userData));
+    window.open(buildMailToLink(value, userData, client!));
     closeDialog();
   };
 

@@ -23,76 +23,13 @@ import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
 import Port from '../model/Port';
-import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import Quotes from '../contexts/Quotes';
+import { Quote, QuoteGroup } from './QuoteGroups';
 
 interface Props {
   children: React.ReactNode;
-}
-
-export interface QuoteGroup {
-  id: string;
-  dateIssued: Date;
-  origin?: Port;
-  destination?: Port;
-  containers: Container[];
-  commodityTypes: CommodityType[];
-  quotes: Quote[];
-}
-
-export interface Quote {
-  clientId: string;
-  groupId: string;
-  id: string;
-  carrier: Carrier;
-  dateIssued: Date;
-  validityPeriod: { from: Date; to: Date };
-  origin: Port;
-  destination: Port;
-  containers: Container[];
-  commodityTypes?: CommodityType[];
-  quoteDetails: QuoteDetail[];
-  costDetailRemarks: CostDetailRemark[];
-  serviceDetails: ServiceDetail[];
-  remarks: Remark[];
-  terms: Term[];
-}
-
-export interface Term {
-  TermLabel?: string;
-  TermValue: string;
-  TermDetail?: string;
-  TermURL?: string;
-}
-
-export interface QuoteDetail {
-  Pos: string;
-  Description: string;
-  Currency: string;
-  CostValue?: string;
-  CostUnit?: string;
-  Remark?: string;
-  RemarkRef?: string;
-}
-
-export interface CostDetailRemark {
-  RemarkRef: string;
-  RemarkText: string;
-}
-
-export interface ServiceDetail {
-  Frequency: string;
-  Routing: string;
-  TransitTime: string;
-}
-
-export interface Remark {
-  Reefer: string;
-  RemarkLabel: string;
-  RemarkText: string;
-  RemarkTitle: string;
 }
 
 const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
@@ -175,7 +112,7 @@ const QuoteGroups: React.FC<Props> = ({ children }) => {
 
   const quoteGroups = useMemo(() => (quotes === undefined ? undefined : normalize(quotes)), [quotes, normalize]);
 
-  return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
+  return <Context.Provider value={quoteGroups as QuoteGroup[] | undefined}>{children}</Context.Provider>;
 };
 
 export default QuoteGroups;

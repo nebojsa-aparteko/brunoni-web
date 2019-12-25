@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo } from 'react';
 import { useId } from 'react-id-generator';
 import changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
@@ -34,7 +34,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
   const history = useHistory();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
-  const [user, userData] = useUser();
+  const [user, userData, client] = useUser();
   const [actingAs, setActingAs] = useContext(ActingAs);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -90,14 +90,12 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         onClose={handleMenuClose}
       >
         {actingAs ? (
-          actingAs!.company?.name && (
+          client?.name && (
             <Fragment>
               <MenuItem disabled style={{ opacity: 'initial' }}>
                 <Box>
-                  <Typography variant="subtitle1">{actingAs!.company.name.toUpperCase()}</Typography>
-                  {actingAs!.company.city && (
-                    <Typography variant="subtitle2">{actingAs!.company.city.toUpperCase()}</Typography>
-                  )}
+                  <Typography variant="subtitle1">{client.name.toUpperCase()}</Typography>
+                  {client.city && <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>}
                 </Box>
               </MenuItem>
               {actingAs!.isAdmin && (
@@ -121,7 +119,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
                 </Typography>
               </Box>
             </MenuItem>
-            {userData?.company && <MenuItem onClick={handleSwitch}>Switch to {userData?.company.name}</MenuItem>}
+            {client && <MenuItem onClick={handleSwitch}>Switch to {client.name}</MenuItem>}
           </Fragment>
         ) : null}
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>

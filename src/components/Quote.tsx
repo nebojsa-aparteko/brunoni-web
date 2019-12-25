@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import {
   Box,
   Container,
@@ -29,8 +29,9 @@ import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
 import QuoteGroups from '../contexts/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
-import { portLongFormatLabel, portShortFormatLabel } from '../utilities/formattedPortDisplay';
+import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import changeCase from 'change-case';
+import useClients from '../hooks/useClients';
 
 interface Props {
   id: string;
@@ -93,6 +94,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const quoteGroups = useContext(QuoteGroups);
   const [user, userData] = useUser();
+  const clients = useClients();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -121,6 +123,12 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
     );
   }
 
+  const client = clients?.find(client => client.id === quote.clientId);
+
+  const quoteTitle = `${quote.carrier.name || quote.carrier.id} - ${
+    quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
+  }`;
+
   return (
     <Container maxWidth="lg">
       <ScrollToTopOnMount />
@@ -138,9 +146,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
         <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
           <QuoteNav
             backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
-            title={`Quotation - ${quote.carrier.name || quote.carrier.id} - ${
-              quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
-            }`}
+            title={`Quotation - ${quoteTitle}`}
             subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
           />
 
@@ -149,7 +155,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
               color="primary"
               variant="contained"
               size="small"
-              href={buildMailToLink(quote, [user, userData])}
+              href={buildMailToLink(quote, [user, userData, client!])}
               target="_blank"
             >
               Book Now
@@ -163,7 +169,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
               variant="outlined"
               size="small"
               startIcon={<FlareIcon />}
-              href={buildSpecialRequestLink(quote, [user, userData])}
+              href={buildSpecialRequestLink(quote, [user, userData, client!])}
               target="_blank"
             >
               {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
@@ -171,7 +177,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
           </Box>
         </Box>
         <Grid item xs={12}>
-          <Page title="Quotation">
+          <Page title={quoteTitle}>
             <Grid container spacing={2}>
               <Grid item md={6} xs={12} className={classes.hidePrint}>
                 <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />

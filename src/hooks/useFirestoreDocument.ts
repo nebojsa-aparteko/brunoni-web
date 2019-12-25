@@ -1,42 +1,38 @@
 import { useEffect, useState } from 'react';
 import firebase from '../firebase';
-import useUser from './useUser';
 
-export default function useFirestoreDocument(name: string) {
+export default function useFirestoreDocument(collection: string, id?: string) {
   const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined>();
 
-  const userRecord = useUser()[1];
-
   useEffect(() => {
-    if (!userRecord) {
-      setSnapshot(undefined);
-      return undefined;
+    if (!id) {
+      return;
     }
 
     (async () => {
       try {
         const document = await firebase
           .firestore()
-          .collection(name)
-          .doc(userRecord!.alphacomClientId);
+          .collection(collection)
+          .doc(id);
 
         return document.onSnapshot({
           next: (snapshot: firebase.firestore.DocumentSnapshot) => {
-            console.debug('useFirestoreDocument', name, 'updated with', snapshot);
+            console.debug('useFirestoreDocument', `/${collection}/${id}`, 'updated with', snapshot);
             setSnapshot(snapshot);
           },
           error: (error: Error) => {
-            console.error('useFirestoreDocument', name, 'threw an error', error);
+            console.error('useFirestoreDocument', `/${collection}/${id}`, 'threw an error', error);
           },
           complete: () => {
-            console.log('useFirestoreDocument', name, 'completed');
+            console.log('useFirestoreDocument', `/${collection}/${id}`, 'completed');
           },
         });
       } catch (error) {
-        console.error('useFirestoreDocument', name, 'threw an error', error);
+        console.error('useFirestoreDocument', `/${collection}/${id}`, 'threw an error', error);
       }
     })();
-  }, [name, userRecord?.alphacomClientId]);
+  }, [collection, id]);
 
   return snapshot;
 }

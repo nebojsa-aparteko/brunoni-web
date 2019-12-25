@@ -6,6 +6,8 @@ import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroups';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
 import UserRecords from '../../contexts/UserRecords';
+import useClients from '../../hooks/useClients';
+import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 
 interface Props {
   quote: Quote;
@@ -68,30 +70,34 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content, className, show
 const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) => {
   const classes = useStyles();
   const users = useContext(UserRecords);
+  const clients = useClients();
+  const requestedBy = useUserByAlphacomId(quote.userId);
 
   const clientInfo = useMemo(() => {
+    const user = users?.find(user => user.alphacomClientId === quote.clientId);
+    const client = clients?.find(client => client.id === quote.clientId);
+
     if (!showCompanyInfo) {
       return (
         <TableRowData
           label="Quote For"
-          content={userData?.company.name.toUpperCase() + ', ' + userData?.company.city.toUpperCase()}
+          content={client ? client.name.toUpperCase() + ', ' + client.city.toUpperCase() : quote.clientId}
           className={classes.tableCellQuoteUserData}
         />
       );
     }
-    const user = users?.find(user => user.alphacomClientId === quote.clientId);
 
     return (
       <Fragment>
+        <TableRowData label="Quote For" content={client ? client.name + ', ' + client.city : quote.clientId} />
         <TableRowData
-          label="Quote For"
-          content={user ? user.company.name + ', ' + user.company.city : quote.clientId}
+          label="Requested By"
+          content={requestedBy ? `${requestedBy.firstName} ${requestedBy.lastName}` : quote.userId}
         />
-        <TableRowData label="Requested By" content={user ? user.alphacomId : quote.clientId} />
         <TableRowData label="" content="" />
       </Fragment>
     );
-  }, [showCompanyInfo, users, quote]);
+  }, [showCompanyInfo, users, quote, clients]);
 
   return (
     <Table size="small" aria-label="a dense table">

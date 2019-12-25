@@ -45,6 +45,7 @@ export interface QuoteGroup {
 
 export interface Quote {
   clientId: string;
+  userId: string;
   groupId: string;
   id: string;
   carrier: Carrier;

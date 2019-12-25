@@ -11,4 +11,6 @@ export default interface UserRecord {
     countryCode: string;
   };
   isAdmin?: boolean;
+  firstName: string;
+  lastName: string;
 }

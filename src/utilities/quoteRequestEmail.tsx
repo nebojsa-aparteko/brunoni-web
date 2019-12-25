@@ -8,6 +8,7 @@ import OOG from '../model/OOG';
 import Container from '../model/Container';
 import ContainerDetails from '../model/ContainerDetails';
 import UserRecord from '../model/UserRecord';
+import Client from '../model/Client';
 
 const renderIMO = (imo: IMO) =>
   `\n   IMO Class ${imo.IMOClass}, UN Number: ${imo.UNNumber}, PG Number: ${imo.PGNumber}`;
@@ -15,7 +16,11 @@ const renderIMO = (imo: IMO) =>
 const renderOOG = (oog: OOG) =>
   `\n   Out of gauge item ${oog.length}×${oog.width}×${oog.height} [cm] (L×W×H), ${oog.weight} [kg]`;
 
-export const createEmailBody = (searchParams: DetailedRouteSearchParams, userData: UserRecord): string => {
+export const createEmailBody = (
+  searchParams: DetailedRouteSearchParams,
+  userData: UserRecord,
+  client: Client,
+): string => {
   const cargoDetailsString: string = flatMap(
     (container: Container & ContainerDetails) =>
       ' - ' +
@@ -36,7 +41,7 @@ export const createEmailBody = (searchParams: DetailedRouteSearchParams, userDat
 
 I want to request a quote with the following contents:
 
-Company: ${userData.company.name}, ${userData.company.city}
+Company: ${client.name}, ${client.city}
 
 Origin Port: ${searchParams.originPort!.city} - ${searchParams.originPort!.country} (${searchParams.originPort!.id})
 Destination Port: ${searchParams.destinationPort!.city} - ${searchParams.destinationPort!.country} (${
@@ -51,7 +56,7 @@ Cargo Details:
 ${cargoDetailsString}`;
 };
 
-export const buildMailToLink = (searchParams: DetailedRouteSearchParams, userData: UserRecord) => {
+export const buildMailToLink = (searchParams: DetailedRouteSearchParams, userData: UserRecord, client: Client) => {
   const mailtoAddress =
     process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
   return (
@@ -60,7 +65,7 @@ export const buildMailToLink = (searchParams: DetailedRouteSearchParams, userDat
       [
         'subject=' +
           encodeURI('Request quote - ' + searchParams.originPort!.city + ' → ' + searchParams.destinationPort!.city),
-        'body=' + encodeURI(createEmailBody(searchParams, userData)),
+        'body=' + encodeURI(createEmailBody(searchParams, userData, client)),
       ].join('&'),
     )
   );

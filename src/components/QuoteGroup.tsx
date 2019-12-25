@@ -34,7 +34,6 @@ import uniqWith from 'lodash/fp/uniqWith';
 import { Link as RouterLink } from 'react-router-dom';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -47,9 +46,10 @@ import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroups';
 import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
-import { portLongFormatLabel, portShortFormatLabel, quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
+import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import UserRecords from '../contexts/UserRecords';
-import { useHistory } from 'react-router';
+import useClients from '../hooks/useClients';
+import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 
 interface Props {
   id: string;
@@ -62,7 +62,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(4),
     padding: theme.spacing(3),
   },
-
   currencyCell: {
     textAlign: 'right',
   },
@@ -120,7 +119,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const [user, userData] = useUser();
+  const [user, userData, client] = useUser();
 
   const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMoreAnchorEl(event.currentTarget);
@@ -139,7 +138,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         color="primary"
         variant="contained"
         size="small"
-        href={buildMailToLink(quote, [user, userData])}
+        href={buildMailToLink(quote, [user, userData, client])}
         target="_blank"
       >
         Book Now
@@ -148,7 +147,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         <MoreVertIcon />
       </IconButton>
       <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-        <MenuItem component="a" href={buildSpecialRequestLink(quote, [user, userData])} target="_blank">
+        <MenuItem component="a" href={buildSpecialRequestLink(quote, [user, userData, client])} target="_blank">
           <ListItemIcon>
             <FlareIcon fontSize="small" />
           </ListItemIcon>
@@ -163,10 +162,15 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
   const quoteGroups = useContext(QuoteGroups);
+  const clients = useClients();
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
-  const quoteGroup = quoteGroups?.find(quoteGroup => quoteGroup.id === id);
+  const quoteGroup = useMemo(() => quoteGroups?.find(quoteGroup => quoteGroup.id === id), [quoteGroups]);
+  const client = useMemo(() => clients?.find(client => client.id === quoteGroup?.quotes[0].clientId), [
+    quoteGroup,
+    clients,
+  ]);
 
   const quotesByCarrier = useMemo(
     () =>
@@ -183,23 +187,26 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   }, [quoteGroup]);
 
   const users = useContext(UserRecords);
+  const requestedBy = useUserByAlphacomId(quoteGroup?.quotes[0].userId);
 
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
       return null;
     }
 
-    const user = users?.find(user => user.alphacomClientId === quoteGroup?.quotes[0].clientId);
-
     return (
       <Box mt={2} mb={2}>
         <Typography variant="body2">
           <span style={{ fontWeight: 700 }}>Quote for: </span>{' '}
-          {user ? user.company.name + ', ' + user.company.city : quoteGroup?.quotes[0].clientId}
+          {client ? client.name + ', ' + client.city : quoteGroup?.quotes[0].clientId}
+        </Typography>
+        <Typography variant="body2">
+          <span style={{ fontWeight: 700 }}>Requested by: </span>{' '}
+          {requestedBy ? `${requestedBy.firstName} ${requestedBy.lastName}` : quoteGroup?.quotes[0].userId}
         </Typography>
       </Box>
     );
-  }, [showCompanyInfo, users, quoteGroup]);
+  }, [showCompanyInfo, users, quoteGroup, client, requestedBy]);
 
   if (!quoteGroup) {
     return (

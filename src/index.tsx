@@ -10,7 +10,7 @@ import LoginDialogProvider from './components/LoginDialogProvider';
 import CookiesNotification from './components/CookiesNotification';
 import ActingAsProvider from './providers/ActingAs';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
-import FirestoreDocumentProvider from './providers/FirestoreDocument';
+import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument';
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
@@ -31,13 +31,14 @@ import firebase from './firebase';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
 import { QuoteListProvider } from './contexts/QuoteListContext';
 import ActingAs from './contexts/ActingAs';
-import UserRecord from './contexts/UserRecord';
+import UserRecordContext from './contexts/UserRecord';
+import useFirestoreDocument from './hooks/useFirestoreDocument';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-export default function ScrollToTop() {
+function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const appFont = new FontFaceObserver('Montserrat');
 const fontLoaded = appFont.load();
 
 const UserApp: React.FC = () => {
-  const userRecord = useContext(UserRecord);
+  const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
 
   switch (actingAs) {
@@ -64,7 +65,7 @@ const UserApp: React.FC = () => {
           return <App />;
         case null:
           return (
-            <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+            <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
               <QuotesProvider>
                 <QuoteGroupsProvider>
                   <QuoteListProvider>
@@ -72,7 +73,7 @@ const UserApp: React.FC = () => {
                   </QuoteListProvider>
                 </QuoteGroupsProvider>
               </QuotesProvider>
-            </FirestoreDocumentProvider>
+            </FirestoreClientDocumentProvider>
           );
         default:
           return userRecord.isAdmin ? (
@@ -91,7 +92,7 @@ const UserApp: React.FC = () => {
       }
     default:
       return (
-        <FirestoreDocumentProvider name="statistics" context={StatisticsContext}>
+        <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
           <QuotesProvider>
             <QuoteGroupsProvider>
               <QuoteListProvider>
@@ -99,7 +100,7 @@ const UserApp: React.FC = () => {
               </QuoteListProvider>
             </QuoteGroupsProvider>
           </QuotesProvider>
-        </FirestoreDocumentProvider>
+        </FirestoreClientDocumentProvider>
       );
   }
 };

@@ -9,17 +9,16 @@ import {
   TableRow,
   Grid,
   Chip,
-  Button,
   createStyles,
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
 import UserRecords from '../../contexts/UserRecords';
 import { useHistory } from 'react-router';
-import { portShortFormatLabel, quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
+import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
+import useClients from '../../hooks/useClients';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,21 +37,25 @@ interface RowProps extends QuoteGroup {
 const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, containers, commodityTypes, quotes }) => {
   const classes = useStyles();
   const users = useContext(UserRecords);
+  const clients = useClients();
   const history = useHistory();
+
+  const client = useMemo(() => clients?.find(client => client.id === quotes[0].clientId), [
+    clients,
+    quotes[0].clientId,
+  ]);
 
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
       return null;
     }
 
-    const user = users?.find(user => user.alphacomClientId === quotes[0].clientId);
-
-    if (!user) {
+    if (!client) {
       return <TableCell>{quotes[0].clientId}</TableCell>;
     }
 
-    return <TableCell>{user.company.name}</TableCell>;
-  }, [showCompanyInfo, users, quotes[0].clientId]);
+    return <TableCell>{client.name}</TableCell>;
+  }, [showCompanyInfo, client, quotes[0].clientId]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
     history.push(pathToNavigate);
