@@ -13,4 +13,5 @@ export default interface UserRecord {
   isAdmin?: boolean;
   firstName: string;
   lastName: string;
+  emailAddress: string;
 }

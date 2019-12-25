@@ -8,5 +8,7 @@ export default function useUserByAlphacomId(id?: string) {
 
   const clientDocs = useFirestoreCollection('users', query);
 
-  return clientDocs?.docs[0] as UserRecord | null | undefined;
+  const doc = clientDocs?.docs[0];
+
+  return doc?.data() as UserRecord | null | undefined;
 }

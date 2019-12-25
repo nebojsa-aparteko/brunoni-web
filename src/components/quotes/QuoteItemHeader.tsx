@@ -1,5 +1,7 @@
 import React, { useContext, useMemo, Fragment } from 'react';
 import formatDate from 'date-fns/format';
+import identity from 'lodash/fp/identity';
+import invoke from 'lodash/fp/invoke';
 import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
@@ -74,7 +76,6 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
   const requestedBy = useUserByAlphacomId(quote.userId);
 
   const clientInfo = useMemo(() => {
-    const user = users?.find(user => user.alphacomClientId === quote.clientId);
     const client = clients?.find(client => client.id === quote.clientId);
 
     if (!showCompanyInfo) {
@@ -92,7 +93,18 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
         <TableRowData label="Quote For" content={client ? client.name + ', ' + client.city : quote.clientId} />
         <TableRowData
           label="Requested By"
-          content={requestedBy ? `${requestedBy.firstName} ${requestedBy.lastName}` : quote.userId}
+          content={
+            quote.userId
+              ? requestedBy
+                ? [requestedBy.firstName, requestedBy.lastName]
+                    .filter(identity)
+                    .map(invoke('trim'))
+                    .join(' ') ||
+                  requestedBy.emailAddress ||
+                  quote.userId
+                : quote.userId
+              : '-'
+          }
         />
         <TableRowData label="" content="" />
       </Fragment>

@@ -23,6 +23,8 @@ import {
   Typography,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
+import identity from 'lodash/fp/identity';
+import invoke from 'lodash/fp/invoke';
 import groupBy from 'lodash/fp/groupBy';
 import orderBy from 'lodash/fp/orderBy';
 import toPairs from 'lodash/fp/toPairs';
@@ -200,10 +202,19 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
           <span style={{ fontWeight: 700 }}>Quote for: </span>{' '}
           {client ? client.name + ', ' + client.city : quoteGroup?.quotes[0].clientId}
         </Typography>
-        <Typography variant="body2">
-          <span style={{ fontWeight: 700 }}>Requested by: </span>{' '}
-          {requestedBy ? `${requestedBy.firstName} ${requestedBy.lastName}` : quoteGroup?.quotes[0].userId}
-        </Typography>
+        {quoteGroup?.quotes[0].userId && (
+          <Typography variant="body2">
+            <span style={{ fontWeight: 700 }}>Requested by: </span>{' '}
+            {requestedBy
+              ? [requestedBy.firstName, requestedBy.lastName]
+                  .filter(identity)
+                  .map(invoke('trim'))
+                  .join(' ') ||
+                requestedBy.emailAddress ||
+                quoteGroup?.quotes[0].userId
+              : quoteGroup?.quotes[0].userId}
+          </Typography>
+        )}
       </Box>
     );
   }, [showCompanyInfo, users, quoteGroup, client, requestedBy]);
