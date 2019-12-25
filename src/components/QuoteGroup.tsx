@@ -52,6 +52,7 @@ import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import UserRecords from '../contexts/UserRecords';
 import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
+import Carriers from '../contexts/Carriers';
 
 interface Props {
   id: string;
@@ -163,6 +164,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
 const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
+  const carriers = useContext(Carriers);
   const quoteGroups = useContext(QuoteGroups);
   const clients = useClients();
 
@@ -291,7 +293,9 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
                     expandIcon={<ExpandMoreIcon />}
                     onClick={() => handlePanelClick(carrierId)}
                   >
-                    <Typography variant="h4">{carrierId}</Typography>
+                    <Typography variant="h4">
+                      {carriers?.find(carrier => carrier.id === carrierId)?.name || carrierId}
+                    </Typography>
                   </ExpansionPanelSummary>
 
                   <ExpansionPanelDetails>
