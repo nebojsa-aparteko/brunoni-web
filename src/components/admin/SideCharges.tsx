@@ -77,7 +77,7 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
         onChange={handleTabChange}
         className={classes.tabs}
       >
-        <Tab label="Import" />
+        <Tab label="Import / Crosstrade" />
         <Tab label="Export" />
       </Tabs>
       <Box p={2}>

@@ -112,7 +112,7 @@ const EquipmentSituation: React.FC<Props> = () => {
                 <Grid container spacing={3}>
                   <Grid item sm={12} xs={12} md={6}>
                     <Typography variant="h5" gutterBottom>
-                      Import
+                      Import / Crosstrade
                     </Typography>
                     {sideCharges!.importCharges.map(renderCharges)}
                   </Grid>
