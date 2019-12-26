@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { Fragment, useCallback, useContext } from 'react';
 import get from 'lodash/fp/get';
 import {
   Theme,
@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
     '& td': {
       whiteSpace: 'nowrap',
-      width: '50%',
     },
   },
   expansionPanelSummary: {
@@ -65,7 +64,9 @@ const EquipmentSituation: React.FC<Props> = () => {
             <TableHead>
               <TableRow>
                 {charges.columns.map((column, j) => (
-                  <TableCell key={j}>{column}</TableCell>
+                  <TableCell key={j} style={{ width: `${100 / charges.columns.length}%` }}>
+                    {column}
+                  </TableCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -73,7 +74,9 @@ const EquipmentSituation: React.FC<Props> = () => {
               {charges.rows.map((row, i) => (
                 <TableRow key={i} className={classes.tableRow}>
                   {charges.columns.map((_, j) => (
-                    <TableCell key={j}>{row.values[j]}</TableCell>
+                    <TableCell key={j} style={{ width: `${100 / charges.columns.length}%` }}>
+                      {row.values[j]}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
@@ -86,13 +89,15 @@ const EquipmentSituation: React.FC<Props> = () => {
   );
 
   return (
-    <Container>
-      <Box p={2} pb={0} mt={5} mb={1}>
-        <Typography variant="h3" gutterBottom>
-          Side Charges
-        </Typography>
-      </Box>
-      <Box my={4}>
+    <Fragment>
+      <Container>
+        <Box mt={4} mb={2}>
+          <Typography variant="h3" gutterBottom>
+            Side Charges
+          </Typography>
+        </Box>
+      </Container>
+      <Box m={4}>
         {carriers &&
           carriers.filter(get('sideCharges')).map(({ id, name, sideCharges }) => (
             <ExpansionPanel expanded={expanded === (name || id)} onChange={handleChange(name || id)}>
@@ -122,7 +127,7 @@ const EquipmentSituation: React.FC<Props> = () => {
             </ExpansionPanel>
           ))}
       </Box>
-    </Container>
+    </Fragment>
   );
 };
 
