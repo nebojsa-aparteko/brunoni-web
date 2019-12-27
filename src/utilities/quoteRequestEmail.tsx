@@ -29,11 +29,15 @@ export const createEmailBody = (
       ', ' +
       container?.commodityType?.name +
       (container.pickupLocation ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}` : '') +
-      (container.imo ? (container.imo[0] ? container.imo[1].map(renderIMO) : '\n   This container contains IMO') : '') +
+      (container.imo
+        ? container.imo[0]
+          ? '\n   This container contains IMO' + container.imo[1].map(renderIMO)
+          : ''
+        : '') +
       (container.oog
         ? container.oog[0]
-          ? container.oog[1].map(renderOOG)
-          : '\n   This container is out of gauge'
+          ? '\n   This container is out of gauge' + container.oog[1].map(renderOOG)
+          : ''
         : ''),
   )(searchParams.containers).join('\n');
 
