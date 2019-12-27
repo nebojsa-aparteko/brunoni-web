@@ -80,7 +80,8 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
               </ListItemIcon>
               <ListItemText
                 primary={
-                  (container.quantity > 1 ? container.quantity + ' × ' : '') + container!.containerType?.description
+                  (container.quantity > 1 ? container.quantity + ' × ' : '') +
+                  (container!.containerType?.description || container!.containerType?.id)
                 }
                 primaryTypographyProps={{ variant: 'body1' }}
               />
