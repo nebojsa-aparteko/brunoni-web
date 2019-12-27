@@ -25,7 +25,7 @@ export default () => {
       </Box>
       <Grid container spacing={3}>
         {specialOffers.map(specialOffer =>
-          specialOffer.containerType ? (
+          specialOffer.containerType && specialOffer.containerType.name ? (
             <Grid item md={4} xs={12} key={specialOffer.id}>
               <SpecialOffer {...specialOffer} />
             </Grid>

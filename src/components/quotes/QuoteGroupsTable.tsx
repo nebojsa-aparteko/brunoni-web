@@ -90,7 +90,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
           {commodityTypes &&
             commodityTypes.map((commodityType, index) => (
               <Grid item key={index}>
-                <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id} />
+                <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id || 'N/A'} />
               </Grid>
             ))}
         </Grid>

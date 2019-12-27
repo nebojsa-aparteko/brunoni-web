@@ -86,12 +86,16 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
               />
             </ListItem>
 
-            {(container?.commodityType?.name || container?.commodityType?.id) && (
+            {container.commodityType && (
               <ListItem disableGutters className={classes.cargoDetails}>
                 <ListItemIcon>
                   <SvgIcon component={PackageIconSVG} viewBox="0 0 473.8 473.8" />
                 </ListItemIcon>
-                <ListItemText secondary={container.commodityType.name || container.commodityType.id} />
+                <ListItemText
+                  secondary={
+                    container.commodityType.id ? container.commodityType.name || container.commodityType.id : 'N/A'
+                  }
+                />
               </ListItem>
             )}
 
