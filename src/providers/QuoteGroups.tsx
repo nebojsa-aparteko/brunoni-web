@@ -26,6 +26,7 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import Quotes from '../contexts/Quotes';
+import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
@@ -112,7 +113,12 @@ const normalizeQuoteGroups = (
 ) => {
   const normalizeContainer = flow(
     update('containerType', getContainerType),
-    update('commodityType', commodityType => (commodityType.trim() === '0' ? null : getCommodityType(commodityType))),
+    container =>
+      update('commodityType', commodityType =>
+        commodityType.trim() === '0'
+          ? { id: get('commodityText')(container), name: get('commodityText')(container) }
+          : getCommodityType(commodityType),
+      )(container),
     update('pickupLocation', getPickupLocation),
   );
 

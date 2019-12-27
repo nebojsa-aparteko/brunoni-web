@@ -45,7 +45,12 @@ const normalizeQuoteGroups = (
 ) => {
   const normalizeContainer = flow(
     update('containerType', getContainerType),
-    update('commodityType', commodityType => (commodityType.trim() === '0' ? null : getCommodityType(commodityType))),
+    container =>
+      update('commodityType', commodityType =>
+        commodityType.trim() === '0'
+          ? { id: get('commodityText')(container), name: get('commodityText')(container) }
+          : getCommodityType(commodityType),
+      )(container),
     update('pickupLocation', getPickupLocation),
   );
 
