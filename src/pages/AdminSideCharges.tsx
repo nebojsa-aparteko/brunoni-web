@@ -17,9 +17,11 @@ import { makeStyles } from '@material-ui/styles';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import SideCharges from '../components/admin/SideCharges';
 
-const GetStarted: React.FC = () => {
-  return <Typography>Start by selecting one of the carriers</Typography>;
-};
+const GetStarted: React.FC = () => (
+  <Box p={2}>
+    <Typography variant="subtitle1">Start by selecting one of the carriers</Typography>
+  </Box>
+);
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatarContainer: {
@@ -37,7 +39,7 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
   const carriers = useContext(Carriers);
 
   return (
-    <Box m={2}>
+    <Box m={4}>
       <Meta title="Side Charges" />
       <Grid container spacing={2}>
         <Grid item xs={3}>
