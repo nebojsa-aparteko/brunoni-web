@@ -15,7 +15,6 @@ import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
 import AdminQuotesProvider from './providers/AdminQuotes';
-import AdminQuoteGroupsProvider from './providers/AdminQuoteGroups';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
@@ -78,13 +77,13 @@ const UserApp: React.FC = () => {
         default:
           return userRecord.isAdmin ? (
             <AdminQuotesProvider>
-              <AdminQuoteGroupsProvider>
+              <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
                     <App />
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
-              </AdminQuoteGroupsProvider>
+              </QuoteGroupsProvider>
             </AdminQuotesProvider>
           ) : (
             <App />

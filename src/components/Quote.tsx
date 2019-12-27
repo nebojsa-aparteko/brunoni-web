@@ -145,7 +145,11 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
         </Box>
         <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
           <QuoteNav
-            backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
+            backTo={
+              quote.groupId !== quote.id && quoteGroup.quotes.length > 1
+                ? `/quotes/groups/${quote.groupId}`
+                : `/quotes/groups`
+            }
             title={`Quotation - ${quoteTitle}`}
             subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
           />

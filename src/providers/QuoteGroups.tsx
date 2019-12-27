@@ -34,6 +34,7 @@ interface Props {
 
 export interface QuoteGroup {
   id: string;
+  sortingId: string;
   dateIssued: Date;
   origin?: Port;
   placeOfDeliveryName?: string;
