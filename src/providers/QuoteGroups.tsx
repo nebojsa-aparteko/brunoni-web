@@ -123,7 +123,11 @@ const normalizeQuoteGroups = (
     update('pickupLocation', getPickupLocation),
   );
 
-  const normalizeContainers = flow(asArray, map(normalizeContainer));
+  const normalizeContainers = flow(
+    asArray,
+    map(normalizeContainer),
+    filter(container => container.containerType !== null),
+  );
 
   const normalizeQuote = flow(
     update('carrier', getCarrier),
