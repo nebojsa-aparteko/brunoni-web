@@ -78,19 +78,11 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
   const clientInfo = useMemo(() => {
     const client = clients?.find(client => client.id === quote.clientId);
 
-    if (!showCompanyInfo) {
-      return (
-        <TableRowData
-          label="Quote For"
-          content={client ? client.name.toUpperCase() + ', ' + client.city.toUpperCase() : quote.clientId}
-          className={classes.tableCellQuoteUserData}
-        />
-      );
-    }
-
     return (
       <Fragment>
-        <TableRowData label="Quote For" content={client ? client.name + ', ' + client.city : quote.clientId} />
+        {showCompanyInfo && (
+          <TableRowData label="Quote For" content={client ? client.name + ', ' + client.city : quote.clientId} />
+        )}
         <TableRowData
           label="Requested By"
           content={
