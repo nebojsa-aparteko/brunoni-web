@@ -6,8 +6,10 @@ import {
   CardContent,
   CardHeader,
   makeStyles,
+  Paper,
   TablePagination,
   Typography,
+  Container as MUIContainer,
 } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroups';
@@ -38,6 +40,7 @@ import useClients from '../hooks/useClients';
 import Port from '../model/Port';
 import focusAndSelect from '../utilities/focusAndSelect';
 import Client from '../model/Client';
+import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -46,6 +49,21 @@ interface Props {
 }
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
+    padding: theme.spacing(5),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
+    },
+  },
   content: {
     padding: 0,
     overflowX: 'auto',
@@ -157,6 +175,16 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const handleClientChange = (client: Client) => {
     setClientFilter(client);
   };
+
+  if (!quoteGroups) {
+    return (
+      <MUIContainer maxWidth="lg">
+        <Paper className={classes.root}>
+          <ChartsCircularProgress />
+        </Paper>
+      </MUIContainer>
+    );
+  }
 
   return (
     <Fragment>
