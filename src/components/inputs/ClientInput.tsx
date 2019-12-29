@@ -5,7 +5,6 @@ import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme } from '@
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import Client from '../../model/Client';
-import theme from '../../theme';
 
 const getOptionLabel = (option: Client) => `${option.name} - ${option.city} (${option.id})`;
 
