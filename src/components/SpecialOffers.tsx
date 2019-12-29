@@ -10,6 +10,8 @@ export default () => {
 
   if (!specialOffers || specialOffers.length < 1) {
     return null;
+  } else if (specialOffers[0].containerType && specialOffers[0].containerType.name === null) {
+    return null;
   }
 
   return (
@@ -24,13 +26,11 @@ export default () => {
         </Typography>
       </Box>
       <Grid container spacing={3}>
-        {specialOffers.map(specialOffer =>
-          specialOffer.containerType && specialOffer.containerType.name ? (
-            <Grid item md={4} xs={12} key={specialOffer.id}>
-              <SpecialOffer {...specialOffer} />
-            </Grid>
-          ) : null,
-        )}
+        {specialOffers.map(specialOffer => (
+          <Grid item md={4} xs={12} key={specialOffer.id}>
+            <SpecialOffer {...specialOffer} />
+          </Grid>
+        ))}
       </Grid>
     </Fragment>
   );

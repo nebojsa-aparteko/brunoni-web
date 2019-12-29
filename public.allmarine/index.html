@@ -29,6 +29,26 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700&display=swap" rel="stylesheet">
 
     <style>
+      @media print {
+        nav {
+          display: none;
+        }
+
+        @page {
+          margin: 0 1cm 1cm;
+        }
+
+
+        body {
+          margin: 1cm;
+        }
+      }
+
+      html, body {
+        height: 100%;
+        -webkit-text-size-adjust: none;
+      }
+
       #root {
         display: flex;
         flex-direction: column;
