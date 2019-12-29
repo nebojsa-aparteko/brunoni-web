@@ -20,6 +20,7 @@ export const doNotShowCities = [
   'jk rotterdam',
   'kt rotterdam',
   'km rotterdam',
+  'kr rotterdam',
   'ld rotterdam',
   'la maasvlakte-rt',
   'lb, maasvlakte rotterdam',
