@@ -33,6 +33,11 @@ import { DateRange } from './DateRangePicker/types';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
+import ClientInput from './inputs/ClientInput';
+import useClients from '../hooks/useClients';
+import Port from '../model/Port';
+import focusAndSelect from '../utilities/focusAndSelect';
+import Client from '../model/Client';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -74,6 +79,10 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
+  const clients = useClients();
+
+  const [clientFilter, setClientFilter] = useState<Client>();
+
   const [dateRange, setDateRange] = useState<DateRange>();
 
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
@@ -85,6 +94,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const resultChunks = useMemo(() => {
     const dateFilteredQuoteGroups = filter(
       (quoteGroup: QuoteGroup) =>
+        (clientFilter ? quoteGroup.quotes[0].clientId === clientFilter.id : true) &&
         compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
         compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(quoteGroups);
@@ -110,9 +120,9 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               find((commodityType: CommodityType) => {
                 return containsString(commodityType.name, searchString);
               })(quoteGroup.commodityTypes) !== undefined ||
-              find((quote: Quote) => {
-                return quote.carrier ? containsString(quote.carrier.id, searchString) : false;
-              })(quoteGroup.quotes) !== undefined,
+              find((quote: Quote) => (quote.carrier ? containsString(quote.carrier.id, searchString) : false))(
+                quoteGroup.quotes,
+              ) !== undefined,
           )(dateFilteredQuoteGroups)
         : dateFilteredQuoteGroups;
 
@@ -122,7 +132,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     )(filteredResults);
     setFilteredResults(sortedFiltered);
     return chunk(rowsPerPage)(sortedFiltered);
-  }, [quoteGroups, searchString, page, rowsPerPage, dateRange]);
+  }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));
@@ -144,10 +154,22 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     setDateRange(dateRange);
   };
 
+  const handleClientChange = (client: Client) => {
+    setClientFilter(client);
+  };
+
   return (
     <Fragment>
-      <Box display="flex" flexDirection="row-reverse" my={2}>
+      <Box
+        display="flex"
+        flexDirection="row-reverse"
+        flexWrap="wrap"
+        my={2}
+        justifyContent="space-between"
+        alignContent="space-around"
+      >
         <DateRangeInput onChange={handleDateRangeChange} />
+        {showCompanyInfo && <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />}
       </Box>
 
       <Card className={className} {...rest}>

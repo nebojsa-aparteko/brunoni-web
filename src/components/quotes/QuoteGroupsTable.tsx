@@ -12,6 +12,7 @@ import {
   createStyles,
   makeStyles,
   Theme,
+  Typography,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
@@ -19,6 +20,9 @@ import UserRecords from '../../contexts/UserRecords';
 import { useHistory } from 'react-router';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 import useClients from '../../hooks/useClients';
+import identity from 'lodash/fp/identity';
+import invoke from 'lodash/fp/invoke';
+import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,6 +44,8 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
   const clients = useClients();
   const history = useHistory();
 
+  const requestedBy = useUserByAlphacomId(quotes[0].userId);
+
   const client = useMemo(() => clients?.find(client => client.id === quotes[0].clientId), [
     clients,
     quotes[0].clientId,
@@ -54,7 +60,23 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
       return <TableCell>{quotes[0].clientId}</TableCell>;
     }
 
-    return <TableCell>{client.name}</TableCell>;
+    return (
+      <TableCell>
+        {client.name}
+        <Typography variant="body2">
+          {quotes[0].userId
+            ? requestedBy
+              ? [requestedBy.firstName, requestedBy.lastName]
+                  .filter(identity)
+                  .map(invoke('trim'))
+                  .join(' ') ||
+                requestedBy.emailAddress ||
+                quotes[0].userId
+              : quotes[0].userId
+            : '-'}
+        </Typography>
+      </TableCell>
+    );
   }, [showCompanyInfo, client, quotes[0].clientId]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
