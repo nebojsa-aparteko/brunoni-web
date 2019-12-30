@@ -65,6 +65,7 @@ export interface Quote {
   serviceDetails: ServiceDetail[];
   remarks: Remark[];
   terms: Term[];
+  archived?: boolean;
 }
 
 export interface Term {

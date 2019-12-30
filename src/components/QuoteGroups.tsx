@@ -112,6 +112,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const resultChunks = useMemo(() => {
     const dateFilteredQuoteGroups = filter(
       (quoteGroup: QuoteGroup) =>
+        !quoteGroup.quotes[0].archived &&
         (clientFilter ? quoteGroup.quotes[0].clientId === clientFilter.id : true) &&
         compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
         compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
