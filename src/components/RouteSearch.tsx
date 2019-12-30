@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -6,6 +6,7 @@ import isObject from 'lodash/fp/isObject';
 import update from 'lodash/fp/update';
 import uniq from 'lodash/fp/uniq';
 import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
 import { Box, Grid, makeStyles, Paper, Theme } from '@material-ui/core';
 import RouteSearchBar from './RouteSearchBar';
 import RouteSearchFilters from './RouteSearchFilters';
@@ -20,6 +21,8 @@ import useRequest, { RequestError } from '../hooks/useRequest';
 import useErrorMessage from '../utilities/useErrorMessage';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import SpecialOffers from './SpecialOffers';
+import useUser from '../hooks/useUser';
+import firebase from '../firebase';
 
 interface Props {}
 
@@ -96,12 +99,34 @@ const RouteSearch: React.FC<Props> = () => {
     return `${process.env.REACT_APP_API_URL}/routes?${search}`;
   }, [params]);
 
+  const [user, userData] = useUser();
+
+  useEffect(() => {
+    if (!busy || error || result) {
+      return;
+    }
+
+    firebase
+      .firestore()
+      .collection('schedule-searches')
+      .add({
+        origin: params.originPort?.id || null,
+        destination: params.destinationPort?.id || null,
+        date: formatDate(params.date, 'yyyy-MM-dd') || null,
+        weeks: params.weeks.toString() || null,
+        carrier: carrierFilter || null,
+        userId: get('uid')(user) || null,
+        alphacomId: get('alphacomId')(userData) || null,
+        alphacomClientId: get('alphacomClientId')(userData) || null,
+        timestamp: new Date() || null,
+      });
+  }, [busy, error, result, search, user]);
+
   useErrorMessage(error, error =>
     error instanceof RequestError && error.response.status === 504
       ? 'Service is unavailable at the moment. Please try again later.'
       : 'Unexpected error occurred.',
   );
-  //sorting.sort(
 
   const carrierFilterFn = (carrierId?: string) => (routes: RouteSearchResult[]) =>
     carrierId
