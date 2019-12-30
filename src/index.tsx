@@ -31,7 +31,6 @@ import { RouteSearchProvider } from './contexts/RouteSearchContext';
 import { QuoteListProvider } from './contexts/QuoteListContext';
 import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecord';
-import useFirestoreDocument from './hooks/useFirestoreDocument';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();

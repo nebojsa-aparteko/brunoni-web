@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/styles';
-import { Input, Theme, Box, InputAdornment, IconButton, FormControl } from '@material-ui/core';
+import { Input, Theme, InputAdornment, IconButton, FormControl } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import ClearIcon from '@material-ui/icons/Clear';
 import debounce from 'lodash/fp/debounce';

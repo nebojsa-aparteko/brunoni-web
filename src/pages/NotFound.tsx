@@ -1,9 +1,7 @@
 import React from 'react';
 import { Typography, Grid, Box, Button, Container } from '@material-ui/core';
 import Link from '../components/Link';
-import { Error } from '../components/Illustrations';
 import Image from 'material-ui-image/lib/components/Image/Image';
-import LoginWidget from '../components/LoginWidget';
 
 const NotFound: React.FC = () => (
   <Container>

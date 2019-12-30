@@ -95,7 +95,7 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
                   requestedBy.emailAddress ||
                   quote.userId
                 : quote.userId
-              : '-'
+              : quote.userNameString || ' - '
           }
         />
         <TableRowData label="" content="" />

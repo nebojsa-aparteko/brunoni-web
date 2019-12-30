@@ -4,18 +4,10 @@ import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
 import SelectInput from './SelectInput';
 import filter from 'lodash/fp/filter';
-import find from 'lodash/fp/find';
 import map from 'lodash/fp/map';
-import intersection from 'lodash/fp/intersection';
-import flow from 'lodash/fp/flow';
 import flatten from 'lodash/fp/flatten';
-import get from 'lodash/fp/get';
 import intersectionWith from 'lodash/fp/intersectionWith';
-import intersectionBy from 'lodash/fp/intersectionBy';
-import logAs from '../../utilities/logAs';
-import ContainerType from '../../model/ContainerType';
 import isEqual from 'lodash/fp/isEqual';
-import concat from 'lodash/fp/concat';
 
 interface Props extends InputProps<CommodityType | undefined> {
   margin: string;

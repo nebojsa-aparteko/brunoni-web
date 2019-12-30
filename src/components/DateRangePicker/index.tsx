@@ -86,7 +86,7 @@ const DateRangePickerImpl: React.FunctionComponent<DateRangePickerProps> = props
   };
 
   const onMonthNavigate = (marker: Marker, action: NavigationAction) => {
-    if (marker == MARKERS.FIRST_MONTH) {
+    if (marker === MARKERS.FIRST_MONTH) {
       const firstNew = addMonths(firstMonth, action);
       if (isBefore(firstNew, secondMonth)) setFirstMonth(firstNew);
     } else {

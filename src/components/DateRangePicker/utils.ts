@@ -7,8 +7,6 @@ import {
   addDays,
   isSameDay,
   isWithinInterval,
-  parse,
-  isValid,
 } from 'date-fns';
 import { DateRange } from './types';
 

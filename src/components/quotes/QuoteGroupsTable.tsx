@@ -73,7 +73,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
                 requestedBy.emailAddress ||
                 quotes[0].userId
               : quotes[0].userId
-            : '-'}
+            : quotes[0].userNameString || ' - '}
         </Typography>
       </TableCell>
     );

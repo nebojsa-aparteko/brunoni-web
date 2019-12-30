@@ -1,17 +1,5 @@
 import React, { useMemo, Fragment } from 'react';
-import {
-  Grid,
-  Typography,
-  ListItem,
-  Box,
-  Chip,
-  makeStyles,
-  ListItemIcon,
-  ListItemText,
-  SvgIcon,
-  Icon,
-  Divider,
-} from '@material-ui/core';
+import { Grid, Typography, ListItem, Box, makeStyles, ListItemIcon, ListItemText, SvgIcon } from '@material-ui/core';
 import List from '@material-ui/core/List';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
@@ -22,7 +10,6 @@ import uniqBy from 'lodash/fp/uniqBy';
 import Container from '../../model/Container';
 import CommodityType from '../../model/CommodityType';
 import { getLocationLabel } from '../inputs/LocationInput';
-import PickupLocation from '../../model/PickupLocation';
 import DepotLocationIcon from '@material-ui/icons/LocalShipping';
 import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';

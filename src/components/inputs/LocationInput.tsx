@@ -5,7 +5,6 @@ import PickupLocation from '../../model/PickupLocation';
 import SelectInput from './SelectInput';
 import orderBy from 'lodash/fp/orderBy';
 import get from 'lodash/fp/get';
-import CommodityType from '../../model/CommodityType';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import includes from 'lodash/fp/includes';
