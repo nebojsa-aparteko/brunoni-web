@@ -208,9 +208,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               <Typography variant="subtitle1" display="inline">
                 Quotes
               </Typography>
-              <Box mx={1} my={-1}>
-                <SynchronizeButton collection="quotes" />
-              </Box>
+              {showCompanyInfo && (
+                <Box mx={1} my={-1}>
+                  <SynchronizeButton collection="quotes" />
+                </Box>
+              )}
               <Box flex={1} />
               <Search
                 onSearch={handleSearch}

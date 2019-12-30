@@ -49,9 +49,9 @@ const DashboardCharts: React.FC = () => {
                   <MenuItem value={currentYear - 2}>{currentYear - 2}</MenuItem>
                 </Select>
               </FormControl>
-              <Box my={-1}>
-                <SynchronizeButton collection="clientPerformance" />
-              </Box>
+              {/*<Box my={-1}>*/}
+              {/*  <SynchronizeButton collection="clientPerformance" />*/}
+              {/*</Box>*/}
             </Box>
           </Grid>
         </Grid>
