@@ -37,7 +37,13 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     const values = flow(
       performanceByCarrierByYear(year),
       toPairs,
-      map(update(0, carrierId => carriers?.find(carrier => carrier.id === carrierId) || { name: carrierId })),
+      map(
+        update(
+          0,
+          carrierId =>
+            carriers?.find(carrier => carrier.id === carrierId || carrier.name === carrierId) || { name: carrierId },
+        ),
+      ),
       filter(get(1)),
     )(clientPerformance);
 
