@@ -39,7 +39,6 @@ import addDays from 'date-fns/addDays';
 import ClientInput from './inputs/ClientInput';
 import useClients from '../hooks/useClients';
 import Port from '../model/Port';
-import focusAndSelect from '../utilities/focusAndSelect';
 import Client from '../model/Client';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import PortInput from './inputs/PortInput';
@@ -129,13 +128,13 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
       searchString && searchString.length > 0 && dateFilteredQuoteGroups
         ? filter(
             (quoteGroup: QuoteGroup) =>
+              containsString(quoteGroup.id, searchString) ||
               (quoteGroup.quotes[0].placeOfReceiptName
                 ? containsString(quoteGroup.quotes[0].placeOfReceiptName!, searchString)
                 : false) ||
               (quoteGroup.quotes[0].placeOfDeliveryName
                 ? containsString(quoteGroup.quotes[0].placeOfDeliveryName!, searchString)
                 : false) ||
-              find((quote: Quote) => containsString(quote.id, searchString))(quoteGroup.quotes) !== undefined || // search through the quotes for online quotes
               containsString(quoteGroup.origin?.id || '', searchString) ||
               containsString(quoteGroup.origin?.city || '', searchString) ||
               containsString(quoteGroup.destination?.id || '', searchString) ||
@@ -146,9 +145,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               find((commodityType: CommodityType) => {
                 return containsString(commodityType.name, searchString);
               })(quoteGroup.commodityTypes) !== undefined ||
-              find((quote: Quote) => (quote.carrier ? containsString(quote.carrier.id, searchString) : false))(
-                quoteGroup.quotes,
-              ) !== undefined,
+              find(
+                (quote: Quote) =>
+                  (quote.carrier ? containsString(quote.carrier.id, searchString) : false) ||
+                  containsString(quote.id, searchString),
+              )(quoteGroup.quotes) !== undefined,
           )(dateFilteredQuoteGroups)
         : dateFilteredQuoteGroups;
 
