@@ -205,30 +205,29 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
         justifyContent="space-between"
         alignContent="space-around"
       >
-        {!showCompanyInfo && <DateRangeInput onChange={handleDateRangeChange} />}
-
-        {showCompanyInfo && (
-          <Grid container spacing={2}>
+        <Grid container spacing={2}>
+          {showCompanyInfo && (
             <Grid item sm={3} xs={12}>
               <Box display="flex">
                 <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />
                 {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
               </Box>
             </Grid>
-            <Grid item sm={3} xs={12}>
-              <PortInput label="Origin" ports={ports} value={originPort} onChange={setOriginPort} />
-            </Grid>
-            <Grid item sm={3} xs={12}>
-              <PortInput label="Destination" ports={ports} value={destinationPort} onChange={setDestinationPort} />
-            </Grid>
-
-            <Grid item sm={3} xs={12}>
-              <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-                <DateRangeInput onChange={handleDateRangeChange} />
-              </Box>
-            </Grid>
+          )}
+          <Grid item sm={3} xs={12}>
+            <PortInput label="Origin" ports={ports} value={originPort} onChange={setOriginPort} />
           </Grid>
-        )}
+          <Grid item sm={3} xs={12}>
+            <PortInput label="Destination" ports={ports} value={destinationPort} onChange={setDestinationPort} />
+          </Grid>
+
+          {!showCompanyInfo && <Grid item sm={3} xs={12} />}
+          <Grid item sm={3} xs={12}>
+            <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
+              <DateRangeInput onChange={handleDateRangeChange} />
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
 
       <Card className={className} {...rest}>
