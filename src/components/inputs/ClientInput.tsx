@@ -21,12 +21,7 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    minWidth: '320px',
-    width: '30%',
-    [theme.breakpoints.down('sm')]: {
-      marginTop: theme.spacing(2),
-      width: '100%',
-    },
+    width: '100%',
   },
   input: {
     flexWrap: 'nowrap',

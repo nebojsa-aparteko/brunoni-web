@@ -10,6 +10,7 @@ import {
   TablePagination,
   Typography,
   Container as MUIContainer,
+  Grid,
 } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroups';
@@ -41,6 +42,8 @@ import Port from '../model/Port';
 import focusAndSelect from '../utilities/focusAndSelect';
 import Client from '../model/Client';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
+import PortInput from './inputs/PortInput';
+import Ports from '../contexts/Ports';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -98,8 +101,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const quoteGroups = useContext(QuoteGroupsContext);
 
   const clients = useClients();
+  const ports = useContext(Ports);
 
   const [clientFilter, setClientFilter] = useState<Client>();
+  const [originPort, setOriginPort] = useState<Port>();
+  const [destinationPort, setDestinationPort] = useState<Port>();
 
   const [dateRange, setDateRange] = useState<DateRange>();
 
@@ -114,6 +120,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
       (quoteGroup: QuoteGroup) =>
         !quoteGroup.quotes[0].archived &&
         (clientFilter ? quoteGroup.quotes[0].clientId === clientFilter.id : true) &&
+        (originPort ? quoteGroup.origin?.id === originPort.id : true) &&
+        (destinationPort ? quoteGroup.destination?.id === destinationPort.id : true) &&
         compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
         compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(quoteGroups);
@@ -150,7 +158,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     )(filteredResults);
     setFilteredResults(sortedFiltered);
     return chunk(rowsPerPage)(sortedFiltered);
-  }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter]);
+  }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));
@@ -196,12 +204,29 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
         justifyContent="space-between"
         alignContent="space-around"
       >
-        <DateRangeInput onChange={handleDateRangeChange} />
+        {!showCompanyInfo && <DateRangeInput onChange={handleDateRangeChange} />}
+
         {showCompanyInfo && (
-          <Box mx={1} my={-1} display="flex">
-            <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />
-            {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
-          </Box>
+          <Grid container spacing={2}>
+            <Grid item sm={3} xs={12}>
+              <Box display="flex">
+                <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />
+                {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
+              </Box>
+            </Grid>
+            <Grid item sm={3} xs={12}>
+              <PortInput label="Origin" ports={ports} value={originPort} onChange={setOriginPort} />
+            </Grid>
+            <Grid item sm={3} xs={12}>
+              <PortInput label="Destination" ports={ports} value={destinationPort} onChange={setDestinationPort} />
+            </Grid>
+
+            <Grid item sm={3} xs={12}>
+              <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
+                <DateRangeInput onChange={handleDateRangeChange} />
+              </Box>
+            </Grid>
+          </Grid>
         )}
       </Box>
 
