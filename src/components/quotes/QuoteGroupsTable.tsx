@@ -23,6 +23,7 @@ import useClients from '../../hooks/useClients';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import UserRecord from '../../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,9 +39,29 @@ interface RowProps extends QuoteGroup {
   showCompanyInfo?: boolean;
 }
 
+export const ClientRequestedByLabel: React.FC<{
+  userRecord: UserRecord | null | undefined;
+  userId: string;
+  userNameString: string;
+}> = ({ userRecord, userId, userNameString }) => {
+  return (
+    <Typography variant="body2">
+      {userId
+        ? userRecord
+          ? [userRecord.firstName, userRecord.lastName]
+              .filter(identity)
+              .map(invoke('trim'))
+              .join(' ') ||
+            userRecord.emailAddress ||
+            userId
+          : userId
+        : userNameString || ' - '}
+    </Typography>
+  );
+};
+
 const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, containers, commodityTypes, quotes }) => {
   const classes = useStyles();
-  const users = useContext(UserRecords);
   const clients = useClients();
   const history = useHistory();
 
@@ -63,18 +84,11 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
     return (
       <TableCell>
         {client.name}
-        <Typography variant="body2">
-          {quotes[0].userId
-            ? requestedBy
-              ? [requestedBy.firstName, requestedBy.lastName]
-                  .filter(identity)
-                  .map(invoke('trim'))
-                  .join(' ') ||
-                requestedBy.emailAddress ||
-                quotes[0].userId
-              : quotes[0].userId
-            : quotes[0].userNameString || ' - '}
-        </Typography>
+        <ClientRequestedByLabel
+          userRecord={requestedBy}
+          userId={quotes[0].userId}
+          userNameString={quotes[0].userNameString}
+        />
       </TableCell>
     );
   }, [showCompanyInfo, client, quotes[0].clientId]);
@@ -94,7 +108,16 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
       key={id}
     >
       {clientInfo}
-      <TableCell>{quoteRouteLabelDisplay(quotes[0], true)}</TableCell>
+      <TableCell>
+        {quoteRouteLabelDisplay(quotes[0], true)}
+        {!showCompanyInfo && (
+          <ClientRequestedByLabel
+            userRecord={requestedBy}
+            userId={quotes[0].userId}
+            userNameString={quotes[0].userNameString}
+          />
+        )}
+      </TableCell>
       <TableCell>{uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}</TableCell>
       <TableCell>
         <Grid container spacing={1}>

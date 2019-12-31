@@ -121,7 +121,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
       searchString && searchString.length > 0 && dateFilteredQuoteGroups
         ? filter(
             (quoteGroup: QuoteGroup) =>
-              containsString(quoteGroup.id, searchString) ||
               (quoteGroup.quotes[0].placeOfReceiptName
                 ? containsString(quoteGroup.quotes[0].placeOfReceiptName!, searchString)
                 : false) ||
@@ -198,7 +197,12 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
         alignContent="space-around"
       >
         <DateRangeInput onChange={handleDateRangeChange} />
-        {showCompanyInfo && <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />}
+        {showCompanyInfo && (
+          <Box mx={1} my={-1} display="flex">
+            <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />
+            {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
+          </Box>
+        )}
       </Box>
 
       <Card className={className} {...rest}>
@@ -209,11 +213,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               <Typography variant="subtitle1" display="inline">
                 Quotes
               </Typography>
-              {showCompanyInfo && (
-                <Box mx={1} my={-1}>
-                  <SynchronizeButton collection="quotes" />
-                </Box>
-              )}
               <Box flex={1} />
               <Search
                 onSearch={handleSearch}

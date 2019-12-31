@@ -6,6 +6,7 @@ import useUser from '../hooks/useUser';
 
 interface Props {
   collection: 'quotes' | 'clientPerformance';
+  alphacomClientId: string;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const SynchronizeButton: React.FC<Props> = ({ collection }) => {
+const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) => {
   const classes = useStyles();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -38,17 +39,20 @@ const SynchronizeButton: React.FC<Props> = ({ collection }) => {
       try {
         const token = await user.getIdToken();
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/synchronization/${collection}`, {
-          method: 'POST',
-          mode: 'cors',
-          cache: 'no-cache',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/synchronization/${collection}/${alphacomClientId}`,
+          {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            signal,
           },
-          signal,
-        });
+        );
 
         if (response.ok) {
           enqueueSnackbar(<Typography color="inherit">Contents are now up to date.</Typography>, { variant: 'info' });
