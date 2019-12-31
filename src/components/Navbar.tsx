@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
           brunoni: {
             position: 'relative',
             top: 6,
-            width: 80,
+            height: 78,
           },
           allmarine: {
             maxHeight: 80,
