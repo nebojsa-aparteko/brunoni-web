@@ -51,13 +51,19 @@ const firebaseConfig =
 
 firebase.initializeApp(firebaseConfig);
 
-// firebase
-//   .firestore()
-//   .enablePersistence({
-//     synchronizeTabs: true,
-//   })
-//   .catch(function(err) {
-//     console.warn('Failed to enable firestore persistence', err);
-//   });
+firebase
+  .firestore()
+  .enablePersistence({
+    synchronizeTabs: true,
+  })
+  .then(() => {
+    console.log('Enabled offline sync');
+    // firebase.firestore().clearPersistence().catch(error => {
+    //   console.error('Could not enable persistence:', error.code);
+    // });
+  })
+  .catch(function(err) {
+    console.warn('Failed to enable firestore persistence', err);
+  });
 
 export default firebase;

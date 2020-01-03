@@ -267,7 +267,7 @@ const Navbar: React.FC = () => {
                     <Fragment>
                       {formControl}
                       <div className={classes.item}>
-                        <Button component={Link} to="/quotes/get" underline="none" variant="outlined">
+                        <Button component={Link} to="/quotes/get" underline="none" variant="contained" color="primary">
                           Get Quote
                         </Button>
                       </div>
