@@ -102,15 +102,17 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
   const clients = useClients();
   const ports = useContext(Ports);
 
-  const [clientFilter, setClientFilter] = useState<Client>();
-  const [originPort, setOriginPort] = useState<Port>();
-  const [destinationPort, setDestinationPort] = useState<Port>();
-
   const [dateRange, setDateRange] = useState<DateRange>();
 
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
 
-  const { searchString, page, rowsPerPage } = quoteListContextData;
+  const { searchString, page, rowsPerPage, clientFilter, originPort, destinationPort } = quoteListContextData;
+
+  const setOriginPort = (port: Port) => setQuoteListContextData(set('originPort', port)(quoteListContextData));
+  const setDestinationPort = (port: Port) =>
+    setQuoteListContextData(set('destinationPort', port)(quoteListContextData));
+  const setClientFilter = (client: Client) =>
+    setQuoteListContextData(set('clientFilter', client)(quoteListContextData));
 
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
@@ -181,10 +183,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
     setDateRange(dateRange);
   };
 
-  const handleClientChange = (client: Client) => {
-    setClientFilter(client);
-  };
-
   if (!quoteGroups) {
     return (
       <MUIContainer maxWidth="lg">
@@ -209,7 +207,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
           {showCompanyInfo && (
             <Grid item sm={3} xs={12}>
               <Box display="flex">
-                <ClientInput label="Choose Client" clients={clients} onChange={handleClientChange} />
+                <ClientInput label="Choose Client" clients={clients} onChange={setClientFilter} value={clientFilter} />
                 {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
               </Box>
             </Grid>
