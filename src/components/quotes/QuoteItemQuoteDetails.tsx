@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
+import Linkify from 'react-linkify';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-import { Grid } from '@material-ui/core';
+import { Grid, Link } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -78,8 +79,16 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
                   <TableCell align="right">{quoteDetail.CostValue}</TableCell>
                   <TableCell>{quoteDetail.CostUnit}</TableCell>
                   <TableCell>
-                    {quoteDetail.RemarkRef || ''}
-                    {quoteDetail.Remark}
+                    <Linkify
+                      componentDecorator={(decoratedHref: string, decoratedText: string, key: number) => (
+                        <Link key={key} href={decoratedHref}>
+                          {decoratedText}
+                        </Link>
+                      )}
+                    >
+                      {quoteDetail.RemarkRef || ''}
+                      {quoteDetail.Remark}
+                    </Linkify>
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
-import { Grid, useMediaQuery, useTheme } from '@material-ui/core';
+import Linkify from 'react-linkify';
+import { Grid, Link, useMediaQuery, useTheme } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
 import { Remark } from '../../providers/QuoteGroups';
@@ -18,16 +19,26 @@ const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => {
       {remarks.map((remark, i) => (
         <Fragment key={i}>
           <Grid item md={3} sm={4} xs={isPrint ? 4 : 12}>
-            <InfoBoxItem
-              title={remark.RemarkTitle}
-              label1HTML={remark.RemarkLabel ? { __html: remark.RemarkLabel } : ''}
-            />
+            <Linkify>
+              <InfoBoxItem
+                title={remark.RemarkTitle}
+                label1HTML={remark.RemarkLabel ? { __html: remark.RemarkLabel } : ''}
+              />
+            </Linkify>
           </Grid>
           <Grid item md={9} sm={8} xs={isPrint ? 8 : 12}>
-            <InfoBoxItem
-              label1HTML={{ __html: remark.RemarkText }}
-              occupySpaceForTitle={isXS ? false : remark.RemarkTitle !== null}
-            />
+            <Linkify
+              componentDecorator={(decoratedHref: string, decoratedText: string, key: number) => (
+                <Link key={key} href={decoratedHref}>
+                  {decoratedText}
+                </Link>
+              )}
+            >
+              <InfoBoxItem
+                label1HTML={{ __html: remark.RemarkText }}
+                occupySpaceForTitle={isXS ? false : remark.RemarkTitle !== null}
+              />
+            </Linkify>
           </Grid>
         </Fragment>
       ))}

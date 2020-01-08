@@ -44,6 +44,7 @@
     "react-dom": "^16.11.0",
     "react-helmet": "^5.2.1",
     "react-id-generator": "^3.0.0",
+    "react-linkify": "^1.0.0-alpha",
     "react-perfect-scrollbar": "^1.5.3",
     "react-router-dom": "^5.1.2",
     "react-scripts": "next",
@@ -78,6 +79,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-linkify": "^1.0.0",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "prettier": "^1.19.1"
