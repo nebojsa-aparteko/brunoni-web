@@ -13,6 +13,8 @@ import subMonths from 'date-fns/subMonths';
 import get from 'lodash/fp/get';
 import formatDate from 'date-fns/format';
 import endOfDay from 'date-fns/endOfDay';
+import subYears from 'date-fns/subYears';
+import endOfYear from 'date-fns/endOfYear';
 import { QuoteListContext } from '../../contexts/QuoteListContext';
 import set from 'lodash/fp/set';
 
@@ -49,6 +51,11 @@ export const rangePredefinedValues: DefinedRange[] = [
     label: 'This Year',
     startDate: startOfYear(new Date()),
     endDate: endOfDay(new Date()),
+  },
+  {
+    label: 'Last Year',
+    startDate: startOfYear(subYears(new Date(), 1)),
+    endDate: endOfYear(subYears(new Date(), 1)),
   },
 ];
 
