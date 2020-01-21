@@ -18,7 +18,7 @@ const QuoteGroups: React.FC = () => {
     <Fragment>
       <Meta title="Quotes" />
       <Container maxWidth="lg" className={classes.root}>
-        <QuoteGroupsView showGetQuoteButton={false} />
+        <QuoteGroupsView showGetQuoteButton={true} />
       </Container>
     </Fragment>
   );

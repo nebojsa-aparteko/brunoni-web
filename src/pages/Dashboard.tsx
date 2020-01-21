@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
   return (
     <Container className={classes.root}>
       <DashboardCharts />
-      <QuoteGroups showGetQuoteButton={false} className={classes.quoteDetails} />
+      <QuoteGroups showGetQuoteButton={true} className={classes.quoteDetails} />
     </Container>
   );
 };

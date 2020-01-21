@@ -95,7 +95,7 @@ const containsString = (prop: string, searchString: string) => {
   return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
 };
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, className, ...rest }) => {
+const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyInfo, className, ...rest }) => {
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
@@ -236,6 +236,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showCompanyInfo, cla
               <Typography variant="subtitle1" display="inline">
                 Quotes
               </Typography>
+              {showGetQuoteButton && (
+                <Box ml={4}>
+                  <GetQuotesButton />
+                </Box>
+              )}
               <Box flex={1} />
               <Search
                 onSearch={handleSearch}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, useHistory, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
@@ -50,18 +50,27 @@ const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
 
+const showIntercom = (show: Boolean) => {
+  Intercom('update', {
+    hide_default_launcher: !show,
+  });
+};
+
 const UserApp: React.FC = () => {
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
 
   switch (actingAs) {
     case undefined:
+      showIntercom(true);
       return <App />;
     case null:
       switch (userRecord) {
         case undefined:
+          showIntercom(true);
           return <App />;
         case null:
+          showIntercom(true);
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
               <QuotesProvider>
@@ -74,6 +83,11 @@ const UserApp: React.FC = () => {
             </FirestoreClientDocumentProvider>
           );
         default:
+          if (userRecord.isAdmin) {
+            showIntercom(false);
+          } else {
+            showIntercom(true);
+          }
           return userRecord.isAdmin ? (
             <AdminQuotesProvider>
               <QuoteGroupsProvider>
@@ -89,6 +103,7 @@ const UserApp: React.FC = () => {
           );
       }
     default:
+      showIntercom(true);
       return (
         <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
           <QuotesProvider>

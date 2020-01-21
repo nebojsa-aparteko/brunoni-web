@@ -92,8 +92,8 @@ const UserRoutes: React.FC = () => {
 const useStyles = makeStyles((theme: Theme) => ({
   goTop: {
     position: 'fixed',
-    bottom: '30px',
-    right: '30px',
+    bottom: '100px',
+    right: '22px',
   },
   deviceControl: {
     [theme.breakpoints.down('sm')]: {
