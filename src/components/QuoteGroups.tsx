@@ -230,7 +230,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
 
       <Card className={className} {...rest}>
         <CardHeader
-          action={showGetQuoteButton && <GetQuotesButton />}
           title={
             <Box display="flex" alignItems="center">
               <Typography variant="subtitle1" display="inline">
