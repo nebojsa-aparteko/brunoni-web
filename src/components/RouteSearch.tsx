@@ -106,6 +106,14 @@ const RouteSearch: React.FC<Props> = () => {
       return;
     }
 
+    Intercom('trackEvent', 'searched-schedule', {
+      origin: params.originPort?.id || null,
+      destination: params.destinationPort?.id || null,
+      date: formatDate(params.date, 'yyyy-MM-dd') || null,
+      weeks: params.weeks.toString() || null,
+      carrier: carrierFilter || null,
+    });
+
     firebase
       .firestore()
       .collection('schedule-searches')

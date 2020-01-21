@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useHistory, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
@@ -103,9 +103,43 @@ const UserApp: React.FC = () => {
   }
 };
 
+const IntercomRouteUpdater = () => {
+  const history = useHistory();
+
+  useEffect(() => {
+    Intercom('update', { last_request_at: new Date().getTime() / 1000 });
+  }, [history.location.pathname]);
+
+  return null;
+};
+
+let prevUser: firebase.User | null | undefined = undefined;
+
 const render = (user: firebase.User | null) => {
+  if (prevUser && !user) {
+    Intercom('shutdown');
+  } else {
+    Intercom('boot', {
+      app_id: 'p6unnr5i',
+      ...(user
+        ? {
+            email: user.email,
+            user_id: user.uid,
+            ...(user.metadata && user.metadata.creationTime
+              ? {
+                  created_at: new Date(user.metadata.creationTime).getTime() / 1000,
+                }
+              : {}),
+          }
+        : {}),
+    });
+  }
+
+  prevUser = user;
+
   const app = (
     <Router>
+      <IntercomRouteUpdater />
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
           <LoginDialogProvider>
