@@ -32,6 +32,8 @@ import QuoteNav from './quotes/QuoteItemNav';
 import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import changeCase from 'change-case';
 import useClients from '../hooks/useClients';
+import ContainerType from '../model/Container';
+import { Quote as QuoteModel } from '../providers/QuoteGroups';
 
 interface Props {
   id: string;
@@ -89,6 +91,15 @@ function ScrollToTopOnMount() {
   return null;
 }
 
+const buildQuoteTile = (quote: QuoteModel) =>
+  `${quote.carrier.name || quote.carrier.id} - ${
+    quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
+  }`;
+
+const handleSpecialRequest = (quote: QuoteModel) => {
+  Intercom('showNewMessage', `Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`);
+};
+
 const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
@@ -125,122 +136,157 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const client = clients?.find(client => client.id === quote.clientId);
 
-  const quoteTitle = `${quote.carrier.name || quote.carrier.id} - ${
-    quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
-  }`;
+  const quoteTitle = buildQuoteTile(quote);
+
+  Intercom('update', {
+    quote_last_viewed_carrier: quote.carrier.name || quote.carrier.id,
+    quote_last_viewed_id: quote.id,
+    quote_last_viewed_link:
+      process.env.REACT_APP_BRAND === 'brunoni'
+        ? `https://mybrunoni.ch/quotes/${quote.id}`
+        : `https://myallmarine.ch/quotes/${quote.id}`,
+  });
+
+  Intercom('trackEvent', 'viewed-quote', {
+    quoteId: quote.id,
+    quoteLink:
+      process.env.REACT_APP_BRAND === 'brunoni'
+        ? `https://mybrunoni.ch/quotes/${quote.id}`
+        : `https://myallmarine.ch/quotes/${quote.id}`,
+    origin: quote.origin.id,
+    destination: quote.destination.id,
+    date: quote.dateIssued.toISOString(),
+    containers: JSON.stringify(
+      quote.containers.map((container: ContainerType) => ({
+        type: container.containerType!.id,
+        commodity: container.commodityType!.id,
+        location: container.pickupLocation?.id,
+        quantity: container.quantity,
+      })),
+    ),
+  });
 
   return (
-    <Container maxWidth="lg">
-      <ScrollToTopOnMount />
-      <Paper className={classes.root}>
-        <Box display="none" displayPrint="block" mb={2}>
-          <Box mb={2}>
-            <img
-              src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-              alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
-              style={{ width: '5em' }}
-            />
-          </Box>
-          <Divider />
-        </Box>
-        <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-          <QuoteNav
-            backTo={
-              quote.groupId !== quote.id && quoteGroup.quotes.length > 1
-                ? `/quotes/groups/${quote.groupId}`
-                : `/quotes/groups`
-            }
-            title={`Quotation - ${quoteTitle}`}
-            subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
-          />
-
-          <Box className={classes.actions} displayPrint="none">
-            <Button
-              color="primary"
-              variant="contained"
-              size="small"
-              href={buildMailToLink(quote, [user, userData, client!])}
-              target="_blank"
-            >
-              Book Now
-            </Button>
-
-            <Button aria-label="print" variant="outlined" size="small" startIcon={<PrintIcon />} onClick={handlePrint}>
-              Print
-            </Button>
-            <Button
-              aria-label="special request"
-              variant="outlined"
-              size="small"
-              startIcon={<FlareIcon />}
-              href={buildSpecialRequestLink(quote, [user, userData, client!])}
-              target="_blank"
-            >
-              {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
-            </Button>
-          </Box>
-        </Box>
-        <Grid item xs={12}>
-          <Page title={quoteTitle}>
-            <Grid container spacing={2}>
-              <Grid item md={6} xs={12} className={classes.hidePrint}>
-                <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
-              </Grid>
-              <Grid item md={6} xs={12} className={classes.hidePrint}>
-                <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Box display="none" displayPrint="block" width="100%">
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <QuoteItemHeader quote={quote} userData={userData} />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
-              <QuoteItemTerms terms={quote.terms} />
-              <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
-              <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
-              <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
-              <QuoteItemRemarks remarks={quote.remarks} />
-            </Grid>
-
-            <Box displayPrint="block" display="none" marginTop="1em">
-              <Divider />
-              <Typography variant="body1">
-                <br />
-                <br />
-                {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                  <span>Your Brunoni-Team</span>
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                  <span>Your Allmarine-Team</span>
-                ) : null}
-                <br />
-                {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                  <span>Tel. 044 455 58 58</span>
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                  <span>Tel. 044 533 38 48</span>
-                ) : null}
-                <br />
-                {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                  <span>info@brunoni.ch</span>
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                  <span>info@allmarine.ch</span>
-                ) : null}
-              </Typography>
+    <Page title={quoteTitle}>
+      <Container maxWidth="lg">
+        <ScrollToTopOnMount />
+        <Paper className={classes.root}>
+          <Box display="none" displayPrint="block" mb={2}>
+            <Box mb={2}>
+              <img
+                src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                style={{ width: '5em' }}
+              />
             </Box>
-          </Page>
-        </Grid>
-      </Paper>
-    </Container>
+            <Divider />
+          </Box>
+          <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+            <QuoteNav
+              backTo={
+                quote.groupId !== quote.id && quoteGroup.quotes.length > 1
+                  ? `/quotes/groups/${quote.groupId}`
+                  : `/quotes/groups`
+              }
+              title={`Quotation - ${quoteTitle}`}
+              subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
+            />
+
+            <Box className={classes.actions} displayPrint="none">
+              <Button
+                color="primary"
+                variant="contained"
+                size="small"
+                href={buildMailToLink(quote, [user, userData, client!])}
+                target="_blank"
+              >
+                Book Now
+              </Button>
+
+              <Button
+                aria-label="print"
+                variant="outlined"
+                size="small"
+                startIcon={<PrintIcon />}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+              <Button
+                aria-label="special request"
+                variant="outlined"
+                size="small"
+                startIcon={<FlareIcon />}
+                onClick={() => handleSpecialRequest(quote)}
+                href={buildSpecialRequestLink(quote, [user, userData, client!])}
+                target="_blank"
+              >
+                {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
+              </Button>
+            </Box>
+          </Box>
+          <Grid item xs={12}>
+            <Page title={quoteTitle}>
+              <Grid container spacing={2}>
+                <Grid item md={6} xs={12} className={classes.hidePrint}>
+                  <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
+                </Grid>
+                <Grid item md={6} xs={12} className={classes.hidePrint}>
+                  <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Box display="none" displayPrint="block" width="100%">
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <QuoteItemHeader quote={quote} userData={userData} />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+                <QuoteItemTerms terms={quote.terms} />
+                <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
+                <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
+                <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
+                <QuoteItemRemarks remarks={quote.remarks} />
+              </Grid>
+
+              <Box displayPrint="block" display="none" marginTop="1em">
+                <Divider />
+                <Typography variant="body1">
+                  <br />
+                  <br />
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>Your Brunoni-Team</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>Your Allmarine-Team</span>
+                  ) : null}
+                  <br />
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>Tel. 044 455 58 58</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>Tel. 044 533 38 48</span>
+                  ) : null}
+                  <br />
+                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                    <span>info@brunoni.ch</span>
+                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                    <span>info@allmarine.ch</span>
+                  ) : null}
+                </Typography>
+              </Box>
+            </Page>
+          </Grid>
+        </Paper>
+      </Container>
+    </Page>
   );
 };
 

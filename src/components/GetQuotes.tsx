@@ -149,12 +149,14 @@ const GetQuotes: React.FC<Props> = () => {
           destination: destinationPort!.id,
           date: date.toISOString(),
           weeks: Number(weeks),
-          containers: containers.map((container: ContainerType) => ({
-            type: container.containerType!.id,
-            commodity: container.commodityType!.id,
-            location: container.pickupLocation?.id,
-            quantity: container.quantity,
-          })),
+          containers: JSON.stringify(
+            containers.map((container: ContainerType) => ({
+              type: container.containerType!.id,
+              commodity: container.commodityType!.id,
+              location: container.pickupLocation?.id,
+              quantity: container.quantity,
+            })),
+          ),
         });
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {

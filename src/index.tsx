@@ -60,6 +60,18 @@ const UserApp: React.FC = () => {
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
 
+  if (userRecord) {
+    Intercom('update', {
+      alphacomId: userRecord.alphacomId,
+      company: {
+        id: userRecord.alphacomClientId,
+        name: userRecord.company.name,
+        city: userRecord.company.city,
+        countryCode: userRecord.company.countryCode,
+      },
+    });
+  }
+
   switch (actingAs) {
     case undefined:
       showIntercom(true);
@@ -71,6 +83,7 @@ const UserApp: React.FC = () => {
           return <App />;
         case null:
           showIntercom(true);
+          // Company
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
               <QuotesProvider>
@@ -140,6 +153,7 @@ const render = (user: firebase.User | null) => {
         ? {
             email: user.email,
             user_id: user.uid,
+            user_hash: '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b',
             ...(user.metadata && user.metadata.creationTime
               ? {
                   created_at: new Date(user.metadata.creationTime).getTime() / 1000,

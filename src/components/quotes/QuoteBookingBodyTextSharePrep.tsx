@@ -78,6 +78,7 @@ export const buildSpecialRequestLink = (
   quote: Quote | undefined,
   [user, userData, client]: [firebase.User, UserRecord, Client],
 ) => {
+  if (process.env.REACT_APP_BRAND === 'brunoni') return '';
   const mailtoAddress =
     process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
   if (quote) {
