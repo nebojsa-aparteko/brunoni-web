@@ -62,6 +62,7 @@ const UserApp: React.FC = () => {
 
   if (userRecord) {
     Intercom('update', {
+      name: `${userRecord.firstName} ${userRecord.lastName}`,
       alphacomId: userRecord.alphacomId,
       company: {
         id: userRecord.alphacomClientId,
