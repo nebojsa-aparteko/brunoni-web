@@ -14,7 +14,6 @@
     "@types/change-case": "^2.3.1",
     "@types/classnames": "^2.2.9",
     "@types/fontfaceobserver": "^0.0.6",
-    "@types/intercom-web": "^2.8.7",
     "@types/jest": "24.0.23",
     "@types/js-cookie": "^2.2.4",
     "@types/lodash": "^4.14.146",

@@ -23,6 +23,7 @@ import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import SpecialOffers from './SpecialOffers';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
+import ContainerType from '../model/Container';
 
 interface Props {}
 
@@ -106,13 +107,25 @@ const RouteSearch: React.FC<Props> = () => {
       return;
     }
 
-    Intercom('trackEvent', 'searched-schedule', {
-      origin: params.originPort?.id || null,
-      destination: params.destinationPort?.id || null,
-      date: formatDate(params.date, 'yyyy-MM-dd') || null,
-      weeks: params.weeks.toString() || null,
-      carrier: carrierFilter || null,
-    });
+    $crisp.push([
+      'set',
+      'session:event',
+      [
+        [
+          [
+            'searched-schedule',
+            {
+              origin: params.originPort?.id || null,
+              destination: params.destinationPort?.id || null,
+              date: formatDate(params.date, 'yyyy-MM-dd') || null,
+              weeks: params.weeks.toString() || null,
+              carrier: carrierFilter || null,
+            },
+            'black',
+          ],
+        ],
+      ],
+    ]);
 
     firebase
       .firestore()

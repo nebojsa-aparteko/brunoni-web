@@ -97,7 +97,8 @@ const buildQuoteTile = (quote: QuoteModel) =>
   }`;
 
 const handleSpecialRequest = (quote: QuoteModel) => {
-  Intercom('showNewMessage', `Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`);
+  // TODO Try to show custom message `Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`
+  $crisp.push(['do', 'chat:open']);
 };
 
 const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
@@ -138,33 +139,53 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const quoteTitle = buildQuoteTile(quote);
 
-  Intercom('update', {
-    quote_last_viewed_carrier: quote.carrier.name || quote.carrier.id,
-    quote_last_viewed_id: quote.id,
-    quote_last_viewed_link:
-      process.env.REACT_APP_BRAND === 'brunoni'
-        ? `https://mybrunoni.ch/quotes/${quote.id}`
-        : `https://myallmarine.ch/quotes/${quote.id}`,
-  });
+  $crisp.push([
+    'set',
+    'session:data',
+    [
+      [
+        ['quote-last-viewed-carrier', quote.carrier.name || quote.carrier.id],
+        ['quote-last-viewed-id', quote.id],
+        [
+          'quote-last-viewed-link',
+          process.env.REACT_APP_BRAND === 'brunoni'
+            ? `https://mybrunoni.ch/quotes/${quote.id}`
+            : `https://myallmarine.ch/quotes/${quote.id}`,
+        ],
+      ],
+    ],
+  ]);
 
-  Intercom('trackEvent', 'viewed-quote', {
-    quoteId: quote.id,
-    quoteLink:
-      process.env.REACT_APP_BRAND === 'brunoni'
-        ? `https://mybrunoni.ch/quotes/${quote.id}`
-        : `https://myallmarine.ch/quotes/${quote.id}`,
-    origin: quote.origin.id,
-    destination: quote.destination.id,
-    date: quote.dateIssued.toISOString(),
-    containers: JSON.stringify(
-      quote.containers.map((container: ContainerType) => ({
-        type: container.containerType!.id,
-        commodity: container.commodityType!.id,
-        location: container.pickupLocation?.id,
-        quantity: container.quantity,
-      })),
-    ),
-  });
+  $crisp.push([
+    'set',
+    'session:event',
+    [
+      [
+        [
+          'viewed-quote',
+          {
+            quoteId: quote.id,
+            quoteLink:
+              process.env.REACT_APP_BRAND === 'brunoni'
+                ? `https://mybrunoni.ch/quotes/${quote.id}`
+                : `https://myallmarine.ch/quotes/${quote.id}`,
+            origin: quote.origin.id,
+            destination: quote.destination.id,
+            date: quote.dateIssued.toISOString(),
+            containers: JSON.stringify(
+              quote.containers.map((container: ContainerType) => ({
+                type: container.containerType!.id,
+                commodity: container.commodityType!.id,
+                location: container.pickupLocation?.id,
+                quantity: container.quantity,
+              })),
+            ),
+          },
+          'black',
+        ],
+      ],
+    ],
+  ]);
 
   return (
     <Page title={quoteTitle}>

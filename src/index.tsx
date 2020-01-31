@@ -50,10 +50,8 @@ const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
 
-const showIntercom = (show: Boolean) => {
-  Intercom('update', {
-    hide_default_launcher: !show,
-  });
+const showCrispChat = (show: Boolean) => {
+  $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
 };
 
 const UserApp: React.FC = () => {
@@ -61,29 +59,38 @@ const UserApp: React.FC = () => {
   const [actingAs] = useContext(ActingAs);
 
   if (userRecord) {
-    Intercom('update', {
-      name: `${userRecord.firstName} ${userRecord.lastName}`,
-      alphacomId: userRecord.alphacomId,
-      company: {
-        id: userRecord.alphacomClientId,
-        name: userRecord.company.name,
-        city: userRecord.company.city,
-        countryCode: userRecord.company.countryCode,
-      },
-    });
+    $crisp.push([
+      'set',
+      'session:data',
+      [
+        [
+          ['name', `${userRecord.firstName} ${userRecord.lastName}`],
+          ['alphacomId', userRecord.alphacomId],
+          [
+            'company',
+            {
+              id: userRecord.alphacomClientId,
+              name: userRecord.company.name,
+              city: userRecord.company.city,
+              countryCode: userRecord.company.countryCode,
+            },
+          ],
+        ],
+      ],
+    ]);
   }
 
   switch (actingAs) {
     case undefined:
-      showIntercom(true);
+      showCrispChat(true);
       return <App />;
     case null:
       switch (userRecord) {
         case undefined:
-          showIntercom(true);
+          showCrispChat(true);
           return <App />;
         case null:
-          showIntercom(true);
+          showCrispChat(true);
           // Company
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
@@ -98,9 +105,9 @@ const UserApp: React.FC = () => {
           );
         default:
           if (userRecord.isAdmin) {
-            showIntercom(false);
+            showCrispChat(false);
           } else {
-            showIntercom(true);
+            showCrispChat(true);
           }
           return userRecord.isAdmin ? (
             <AdminQuotesProvider>
@@ -117,7 +124,7 @@ const UserApp: React.FC = () => {
           );
       }
     default:
-      showIntercom(true);
+      showCrispChat(true);
       return (
         <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
           <QuotesProvider>
@@ -132,11 +139,11 @@ const UserApp: React.FC = () => {
   }
 };
 
-const IntercomRouteUpdater = () => {
+const CrispChatRouteUpdater = () => {
   const history = useHistory();
 
   useEffect(() => {
-    Intercom('update', { last_request_at: new Date().getTime() / 1000 });
+    $crisp.push(['set', 'session:data', [[['last-request-at', new Date()]]]]);
   }, [history.location.pathname]);
 
   return null;
@@ -146,30 +153,31 @@ let prevUser: firebase.User | null | undefined = undefined;
 
 const render = (user: firebase.User | null) => {
   if (prevUser && !user) {
-    Intercom('shutdown');
+    $crisp.push(['do', 'session:reset', [false]]);
+  } else if (user) {
+    $crisp.push(['set', 'user:email', [user.email]]);
+
+    $crisp.push([
+      'set',
+      'session:data',
+      [
+        [
+          ['user-id', user.uid],
+          ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
+          ...(user.metadata && user.metadata.creationTime
+            ? [['created-at', new Date(user.metadata.creationTime)]]
+            : []),
+        ],
+      ],
+    ]);
   } else {
-    Intercom('boot', {
-      app_id: 'p6unnr5i',
-      ...(user
-        ? {
-            email: user.email,
-            user_id: user.uid,
-            user_hash: '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b',
-            ...(user.metadata && user.metadata.creationTime
-              ? {
-                  created_at: new Date(user.metadata.creationTime).getTime() / 1000,
-                }
-              : {}),
-          }
-        : {}),
-    });
   }
 
   prevUser = user;
 
   const app = (
     <Router>
-      <IntercomRouteUpdater />
+      <CrispChatRouteUpdater />
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
           <LoginDialogProvider>
