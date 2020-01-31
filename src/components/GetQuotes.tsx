@@ -144,32 +144,36 @@ const GetQuotes: React.FC<Props> = () => {
       try {
         const token = await user.getIdToken();
 
-        $crisp.push([
-          'set',
-          'session:event',
-          [
+        try {
+          $crisp.push([
+            'set',
+            'session:event',
             [
               [
-                'requested-quotes',
-                {
-                  origin: originPort!.id,
-                  destination: destinationPort!.id,
-                  date: date.toISOString(),
-                  weeks: Number(weeks),
-                  containers: JSON.stringify(
-                    containers.map((container: ContainerType) => ({
-                      type: container.containerType!.id,
-                      commodity: container.commodityType!.id,
-                      location: container.pickupLocation?.id,
-                      quantity: container.quantity,
-                    })),
-                  ),
-                },
-                'black',
+                [
+                  'requested-quotes',
+                  {
+                    origin: originPort!.id,
+                    destination: destinationPort!.id,
+                    date: date.toISOString(),
+                    weeks: Number(weeks),
+                    containers: JSON.stringify(
+                      containers.map((container: ContainerType) => ({
+                        type: container.containerType!.id,
+                        commodity: container.commodityType!.id,
+                        location: container.pickupLocation?.id,
+                        quantity: container.quantity,
+                      })),
+                    ),
+                  },
+                  'black',
+                ],
               ],
             ],
-          ],
-        ]);
+          ]);
+        } catch (e) {
+          console.warn('Failed to push crisp command.');
+        }
 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {
           method: 'POST',

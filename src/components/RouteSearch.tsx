@@ -107,25 +107,29 @@ const RouteSearch: React.FC<Props> = () => {
       return;
     }
 
-    $crisp.push([
-      'set',
-      'session:event',
-      [
+    try {
+      $crisp.push([
+        'set',
+        'session:event',
         [
           [
-            'searched-schedule',
-            {
-              origin: params.originPort?.id || null,
-              destination: params.destinationPort?.id || null,
-              date: formatDate(params.date, 'yyyy-MM-dd') || null,
-              weeks: params.weeks.toString() || null,
-              carrier: carrierFilter || null,
-            },
-            'black',
+            [
+              'searched-schedule',
+              {
+                origin: params.originPort?.id || null,
+                destination: params.destinationPort?.id || null,
+                date: formatDate(params.date, 'yyyy-MM-dd') || null,
+                weeks: params.weeks.toString() || null,
+                carrier: carrierFilter || null,
+              },
+              'black',
+            ],
           ],
         ],
-      ],
-    ]);
+      ]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
 
     firebase
       .firestore()

@@ -98,7 +98,11 @@ const buildQuoteTile = (quote: QuoteModel) =>
 
 const handleSpecialRequest = (quote: QuoteModel) => {
   // TODO Try to show custom message `Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`
-  $crisp.push(['do', 'chat:open']);
+  try {
+    $crisp.push(['do', 'chat:open']);
+  } catch (e) {
+    console.warn('Failed to push crisp command.');
+  }
 };
 
 const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
@@ -139,53 +143,61 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const quoteTitle = buildQuoteTile(quote);
 
-  $crisp.push([
-    'set',
-    'session:data',
-    [
+  try {
+    $crisp.push([
+      'set',
+      'session:data',
       [
-        ['quote-last-viewed-carrier', quote.carrier.name || quote.carrier.id],
-        ['quote-last-viewed-id', quote.id],
         [
-          'quote-last-viewed-link',
-          process.env.REACT_APP_BRAND === 'brunoni'
-            ? `https://mybrunoni.ch/quotes/${quote.id}`
-            : `https://myallmarine.ch/quotes/${quote.id}`,
+          ['quote-last-viewed-carrier', quote.carrier.name || quote.carrier.id],
+          ['quote-last-viewed-id', quote.id],
+          [
+            'quote-last-viewed-link',
+            process.env.REACT_APP_BRAND === 'brunoni'
+              ? `https://mybrunoni.ch/quotes/${quote.id}`
+              : `https://myallmarine.ch/quotes/${quote.id}`,
+          ],
         ],
       ],
-    ],
-  ]);
+    ]);
+  } catch (e) {
+    console.warn('Failed to push crisp command.');
+  }
 
-  $crisp.push([
-    'set',
-    'session:event',
-    [
+  try {
+    $crisp.push([
+      'set',
+      'session:event',
       [
         [
-          'viewed-quote',
-          {
-            quoteId: quote.id,
-            quoteLink:
-              process.env.REACT_APP_BRAND === 'brunoni'
-                ? `https://mybrunoni.ch/quotes/${quote.id}`
-                : `https://myallmarine.ch/quotes/${quote.id}`,
-            origin: quote.origin.id,
-            destination: quote.destination.id,
-            date: quote.dateIssued.toISOString(),
-            containers: JSON.stringify(
-              quote.containers.map((container: ContainerType) => ({
-                type: container.containerType!.id,
-                commodity: container.commodityType!.id,
-                location: container.pickupLocation?.id,
-                quantity: container.quantity,
-              })),
-            ),
-          },
-          'black',
+          [
+            'viewed-quote',
+            {
+              quoteId: quote.id,
+              quoteLink:
+                process.env.REACT_APP_BRAND === 'brunoni'
+                  ? `https://mybrunoni.ch/quotes/${quote.id}`
+                  : `https://myallmarine.ch/quotes/${quote.id}`,
+              origin: quote.origin.id,
+              destination: quote.destination.id,
+              date: quote.dateIssued.toISOString(),
+              containers: JSON.stringify(
+                quote.containers.map((container: ContainerType) => ({
+                  type: container.containerType!.id,
+                  commodity: container.commodityType!.id,
+                  location: container.pickupLocation?.id,
+                  quantity: container.quantity,
+                })),
+              ),
+            },
+            'black',
+          ],
         ],
       ],
-    ],
-  ]);
+    ]);
+  } catch (e) {
+    console.warn('Failed to push crisp command.');
+  }
 
   return (
     <Page title={quoteTitle}>

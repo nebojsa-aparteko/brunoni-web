@@ -51,7 +51,11 @@ const appFont = new FontFaceObserver('Montserrat');
 const fontLoaded = appFont.load();
 
 const showCrispChat = (show: Boolean) => {
-  $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
+  try {
+    $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
+  } catch (e) {
+    console.warn('Failed to push crisp command.');
+  }
 };
 
 const UserApp: React.FC = () => {
@@ -59,25 +63,29 @@ const UserApp: React.FC = () => {
   const [actingAs] = useContext(ActingAs);
 
   if (userRecord) {
-    $crisp.push([
-      'set',
-      'session:data',
-      [
+    try {
+      $crisp.push([
+        'set',
+        'session:data',
         [
-          ['name', `${userRecord.firstName} ${userRecord.lastName}`],
-          ['alphacomId', userRecord.alphacomId],
           [
-            'company',
-            {
-              id: userRecord.alphacomClientId,
-              name: userRecord.company.name,
-              city: userRecord.company.city,
-              countryCode: userRecord.company.countryCode,
-            },
+            ['name', `${userRecord.firstName} ${userRecord.lastName}`],
+            ['alphacomId', userRecord.alphacomId],
+            [
+              'company',
+              {
+                id: userRecord.alphacomClientId,
+                name: userRecord.company.name,
+                city: userRecord.company.city,
+                countryCode: userRecord.company.countryCode,
+              },
+            ],
           ],
         ],
-      ],
-    ]);
+      ]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
   }
 
   switch (actingAs) {
@@ -143,7 +151,11 @@ const CrispChatRouteUpdater = () => {
   const history = useHistory();
 
   useEffect(() => {
-    $crisp.push(['set', 'session:data', [[['last-request-at', new Date()]]]]);
+    try {
+      $crisp.push(['set', 'session:data', [[['last-request-at', new Date()]]]]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
   }, [history.location.pathname]);
 
   return null;
@@ -153,23 +165,35 @@ let prevUser: firebase.User | null | undefined = undefined;
 
 const render = (user: firebase.User | null) => {
   if (prevUser && !user) {
-    $crisp.push(['do', 'session:reset', [false]]);
+    try {
+      $crisp.push(['do', 'session:reset', [false]]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
   } else if (user) {
-    $crisp.push(['set', 'user:email', [user.email]]);
+    try {
+      $crisp.push(['set', 'user:email', [user.email]]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
 
-    $crisp.push([
-      'set',
-      'session:data',
-      [
+    try {
+      $crisp.push([
+        'set',
+        'session:data',
         [
-          ['user-id', user.uid],
-          ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
-          ...(user.metadata && user.metadata.creationTime
-            ? [['created-at', new Date(user.metadata.creationTime)]]
-            : []),
+          [
+            ['user-id', user.uid],
+            ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
+            ...(user.metadata && user.metadata.creationTime
+              ? [['created-at', new Date(user.metadata.creationTime)]]
+              : []),
+          ],
         ],
-      ],
-    ]);
+      ]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
   } else {
   }
 
