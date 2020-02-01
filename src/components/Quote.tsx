@@ -149,13 +149,15 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
       'session:data',
       [
         [
-          ['quote-last-viewed-carrier', quote.carrier.name || quote.carrier.id],
-          ['quote-last-viewed-id', quote.id],
+          ['quote-last-viewed-carrier', String(quote.carrier.name || quote.carrier.id)],
+          ['quote-last-viewed-id', String(quote.id)],
           [
             'quote-last-viewed-link',
-            process.env.REACT_APP_BRAND === 'brunoni'
-              ? `https://mybrunoni.ch/quotes/${quote.id}`
-              : `https://myallmarine.ch/quotes/${quote.id}`,
+            String(
+              process.env.REACT_APP_BRAND === 'brunoni'
+                ? `https://mybrunoni.ch/quotes/${quote.id}`
+                : `https://myallmarine.ch/quotes/${quote.id}`,
+            ),
           ],
         ],
       ],
@@ -173,14 +175,15 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
           [
             'viewed-quote',
             {
-              quoteId: quote.id,
-              quoteLink:
+              quoteId: String(quote.id),
+              quoteLink: String(
                 process.env.REACT_APP_BRAND === 'brunoni'
                   ? `https://mybrunoni.ch/quotes/${quote.id}`
                   : `https://myallmarine.ch/quotes/${quote.id}`,
-              origin: quote.origin.id,
-              destination: quote.destination.id,
-              date: quote.dateIssued.toISOString(),
+              ),
+              origin: String(quote.origin.id),
+              destination: String(quote.destination.id),
+              date: quote.dateIssued.toISOString().slice(0, 10),
               containers: JSON.stringify(
                 quote.containers.map((container: ContainerType) => ({
                   type: container.containerType!.id,

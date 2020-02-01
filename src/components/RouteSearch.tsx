@@ -116,11 +116,11 @@ const RouteSearch: React.FC<Props> = () => {
             [
               'searched-schedule',
               {
-                origin: params.originPort?.id || null,
-                destination: params.destinationPort?.id || null,
-                date: formatDate(params.date, 'yyyy-MM-dd') || null,
-                weeks: params.weeks.toString() || null,
-                carrier: carrierFilter || null,
+                origin: String(params.originPort?.id || ''),
+                destination: String(params.destinationPort?.id || ''),
+                date: String(formatDate(params.date, 'yyyy-MM-dd') || ''),
+                weeks: String(params.weeks.toString() || ''),
+                carrier: String(carrierFilter || ''),
               },
               'black',
             ],

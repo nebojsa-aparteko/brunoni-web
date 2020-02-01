@@ -70,15 +70,15 @@ const UserApp: React.FC = () => {
         [
           [
             ['name', `${userRecord.firstName} ${userRecord.lastName}`],
-            ['alphacomId', userRecord.alphacomId],
+            ['alphacomId', String(userRecord.alphacomId)],
             [
               'company',
-              {
+              JSON.stringify({
                 id: userRecord.alphacomClientId,
                 name: userRecord.company.name,
                 city: userRecord.company.city,
                 countryCode: userRecord.company.countryCode,
-              },
+              }),
             ],
           ],
         ],
@@ -152,7 +152,7 @@ const CrispChatRouteUpdater = () => {
 
   useEffect(() => {
     try {
-      $crisp.push(['set', 'session:data', [[['last-request-at', new Date()]]]]);
+      $crisp.push(['set', 'session:data', [[['last-request-at', new Date().toISOString().slice(0, 10)]]]]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
     }
@@ -172,7 +172,7 @@ const render = (user: firebase.User | null) => {
     }
   } else if (user) {
     try {
-      $crisp.push(['set', 'user:email', [user.email]]);
+      $crisp.push(['set', 'user:email', [String(user.email)]]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
     }
@@ -183,10 +183,10 @@ const render = (user: firebase.User | null) => {
         'session:data',
         [
           [
-            ['user-id', user.uid],
+            ['user-id', String(user.uid)],
             ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
             ...(user.metadata && user.metadata.creationTime
-              ? [['created-at', new Date(user.metadata.creationTime)]]
+              ? [['created-at', new Date(user.metadata.creationTime).toISOString().slice(0, 10)]]
               : []),
           ],
         ],

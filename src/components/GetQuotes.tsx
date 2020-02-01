@@ -153,10 +153,10 @@ const GetQuotes: React.FC<Props> = () => {
                 [
                   'requested-quotes',
                   {
-                    origin: originPort!.id,
-                    destination: destinationPort!.id,
-                    date: date.toISOString(),
-                    weeks: Number(weeks),
+                    origin: String(originPort!.id),
+                    destination: String(destinationPort!.id),
+                    date: date.toISOString().slice(0, 10),
+                    weeks: String(weeks),
                     containers: JSON.stringify(
                       containers.map((container: ContainerType) => ({
                         type: container.containerType!.id,
