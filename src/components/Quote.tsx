@@ -97,9 +97,17 @@ const buildQuoteTile = (quote: QuoteModel) =>
   }`;
 
 const handleSpecialRequest = (quote: QuoteModel) => {
-  // TODO Try to show custom message `Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`
   try {
     $crisp.push(['do', 'chat:open']);
+  } catch (e) {
+    console.warn('Failed to push crisp command.');
+  }
+  try {
+    $crisp.push([
+      'set',
+      'message:text',
+      [`Hello I have a special request for quote #${quote.id} - ${buildQuoteTile(quote)}`],
+    ]);
   } catch (e) {
     console.warn('Failed to push crisp command.');
   }

@@ -63,6 +63,21 @@ const UserApp: React.FC = () => {
   const [actingAs] = useContext(ActingAs);
 
   if (userRecord) {
+    console.log('userRecord', userRecord);
+    try {
+      $crisp.push([
+        'set',
+        'user:company',
+        [userRecord.company.name, { geolocation: [userRecord.company.countryCode, userRecord.company.city] }],
+      ]);
+      $crisp.push([
+        'set',
+        'user:name',
+        [userRecord.company.name, { geolocation: [userRecord.company.countryCode, userRecord.company.city] }],
+      ]);
+    } catch (e) {
+      console.warn('Failed to push crisp command.');
+    }
     try {
       $crisp.push([
         'set',
@@ -71,15 +86,6 @@ const UserApp: React.FC = () => {
           [
             ['name', `${userRecord.firstName} ${userRecord.lastName}`],
             ['alphacomId', String(userRecord.alphacomId)],
-            [
-              'company',
-              JSON.stringify({
-                id: userRecord.alphacomClientId,
-                name: userRecord.company.name,
-                city: userRecord.company.city,
-                countryCode: userRecord.company.countryCode,
-              }),
-            ],
           ],
         ],
       ]);
