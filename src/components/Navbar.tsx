@@ -218,7 +218,11 @@ const Navbar: React.FC = () => {
                         Quotes
                       </Button>
                     </div>
-
+                    <div className={classes.item}>
+                      <Button component={Link} to="/bookings" underline="none">
+                        Bookings
+                      </Button>
+                    </div>
                     <div className={classes.item}>
                       <Button
                         endIcon={<KeyboardArrowDownIcon />}
@@ -252,6 +256,11 @@ const Navbar: React.FC = () => {
                     <div className={classes.item}>
                       <Button component={Link} to="/quotes/groups" underline="none">
                         Quotes
+                      </Button>
+                    </div>
+                    <div className={classes.item}>
+                      <Button component={Link} to="/bookings" underline="none">
+                        Bookings
                       </Button>
                     </div>
                     <div className={classes.item}>
@@ -342,6 +351,9 @@ const Navbar: React.FC = () => {
                     component={props => <Link {...props} to="/quotes/groups" />}
                   >
                     <ListItemText primary="Quotes" />
+                  </ListItem>
+                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/bookings" />}>
+                    <ListItemText primary="Bookings" />
                   </ListItem>
                   <ListItem
                     button

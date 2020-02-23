@@ -9,6 +9,7 @@ import Quote from './pages/Quote';
 import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
+import Bookings from './pages/Bookings';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminQuoteGroups from './pages/AdminQuoteGroups';
@@ -17,7 +18,6 @@ import AdminQuote from './pages/AdminQuote';
 import AdminSideCharges from './pages/AdminSideCharges';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
-
 import useUser from './hooks/useUser';
 import Navbar from './components/Navbar';
 import AllmarineFooter from './components/AllmarineFooter';
@@ -48,6 +48,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
+    <Route exact path="/bookings" component={Bookings} />
     <Route exact path="/equipment" component={Unauthorized} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route component={NotFound} />
@@ -62,6 +63,7 @@ const userRoutes = (
     <Route exact path="/quotes/groups/:id" component={QuoteGroup} />
     <Route exact path="/quotes/get" component={GetQuotes} />
     <Route exact path="/quotes/:id" component={Quote} />
+    <Route exact path="/bookings" component={Bookings} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route path="/charges" component={SideCharges} />
     <Route component={NotFound} />
