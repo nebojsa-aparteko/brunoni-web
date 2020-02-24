@@ -1,7 +1,12 @@
 export interface Booking {
   id: string;
   CarrierID: string;
-  Category: string;
+  Vessel: string;
+  Voyage: string;
+  PlaceOfRecieptName: string;
+  ETS: string;
   FinalDestinationName: string;
-  ForwAdrId: string;
+  ETA: string;
+  BkgStatus?: string;
+  TimeStamp: string;
 }
