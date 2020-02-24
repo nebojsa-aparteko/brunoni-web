@@ -8,7 +8,7 @@ import {
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
-import BookingsTable from './BookingsTable';
+import BookingsTable from './bookings/BookingsTable';
 
 interface Props {}
 
