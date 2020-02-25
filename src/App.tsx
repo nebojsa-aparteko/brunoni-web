@@ -10,7 +10,7 @@ import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
 import Bookings from './pages/Bookings';
-import Booking from './components/bookings/BookingDetail';
+import Booking from './pages/Booking';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminQuoteGroups from './pages/AdminQuoteGroups';

@@ -1,9 +1,11 @@
 import React, { Fragment, useContext } from 'react';
 import {
   makeStyles,
-  Container,
+  Container as MUIContainer,
   Paper,
-  Theme
+  Theme,
+  Card,
+  CardContent
 } from '@material-ui/core';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
@@ -12,12 +14,42 @@ import BookingsTable from './bookings/BookingsTable';
 
 interface Props {}
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
-    padding: theme.spacing(3),
-  }
+    padding: theme.spacing(5),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
+    },
+  },
+  content: {
+    padding: 0,
+    overflowX: 'auto',
+  },
+  inner: {
+    minWidth: 700,
+  },
+  nameCell: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  avatar: {
+    height: 42,
+    width: 42,
+    marginRight: theme.spacing(1),
+  },
+  actions: {
+    padding: theme.spacing(1),
+    justifyContent: 'flex-end',
+  },
 }));
 
 const Bookings: React.FC<Props> = () => {
@@ -26,22 +58,22 @@ const Bookings: React.FC<Props> = () => {
 
   if ( !bookings ) {
     return (
-      <Container maxWidth="lg">
+      <MUIContainer maxWidth="lg">
         <Paper className={classes.root}>
           <ChartsCircularProgress />
         </Paper>
-      </Container>
+      </MUIContainer>
     );
   }
 
   return (
     <Fragment>
       <Meta title={'Bookings'} />
-      <Container maxWidth="lg">
-        <Paper className={classes.root}>
+      <Card>
+        <CardContent className={classes.content}>
           <BookingsTable data={bookings} />
-        </Paper>
-      </Container>
+        </CardContent>
+      </Card>
     </Fragment>
   );
 };
