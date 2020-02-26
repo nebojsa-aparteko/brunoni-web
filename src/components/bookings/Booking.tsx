@@ -1,75 +1,61 @@
-import React, { useState, useContext, Fragment } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Box,
+  Button,
   Container,
+  Divider,
   Grid,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
   makeStyles,
   Paper,
-  Theme,
-  Typography
+  Theme
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Meta from '../Meta';
+import PrintIcon from '@material-ui/icons/Print';
+import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import Bookings from '../../contexts/Bookings';
 import { Booking as BookingModel } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
+import BookingSummary from './BookingSummary';
+import BookingContainers from './BookingContainers';
+import BookingFreight from './BookingFreight';
+import PortTerms from './PortTerms';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
-    padding: theme.spacing(3),
-  },
-  currencyCell: {
-    textAlign: 'right',
-  },
-  tableScroll: {
-    overflowX: 'auto',
+    padding: theme.spacing(5),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
+    },
   },
   title: {
     fontSize: '1.2em',
   },
-  buttonContainer: {
-    paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
-    border: 'none',
+  actionBar: {
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+    },
+    ['@media print']: {
+      marginBottom: theme.spacing(0),
+    },
   },
-  noBorder: {
-    border: 'none',
-  },
-  costUnitCell: {
-    paddingLeft: 0,
-  },
-  buttons: {
-    '& > * + *': {
+  actions: {
+    '& > *': {
       marginLeft: theme.spacing(1),
     },
   },
-  tableHead: {
-    '& th': {
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1),
+  hidePrint: {
+    ['@media print']: {
+      display: 'none',
     },
-  },
-  tableRow: {
-    '& td, th': {
-      whiteSpace: 'nowrap',
-    },
-    '& td': {
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1),
-    },
-  },
-  alternateCell: {
-    backgroundColor: '#f1f6f8', // TODO figure out why theme overrides from ./theme
-    // are in collision with the default Material UI theme.
-  },
-  borderCell: {
-    borderLeft: `1px solid ${theme.palette.divider}`,
   },
 }));
 
@@ -81,87 +67,96 @@ const getBookingTitle = (booking: BookingModel | undefined) => {
   return booking?.CarrierID;
 };
 
+function ScrollToTopOnMount() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return null;
+}
+
+const handlePrint = () => {
+  window.print();
+};
+
 const Booking: React.FC<Props> = ({ id }) => {
-  const [selectedPanel, setSelectedPanel] = useState('');
   const bookings = useContext(Bookings);
   const booking = bookings?.find(booking => booking.id === id);
   const bookingTitle = getBookingTitle(booking) || '';
   const classes = useStyles();
 
-  const handlePanelClick = (bookingID: string) => {
-    if (selectedPanel === bookingID) {
-      setSelectedPanel('');
-    } else {
-      setSelectedPanel(bookingID);
-      window.scrollTo(0, 150);
-    }
-  };
-
   if( !booking ) {
     return (
       <Container maxWidth="lg">
-        <ChartsCircularProgress />
+        <Paper className={classes.root}>
+          <ChartsCircularProgress />
+        </Paper>
       </Container>
     );
   }
 
-  // console.log(booking);
+  console.log(booking);
 
   return (
-    <Fragment>
-      <Meta title={bookingTitle} />
+    <Page title={bookingTitle}>
       <Container maxWidth="lg">
-        <Box mt={6}>
-          <QuoteNav
-            backTo='/bookings'
-            subtitle={`ID ${booking.id}`}
-            title={`Booking - ${bookingTitle}`}
-          />
-        </Box>
+        <ScrollToTopOnMount />
 
-        <Box mt={2} mb={2}>
-          <Typography variant="body2">
-            <strong>Vessel: </strong>{booking.Vessel}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Loading: </strong>{booking.PlaceOfRecieptName}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Dischg.: </strong>{booking.FinalDestinationName}
-          </Typography>
-          <Typography variant="body2">
-            <strong>B/L-NO: </strong>{booking['BL-No']}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Volume: </strong>
-          </Typography>
-        </Box>
-
-        <Box mb={6}>
-          <Box id={id} mb={1}>
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel === id}>
-              <ExpansionPanelSummary
-                aria-controls="panel1c-content"
-                expandIcon={<ExpandMoreIcon />}
-                onClick={() => handlePanelClick(id)}
-              >
-                <Typography variant="h4">Item 1</Typography>
-              </ExpansionPanelSummary>
-
-              <ExpansionPanelDetails>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Paper className={classes.tableScroll}>
-                      Cargo details
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
+        <Paper className={classes.root}>
+          <Box display="none" displayPrint="block" mb={2}>
+            <Box mb={2}>
+              {/* <img
+                src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                style={{ width: '5em' }}
+              /> */}
+            </Box>
+            <Divider />
           </Box>
-        </Box>
+
+          <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+            <QuoteNav
+              backTo='/bookings'
+              subtitle={`ID ${booking.id}`}
+              title={`Booking - ${bookingTitle}`}
+            />
+            <Box className={classes.actions} displayPrint="none">
+              <Button
+                aria-label="print"
+                variant="outlined"
+                size="small"
+                startIcon={<PrintIcon />}
+                onClick={handlePrint}
+              >
+                Print
+              </Button>
+            </Box>
+          </Box>
+
+          <Grid item xs={12}>
+            <Page title={bookingTitle}>
+
+              <Grid container spacing={2}>
+                <Grid item md={6} xs={12}>
+                  <BookingSummary booking={booking} />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <BookingContainers cargoDetail={booking.CargoDetails.CargoDetail} />
+                </Grid>
+              </Grid>
+
+              <Box marginTop="1em" marginBottom="1em">
+                <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
+              </Box>
+
+              <Box marginTop="1em" marginBottom="1em">
+                <PortTerms portTerms={booking.PortTerms} />
+              </Box>
+            </Page>
+          </Grid>
+        </Paper>
       </Container>
-    </Fragment>
+    </Page>
   );
 };
 

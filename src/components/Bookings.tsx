@@ -3,7 +3,6 @@ import {
   makeStyles,
   Container as MUIContainer,
   Paper,
-  Theme,
   Card,
   CardContent
 } from '@material-ui/core';
