@@ -7,18 +7,20 @@ import {
   Grid,
   makeStyles,
   Paper,
-  Theme
+  Theme,
+  Typography
 } from '@material-ui/core';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import Bookings from '../../contexts/Bookings';
-import { Booking as BookingModel } from '../../model/Booking';
+import { Booking as BookingModel, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import BookingContainers from './BookingContainers';
 import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
+import SpecialRemarks from './SpecialRemarks';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -85,6 +87,9 @@ const Booking: React.FC<Props> = ({ id }) => {
   const bookingTitle = getBookingTitle(booking) || '';
   const classes = useStyles();
 
+  let specialRemarks: Remark[] = [];
+  let finalRemarks: Remark[] = [];
+
   if( !booking ) {
     return (
       <Container maxWidth="lg">
@@ -96,6 +101,14 @@ const Booking: React.FC<Props> = ({ id }) => {
   }
 
   console.log(booking);
+
+  booking.Remarks.Remark.forEach(remarkItem => {
+    if(remarkItem.RemarkType === 'SPECIAL REMARKS') {
+      specialRemarks.push(remarkItem);
+    } else if(remarkItem.RemarkType === 'FINAL REMARKS') {
+      finalRemarks.push(remarkItem);
+    }
+  });
 
   return (
     <Page title={bookingTitle}>
@@ -145,13 +158,25 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Grid>
               </Grid>
 
-              <Box marginTop="1em" marginBottom="1em">
+              <Box marginTop="2em" marginBottom="2em">
+                <PortTerms portTerms={booking.PortTerms} />
+              </Box>
+
+              <Box marginTop="2em" marginBottom="2em">
+                <SpecialRemarks remarks={specialRemarks} />
+              </Box>
+
+              <Box marginTop="2em" marginBottom="2em">
                 <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
               </Box>
 
-              <Box marginTop="1em" marginBottom="1em">
-                <PortTerms portTerms={booking.PortTerms} />
-              </Box>
+              {finalRemarks.map(item => {
+                return (
+                  <Typography variant="body2">
+                    <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
+                  </Typography>
+                );
+              })}
             </Page>
           </Grid>
         </Paper>

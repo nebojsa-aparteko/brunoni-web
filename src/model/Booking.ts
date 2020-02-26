@@ -29,10 +29,18 @@ export interface Booking {
   PODName: string;
   FinalDestinationISO: string;
   PortTerms: PortTerms;
+  Remarks: {
+    Remark: Remark[];
+  };
   'ERP-BkgRef': string;
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export interface Remark {
+  RemarkTxt: string;
+  RemarkType: string;
 }
 
 export interface PortTerms {
