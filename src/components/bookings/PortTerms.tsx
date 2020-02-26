@@ -105,7 +105,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
         </TableBody>
       </Table>
 
-      <Box marginTop="1em" marginBottom="1em">
+      <Box className={classes.tableWrapper} marginTop="1em" marginBottom="1em">
         <Table className={classes.table} size="small">
           <TableHead className={classes.tableHead}>
             <TableRow className={classes.tableRow}>
