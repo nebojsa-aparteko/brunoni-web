@@ -21,6 +21,7 @@ import BookingContainers from './BookingContainers';
 import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
+import PickupLocations from './PickupLocations';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -157,6 +158,10 @@ const Booking: React.FC<Props> = ({ id }) => {
                   <BookingContainers cargoDetail={booking.CargoDetails.CargoDetail} />
                 </Grid>
               </Grid>
+
+              <Box marginTop="2em" marginBottom="2em">
+                <PickupLocations />
+              </Box>
 
               <Box marginTop="2em" marginBottom="2em">
                 <PortTerms portTerms={booking.PortTerms} />
