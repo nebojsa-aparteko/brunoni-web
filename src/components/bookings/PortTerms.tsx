@@ -112,7 +112,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
               <TableCell>Closing for</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Time</TableCell>
-              <TableCell>Text</TableCell>
+              <TableCell>Remarks</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

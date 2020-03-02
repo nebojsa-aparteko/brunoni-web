@@ -131,7 +131,7 @@ const Booking: React.FC<Props> = ({ id }) => {
           <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
             <QuoteNav
               backTo='/bookings'
-              subtitle={`ID ${booking.id}`}
+              subtitle={`File No. ${booking.id}`}
               title={`Booking - ${bookingTitle}`}
             />
             <Box className={classes.actions} displayPrint="none">
