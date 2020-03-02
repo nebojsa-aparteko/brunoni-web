@@ -14,6 +14,7 @@ import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
+import BookingsProvider from './providers/Bookings';
 import AdminQuotesProvider from './providers/AdminQuotes';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
@@ -31,7 +32,6 @@ import { RouteSearchProvider } from './contexts/RouteSearchContext';
 import { QuoteListProvider } from './contexts/QuoteListContext';
 import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecord';
-import BookingsContext from './contexts/Bookings';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -112,9 +112,9 @@ const UserApp: React.FC = () => {
               <QuotesProvider>
                 <QuoteGroupsProvider>
                   <QuoteListProvider>
-                  <FirestoreCollectionProvider name="bookings" context={BookingsContext}>
-                    <App />
-                  </FirestoreCollectionProvider>
+                    <BookingsProvider>
+                      <App />
+                    </BookingsProvider>
                   </QuoteListProvider>
                 </QuoteGroupsProvider>
               </QuotesProvider>
@@ -131,9 +131,9 @@ const UserApp: React.FC = () => {
               <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
-                    <FirestoreCollectionProvider name="bookings" context={BookingsContext}>
+                    <BookingsProvider isAdmin={true}>
                       <App />
-                    </FirestoreCollectionProvider>
+                    </BookingsProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>
@@ -149,9 +149,9 @@ const UserApp: React.FC = () => {
           <QuotesProvider>
             <QuoteGroupsProvider>
               <QuoteListProvider>
-                <FirestoreCollectionProvider name="bookings" context={BookingsContext}>
+                <BookingsProvider>
                   <App />
-                </FirestoreCollectionProvider>
+                </BookingsProvider>
               </QuoteListProvider>
             </QuoteGroupsProvider>
           </QuotesProvider>
