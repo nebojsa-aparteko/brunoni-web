@@ -44,6 +44,8 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
   const history = useHistory();
 
+  console.log('bookings: ', bookings);
+
   const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
     history.push(`/bookings/${id}`);
   };
