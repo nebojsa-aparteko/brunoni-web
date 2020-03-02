@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface Props {
-  data?: Booking[] | null;
+  bookings?: Booking[] | null;
+  showCompanyInfo?: boolean;
 }
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
@@ -39,7 +40,7 @@ const formatEstimatedDate = (date: string) => {
   return [dateParts[0], dateParts[1]].join('.');
 };
 
-const BookingsTable: React.FC<Props> = ({ data }) => {
+const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -51,6 +52,9 @@ const BookingsTable: React.FC<Props> = ({ data }) => {
     <Table>
       <TableHead>
         <TableRow>
+          {showCompanyInfo ? (
+            <TableCell>Client</TableCell>
+          ) : null}
           <TableCell>Carrier</TableCell>
           <TableCell>Vessel</TableCell>
           <TableCell>Origin</TableCell>
@@ -60,7 +64,7 @@ const BookingsTable: React.FC<Props> = ({ data }) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {data?.map(booking => {
+        {bookings?.map(booking => {
           return (
             <TableRow
               hover
@@ -69,6 +73,9 @@ const BookingsTable: React.FC<Props> = ({ data }) => {
               onClick={event => handleRowClick(event, booking.id)}
               key={booking.id}
             >
+              {showCompanyInfo ? (
+                <TableCell>{booking.ForwAdrId}</TableCell>
+              ) : null}
               <TableCell>{booking.CarrierID}</TableCell>
               <TableCell>
                 {booking.Vessel}<br/>

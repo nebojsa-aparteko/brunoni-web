@@ -175,9 +175,9 @@ const Booking: React.FC<Props> = ({ id }) => {
                 <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
               </Box>
 
-              {finalRemarks.map(item => {
+              {finalRemarks.map((item, index) => {
                 return (
-                  <Typography variant="body2">
+                  <Typography variant="body2" key={`final-remark-${index}`}>
                     <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
                   </Typography>
                 );

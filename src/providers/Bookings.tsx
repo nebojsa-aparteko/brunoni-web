@@ -5,30 +5,21 @@ import useUser from '../hooks/useUser';
 
 interface Props {
   children: React.ReactNode;
-  isAdmin?: boolean;
 }
 
-const Bookings: React.FC<Props> = ({ children, isAdmin }) => {
+const Bookings: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
 
-  if(isAdmin) {
-    return (
-      <FirestoreCollectionProvider name="bookings" context={BookingsContext}>
-        {children}
-      </FirestoreCollectionProvider>
-    );
-  } else {
-    let query = userRecord?.alphacomClientId
+  const query = userRecord?.alphacomClientId
       ? (collection: firebase.firestore.CollectionReference) =>
           collection.where('ForwAdrId', '==', userRecord!.alphacomClientId)
       : null;
 
-      return (
-        <FirestoreCollectionProvider name="bookings" query={query} context={BookingsContext}>
-          {children}
-        </FirestoreCollectionProvider>
-      );
-  }
+    return (
+      <FirestoreCollectionProvider name="bookings" query={query} context={BookingsContext}>
+        {children}
+      </FirestoreCollectionProvider>
+    );
 };
 
 export default Bookings;

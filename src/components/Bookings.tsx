@@ -11,7 +11,9 @@ import BookingsContext from '../contexts/Bookings';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 
-interface Props {}
+interface Props {
+  showCompanyInfo?: boolean;
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -51,7 +53,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Bookings: React.FC<Props> = () => {
+const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
@@ -70,7 +72,7 @@ const Bookings: React.FC<Props> = () => {
       <Meta title={'Bookings'} />
       <Card>
         <CardContent className={classes.content}>
-          <BookingsTable data={bookings} />
+          <BookingsTable bookings={bookings} showCompanyInfo={showCompanyInfo} />
         </CardContent>
       </Card>
     </Fragment>

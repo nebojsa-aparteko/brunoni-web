@@ -10,6 +10,7 @@ import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
 import Bookings from './pages/Bookings';
+import BookingsAdmin from './pages/BookingsAdmin';
 import Booking from './pages/Booking';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
@@ -49,7 +50,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
-    <Route exact path="/bookings" component={Bookings} />
+    <Route exact path="/bookings" component={BookingsAdmin} />
     <Route exact path="/bookings/:id" component={Booking} />
     <Route exact path="/equipment" component={Unauthorized} />
     <Route path="/charges" component={AdminSideCharges} />

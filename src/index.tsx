@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, useHistory, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
@@ -15,6 +15,7 @@ import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
 import BookingsProvider from './providers/Bookings';
+import BookingsAdminProvider from './providers/BookingsAdmin';
 import AdminQuotesProvider from './providers/AdminQuotes';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
@@ -131,9 +132,9 @@ const UserApp: React.FC = () => {
               <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
-                    <BookingsProvider isAdmin={true}>
+                    <BookingsAdminProvider>
                       <App />
-                    </BookingsProvider>
+                    </BookingsAdminProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>
