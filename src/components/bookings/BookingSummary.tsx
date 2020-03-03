@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
+import useClients from '../../hooks/useClients';
 
 interface Props {
   booking: Booking;
@@ -60,6 +61,21 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 };
 
 const BookingSummary: React.FC<Props> = ({ booking }) => {
+  const clients = useClients();
+
+  const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
+    clients,
+    booking.ForwAdrId,
+  ]);
+
+  const clientInfo = useMemo(() => {
+    if ( !client ) {
+      return booking.ForwAdrId;
+    }
+
+    return client.name;
+  }, [client, booking.ForwAdrId]);
+
   return (
     <Table size="small" aria-label="a dense table">
        <colgroup>
@@ -86,9 +102,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         ) : null}
 
         <TableRowData label={'Carrier'} content={booking.CarrierID} />
-
-        {/* TODO: Implement client name by 'ForwAdrId' */}
-        <TableRowData label={'Client'} content={booking.ForwAdrId} />
+        <TableRowData label={'Client'} content={clientInfo} />
       </TableBody>
     </Table>
   );

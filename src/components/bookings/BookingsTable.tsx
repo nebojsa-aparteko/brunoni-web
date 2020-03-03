@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, Fragment } from 'react';
 import { useHistory } from 'react-router';
 import {
   Table,
@@ -10,8 +10,10 @@ import {
   makeStyles,
   Theme
 } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
 import { Booking } from '../../model/Booking';
+import useClients from '../../hooks/useClients';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,6 +30,11 @@ interface Props {
   showCompanyInfo?: boolean;
 }
 
+interface RowProps {
+  showCompanyInfo?: boolean;
+  booking: Booking;
+}
+
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
 const formatEstimatedDate = (date: string) => {
@@ -40,23 +47,90 @@ const formatEstimatedDate = (date: string) => {
   return [dateParts[0], dateParts[1]].join('.');
 };
 
-const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
+const BookingsTableBodySekeleton: React.FC = () => (
+  <Fragment>
+    {[...Array(7)].map((_, i) => (
+      <TableRow key={i}>
+        <TableCell>
+          <Skeleton width={50} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={65} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+      </TableRow>
+    ))}
+  </Fragment>
+);
+
+const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
   const classes = useStyles();
+  const clients = useClients();
   const history = useHistory();
 
-  console.log('bookings: ', bookings);
+  const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
+    clients,
+    booking.ForwAdrId,
+  ]);
+
+  const clientInfo = useMemo(() => {
+    if ( !showCompanyInfo ) return null;
+
+    if ( !client ) {
+      return <TableCell>{booking.ForwAdrId}</TableCell>;
+    }
+
+    return <TableCell>{client.name}</TableCell>;
+  }, [showCompanyInfo, client, booking.ForwAdrId]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
     history.push(`/bookings/${id}`);
   };
 
   return (
+      <TableRow
+        hover
+        tabIndex={-1}
+        className={classes.tableRow}
+        onClick={event => handleRowClick(event, booking.id)}
+        key={booking.id}
+      >
+        {clientInfo}
+        <TableCell>{booking.CarrierID}</TableCell>
+        <TableCell>
+          {booking.Vessel}<br/>
+          Voyage Number {booking.Voyage}
+        </TableCell>
+        <TableCell>
+          {booking.PlaceOfRecieptName}<br />
+          ETS. {formatEstimatedDate(booking.ETS)}
+        </TableCell>
+        <TableCell>
+          {booking.FinalDestinationName}<br />
+          ETA. {formatEstimatedDate(booking.ETA)}
+        </TableCell>
+        <TableCell>{booking.BkgStatus || 'N/A'}</TableCell>
+        <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
+    </TableRow>
+  );
+};
+
+const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
+  console.log('bookings: ', bookings);
+
+  return (
     <Table>
       <TableHead>
         <TableRow>
-          {showCompanyInfo ? (
-            <TableCell>Client</TableCell>
-          ) : null}
+          {showCompanyInfo && <TableCell>Client</TableCell>}
           <TableCell>Carrier</TableCell>
           <TableCell>Vessel</TableCell>
           <TableCell>Origin</TableCell>
@@ -66,36 +140,13 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {bookings?.map(booking => {
-          return (
-            <TableRow
-              hover
-              tabIndex={-1}
-              className={classes.tableRow}
-              onClick={event => handleRowClick(event, booking.id)}
-              key={booking.id}
-            >
-              {showCompanyInfo ? (
-                <TableCell>{booking.ForwAdrId}</TableCell>
-              ) : null}
-              <TableCell>{booking.CarrierID}</TableCell>
-              <TableCell>
-                {booking.Vessel}<br/>
-                Voyage Number {booking.Voyage}
-              </TableCell>
-              <TableCell>
-                {booking.PlaceOfRecieptName}<br />
-                ETS. {formatEstimatedDate(booking.ETS)}
-              </TableCell>
-              <TableCell>
-                {booking.FinalDestinationName}<br />
-                ETA. {formatEstimatedDate(booking.ETA)}
-              </TableCell>
-              <TableCell>{booking.BkgStatus || 'N/A'}</TableCell>
-              <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
-            </TableRow>
-          );
-        })}
+        {!bookings ? (
+          <BookingsTableBodySekeleton />
+        ) : (
+          bookings.map(booking => (
+            <BookingRow key={`booking-row-${booking.id}`} showCompanyInfo={showCompanyInfo} booking={booking} />
+          ))
+        )}
       </TableBody>
     </Table>
   );
