@@ -82,6 +82,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
       )}
       <Menu
         anchorEl={anchorEl}
+        getContentAnchorEl={null}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         id={menuId}
         keepMounted
@@ -91,7 +92,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
       >
         {actingAs ? (
           client?.name && (
-            <Fragment>
+            <div>
               <MenuItem disabled style={{ opacity: 'initial' }}>
                 <Box>
                   <Typography variant="subtitle1">{client.name.toUpperCase()}</Typography>
@@ -106,10 +107,10 @@ const UserWidget: React.FC<Props> = ({ active }) => {
                     .join(' ')}
                 </MenuItem>
               )}
-            </Fragment>
+            </div>
           )
         ) : actingAs === null ? (
-          <Fragment>
+          <div>
             <MenuItem disabled style={{ opacity: 'initial' }}>
               <Box>
                 <Typography variant="subtitle1">
@@ -120,7 +121,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
               </Box>
             </MenuItem>
             {client && <MenuItem onClick={handleSwitch}>Switch to {client.name}</MenuItem>}
-          </Fragment>
+          </div>
         ) : null}
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
       </Menu>
