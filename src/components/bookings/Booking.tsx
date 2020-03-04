@@ -17,7 +17,7 @@ import Bookings from '../../contexts/Bookings';
 import { Booking as BookingModel, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
-import BookingContainers from './BookingContainers';
+import ContainerDetails from './ContainerDetails';
 import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
@@ -149,15 +149,16 @@ const Booking: React.FC<Props> = ({ id }) => {
 
           <Grid item xs={12}>
             <Page title={bookingTitle}>
+              <Box marginTop="2em" marginBottom="2em">
+                <BookingSummary booking={booking} />
+              </Box>
 
-              <Grid container spacing={2}>
-                <Grid item md={6} xs={12}>
-                  <BookingSummary booking={booking} />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <BookingContainers cargoDetail={booking.CargoDetails.CargoDetail} />
-                </Grid>
-              </Grid>
+              <Box marginTop="2em" marginBottom="2em">
+                <ContainerDetails
+                  cargoDetail={booking.CargoDetails.CargoDetail}
+                  version={booking.Version}
+                />
+              </Box>
 
               <Box marginTop="2em" marginBottom="2em">
                 <PickupLocations />

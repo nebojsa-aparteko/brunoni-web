@@ -13,9 +13,7 @@ export interface Booking {
   ETA: string;
   BkgStatus: string | null;
   TimeStamp: string;
-  CargoDetails: {
-    CargoDetail: CargoDetail;
-  };
+  CargoDetails: CargoDetailItems;
   FreightDetails: {
     FreightDetail: FreightDetail[]
   };
@@ -33,10 +31,16 @@ export interface Booking {
   Remarks: {
     Remark: Remark[];
   };
+  Version: BookingVersion;
   'ERP-BkgRef': string;
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export enum BookingVersion {
+  long = 'Long',
+  short = 'Short',
 }
 
 export interface Remark {
@@ -62,6 +66,10 @@ export interface Closing {
   ClosingType: string;
 }
 
+export interface CargoDetailItems {
+  CargoDetail: CargoDetail | CargoDetail[];
+}
+
 export interface CargoDetail {
   CommodityTXT: string;
   CargoDetailRermarks: string;
@@ -69,6 +77,24 @@ export interface CargoDetail {
   CtrQuantity: string;
   CommodityID: string;
   CtypID: CtypID;
+  LocRefs: LocRefs;
+}
+
+export interface LocRefs {
+  LocRef: LocRefItem[];
+}
+
+export interface LocRefItem {
+  LocRef: string;
+  LocDate: string;
+  LocDet: string;
+  LocType: BookingLocType;
+  CargoDetailRermarks: string;
+}
+
+export enum BookingLocType {
+  pickUp = 'PICK UP',
+  delivery = 'DELIVERY',
 }
 
 export interface FreightDetail {
