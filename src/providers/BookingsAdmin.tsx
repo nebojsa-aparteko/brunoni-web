@@ -55,7 +55,7 @@ const BookingsAdmin: React.FC<Props> = ({ children }) => {
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
 
-  const snapshot = useFirestoreCollection('bookings');
+  const snapshot = useFirestoreCollection('bookings')
   const bookingsResult = useMemo(() => snapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() })), [snapshot]);
 
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
