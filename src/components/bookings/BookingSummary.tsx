@@ -89,12 +89,21 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         />
         <TableRowData
           label={'Port of Loading'}
-          content={[ booking.PlaceOfRecieptName, booking.ETS ].join('<br/>ETS: ')}
+          content={[ booking.POLName, booking.ETS ].join('<br/>ETS: ')}
         />
         <TableRowData
           label={'Port of Discharge'}
-          content={[booking.FinalDestinationName, booking.ETA].join('<br/>ETA: ')}
+          content={[booking.PODName, booking.ETA].join('<br/>ETA: ')}
         />
+        <TableRowData
+          label={'Place of Receipt'}
+          content={booking.PlaceOfRecieptName}
+        />
+        <TableRowData
+          label={'Place of Delivery'}
+          content={booking.FinalDestinationName}
+        />
+
         <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
 
         {booking.BkgAgentContact ? (
