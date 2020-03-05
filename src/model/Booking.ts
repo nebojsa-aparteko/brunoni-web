@@ -103,6 +103,7 @@ export interface FreightDetail {
   UnitValue: string;
   Total: string;
   Currency: string;
+  Unit: string;
 }
 
 export enum CtypID {

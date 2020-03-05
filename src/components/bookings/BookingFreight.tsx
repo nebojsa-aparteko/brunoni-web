@@ -65,23 +65,23 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
             <TableHead className={classes.tableHead}>
               <TableRow className={classes.tableRow}>
                 <TableCell>Description</TableCell>
-                <TableCell>Anz</TableCell>
-                <TableCell>Unit</TableCell>
-                <TableCell>Cost</TableCell>
-                <TableCell>Total</TableCell>
                 <TableCell align="right">Currency</TableCell>
+                <TableCell align="right">Cost Value</TableCell>
+                <TableCell>Cost Unit</TableCell>
+                <TableCell>Remark</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {freightDetails.map((freight, index) => {
+                console.log('freight: ', freight);
+
                 return (
-                  <TableRow key={`booking-freight-${index}`} className={classes.tableRow}>
+                  <TableRow selected={(index + 1) % 2 === 0} key={`booking-freight-${index}`} className={classes.tableRow}>
                     <TableCell component="th" scope="row">{freight.Txt}</TableCell>
-                    <TableCell>{freight.Anz}</TableCell>
-                    <TableCell>X</TableCell>
-                    <TableCell>{freight.UnitValue}</TableCell>
-                    <TableCell>{freight.Total}</TableCell>
                     <TableCell align="right">{freight.Currency}</TableCell>
+                    <TableCell align="right">{freight.UnitValue}</TableCell>
+                    <TableCell>{freight.Unit}</TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 );
               })}
