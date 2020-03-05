@@ -21,7 +21,6 @@ import ContainerDetails from './ContainerDetails';
 import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
-import PickupLocations from './PickupLocations';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -158,10 +157,6 @@ const Booking: React.FC<Props> = ({ id }) => {
                   cargoDetail={booking.CargoDetails.CargoDetail}
                   version={booking.Version}
                 />
-              </Box>
-
-              <Box marginTop="2em" marginBottom="2em">
-                <PickupLocations />
               </Box>
 
               <Box marginTop="2em" marginBottom="2em">
