@@ -99,10 +99,13 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
           label={'Port of Discharge'}
           content={[booking.PODName, booking.ETA].join('<br/>ETA: ')}
         />
-        <TableRowData
-          label={'Place of Delivery'}
-          content={booking.FinalDestinationName}
-        />
+
+        {(booking.PODName !== booking.FinalDestinationName) ? (
+          <TableRowData
+            label={'Place of Delivery'}
+            content={booking.FinalDestinationName}
+          />
+        ) : null}
 
         <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
 
