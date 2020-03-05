@@ -17,7 +17,7 @@ const BookingsAdmin: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Bookings" />
-      <Container maxWidth="lg" className={classes.root}>
+      <Container maxWidth="xl" className={classes.root}>
         <BookingsView showCompanyInfo />
       </Container>
     </Fragment>
