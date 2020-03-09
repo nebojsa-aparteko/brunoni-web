@@ -127,6 +127,8 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
           {booking.PlaceOfRecieptName}<br />
           ETS. {formatEstimatedDate(booking.ETS)}
         </TableCell>
+        <TableCell>{booking['BL-No']}</TableCell>
+        <TableCell>{booking['Cust-BkgRef']}</TableCell>
         <TableCell>
           {booking.FinalDestinationName}<br />
           ETA. {formatEstimatedDate(booking.ETA)}
@@ -148,6 +150,10 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
           <TableCell>Carrier</TableCell>
           <TableCell>Vessel</TableCell>
           <TableCell>Origin</TableCell>
+
+          <TableCell>Booking No.</TableCell>
+          <TableCell>Your Reference</TableCell>
+
           <TableCell>Destination</TableCell>
           <TableCell>Status</TableCell>
           <TableCell>Last Update</TableCell>
