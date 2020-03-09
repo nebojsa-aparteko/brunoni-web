@@ -8,7 +8,8 @@ import {
   TableRow,
   createStyles,
   makeStyles,
-  Theme
+  Theme,
+  Typography
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
@@ -86,6 +87,19 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
 
     if ( !client ) {
       return <TableCell>{booking.ForwAdrId}</TableCell>;
+    }
+
+    if(booking.ForwarderPersTxt || booking['Cust-BkgRef']) {
+      return (
+        <TableCell>
+          {client.name}
+          <Typography variant="body2">
+            {booking.ForwarderPersTxt && booking.ForwarderPersTxt}
+            {(booking.ForwarderPersTxt && booking['Cust-BkgRef']) ? ' - ' : null}
+            {booking['Cust-BkgRef'] && booking['Cust-BkgRef']}
+          </Typography>
+        </TableCell>
+      );
     }
 
     return <TableCell>{client.name}</TableCell>;
