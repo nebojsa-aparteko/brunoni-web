@@ -20,7 +20,7 @@ export interface Booking {
   Category: string;
   BkgAgentContact: string | null;
   ForwAdrId: string;
-  clientName?: string;
+  ForwarderPersTxt: string | null;
   PlaceOfRecieptISO: string;
   POL: string;
   POLName: string;

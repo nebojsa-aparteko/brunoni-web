@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
+import React, { useMemo, Fragment } from 'react';
+import { Table, TableCell, TableRow, makeStyles, Typography } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
@@ -49,6 +49,19 @@ interface TableRowProps {
   className?: any;
 }
 
+export const ClientDetails: React.FC<{
+  forwarderPersTxt: string | null;
+  bkgRef: string;
+}> = ({ forwarderPersTxt, bkgRef }) => {
+  return (
+    <Typography variant="body2">
+      {forwarderPersTxt && forwarderPersTxt}
+      {(forwarderPersTxt && bkgRef) ? ' - ' : null}
+      {bkgRef && bkgRef}
+    </Typography>
+  );
+};
+
 const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
@@ -61,6 +74,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 };
 
 const BookingSummary: React.FC<Props> = ({ booking }) => {
+  const classes = useStyles();
   const clients = useClients();
 
   const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
@@ -73,8 +87,16 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
       return booking.ForwAdrId;
     }
 
-    return client.name;
-  }, [client, booking.ForwAdrId]);
+    return (
+      <Fragment>
+        {client.name}
+        <ClientDetails
+          forwarderPersTxt={booking.ForwarderPersTxt}
+          bkgRef={booking['Cust-BkgRef']}
+        />
+      </Fragment>
+    );
+  }, [client, booking]);
 
   return (
     <Table size="small" aria-label="a dense table">
@@ -118,7 +140,13 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         ) : null}
 
         <TableRowData label={'Carrier'} content={booking.CarrierID} />
-        <TableRowData label={'Client'} content={clientInfo} />
+
+        <TableRow className={classes.tableRow}>
+          <TableCell className={classes.tableCellLabel}>Client</TableCell>
+          <TableCell className={classes.tableCell}>
+            {clientInfo}
+          </TableCell>
+        </TableRow>
       </TableBody>
     </Table>
   );
