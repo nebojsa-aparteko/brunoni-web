@@ -125,7 +125,16 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
         key={booking.id}
       >
         {clientInfo}
-        <TableCell>{booking.CarrierID}</TableCell>
+        <TableCell>
+          {booking.CarrierID}
+          {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
+            <Typography variant="body2">
+              {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
+              {(booking['ERP-CarrierID'] && booking['ERP-ServiceID']) ? ' - ' : null}
+              {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
+            </Typography>
+          ) : null}
+        </TableCell>
         <TableCell>
           {booking.Vessel}<br/>
           Voyage Number {booking.Voyage}
@@ -161,10 +170,8 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
           <TableCell>Carrier</TableCell>
           <TableCell>Vessel</TableCell>
           <TableCell>Origin</TableCell>
-
           <TableCell>Booking No.</TableCell>
           <TableCell>Your Reference</TableCell>
-
           <TableCell>Destination</TableCell>
           <TableCell>Status</TableCell>
           <TableCell>Last Update</TableCell>

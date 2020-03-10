@@ -33,6 +33,8 @@ export interface Booking {
   };
   Version: BookingVersion;
   'ERP-BkgRef': string;
+  'ERP-CarrierID': string;
+  'ERP-ServiceID': string;
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
