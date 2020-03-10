@@ -11,7 +11,7 @@ export interface Booking {
   ETS: string;
   FinalDestinationName: string;
   ETA: string;
-  BkgStatus: string | null;
+  BkgStatus: BookingStatusCode | null;
   TimeStamp: string;
   CargoDetails: CargoDetailItems;
   FreightDetails: {
@@ -36,6 +36,16 @@ export interface Booking {
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export enum BookingStatusCode {
+  Status1 = '1',
+  Status2 = '2',
+  Status3 = '3',
+}
+
+export interface BookingStatus {
+  [key: string]: string;
 }
 
 export enum BookingVersion {

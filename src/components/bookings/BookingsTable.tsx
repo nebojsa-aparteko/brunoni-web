@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, BookingStatus } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -34,6 +34,13 @@ interface Props {
 interface RowProps {
   showCompanyInfo?: boolean;
   booking: Booking;
+}
+
+export const BOOKING_STATUS: BookingStatus = {
+  default: 'CONFIRMED',
+  status1: 'CONFIRMED / DEPOT OUT',
+  status2: 'CONFIRMED / GATE IN',
+  status3: 'CONFIRMED / SHIPPED ON BOARD'
 }
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
@@ -133,7 +140,11 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
           {booking.FinalDestinationName}<br />
           ETA. {formatEstimatedDate(booking.ETA)}
         </TableCell>
-        <TableCell>{booking.BkgStatus || 'N/A'}</TableCell>
+        <TableCell>
+          {booking.BkgStatus ? (
+            BOOKING_STATUS[`status${booking.BkgStatus}`]
+          ) : BOOKING_STATUS.default}
+        </TableCell>
         <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
     </TableRow>
   );
