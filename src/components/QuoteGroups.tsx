@@ -117,6 +117,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
+
     const dateFilteredQuoteGroups = filter(
       (quoteGroup: QuoteGroup) =>
         !quoteGroup.quotes[0].archived &&
@@ -126,6 +127,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
         compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
         compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(quoteGroups);
+
     const filteredResults =
       searchString && searchString.length > 0 && dateFilteredQuoteGroups
         ? filter(
@@ -159,8 +161,11 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
       [get('dateIssued'), flow(get('sortingId'), padStart(10))],
       ['desc', 'desc'],
     )(filteredResults);
+
     setFilteredResults(sortedFiltered);
+
     return chunk(rowsPerPage)(sortedFiltered);
+
   }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {

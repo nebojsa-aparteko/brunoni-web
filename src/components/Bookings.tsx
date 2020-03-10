@@ -1,13 +1,20 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import {
   makeStyles,
   Container as MUIContainer,
   Paper,
   Card,
-  CardContent
+  CardContent,
+  CardActions,
+  TablePagination
 } from '@material-ui/core';
+import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
+import set from 'lodash/fp/set';
+import chunk from 'lodash/fp/chunk';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
+import { QuoteListContext } from '../contexts/QuoteListContext';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 
@@ -56,6 +63,22 @@ const useStyles = makeStyles(theme => ({
 const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
+  const [ bookingsContextData, setBookingsContextData ] = useContext(QuoteListContext);
+  const { page, rowsPerPage } = bookingsContextData;
+
+  const resultChunks = useMemo(() => {
+    return chunk(rowsPerPage)(bookings);
+  }, [bookings, rowsPerPage]);
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+    setBookingsContextData(set('page', page)(bookingsContextData));
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setBookingsContextData(
+      flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
+    );
+  };
 
   if ( !bookings ) {
     return (
@@ -72,8 +95,24 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
       <Meta title={'Bookings'} />
       <Card>
         <CardContent className={classes.content}>
-          <BookingsTable bookings={bookings} showCompanyInfo={showCompanyInfo} />
+          <BookingsTable
+            bookings={resultChunks && (get(page)(resultChunks) || [])}
+            showCompanyInfo={showCompanyInfo}
+          />
         </CardContent>
+        <CardActions className={classes.actions}>
+          {bookings && bookings.length > 0 && (
+            <TablePagination
+              component="div"
+              count={bookings.length}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+            />
+          )}
+        </CardActions>
       </Card>
     </Fragment>
   );
