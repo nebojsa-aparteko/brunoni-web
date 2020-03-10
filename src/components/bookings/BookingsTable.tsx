@@ -110,7 +110,7 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
     }
 
     return <TableCell>{client.name}</TableCell>;
-  }, [showCompanyInfo, client, booking.ForwAdrId]);
+  }, [showCompanyInfo, client, booking]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
     history.push(`/bookings/${id}`);
