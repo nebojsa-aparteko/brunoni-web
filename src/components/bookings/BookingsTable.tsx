@@ -139,12 +139,12 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
           {booking.PlaceOfRecieptName}<br />
           ETS. {formatEstimatedDate(booking.ETS)}
         </TableCell>
-        <TableCell>{booking['BL-No']}</TableCell>
-        <TableCell>{booking['Cust-BkgRef']}</TableCell>
         <TableCell>
           {booking.FinalDestinationName}<br />
           ETA. {formatEstimatedDate(booking.ETA)}
         </TableCell>
+        <TableCell>{booking['BL-No']}</TableCell>
+        <TableCell>{booking['Cust-BkgRef']}</TableCell>
         <TableCell>
           {booking.BkgStatus ? (
             BOOKING_STATUS[`status${booking.BkgStatus}`]
@@ -166,11 +166,13 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
           <TableCell>Carrier</TableCell>
           <TableCell>Vessel</TableCell>
           <TableCell>Origin</TableCell>
-          <TableCell>Booking No.</TableCell>
-          <TableCell>Your Reference</TableCell>
           <TableCell>Destination</TableCell>
+          <TableCell>Booking Number</TableCell>
+          <TableCell>Your Reference</TableCell>
           <TableCell>Status</TableCell>
-          <TableCell>Last Update</TableCell>
+          <TableCell>Date</TableCell>
+          {/* <TableCell>Contact</TableCell>
+          <TableCell>Progress</TableCell> */}
         </TableRow>
       </TableHead>
       <TableBody>
