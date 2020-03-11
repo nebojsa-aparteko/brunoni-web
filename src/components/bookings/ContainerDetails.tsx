@@ -35,6 +35,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
   },
   tableRow: {
+    verticalAlign: 'top',
     ['@media not print']: {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
