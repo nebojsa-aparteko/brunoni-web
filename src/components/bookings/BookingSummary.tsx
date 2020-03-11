@@ -50,13 +50,13 @@ interface TableRowProps {
 }
 
 export const ClientDetails: React.FC<{
-  forwarderPersTxt: string | null;
+  forwPersID: string | null;
   bkgRef: string;
-}> = ({ forwarderPersTxt, bkgRef }) => {
+}> = ({ forwPersID, bkgRef }) => {
   return (
     <Typography variant="body2">
-      {forwarderPersTxt && forwarderPersTxt}
-      {(forwarderPersTxt && bkgRef) ? ' - ' : null}
+      {forwPersID && forwPersID}
+      {(forwPersID && bkgRef) ? <br /> : null}
       {bkgRef && bkgRef}
     </Typography>
   );
@@ -91,7 +91,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
       <Fragment>
         {client.name}
         <ClientDetails
-          forwarderPersTxt={booking.ForwarderPersTxt}
+          forwPersID={booking.ForwPersID}
           bkgRef={booking['Cust-BkgRef']}
         />
       </Fragment>

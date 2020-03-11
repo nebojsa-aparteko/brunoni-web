@@ -12,6 +12,7 @@ export interface Booking {
   FinalDestinationETA: string;
   ETS: string;
   FinalDestinationName: string;
+  ForwPersID: string;
   ETA: string;
   BkgStatus: BookingStatusCode | null;
   TimeStamp: string;

@@ -96,20 +96,16 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
       return <TableCell>{booking.ForwAdrId}</TableCell>;
     }
 
-    if(booking.ForwarderPersTxt || booking['Cust-BkgRef']) {
-      return (
-        <TableCell>
-          {client.name}
+    return (
+      <TableCell>
+        {client.name}
+        {booking.ForwPersID ? (
           <Typography variant="body2">
-            {booking.ForwarderPersTxt && booking.ForwarderPersTxt}
-            {(booking.ForwarderPersTxt && booking['Cust-BkgRef']) ? ' - ' : null}
-            {booking['Cust-BkgRef'] && booking['Cust-BkgRef']}
+            {booking.ForwPersID}
           </Typography>
-        </TableCell>
-      );
-    }
-
-    return <TableCell>{client.name}</TableCell>;
+        ) : null}
+      </TableCell>
+    );
   }, [showCompanyInfo, client, booking]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
