@@ -73,8 +73,6 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
             </TableHead>
             <TableBody>
               {freightDetails.map((freight, index) => {
-                console.log('freight: ', freight);
-
                 return (
                   <TableRow selected={(index + 1) % 2 === 0} key={`booking-freight-${index}`} className={classes.tableRow}>
                     <TableCell component="th" scope="row">{freight.Txt}</TableCell>

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { useContext, useMemo, Fragment } from 'react';
 import {
   Box,
   Divider,
@@ -12,6 +12,8 @@ import {
 } from '@material-ui/core';
 import isArray from 'lodash/fp/isArray';
 import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
+import ContainerType from '../../model/ContainerType';
+import ContainerTypes from '../../contexts/ContainerTypes';
 
 interface Props {
   cargoDetail: CargoDetail | CargoDetail[];
@@ -26,6 +28,7 @@ interface TableRowProps {
 interface ContainerItemProps {
   detail: CargoDetail;
   index?: number;
+  containerTypes: ContainerType[] | undefined;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -71,7 +74,9 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-const ContainerItem: React.FC<ContainerItemProps> = ({ detail, index }) => {
+const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index }) => {
+  const container = containerTypes?.find(type => type.id === detail.CtypID);
+
   return (
     <Fragment>
       <Typography variant="h4">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
@@ -85,7 +90,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, index }) => {
               <col style={{ width: '60%' }} />
             </colgroup>
             <TableBody>
-              <TableRowData label={'Equipment'} content={`${detail.CtrQuantity} x ${detail.CtypID}`} />
+              <TableRowData label={'Equipment'} content={`${detail.CtrQuantity} x ${container?.description || detail.CtypID}`} />
 
               {detail.CommodityTXT ? (
                 <TableRowData label={'Commodity'} content={detail.CommodityTXT} />
@@ -104,10 +109,10 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, index }) => {
               <col style={{ width: '60%' }} />
             </colgroup>
             <TableBody>
-              {detail.LocRefs.LocRef.map((ref: LocRefItem) => {
+              {detail.LocRefs.LocRef.map((ref: LocRefItem, index: number) => {
                 if(ref.LocType === 'PICK UP') {
                   return (
-                    <Fragment>
+                    <Fragment key={`booking-loc-ref-${index}`}>
                       <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />
                       <TableRowData label={'Pick Up Date'} content={ref.LocDate} />
                       <TableRowData label={'Pick Up Location'} content={ref.LocDet} />
@@ -143,6 +148,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, index }) => {
 };
 
 const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
+  const containerTypes = useContext(ContainerTypes);
+
   return (
     <Grid item xs={12}>
       <Box marginTop="2em" marginBottom="2em">
@@ -151,10 +158,10 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
 
       {isArray(cargoDetail) ? (
         cargoDetail.map((cargoDetailItem, index) => {
-          return <ContainerItem key={`cargo-detail-${index}`} index={index} detail={cargoDetailItem} />;
+          return <ContainerItem key={`cargo-detail-${index}`} index={index} detail={cargoDetailItem} containerTypes={containerTypes} />;
         })
       ) : (
-        <ContainerItem detail={cargoDetail} />
+        <ContainerItem detail={cargoDetail} containerTypes={containerTypes} />
       )}
     </Grid>
   );
