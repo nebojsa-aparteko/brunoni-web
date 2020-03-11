@@ -122,7 +122,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
                 if (ref.LocType === 'DELIVERY') {
                   return (
-                    <Fragment>
+                    <Fragment key={`booking-loc-type-${index}`}>
                       <TableRowData label={'Delivery Reference'} content={ref.LocRef} />
                       <TableRowData label={'Delivery Address'} content={ref.LocDet} />
                     </Fragment>

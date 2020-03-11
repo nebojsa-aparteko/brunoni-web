@@ -122,7 +122,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
                   <TableCell>{item.ClosingType}</TableCell>
                   <TableCell>{item.ClosingDate}</TableCell>
                   <TableCell>{item.ClosingTime} h</TableCell>
-                  <TableCell>{item.ClosingTxt}</TableCell>
+                  <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
                 </TableRow>
               );
             })}
