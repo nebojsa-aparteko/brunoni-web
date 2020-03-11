@@ -22,6 +22,25 @@ const useStyles = makeStyles((theme: Theme) =>
       '& td': {
         whiteSpace: 'nowrap'
       }
+    },
+    progress: {
+      width: '100%',
+      backgroundColor: 'white',
+      border: '1px solid #ccc',
+    },
+    progressBar: {
+      width: '0%',
+      height: '20px',
+      backgroundColor: 'green',
+    },
+    avatarCell: {
+      textAlign: 'center',
+    },
+    avatar: {
+      width: '40px',
+      height: '40px',
+      borderRadius: '20px',
+      display: 'block'
     }
   })
 );
@@ -57,7 +76,7 @@ const formatEstimatedDate = (date: string) => {
 
 const BookingsTableBodySekeleton: React.FC = () => (
   <Fragment>
-    {[...Array(7)].map((_, i) => (
+    {[...Array(10)].map((_, i) => (
       <TableRow key={i}>
         <TableCell>
           <Skeleton width={50} height={16} style={{ margin: 0 }} />
@@ -74,10 +93,38 @@ const BookingsTableBodySekeleton: React.FC = () => (
         <TableCell>
           <Skeleton width={140} height={16} style={{ margin: 0 }} />
         </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
       </TableRow>
     ))}
   </Fragment>
 );
+
+const ShipmentProgress: React.FC = () => {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.progress}>
+      <div className={classes.progressBar} role="progressbar" style={{width: '40%'}}></div>
+    </div>
+  );
+};
 
 const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
   const classes = useStyles();
@@ -151,11 +198,19 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
           ) : BOOKING_STATUS.default}
         </TableCell>
         <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
+        <TableCell className={classes.avatarCell}>
+          <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
+        </TableCell>
+        <TableCell>
+          <ShipmentProgress />
+        </TableCell>
     </TableRow>
   );
 };
 
 const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
+  const classes = useStyles();
+
   console.log('bookings: ', bookings);
 
   return (
@@ -171,8 +226,8 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
           <TableCell>Your Reference</TableCell>
           <TableCell>Status</TableCell>
           <TableCell>Date</TableCell>
-          {/* <TableCell>Contact</TableCell>
-          <TableCell>Progress</TableCell> */}
+          <TableCell className={classes.avatarCell}>Contact</TableCell>
+          <TableCell>Progress</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
