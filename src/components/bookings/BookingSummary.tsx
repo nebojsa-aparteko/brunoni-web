@@ -113,7 +113,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         {(booking.POLName !== booking.PlaceOfRecieptName) ? (
           <TableRowData
             label={'Place of Receipt'}
-            content={booking.PlaceOfRecieptName}
+            content={[ booking.PlaceOfRecieptName, booking.PlaceOfReceiptETS ].join('<br/>ETS: ')}
           />
         ) : null}
 
@@ -129,7 +129,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         {(booking.PODName !== booking.FinalDestinationName) ? (
           <TableRowData
             label={'Place of Delivery'}
-            content={booking.FinalDestinationName}
+            content={[booking.FinalDestinationName, booking.FinalDestinationETA].join('<br/>ETA: ')}
           />
         ) : null}
 

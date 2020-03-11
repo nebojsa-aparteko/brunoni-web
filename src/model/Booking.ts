@@ -8,6 +8,8 @@ export interface Booking {
   Vessel: string;
   Voyage: string;
   PlaceOfRecieptName: string;
+  PlaceOfReceiptETS: string;
+  FinalDestinationETA: string;
   ETS: string;
   FinalDestinationName: string;
   ETA: string;
