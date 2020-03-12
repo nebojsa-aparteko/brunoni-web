@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, Fragment } from 'react';
 import {
   Box,
   Button,
@@ -14,7 +14,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import Bookings from '../../contexts/Bookings';
-import { Booking as BookingModel, Remark } from '../../model/Booking';
+import { Booking as BookingModel, Remark, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
@@ -84,6 +84,10 @@ const handlePrint = () => {
 const remark = {
   special: 'SPECIAL REMARKS',
   final: 'FINAL REMARKS'
+};
+
+export const isLongVersion = (version: BookingVersion) => {
+  return version === 'Long';
 };
 
 const Booking: React.FC<Props> = ({ id }) => {
@@ -164,13 +168,17 @@ const Booking: React.FC<Props> = ({ id }) => {
                 />
               </Box>
 
-              <Box marginTop="2em" marginBottom="2em">
-                <PortTerms portTerms={booking.PortTerms} />
-              </Box>
+              {isLongVersion(booking.Version) ? (
+                <Fragment>
+                  <Box marginTop="2em" marginBottom="2em">
+                    <PortTerms portTerms={booking.PortTerms} />
+                  </Box>
 
-              <Box marginTop="2em" marginBottom="2em">
-                <SpecialRemarks remarks={specialRemarks} />
-              </Box>
+                  <Box marginTop="2em" marginBottom="2em">
+                    <SpecialRemarks remarks={specialRemarks} />
+                  </Box>
+                </Fragment>
+              ) : null}
 
               <Box marginTop="2em" marginBottom="2em">
                 <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />

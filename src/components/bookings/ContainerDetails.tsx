@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, Fragment } from 'react';
+import React, { useContext, Fragment } from 'react';
 import {
   Box,
   Divider,
@@ -14,6 +14,7 @@ import isArray from 'lodash/fp/isArray';
 import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
+import { isLongVersion } from './Booking';
 
 interface Props {
   cargoDetail: CargoDetail | CargoDetail[];
@@ -29,6 +30,7 @@ interface ContainerItemProps {
   detail: CargoDetail;
   index?: number;
   containerTypes: ContainerType[] | undefined;
+  version: BookingVersion;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -74,8 +76,8 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index }) => {
-  const container = containerTypes?.find(type => type.id === detail.CtypID);
+const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version }) => {
+  const cont = containerTypes?.find(type => type.id === detail.CtypID);
 
   return (
     <Fragment>
@@ -83,61 +85,64 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
       <Box marginTop="2em" marginBottom="2em">
         <Grid container spacing={2}>
-        <Grid item md={6} xs={12}>
-          <Table size="small" aria-label="a dense table">
-            <colgroup>
-              <col style={{ width: '40%' }} />
-              <col style={{ width: '60%' }} />
-            </colgroup>
-            <TableBody>
-              <TableRowData label={'Equipment'} content={`${detail.CtrQuantity} x ${container?.description || detail.CtypID}`} />
+          <Grid item md={6} xs={12}>
+            <Table size="small" aria-label="a dense table">
+              <colgroup>
+                <col style={{ width: '40%' }} />
+                <col style={{ width: '60%' }} />
+              </colgroup>
+              <TableBody>
+                <TableRowData label={'Equipment'} content={`${detail.CtrQuantity} x ${cont?.description || detail.CtypID}`} />
 
-              {detail.CommodityTXT ? (
-                <TableRowData label={'Commodity'} content={detail.CommodityTXT} />
-              ) : null}
+                {detail.CommodityTXT ? (
+                  <TableRowData label={'Commodity'} content={detail.CommodityTXT} />
+                ) : null}
 
-              {detail.CtrWeight ? (
-                <TableRowData label={'Weight'} content={detail.CtrWeight} />
-              ) : null}
-            </TableBody>
-          </Table>
+                {detail.CtrWeight ? (
+                  <TableRowData label={'Weight'} content={detail.CtrWeight} />
+                ) : null}
+              </TableBody>
+            </Table>
+          </Grid>
+
+          {isLongVersion(version) ? (
+            <Grid item md={6} xs={12}>
+              <Table size="small" aria-label="a dense table">
+                <colgroup>
+                  <col style={{ width: '40%' }} />
+                  <col style={{ width: '60%' }} />
+                </colgroup>
+                <TableBody>
+                  {detail.LocRefs.LocRef.map((ref: LocRefItem, index: number) => {
+                    if(ref.LocType === 'PICK UP') {
+                      return (
+                        <Fragment key={`booking-loc-ref-${index}`}>
+                          <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />
+                          <TableRowData label={'Pick Up Date'} content={ref.LocDate} />
+                          <TableRowData label={'Pick Up Location'} content={ref.LocDet} />
+                        </Fragment>
+                      );
+                    }
+
+                    if (ref.LocType === 'DELIVERY') {
+                      return (
+                        <Fragment key={`booking-loc-type-${index}`}>
+                          <TableRowData label={'Delivery Reference'} content={ref.LocRef} />
+                          <TableRowData label={'Delivery Address'} content={ref.LocDet} />
+                        </Fragment>
+                      );
+                    }
+                  })}
+
+                  <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} />
+                  <TableRowData label={'Storage Tariff'} content={'N/A'} />
+
+                  <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
+                </TableBody>
+              </Table>
+            </Grid>
+          ) : null}
         </Grid>
-        <Grid item md={6} xs={12}>
-          <Table size="small" aria-label="a dense table">
-            <colgroup>
-              <col style={{ width: '40%' }} />
-              <col style={{ width: '60%' }} />
-            </colgroup>
-            <TableBody>
-              {detail.LocRefs.LocRef.map((ref: LocRefItem, index: number) => {
-                if(ref.LocType === 'PICK UP') {
-                  return (
-                    <Fragment key={`booking-loc-ref-${index}`}>
-                      <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />
-                      <TableRowData label={'Pick Up Date'} content={ref.LocDate} />
-                      <TableRowData label={'Pick Up Location'} content={ref.LocDet} />
-                    </Fragment>
-                  );
-                }
-
-                if (ref.LocType === 'DELIVERY') {
-                  return (
-                    <Fragment key={`booking-loc-type-${index}`}>
-                      <TableRowData label={'Delivery Reference'} content={ref.LocRef} />
-                      <TableRowData label={'Delivery Address'} content={ref.LocDet} />
-                    </Fragment>
-                  );
-                }
-              })}
-
-              <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} />
-              <TableRowData label={'Storage Tariff'} content={'N/A'} />
-
-              <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
-            </TableBody>
-          </Table>
-        </Grid>
-      </Grid>
       </Box>
 
       <Box marginTop="2em" marginBottom="2em">
@@ -158,10 +163,16 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
 
       {isArray(cargoDetail) ? (
         cargoDetail.map((cargoDetailItem, index) => {
-          return <ContainerItem key={`cargo-detail-${index}`} index={index} detail={cargoDetailItem} containerTypes={containerTypes} />;
+          return <ContainerItem
+            key={`cargo-detail-${index}`}
+            index={index}
+            detail={cargoDetailItem}
+            containerTypes={containerTypes}
+            version={version}
+          />;
         })
       ) : (
-        <ContainerItem detail={cargoDetail} containerTypes={containerTypes} />
+        <ContainerItem detail={cargoDetail} containerTypes={containerTypes} version={version} />
       )}
     </Grid>
   );
