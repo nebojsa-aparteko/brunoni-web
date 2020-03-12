@@ -66,7 +66,7 @@ interface Props {
 }
 
 const getBookingTitle = (booking: BookingModel | undefined) => {
-  return booking?.CarrierID;
+  return booking?.CarrierID.toUpperCase();
 };
 
 function ScrollToTopOnMount() {
