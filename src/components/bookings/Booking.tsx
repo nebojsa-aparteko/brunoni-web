@@ -81,6 +81,11 @@ const handlePrint = () => {
   window.print();
 };
 
+const remark = {
+  special: 'SPECIAL REMARKS',
+  final: 'FINAL REMARKS'
+};
+
 const Booking: React.FC<Props> = ({ id }) => {
   const bookings = useContext(Bookings);
   const booking = bookings?.find(booking => booking.id === id);
@@ -103,9 +108,9 @@ const Booking: React.FC<Props> = ({ id }) => {
   console.log(booking);
 
   booking.Remarks.Remark.forEach(remarkItem => {
-    if(remarkItem.RemarkType === 'SPECIAL REMARKS') {
+    if(remarkItem.RemarkType === remark.special) {
       specialRemarks.push(remarkItem);
-    } else if(remarkItem.RemarkType === 'FINAL REMARKS') {
+    } else if(remarkItem.RemarkType === remark.final) {
       finalRemarks.push(remarkItem);
     }
   });
