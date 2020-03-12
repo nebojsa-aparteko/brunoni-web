@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '40px',
       borderRadius: '20px',
       display: 'block'
+    },
+    textEmphasized: {
+      textTransform: 'uppercase'
     }
   })
 );
@@ -198,7 +201,7 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
         key={booking.id}
       >
         {clientInfo}
-        <TableCell>
+        <TableCell className={classes.textEmphasized}>
           {booking.CarrierID}
           {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
             <Typography variant="body2">
