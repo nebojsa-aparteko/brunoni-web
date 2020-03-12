@@ -14,13 +14,13 @@ export interface Booking {
   FinalDestinationName: string;
   ForwPersID: string;
   ETA: string;
-  BkgStatus: BookingStatusCode | null;
+  BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
   TimeStamp: string;
   CargoDetails: CargoDetailItems;
   FreightDetails: {
     FreightDetail: FreightDetail[]
   };
-  Category: string;
+  Category: BookingCategory;
   BkgAgentContact: string | null;
   ForwAdrId: string;
   ForwarderPersTxt: string | null;
@@ -43,10 +43,23 @@ export interface Booking {
   'BL-No': string;
 }
 
-export enum BookingStatusCode {
+export enum BookingCategory {
+  Import = 'Import',
+  Export = 'Export',
+}
+
+export enum ExportShipmentStatusCode {
+  Status10 = '10',
+  Status20 = '20',
+  Status30 = '30',
+  Status40 = '40',
+}
+
+export enum ImportShipmentStatusCode {
   Status1 = '1',
   Status2 = '2',
   Status3 = '3',
+  Status4 = '4',
 }
 
 export interface BookingStatus {

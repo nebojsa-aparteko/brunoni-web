@@ -13,7 +13,12 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking, BookingStatus } from '../../model/Booking';
+import {
+  Booking,
+  BookingCategory,
+  ExportShipmentStatusCode,
+  ImportShipmentStatusCode
+} from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -55,12 +60,37 @@ interface RowProps {
   booking: Booking;
 }
 
-export const BOOKING_STATUS: BookingStatus = {
-  default: 'CONFIRMED',
-  status1: 'CONFIRMED / DEPOT OUT',
-  status2: 'CONFIRMED / GATE IN',
-  status3: 'CONFIRMED / SHIPPED ON BOARD'
+interface BookingStatuses {
+  [key: string]: {
+    [key: string]: string;
+  };
 }
+
+const bookingStatus: BookingStatuses = {
+  export: {
+    status10: 'CONFIRMED',
+    status20: 'CONFIRMED / DEPOT OUT',
+    status30: 'CONFIRMED / GATE IN',
+    status40: 'SHIPPED ON BOARD'
+  },
+  import: {
+    status1: 'ON WATER',
+    status2: 'ARRIVED AT POD',
+    status3: 'ARRIVED AT POD / GATE OUT TERMINAL',
+    status4: 'EMPTY RETURNED'
+  }
+}
+
+const getBookingStatus = (
+  category: BookingCategory,
+  statusCode: ExportShipmentStatusCode | ImportShipmentStatusCode | null
+): string | undefined => {
+  const categoryName = category.toLowerCase();
+
+  if(categoryName in bookingStatus) {
+    return bookingStatus[categoryName][`status${statusCode}`];
+  }
+};
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
@@ -193,9 +223,7 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
         <TableCell>{booking['BL-No']}</TableCell>
         <TableCell>{booking['Cust-BkgRef']}</TableCell>
         <TableCell>
-          {booking.BkgStatus ? (
-            BOOKING_STATUS[`status${booking.BkgStatus}`]
-          ) : BOOKING_STATUS.default}
+          {getBookingStatus(booking.Category, booking.BkgStatus)}
         </TableCell>
         <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
         <TableCell className={classes.avatarCell}>
