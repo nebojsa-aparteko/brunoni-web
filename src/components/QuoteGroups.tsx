@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const containsString = (prop: string, searchString: string) => {
+export const containsString = (prop: string, searchString: string) => {
   const byMultiple = flatMap((value: string) => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1)(
     searchString.split(' '),
   );

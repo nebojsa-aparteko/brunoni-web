@@ -1,22 +1,30 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo, useState } from 'react';
 import {
+  Box,
   makeStyles,
   Container as MUIContainer,
   Paper,
   Card,
   CardContent,
+  CardHeader,
   CardActions,
-  TablePagination
+  TablePagination,
+  Typography
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
+import filter from 'lodash/fp/filter';
+import reduce from 'lodash/fp/reduce';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
 import { QuoteListContext } from '../contexts/QuoteListContext';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
+import  { Booking } from '../model/Booking';
+import Search from './SearchBar/Search';
+import { containsString } from './QuoteGroups';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -63,12 +71,25 @@ const useStyles = makeStyles(theme => ({
 const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
+  const [ filteredResults, setFilteredResults ] = useState<Booking[] | undefined | null>([]);
   const [ bookingsContextData, setBookingsContextData ] = useContext(QuoteListContext);
-  const { page, rowsPerPage } = bookingsContextData;
+  const { page, rowsPerPage, searchString } = bookingsContextData;
 
   const resultChunks = useMemo(() => {
-    return chunk(rowsPerPage)(bookings);
-  }, [bookings, rowsPerPage]);
+    if( !searchString || searchString.length <= 0 ) {
+      setFilteredResults(bookings);
+
+      return chunk(rowsPerPage)(bookings);
+    }
+
+    const result = filter(
+      (booking: Booking) => containsString(booking.id, searchString)
+    )(bookings);
+
+    setFilteredResults(result);
+
+    return chunk(rowsPerPage)(result);
+  }, [bookings, rowsPerPage, searchString]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setBookingsContextData(set('page', page)(bookingsContextData));
@@ -78,6 +99,12 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     setBookingsContextData(
       flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
     );
+  };
+
+  const handleSearch = (searchStringNew: string) => {
+    if (searchStringNew !== searchString) {
+      setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
+    }
   };
 
   if ( !bookings ) {
@@ -94,17 +121,35 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     <Fragment>
       <Meta title={'Bookings'} />
       <Card>
+        <CardHeader
+          title={
+            <Box display="flex" alignItems="center">
+              <Typography variant="subtitle1" display="inline">
+                Bookings
+              </Typography>
+
+              <Box flex={1} />
+
+              <Search
+                onSearch={handleSearch}
+                style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
+              />
+            </Box>
+          }
+        />
+
         <CardContent className={classes.content}>
           <BookingsTable
             bookings={resultChunks && (get(page)(resultChunks) || [])}
             showCompanyInfo={showCompanyInfo}
           />
         </CardContent>
+
         <CardActions className={classes.actions}>
           {bookings && bookings.length > 0 && (
             <TablePagination
               component="div"
-              count={bookings.length}
+              count={filteredResults ? filteredResults.length : 0}
               onChangePage={handleChangePage}
               onChangeRowsPerPage={handleChangeRowsPerPage}
               page={page}

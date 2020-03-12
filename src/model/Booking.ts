@@ -1,7 +1,3 @@
-export default interface BookingsCollection {
-  bookings: Booking[];
-}
-
 export interface Booking {
   id: string;
   CarrierID: string;
