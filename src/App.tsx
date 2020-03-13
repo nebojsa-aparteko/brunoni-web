@@ -46,7 +46,7 @@ const anonymousRoutes = (
 const adminRoutes = (
   <Switch>
     <Route exact path="/" component={AdminDashboard} />
-    <Route exact path="/schedule" component={Unauthorized} />
+    <Route exact path="/schedule" component={Routes} />
     <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
