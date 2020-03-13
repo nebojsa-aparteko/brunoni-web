@@ -16,7 +16,8 @@ import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
-import reduce from 'lodash/fp/reduce';
+// import reduce from 'lodash/fp/reduce';
+// import flatMap from 'lodash/fp/flatMap';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
 import { QuoteListContext } from '../contexts/QuoteListContext';
@@ -68,6 +69,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+// const containsString = (prop: string, searchString: string) => {
+//   console.log('prop: ', prop);
+//   console.log('searchString: ', searchString);
+
+//   const byMultiple = flatMap((value: string) => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1)(
+//     searchString.split(' '),
+//   );
+//   return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
+// };
+
 const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
@@ -83,7 +94,36 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     }
 
     const result = filter(
-      (booking: Booking) => containsString(booking.id, searchString)
+      // client => use drop-down filter
+
+      // carrier => booking.CarrierID
+      // vessel => booking.Vessel
+      // origin => booking.PlaceOfRecieptName
+      // destionation => booking.FinalDestinationName
+      // booking number => booking['BL-No']
+      // your refference => booking['Cust-BkgRef']
+
+      // status => booking.BkgStatus => map numeric statuses to string constants
+
+      (booking: Booking) =>
+        (booking.CarrierID
+          ? containsString(booking.CarrierID, searchString)
+          : false) ||
+        (booking.Vessel
+          ? containsString(booking.Vessel, searchString)
+          : false) ||
+        (booking.PlaceOfRecieptName
+          ? containsString(booking.PlaceOfRecieptName, searchString)
+          : false) ||
+        (booking.FinalDestinationName
+          ? containsString(booking.FinalDestinationName, searchString)
+          : false)
+        // ('BL-No' in booking
+        //   ? containsString(booking['BL-No'], searchString)
+        //   : false)
+        // ('Cust-BkgRef' in booking
+        //   ? containsString(booking['Cust-BkgRef'], searchString)
+        //   : false)
     )(bookings);
 
     setFilteredResults(result);
