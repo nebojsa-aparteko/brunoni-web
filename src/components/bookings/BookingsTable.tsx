@@ -1,6 +1,8 @@
-import React, { useMemo, Fragment } from 'react';
+import React, { useMemo, useState, Fragment } from 'react';
 import { useHistory } from 'react-router';
 import {
+  Dialog,
+  DialogTitle,
   Table,
   TableBody,
   TableCell,
@@ -20,6 +22,8 @@ import {
   ImportShipmentStatusCode
 } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
+import ExportChecklist from './ExportChecklist';
+import ImportChecklist from './ImportChecklist';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -163,6 +167,7 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
   const classes = useStyles();
   const clients = useClients();
   const history = useHistory();
+  const [ isModalOpen, setIsModalOpen ] = useState(false);
 
   const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
     clients,
@@ -192,49 +197,73 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
     history.push(`/bookings/${id}`);
   };
 
+  const handleProgressClick = (event: React.MouseEvent<unknown>) => {
+    event.stopPropagation();
+
+    setIsModalOpen(true);
+  };
+
+  const handleDialogClose = (event: React.MouseEvent<unknown>) => {
+    setIsModalOpen(false);
+  }
+
+  const renderDialog = (booking: Booking) => {
+    if(booking.Category !== 'Export' && booking.Category !== 'Import') return null;
+
+    return (
+      <Dialog open={isModalOpen} onClose={handleDialogClose} aria-labelledby="check-list">
+        <DialogTitle id="check-list">Check List</DialogTitle>
+
+        {booking.Category === 'Export' ? <ExportChecklist /> : null}
+        {booking.Category === 'Import' ? <ImportChecklist /> : null}
+      </Dialog>
+    );
+  }
+
   return (
-      <TableRow
-        hover
-        tabIndex={-1}
-        className={classes.tableRow}
-        onClick={event => handleRowClick(event, booking.id)}
-        key={booking.id}
-      >
-        {clientInfo}
-        <TableCell className={classes.textEmphasized}>
-          {booking.CarrierID}
-          {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
-            <Typography variant="body2">
-              {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
-              {(booking['ERP-CarrierID'] && booking['ERP-ServiceID']) ? ' - ' : null}
-              {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
-            </Typography>
-          ) : null}
-        </TableCell>
-        <TableCell>
-          {booking.Vessel}<br/>
-          Voyage Number {booking.Voyage}
-        </TableCell>
-        <TableCell>
-          {booking.PlaceOfRecieptName}<br />
-          ETS. {formatEstimatedDate(booking.ETS)}
-        </TableCell>
-        <TableCell>
-          {booking.FinalDestinationName}<br />
-          ETA. {formatEstimatedDate(booking.ETA)}
-        </TableCell>
-        <TableCell>{booking['BL-No']}</TableCell>
-        <TableCell>{booking['Cust-BkgRef']}</TableCell>
-        <TableCell>
-          {getBookingStatus(booking.Category, booking.BkgStatus)}
-        </TableCell>
-        <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
-        <TableCell className={classes.avatarCell}>
-          <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
-        </TableCell>
-        <TableCell>
-          <ShipmentProgress />
-        </TableCell>
+    <TableRow
+      hover
+      tabIndex={-1}
+      className={classes.tableRow}
+      onClick={event => handleRowClick(event, booking.id)}
+      key={booking.id}
+    >
+      {clientInfo}
+      <TableCell className={classes.textEmphasized}>
+        {booking.CarrierID}
+        {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
+          <Typography variant="body2">
+            {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
+            {(booking['ERP-CarrierID'] && booking['ERP-ServiceID']) ? ' - ' : null}
+            {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
+          </Typography>
+        ) : null}
+      </TableCell>
+      <TableCell>
+        {booking.Vessel}<br/>
+        Voyage Number {booking.Voyage}
+      </TableCell>
+      <TableCell>
+        {booking.PlaceOfRecieptName}<br />
+        ETS. {formatEstimatedDate(booking.ETS)}
+      </TableCell>
+      <TableCell>
+        {booking.FinalDestinationName}<br />
+        ETA. {formatEstimatedDate(booking.ETA)}
+      </TableCell>
+      <TableCell>{booking['BL-No']}</TableCell>
+      <TableCell>{booking['Cust-BkgRef']}</TableCell>
+      <TableCell>
+        {getBookingStatus(booking.Category, booking.BkgStatus)}
+      </TableCell>
+      <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
+      <TableCell className={classes.avatarCell}>
+        <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
+      </TableCell>
+      <TableCell onClick={event => handleProgressClick(event)}>
+        <ShipmentProgress />
+        {isModalOpen ? renderDialog(booking) : null}
+      </TableCell>
     </TableRow>
   );
 };
@@ -245,32 +274,34 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
   console.log('bookings: ', bookings);
 
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          {showCompanyInfo && <TableCell>Client</TableCell>}
-          <TableCell>Carrier</TableCell>
-          <TableCell>Vessel</TableCell>
-          <TableCell>Origin</TableCell>
-          <TableCell>Destination</TableCell>
-          <TableCell>Booking Number</TableCell>
-          <TableCell>Your Reference</TableCell>
-          <TableCell>Status</TableCell>
-          <TableCell>Date</TableCell>
-          <TableCell className={classes.avatarCell}>Contact</TableCell>
-          <TableCell>Progress</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {!bookings ? (
-          <BookingsTableBodySekeleton />
-        ) : (
-          bookings.map(booking => (
-            <BookingRow key={`booking-row-${booking.id}`} showCompanyInfo={showCompanyInfo} booking={booking} />
-          ))
-        )}
-      </TableBody>
-    </Table>
+    <Fragment>
+      <Table>
+        <TableHead>
+          <TableRow>
+            {showCompanyInfo && <TableCell>Client</TableCell>}
+            <TableCell>Carrier</TableCell>
+            <TableCell>Vessel</TableCell>
+            <TableCell>Origin</TableCell>
+            <TableCell>Destination</TableCell>
+            <TableCell>Booking Number</TableCell>
+            <TableCell>Your Reference</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell className={classes.avatarCell}>Contact</TableCell>
+            <TableCell>Progress</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {!bookings ? (
+            <BookingsTableBodySekeleton />
+          ) : (
+            bookings.map(booking => (
+              <BookingRow key={`booking-row-${booking.id}`} showCompanyInfo={showCompanyInfo} booking={booking} />
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </Fragment>
   );
 };
 
