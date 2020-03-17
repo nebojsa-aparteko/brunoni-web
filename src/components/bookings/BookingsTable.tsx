@@ -4,7 +4,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  // IconButton,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -15,7 +15,7 @@ import {
   Theme,
   Typography
 } from '@material-ui/core';
-// import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
 import {
@@ -57,13 +57,13 @@ const useStyles = makeStyles((theme: Theme) =>
     textEmphasized: {
       textTransform: 'uppercase'
     },
-    // closeModal: {
-    //   position: 'absolute',
-    //   top: '5px',
-    //   right: '12px',
-    //   width: '47px',
-    //   height: '47px',
-    // }
+    closeModal: {
+      position: 'absolute',
+      top: '5px',
+      right: '12px',
+      width: '47px',
+      height: '47px',
+    }
   })
 );
 
@@ -75,6 +75,15 @@ interface Props {
 interface RowProps {
   showCompanyInfo?: boolean;
   booking: Booking;
+  onProgressClick: any;
+  onClick: any;
+}
+
+interface ProgressDialogProps {
+  isOpen: boolean;
+  booking: Booking | undefined;
+  showCompanyInfo?: boolean;
+  handleClose: any;
 }
 
 interface BookingStatuses {
@@ -173,11 +182,34 @@ const ShipmentProgress: React.FC = () => {
   );
 };
 
-const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
+const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
+  const classes = useStyles();
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+    >
+      <DialogTitle disableTypography id="dialog-title-check-list">
+        <Typography variant="h4">
+          {booking?.CarrierID}
+        </Typography>
+        <IconButton onClick={handleClose} className={classes.closeModal}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        {booking?.Category === 'Export' ? <ExportChecklist showCompanyInfo={showCompanyInfo} /> : null}
+        {booking?.Category === 'Import' ? <ImportChecklist showCompanyInfo={showCompanyInfo} /> : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick}) => {
   const classes = useStyles();
   const clients = useClients();
-  const history = useHistory();
-  const [ isModalOpen, setIsModalOpen ] = useState(false);
 
   const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
     clients,
@@ -203,50 +235,17 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
     );
   }, [showCompanyInfo, client, booking]);
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
-    history.push(`/bookings/${id}`);
-  };
-
-  const handleProgressClick = (event: React.MouseEvent<unknown>) => {
-    event.stopPropagation();
-
-    setIsModalOpen(true);
-  };
-
-  const handleDialogClose = (event: React.MouseEvent<unknown>) => {
-    setIsModalOpen(false);
-  }
-
-  const renderDialog = (booking: Booking) => {
-    if(booking.Category !== 'Export' && booking.Category !== 'Import') return null;
-
-    return (
-      <Dialog open={isModalOpen} onClose={handleDialogClose} aria-labelledby="check-list">
-        <DialogTitle id="check-list">
-          <Typography variant="h4">Check List</Typography>
-          {/* <IconButton onClick={handleDialogClose} className={classes.closeModal}>
-            <CloseIcon />
-          </IconButton> */}
-        </DialogTitle>
-        <DialogContent>
-          {booking.Category === 'Export' ? <ExportChecklist showCompanyInfo={showCompanyInfo} /> : null}
-          {booking.Category === 'Import' ? <ImportChecklist showCompanyInfo={showCompanyInfo} /> : null}
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
     <TableRow
       hover
       tabIndex={-1}
       className={classes.tableRow}
-      onClick={event => handleRowClick(event, booking.id)}
+      onClick={onClick}
       key={booking.id}
     >
       {clientInfo}
       <TableCell className={classes.textEmphasized}>
-        {booking.CarrierID}
+        {booking.CarrierID.toUpperCase()}
         {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
           <Typography variant="body2">
             {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
@@ -276,9 +275,8 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
       <TableCell className={classes.avatarCell}>
         <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
       </TableCell>
-      <TableCell onClick={event => handleProgressClick(event)}>
+      <TableCell onClick={onProgressClick}>
         <ShipmentProgress />
-        {isModalOpen ? renderDialog(booking) : null}
       </TableCell>
     </TableRow>
   );
@@ -286,6 +284,22 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
 
 const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
+  const history = useHistory();
+  const [ dialogData, setDialogData ] = useState<Booking | undefined>(undefined);
+  const [ isDialogOpen, setIsDialogOpen ] = useState(false);
+
+  const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
+    history.push(`/bookings/${id}`);
+  };
+
+  const handleProgressClick = (event: React.MouseEvent<unknown>, booking: Booking) => {
+    event.stopPropagation();
+
+    setIsDialogOpen(true);
+    setDialogData(booking);
+  };
+
+  const handleDialogClose = () => setIsDialogOpen(false);
 
   console.log('bookings: ', bookings);
 
@@ -312,11 +326,23 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
             <BookingsTableBodySekeleton />
           ) : (
             bookings.map(booking => (
-              <BookingRow key={`booking-row-${booking.id}`} showCompanyInfo={showCompanyInfo} booking={booking} />
+              <BookingRow
+                key={`booking-row-${booking.id}`}
+                showCompanyInfo={showCompanyInfo}
+                booking={booking}
+                onClick={(event: React.MouseEvent<unknown>) => handleRowClick(event, booking.id)}
+                onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
+              />
             ))
           )}
         </TableBody>
       </Table>
+      <BoookingProgressDialog
+        isOpen={isDialogOpen}
+        handleClose={handleDialogClose}
+        booking={dialogData}
+        showCompanyInfo={showCompanyInfo}
+      />
     </Fragment>
   );
 };
