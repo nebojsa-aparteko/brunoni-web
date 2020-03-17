@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -15,6 +15,11 @@ interface Props {
   showCompanyInfo?: boolean;
 }
 
+interface Data {
+  key: string;
+  value: boolean | string;
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -28,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     table: {
       overflowX: 'auto',
+      marginBottom: '1.5em',
     },
     tableHead: {
       fontWeight: theme.typography.fontWeightBold,
@@ -39,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
     tableRow: {
       '& td': {
         whiteSpace: 'nowrap',
+        textTransform: 'uppercase'
       },
       ['@media print']: {
         '& td': {
@@ -59,9 +66,59 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const isRegularUser = !showCompanyInfo;
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+  const [ data, setData ] = useState<Data[] | undefined>(undefined);
+
+  useEffect(() => {
+    const payload: Data[] = [
+      {
+        key: 'Depot Out',
+        value: true
+      },
+      {
+        key: 'Gate In Terminal',
+        value: true
+      },
+      {
+        key: 'VGM Submission',
+        value: true
+      },
+      {
+        key: 'Shipping Instructions',
+        value: true
+      },
+      {
+        key: 'B/L Draft Received',
+        value: true
+      },
+      {
+        key: 'B/L Draft Approved',
+        value: true
+      },
+      {
+        key: 'Shipped on Board',
+        value: 'PENDING'
+      },
+      {
+        key: 'Final B/L Copy',
+        value: 'PENDING'
+      }
+    ];
+
+    setData(payload);
+  }, []);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
     console.log('handleCheckboxChange');
-    // onChange(checked ? [true, defaultItemValue] : [false]);
+
+    const updatedData = data?.map(item => {
+      if(item.key === key) {
+        item.value = !item.value;
+      }
+
+      return item;
+    });
+
+    setData(updatedData);
   };
 
   return (
@@ -73,50 +130,26 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        <TableRow selected={false} className={classes.tableRow}>
-          <TableCell>Depot Out</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={true} className={classes.tableRow}>
-          <TableCell>Gate In Terminal</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={false} className={classes.tableRow}>
-          <TableCell>VGM Submission</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={true} className={classes.tableRow}>
-          <TableCell>Shipping Instructions</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={false} className={classes.tableRow}>
-          <TableCell>B/L Draft Received</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={true} className={classes.tableRow}>
-          <TableCell>B/L Draft Approved</TableCell>
-          <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
-          </TableCell>
-        </TableRow>
-        <TableRow selected={false} className={classes.tableRow}>
-          <TableCell>Shipped on Board</TableCell>
-          <TableCell align="center" className={classes.textEmphasized}>PENDING</TableCell>
-        </TableRow>
-        <TableRow selected={true} className={classes.tableRow}>
-          <TableCell>Final B/L Copy</TableCell>
-          <TableCell align="center" className={classes.textEmphasized}>PENDING</TableCell>
-        </TableRow>
+        {data && data.map((item: Data, index: number) => {
+          return (
+            <TableRow key={`export-checklist-row-${index}`} selected={(index + 1) % 2 === 0} className={classes.tableRow}>
+              <TableCell>{item.key}</TableCell>
+              {typeof item.value === 'boolean' ? (
+                <TableCell align="center">
+                  <Checkbox
+                    checked={item.value}
+                    onChange={event => handleCheckboxChange(event, item.key)}
+                    disabled={isRegularUser}
+                  />
+                </TableCell>
+              ) : (
+                <TableCell align="center" className={classes.textEmphasized}>
+                  {item.value}
+                </TableCell>
+              )}
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
