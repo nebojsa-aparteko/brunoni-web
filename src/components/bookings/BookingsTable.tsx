@@ -3,6 +3,8 @@ import { useHistory } from 'react-router';
 import {
   Dialog,
   DialogTitle,
+  DialogContent,
+  // IconButton,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +15,7 @@ import {
   Theme,
   Typography
 } from '@material-ui/core';
+// import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
 import {
@@ -53,7 +56,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textEmphasized: {
       textTransform: 'uppercase'
-    }
+    },
+    // closeModal: {
+    //   position: 'absolute',
+    //   top: '5px',
+    //   right: '12px',
+    //   width: '47px',
+    //   height: '47px',
+    // }
   })
 );
 
@@ -212,10 +222,16 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking }) => {
 
     return (
       <Dialog open={isModalOpen} onClose={handleDialogClose} aria-labelledby="check-list">
-        <DialogTitle id="check-list">Check List</DialogTitle>
-
-        {booking.Category === 'Export' ? <ExportChecklist /> : null}
-        {booking.Category === 'Import' ? <ImportChecklist /> : null}
+        <DialogTitle id="check-list">
+          <Typography variant="h4">Check List</Typography>
+          {/* <IconButton onClick={handleDialogClose} className={classes.closeModal}>
+            <CloseIcon />
+          </IconButton> */}
+        </DialogTitle>
+        <DialogContent>
+          {booking.Category === 'Export' ? <ExportChecklist showCompanyInfo={showCompanyInfo} /> : null}
+          {booking.Category === 'Import' ? <ImportChecklist showCompanyInfo={showCompanyInfo} /> : null}
+        </DialogContent>
       </Dialog>
     );
   }

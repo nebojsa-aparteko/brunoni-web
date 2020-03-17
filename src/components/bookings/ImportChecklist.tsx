@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Checkbox,
   createStyles,
   Theme,
   Table,
@@ -10,7 +11,9 @@ import {
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 
-interface Props {}
+interface Props {
+  showCompanyInfo?: boolean;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const ImportChecklist: React.FC<Props> = () => {
+const ImportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
 
   return (

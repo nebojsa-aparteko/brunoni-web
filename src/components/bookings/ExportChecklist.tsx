@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Checkbox,
   createStyles,
   Theme,
   Table,
@@ -10,7 +11,9 @@ import {
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 
-interface Props {}
+interface Props {
+  showCompanyInfo?: boolean;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +27,6 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(2),
     },
     table: {
-      minWidth: 650,
       overflowX: 'auto',
     },
     tableHead: {
@@ -47,61 +49,72 @@ const useStyles = makeStyles((theme: Theme) =>
     tableWrapper: {
       overflowX: 'auto',
     },
+    textEmphasized: {
+      color: 'red'
+    }
   }),
 );
 
-const ExportChecklist: React.FC<Props> = () => {
+const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    console.log('handleCheckboxChange');
+    // onChange(checked ? [true, defaultItemValue] : [false]);
+  };
 
   return (
     <Table className={classes.table} size="small">
       <TableHead className={classes.tableHead}>
         <TableRow className={classes.tableRow}>
           <TableCell>&nbsp;</TableCell>
-          <TableCell>CHECK LIST</TableCell>
-          <TableCell>&nbsp;</TableCell>
+          <TableCell align="center">CHECK LIST</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>Depot Out</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={true} />
+          </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>Gate In Terminal</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={false} />
+          </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>VGM Submission</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+          </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>Shipping Instructions</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+          </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>B/L Draft Received</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+          </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>B/L Draft Approved</TableCell>
-          <TableCell>OK</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center">
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+          </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>Shipped on Board</TableCell>
-          <TableCell>PENDING</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center" className={classes.textEmphasized}>PENDING</TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>Final B/L Copy</TableCell>
-          <TableCell>PENDING</TableCell>
-          <TableCell></TableCell>
+          <TableCell align="center" className={classes.textEmphasized}>PENDING</TableCell>
         </TableRow>
       </TableBody>
     </Table>
