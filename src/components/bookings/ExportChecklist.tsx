@@ -57,6 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
+  const isRegularUser = !showCompanyInfo;
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     console.log('handleCheckboxChange');
@@ -75,37 +76,37 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>Depot Out</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={true} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>Gate In Terminal</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={false} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>VGM Submission</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>Shipping Instructions</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>B/L Draft Received</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={true} className={classes.tableRow}>
           <TableCell>B/L Draft Approved</TableCell>
           <TableCell align="center">
-            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={!showCompanyInfo} />
+            <Checkbox checked={true} onChange={handleCheckboxChange} disabled={isRegularUser} />
           </TableCell>
         </TableRow>
         <TableRow selected={false} className={classes.tableRow}>
