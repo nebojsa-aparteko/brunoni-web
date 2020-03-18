@@ -8,14 +8,17 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
+import { Booking } from '../../model/Booking';
 
 interface Props {
   showCompanyInfo?: boolean;
+  booking: Booking | undefined;
 }
 
 interface Data {
   key: string;
   value: boolean | string;
+  attachment: string | null;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -60,54 +63,94 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
+const CheckList: React.FC<Props> = ({ showCompanyInfo, booking }) => {
   const classes = useStyles();
   const isRegularUser = !showCompanyInfo;
 
   const [ data, setData ] = useState<Data[] | undefined>(undefined);
 
   useEffect(() => {
-    const payload: Data[] = [
+    const payloadExport: Data[] = [
       {
         key: 'Depot Out',
-        value: true
+        value: true,
+        attachment: null
       },
       {
         key: 'Gate In Terminal',
-        value: true
+        value: true,
+        attachment: null
       },
       {
         key: 'VGM Submission',
-        value: true
+        value: true,
+        attachment: null
       },
       {
         key: 'Shipping Instructions',
-        value: true
+        value: true,
+        attachment: 'PDF'
       },
       {
         key: 'B/L Draft Received',
-        value: true
+        value: true,
+        attachment: 'PDF'
       },
       {
         key: 'B/L Draft Approved',
-        value: true
+        value: true,
+        attachment: 'PDF'
       },
       {
         key: 'Shipped on Board',
-        value: 'PENDING'
+        value: 'PENDING',
+        attachment: null
       },
       {
         key: 'Final B/L Copy',
-        value: 'PENDING'
+        value: 'PENDING',
+        attachment: null
       }
     ];
 
-    setData(payload);
-  }, []);
+    const payloadImport: Data[] = [
+      {
+        key: 'Bill of Lading Copy',
+        value: true,
+        attachment: 'PDF'
+      },
+      {
+        key: 'Release Instructions',
+        value: true,
+        attachment: 'PDF'
+      },
+      {
+        key: 'Pin Number',
+        value: true,
+        attachment: 'PDF'
+      },
+      {
+        key: 'Gate out Terminal',
+        value: false,
+        attachment: null
+      },
+      {
+        key: 'Depot In',
+        value: 'PENDING',
+        attachment: null
+      }
+    ];
+
+    if(booking && booking.Category === 'Export') {
+      setData(payloadExport);
+    }
+
+    if(booking && booking.Category === 'Import') {
+      setData(payloadImport);
+    }
+  }, [booking]);
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
-    console.log('handleCheckboxChange');
-
     const updatedData = data?.map(item => {
       if(item.key === key) {
         item.value = !item.value;
@@ -124,7 +167,7 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
       {data && data.map((item: Data, index: number) => {
         return (
           <TableRow
-            key={`export-checklist-row-${index}`}
+            key={`check-list-row-${index}`}
             selected={index % 2 === 0}
             className={classes.tableRow}
           >
@@ -142,7 +185,7 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
               </TableCell>
             )}
             <TableCell>{item.key}</TableCell>
-            <TableCell>PDF</TableCell>
+            <TableCell>{item.attachment}</TableCell>
           </TableRow>
         );
       })}
@@ -150,4 +193,4 @@ const ExportChecklist: React.FC<Props> = ({ showCompanyInfo }) => {
   );
 };
 
-export default ExportChecklist;
+export default CheckList;

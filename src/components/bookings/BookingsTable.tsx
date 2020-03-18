@@ -27,8 +27,7 @@ import {
   ImportShipmentStatusCode
 } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
-import ExportChecklist from './ExportChecklist';
-import ImportChecklist from './ImportChecklist';
+import CheckList from './CheckList';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -205,8 +204,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        {booking?.Category === 'Export' ? <ExportChecklist showCompanyInfo={showCompanyInfo} /> : null}
-        {booking?.Category === 'Import' ? <ImportChecklist showCompanyInfo={showCompanyInfo} /> : null}
+        <CheckList showCompanyInfo={showCompanyInfo} booking={booking} />
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">
@@ -305,8 +303,10 @@ const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
   const handleProgressClick = (event: React.MouseEvent<unknown>, booking: Booking) => {
     event.stopPropagation();
 
-    setIsDialogOpen(true);
-    setDialogData(booking);
+    if(booking.Category === 'Export' || booking.Category === 'Import') {
+      setIsDialogOpen(true);
+      setDialogData(booking);
+    }
   };
 
   const handleDialogClose = () => setIsDialogOpen(false);
