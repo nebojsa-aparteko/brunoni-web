@@ -22,7 +22,7 @@ const QuoteListProvider = (props: any) => {
     searchString: '',
     page: 0,
     rowsPerPage: 10,
-    dateRange: rangePredefinedValues[3],
+    dateRange: rangePredefinedValues[0],
   });
   const setStateFn = (state: QuoteListStateParams) => {
     setState(state);
