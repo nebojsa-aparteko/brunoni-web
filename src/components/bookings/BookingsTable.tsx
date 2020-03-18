@@ -1,7 +1,9 @@
 import React, { useMemo, useState, Fragment } from 'react';
 import { useHistory } from 'react-router';
 import {
+  Button,
   Dialog,
+  DialogActions,
   DialogTitle,
   DialogContent,
   IconButton,
@@ -63,6 +65,9 @@ const useStyles = makeStyles((theme: Theme) =>
       right: '12px',
       width: '47px',
       height: '47px',
+    },
+    dialogActions: {
+      padding: '8px 24px 24px',
     }
   })
 );
@@ -193,7 +198,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     >
       <DialogTitle disableTypography id="dialog-title-check-list">
         <Typography variant="h4">
-          {booking?.CarrierID}
+          {booking?.CarrierID.toUpperCase()}
         </Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
@@ -203,6 +208,11 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         {booking?.Category === 'Export' ? <ExportChecklist showCompanyInfo={showCompanyInfo} /> : null}
         {booking?.Category === 'Import' ? <ImportChecklist showCompanyInfo={showCompanyInfo} /> : null}
       </DialogContent>
+      <DialogActions classes={{ root: classes.dialogActions }}>
+        <Button onClick={handleClose} color="primary" variant="contained" size="medium">
+          Save Changes
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
