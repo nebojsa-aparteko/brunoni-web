@@ -99,8 +99,8 @@ interface BookingStatuses {
 const bookingStatus: BookingStatuses = {
   export: {
     status10: 'CONFIRMED',
-    status20: 'CONFIRMED / DEPOT OUT',
-    status30: 'CONFIRMED / GATE IN',
+    status20: 'DEPOT OUT',
+    status30: 'GATE IN',
     status40: 'SHIPPED ON BOARD'
   },
   import: {
