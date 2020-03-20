@@ -204,7 +204,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CheckList showCompanyInfo={showCompanyInfo} booking={booking} />
+        <CheckList booking={booking} />
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">

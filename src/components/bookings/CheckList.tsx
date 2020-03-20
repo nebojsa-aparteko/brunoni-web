@@ -11,7 +11,6 @@ import {
 import { Booking } from '../../model/Booking';
 
 interface Props {
-  showCompanyInfo?: boolean;
   booking: Booking | undefined;
 }
 
@@ -63,9 +62,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const CheckList: React.FC<Props> = ({ showCompanyInfo, booking }) => {
+const CheckList: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
-  const isRegularUser = !showCompanyInfo;
 
   const [ data, setData ] = useState<Data[] | undefined>(undefined);
 
@@ -73,37 +71,37 @@ const CheckList: React.FC<Props> = ({ showCompanyInfo, booking }) => {
     const payloadExport: Data[] = [
       {
         key: 'Depot Out',
-        value: true,
+        value: booking?.BkgStatus === '20' || 'PENDING',
         attachment: null
       },
       {
         key: 'Gate In Terminal',
-        value: true,
+        value: booking?.BkgStatus === '30' || 'PENDING',
         attachment: null
       },
       {
         key: 'VGM Submission',
-        value: true,
+        value: 'PENDING',
         attachment: null
       },
       {
         key: 'Shipping Instructions',
-        value: true,
+        value: 'PENDING',
         attachment: 'PDF'
       },
       {
         key: 'B/L Draft Received',
-        value: true,
+        value: 'PENDING',
         attachment: 'PDF'
       },
       {
         key: 'B/L Draft Approved',
-        value: true,
+        value: 'PENDING',
         attachment: 'PDF'
       },
       {
         key: 'Shipped on Board',
-        value: 'PENDING',
+        value: booking?.BkgStatus === '40' || 'PENDING',
         attachment: null
       },
       {
@@ -131,7 +129,7 @@ const CheckList: React.FC<Props> = ({ showCompanyInfo, booking }) => {
       },
       {
         key: 'Gate out Terminal',
-        value: false,
+        value: true,
         attachment: null
       },
       {
@@ -176,7 +174,7 @@ const CheckList: React.FC<Props> = ({ showCompanyInfo, booking }) => {
                 <Checkbox
                   checked={item.value}
                   onChange={event => handleCheckboxChange(event, item.key)}
-                  disabled={isRegularUser}
+                  disabled={true}
                 />
               </TableCell>
             ) : (
