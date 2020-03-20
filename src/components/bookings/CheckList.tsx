@@ -148,18 +148,6 @@ const CheckList: React.FC<Props> = ({ booking }) => {
     }
   }, [booking]);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
-    const updatedData = data?.map(item => {
-      if(item.key === key) {
-        item.value = !item.value;
-      }
-
-      return item;
-    });
-
-    setData(updatedData);
-  };
-
   return (
     <Table className={classes.table} size="small" aria-label="a dense table">
       {data && data.map((item: Data, index: number) => {
@@ -171,11 +159,7 @@ const CheckList: React.FC<Props> = ({ booking }) => {
           >
             {typeof item.value === 'boolean' ? (
               <TableCell align="center">
-                <Checkbox
-                  checked={item.value}
-                  onChange={event => handleCheckboxChange(event, item.key)}
-                  disabled={true}
-                />
+                <Checkbox checked={item.value} disabled={true} />
               </TableCell>
             ) : (
               <TableCell align="center" className={classes.textEmphasized}>
