@@ -75,11 +75,13 @@ const CheckList: React.FC<CheckListProps> = ({ data, showCompanyInfo, onCheckbox
               className={classes.tableRow}
             >
               <TableCell align="center">
-                <Checkbox
-                  checked={item.value}
-                  disabled={!showCompanyInfo}
-                  onChange={event => onCheckboxChange(event, item.label)}
-                />
+                {'value' in item ? (
+                  <Checkbox
+                    checked={item.value}
+                    disabled={!showCompanyInfo}
+                    onChange={event => onCheckboxChange(event, item.label)}
+                  />
+                ) : null}
               </TableCell>
 
               <TableCell>{item.label}</TableCell>

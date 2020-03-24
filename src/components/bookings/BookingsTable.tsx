@@ -188,7 +188,7 @@ const ShipmentProgress: React.FC = () => {
 
 export interface CheckListData {
   label: string;
-  value: boolean;
+  value?: boolean;
   documents: CheckListDocument[];
 }
 
@@ -204,7 +204,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   useEffect(() => {
     const payloadExport: CheckListData[] = [
       {
-        label: 'Depot Out',
+        label: 'DEPOT OUT',
         value: booking?.BkgStatus === '20',
         documents: [
           {
@@ -222,66 +222,84 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         ]
       },
       {
-        label: 'Gate In Terminal',
+        label: 'GATE IN TERMINAL',
         value: booking?.BkgStatus === '30',
         documents: []
       },
       {
-        label: 'VGM Submission',
+        label: 'VGM SUBMISSION',
         value: false,
         documents: []
       },
       {
-        label: 'Shipping Instructions',
+        label: 'SHIPPING INSTRUCTIONS',
         value: false,
         documents: []
       },
       {
-        label: 'B/L Draft Received',
+        label: 'B/L DRAFT RECEIVED',
         value: false,
         documents: []
       },
       {
-        label: 'B/L Draft Approved',
+        label: 'B/L DRAFT APPROVED',
         value: false,
         documents: []
       },
       {
-        label: 'Shipped on Board',
+        label: 'SHIPPED ON BOARD',
         value: booking?.BkgStatus === '40',
         documents: []
       },
       {
-        label: 'Final B/L Copy',
+        label: 'FINAL B/L COPY',
         value: false,
+        documents: []
+      },
+      {
+        label: 'INVOICED',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'OTHER',
         documents: []
       }
     ];
 
     const payloadImport: CheckListData[] = [
       {
-        label: 'Bill of Lading Copy',
+        label: 'BILL OF LANDING COPY',
         value: true,
         documents: []
       },
       {
-        label: 'Release Instructions',
+        label: 'RELEASE INSTRUCTIONS',
         value: true,
         documents: []
       },
       {
-        label: 'Pin Number',
+        label: 'PNI NUMBER',
         value: true,
         documents: []
       },
       {
-        label: 'Gate out Terminal',
+        label: 'GATE OUT TERMINAL',
         value: true,
         documents: []
       },
       {
-        label: 'Depot In',
+        label: 'DEPOT IN',
         value: false,
+        documents: []
+      },
+      {
+        label: 'INVOICED',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'OTHER',
         documents: []
       }
     ];
@@ -334,6 +352,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       open={isOpen}
       onClose={handleClose}
       aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
     >
       <DialogTitle disableTypography id="dialog-title-check-list">
         <Typography variant="h4">
