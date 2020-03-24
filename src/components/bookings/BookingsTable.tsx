@@ -20,14 +20,10 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import {
-  Booking,
-  BookingCategory,
-  ExportShipmentStatusCode,
-  ImportShipmentStatusCode
-} from '../../model/Booking';
+import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
+import { CheckListData } from './CheckList';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,56 +67,24 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface Props {
-  bookings?: Booking[] | null;
+interface BookingsTableProps {
+  bookings: Booking[] | undefined;
   showCompanyInfo?: boolean;
 }
 
-interface RowProps {
-  showCompanyInfo?: boolean;
+interface BookingRowProps {
   booking: Booking;
   onProgressClick: any;
   onClick: any;
+  showCompanyInfo?: boolean;
 }
 
 interface ProgressDialogProps {
   isOpen: boolean;
   booking: Booking | undefined;
-  showCompanyInfo?: boolean;
   handleClose: any;
+  showCompanyInfo?: boolean;
 }
-
-interface BookingStatuses {
-  [key: string]: {
-    [key: string]: string;
-  };
-}
-
-const bookingStatus: BookingStatuses = {
-  export: {
-    status10: 'CONFIRMED',
-    status20: 'DEPOT OUT',
-    status30: 'GATE IN',
-    status40: 'SHIPPED ON BOARD'
-  },
-  import: {
-    status1: 'ON WATER',
-    status2: 'ARRIVED AT POD',
-    status3: 'ARRIVED AT POD / GATE OUT TERMINAL',
-    status4: 'EMPTY RETURNED'
-  }
-}
-
-const getBookingStatus = (
-  category: BookingCategory,
-  statusCode: ExportShipmentStatusCode | ImportShipmentStatusCode | null
-): string | undefined => {
-  const categoryName = category.toLowerCase();
-
-  if(categoryName in bookingStatus) {
-    return bookingStatus[categoryName][`status${statusCode}`];
-  }
-};
 
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
@@ -134,48 +98,6 @@ const formatEstimatedDate = (date: string) => {
   return [dateParts[0], dateParts[1]].join('.');
 };
 
-const BookingsTableBodySekeleton: React.FC = () => (
-  <Fragment>
-    {[...Array(10)].map((_, i) => (
-      <TableRow key={i}>
-        <TableCell>
-          <Skeleton width={50} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={65} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
-        </TableCell>
-      </TableRow>
-    ))}
-  </Fragment>
-);
-
 const ShipmentProgress: React.FC = () => {
   const classes = useStyles();
 
@@ -185,17 +107,6 @@ const ShipmentProgress: React.FC = () => {
     </div>
   );
 };
-
-export interface CheckListData {
-  label: string;
-  value?: boolean;
-  documents: CheckListDocument[];
-}
-
-export interface CheckListDocument {
-  isAdmin: boolean;
-  url: string;
-}
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
@@ -237,7 +148,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         documents: []
       },
       {
-        label: 'B/L DRAFT RECEIVED',
+        label: 'B/L DRAFT SENT',
         value: false,
         documents: []
       },
@@ -379,7 +290,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   );
 }
 
-const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick}) => {
+const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick}) => {
   const classes = useStyles();
   const clients = useClients();
 
@@ -440,9 +351,7 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking, onClick, onP
       </TableCell>
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
-      <TableCell>
-        {getBookingStatus(booking.Category, booking.BkgStatus)}
-      </TableCell>
+      <TableCell>{booking.BkgStatusText}</TableCell>
       <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
       <TableCell className={classes.avatarCell}>
         <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
@@ -454,7 +363,49 @@ const BookingRow: React.FC<RowProps> = ({ showCompanyInfo, booking, onClick, onP
   );
 };
 
-const BookingsTable: React.FC<Props> = ({ bookings, showCompanyInfo }) => {
+const BookingsTableBodySekeleton: React.FC = () => (
+  <Fragment>
+    {[...Array(10)].map((_, i) => (
+      <TableRow key={i}>
+        <TableCell>
+          <Skeleton width={50} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={65} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+        <TableCell>
+          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+        </TableCell>
+      </TableRow>
+    ))}
+  </Fragment>
+);
+
+const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
   const history = useHistory();
   const [ dialogData, setDialogData ] = useState<Booking | undefined>(undefined);
