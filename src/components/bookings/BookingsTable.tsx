@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, Fragment } from 'react';
+import React, { useMemo, useState, useEffect, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
@@ -189,6 +189,12 @@ const ShipmentProgress: React.FC = () => {
 export interface CheckListData {
   label: string;
   value: boolean;
+  documents: CheckListDocument[];
+}
+
+export interface CheckListDocument {
+  isAdmin: boolean;
+  url: string;
 }
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
@@ -199,58 +205,84 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     const payloadExport: CheckListData[] = [
       {
         label: 'Depot Out',
-        value: booking?.BkgStatus === '20'
+        value: booking?.BkgStatus === '20',
+        documents: [
+          {
+            isAdmin: false,
+            url: 'filename-1.pdf'
+          },
+          {
+            isAdmin: true,
+            url: 'filename-2.pdf'
+          },
+          {
+            isAdmin: true,
+            url: 'filename-3.pdf'
+          }
+        ]
       },
       {
         label: 'Gate In Terminal',
-        value: booking?.BkgStatus === '30'
+        value: booking?.BkgStatus === '30',
+        documents: []
       },
       {
         label: 'VGM Submission',
-        value: false
+        value: false,
+        documents: []
       },
       {
         label: 'Shipping Instructions',
-        value: false
+        value: false,
+        documents: []
       },
       {
         label: 'B/L Draft Received',
-        value: false
+        value: false,
+        documents: []
       },
       {
         label: 'B/L Draft Approved',
-        value: false
+        value: false,
+        documents: []
       },
       {
         label: 'Shipped on Board',
-        value: booking?.BkgStatus === '40'
+        value: booking?.BkgStatus === '40',
+        documents: []
       },
       {
         label: 'Final B/L Copy',
-        value: false
+        value: false,
+        documents: []
       }
     ];
 
     const payloadImport: CheckListData[] = [
       {
         label: 'Bill of Lading Copy',
-        value: true
+        value: true,
+        documents: []
       },
       {
         label: 'Release Instructions',
-        value: true
+        value: true,
+        documents: []
       },
       {
         label: 'Pin Number',
-        value: true
+        value: true,
+        documents: []
       },
       {
         label: 'Gate out Terminal',
-        value: true
+        value: true,
+        documents: []
       },
       {
         label: 'Depot In',
-        value: false
+        value: false,
+        documents: []
       }
     ];
 
@@ -275,6 +307,28 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     setCheckListData(updatedData);
   };
 
+  const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
+    const updatedData = checkListData?.map(item => {
+      if(item.label.toLowerCase() === label.toLowerCase()) {
+        const newDocuments = acceptedFiles.map((file: any) => {
+          return {
+            isAdmin: isAdmin,
+            url: file.path
+          };
+        });
+
+        item.documents = [
+          ...item.documents,
+          ...newDocuments
+        ];
+      }
+
+      return item;
+    });
+
+    setCheckListData(updatedData);
+  }, [ checkListData ]);
+
   return (
     <Dialog
       open={isOpen}
@@ -294,6 +348,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           data={checkListData}
           showCompanyInfo={showCompanyInfo}
           onCheckboxChange={handleCheckboxChange}
+          onFilesDrop={handleFilesDrop}
         />
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>

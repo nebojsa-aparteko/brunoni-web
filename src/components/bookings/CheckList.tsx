@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -10,12 +10,25 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { CheckListData } from './BookingsTable';
+import { useDropzone } from 'react-dropzone';
+import { CheckListData, CheckListDocument } from './BookingsTable';
+import { PictureAsPdf } from '@material-ui/icons';
 
-interface Props {
+interface CheckListProps {
   data: CheckListData[] | undefined;
   showCompanyInfo?: boolean;
   onCheckboxChange: any;
+  onFilesDrop: any;
+}
+
+interface DropZoneProps {
+  onDrop: any;
+  accept: string;
+  documents: CheckListDocument[];
+}
+
+interface DocumentsListProps {
+  documents: CheckListDocument[];
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -41,7 +54,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '55px',
       '& td': {
         whiteSpace: 'nowrap',
-        textTransform: 'uppercase',
         padding: '6px 12px',
       },
       ['@media print']: {
@@ -56,11 +68,77 @@ const useStyles = makeStyles((theme: Theme) =>
     textEmphasized: {
       color: '#3BADE1',
       fontWeight: 'bold'
+    },
+    dragZone: {
+      border: '1px dashed #ccc',
+      padding: '10px',
+      textAlign: 'center',
+      fontSize: '12px',
+      lineHeight: 1,
+      cursor: 'pointer',
+      '&:hover': {
+        borderColor: '#999',
+      },
+      '&:focus': {
+        outline: 'none',
+      }
+    },
+    documents: {
+      listStyle: 'none',
+      padding: 0,
+      margin: 0,
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    documentItem: {
+      margin: '5px',
     }
   }),
 );
 
-const CheckList: React.FC<Props> = ({ data, showCompanyInfo, onCheckboxChange }) => {
+const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
+  const classes = useStyles();
+
+  return (
+    <ul className={classes.documents}>
+      {documents.map((item: CheckListDocument, index: number) => {
+        // console.log('item: ', item);
+
+        return (
+          <li key={`document-${index}`} className={classes.documentItem}>
+            <PictureAsPdf />
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents }) => {
+  const classes = useStyles();
+
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive
+  } = useDropzone({ onDrop, accept });
+
+  return (
+    <div {...getRootProps()} className={classes.dragZone}>
+      <input {...getInputProps()} />
+
+      {documents && documents.length > 0 ? (
+        <DocumentsList documents={documents} />
+      ) : (isDragActive ? (
+      <small>Drop the files here...</small>
+      ) : (
+      <small>Drag &amp; drop files here,<br/>or click to upload</small>)
+      )}
+    </div>
+  );
+};
+
+const CheckList: React.FC<CheckListProps> = ({ data, showCompanyInfo, onCheckboxChange, onFilesDrop }) => {
   const classes = useStyles();
 
   return (
@@ -91,10 +169,22 @@ const CheckList: React.FC<Props> = ({ data, showCompanyInfo, onCheckboxChange })
 
               <TableCell>{item.label}</TableCell>
 
-              <TableCell>PDF</TableCell>
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, item.label, false)}
+                  accept="application/pdf"
+                  documents={item.documents.filter(document => !document.isAdmin)}
+                />
+              </TableCell>
 
               {showCompanyInfo ? (
-                <TableCell>PDF</TableCell>
+                <TableCell>
+                  <DropZone
+                    onDrop={(files: []) => onFilesDrop(files, item.label, true)}
+                    accept="application/pdf"
+                    documents={item.documents.filter(document => document.isAdmin)}
+                  />
+                </TableCell>
               ) : null}
             </TableRow>
           );
