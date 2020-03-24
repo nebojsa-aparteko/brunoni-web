@@ -1,8 +1,13 @@
 import React from 'react';
 import {
+  Button,
   createStyles,
+  Divider,
+  makeStyles,
+  Menu,
+  MenuItem,
   Theme,
-  makeStyles
+  Typography
 } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
 import { PictureAsPdf } from '@material-ui/icons';
@@ -49,21 +54,75 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     documentItem: {
       margin: '5px',
+    },
+    documentButton: {
+      padding: 0,
+      minWidth: 'auto',
     }
   }),
 );
 
 export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleDocumentClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (event: React.MouseEvent<unknown>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setAnchorEl(null);
+  };
+
+  const handleDownload = (event: React.MouseEvent<unknown>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log('download');
+  };
+
+  const handleDelete = (event: React.MouseEvent<unknown>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log('delete');
+  };
 
   return (
     <ul className={classes.documents}>
       {documents.map((item: DropZoneDocument, index: number) => {
-        console.log('item: ', item.url);
-
         return (
           <li key={`document-${index}`} className={classes.documentItem}>
-            <PictureAsPdf />
+            <Button
+              aria-controls={`document-menu-${index}`}
+              aria-haspopup="true"
+              onClick={handleDocumentClick}
+              className={classes.documentButton}
+            >
+              <PictureAsPdf />
+            </Button>
+            <Menu
+              id={`document-menu-${index}`}
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleClose}>
+                <Typography variant="body2">{item.url}</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleDownload}>Download</MenuItem>
+              <Divider />
+              <MenuItem onClick={handleDelete}>
+                <Typography color="error">Delete</Typography>
+              </MenuItem>
+            </Menu>
           </li>
         );
       })}
