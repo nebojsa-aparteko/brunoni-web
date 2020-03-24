@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import {
   Checkbox,
   createStyles,
@@ -10,7 +10,6 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { CheckListData } from './BookingsTable';
 import DropZone from '../DropZone';
 
 interface CheckListProps {
@@ -18,6 +17,17 @@ interface CheckListProps {
   showCompanyInfo?: boolean;
   onCheckboxChange: any;
   onFilesDrop: any;
+}
+
+export interface CheckListData {
+  label: string;
+  value?: boolean;
+  documents: CheckListDocument[];
+}
+
+interface CheckListDocument {
+  isAdmin: boolean;
+  url: string;
 }
 
 const useStyles = makeStyles((theme: Theme) =>

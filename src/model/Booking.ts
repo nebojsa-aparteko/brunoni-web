@@ -11,6 +11,7 @@ export interface Booking {
   ForwPersID: string;
   ETA: string;
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
+  BkgStatusText: string;
   TimeStamp: string;
   CargoDetails: CargoDetailItems;
   FreightDetails: {
