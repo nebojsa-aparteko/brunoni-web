@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   Checkbox,
   createStyles,
   Theme,
   Table,
+  TableHead,
+  TableBody,
   TableCell,
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking } from '../../model/Booking';
+import { useDropzone } from 'react-dropzone';
+import { CheckListData, CheckListDocument } from './BookingsTable';
+import { PictureAsPdf } from '@material-ui/icons';
 
-interface Props {
-  booking: Booking | undefined;
+interface CheckListProps {
+  data: CheckListData[] | undefined;
+  showCompanyInfo?: boolean;
+  onCheckboxChange: any;
+  onFilesDrop: any;
 }
 
-interface Data {
-  key: string;
-  value: boolean | string;
-  attachment: string | null;
+interface DropZoneProps {
+  onDrop: any;
+  accept: string;
+  documents: CheckListDocument[];
+}
+
+interface DocumentsListProps {
+  documents: CheckListDocument[];
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,7 +54,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '55px',
       '& td': {
         whiteSpace: 'nowrap',
-        textTransform: 'uppercase',
         padding: '6px 12px',
       },
       ['@media print']: {
@@ -58,119 +68,128 @@ const useStyles = makeStyles((theme: Theme) =>
     textEmphasized: {
       color: '#3BADE1',
       fontWeight: 'bold'
+    },
+    dragZone: {
+      border: '1px dashed #ccc',
+      padding: '10px',
+      textAlign: 'center',
+      fontSize: '12px',
+      lineHeight: 1,
+      cursor: 'pointer',
+      '&:hover': {
+        borderColor: '#999',
+      },
+      '&:focus': {
+        outline: 'none',
+      }
+    },
+    documents: {
+      listStyle: 'none',
+      padding: 0,
+      margin: 0,
+      display: 'flex',
+      flexWrap: 'wrap',
+    },
+    documentItem: {
+      margin: '5px',
     }
   }),
 );
 
-const CheckList: React.FC<Props> = ({ booking }) => {
+const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
   const classes = useStyles();
 
-  const [ data, setData ] = useState<Data[] | undefined>(undefined);
+  return (
+    <ul className={classes.documents}>
+      {documents.map((item: CheckListDocument, index: number) => {
+        // console.log('item: ', item);
 
-  useEffect(() => {
-    const payloadExport: Data[] = [
-      {
-        key: 'Depot Out',
-        value: booking?.BkgStatus === '20' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Gate In Terminal',
-        value: booking?.BkgStatus === '30' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'VGM Submission',
-        value: 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Shipping Instructions',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'B/L Draft Received',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'B/L Draft Approved',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'Shipped on Board',
-        value: booking?.BkgStatus === '40' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Final B/L Copy',
-        value: 'PENDING',
-        attachment: null
-      }
-    ];
+        return (
+          <li key={`document-${index}`} className={classes.documentItem}>
+            <PictureAsPdf />
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 
-    const payloadImport: Data[] = [
-      {
-        key: 'Bill of Lading Copy',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Release Instructions',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Pin Number',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Gate out Terminal',
-        value: true,
-        attachment: null
-      },
-      {
-        key: 'Depot In',
-        value: 'PENDING',
-        attachment: null
-      }
-    ];
+const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents }) => {
+  const classes = useStyles();
 
-    if(booking && booking.Category === 'Export') {
-      setData(payloadExport);
-    }
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive
+  } = useDropzone({ onDrop, accept });
 
-    if(booking && booking.Category === 'Import') {
-      setData(payloadImport);
-    }
-  }, [booking]);
+  return (
+    <div {...getRootProps()} className={classes.dragZone}>
+      <input {...getInputProps()} />
+
+      {documents && documents.length > 0 ? (
+        <DocumentsList documents={documents} />
+      ) : (isDragActive ? (
+      <small>Drop the files here...</small>
+      ) : (
+      <small>Drag &amp; drop files here,<br/>or click to upload</small>)
+      )}
+    </div>
+  );
+};
+
+const CheckList: React.FC<CheckListProps> = ({ data, showCompanyInfo, onCheckboxChange, onFilesDrop }) => {
+  const classes = useStyles();
 
   return (
     <Table className={classes.table} size="small" aria-label="a dense table">
-      {data && data.map((item: Data, index: number) => {
-        return (
-          <TableRow
-            key={`check-list-row-${index}`}
-            selected={index % 2 === 0}
-            className={classes.tableRow}
-          >
-            {typeof item.value === 'boolean' ? (
+      <TableHead>
+        <TableRow>
+          <TableCell align="center">&nbsp;</TableCell>
+          <TableCell>&nbsp;</TableCell>
+          <TableCell>Customer</TableCell>
+          {showCompanyInfo && <TableCell>Admin</TableCell>}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data?.map((item: CheckListData, index: number) => {
+          return (
+            <TableRow
+              key={`check-list-row-${index}`}
+              selected={(index + 1) % 2 === 0}
+              className={classes.tableRow}
+            >
               <TableCell align="center">
-                <Checkbox checked={item.value} disabled={true} />
+                <Checkbox
+                  checked={item.value}
+                  disabled={!showCompanyInfo}
+                  onChange={event => onCheckboxChange(event, item.label)}
+                />
               </TableCell>
-            ) : (
-              <TableCell align="center" className={classes.textEmphasized}>
-                {item.value}
+
+              <TableCell>{item.label}</TableCell>
+
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, item.label, false)}
+                  accept="application/pdf"
+                  documents={item.documents.filter(document => !document.isAdmin)}
+                />
               </TableCell>
-            )}
-            <TableCell>{item.key}</TableCell>
-            <TableCell>{item.attachment}</TableCell>
-          </TableRow>
-        );
-      })}
+
+              {showCompanyInfo ? (
+                <TableCell>
+                  <DropZone
+                    onDrop={(files: []) => onFilesDrop(files, item.label, true)}
+                    accept="application/pdf"
+                    documents={item.documents.filter(document => document.isAdmin)}
+                  />
+                </TableCell>
+              ) : null}
+            </TableRow>
+          );
+        })}
+      </TableBody>
     </Table>
   );
 };

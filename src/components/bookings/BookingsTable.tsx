@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Fragment } from 'react';
+import React, { useMemo, useState, useEffect, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
@@ -186,8 +186,148 @@ const ShipmentProgress: React.FC = () => {
   );
 };
 
+export interface CheckListData {
+  label: string;
+  value: boolean;
+  documents: CheckListDocument[];
+}
+
+export interface CheckListDocument {
+  isAdmin: boolean;
+  url: string;
+}
+
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
+  const [ checkListData, setCheckListData ] = useState<CheckListData[] | undefined>(undefined);
+
+  useEffect(() => {
+    const payloadExport: CheckListData[] = [
+      {
+        label: 'Depot Out',
+        value: booking?.BkgStatus === '20',
+        documents: [
+          {
+            isAdmin: false,
+            url: 'filename-1.pdf'
+          },
+          {
+            isAdmin: true,
+            url: 'filename-2.pdf'
+          },
+          {
+            isAdmin: true,
+            url: 'filename-3.pdf'
+          }
+        ]
+      },
+      {
+        label: 'Gate In Terminal',
+        value: booking?.BkgStatus === '30',
+        documents: []
+      },
+      {
+        label: 'VGM Submission',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'Shipping Instructions',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'B/L Draft Received',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'B/L Draft Approved',
+        value: false,
+        documents: []
+      },
+      {
+        label: 'Shipped on Board',
+        value: booking?.BkgStatus === '40',
+        documents: []
+      },
+      {
+        label: 'Final B/L Copy',
+        value: false,
+        documents: []
+      }
+    ];
+
+    const payloadImport: CheckListData[] = [
+      {
+        label: 'Bill of Lading Copy',
+        value: true,
+        documents: []
+      },
+      {
+        label: 'Release Instructions',
+        value: true,
+        documents: []
+      },
+      {
+        label: 'Pin Number',
+        value: true,
+        documents: []
+      },
+      {
+        label: 'Gate out Terminal',
+        value: true,
+        documents: []
+      },
+      {
+        label: 'Depot In',
+        value: false,
+        documents: []
+      }
+    ];
+
+    if(booking?.Category === 'Export') {
+      setCheckListData(payloadExport);
+    }
+
+    if(booking?.Category === 'Import') {
+      setCheckListData(payloadImport);
+    }
+  }, [booking]);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+    const updatedData = checkListData?.map(item => {
+      if(item.label === label) {
+        item.value = !item.value;
+      }
+
+      return item;
+    });
+
+    setCheckListData(updatedData);
+  };
+
+  const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
+    const updatedData = checkListData?.map(item => {
+      if(item.label.toLowerCase() === label.toLowerCase()) {
+        const newDocuments = acceptedFiles.map((file: any) => {
+          return {
+            isAdmin: isAdmin,
+            url: file.path
+          };
+        });
+
+        item.documents = [
+          ...item.documents,
+          ...newDocuments
+        ];
+      }
+
+      return item;
+    });
+
+    setCheckListData(updatedData);
+  }, [ checkListData ]);
 
   return (
     <Dialog
@@ -204,7 +344,12 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CheckList booking={booking} />
+        <CheckList
+          data={checkListData}
+          showCompanyInfo={showCompanyInfo}
+          onCheckboxChange={handleCheckboxChange}
+          onFilesDrop={handleFilesDrop}
+        />
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">
