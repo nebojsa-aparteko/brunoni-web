@@ -4,20 +4,18 @@ import {
   createStyles,
   Theme,
   Table,
+  TableHead,
+  TableBody,
   TableCell,
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking } from '../../model/Booking';
+import { CheckListData } from './BookingsTable';
 
 interface Props {
-  booking: Booking | undefined;
-}
-
-interface Data {
-  key: string;
-  value: boolean | string;
-  attachment: string | null;
+  data: CheckListData[] | undefined;
+  showCompanyInfo?: boolean;
+  onCheckboxChange: any;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -62,115 +60,46 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const CheckList: React.FC<Props> = ({ booking }) => {
+const CheckList: React.FC<Props> = ({ data, showCompanyInfo, onCheckboxChange }) => {
   const classes = useStyles();
-
-  const [ data, setData ] = useState<Data[] | undefined>(undefined);
-
-  useEffect(() => {
-    const payloadExport: Data[] = [
-      {
-        key: 'Depot Out',
-        value: booking?.BkgStatus === '20' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Gate In Terminal',
-        value: booking?.BkgStatus === '30' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'VGM Submission',
-        value: 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Shipping Instructions',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'B/L Draft Received',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'B/L Draft Approved',
-        value: 'PENDING',
-        attachment: 'PDF'
-      },
-      {
-        key: 'Shipped on Board',
-        value: booking?.BkgStatus === '40' || 'PENDING',
-        attachment: null
-      },
-      {
-        key: 'Final B/L Copy',
-        value: 'PENDING',
-        attachment: null
-      }
-    ];
-
-    const payloadImport: Data[] = [
-      {
-        key: 'Bill of Lading Copy',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Release Instructions',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Pin Number',
-        value: true,
-        attachment: 'PDF'
-      },
-      {
-        key: 'Gate out Terminal',
-        value: true,
-        attachment: null
-      },
-      {
-        key: 'Depot In',
-        value: 'PENDING',
-        attachment: null
-      }
-    ];
-
-    if(booking && booking.Category === 'Export') {
-      setData(payloadExport);
-    }
-
-    if(booking && booking.Category === 'Import') {
-      setData(payloadImport);
-    }
-  }, [booking]);
 
   return (
     <Table className={classes.table} size="small" aria-label="a dense table">
-      {data && data.map((item: Data, index: number) => {
-        return (
-          <TableRow
-            key={`check-list-row-${index}`}
-            selected={index % 2 === 0}
-            className={classes.tableRow}
-          >
-            {typeof item.value === 'boolean' ? (
+      <TableHead>
+        <TableRow>
+          <TableCell align="center">&nbsp;</TableCell>
+          <TableCell>&nbsp;</TableCell>
+          <TableCell>Customer</TableCell>
+          {showCompanyInfo && <TableCell>Admin</TableCell>}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data?.map((item: CheckListData, index: number) => {
+          return (
+            <TableRow
+              key={`check-list-row-${index}`}
+              selected={(index + 1) % 2 === 0}
+              className={classes.tableRow}
+            >
               <TableCell align="center">
-                <Checkbox checked={item.value} disabled={true} />
+                <Checkbox
+                  checked={item.value}
+                  disabled={!showCompanyInfo}
+                  onChange={event => onCheckboxChange(event, item.label)}
+                />
               </TableCell>
-            ) : (
-              <TableCell align="center" className={classes.textEmphasized}>
-                {item.value}
-              </TableCell>
-            )}
-            <TableCell>{item.key}</TableCell>
-            <TableCell>{item.attachment}</TableCell>
-          </TableRow>
-        );
-      })}
+
+              <TableCell>{item.label}</TableCell>
+
+              <TableCell>PDF</TableCell>
+
+              {showCompanyInfo ? (
+                <TableCell>PDF</TableCell>
+              ) : null}
+            </TableRow>
+          );
+        })}
+      </TableBody>
     </Table>
   );
 };

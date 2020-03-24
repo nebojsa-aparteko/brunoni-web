@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Fragment } from 'react';
+import React, { useMemo, useState, useEffect, Fragment } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
@@ -186,8 +186,94 @@ const ShipmentProgress: React.FC = () => {
   );
 };
 
+export interface CheckListData {
+  label: string;
+  value: boolean;
+}
+
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
+  const [ checkListData, setCheckListData ] = useState<CheckListData[] | undefined>(undefined);
+
+  useEffect(() => {
+    const payloadExport: CheckListData[] = [
+      {
+        label: 'Depot Out',
+        value: booking?.BkgStatus === '20'
+      },
+      {
+        label: 'Gate In Terminal',
+        value: booking?.BkgStatus === '30'
+      },
+      {
+        label: 'VGM Submission',
+        value: false
+      },
+      {
+        label: 'Shipping Instructions',
+        value: false
+      },
+      {
+        label: 'B/L Draft Received',
+        value: false
+      },
+      {
+        label: 'B/L Draft Approved',
+        value: false
+      },
+      {
+        label: 'Shipped on Board',
+        value: booking?.BkgStatus === '40'
+      },
+      {
+        label: 'Final B/L Copy',
+        value: false
+      }
+    ];
+
+    const payloadImport: CheckListData[] = [
+      {
+        label: 'Bill of Lading Copy',
+        value: true
+      },
+      {
+        label: 'Release Instructions',
+        value: true
+      },
+      {
+        label: 'Pin Number',
+        value: true
+      },
+      {
+        label: 'Gate out Terminal',
+        value: true
+      },
+      {
+        label: 'Depot In',
+        value: false
+      }
+    ];
+
+    if(booking?.Category === 'Export') {
+      setCheckListData(payloadExport);
+    }
+
+    if(booking?.Category === 'Import') {
+      setCheckListData(payloadImport);
+    }
+  }, [booking]);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+    const updatedData = checkListData?.map(item => {
+      if(item.label === label) {
+        item.value = !item.value;
+      }
+
+      return item;
+    });
+
+    setCheckListData(updatedData);
+  };
 
   return (
     <Dialog
@@ -204,7 +290,11 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CheckList booking={booking} />
+        <CheckList
+          data={checkListData}
+          showCompanyInfo={showCompanyInfo}
+          onCheckboxChange={handleCheckboxChange}
+        />
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">
