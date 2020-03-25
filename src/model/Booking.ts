@@ -10,6 +10,7 @@ export interface Booking {
   FinalDestinationName: string;
   ForwPersID: string;
   ETA: string;
+  extensions?: BookingExtension[];
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
   BkgStatusText: string;
   TimeStamp: string;
@@ -38,6 +39,18 @@ export interface Booking {
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export interface BookingExtension {
+  id: string;
+  statusText: string;
+  checked: boolean;
+  documents: BookingDocument[];
+}
+
+export interface BookingDocument {
+  isAdmin: boolean;
+  url: string;
 }
 
 export enum BookingCategory {
