@@ -28,6 +28,7 @@ export interface Booking {
   POD: string;
   PODName: string;
   FinalDestinationISO: string;
+  checklists?: CheckListData[] | undefined;
   DepotOut?: string;
   ShippedOnBoard?: string;
   Invoiced?: string;
@@ -43,6 +44,17 @@ export interface Booking {
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export interface CheckListData {
+  label: string;
+  checked?: boolean;
+  documents: CheckListDocument[] | [];
+}
+
+export interface CheckListDocument {
+  isAdmin: boolean;
+  url: string;
 }
 
 export interface BookingExtension {
