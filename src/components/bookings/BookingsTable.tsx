@@ -2,6 +2,7 @@ import React, { useMemo, useState, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogTitle,
@@ -20,12 +21,19 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, CheckListData } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    button: {
+      position: 'relative',
+    },
+    progressButton: {
+      position: 'absolute',
+    },
     tableRow: {
       '& td': {
         whiteSpace: 'nowrap'
@@ -109,11 +117,39 @@ const ShipmentProgress: React.FC = () => {
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
+  const [isBusy, setIsBusy] = useState(false);
+
+  const saveCheckListChanges = useCallback(async (data: CheckListData[]) => {
+    setIsBusy(true);
+
+    try {
+      await firebase
+        .firestore()
+        .collection('bookings-extension')
+        .doc(booking?.id)
+        .update({
+          checklists: data
+        });
+    } finally {
+      setIsBusy(false);
+    }
+  }, [booking]);
 
   const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    console.log('event: ', event);
-    console.log('label: ', label);
-  }, []);
+    const checklistsData = booking?.checklists?.map((item: CheckListData) => {
+      if(item.label === label) {
+        item.checked = event.target.checked;
+      }
+
+      return item;
+    });
+
+    console.log('checklistsData: ', checklistsData);
+
+    if(!checklistsData) return;
+
+    // saveCheckListChanges(checklistsData);
+  }, [booking]);
 
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
     console.log('acceptedFiles: ', acceptedFiles);
@@ -146,7 +182,13 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">
-          Save Changes
+          <CircularProgress
+            size={16}
+            color="inherit"
+            className={classes.progressButton}
+            style={{ visibility: isBusy ? 'visible' : 'hidden' }}
+          />
+          <span style={{ visibility: isBusy ? 'hidden' : 'visible' }}>Save Changes</span>
         </Button>
       </DialogActions>
     </Dialog>
