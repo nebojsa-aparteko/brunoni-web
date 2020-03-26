@@ -28,6 +28,10 @@ export interface Booking {
   POD: string;
   PODName: string;
   FinalDestinationISO: string;
+  DepotOut?: string;
+  ShippedOnBoard?: string;
+  Invoiced?: string;
+  GateIn?: string;
   PortTerms: PortTerms;
   Remarks: {
     Remark: Remark[];

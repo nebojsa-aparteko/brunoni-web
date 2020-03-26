@@ -81,7 +81,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={(booking?.DepotOut && booking?.DepotOut === 'TRUE') || false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'DEPOT OUT')}
           />
@@ -111,7 +111,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={(booking?.GateIn && booking?.GateIn === 'TRUE') || false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'GATE IN TERMINAL')}
           />
@@ -141,7 +141,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'VGM SUBMISSION')}
           />
@@ -171,7 +171,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'SHIPPING INSTRUCTIONS')}
           />
@@ -201,7 +201,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'B/L DRAFT SENT')}
           />
@@ -231,7 +231,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'B/L DRAFT APPROVED')}
           />
@@ -261,7 +261,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={(booking?.ShippedOnBoard && booking?.ShippedOnBoard === 'TRUE') || false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'SHIPPED ON BOAR')}
           />
@@ -291,7 +291,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'FINAL B/L COPY')}
           />
@@ -321,7 +321,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={(booking?.Invoiced && booking?.Invoiced === 'TRUE') || false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'INVOICED')}
           />
@@ -385,7 +385,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'BILL OF LANDING COPY')}
           />
@@ -414,7 +414,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'RELEASE INSTRUCTIONS')}
           />
@@ -443,7 +443,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'PIN NUMBER')}
           />
@@ -472,7 +472,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'GATE OUT TERMINAL')}
           />
@@ -501,7 +501,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'DEPOT IN')}
           />
@@ -530,7 +530,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={true}
+            checked={false}
             disabled={!isAdmin}
             onChange={event => onCheckboxChange(event, 'INVOICED')}
           />
