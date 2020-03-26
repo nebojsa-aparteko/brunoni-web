@@ -15,7 +15,7 @@ import { PictureAsPdf } from '@material-ui/icons';
 interface DropZoneProps {
   onDrop: any;
   accept: string;
-  documents: DropZoneDocument[];
+  documents: DropZoneDocument[] | [];
 }
 
 interface DropZoneDocument {

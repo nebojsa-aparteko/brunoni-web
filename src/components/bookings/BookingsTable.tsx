@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, Fragment, useCallback } from 'react';
+import React, { useMemo, useState, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
@@ -23,7 +23,6 @@ import formatDate from 'date-fns/format';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
-import { CheckListData } from './CheckList';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -110,153 +109,17 @@ const ShipmentProgress: React.FC = () => {
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
-  const [ checkListData, setCheckListData ] = useState<CheckListData[] | undefined>(undefined);
 
-  useEffect(() => {
-    const payloadExport: CheckListData[] = [
-      {
-        label: 'DEPOT OUT',
-        value: booking?.BkgStatus === '20',
-        documents: [
-          {
-            isAdmin: false,
-            url: 'filename-1.pdf'
-          },
-          {
-            isAdmin: true,
-            url: 'filename-2.pdf'
-          },
-          {
-            isAdmin: true,
-            url: 'filename-3.pdf'
-          }
-        ]
-      },
-      {
-        label: 'GATE IN TERMINAL',
-        value: booking?.BkgStatus === '30',
-        documents: []
-      },
-      {
-        label: 'VGM SUBMISSION',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'SHIPPING INSTRUCTIONS',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'B/L DRAFT SENT',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'B/L DRAFT APPROVED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'SHIPPED ON BOARD',
-        value: booking?.BkgStatus === '40',
-        documents: []
-      },
-      {
-        label: 'FINAL B/L COPY',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'INVOICED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'OTHER',
-        documents: []
-      }
-    ];
-
-    const payloadImport: CheckListData[] = [
-      {
-        label: 'BILL OF LANDING COPY',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'RELEASE INSTRUCTIONS',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'PNI NUMBER',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'GATE OUT TERMINAL',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'DEPOT IN',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'INVOICED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'OTHER',
-        documents: []
-      }
-    ];
-
-    if(booking?.Category === 'Export') {
-      setCheckListData(payloadExport);
-    }
-
-    if(booking?.Category === 'Import') {
-      setCheckListData(payloadImport);
-    }
-  }, [booking]);
-
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    const updatedData = checkListData?.map(item => {
-      if(item.label === label) {
-        item.value = !item.value;
-      }
-
-      return item;
-    });
-
-    setCheckListData(updatedData);
-  };
+  const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+    console.log('event: ', event);
+    console.log('label: ', label);
+  }, []);
 
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
-    const updatedData = checkListData?.map(item => {
-      if(item.label.toLowerCase() === label.toLowerCase()) {
-        const newDocuments = acceptedFiles.map((file: any) => {
-          return {
-            isAdmin: isAdmin,
-            url: file.path
-          };
-        });
-
-        item.documents = [
-          ...item.documents,
-          ...newDocuments
-        ];
-      }
-
-      return item;
-    });
-
-    setCheckListData(updatedData);
-  }, [ checkListData ]);
+    console.log('acceptedFiles: ', acceptedFiles);
+    console.log('label: ', label);
+    console.log('isAdmin: ', isAdmin);
+  }, []);
 
   return (
     <Dialog
@@ -275,7 +138,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </DialogTitle>
       <DialogContent>
         <CheckList
-          data={checkListData}
+          booking={booking}
           showCompanyInfo={showCompanyInfo}
           onCheckboxChange={handleCheckboxChange}
           onFilesDrop={handleFilesDrop}
@@ -411,20 +274,22 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
   const [ dialogData, setDialogData ] = useState<Booking | undefined>(undefined);
   const [ isDialogOpen, setIsDialogOpen ] = useState(false);
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
+  const handleRowClick = useCallback((event: React.MouseEvent<unknown>, id: string) => {
     history.push(`/bookings/${id}`);
-  };
+  }, [history]);
 
-  const handleProgressClick = (event: React.MouseEvent<unknown>, booking: Booking) => {
+  const handleProgressClick = useCallback((event: React.MouseEvent<unknown>, booking: Booking) => {
     event.stopPropagation();
 
     if(booking.Category === 'Export' || booking.Category === 'Import') {
       setIsDialogOpen(true);
       setDialogData(booking);
     }
-  };
+  }, []);
 
-  const handleDialogClose = () => setIsDialogOpen(false);
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, []);
 
   console.log('bookings: ', bookings);
 
