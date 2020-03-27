@@ -123,33 +123,58 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     setIsBusy(true);
 
     try {
-      await firebase
-        .firestore()
-        .collection('bookings-extension')
-        .doc(booking?.id)
-        .update({
-          checklists: data
-        });
+      await firebase.firestore().collection('bookings-extension').doc(booking?.id).get().then( (docRef ) => {
+        if( docRef && docRef.data() ) {
+          return firebase
+            .firestore()
+            .collection('bookings-extension')
+            .doc(booking?.id)
+            .update({
+              checklists: data
+            });
+        } else {
+          return firebase
+            .firestore()
+            .collection('bookings-extension')
+            .doc(booking?.id)
+            .set({
+              checklists: data
+            });
+        }
+      }).catch(error => console.log(error))
     } finally {
       setIsBusy(false);
     }
   }, [booking]);
 
+  const addOrReplace = (array: CheckListData[] | undefined, label: string, isChecked: boolean) => {
+    if(!array) return;
+
+    const i = array.findIndex(_item => _item.label === label);
+
+    if (i > -1) {
+      array[i].checked = isChecked;
+    } else {
+      array.push({
+        label,
+        checked: isChecked
+      });
+    };
+
+    return array;
+  }
+
   const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    const checklistsData = booking?.checklists?.map((item: CheckListData) => {
-      if(item.label === label) {
-        item.checked = event.target.checked;
-      }
+    if(booking && !('checklists' in booking)) {
+      booking.checklists = [];
+    }
 
-      return item;
-    });
-
-    console.log('checklistsData: ', checklistsData);
+    const checklistsData = addOrReplace(booking?.checklists, label, event.target.checked);
 
     if(!checklistsData) return;
 
-    // saveCheckListChanges(checklistsData);
-  }, [booking]);
+    saveCheckListChanges(checklistsData);
+  }, [booking, saveCheckListChanges]);
 
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
     console.log('acceptedFiles: ', acceptedFiles);

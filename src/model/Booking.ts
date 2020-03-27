@@ -49,7 +49,7 @@ export interface Booking {
 export interface CheckListData {
   label: string;
   checked?: boolean;
-  documents: CheckListDocument[] | [];
+  documents?: CheckListDocument[];
 }
 
 export interface CheckListDocument {
@@ -67,6 +67,29 @@ export interface BookingExtension {
 export interface BookingDocument {
   isAdmin: boolean;
   url: string;
+}
+
+export enum StatusExport {
+  DepotOut = 'DEPOT OUT',
+  GateInTerminal = 'GATE IN TERMINAL',
+  VgmSubmission = 'VGM SUBMISSION',
+  ShippingInstructions = 'SHIPPING INSTRUCTIONS',
+  BlDraftSent = 'B/L DRAFT SENT',
+  BlDraftApproved = 'B/L DRAFT APPROVED',
+  ShippedOnBoard = 'SHIPPED ON BOARD',
+  FinalBlCopy = 'FINAL B/L COPY',
+  Invoiced = 'INVOICED',
+  Other = 'OTHER',
+}
+
+export enum StatusImport {
+  BillOfLandingCopy = 'BILL OF LANDING COPY',
+  ReleaseInstructions = 'RELEASE INSTRUCTIONS',
+  PinNumber = 'PIN NUMBER',
+  GateOutTerminal = 'GATE OUT TERMINAL',
+  DepotIn = 'DEPOT IN',
+  Invoiced = 'INVOICED',
+  Other = 'OTHER',
 }
 
 export enum BookingCategory {

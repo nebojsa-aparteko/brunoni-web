@@ -10,7 +10,7 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking, CheckListData } from '../../model/Booking';
+import { Booking, CheckListData, StatusExport, StatusImport } from '../../model/Booking';
 import DropZone from '../DropZone';
 
 interface CheckListProps {
@@ -82,9 +82,13 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={(booking?.DepotOut && booking?.DepotOut === 'TRUE') || false}
+            checked={
+              getRowData(StatusExport.DepotOut, 'checked') ||
+              (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
+              false
+            }
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'DEPOT OUT')}
+            onChange={event => onCheckboxChange(event, StatusExport.DepotOut)}
           />
         </TableCell>
 
@@ -92,18 +96,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'DEPOT OUT', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, false)}
             accept="application/pdf"
-            documents={getRowData('DEPOT OUT', 'documents', false) || []}
+            documents={getRowData(StatusExport.DepotOut, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'DEPOT OUT', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, true)}
               accept="application/pdf"
-              documents={getRowData('DEPOT OUT', 'documents', true) || []}
+              documents={getRowData(StatusExport.DepotOut, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -112,9 +116,13 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={(booking?.GateIn && booking?.GateIn === 'TRUE') || false}
+            checked={
+              getRowData(StatusExport.GateInTerminal, 'checked') ||
+              (booking?.GateIn && booking?.GateIn === 'TRUE') ||
+              false
+            }
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'GATE IN TERMINAL')}
+            onChange={event => onCheckboxChange(event, StatusExport.GateInTerminal)}
           />
         </TableCell>
 
@@ -122,18 +130,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'GATE IN TERMINAL', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, false)}
             accept="application/pdf"
-            documents={getRowData('GATE IN TERMINAL', 'documents', false) || []}
+            documents={getRowData(StatusExport.GateInTerminal, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'GATE IN TERMINAL', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, true)}
               accept="application/pdf"
-              documents={getRowData('GATE IN TERMINAL', 'documents', true) || []}
+              documents={getRowData(StatusExport.GateInTerminal, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -142,9 +150,9 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('VGM SUBMISSION', 'checked') || false}
+            checked={getRowData(StatusExport.VgmSubmission, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'VGM SUBMISSION')}
+            onChange={event => onCheckboxChange(event, StatusExport.VgmSubmission)}
           />
         </TableCell>
 
@@ -152,18 +160,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'VGM SUBMISSION', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, false)}
             accept="application/pdf"
-            documents={getRowData('VGM SUBMISSION', 'documents', false) || []}
+            documents={getRowData(StatusExport.VgmSubmission, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'VGM SUBMISSION', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, true)}
               accept="application/pdf"
-              documents={getRowData('VGM SUBMISSION', 'documents', true) || []}
+              documents={getRowData(StatusExport.VgmSubmission, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -172,9 +180,9 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('SHIPPING INSTRUCTIONS', 'checked') || false}
+            checked={getRowData(StatusExport.ShippingInstructions, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'SHIPPING INSTRUCTIONS')}
+            onChange={event => onCheckboxChange(event, StatusExport.ShippingInstructions)}
           />
         </TableCell>
 
@@ -182,18 +190,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'SHIPPING INSTRUCTIONS', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, false)}
             accept="application/pdf"
-            documents={getRowData('SHIPPING INSTRUCTIONS', 'documents', false) || []}
+            documents={getRowData(StatusExport.ShippingInstructions, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'SHIPPING INSTRUCTIONS', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, true)}
               accept="application/pdf"
-              documents={getRowData('SHIPPING INSTRUCTIONS', 'documents', true) || []}
+              documents={getRowData(StatusExport.ShippingInstructions, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -202,9 +210,9 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('B/L DRAFT SENT', 'checked') || false}
+            checked={getRowData(StatusExport.BlDraftSent, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'B/L DRAFT SENT')}
+            onChange={event => onCheckboxChange(event, StatusExport.BlDraftSent)}
           />
         </TableCell>
 
@@ -212,18 +220,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'B/L DRAFT SENT', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, false)}
             accept="application/pdf"
-            documents={getRowData('B/L DRAFT SENT', 'documents', false) || []}
+            documents={getRowData(StatusExport.BlDraftSent, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'B/L DRAFT SENT', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, true)}
               accept="application/pdf"
-              documents={getRowData('B/L DRAFT SENT', 'documents', true) || []}
+              documents={getRowData(StatusExport.BlDraftSent, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -232,9 +240,9 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('B/L DRAFT APPROVED', 'checked') || false}
+            checked={getRowData(StatusExport.BlDraftApproved, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'B/L DRAFT APPROVED')}
+            onChange={event => onCheckboxChange(event, StatusExport.BlDraftApproved)}
           />
         </TableCell>
 
@@ -242,18 +250,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'B/L DRAFT APPROVED', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, false)}
             accept="application/pdf"
-            documents={getRowData('B/L DRAFT APPROVED', 'documents', false) || []}
+            documents={getRowData(StatusExport.BlDraftApproved, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'B/L DRAFT APPROVED', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, true)}
               accept="application/pdf"
-              documents={getRowData('B/L DRAFT APPROVED', 'documents', true) || []}
+              documents={getRowData(StatusExport.BlDraftApproved, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -262,9 +270,13 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={(booking?.ShippedOnBoard && booking?.ShippedOnBoard === 'TRUE') || false}
+            checked={
+              getRowData(StatusExport.ShippedOnBoard, 'checked') ||
+              (booking?.ShippedOnBoard && booking?.ShippedOnBoard === 'TRUE') ||
+              false
+            }
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'SHIPPED ON BOAR')}
+            onChange={event => onCheckboxChange(event, StatusExport.ShippedOnBoard)}
           />
         </TableCell>
 
@@ -272,18 +284,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'SHIPPED ON BOARD', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, false)}
             accept="application/pdf"
-            documents={getRowData('SHIPPED ON BOARD', 'documents', false) || []}
+            documents={getRowData(StatusExport.ShippedOnBoard, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'SHIPPED ON BOARD', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, true)}
               accept="application/pdf"
-              documents={getRowData('SHIPPED ON BOARD', 'documents', true) || []}
+              documents={getRowData(StatusExport.ShippedOnBoard, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -292,28 +304,28 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('FINAL B/L COPY', 'checked') || false}
+            checked={getRowData(StatusExport.FinalBlCopy, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'FINAL B/L COPY')}
+            onChange={event => onCheckboxChange(event, StatusExport.FinalBlCopy)}
           />
         </TableCell>
 
-        <TableCell>FINAL B/L COP</TableCell>
+        <TableCell>FINAL B/L COPY</TableCell>
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'FINAL B/L COP', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, false)}
             accept="application/pdf"
-            documents={getRowData('FINAL B/L COP', 'documents', false) || []}
+            documents={getRowData(StatusExport.FinalBlCopy, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'FINAL B/L COP', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, true)}
               accept="application/pdf"
-              documents={getRowData('FINAL B/L COP', 'documents', true) || []}
+              documents={getRowData(StatusExport.FinalBlCopy, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -322,9 +334,13 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={(booking?.Invoiced && booking?.Invoiced === 'TRUE') || false}
+            checked={
+              getRowData(StatusExport.Invoiced, 'checked') ||
+              (booking?.Invoiced && booking?.Invoiced === 'TRUE') ||
+              false
+            }
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'INVOICED')}
+            onChange={event => onCheckboxChange(event, StatusExport.Invoiced)}
           />
         </TableCell>
 
@@ -332,18 +348,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'INVOICED', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, false)}
             accept="application/pdf"
-            documents={getRowData('INVOICED', 'documents', false) || []}
+            documents={getRowData(StatusExport.Invoiced, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'INVOICED', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, true)}
               accept="application/pdf"
-              documents={getRowData('INVOICED', 'documents', true) || []}
+              documents={getRowData(StatusExport.Invoiced, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -356,18 +372,18 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'OTHER', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, false)}
             accept="application/pdf"
-            documents={getRowData('OTHER', 'documents', false) || []}
+            documents={getRowData(StatusExport.Other, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'OTHER', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, true)}
               accept="application/pdf"
-              documents={getRowData('OTHER', 'documents', true) || []}
+              documents={getRowData(StatusExport.Other, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -398,9 +414,9 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('BILL OF LANDING COPY', 'checked') || false}
+            checked={getRowData(StatusImport.BillOfLandingCopy, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'BILL OF LANDING COPY')}
+            onChange={event => onCheckboxChange(event, StatusImport.BillOfLandingCopy)}
           />
         </TableCell>
 
@@ -408,18 +424,18 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'BILL OF LANDING COPY', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, false)}
             accept="application/pdf"
-            documents={getRowData('BILL OF LANDING COPY', 'documents', false) || []}
+            documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'BILL OF LANDING COPY', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, true)}
               accept="application/pdf"
-              documents={getRowData('BILL OF LANDING COPY', 'documents', true) || []}
+              documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -427,9 +443,9 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('RELEASE INSTRUCTIONS', 'checked') || false}
+            checked={getRowData(StatusImport.ReleaseInstructions, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'RELEASE INSTRUCTIONS')}
+            onChange={event => onCheckboxChange(event, StatusImport.ReleaseInstructions)}
           />
         </TableCell>
 
@@ -437,18 +453,18 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'RELEASE INSTRUCTIONS', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, false)}
             accept="application/pdf"
-            documents={getRowData('RELEASE INSTRUCTIONS', 'documents', false) || []}
+            documents={getRowData(StatusImport.ReleaseInstructions, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'RELEASE INSTRUCTIONS', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, true)}
               accept="application/pdf"
-              documents={getRowData('RELEASE INSTRUCTIONS', 'documents', true) || []}
+              documents={getRowData(StatusImport.ReleaseInstructions, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -456,9 +472,9 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('PIN NUMBER', 'checked') || false}
+            checked={getRowData(StatusImport.PinNumber, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'PIN NUMBER')}
+            onChange={event => onCheckboxChange(event, StatusImport.PinNumber)}
           />
         </TableCell>
 
@@ -466,28 +482,29 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'PIN NUMBER', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, false)}
             accept="application/pdf"
-            documents={getRowData('PIN NUMBER', 'documents', false) || []}
+            documents={getRowData(StatusImport.PinNumber, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'PIN NUMBER', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, true)}
               accept="application/pdf"
-              documents={getRowData('PIN NUMBER', 'documents', true) || []}
+              documents={getRowData(StatusImport.PinNumber, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
       </TableRow>
+
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('GATE OUT TERMINAL', 'checked') || false}
+            checked={getRowData(StatusImport.GateOutTerminal, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'GATE OUT TERMINAL')}
+            onChange={event => onCheckboxChange(event, StatusImport.GateOutTerminal)}
           />
         </TableCell>
 
@@ -495,18 +512,18 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'GATE OUT TERMINAL', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, false)}
             accept="application/pdf"
-            documents={getRowData('GATE OUT TERMINAL', 'documents', false) || []}
+            documents={getRowData(StatusImport.GateOutTerminal, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'GATE OUT TERMINAL', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, true)}
               accept="application/pdf"
-              documents={getRowData('GATE OUT TERMINAL', 'documents', true) || []}
+              documents={getRowData(StatusImport.GateOutTerminal, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
@@ -514,9 +531,9 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('DEPOT IN', 'checked') || false}
+            checked={getRowData(StatusImport.DepotIn, 'checked') || false}
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'DEPOT IN')}
+            onChange={event => onCheckboxChange(event, StatusImport.DepotIn)}
           />
         </TableCell>
 
@@ -524,28 +541,33 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'DEPOT IN', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, false)}
             accept="application/pdf"
-            documents={getRowData('DEPOT IN', 'documents', false) || []}
+            documents={getRowData(StatusImport.DepotIn, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'DEPOT IN', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, true)}
               accept="application/pdf"
-              documents={getRowData('DEPOT IN', 'documents', true) || []}
+              documents={getRowData(StatusImport.DepotIn, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
       </TableRow>
+
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
           <Checkbox
-            checked={getRowData('INVOICED', 'checked') || false}
+            checked={
+              getRowData(StatusImport.Invoiced, 'checked') ||
+              (booking?.Invoiced && booking?.Invoiced === 'TRUE') ||
+              false
+            }
             disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, 'INVOICED')}
+            onChange={event => onCheckboxChange(event, StatusImport.Invoiced)}
           />
         </TableCell>
 
@@ -553,40 +575,41 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'INVOICED', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, false)}
             accept="application/pdf"
-            documents={getRowData('INVOICED', 'documents', false) || []}
+            documents={getRowData(StatusImport.Invoiced, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'INVOICED', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, true)}
               accept="application/pdf"
-              documents={getRowData('INVOICED', 'documents', true) || []}
+              documents={getRowData(StatusImport.Invoiced, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
       </TableRow>
+
       <TableRow selected={false} className={classes.tableRow}>
         <TableCell>&nbsp;</TableCell>
         <TableCell>OTHER</TableCell>
 
         <TableCell>
           <DropZone
-            onDrop={(files: []) => onFilesDrop(files, 'OTHER', false)}
+            onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, false)}
             accept="application/pdf"
-            documents={getRowData('OTHER', 'documents', false) || []}
+            documents={getRowData(StatusImport.Other, 'documents', false) || []}
           />
         </TableCell>
 
         {isAdmin ? (
           <TableCell>
             <DropZone
-              onDrop={(files: []) => onFilesDrop(files, 'OTHER', true)}
+              onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, true)}
               accept="application/pdf"
-              documents={getRowData('OTHER', 'documents', true) || []}
+              documents={getRowData(StatusImport.Other, 'documents', true) || []}
             />
           </TableCell>
         ) : null}
