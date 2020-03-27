@@ -10,6 +10,7 @@ export interface Booking {
   FinalDestinationName: string;
   ForwPersID: string;
   ETA: string;
+  extensions?: BookingExtension[];
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
   BkgStatusText: string;
   TimeStamp: string;
@@ -27,6 +28,11 @@ export interface Booking {
   POD: string;
   PODName: string;
   FinalDestinationISO: string;
+  checklists?: CheckListData[] | undefined;
+  DepotOut?: string;
+  ShippedOnBoard?: string;
+  Invoiced?: string;
+  GateIn?: string;
   PortTerms: PortTerms;
   Remarks: {
     Remark: Remark[];
@@ -38,6 +44,52 @@ export interface Booking {
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+}
+
+export interface CheckListData {
+  label: string;
+  checked?: boolean;
+  documents?: CheckListDocument[];
+}
+
+export interface CheckListDocument {
+  isAdmin: boolean;
+  url: string;
+}
+
+export interface BookingExtension {
+  id: string;
+  statusText: string;
+  checked: boolean;
+  documents: BookingDocument[];
+}
+
+export interface BookingDocument {
+  isAdmin: boolean;
+  url: string;
+}
+
+export enum StatusExport {
+  DepotOut = 'DEPOT OUT',
+  GateInTerminal = 'GATE IN TERMINAL',
+  VgmSubmission = 'VGM SUBMISSION',
+  ShippingInstructions = 'SHIPPING INSTRUCTIONS',
+  BlDraftSent = 'B/L DRAFT SENT',
+  BlDraftApproved = 'B/L DRAFT APPROVED',
+  ShippedOnBoard = 'SHIPPED ON BOARD',
+  FinalBlCopy = 'FINAL B/L COPY',
+  Invoiced = 'INVOICED',
+  Other = 'OTHER',
+}
+
+export enum StatusImport {
+  BillOfLandingCopy = 'BILL OF LANDING COPY',
+  ReleaseInstructions = 'RELEASE INSTRUCTIONS',
+  PinNumber = 'PIN NUMBER',
+  GateOutTerminal = 'GATE OUT TERMINAL',
+  DepotIn = 'DEPOT IN',
+  Invoiced = 'INVOICED',
+  Other = 'OTHER',
 }
 
 export enum BookingCategory {

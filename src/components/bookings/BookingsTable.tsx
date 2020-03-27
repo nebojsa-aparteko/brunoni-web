@@ -1,7 +1,8 @@
-import React, { useMemo, useState, useEffect, Fragment, useCallback } from 'react';
+import React, { useMemo, useState, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogTitle,
@@ -20,13 +21,19 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, CheckListData } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
-import { CheckListData } from './CheckList';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    button: {
+      position: 'relative',
+    },
+    progressButton: {
+      position: 'absolute',
+    },
     tableRow: {
       '& td': {
         whiteSpace: 'nowrap'
@@ -110,153 +117,70 @@ const ShipmentProgress: React.FC = () => {
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
-  const [ checkListData, setCheckListData ] = useState<CheckListData[] | undefined>(undefined);
+  const [isBusy, setIsBusy] = useState(false);
 
-  useEffect(() => {
-    const payloadExport: CheckListData[] = [
-      {
-        label: 'DEPOT OUT',
-        value: booking?.BkgStatus === '20',
-        documents: [
-          {
-            isAdmin: false,
-            url: 'filename-1.pdf'
-          },
-          {
-            isAdmin: true,
-            url: 'filename-2.pdf'
-          },
-          {
-            isAdmin: true,
-            url: 'filename-3.pdf'
-          }
-        ]
-      },
-      {
-        label: 'GATE IN TERMINAL',
-        value: booking?.BkgStatus === '30',
-        documents: []
-      },
-      {
-        label: 'VGM SUBMISSION',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'SHIPPING INSTRUCTIONS',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'B/L DRAFT SENT',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'B/L DRAFT APPROVED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'SHIPPED ON BOARD',
-        value: booking?.BkgStatus === '40',
-        documents: []
-      },
-      {
-        label: 'FINAL B/L COPY',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'INVOICED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'OTHER',
-        documents: []
-      }
-    ];
+  const saveCheckListChanges = useCallback(async (data: CheckListData[]) => {
+    setIsBusy(true);
 
-    const payloadImport: CheckListData[] = [
-      {
-        label: 'BILL OF LANDING COPY',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'RELEASE INSTRUCTIONS',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'PNI NUMBER',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'GATE OUT TERMINAL',
-        value: true,
-        documents: []
-      },
-      {
-        label: 'DEPOT IN',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'INVOICED',
-        value: false,
-        documents: []
-      },
-      {
-        label: 'OTHER',
-        documents: []
-      }
-    ];
-
-    if(booking?.Category === 'Export') {
-      setCheckListData(payloadExport);
-    }
-
-    if(booking?.Category === 'Import') {
-      setCheckListData(payloadImport);
+    try {
+      await firebase.firestore().collection('bookings-extension').doc(booking?.id).get().then( (docRef ) => {
+        if( docRef && docRef.data() ) {
+          return firebase
+            .firestore()
+            .collection('bookings-extension')
+            .doc(booking?.id)
+            .update({
+              checklists: data
+            });
+        } else {
+          return firebase
+            .firestore()
+            .collection('bookings-extension')
+            .doc(booking?.id)
+            .set({
+              checklists: data
+            });
+        }
+      }).catch(error => console.log(error))
+    } finally {
+      setIsBusy(false);
     }
   }, [booking]);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    const updatedData = checkListData?.map(item => {
-      if(item.label === label) {
-        item.value = !item.value;
-      }
+  const addOrReplace = (array: CheckListData[] | undefined, label: string, isChecked: boolean) => {
+    if(!array) return;
 
-      return item;
-    });
+    const i = array.findIndex(_item => _item.label === label);
 
-    setCheckListData(updatedData);
-  };
+    if (i > -1) {
+      array[i].checked = isChecked;
+    } else {
+      array.push({
+        label,
+        checked: isChecked
+      });
+    };
+
+    return array;
+  }
+
+  const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+    if(booking && !('checklists' in booking)) {
+      booking.checklists = [];
+    }
+
+    const checklistsData = addOrReplace(booking?.checklists, label, event.target.checked);
+
+    if(!checklistsData) return;
+
+    saveCheckListChanges(checklistsData);
+  }, [booking, saveCheckListChanges]);
 
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
-    const updatedData = checkListData?.map(item => {
-      if(item.label.toLowerCase() === label.toLowerCase()) {
-        const newDocuments = acceptedFiles.map((file: any) => {
-          return {
-            isAdmin: isAdmin,
-            url: file.path
-          };
-        });
-
-        item.documents = [
-          ...item.documents,
-          ...newDocuments
-        ];
-      }
-
-      return item;
-    });
-
-    setCheckListData(updatedData);
-  }, [ checkListData ]);
+    console.log('acceptedFiles: ', acceptedFiles);
+    console.log('label: ', label);
+    console.log('isAdmin: ', isAdmin);
+  }, []);
 
   return (
     <Dialog
@@ -275,7 +199,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </DialogTitle>
       <DialogContent>
         <CheckList
-          data={checkListData}
+          booking={booking}
           showCompanyInfo={showCompanyInfo}
           onCheckboxChange={handleCheckboxChange}
           onFilesDrop={handleFilesDrop}
@@ -283,7 +207,13 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </DialogContent>
       <DialogActions classes={{ root: classes.dialogActions }}>
         <Button onClick={handleClose} color="primary" variant="contained" size="medium">
-          Save Changes
+          <CircularProgress
+            size={16}
+            color="inherit"
+            className={classes.progressButton}
+            style={{ visibility: isBusy ? 'visible' : 'hidden' }}
+          />
+          <span style={{ visibility: isBusy ? 'hidden' : 'visible' }}>Save Changes</span>
         </Button>
       </DialogActions>
     </Dialog>
@@ -411,20 +341,22 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
   const [ dialogData, setDialogData ] = useState<Booking | undefined>(undefined);
   const [ isDialogOpen, setIsDialogOpen ] = useState(false);
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, id: string) => {
+  const handleRowClick = useCallback((event: React.MouseEvent<unknown>, id: string) => {
     history.push(`/bookings/${id}`);
-  };
+  }, [history]);
 
-  const handleProgressClick = (event: React.MouseEvent<unknown>, booking: Booking) => {
+  const handleProgressClick = useCallback((event: React.MouseEvent<unknown>, booking: Booking) => {
     event.stopPropagation();
 
     if(booking.Category === 'Export' || booking.Category === 'Import') {
       setIsDialogOpen(true);
       setDialogData(booking);
     }
-  };
+  }, []);
 
-  const handleDialogClose = () => setIsDialogOpen(false);
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, []);
 
   console.log('bookings: ', bookings);
 

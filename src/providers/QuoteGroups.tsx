@@ -26,7 +26,6 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import Quotes from '../contexts/Quotes';
-import logAs from '../utilities/logAs';
 
 interface Props {
   children: React.ReactNode;
