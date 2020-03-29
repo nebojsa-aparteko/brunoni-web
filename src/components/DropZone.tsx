@@ -20,6 +20,7 @@ interface DropZoneProps {
 
 interface DropZoneDocument {
   url: string;
+  name: string;
 }
 
 interface DocumentsListProps {
@@ -115,7 +116,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
               onClose={handleClose}
             >
               <MenuItem onClick={handleClose}>
-                <Typography variant="body2">{item.url}</Typography>
+                <Typography variant="body2">{item.name}</Typography>
               </MenuItem>
               <MenuItem onClick={handleDownload}>Download</MenuItem>
               <Divider />

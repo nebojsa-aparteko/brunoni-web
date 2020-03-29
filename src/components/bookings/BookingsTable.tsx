@@ -1,10 +1,9 @@
 import React, { useMemo, useState, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
-  Button,
+  Backdrop,
   CircularProgress,
   Dialog,
-  DialogActions,
   DialogTitle,
   DialogContent,
   IconButton,
@@ -68,8 +67,8 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '47px',
       height: '47px',
     },
-    dialogActions: {
-      padding: '8px 24px 24px',
+    checkListBackdrop: {
+      zIndex: 1
     }
   })
 );
@@ -118,12 +117,19 @@ const ShipmentProgress: React.FC = () => {
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
   const [isBusy, setIsBusy] = useState(false);
+  const clients = useClients();
+
+  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [
+    clients,
+    booking
+  ]);
 
   const saveCheckListChanges = useCallback(async (data: CheckListData[]) => {
     setIsBusy(true);
 
     try {
       await firebase.firestore().collection('bookings-extension').doc(booking?.id).get().then( (docRef ) => {
+        // update existing booking extension
         if( docRef && docRef.data() ) {
           return firebase
             .firestore()
@@ -133,6 +139,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
               checklists: data
             });
         } else {
+          // create new booking extension
           return firebase
             .firestore()
             .collection('bookings-extension')
@@ -147,40 +154,142 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     }
   }, [booking]);
 
-  const addOrReplace = (array: CheckListData[] | undefined, label: string, isChecked: boolean) => {
-    if(!array) return;
+  const saveFiles = useCallback((files: []): Promise<any> => {
+    const pathBase =  [
+      'booking-documents',
+      'clients',
+      `${client?.id}`,
+      'bookings',
+      `${booking?.id}`
+    ].join('/');
 
-    const i = array.findIndex(_item => _item.label === label);
+    // uploads a file and returns the file download URL
+    const uploadFile = async (file: any): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        let path = [pathBase, `${file.name}`].join('/');
+        let storageRef = firebase.storage().ref( encodeURI(path) );
+        let uploadTask = storageRef.put(file);
 
-    if (i > -1) {
-      array[i].checked = isChecked;
-    } else {
-      array.push({
-        label,
-        checked: isChecked
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, snapshot => {
+          // in progress
+          // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
+          //   // ex. calculate progress
+          // }
+        }, error => {
+          // error
+          reject(error);
+        }, () => {
+          // success
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            resolve(downloadURL);
+          });
+        });
       });
     };
 
-    return array;
-  }
+    return new Promise((resolve, reject) => {
+      let itemsProcessed = 0;
+      let documents: any = [];
 
-  const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    if(booking && !('checklists' in booking)) {
-      booking.checklists = [];
+      files.forEach((file: any, index: number, array: any[]) => {
+        uploadFile(file).then(downloadURL => {
+          itemsProcessed++;
+
+          documents.push({
+            url: downloadURL,
+            name: file.name
+          });
+
+          if(itemsProcessed === array.length) {
+            resolve(documents);
+          }
+        });
+      });
+    });
+  }, [booking, client]);
+
+  const addOrReplace = useCallback((label: string, data: any) => {
+    if( !booking ) return;
+
+    if( !('checklists' in booking) ) {
+      booking.checklists = []
     }
 
-    const checklistsData = addOrReplace(booking?.checklists, label, event.target.checked);
+    const index: number | undefined = booking?.checklists?.findIndex((item: any)=> item.label === label);
+    const key: string = data.key;
+    const value: any = data.value;
+
+    if( booking.checklists && (typeof index !== 'undefined' && index > -1) ) {
+      // update existing entry
+      let existingEntry: any = booking.checklists[index];
+      existingEntry[key] = value;
+    } else {
+      // create new entry
+      let newEntry: any = {
+        [key]: value,
+        label
+      };
+
+      if(booking && booking.checklists) {
+        booking.checklists.push(newEntry);
+      }
+    }
+
+    return booking.checklists;
+  }, [booking]);
+
+  const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+    const checklistsData = addOrReplace(
+      label,
+      {
+        key: 'checked',
+        value: event.target.checked
+      }
+    );
+
+    console.log('checklistsData: ', checklistsData);
 
     if(!checklistsData) return;
 
     saveCheckListChanges(checklistsData);
-  }, [booking, saveCheckListChanges]);
+  }, [addOrReplace, saveCheckListChanges]);
+
+
 
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
     console.log('acceptedFiles: ', acceptedFiles);
     console.log('label: ', label);
     console.log('isAdmin: ', isAdmin);
-  }, []);
+
+    setIsBusy(true);
+
+    saveFiles(acceptedFiles)
+      .then((documents: any) => {
+        // const checklistItem = booking?.checklists?.find((item: any)=> item.label === label);
+
+        const documentsCollection = documents.map((document: any) => {
+          document.isAdmin = isAdmin;
+
+          // TODO: check if document exists => update, or not => create new
+
+          return document;
+        });
+
+        setIsBusy(false);
+
+        const checklistsData = addOrReplace(label, { key: 'documents', value: documentsCollection });
+
+        if(!checklistsData) return;
+
+        saveCheckListChanges(checklistsData);
+      })
+      .catch(err => {
+        setIsBusy(false);
+
+        console.error(err);
+      });
+
+  }, [saveFiles, addOrReplace, saveCheckListChanges]);
 
   return (
     <Dialog
@@ -205,17 +314,9 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           onFilesDrop={handleFilesDrop}
         />
       </DialogContent>
-      <DialogActions classes={{ root: classes.dialogActions }}>
-        <Button onClick={handleClose} color="primary" variant="contained" size="medium">
-          <CircularProgress
-            size={16}
-            color="inherit"
-            className={classes.progressButton}
-            style={{ visibility: isBusy ? 'visible' : 'hidden' }}
-          />
-          <span style={{ visibility: isBusy ? 'hidden' : 'visible' }}>Save Changes</span>
-        </Button>
-      </DialogActions>
+      <Backdrop open={isBusy} className={classes.checkListBackdrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Dialog>
   );
 }
@@ -224,9 +325,9 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
   const classes = useStyles();
   const clients = useClients();
 
-  const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
+  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [
     clients,
-    booking.ForwAdrId,
+    booking,
   ]);
 
   const clientInfo = useMemo(() => {

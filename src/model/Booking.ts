@@ -55,6 +55,7 @@ export interface CheckListData {
 export interface CheckListDocument {
   isAdmin: boolean;
   url: string;
+  name: string;
 }
 
 export interface BookingExtension {
