@@ -154,8 +154,12 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     }
   }, [booking]);
 
-  const saveFiles = useCallback((files: []): Promise<any> => {
-    const pathBase =  [
+
+
+
+
+  const saveFiles = useCallback(async (files: any[], isAdmin: boolean): Promise<any> => {
+    const pathBase = [
       'booking-documents',
       'clients',
       `${client?.id}`,
@@ -163,7 +167,6 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       `${booking?.id}`
     ].join('/');
 
-    // uploads a file and returns the file download URL
     const uploadFile = async (file: any): Promise<any> => {
       return new Promise((resolve, reject) => {
         let path = [pathBase, `${file.name}`].join('/');
@@ -176,7 +179,6 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           //   // ex. calculate progress
           // }
         }, error => {
-          // error
           reject(error);
         }, () => {
           // success
@@ -187,25 +189,18 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       });
     };
 
-    return new Promise((resolve, reject) => {
-      let itemsProcessed = 0;
-      let documents: any = [];
-
-      files.forEach((file: any, index: number, array: any[]) => {
-        uploadFile(file).then(downloadURL => {
-          itemsProcessed++;
-
-          documents.push({
-            url: downloadURL,
-            name: file.name
-          });
-
-          if(itemsProcessed === array.length) {
-            resolve(documents);
-          }
+    const requests = files.map((file: any) => {
+      return uploadFile(file)
+        .then(downloadURL => {
+          return {
+            isAdmin: isAdmin,
+            name: file.name,
+            url: downloadURL
+          };
         });
-      });
-    });
+    })
+
+    return Promise.all(requests);
   }, [booking, client]);
 
   const addOrReplace = useCallback((label: string, data: any) => {
@@ -254,33 +249,26 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     saveCheckListChanges(checklistsData);
   }, [addOrReplace, saveCheckListChanges]);
 
-
-
   const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
-    console.log('acceptedFiles: ', acceptedFiles);
-    console.log('label: ', label);
-    console.log('isAdmin: ', isAdmin);
-
     setIsBusy(true);
 
-    saveFiles(acceptedFiles)
-      .then((documents: any) => {
-        // const checklistItem = booking?.checklists?.find((item: any)=> item.label === label);
+    saveFiles(acceptedFiles, isAdmin)
+      .then((documents: any[]) => {
+        const checklistItem = booking?.checklists?.find((item: any)=> item.label === label);
 
-        const documentsCollection = documents.map((document: any) => {
-          document.isAdmin = isAdmin;
+        console.log('checklistItem: ', checklistItem);
+        console.log('documents: ', documents);
 
-          // TODO: check if document exists => update, or not => create new
+        const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
 
-          return document;
-        });
+        console.log('checklistsData: ', checklistsData);
+
+        if(!checklistsData) {
+          setIsBusy(false);
+          return;
+        };
 
         setIsBusy(false);
-
-        const checklistsData = addOrReplace(label, { key: 'documents', value: documentsCollection });
-
-        if(!checklistsData) return;
-
         saveCheckListChanges(checklistsData);
       })
       .catch(err => {
@@ -289,7 +277,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         console.error(err);
       });
 
-  }, [saveFiles, addOrReplace, saveCheckListChanges]);
+  }, [booking, saveFiles, addOrReplace, saveCheckListChanges]);
 
   return (
     <Dialog
