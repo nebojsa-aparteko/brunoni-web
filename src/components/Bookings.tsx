@@ -9,7 +9,8 @@ import {
   CardHeader,
   CardActions,
   TablePagination,
-  Typography
+  Typography,
+  Grid,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -24,8 +25,18 @@ import BookingsContext from '../contexts/Bookings';
 import { QuoteListContext } from '../contexts/QuoteListContext';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
-import  { Booking } from '../model/Booking';
+import { Booking } from '../model/Booking';
 import Search from './SearchBar/Search';
+import useClients from '../hooks/useClients';
+import Ports from '../contexts/Ports';
+import { DateRange } from './DateRangePicker/types';
+import Port from '../model/Port';
+import Client from '../model/Client';
+import FiltersBar from './SearchBar/FiltersBar';
+import compareAsc from 'date-fns/compareAsc';
+import compareDesc from 'date-fns/compareDesc';
+import addDays from 'date-fns/addDays';
+import parseISO from 'date-fns/parseISO';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -71,7 +82,7 @@ const useStyles = makeStyles(theme => ({
 
 const containsString = (prop: string, searchString: string) => {
   // TODO: Fix API response and remove the condition
-  if(typeof prop !== 'string') {
+  if (typeof prop !== 'string') {
     return false;
   }
 
@@ -84,23 +95,35 @@ const containsString = (prop: string, searchString: string) => {
 const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
-  const [ filteredResults, setFilteredResults ] = useState<Booking[] | undefined | null>([]);
-  const [ bookingsContextData, setBookingsContextData ] = useContext(QuoteListContext);
-  const { page, rowsPerPage, searchString } = bookingsContextData;
+  const clients = useClients();
+  const ports = useContext(Ports);
+
+  const [dateRange, setDateRange] = useState<DateRange>();
+
+  const [bookingsContextData, setBookingsContextData] = useContext(QuoteListContext);
+
+  const { searchString, page, rowsPerPage, clientFilter, originPort, destinationPort } = bookingsContextData;
+
+  const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
     // order bookings by date
-    const sortedBookings = orderBy(
-      bookings,
-      (booking: Booking) => new Date(booking.TimeStamp),
-      ['desc']
-    );
+    const sortedBookings = orderBy(bookings, (booking: Booking) => new Date(booking.TimeStamp), ['desc']);
 
-    if( !searchString || searchString.length <= 0 ) {
-      setFilteredResults(sortedBookings);
+    const filteredBookings = filter(
+      (booking: Booking) =>
+        (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
+        (originPort ? booking.POL === originPort.id : true) &&
+        (destinationPort ? booking.POD === destinationPort.id : true) &&
+        compareAsc(new Date(booking.TimeStamp), dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
+        compareDesc(new Date(booking.TimeStamp), dateRange?.endDate || addDays(new Date(), 1)) !== -1,
+    )(sortedBookings);
 
-      return chunk(rowsPerPage)(sortedBookings);
-    }
+    // if( !searchString || searchString.length <= 0 ) {
+    //   setFilteredResults(filteredBookings);
+    //
+    //   return chunk(rowsPerPage)(filteredBookings);
+    // }
 
     const result = filter(
       // TODO:
@@ -129,22 +152,20 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         // customer reference
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
         // booking number
-        ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false)
-    )(sortedBookings);
+        ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false),
+    )(filteredBookings);
 
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, rowsPerPage, searchString]);
+  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setBookingsContextData(set('page', page)(bookingsContextData));
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingsContextData(
-      flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
-    );
+    setBookingsContextData(flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData));
   };
 
   const handleSearch = (searchStringNew: string) => {
@@ -153,7 +174,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     }
   };
 
-  if ( !bookings ) {
+  if (!bookings) {
     return (
       <MUIContainer maxWidth="lg">
         <Paper className={classes.root}>
@@ -166,6 +187,15 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   return (
     <Fragment>
       <Meta title={'Bookings'} />
+
+      <FiltersBar
+        listContextData={bookingsContextData}
+        setQuoteListContextData={setBookingsContextData}
+        showCompanyInfo={showCompanyInfo}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+      />
+
       <Card>
         <CardHeader
           title={
@@ -185,10 +215,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         />
 
         <CardContent className={classes.content}>
-          <BookingsTable
-            bookings={resultChunks && (get(page)(resultChunks) || [])}
-            showCompanyInfo={showCompanyInfo}
-          />
+          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} showCompanyInfo={showCompanyInfo} />
         </CardContent>
 
         <CardActions className={classes.actions}>
