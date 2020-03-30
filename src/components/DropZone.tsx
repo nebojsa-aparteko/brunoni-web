@@ -59,6 +59,10 @@ const useStyles = makeStyles((theme: Theme) =>
     documentButton: {
       padding: 0,
       minWidth: 'auto',
+    },
+    menuLink: {
+      textDecoration: 'none',
+      color: 'inherit',
     }
   }),
 );
@@ -82,7 +86,6 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
   };
 
   const handleDownload = (event: React.MouseEvent<unknown>) => {
-    event.preventDefault();
     event.stopPropagation();
 
     console.log('download');
@@ -118,7 +121,20 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
               <MenuItem onClick={handleClose}>
                 <Typography variant="body2">{item.name}</Typography>
               </MenuItem>
-              <MenuItem onClick={handleDownload}>Download</MenuItem>
+
+              <MenuItem>
+                <a
+                  onClick={handleDownload}
+                  href={item.url}
+                  download={item.name}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={classes.menuLink}
+                >
+                  Download
+                </a>
+              </MenuItem>
+
               <Divider />
               <MenuItem onClick={handleDelete}>
                 <Typography color="error">Delete</Typography>
