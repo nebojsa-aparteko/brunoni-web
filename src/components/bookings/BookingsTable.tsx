@@ -20,7 +20,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking, CheckListData } from '../../model/Booking';
+import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
 import firebase from '../../firebase';
@@ -92,6 +92,11 @@ interface ProgressDialogProps {
   showCompanyInfo?: boolean;
 }
 
+interface AddOrReplacePayload {
+  key: string;
+  value: boolean | CheckListDocument[];
+}
+
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
 const formatEstimatedDate = (date: string) => {
@@ -154,11 +159,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     }
   }, [booking]);
 
-
-
-
-
-  const saveFiles = useCallback(async (files: any[], isAdmin: boolean): Promise<any> => {
+  const saveFiles = useCallback(async (files: File[], isAdmin: boolean): Promise<any> => {
     const pathBase = [
       'booking-documents',
       'clients',
@@ -167,7 +168,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       `${booking?.id}`
     ].join('/');
 
-    const uploadFile = async (file: any): Promise<any> => {
+    const uploadFile = async (file: File): Promise<any> => {
       return new Promise((resolve, reject) => {
         let path = [pathBase, `${file.name}`].join('/');
         let storageRef = firebase.storage().ref( encodeURI(path) );
@@ -182,14 +183,14 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           reject(error);
         }, () => {
           // success
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
             resolve(downloadURL);
           });
         });
       });
     };
 
-    const requests = files.map((file: any) => {
+    const requests = files.map((file: File) => {
       return uploadFile(file)
         .then(downloadURL => {
           return {
@@ -203,14 +204,14 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     return Promise.all(requests);
   }, [booking, client]);
 
-  const addOrReplace = useCallback((label: string, data: any) => {
+  const addOrReplace = useCallback((label: string, data: AddOrReplacePayload) => {
     if( !booking ) return;
 
     if( !('checklists' in booking) ) {
       booking.checklists = []
     }
 
-    const index: number | undefined = booking?.checklists?.findIndex((item: any)=> item.label === label);
+    const index: number | undefined = booking?.checklists?.findIndex((item: CheckListData)=> item.label === label);
 
     const key: string = data.key;
     let value: any;
@@ -248,13 +249,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   }, [booking]);
 
   const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    const checklistsData = addOrReplace(
-      label,
-      {
-        key: 'checked',
-        value: event.target.checked
-      }
-    );
+    const checklistsData = addOrReplace( label, { key: 'checked', value: event.target.checked } );
 
     console.log('checklistsData: ', checklistsData);
 
@@ -263,21 +258,20 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     saveCheckListChanges(checklistsData);
   }, [addOrReplace, saveCheckListChanges]);
 
-  const handleFilesDrop = useCallback((acceptedFiles, label, isAdmin) => {
+  const handleFilesDrop = useCallback((acceptedFiles: File[], label: string, isAdmin: boolean) => {
     setIsBusy(true);
 
     saveFiles(acceptedFiles, isAdmin)
-      .then((documents: any[]) => {
-        console.log('documents: ', documents);
-
+      .then((documents: CheckListDocument[]) => {
         const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
 
-        if(!checklistsData) {
+        if( !checklistsData ) {
           setIsBusy(false);
           return;
         };
 
         setIsBusy(false);
+
         saveCheckListChanges(checklistsData);
       })
       .catch(err => {
@@ -286,7 +280,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         console.error(err);
       });
 
-  }, [booking, saveFiles, addOrReplace, saveCheckListChanges]);
+  }, [saveFiles, addOrReplace, saveCheckListChanges]);
 
   return (
     <Dialog
