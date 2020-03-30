@@ -211,17 +211,31 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     }
 
     const index: number | undefined = booking?.checklists?.findIndex((item: any)=> item.label === label);
+
     const key: string = data.key;
-    const value: any = data.value;
+    let value: any;
 
     if( booking.checklists && (typeof index !== 'undefined' && index > -1) ) {
       // update existing entry
       let existingEntry: any = booking.checklists[index];
+
+      if(typeof data.value === 'boolean') {
+        value = data.value;
+      }
+
+      if( Array.isArray(data.value) ) {
+        value = [
+          ...(existingEntry.documents || []),
+          ...data.value
+        ];
+      }
+
       existingEntry[key] = value;
+
     } else {
       // create new entry
       let newEntry: any = {
-        [key]: value,
+        [key]: data.value,
         label
       };
 
@@ -254,14 +268,9 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
 
     saveFiles(acceptedFiles, isAdmin)
       .then((documents: any[]) => {
-        const checklistItem = booking?.checklists?.find((item: any)=> item.label === label);
-
-        console.log('checklistItem: ', checklistItem);
         console.log('documents: ', documents);
 
         const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
-
-        console.log('checklistsData: ', checklistsData);
 
         if(!checklistsData) {
           setIsBusy(false);
