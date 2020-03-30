@@ -1,15 +1,5 @@
 import React, { useContext, useEffect, Fragment } from 'react';
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  Grid,
-  makeStyles,
-  Paper,
-  Theme,
-  Typography
-} from '@material-ui/core';
+import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -83,7 +73,7 @@ const handlePrint = () => {
 
 const remark = {
   special: 'SPECIAL REMARKS',
-  final: 'FINAL REMARKS'
+  final: 'FINAL REMARKS',
 };
 
 export const isLongVersion = (version: BookingVersion) => {
@@ -99,7 +89,7 @@ const Booking: React.FC<Props> = ({ id }) => {
   let specialRemarks: Remark[] = [];
   let finalRemarks: Remark[] = [];
 
-  if( !booking ) {
+  if (!booking) {
     return (
       <Container maxWidth="lg">
         <Paper className={classes.root}>
@@ -111,13 +101,15 @@ const Booking: React.FC<Props> = ({ id }) => {
 
   console.log(booking);
 
-  booking.Remarks.Remark.forEach(remarkItem => {
-    if(remarkItem.RemarkType === remark.special) {
-      specialRemarks.push(remarkItem);
-    } else if(remarkItem.RemarkType === remark.final) {
-      finalRemarks.push(remarkItem);
-    }
-  });
+  if (booking.Remarks) {
+    booking.Remarks.Remark.forEach(remarkItem => {
+      if (remarkItem.RemarkType === remark.special) {
+        specialRemarks.push(remarkItem);
+      } else if (remarkItem.RemarkType === remark.final) {
+        finalRemarks.push(remarkItem);
+      }
+    });
+  }
 
   return (
     <Page title={bookingTitle}>
@@ -137,11 +129,7 @@ const Booking: React.FC<Props> = ({ id }) => {
           </Box>
 
           <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-            <QuoteNav
-              backTo='/bookings'
-              subtitle={`File No. ${booking.id}`}
-              title={`Booking - ${bookingTitle}`}
-            />
+            <QuoteNav backTo="/bookings" subtitle={`File No. ${booking.id}`} title={`Booking - ${bookingTitle}`} />
             <Box className={classes.actions} displayPrint="none">
               <Button
                 aria-label="print"
@@ -162,10 +150,7 @@ const Booking: React.FC<Props> = ({ id }) => {
               </Box>
 
               <Box marginTop="2em" marginBottom="2em">
-                <ContainerDetails
-                  cargoDetail={booking.CargoDetails.CargoDetail}
-                  version={booking.Version}
-                />
+                <ContainerDetails cargoDetail={booking.CargoDetails.CargoDetail} version={booking.Version} />
               </Box>
 
               {isLongVersion(booking.Version) ? (
