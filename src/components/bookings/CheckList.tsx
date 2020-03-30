@@ -18,6 +18,7 @@ interface CheckListProps {
   showCompanyInfo?: boolean;
   onCheckboxChange: any;
   onFilesDrop: any;
+  onDelete?: any;
 }
 
 interface TableBodyProps {
@@ -25,6 +26,7 @@ interface TableBodyProps {
   isAdmin?: boolean;
   onCheckboxChange: any;
   onFilesDrop: any;
+  onDelete?: any;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -60,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop }) => {
+const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop, onDelete }) => {
   const classes = useStyles();
 
   const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
@@ -99,6 +101,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.DepotOut, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
           />
         </TableCell>
 
@@ -108,6 +111,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.DepotOut, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
             />
           </TableCell>
         ) : null}
@@ -133,6 +137,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.GateInTerminal, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.GateInTerminal, name)}
           />
         </TableCell>
 
@@ -142,6 +147,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.GateInTerminal, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.GateInTerminal, name)}
             />
           </TableCell>
         ) : null}
@@ -163,6 +169,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.VgmSubmission, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.VgmSubmission, name)}
           />
         </TableCell>
 
@@ -172,6 +179,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.VgmSubmission, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.VgmSubmission, name)}
             />
           </TableCell>
         ) : null}
@@ -193,6 +201,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.ShippingInstructions, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
           />
         </TableCell>
 
@@ -202,6 +211,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.ShippingInstructions, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
             />
           </TableCell>
         ) : null}
@@ -223,6 +233,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.BlDraftSent, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.BlDraftSent, name)}
           />
         </TableCell>
 
@@ -232,6 +243,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.BlDraftSent, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.BlDraftSent, name)}
             />
           </TableCell>
         ) : null}
@@ -253,6 +265,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.BlDraftApproved, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.BlDraftApproved, name)}
           />
         </TableCell>
 
@@ -262,6 +275,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.BlDraftApproved, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.BlDraftApproved, name)}
             />
           </TableCell>
         ) : null}
@@ -287,6 +301,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.ShippedOnBoard, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.ShippedOnBoard, name)}
           />
         </TableCell>
 
@@ -296,6 +311,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.ShippedOnBoard, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.ShippedOnBoard, name)}
             />
           </TableCell>
         ) : null}
@@ -317,6 +333,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.FinalBlCopy, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.FinalBlCopy, name)}
           />
         </TableCell>
 
@@ -326,6 +343,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.FinalBlCopy, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.FinalBlCopy, name)}
             />
           </TableCell>
         ) : null}
@@ -351,6 +369,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.Invoiced, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.Invoiced, name)}
           />
         </TableCell>
 
@@ -360,6 +379,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.Invoiced, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.Invoiced, name)}
             />
           </TableCell>
         ) : null}
@@ -375,6 +395,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, false)}
             accept="application/pdf"
             documents={getRowData(StatusExport.Other, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusExport.Other, name)}
           />
         </TableCell>
 
@@ -384,6 +405,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, true)}
               accept="application/pdf"
               documents={getRowData(StatusExport.Other, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusExport.Other, name)}
             />
           </TableCell>
         ) : null}
@@ -392,7 +414,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
   );
 };
 
-const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop }) => {
+const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop, onDelete }) => {
   const classes = useStyles();
 
   const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
@@ -427,6 +449,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.BillOfLandingCopy, name)}
           />
         </TableCell>
 
@@ -436,6 +459,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.BillOfLandingCopy, name)}
             />
           </TableCell>
         ) : null}
@@ -456,6 +480,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.ReleaseInstructions, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.ReleaseInstructions, name)}
           />
         </TableCell>
 
@@ -465,6 +490,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.ReleaseInstructions, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.ReleaseInstructions, name)}
             />
           </TableCell>
         ) : null}
@@ -485,6 +511,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.PinNumber, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.PinNumber, name)}
           />
         </TableCell>
 
@@ -494,6 +521,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.PinNumber, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.PinNumber, name)}
             />
           </TableCell>
         ) : null}
@@ -515,6 +543,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.GateOutTerminal, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.GateOutTerminal, name)}
           />
         </TableCell>
 
@@ -524,6 +553,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.GateOutTerminal, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.GateOutTerminal, name)}
             />
           </TableCell>
         ) : null}
@@ -544,6 +574,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.DepotIn, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.DepotIn, name)}
           />
         </TableCell>
 
@@ -553,6 +584,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.DepotIn, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.DepotIn, name)}
             />
           </TableCell>
         ) : null}
@@ -578,6 +610,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.Invoiced, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.Invoiced, name)}
           />
         </TableCell>
 
@@ -587,6 +620,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.Invoiced, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.Invoiced, name)}
             />
           </TableCell>
         ) : null}
@@ -601,6 +635,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, false)}
             accept="application/pdf"
             documents={getRowData(StatusImport.Other, 'documents', false) || []}
+            onDelete={(name: string) => onDelete(StatusImport.Other, name)}
           />
         </TableCell>
 
@@ -610,6 +645,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, true)}
               accept="application/pdf"
               documents={getRowData(StatusImport.Other, 'documents', true) || []}
+              onDelete={(name: string) => onDelete(StatusImport.Other, name)}
             />
           </TableCell>
         ) : null}
@@ -622,7 +658,8 @@ const CheckList: React.FC<CheckListProps> = ({
   booking,
   showCompanyInfo,
   onCheckboxChange,
-  onFilesDrop
+  onFilesDrop,
+  onDelete
 }) => {
   const classes = useStyles();
 
@@ -642,6 +679,7 @@ const CheckList: React.FC<CheckListProps> = ({
           isAdmin={showCompanyInfo}
           onCheckboxChange={onCheckboxChange}
           onFilesDrop={onFilesDrop}
+          onDelete={onDelete}
         />
       : null}
       {booking?.Category === 'Import' ?
@@ -650,6 +688,7 @@ const CheckList: React.FC<CheckListProps> = ({
           isAdmin={showCompanyInfo}
           onCheckboxChange={onCheckboxChange}
           onFilesDrop={onFilesDrop}
+          onDelete={onDelete}
         />
       : null}
     </Table>

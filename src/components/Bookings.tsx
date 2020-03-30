@@ -18,6 +18,7 @@ import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
 import reduce from 'lodash/fp/reduce';
 import flatMap from 'lodash/fp/flatMap';
+import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
 import { QuoteListContext } from '../contexts/QuoteListContext';
@@ -88,10 +89,17 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const { page, rowsPerPage, searchString } = bookingsContextData;
 
   const resultChunks = useMemo(() => {
-    if( !searchString || searchString.length <= 0 ) {
-      setFilteredResults(bookings);
+    // order bookings by date
+    const sortedBookings = orderBy(
+      bookings,
+      (booking: Booking) => new Date(booking.TimeStamp),
+      ['desc']
+    );
 
-      return chunk(rowsPerPage)(bookings);
+    if( !searchString || searchString.length <= 0 ) {
+      setFilteredResults(sortedBookings);
+
+      return chunk(rowsPerPage)(sortedBookings);
     }
 
     const result = filter(
@@ -122,7 +130,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
         // booking number
         ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false)
-    )(bookings);
+    )(sortedBookings);
 
     setFilteredResults(result);
 

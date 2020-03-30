@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Button,
   createStyles,
@@ -16,6 +16,7 @@ interface DropZoneProps {
   onDrop: any;
   accept: string;
   documents: DropZoneDocument[] | [];
+  onDelete?: any;
 }
 
 interface DropZoneDocument {
@@ -25,6 +26,7 @@ interface DropZoneDocument {
 
 interface DocumentsListProps {
   documents: DropZoneDocument[];
+  onDelete?: any;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -59,41 +61,42 @@ const useStyles = makeStyles((theme: Theme) =>
     documentButton: {
       padding: 0,
       minWidth: 'auto',
+    },
+    menuLink: {
+      textDecoration: 'none',
+      color: 'inherit',
     }
   }),
 );
 
-export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
+export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelete }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleDocumentClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDocumentClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
 
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = (event: React.MouseEvent<unknown>) => {
+  const handleClose = useCallback((event: React.MouseEvent<unknown>) => {
     event.preventDefault();
     event.stopPropagation();
 
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleDownload = (event: React.MouseEvent<unknown>) => {
+  const handleDownload = useCallback((event: React.MouseEvent<unknown>) => {
+    event.stopPropagation();
+  }, []);
+
+  const handleDelete = useCallback((event: React.MouseEvent<unknown>, name: string) => {
     event.preventDefault();
     event.stopPropagation();
 
-    console.log('download');
-  };
-
-  const handleDelete = (event: React.MouseEvent<unknown>) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    console.log('delete');
-  };
+    onDelete(name);
+  }, [onDelete]);
 
   return (
     <ul className={classes.documents}>
@@ -118,9 +121,22 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
               <MenuItem onClick={handleClose}>
                 <Typography variant="body2">{item.name}</Typography>
               </MenuItem>
-              <MenuItem onClick={handleDownload}>Download</MenuItem>
+
+              <MenuItem>
+                <a
+                  onClick={handleDownload}
+                  href={item.url}
+                  download={item.name}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={classes.menuLink}
+                >
+                  Download
+                </a>
+              </MenuItem>
+
               <Divider />
-              <MenuItem onClick={handleDelete}>
+              <MenuItem onClick={event => handleDelete(event, item.name)}>
                 <Typography color="error">Delete</Typography>
               </MenuItem>
             </Menu>
@@ -131,7 +147,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents }) => {
   );
 };
 
-const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents }) => {
+const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents, onDelete }) => {
   const classes = useStyles();
 
   const {
@@ -145,7 +161,7 @@ const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents }) => {
       <input {...getInputProps()} />
 
       {documents && documents.length > 0 ? (
-        <DocumentsList documents={documents} />
+        <DocumentsList documents={documents} onDelete={onDelete} />
       ) : (isDragActive ? (
       <small>Drop the files here...</small>
       ) : (
