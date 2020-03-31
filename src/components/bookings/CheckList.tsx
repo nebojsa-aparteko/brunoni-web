@@ -584,15 +584,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>PIN NUMBER</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusImport.PinNumber, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.PinNumber, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -616,15 +608,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>GATE OUT TERMINAL</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusImport.GateOutTerminal, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.GateOutTerminal, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -647,15 +631,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>DEPOT IN</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusImport.DepotIn, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.DepotIn, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -683,15 +659,7 @@ const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>INVOICED</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusImport.Invoiced, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.Invoiced, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
