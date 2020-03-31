@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -116,6 +116,106 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
           </TableCell>
         ) : null}
       </TableRow>
+
+      {booking?.IMCO ? (
+        <Fragment>
+          <TableRow selected={false} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.ImoRequested, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.ImoRequested)}
+              />
+            </TableCell>
+
+            <TableCell>IMO REQUESTED</TableCell>
+
+            <TableCell>
+              <DropZone
+                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoRequested, false)}
+                accept="application/pdf"
+                documents={getRowData(StatusExport.ImoRequested, 'documents', false) || []}
+                onDelete={(name: string) => onDelete(StatusExport.ImoRequested, name)}
+              />
+            </TableCell>
+
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoRequested, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.ImoRequested, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.ImoRequested, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
+
+          <TableRow selected={false} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.ImoApproved, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.ImoApproved)}
+              />
+            </TableCell>
+
+            <TableCell>IMO APPROVED</TableCell>
+
+            <TableCell>
+              <DropZone
+                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoApproved, false)}
+                accept="application/pdf"
+                documents={getRowData(StatusExport.ImoApproved, 'documents', false) || []}
+                onDelete={(name: string) => onDelete(StatusExport.ImoApproved, name)}
+              />
+            </TableCell>
+
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoApproved, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.ImoApproved, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.ImoApproved, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
+
+          <TableRow selected={false} className={classes.tableRow}>
+          <TableCell>
+            <Checkbox
+              checked={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'checked') || false}
+              disabled={!isAdmin}
+              onChange={event => onCheckboxChange(event, StatusExport.FinalDgdSheetAndDeliveryDetails)}
+            />
+          </TableCell>
+
+          <TableCell>FINAL DGD SHEET &amp; DELIVERY DETAILS</TableCell>
+
+          <TableCell>
+            <DropZone
+              onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalDgdSheetAndDeliveryDetails, false)}
+              accept="application/pdf"
+              documents={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'documents', false) || []}
+              onDelete={(name: string) => onDelete(StatusExport.FinalDgdSheetAndDeliveryDetails, name)}
+            />
+          </TableCell>
+
+          {isAdmin ? (
+            <TableCell>
+              <DropZone
+                onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalDgdSheetAndDeliveryDetails, true)}
+                accept="application/pdf"
+                documents={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'documents', true) || []}
+                onDelete={(name: string) => onDelete(StatusExport.FinalDgdSheetAndDeliveryDetails, name)}
+              />
+            </TableCell>
+          ) : null}
+        </TableRow>
+        </Fragment>
+      ) : null}
 
       <TableRow selected={true} className={classes.tableRow}>
         <TableCell>
