@@ -95,15 +95,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>DEPOT OUT</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.DepotOut, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -231,15 +223,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>GATE IN TERMINAL</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.GateInTerminal, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.GateInTerminal, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -263,15 +247,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>VGM SUBMISSION</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.VgmSubmission, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.VgmSubmission, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -359,15 +335,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>B/L DRAFT APPROVED</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.BlDraftApproved, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.BlDraftApproved, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -395,15 +363,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>SHIPPED ON BOARD</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.ShippedOnBoard, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.ShippedOnBoard, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
@@ -463,15 +423,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableCell>
 
         <TableCell>INVOICED</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, false)}
-            accept="application/pdf"
-            documents={getRowData(StatusExport.Invoiced, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.Invoiced, name)}
-          />
-        </TableCell>
+        <TableCell>&nbsp;</TableCell>
 
         {isAdmin ? (
           <TableCell>
