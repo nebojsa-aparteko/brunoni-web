@@ -158,7 +158,7 @@ export interface CargoDetail {
   CtrWeight: string;
   CtrQuantity: string;
   CommodityID: string;
-  CtypID: CtypID;
+  CtypID: string;
   LocRefs: LocRefs;
 }
 
@@ -188,9 +188,12 @@ export interface FreightDetail {
   Unit: string;
 }
 
-export enum CtypID {
-  The22G1 = '22G1',
-  The22R1 = '22R1',
-  The42G1 = '42G1',
-  The45G1 = '45G1',
+export enum ShipperOwnedContainer {
+  The20TK = '20TK',
+  The20SO = '20SO',
+  The40SO = '40SO',
+  The40HS = '40HS',
+  The20OS = '20OS',
+  The20FS = '20FS',
+  The40FS = '40FS',
 }

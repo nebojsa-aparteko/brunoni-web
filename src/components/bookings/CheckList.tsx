@@ -10,7 +10,7 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking, CheckListData, StatusExport, StatusImport } from '../../model/Booking';
+import { Booking, CheckListData, StatusExport, StatusImport, ShipperOwnedContainer } from '../../model/Booking';
 import DropZone from '../DropZone';
 
 interface CheckListProps {
@@ -79,35 +79,62 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     return data[property];
   }
 
+  const isShipperOwnedContainer = () => {
+    let isShipper: boolean = false;
+
+    let isShipperOwned = (id: any) => {
+      return Object.values(ShipperOwnedContainer).includes(id);
+    };
+
+    if( Array.isArray(booking?.CargoDetails) ) {
+      let t = booking?.CargoDetails?.find(detail => isShipperOwned(detail.CargoDetail.CtypID));
+
+      if(t) isShipper = true;
+    }
+
+    if (
+      booking &&
+      booking?.CargoDetails &&
+      booking?.CargoDetails?.CargoDetail &&
+      'CtypID' in booking?.CargoDetails?.CargoDetail
+    ) {
+      isShipper = isShipperOwned(booking.CargoDetails.CargoDetail.CtypID);
+    }
+
+    return isShipper;
+  };
+
   return (
     <TableBody>
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={
-              getRowData(StatusExport.DepotOut, 'checked') ||
-              (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
-              false
-            }
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.DepotOut)}
-          />
-        </TableCell>
-
-        <TableCell>DEPOT OUT</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
+      {!isShipperOwnedContainer() ? (
+        <TableRow selected={false} className={classes.tableRow}>
           <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, true)}
-              accept="application/pdf"
-              documents={getRowData(StatusExport.DepotOut, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
+            <Checkbox
+              checked={
+                getRowData(StatusExport.DepotOut, 'checked') ||
+                (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
+                false
+              }
+              disabled={!isAdmin}
+              onChange={event => onCheckboxChange(event, StatusExport.DepotOut)}
             />
           </TableCell>
-        ) : null}
-      </TableRow>
+
+          <TableCell>DEPOT OUT</TableCell>
+          <TableCell>&nbsp;</TableCell>
+
+          {isAdmin ? (
+            <TableCell>
+              <DropZone
+                onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, true)}
+                accept="application/pdf"
+                documents={getRowData(StatusExport.DepotOut, 'documents', true) || []}
+                onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
+              />
+            </TableCell>
+          ) : null}
+        </TableRow>
+      ) : null}
 
       {booking?.IMCO ? (
         <Fragment>
