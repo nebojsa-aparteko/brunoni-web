@@ -31,6 +31,7 @@ export interface Booking {
   checklists?: CheckListData[] | undefined;
   DepotOut?: string;
   ShippedOnBoard?: string;
+  IMCO: string;
   Invoiced?: string;
   GateIn?: string;
   PortTerms: PortTerms;
@@ -72,6 +73,9 @@ export interface BookingDocument {
 
 export enum StatusExport {
   DepotOut = 'DEPOT OUT',
+  ImoRequested = 'IMO REQUESTED',
+  ImoApproved = 'IMO APPROVED',
+  FinalDgdSheetAndDeliveryDetails = 'FINAL DGD SHEET AND DELIVERY DETAILS',
   GateInTerminal = 'GATE IN TERMINAL',
   VgmSubmission = 'VGM SUBMISSION',
   ShippingInstructions = 'SHIPPING INSTRUCTIONS',
