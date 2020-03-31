@@ -43,6 +43,7 @@ import Client from '../model/Client';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import PortInput from './inputs/PortInput';
 import Ports from '../contexts/Ports';
+import FiltersBar from './SearchBar/FiltersBar';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -99,25 +100,15 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
-  const clients = useClients();
-  const ports = useContext(Ports);
-
   const [dateRange, setDateRange] = useState<DateRange>();
 
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
 
   const { searchString, page, rowsPerPage, clientFilter, originPort, destinationPort } = quoteListContextData;
 
-  const setOriginPort = (port: Port) => setQuoteListContextData(set('originPort', port)(quoteListContextData));
-  const setDestinationPort = (port: Port) =>
-    setQuoteListContextData(set('destinationPort', port)(quoteListContextData));
-  const setClientFilter = (client: Client) =>
-    setQuoteListContextData(set('clientFilter', client)(quoteListContextData));
-
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-
     const dateFilteredQuoteGroups = filter(
       (quoteGroup: QuoteGroup) =>
         !quoteGroup.quotes[0].archived &&
@@ -165,7 +156,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
     setFilteredResults(sortedFiltered);
 
     return chunk(rowsPerPage)(sortedFiltered);
-
   }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -184,10 +174,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
     }
   };
 
-  const handleDateRangeChange = (dateRange: DateRange) => {
-    setDateRange(dateRange);
-  };
-
   if (!quoteGroups) {
     return (
       <MUIContainer maxWidth="lg">
@@ -200,38 +186,14 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
 
   return (
     <Fragment>
-      <Box
-        display="flex"
-        flexDirection="row-reverse"
-        flexWrap="wrap"
-        my={2}
-        justifyContent="space-between"
-        alignContent="space-around"
-      >
-        <Grid container spacing={2}>
-          {showCompanyInfo && (
-            <Grid item sm={3} xs={12}>
-              <Box display="flex">
-                <ClientInput label="Choose Client" clients={clients} onChange={setClientFilter} value={clientFilter} />
-                {clientFilter && <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />}
-              </Box>
-            </Grid>
-          )}
-          <Grid item sm={3} xs={12}>
-            <PortInput label="Origin" ports={ports} value={originPort} onChange={setOriginPort} />
-          </Grid>
-          <Grid item sm={3} xs={12}>
-            <PortInput label="Destination" ports={ports} value={destinationPort} onChange={setDestinationPort} />
-          </Grid>
-
-          {!showCompanyInfo && <Grid item sm={3} xs={12} />}
-          <Grid item sm={3} xs={12}>
-            <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-              <DateRangeInput onChange={handleDateRangeChange} />
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
+      <FiltersBar
+        listContextData={quoteListContextData}
+        setQuoteListContextData={setQuoteListContextData}
+        showCompanyInfo={showCompanyInfo}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        showRefreshButton
+      />
 
       <Card className={className} {...rest}>
         <CardHeader

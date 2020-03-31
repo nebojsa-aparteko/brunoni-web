@@ -1,14 +1,5 @@
 import React, { Fragment } from 'react';
-import {
-  Table,
-  TableHead,
-  TableCell,
-  TableRow,
-  Theme,
-  createStyles,
-  Box,
-  makeStyles
-} from '@material-ui/core';
+import { Table, TableHead, TableCell, TableRow, Theme, createStyles, Box, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { PortTerms } from '../../model/Booking';
 
@@ -74,7 +65,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   return (
     <TableRow className={classes.tableRow}>
       <TableCell className={classes.tableCellLabel}>{label}</TableCell>
-      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content}} />
+      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content }} />
     </TableRow>
   );
 };
@@ -90,18 +81,9 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
           <col style={{ width: '60%' }} />
         </colgroup>
         <TableBody>
-          <TableRowData
-            label={'Liner Port Agent'}
-            content={portTerms.LinerPortAgent}
-          />
-          <TableRowData
-            label={'FOB Delivery By'}
-            content={portTerms.FOBDeliveryBy}
-          />
-          <TableRowData
-            label={'VGM Submission By'}
-            content={portTerms.VGMSubmByTxt}
-          />
+          <TableRowData label={'Liner Port Agent'} content={portTerms.LinerPortAgent} />
+          <TableRowData label={'FOB Delivery By'} content={portTerms.FOBDeliveryBy} />
+          <TableRowData label={'VGM Submission By'} content={portTerms.VGMSubmByTxt} />
         </TableBody>
       </Table>
 
@@ -116,20 +98,20 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {portTerms.Closings.Closing.map((item, index) => {
-              return (
-                <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
-                  <TableCell>{item.ClosingType}</TableCell>
-                  <TableCell>{item.ClosingDate}</TableCell>
-                  <TableCell>{item.ClosingTime} h</TableCell>
-                  <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
-                </TableRow>
-              );
-            })}
+            {portTerms.Closings &&
+              portTerms.Closings.Closing.map((item, index) => {
+                return (
+                  <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
+                    <TableCell>{item.ClosingType}</TableCell>
+                    <TableCell>{item.ClosingDate}</TableCell>
+                    <TableCell>{item.ClosingTime} h</TableCell>
+                    <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </Box>
-
     </Fragment>
   );
 };

@@ -1,15 +1,5 @@
 import React, { useContext, Fragment } from 'react';
-import {
-  Box,
-  Divider,
-  Grid,
-  Typography,
-  makeStyles,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell
-} from '@material-ui/core';
+import { Box, Divider, Grid, Typography, makeStyles, Table, TableBody, TableRow, TableCell } from '@material-ui/core';
 import isArray from 'lodash/fp/isArray';
 import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
@@ -64,14 +54,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
 const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
   return (
     <TableRow className={classes.tableRow}>
       <TableCell className={classes.tableCellLabel}>{label}</TableCell>
-      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content}} />
+      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content }} />
     </TableRow>
   );
 };
@@ -84,29 +73,28 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
       <Typography variant="h4">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
 
       <Box marginTop="2em" marginBottom="2em">
-        <Grid container spacing={2}>
-          <Grid item md={6} xs={12}>
+        <Grid container spacing={0}>
+          <Grid item md={5} xs={12}>
             <Table size="small" aria-label="a dense table">
               <colgroup>
                 <col style={{ width: '40%' }} />
                 <col style={{ width: '60%' }} />
               </colgroup>
               <TableBody>
-                <TableRowData label={'Equipment'} content={`${detail.CtrQuantity} x ${cont?.description || detail.CtypID}`} />
+                <TableRowData
+                  label={'Equipment'}
+                  content={`${detail.CtrQuantity} x ${cont?.description || detail.CtypID}`}
+                />
 
-                {detail.CommodityTXT ? (
-                  <TableRowData label={'Commodity'} content={detail.CommodityTXT} />
-                ) : null}
+                {detail.CommodityTXT ? <TableRowData label={'Commodity'} content={detail.CommodityTXT} /> : null}
 
-                {detail.CtrWeight ? (
-                  <TableRowData label={'Weight'} content={detail.CtrWeight} />
-                ) : null}
+                {detail.CtrWeight ? <TableRowData label={'Weight'} content={detail.CtrWeight} /> : null}
               </TableBody>
             </Table>
           </Grid>
 
           {isLongVersion(version) ? (
-            <Grid item md={6} xs={12}>
+            <Grid item md={7} xs={12}>
               <Table size="small" aria-label="a dense table">
                 <colgroup>
                   <col style={{ width: '40%' }} />
@@ -114,7 +102,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                 </colgroup>
                 <TableBody>
                   {detail.LocRefs.LocRef.map((ref: LocRefItem, index: number) => {
-                    if(ref.LocType === 'PICK UP') {
+                    if (ref.LocType === 'PICK UP') {
                       return (
                         <Fragment key={`booking-loc-ref-${index}`}>
                           <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />
@@ -163,13 +151,15 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
 
       {isArray(cargoDetail) ? (
         cargoDetail.map((cargoDetailItem, index) => {
-          return <ContainerItem
-            key={`cargo-detail-${index}`}
-            index={index}
-            detail={cargoDetailItem}
-            containerTypes={containerTypes}
-            version={version}
-          />;
+          return (
+            <ContainerItem
+              key={`cargo-detail-${index}`}
+              index={index}
+              detail={cargoDetailItem}
+              containerTypes={containerTypes}
+              version={version}
+            />
+          );
         })
       ) : (
         <ContainerItem detail={cargoDetail} containerTypes={containerTypes} version={version} />
