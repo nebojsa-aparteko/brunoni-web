@@ -165,7 +165,7 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Fragment>
               ) : null}
 
-              {booking.FreightDetails && (
+              {booking.FreightDetails && booking.FreightDetails.FreightDetail && (
                 <Box marginTop="2em" marginBottom="2em">
                   <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
                 </Box>
