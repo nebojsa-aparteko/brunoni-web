@@ -165,9 +165,11 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Fragment>
               ) : null}
 
-              <Box marginTop="2em" marginBottom="2em">
-                <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
-              </Box>
+              {booking.FreightDetails && (
+                <Box marginTop="2em" marginBottom="2em">
+                  <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
+                </Box>
+              )}
 
               {finalRemarks.map((item, index) => {
                 return (
