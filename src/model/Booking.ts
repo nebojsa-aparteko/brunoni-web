@@ -31,7 +31,6 @@ export interface Booking {
   checklists?: CheckListData[] | undefined;
   DepotOut?: string;
   ShippedOnBoard?: string;
-  IMCO: string;
   Invoiced?: string;
   GateIn?: string;
   PortTerms: PortTerms;
@@ -73,6 +72,8 @@ export interface BookingDocument {
 
 export enum StatusExport {
   DepotOut = 'DEPOT OUT',
+  OogRequested = 'OOG REQUESTED',
+  OogApproved = 'OOG APPROVED',
   ImoRequested = 'IMO REQUESTED',
   ImoApproved = 'IMO APPROVED',
   FinalDgdSheetAndDeliveryDetails = 'FINAL DGD SHEET AND DELIVERY DETAILS',
@@ -160,6 +161,8 @@ export interface CargoDetail {
   CommodityID: string;
   CtypID: string;
   LocRefs: LocRefs;
+  IMCO: IMCO | null;
+  Overdimension: CargoOverdimension | null;
 }
 
 export interface LocRefs {
@@ -196,4 +199,12 @@ export enum ShipperOwnedContainer {
   The20OS = '20OS',
   The20FS = '20FS',
   The40FS = '40FS',
+}
+
+export enum CargoOverdimension {
+  Trigger = 'Yes',
+}
+
+export enum IMCO {
+  Trigger = 'Yes',
 }

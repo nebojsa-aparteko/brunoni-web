@@ -10,7 +10,16 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking, CheckListData, StatusExport, StatusImport, ShipperOwnedContainer } from '../../model/Booking';
+import {
+  Booking,
+  CheckListData,
+  StatusExport,
+  StatusImport,
+  ShipperOwnedContainer,
+  CargoOverdimension,
+  IMCO,
+  CargoDetail
+} from '../../model/Booking';
 import DropZone from '../DropZone';
 
 interface CheckListProps {
@@ -79,33 +88,42 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     return data[property];
   }
 
-  const isShipperOwnedContainer = () => {
-    let isShipper: boolean = false;
-
-    let isShipperOwned = (id: any) => {
-      return Object.values(ShipperOwnedContainer).includes(id);
-    };
-
+  const getCargoDetails = () => {
     if( Array.isArray(booking?.CargoDetails) ) {
-      let t = booking?.CargoDetails?.find(detail => isShipperOwned(detail.CargoDetail.CtypID));
-
-      if(t) isShipper = true;
+      return booking?.CargoDetails;
+    } else if(booking?.CargoDetails && booking?.CargoDetails.CargoDetail) {
+      return [ booking?.CargoDetails ];
+    } else {
+      return [];
     }
+  };
 
-    if (
-      booking &&
-      booking?.CargoDetails &&
-      booking?.CargoDetails?.CargoDetail &&
-      'CtypID' in booking?.CargoDetails?.CargoDetail
-    ) {
-      isShipper = isShipperOwned(booking.CargoDetails.CargoDetail.CtypID);
-    }
+  const isOverdimensionedContainer = (): boolean => {
+    let details = getCargoDetails();
+    let overdimensionedContainer = details?.find(detail => detail.CargoDetail.Overdimension === CargoOverdimension.Trigger);
 
-    return isShipper;
+    return Boolean(overdimensionedContainer);
+  };
+
+  const isShipperOwnedContainer = (): boolean => {
+    let details = getCargoDetails();
+    let shipperContainer = details?.find(detail => {
+      return Object.values(ShipperOwnedContainer).includes(detail.CargoDetail.CtypID);
+    });
+
+    return Boolean(shipperContainer);
+  };
+
+  const isImcoContainer = (): boolean => {
+    let details = getCargoDetails();
+    let imcoContainer = details?.find(detail => detail.CargoDetail.IMCO === IMCO.Trigger);
+
+    return Boolean(imcoContainer);
   };
 
   return (
     <TableBody>
+      {/* Exception #2: Shipper's owned Container */}
       {!isShipperOwnedContainer() ? (
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>
@@ -136,7 +154,8 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableRow>
       ) : null}
 
-      {booking?.IMCO ? (
+      {/* Exception #1: IMCO Container */}
+      {isImcoContainer() ? (
         <Fragment>
           <TableRow selected={false} className={classes.tableRow}>
             <TableCell>
@@ -148,15 +167,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
 
             <TableCell>IMO REQUESTED</TableCell>
-
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoRequested, false)}
-                accept="application/pdf"
-                documents={getRowData(StatusExport.ImoRequested, 'documents', false) || []}
-                onDelete={(name: string) => onDelete(StatusExport.ImoRequested, name)}
-              />
-            </TableCell>
+            <TableCell>&nbsp; </TableCell>
 
             {isAdmin ? (
               <TableCell>
@@ -180,15 +191,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
 
             <TableCell>IMO APPROVED</TableCell>
-
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoApproved, false)}
-                accept="application/pdf"
-                documents={getRowData(StatusExport.ImoApproved, 'documents', false) || []}
-                onDelete={(name: string) => onDelete(StatusExport.ImoApproved, name)}
-              />
-            </TableCell>
+            <TableCell>&nbsp; </TableCell>
 
             {isAdmin ? (
               <TableCell>
@@ -233,6 +236,54 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
           ) : null}
         </TableRow>
+        </Fragment>
+      ) : null}
+
+      {/* Exception #3: Overdimensioned Container */}
+      {isOverdimensionedContainer() ? (
+        <Fragment>
+          <TableRow selected={true} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.OogRequested, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.OogRequested)}
+              />
+            </TableCell>
+            <TableCell>OOG REQUESTED</TableCell>
+            <TableCell>&nbsp;</TableCell>
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogRequested, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.OogRequested, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.OogRequested, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
+          <TableRow selected={true} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.OogApproved, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.OogApproved)}
+              />
+            </TableCell>
+            <TableCell>OOG APPROVED</TableCell>
+            <TableCell>&nbsp;</TableCell>
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogApproved, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.OogApproved, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.OogApproved, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
         </Fragment>
       ) : null}
 
