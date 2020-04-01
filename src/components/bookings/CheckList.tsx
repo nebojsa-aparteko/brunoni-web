@@ -16,7 +16,8 @@ import {
   StatusExport,
   StatusImport,
   ShipperOwnedContainer,
-  CargoOverdimension
+  CargoOverdimension,
+  IMCO
 } from '../../model/Booking';
 import DropZone from '../DropZone';
 
@@ -131,8 +132,29 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     return isShipper;
   };
 
+  const isImcoContainer = (): boolean => {
+    let isImco: boolean = false;
+
+    if( Array.isArray(booking?.CargoDetails) ) {
+      let t = booking?.CargoDetails?.find(detail => detail.CargoDetail.IMCO === IMCO.Trigger);
+
+      if(t) isImco = true;
+    }
+
+    if (
+      booking?.CargoDetails &&
+      booking?.CargoDetails.CargoDetail &&
+      'IMCO' in booking?.CargoDetails.CargoDetail
+    ) {
+      isImco = booking?.CargoDetails.CargoDetail.IMCO === IMCO.Trigger;
+    }
+
+    return isImco;
+  };
+
   return (
     <TableBody>
+      {/* Exception #2: Shipper's owned Container */}
       {!isShipperOwnedContainer() ? (
         <TableRow selected={false} className={classes.tableRow}>
           <TableCell>
@@ -163,7 +185,8 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </TableRow>
       ) : null}
 
-      {booking?.IMCO ? (
+      {/* Exception #1: IMCO Container */}
+      {isImcoContainer() ? (
         <Fragment>
           <TableRow selected={false} className={classes.tableRow}>
             <TableCell>
@@ -175,15 +198,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
 
             <TableCell>IMO REQUESTED</TableCell>
-
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoRequested, false)}
-                accept="application/pdf"
-                documents={getRowData(StatusExport.ImoRequested, 'documents', false) || []}
-                onDelete={(name: string) => onDelete(StatusExport.ImoRequested, name)}
-              />
-            </TableCell>
+            <TableCell>&nbsp; </TableCell>
 
             {isAdmin ? (
               <TableCell>
@@ -207,15 +222,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
 
             <TableCell>IMO APPROVED</TableCell>
-
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoApproved, false)}
-                accept="application/pdf"
-                documents={getRowData(StatusExport.ImoApproved, 'documents', false) || []}
-                onDelete={(name: string) => onDelete(StatusExport.ImoApproved, name)}
-              />
-            </TableCell>
+            <TableCell>&nbsp; </TableCell>
 
             {isAdmin ? (
               <TableCell>
@@ -263,6 +270,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
         </Fragment>
       ) : null}
 
+      {/* Exception #3: Overdimensioned Container */}
       {isOverdimensionedContainer() ? (
         <Fragment>
           <TableRow selected={true} className={classes.tableRow}>

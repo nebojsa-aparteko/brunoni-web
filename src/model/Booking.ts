@@ -31,7 +31,6 @@ export interface Booking {
   checklists?: CheckListData[] | undefined;
   DepotOut?: string;
   ShippedOnBoard?: string;
-  IMCO: string;
   Invoiced?: string;
   GateIn?: string;
   PortTerms: PortTerms;
@@ -162,7 +161,8 @@ export interface CargoDetail {
   CommodityID: string;
   CtypID: string;
   LocRefs: LocRefs;
-  Overdimension: string | null;
+  IMCO: IMCO | null;
+  Overdimension: CargoOverdimension | null;
 }
 
 export interface LocRefs {
@@ -202,5 +202,9 @@ export enum ShipperOwnedContainer {
 }
 
 export enum CargoOverdimension {
+  Trigger = 'Yes',
+}
+
+export enum IMCO {
   Trigger = 'Yes',
 }
