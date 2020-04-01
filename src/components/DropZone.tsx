@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Button, createStyles, Divider, makeStyles, Menu, MenuItem, Theme, Typography } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
-import { PictureAsPdf } from '@material-ui/icons';
+import { InsertDriveFile } from '@material-ui/icons';
 
 interface DropZoneProps {
   onDrop: any;
@@ -102,7 +102,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
               onClick={handleDocumentClick}
               className={classes.documentButton}
             >
-              <PictureAsPdf />
+              <InsertDriveFile />
             </Button>
             <Menu
               id={`document-menu-${index}`}
