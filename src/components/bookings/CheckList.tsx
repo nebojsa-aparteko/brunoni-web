@@ -10,7 +10,14 @@ import {
   TableRow,
   makeStyles
 } from '@material-ui/core';
-import { Booking, CheckListData, StatusExport, StatusImport, ShipperOwnedContainer } from '../../model/Booking';
+import {
+  Booking,
+  CheckListData,
+  StatusExport,
+  StatusImport,
+  ShipperOwnedContainer,
+  CargoOverdimension
+} from '../../model/Booking';
 import DropZone from '../DropZone';
 
 interface CheckListProps {
@@ -79,7 +86,27 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     return data[property];
   }
 
-  const isShipperOwnedContainer = () => {
+  const isOverdimensionedContainer = (): boolean => {
+    let isOverdimensioned: boolean = false;
+
+    if( Array.isArray(booking?.CargoDetails) ) {
+      let t = booking?.CargoDetails?.find(detail => detail.CargoDetail?.Overdimension === CargoOverdimension.Trigger);
+
+      if(t) isOverdimensioned = true;
+    }
+
+    if (
+      booking?.CargoDetails &&
+      booking?.CargoDetails.CargoDetail &&
+      'Overdimension' in booking?.CargoDetails.CargoDetail
+    ) {
+      isOverdimensioned = booking?.CargoDetails.CargoDetail.Overdimension === CargoOverdimension.Trigger;
+    }
+
+    return isOverdimensioned;
+  };
+
+  const isShipperOwnedContainer = (): boolean => {
     let isShipper: boolean = false;
 
     let isShipperOwned = (id: any) => {
@@ -233,6 +260,53 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             </TableCell>
           ) : null}
         </TableRow>
+        </Fragment>
+      ) : null}
+
+      {isOverdimensionedContainer() ? (
+        <Fragment>
+          <TableRow selected={true} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.OogRequested, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.OogRequested)}
+              />
+            </TableCell>
+            <TableCell>OOG REQUESTED</TableCell>
+            <TableCell>&nbsp;</TableCell>
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogRequested, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.OogRequested, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.OogRequested, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
+          <TableRow selected={true} className={classes.tableRow}>
+            <TableCell>
+              <Checkbox
+                checked={getRowData(StatusExport.OogApproved, 'checked') || false}
+                disabled={!isAdmin}
+                onChange={event => onCheckboxChange(event, StatusExport.OogApproved)}
+              />
+            </TableCell>
+            <TableCell>OOG APPROVED</TableCell>
+            <TableCell>&nbsp;</TableCell>
+            {isAdmin ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogApproved, true)}
+                  accept="application/pdf"
+                  documents={getRowData(StatusExport.OogApproved, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.OogApproved, name)}
+                />
+              </TableCell>
+            ) : null}
+          </TableRow>
         </Fragment>
       ) : null}
 
