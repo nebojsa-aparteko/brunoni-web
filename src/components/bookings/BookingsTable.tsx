@@ -24,6 +24,7 @@ import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
 import firebase from '../../firebase';
+import { isNull } from 'util';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,7 +101,10 @@ interface AddOrReplacePayload {
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
 const formatEstimatedDate = (date: string) => {
-  if (date.indexOf('.') < 0) {
+  if (date === null) {
+    return 'NOT SET';
+  }
+  if (date?.indexOf('.') < 0) {
     return date;
   }
 
