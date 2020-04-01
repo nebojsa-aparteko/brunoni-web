@@ -1,20 +1,10 @@
 import React, { useCallback } from 'react';
-import {
-  Button,
-  createStyles,
-  Divider,
-  makeStyles,
-  Menu,
-  MenuItem,
-  Theme,
-  Typography
-} from '@material-ui/core';
+import { Button, createStyles, Divider, makeStyles, Menu, MenuItem, Theme, Typography } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
 import { PictureAsPdf } from '@material-ui/icons';
 
 interface DropZoneProps {
   onDrop: any;
-  accept: string;
   documents: DropZoneDocument[] | [];
   onDelete?: any;
 }
@@ -46,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       '&:focus': {
         outline: 'none',
-      }
+      },
     },
     documents: {
       listStyle: 'none',
@@ -65,7 +55,7 @@ const useStyles = makeStyles((theme: Theme) =>
     menuLink: {
       textDecoration: 'none',
       color: 'inherit',
-    }
+    },
   }),
 );
 
@@ -91,12 +81,15 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
     event.stopPropagation();
   }, []);
 
-  const handleDelete = useCallback((event: React.MouseEvent<unknown>, name: string) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleDelete = useCallback(
+    (event: React.MouseEvent<unknown>, name: string) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    onDelete(name);
-  }, [onDelete]);
+      onDelete(name);
+    },
+    [onDelete],
+  );
 
   return (
     <ul className={classes.documents}>
@@ -147,14 +140,10 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
   );
 };
 
-const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents, onDelete }) => {
+const DropZone: React.FC<DropZoneProps> = ({ onDrop, documents, onDelete }) => {
   const classes = useStyles();
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive
-  } = useDropzone({ onDrop, accept });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
     <div {...getRootProps()} className={classes.dragZone}>
@@ -162,10 +151,14 @@ const DropZone: React.FC<DropZoneProps>  = ({ onDrop, accept, documents, onDelet
 
       {documents && documents.length > 0 ? (
         <DocumentsList documents={documents} onDelete={onDelete} />
-      ) : (isDragActive ? (
-      <small>Drop the files here...</small>
+      ) : isDragActive ? (
+        <small>Drop the files here...</small>
       ) : (
-      <small>Drag &amp; drop files here,<br/>or click to upload</small>)
+        <small>
+          Drag &amp; drop files here,
+          <br />
+          or click to upload
+        </small>
       )}
     </div>
   );
