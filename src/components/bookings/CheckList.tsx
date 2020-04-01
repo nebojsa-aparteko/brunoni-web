@@ -17,7 +17,8 @@ import {
   StatusImport,
   ShipperOwnedContainer,
   CargoOverdimension,
-  IMCO
+  IMCO,
+  CargoDetail
 } from '../../model/Booking';
 import DropZone from '../DropZone';
 
@@ -87,69 +88,37 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     return data[property];
   }
 
-  const isOverdimensionedContainer = (): boolean => {
-    let isOverdimensioned: boolean = false;
-
+  const getCargoDetails = () => {
     if( Array.isArray(booking?.CargoDetails) ) {
-      let t = booking?.CargoDetails?.find(detail => detail.CargoDetail?.Overdimension === CargoOverdimension.Trigger);
-
-      if(t) isOverdimensioned = true;
+      return booking?.CargoDetails;
+    } else if(booking?.CargoDetails && booking?.CargoDetails.CargoDetail) {
+      return [ booking?.CargoDetails ];
+    } else {
+      return [];
     }
+  };
 
-    if (
-      booking?.CargoDetails &&
-      booking?.CargoDetails.CargoDetail &&
-      'Overdimension' in booking?.CargoDetails.CargoDetail
-    ) {
-      isOverdimensioned = booking?.CargoDetails.CargoDetail.Overdimension === CargoOverdimension.Trigger;
-    }
+  const isOverdimensionedContainer = (): boolean => {
+    let details = getCargoDetails();
+    let overdimensionedContainer = details?.find(detail => detail.CargoDetail.Overdimension === CargoOverdimension.Trigger);
 
-    return isOverdimensioned;
+    return Boolean(overdimensionedContainer);
   };
 
   const isShipperOwnedContainer = (): boolean => {
-    let isShipper: boolean = false;
+    let details = getCargoDetails();
+    let shipperContainer = details?.find(detail => {
+      return Object.values(ShipperOwnedContainer).includes(detail.CargoDetail.CtypID);
+    });
 
-    let isShipperOwned = (id: any) => {
-      return Object.values(ShipperOwnedContainer).includes(id);
-    };
-
-    if( Array.isArray(booking?.CargoDetails) ) {
-      let t = booking?.CargoDetails?.find(detail => isShipperOwned(detail.CargoDetail.CtypID));
-
-      if(t) isShipper = true;
-    }
-
-    if (
-      booking &&
-      booking?.CargoDetails &&
-      booking?.CargoDetails?.CargoDetail &&
-      'CtypID' in booking?.CargoDetails?.CargoDetail
-    ) {
-      isShipper = isShipperOwned(booking.CargoDetails.CargoDetail.CtypID);
-    }
-
-    return isShipper;
+    return Boolean(shipperContainer);
   };
 
   const isImcoContainer = (): boolean => {
-    let isImco: boolean = false;
+    let details = getCargoDetails();
+    let imcoContainer = details?.find(detail => detail.CargoDetail.IMCO === IMCO.Trigger);
 
-    if( Array.isArray(booking?.CargoDetails) ) {
-      let t = booking?.CargoDetails?.find(detail => detail.CargoDetail.IMCO === IMCO.Trigger);
-
-      if(t) isImco = true;
-    }
-
-    if (
-      booking?.CargoDetails &&
-      booking?.CargoDetails.CargoDetail &&
-      'IMCO' in booking?.CargoDetails.CargoDetail
-    ) {
-      isImco = booking?.CargoDetails.CargoDetail.IMCO === IMCO.Trigger;
-    }
-
-    return isImco;
+    return Boolean(imcoContainer);
   };
 
   return (
