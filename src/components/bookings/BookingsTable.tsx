@@ -15,7 +15,7 @@ import {
   createStyles,
   makeStyles,
   Theme,
-  Typography
+  Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
@@ -35,8 +35,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tableRow: {
       '& td': {
-        whiteSpace: 'nowrap'
-      }
+        whiteSpace: 'nowrap',
+      },
     },
     progress: {
       width: '100%',
@@ -55,10 +55,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '40px',
       height: '40px',
       borderRadius: '20px',
-      display: 'block'
+      display: 'block',
     },
     textEmphasized: {
-      textTransform: 'uppercase'
+      textTransform: 'uppercase',
     },
     closeModal: {
       position: 'absolute',
@@ -68,9 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '47px',
     },
     checkListBackdrop: {
-      zIndex: 1
-    }
-  })
+      zIndex: 1,
+    },
+  }),
 );
 
 interface BookingsTableProps {
@@ -100,7 +100,7 @@ interface AddOrReplacePayload {
 const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
 
 const formatEstimatedDate = (date: string) => {
-  if(date.indexOf('.') < 0) {
+  if (date.indexOf('.') < 0) {
     return date;
   }
 
@@ -114,7 +114,7 @@ const ShipmentProgress: React.FC = () => {
 
   return (
     <div className={classes.progress}>
-      <div className={classes.progressBar} role="progressbar" style={{width: '40%'}}></div>
+      <div className={classes.progressBar} role="progressbar" style={{ width: '40%' }}></div>
     </div>
   );
 };
@@ -124,215 +124,225 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   const [isBusy, setIsBusy] = useState(false);
   const clients = useClients();
 
-  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [
-    clients,
-    booking
-  ]);
+  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
-  const saveCheckListChanges = useCallback(async (data: CheckListData[]) => {
-    setIsBusy(true);
+  const saveCheckListChanges = useCallback(
+    async (data: CheckListData[]) => {
+      setIsBusy(true);
 
-    try {
-      await firebase.firestore().collection('bookings-extension').doc(booking?.id).get().then( (docRef ) => {
-        // update existing booking extension
-        if( docRef && docRef.data() ) {
-          return firebase
-            .firestore()
-            .collection('bookings-extension')
-            .doc(booking?.id)
-            .update({
-              checklists: data
-            });
-        } else {
-          // create new booking extension
-          return firebase
-            .firestore()
-            .collection('bookings-extension')
-            .doc(booking?.id)
-            .set({
-              checklists: data
-            });
-        }
-      }).catch(error => console.log(error))
-    } finally {
-      setIsBusy(false);
-    }
-  }, [booking]);
+      try {
+        await firebase
+          .firestore()
+          .collection('bookings-extension')
+          .doc(booking?.id)
+          .get()
+          .then(docRef => {
+            // update existing booking extension
+            if (docRef && docRef.data()) {
+              return firebase
+                .firestore()
+                .collection('bookings-extension')
+                .doc(booking?.id)
+                .update({
+                  checklists: data,
+                });
+            } else {
+              // create new booking extension
+              return firebase
+                .firestore()
+                .collection('bookings-extension')
+                .doc(booking?.id)
+                .set({
+                  checklists: data,
+                });
+            }
+          })
+          .catch(error => console.log(error));
+      } finally {
+        setIsBusy(false);
+      }
+    },
+    [booking],
+  );
 
   const getStorageBasePath = useCallback((): string => {
-    return [
-      'booking-documents',
-      'clients',
-      `${client?.id}`,
-      'bookings',
-      `${booking?.id}`
-    ].join('/');
+    return ['booking-documents', 'clients', `${client?.id}`, 'bookings', `${booking?.id}`].join('/');
   }, [booking, client]);
 
-  const saveFiles = useCallback(async (files: File[], isAdmin: boolean): Promise<any> => {
-    const uploadFile = async (file: File): Promise<any> => {
-      return new Promise((resolve, reject) => {
-        let path = [getStorageBasePath(), `${file.name}`].join('/');
-        let storageRef = firebase.storage().ref( encodeURI(path) );
-        let uploadTask = storageRef.put(file);
+  const saveFiles = useCallback(
+    async (files: File[], isAdmin: boolean): Promise<any> => {
+      const uploadFile = async (file: File): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          let path = [getStorageBasePath(), `${file.name}`].join('/');
+          let storageRef = firebase.storage().ref(encodeURI(path));
+          let uploadTask = storageRef.put(file);
 
-        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, snapshot => {
-          // in progress
-          // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
-          //   // ex. calculate progress
-          // }
-        }, error => {
-          reject(error);
-        }, () => {
-          // success
-          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
-            resolve(downloadURL);
-          });
+          uploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+              // in progress
+              // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
+              //   // ex. calculate progress
+              // }
+            },
+            error => {
+              reject(error);
+            },
+            () => {
+              // success
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+                resolve(downloadURL);
+              });
+            },
+          );
         });
-      });
-    };
+      };
 
-    const requests = files.map((file: File) => {
-      return uploadFile(file)
-        .then(downloadURL => {
+      const requests = files.map((file: File) => {
+        return uploadFile(file).then(downloadURL => {
           return {
             isAdmin: isAdmin,
             name: file.name,
-            url: downloadURL
+            url: downloadURL,
           };
         });
-    })
-
-    return Promise.all(requests);
-  }, [getStorageBasePath]);
-
-  const deleteFile = useCallback(async (name: any): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      const path = [getStorageBasePath(), `${name}`].join('/');
-      const storageRef = firebase.storage().ref();
-      const documentRef = storageRef.child( encodeURI(path) );
-
-      documentRef
-        .delete()
-        .then(()=> resolve(name))
-        .catch(error => reject(error));
-    });
-  }, [getStorageBasePath]);
-
-  const addOrReplace = useCallback((label: string, data: AddOrReplacePayload) => {
-    if( !booking ) return;
-
-    if( !('checklists' in booking) ) {
-      booking.checklists = []
-    }
-
-    const index: number | undefined = booking?.checklists?.findIndex((item: CheckListData)=> item.label === label);
-
-    const key: string = data.key;
-    let value: any;
-
-    if( booking.checklists && (typeof index !== 'undefined' && index > -1) ) {
-      // update existing entry
-      let existingEntry: any = booking.checklists[index];
-
-      if(typeof data.value === 'boolean') {
-        value = data.value;
-      }
-
-      if( Array.isArray(data.value) ) {
-        value = [
-          ...(existingEntry.documents || []),
-          ...data.value
-        ];
-      }
-
-      existingEntry[key] = value;
-
-    } else {
-      // create new entry
-      let newEntry: any = {
-        [key]: data.value,
-        label
-      };
-
-      if(booking && booking.checklists) {
-        booking.checklists.push(newEntry);
-      }
-    }
-
-    return booking.checklists;
-  }, [booking]);
-
-  const handleCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-    const checklistsData = addOrReplace( label, { key: 'checked', value: event.target.checked } );
-
-    if(!checklistsData) return;
-
-    saveCheckListChanges(checklistsData);
-  }, [addOrReplace, saveCheckListChanges]);
-
-  const handleFilesDrop = useCallback((acceptedFiles: File[], label: string, isAdmin: boolean) => {
-    setIsBusy(true);
-
-    saveFiles(acceptedFiles, isAdmin)
-      .then((documents: CheckListDocument[]) => {
-        const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
-
-        if( !checklistsData ) {
-          setIsBusy(false);
-          return;
-        };
-
-        setIsBusy(false);
-
-        saveCheckListChanges(checklistsData);
-      })
-      .catch(err => {
-        setIsBusy(false);
-
-        console.error(err);
       });
 
-  }, [saveFiles, addOrReplace, saveCheckListChanges]);
+      return Promise.all(requests);
+    },
+    [getStorageBasePath],
+  );
 
-  const handleFileRemoval = useCallback((label: string, name: string) => {
-    setIsBusy(true);
+  const deleteFile = useCallback(
+    async (name: any): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        const path = [getStorageBasePath(), `${name}`].join('/');
+        const storageRef = firebase.storage().ref();
+        const documentRef = storageRef.child(encodeURI(path));
 
-    deleteFile(name)
-      .then((fileName) => {
-        const checklistsData = booking?.checklists?.map(item => {
-          if(item.label === label) {
-            item.documents = item?.documents?.filter(document => document.name !== fileName);
+        documentRef
+          .delete()
+          .then(() => resolve(name))
+          .catch(error => reject(error));
+      });
+    },
+    [getStorageBasePath],
+  );
+
+  const addOrReplace = useCallback(
+    (label: string, data: AddOrReplacePayload) => {
+      if (!booking) return;
+
+      if (!('checklists' in booking)) {
+        booking.checklists = [];
+      }
+
+      const index: number | undefined = booking?.checklists?.findIndex((item: CheckListData) => item.label === label);
+
+      const key: string = data.key;
+      let value: any;
+
+      if (booking.checklists && typeof index !== 'undefined' && index > -1) {
+        // update existing entry
+        let existingEntry: any = booking.checklists[index];
+
+        if (typeof data.value === 'boolean') {
+          value = data.value;
+        }
+
+        if (Array.isArray(data.value)) {
+          value = [...(existingEntry.documents || []), ...data.value];
+        }
+
+        existingEntry[key] = value;
+      } else {
+        // create new entry
+        let newEntry: any = {
+          [key]: data.value,
+          label,
+        };
+
+        if (booking && booking.checklists) {
+          booking.checklists.push(newEntry);
+        }
+      }
+
+      return booking.checklists;
+    },
+    [booking],
+  );
+
+  const handleCheckboxChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+      const checklistsData = addOrReplace(label, { key: 'checked', value: event.target.checked });
+
+      if (!checklistsData) return;
+
+      saveCheckListChanges(checklistsData);
+    },
+    [addOrReplace, saveCheckListChanges],
+  );
+
+  const handleFilesDrop = useCallback(
+    (acceptedFiles: File[], label: string, isAdmin: boolean) => {
+      setIsBusy(true);
+
+      saveFiles(acceptedFiles, isAdmin)
+        .then((documents: CheckListDocument[]) => {
+          const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
+
+          if (!checklistsData) {
+            setIsBusy(false);
+            return;
           }
 
-          return item;
-        });
-
-        if( !checklistsData ) {
           setIsBusy(false);
-          return;
-        };
 
-        setIsBusy(false);
-        saveCheckListChanges(checklistsData);
-      })
-      .catch(error => {
-        console.error('File not deleted due to an error: ', error);
-        setIsBusy(false);
-      });
-  }, [booking, deleteFile, saveCheckListChanges]);
+          saveCheckListChanges(checklistsData);
+        })
+        .catch(err => {
+          setIsBusy(false);
+
+          console.error(err);
+        });
+    },
+    [saveFiles, addOrReplace, saveCheckListChanges],
+  );
+
+  const handleFileRemoval = useCallback(
+    (label: string, name: string) => {
+      setIsBusy(true);
+
+      deleteFile(name)
+        .then(fileName => {
+          const checklistsData = booking?.checklists?.map(item => {
+            if (item.label === label) {
+              item.documents = item?.documents?.filter(document => document.name !== fileName);
+            }
+
+            return item;
+          });
+
+          if (!checklistsData) {
+            setIsBusy(false);
+            return;
+          }
+
+          setIsBusy(false);
+          saveCheckListChanges(checklistsData);
+        })
+        .catch(error => {
+          console.error('File not deleted due to an error: ', error);
+          setIsBusy(false);
+        });
+    },
+    [booking, deleteFile, saveCheckListChanges],
+  );
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      aria-labelledby="dialog-title-check-list"
-      maxWidth="md"
-    >
+    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <DialogTitle disableTypography id="dialog-title-check-list">
-        <Typography variant="h4">
-          {booking?.CarrierID.toUpperCase()}
-        </Typography>
+        <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -351,65 +361,55 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </Backdrop>
     </Dialog>
   );
-}
+};
 
-const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick}) => {
+const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick }) => {
   const classes = useStyles();
   const clients = useClients();
 
-  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [
-    clients,
-    booking,
-  ]);
+  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
   const clientInfo = useMemo(() => {
-    if ( !showCompanyInfo ) return null;
+    if (!showCompanyInfo) return null;
 
-    if ( !client ) {
+    if (!client) {
       return <TableCell>{booking.ForwAdrId}</TableCell>;
     }
 
     return (
       <TableCell>
         {client.name}
-        {booking.ForwPersID ? (
-          <Typography variant="body2">
-            {booking.ForwPersID}
-          </Typography>
-        ) : null}
+        {booking.ForwPersID ? <Typography variant="body2">{booking.ForwPersID}</Typography> : null}
       </TableCell>
     );
   }, [showCompanyInfo, client, booking]);
 
   return (
-    <TableRow
-      hover
-      tabIndex={-1}
-      className={classes.tableRow}
-      onClick={onClick}
-      key={booking.id}
-    >
+    <TableRow hover tabIndex={-1} className={classes.tableRow} onClick={onClick} key={booking.id}>
       {clientInfo}
       <TableCell className={classes.textEmphasized}>
         {booking.CarrierID.toUpperCase()}
         {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
           <Typography variant="body2">
             {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
-            {(booking['ERP-CarrierID'] && booking['ERP-ServiceID']) ? ' - ' : null}
+            {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
             {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
           </Typography>
         ) : null}
       </TableCell>
       <TableCell>
-        {booking.Vessel}<br/>
+        {booking.Vessel}
+        <br />
         Voyage Number {booking.Voyage}
       </TableCell>
       <TableCell>
-        {booking.PlaceOfRecieptName}<br />
+        {booking.PlaceOfRecieptName}
+        <br />
         ETS. {formatEstimatedDate(booking.ETS)}
       </TableCell>
       <TableCell>
-        {booking.FinalDestinationName}<br />
+        {booking.FinalDestinationName}
+        <br />
         ETA. {formatEstimatedDate(booking.ETA)}
       </TableCell>
       <TableCell>{booking['BL-No']}</TableCell>
@@ -417,7 +417,11 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>{booking.BkgStatusText}</TableCell>
       <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
       <TableCell className={classes.avatarCell}>
-        <img className={classes.avatar} src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png" alt="Nenad" />
+        <img
+          className={classes.avatar}
+          src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png"
+          alt="Nenad"
+        />
       </TableCell>
       <TableCell onClick={onProgressClick}>
         <ShipmentProgress />
@@ -471,17 +475,20 @@ const BookingsTableBodySekeleton: React.FC = () => (
 const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
   const history = useHistory();
-  const [ dialogData, setDialogData ] = useState<Booking | undefined>(undefined);
-  const [ isDialogOpen, setIsDialogOpen ] = useState(false);
+  const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleRowClick = useCallback((event: React.MouseEvent<unknown>, id: string) => {
-    history.push(`/bookings/${id}`);
-  }, [history]);
+  const handleRowClick = useCallback(
+    (event: React.MouseEvent<unknown>, id: string) => {
+      history.push(`/bookings/${id}`);
+    },
+    [history],
+  );
 
   const handleProgressClick = useCallback((event: React.MouseEvent<unknown>, booking: Booking) => {
     event.stopPropagation();
 
-    if(booking.Category === 'Export' || booking.Category === 'Import') {
+    if (booking.Category === 'Export' || booking.Category === 'Import') {
       setIsDialogOpen(true);
       setDialogData(booking);
     }
@@ -490,8 +497,6 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, []);
-
-  console.log('bookings: ', bookings);
 
   return (
     <Fragment>
