@@ -14,10 +14,8 @@ export interface Booking {
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
   BkgStatusText: string;
   TimeStamp: string;
-  CargoDetails: CargoDetailItems;
-  FreightDetails: {
-    FreightDetail: FreightDetail[]
-  };
+  CargoDetails: CargoDetail[];
+  FreightDetails: FreightDetail[];
   Category: BookingCategory;
   BkgAgentContact: string | null;
   ForwAdrId: string;
@@ -34,9 +32,7 @@ export interface Booking {
   Invoiced?: string;
   GateIn?: string;
   PortTerms: PortTerms;
-  Remarks: {
-    Remark: Remark[];
-  };
+  Remarks: Remark[];
   Version: BookingVersion;
   'ERP-BkgRef': string;
   'ERP-CarrierID': string;
@@ -69,6 +65,36 @@ export interface BookingDocument {
   isAdmin: boolean;
   url: string;
 }
+
+export interface StatusItem {
+  name: string;
+  option: boolean;
+}
+
+interface ChecklistItem {
+  id: string;
+  label: string;
+  showFileUpload: boolean;
+  showForPorts: string[];
+  doNotShowForContainers: string[];
+}
+
+let checklistItems: ChecklistItem[] = [
+  {
+    id: 'depot_out',
+    label: 'DEPOT OUT',
+    showFileUpload: true,
+    showForPorts: [''],
+    doNotShowForContainers: ['22T1', '22U2'],
+  },
+  {
+    id: 'oog_requested',
+    label: 'OOG REQUESTED',
+    showFileUpload: true,
+    showForPorts: [''],
+    doNotShowForContainers: ['22T1', '22U2'],
+  },
+];
 
 export enum StatusExport {
   DepotOut = 'DEPOT OUT',
@@ -132,9 +158,7 @@ export interface Remark {
 }
 
 export interface PortTerms {
-  Closings: {
-    Closing: Closing[];
-  };
+  Closings: Closing[];
   FOBDeliveryBy: string;
   LinerPortAgent: string;
   RelevantPort: string;
@@ -147,10 +171,6 @@ export interface Closing {
   ClosingTime: string;
   ClosingTxt: string;
   ClosingType: string;
-}
-
-export interface CargoDetailItems {
-  CargoDetail: CargoDetail | CargoDetail[];
 }
 
 export interface CargoDetail {

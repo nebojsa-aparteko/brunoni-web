@@ -7,7 +7,7 @@ import ContainerTypes from '../../contexts/ContainerTypes';
 import { isLongVersion } from './Booking';
 
 interface Props {
-  cargoDetail: CargoDetail | CargoDetail[];
+  cargoDetail: CargoDetail[];
   version: BookingVersion;
 }
 
@@ -149,21 +149,15 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
         <Divider />
       </Box>
 
-      {isArray(cargoDetail) ? (
-        cargoDetail.map((cargoDetailItem, index) => {
-          return (
-            <ContainerItem
-              key={`cargo-detail-${index}`}
-              index={index}
-              detail={cargoDetailItem}
-              containerTypes={containerTypes}
-              version={version}
-            />
-          );
-        })
-      ) : (
-        <ContainerItem detail={cargoDetail} containerTypes={containerTypes} version={version} />
-      )}
+      {cargoDetail.map((cargoDetailItem, index) => (
+        <ContainerItem
+          key={`cargo-detail-${index}`}
+          index={index}
+          detail={cargoDetailItem}
+          containerTypes={containerTypes}
+          version={version}
+        />
+      ))}
     </Grid>
   );
 };

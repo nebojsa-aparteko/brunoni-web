@@ -102,7 +102,7 @@ const Booking: React.FC<Props> = ({ id }) => {
   console.log(booking);
 
   if (booking.Remarks) {
-    booking.Remarks.Remark.forEach(remarkItem => {
+    booking.Remarks.forEach(remarkItem => {
       if (remarkItem.RemarkType === remark.special) {
         specialRemarks.push(remarkItem);
       } else if (remarkItem.RemarkType === remark.final) {
@@ -150,7 +150,7 @@ const Booking: React.FC<Props> = ({ id }) => {
               </Box>
 
               <Box marginTop="2em" marginBottom="2em">
-                <ContainerDetails cargoDetail={booking.CargoDetails.CargoDetail} version={booking.Version} />
+                <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
               </Box>
 
               {isLongVersion(booking.Version) ? (
@@ -165,9 +165,9 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Fragment>
               ) : null}
 
-              {booking.FreightDetails && booking.FreightDetails.FreightDetail && (
+              {booking.FreightDetails && (
                 <Box marginTop="2em" marginBottom="2em">
-                  <BookingFreight freightDetails={booking.FreightDetails.FreightDetail} />
+                  <BookingFreight freightDetails={booking.FreightDetails} />
                 </Box>
               )}
 

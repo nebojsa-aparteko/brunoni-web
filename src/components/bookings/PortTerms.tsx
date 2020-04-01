@@ -99,7 +99,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
           </TableHead>
           <TableBody>
             {portTerms.Closings &&
-              portTerms.Closings.Closing.map((item, index) => {
+              portTerms.Closings.map((item, index) => {
                 return (
                   <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
                     <TableCell>{item.ClosingType}</TableCell>

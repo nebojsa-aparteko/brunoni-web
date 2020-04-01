@@ -91,8 +91,6 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
   const getCargoDetails = () => {
     if (Array.isArray(booking?.CargoDetails)) {
       return booking?.CargoDetails;
-    } else if (booking?.CargoDetails && booking?.CargoDetails.CargoDetail) {
-      return [booking?.CargoDetails];
     } else {
       return [];
     }
@@ -100,9 +98,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
   const isOverdimensionedContainer = (): boolean => {
     let details = getCargoDetails();
-    let overdimensionedContainer = details?.find(
-      detail => detail.CargoDetail.Overdimension === CargoOverdimension.Trigger,
-    );
+    let overdimensionedContainer = details?.find(detail => detail.Overdimension === CargoOverdimension.Trigger);
 
     return Boolean(overdimensionedContainer);
   };
@@ -110,7 +106,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
   const isShipperOwnedContainer = (): boolean => {
     let details = getCargoDetails();
     let shipperContainer = details?.find(detail => {
-      return Object.values(ShipperOwnedContainer).includes(detail.CargoDetail.CtypID);
+      return Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
     });
 
     return Boolean(shipperContainer);
@@ -118,7 +114,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
   const isImcoContainer = (): boolean => {
     let details = getCargoDetails();
-    let imcoContainer = details?.find(detail => detail.CargoDetail.IMCO === IMCO.Trigger);
+    let imcoContainer = details?.find(detail => detail.IMCO === IMCO.Trigger);
 
     return Boolean(imcoContainer);
   };
