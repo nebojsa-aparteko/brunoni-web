@@ -38,6 +38,130 @@ interface TableBodyProps {
   onDelete?: any;
 }
 
+interface ChecklistItem {
+  id: string;
+  label: string;
+  showFileUpload: boolean;
+  status: StatusExport | StatusImport;
+  filters: ((detail: CargoDetail) => boolean)[];
+  additionalCondition?: string;
+}
+const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
+
+const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
+  detail.Overdimension === CargoOverdimension.Trigger;
+
+const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
+  !Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
+let checklistItems: ChecklistItem[] = [
+  {
+    id: 'depot_out',
+    label: 'DEPOT OUT',
+    showFileUpload: true,
+    status: StatusExport.DepotOut,
+    filters: [isShipperOwnedContainer],
+    additionalCondition: 'DepotOut',
+  },
+  {
+    id: 'imo_requested',
+    label: 'IMO REQUESTED',
+    showFileUpload: false,
+    status: StatusExport.ImoRequested,
+    filters: [isImcoContainer],
+  },
+  {
+    id: 'imo_approved',
+    label: 'IMO APPROVED',
+    showFileUpload: false,
+    status: StatusExport.ImoApproved,
+    filters: [isImcoContainer],
+  },
+  {
+    id: 'final_dgd_sheet_and_delivery_details',
+    label: 'FINAL DGD SHEET & DELIVERY DETAILS',
+    showFileUpload: true,
+    status: StatusExport.FinalDgdSheetAndDeliveryDetails,
+    filters: [isImcoContainer],
+  },
+  {
+    id: 'oog_requested',
+    label: 'OOG REQUESTED',
+    showFileUpload: false,
+    status: StatusExport.OogRequested,
+    filters: [isOverdimensionedContainer],
+  },
+  {
+    id: 'oog_approved',
+    label: 'OOG APPROVED',
+    showFileUpload: false,
+    status: StatusExport.OogApproved,
+    filters: [isOverdimensionedContainer],
+  },
+  {
+    id: 'gate_in_terminal',
+    label: 'GATE IN TERMINAL',
+    showFileUpload: false,
+    status: StatusExport.GateInTerminal,
+    filters: [],
+  },
+  {
+    id: 'vgm_submission',
+    label: 'VGM SUBMISSION',
+    showFileUpload: false,
+    status: StatusExport.VgmSubmission,
+    filters: [],
+  },
+  {
+    id: 'shipping_instructions',
+    label: 'SHIPPING INSTRUCTIONS',
+    showFileUpload: true,
+    status: StatusExport.ShippingInstructions,
+    filters: [],
+  },
+  {
+    id: 'bl_draft_sent',
+    label: 'B/L DRAFT SENT',
+    showFileUpload: true,
+    status: StatusExport.BlDraftSent,
+    filters: [],
+  },
+  {
+    id: 'bl_draft_approved',
+    label: 'B/L DRAFT APPROVED',
+    showFileUpload: false,
+    status: StatusExport.BlDraftApproved,
+    filters: [],
+  },
+  {
+    id: 'shipped_on_board',
+    label: 'SHIPPED ON BOARD',
+    showFileUpload: false,
+    status: StatusExport.ShippedOnBoard,
+    filters: [],
+  },
+  {
+    id: 'final_bl_copy',
+    label: 'FINAL B/L COPY',
+    showFileUpload: true,
+    status: StatusExport.FinalBlCopy,
+    filters: [],
+  },
+  {
+    id: 'invoiced',
+    label: 'INVOICED',
+    showFileUpload: false,
+    status: StatusExport.Invoiced,
+    filters: [],
+  },
+  {
+    id: 'other',
+    label: 'OTHER',
+    showFileUpload: true,
+    status: StatusExport.Other,
+    filters: [],
+  },
+];
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -76,15 +200,12 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
 
   const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
     const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-
     if (!data || !(property in data)) return null;
 
     if (typeof isAdminColumn === 'boolean') {
       let collection = data[property] || [];
-
       return collection.filter((item: any) => item.isAdmin === isAdminColumn);
     }
-
     return data[property];
   };
 
@@ -96,428 +217,58 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     }
   };
 
-  const isOverdimensionedContainer = (): boolean => {
+  const applyFilter = (filterMethod: (detail: CargoDetail) => boolean): boolean => {
     let details = getCargoDetails();
-    let overdimensionedContainer = details?.find(detail => detail.Overdimension === CargoOverdimension.Trigger);
-
-    return Boolean(overdimensionedContainer);
-  };
-
-  const isShipperOwnedContainer = (): boolean => {
-    let details = getCargoDetails();
-    let shipperContainer = details?.find(detail => {
-      return Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
-    });
-
-    return Boolean(shipperContainer);
-  };
-
-  const isImcoContainer = (): boolean => {
-    let details = getCargoDetails();
-    let imcoContainer = details?.find(detail => detail.IMCO === IMCO.Trigger);
-
-    return Boolean(imcoContainer);
+    let mainFilter = details?.find(detail => filterMethod(detail));
+    return Boolean(mainFilter);
   };
 
   return (
     <TableBody>
       {/* Exception #2: Shipper's owned Container */}
-      {!isShipperOwnedContainer() ? (
-        <TableRow selected={false} className={classes.tableRow}>
-          <TableCell>
-            <Checkbox
-              checked={
-                getRowData(StatusExport.DepotOut, 'checked') ||
-                (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
-                false
-              }
-              disabled={!isAdmin}
-              onChange={event => onCheckboxChange(event, StatusExport.DepotOut)}
-            />
-          </TableCell>
-
-          <TableCell>DEPOT OUT</TableCell>
-          <TableCell>&nbsp;</TableCell>
-
-          {isAdmin ? (
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.DepotOut, true)}
-                documents={getRowData(StatusExport.DepotOut, 'documents', true) || []}
-                onDelete={(name: string) => onDelete(StatusExport.DepotOut, name)}
-              />
-            </TableCell>
-          ) : null}
-        </TableRow>
-      ) : null}
-
-      {/* Exception #1: IMCO Container */}
-      {isImcoContainer() ? (
-        <Fragment>
+      {checklistItems.map(item => {
+        let showField = item.filters.reduce(
+          (accumulator, currentValue) => applyFilter(currentValue) && accumulator,
+          true,
+        );
+        return showField ? (
           <TableRow selected={false} className={classes.tableRow}>
             <TableCell>
               <Checkbox
-                checked={getRowData(StatusExport.ImoRequested, 'checked') || false}
+                checked={
+                  getRowData(item.status, 'checked') ||
+                  // (item.additionalCondition && booking?.[item.additionalCondition] && booking?.[item.additionalCondition] === 'TRUE') ||
+                  false
+                }
                 disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, StatusExport.ImoRequested)}
+                onChange={event => onCheckboxChange(event, item.status)}
               />
             </TableCell>
 
-            <TableCell>IMO REQUESTED</TableCell>
-            <TableCell>&nbsp; </TableCell>
-
+            <TableCell>{item.label}</TableCell>
+            {item.showFileUpload ? (
+              <TableCell>
+                <DropZone
+                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, false)}
+                  documents={getRowData(StatusExport.ShippingInstructions, 'documents', false) || []}
+                  onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
+                />
+              </TableCell>
+            ) : (
+              <TableCell>&nbsp; </TableCell>
+            )}
             {isAdmin ? (
               <TableCell>
                 <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoRequested, true)}
-                  documents={getRowData(StatusExport.ImoRequested, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.ImoRequested, name)}
+                  onDrop={(files: []) => onFilesDrop(files, item.status, true)}
+                  documents={getRowData(item.status, 'documents', true) || []}
+                  onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
             ) : null}
           </TableRow>
-
-          <TableRow selected={false} className={classes.tableRow}>
-            <TableCell>
-              <Checkbox
-                checked={getRowData(StatusExport.ImoApproved, 'checked') || false}
-                disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, StatusExport.ImoApproved)}
-              />
-            </TableCell>
-
-            <TableCell>IMO APPROVED</TableCell>
-            <TableCell>&nbsp; </TableCell>
-
-            {isAdmin ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ImoApproved, true)}
-                  documents={getRowData(StatusExport.ImoApproved, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.ImoApproved, name)}
-                />
-              </TableCell>
-            ) : null}
-          </TableRow>
-
-          <TableRow selected={false} className={classes.tableRow}>
-            <TableCell>
-              <Checkbox
-                checked={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'checked') || false}
-                disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, StatusExport.FinalDgdSheetAndDeliveryDetails)}
-              />
-            </TableCell>
-
-            <TableCell>FINAL DGD SHEET &amp; DELIVERY DETAILS</TableCell>
-
-            <TableCell>
-              <DropZone
-                onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalDgdSheetAndDeliveryDetails, false)}
-                documents={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'documents', false) || []}
-                onDelete={(name: string) => onDelete(StatusExport.FinalDgdSheetAndDeliveryDetails, name)}
-              />
-            </TableCell>
-
-            {isAdmin ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalDgdSheetAndDeliveryDetails, true)}
-                  documents={getRowData(StatusExport.FinalDgdSheetAndDeliveryDetails, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.FinalDgdSheetAndDeliveryDetails, name)}
-                />
-              </TableCell>
-            ) : null}
-          </TableRow>
-        </Fragment>
-      ) : null}
-
-      {/* Exception #3: Overdimensioned Container */}
-      {isOverdimensionedContainer() ? (
-        <Fragment>
-          <TableRow selected={true} className={classes.tableRow}>
-            <TableCell>
-              <Checkbox
-                checked={getRowData(StatusExport.OogRequested, 'checked') || false}
-                disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, StatusExport.OogRequested)}
-              />
-            </TableCell>
-            <TableCell>OOG REQUESTED</TableCell>
-            <TableCell>&nbsp;</TableCell>
-            {isAdmin ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogRequested, true)}
-                  documents={getRowData(StatusExport.OogRequested, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.OogRequested, name)}
-                />
-              </TableCell>
-            ) : null}
-          </TableRow>
-          <TableRow selected={true} className={classes.tableRow}>
-            <TableCell>
-              <Checkbox
-                checked={getRowData(StatusExport.OogApproved, 'checked') || false}
-                disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, StatusExport.OogApproved)}
-              />
-            </TableCell>
-            <TableCell>OOG APPROVED</TableCell>
-            <TableCell>&nbsp;</TableCell>
-            {isAdmin ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.OogApproved, true)}
-                  documents={getRowData(StatusExport.OogApproved, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.OogApproved, name)}
-                />
-              </TableCell>
-            ) : null}
-          </TableRow>
-        </Fragment>
-      ) : null}
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={
-              getRowData(StatusExport.GateInTerminal, 'checked') ||
-              (booking?.GateIn && booking?.GateIn === 'TRUE') ||
-              false
-            }
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.GateInTerminal)}
-          />
-        </TableCell>
-
-        <TableCell>GATE IN TERMINAL</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.GateInTerminal, true)}
-              documents={getRowData(StatusExport.GateInTerminal, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.GateInTerminal, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusExport.VgmSubmission, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.VgmSubmission)}
-          />
-        </TableCell>
-
-        <TableCell>VGM SUBMISSION</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.VgmSubmission, true)}
-              documents={getRowData(StatusExport.VgmSubmission, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.VgmSubmission, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusExport.ShippingInstructions, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.ShippingInstructions)}
-          />
-        </TableCell>
-
-        <TableCell>SHIPPING INSTRUCTIONS</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, false)}
-            documents={getRowData(StatusExport.ShippingInstructions, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, true)}
-              documents={getRowData(StatusExport.ShippingInstructions, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusExport.BlDraftSent, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.BlDraftSent)}
-          />
-        </TableCell>
-
-        <TableCell>B/L DRAFT SENT</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, false)}
-            documents={getRowData(StatusExport.BlDraftSent, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.BlDraftSent, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftSent, true)}
-              documents={getRowData(StatusExport.BlDraftSent, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.BlDraftSent, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusExport.BlDraftApproved, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.BlDraftApproved)}
-          />
-        </TableCell>
-
-        <TableCell>B/L DRAFT APPROVED</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.BlDraftApproved, true)}
-              documents={getRowData(StatusExport.BlDraftApproved, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.BlDraftApproved, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={
-              getRowData(StatusExport.ShippedOnBoard, 'checked') ||
-              (booking?.ShippedOnBoard && booking?.ShippedOnBoard === 'TRUE') ||
-              false
-            }
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.ShippedOnBoard)}
-          />
-        </TableCell>
-
-        <TableCell>SHIPPED ON BOARD</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippedOnBoard, true)}
-              documents={getRowData(StatusExport.ShippedOnBoard, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.ShippedOnBoard, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusExport.FinalBlCopy, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.FinalBlCopy)}
-          />
-        </TableCell>
-
-        <TableCell>FINAL B/L COPY</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, false)}
-            documents={getRowData(StatusExport.FinalBlCopy, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.FinalBlCopy, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.FinalBlCopy, true)}
-              documents={getRowData(StatusExport.FinalBlCopy, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.FinalBlCopy, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={
-              getRowData(StatusExport.Invoiced, 'checked') ||
-              (booking?.Invoiced && booking?.Invoiced === 'TRUE') ||
-              false
-            }
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusExport.Invoiced)}
-          />
-        </TableCell>
-
-        <TableCell>INVOICED</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.Invoiced, true)}
-              documents={getRowData(StatusExport.Invoiced, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.Invoiced, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>&nbsp;</TableCell>
-
-        <TableCell>OTHER</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, false)}
-            documents={getRowData(StatusExport.Other, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusExport.Other, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusExport.Other, true)}
-              documents={getRowData(StatusExport.Other, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusExport.Other, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
+        ) : null;
+      })}
     </TableBody>
   );
 };
