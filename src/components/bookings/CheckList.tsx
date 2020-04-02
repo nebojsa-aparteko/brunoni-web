@@ -198,7 +198,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'DEPOT IN',
     showFileUpload: false,
     status: StatusImport.DepotIn,
-    filters: [],
+    filters: [isShipperOwnedContainer],
   },
   {
     id: 'invoiced',
@@ -346,26 +346,14 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheck
           {showCompanyInfo && <TableCell>Admin</TableCell>}
         </TableRow>
       </TableHead>
-      {booking?.Category === 'Export' ? (
-        <CheckListContent
-          booking={booking}
-          isAdmin={showCompanyInfo}
-          onCheckboxChange={onCheckboxChange}
-          onFilesDrop={onFilesDrop}
-          onDelete={onDelete}
-          checklistItems={checklistItemsExport}
-        />
-      ) : null}
-      {booking?.Category === 'Import' ? (
-        <CheckListContent
-          booking={booking}
-          isAdmin={showCompanyInfo}
-          onCheckboxChange={onCheckboxChange}
-          onFilesDrop={onFilesDrop}
-          onDelete={onDelete}
-          checklistItems={checklistItemsImport}
-        />
-      ) : null}
+      <CheckListContent
+        booking={booking}
+        isAdmin={showCompanyInfo}
+        onCheckboxChange={onCheckboxChange}
+        onFilesDrop={onFilesDrop}
+        onDelete={onDelete}
+        checklistItems={booking?.Category === 'Export' ? checklistItemsExport : checklistItemsImport}
+      />
     </Table>
   );
 };
