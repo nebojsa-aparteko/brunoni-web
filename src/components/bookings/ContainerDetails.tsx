@@ -149,15 +149,16 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
         <Divider />
       </Box>
 
-      {cargoDetail.map((cargoDetailItem, index) => (
-        <ContainerItem
-          key={`cargo-detail-${index}`}
-          index={index}
-          detail={cargoDetailItem}
-          containerTypes={containerTypes}
-          version={version}
-        />
-      ))}
+      {cargoDetail &&
+        cargoDetail.map((cargoDetailItem, index) => (
+          <ContainerItem
+            key={`cargo-detail-${index}`}
+            index={index}
+            detail={cargoDetailItem}
+            containerTypes={containerTypes}
+            version={version}
+          />
+        ))}
     </Grid>
   );
 };
