@@ -286,7 +286,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
   return (
     <TableBody>
       {/* Exception #2: Shipper's owned Container */}
-      {checklistItemsExport.map(item => {
+      {checklistItems.map(item => {
         let showField = item.filters.reduce(
           (accumulator, currentValue) => applyFilter(currentValue) && accumulator,
           true,
