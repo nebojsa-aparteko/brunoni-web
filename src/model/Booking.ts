@@ -66,36 +66,6 @@ export interface BookingDocument {
   url: string;
 }
 
-export interface StatusItem {
-  name: string;
-  option: boolean;
-}
-
-interface ChecklistItem {
-  id: string;
-  label: string;
-  showFileUpload: boolean;
-  showForPorts: string[];
-  doNotShowForContainers: string[];
-}
-
-let checklistItems: ChecklistItem[] = [
-  {
-    id: 'depot_out',
-    label: 'DEPOT OUT',
-    showFileUpload: true,
-    showForPorts: [''],
-    doNotShowForContainers: ['22T1', '22U2'],
-  },
-  {
-    id: 'oog_requested',
-    label: 'OOG REQUESTED',
-    showFileUpload: true,
-    showForPorts: [''],
-    doNotShowForContainers: ['22T1', '22U2'],
-  },
-];
-
 export enum StatusExport {
   DepotOut = 'DEPOT OUT',
   OogRequested = 'OOG REQUESTED',
