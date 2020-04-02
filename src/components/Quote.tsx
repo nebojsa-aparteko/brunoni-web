@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -30,7 +30,7 @@ import FlareIcon from '@material-ui/icons/Flare';
 import QuoteGroups from '../contexts/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
-import changeCase from 'change-case';
+import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
 import { Quote as QuoteModel } from '../providers/QuoteGroups';
@@ -219,7 +219,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
             <Box mb={2}>
               <img
                 src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                 style={{ width: '5em' }}
               />
             </Box>

@@ -3,6 +3,7 @@ import {
   Box,
   makeStyles,
   Container as MUIContainer,
+  Divider,
   Paper,
   Card,
   CardContent,
@@ -10,15 +11,15 @@ import {
   CardActions,
   TablePagination,
   Typography,
-  Grid,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
-import reduce from 'lodash/fp/reduce';
-import flatMap from 'lodash/fp/flatMap';
 import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
 import BookingsContext from '../contexts/Bookings';
@@ -27,16 +28,12 @@ import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
 import Search from './SearchBar/Search';
-import useClients from '../hooks/useClients';
-import Ports from '../contexts/Ports';
 import { DateRange } from './DateRangePicker/types';
-import Port from '../model/Port';
-import Client from '../model/Client';
 import FiltersBar from './SearchBar/FiltersBar';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
-import parseISO from 'date-fns/parseISO';
+import containsString from '../utilities/containsString';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -78,25 +75,17 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(1),
     justifyContent: 'flex-end',
   },
+  importOrExport: {
+    flexDirection: 'row',
+    marginLeft: theme.spacing(4),
+  },
 }));
-
-const containsString = (prop: string, searchString: string) => {
-  // TODO: Fix API response and remove the condition
-  if (typeof prop !== 'string') {
-    return false;
-  }
-
-  const byMultiple = flatMap((value: string) => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1)(
-    searchString.split(' '),
-  );
-  return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
-};
 
 const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
-  const clients = useClients();
-  const ports = useContext(Ports);
+
+  const [importOrExport, setImportOrExport] = useState('Import');
 
   const [dateRange, setDateRange] = useState<DateRange>();
 
@@ -112,6 +101,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
 
     const filteredBookings = filter(
       (booking: Booking) =>
+        booking.Category === importOrExport &&
         (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
         (originPort ? booking.POL === originPort.id : true) &&
         (destinationPort ? booking.POD === destinationPort.id : true) &&
@@ -158,7 +148,11 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
+  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort, importOrExport]);
+
+  const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setImportOrExport((event.target as HTMLInputElement).value);
+  };
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setBookingsContextData(set('page', page)(bookingsContextData));
@@ -203,6 +197,17 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
               <Typography variant="subtitle1" display="inline">
                 Bookings
               </Typography>
+              <Divider orientation="vertical" style={{ height: '100%' }} />
+              <RadioGroup
+                aria-label="importexport"
+                name="importexport"
+                value={importOrExport}
+                onChange={handleImportOrExportChange}
+                className={classes.importOrExport}
+              >
+                <FormControlLabel value="Import" control={<Radio />} label="Import" />
+                <FormControlLabel value="Export" control={<Radio />} label="Export" />
+              </RadioGroup>
 
               <Box flex={1} />
 

@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
-import changeCase from 'change-case';
+import * as changeCase from 'change-case';
 import { useHistory } from 'react-router';
 import {
   makeStyles,
@@ -10,7 +10,6 @@ import {
   Button,
   Box,
   Drawer,
-  Typography,
   List,
   ListItem,
   ListItemIcon,
@@ -30,8 +29,6 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Divider from '@material-ui/core/Divider';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import firebase from '../firebase';
-import { useSnackbar } from 'notistack';
 import LoginDialog from '../contexts/LoginDialog';
 import ActingAs from '../contexts/ActingAs';
 import LaunchIcon from '@material-ui/icons/Launch';
@@ -121,9 +118,7 @@ const Navbar: React.FC = () => {
   const { open } = useContext(LoginDialog);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const { enqueueSnackbar } = useSnackbar();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
 
   const gotoQuoteInputRef = useRef<HTMLInputElement>();
 
@@ -196,7 +191,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                  alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>
@@ -318,7 +313,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                  alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>

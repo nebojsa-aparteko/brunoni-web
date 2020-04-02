@@ -121,7 +121,7 @@ const Booking: React.FC<Props> = ({ id }) => {
             <Box mb={2}>
               {/* <img
                 src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                 style={{ width: '5em' }}
               /> */}
             </Box>
