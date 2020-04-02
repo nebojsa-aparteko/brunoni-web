@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import {
   Checkbox,
   createStyles,
@@ -45,7 +45,7 @@ interface ChecklistItem {
   showFileUpload: boolean;
   status: StatusExport | StatusImport;
   filters: ((detail: CargoDetail) => boolean)[];
-  additionalCondition?: string;
+  additionalCondition?: (booking: Booking | undefined) => boolean | undefined | '';
 }
 const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
 
@@ -62,7 +62,7 @@ const checklistItemsExport: ChecklistItem[] = [
     showFileUpload: false,
     status: StatusExport.DepotOut,
     filters: [isShipperOwnedContainer],
-    additionalCondition: 'DepotOut',
+    additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE',
   },
   {
     id: 'imo_requested',
@@ -297,8 +297,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
               <Checkbox
                 checked={
                   getRowData(item.status, 'checked') ||
-                  // (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
-                  // (item.additionalCondition && booking?.[item.additionalCondition] && booking?.[item.additionalCondition] === 'TRUE') ||
+                  (item?.additionalCondition && item?.additionalCondition(booking)) ||
                   false
                 }
                 disabled={!isAdmin}
