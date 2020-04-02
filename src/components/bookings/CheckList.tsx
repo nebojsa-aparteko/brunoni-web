@@ -36,6 +36,7 @@ interface TableBodyProps {
   onCheckboxChange: any;
   onFilesDrop: any;
   onDelete?: any;
+  checklistItems: ChecklistItem[];
 }
 
 interface ChecklistItem {
@@ -53,11 +54,12 @@ const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
 
 const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
   !Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
-let checklistItems: ChecklistItem[] = [
+
+const checklistItemsExport: ChecklistItem[] = [
   {
     id: 'depot_out',
     label: 'DEPOT OUT',
-    showFileUpload: true,
+    showFileUpload: false,
     status: StatusExport.DepotOut,
     filters: [isShipperOwnedContainer],
     additionalCondition: 'DepotOut',
@@ -162,6 +164,58 @@ let checklistItems: ChecklistItem[] = [
   },
 ];
 
+const checklistItemsImport: ChecklistItem[] = [
+  {
+    id: 'bill_of_landing_copy',
+    label: 'BILL OF LANDING COPY',
+    showFileUpload: true,
+    status: StatusImport.BillOfLandingCopy,
+    filters: [],
+  },
+  {
+    id: 'release_instructions',
+    label: 'RELEASE INSTRUCTIONS',
+    showFileUpload: true,
+    status: StatusImport.ReleaseInstructions,
+    filters: [],
+  },
+  {
+    id: 'pin_number',
+    label: 'PIN NUMBER',
+    showFileUpload: false,
+    status: StatusImport.PinNumber,
+    filters: [],
+  },
+  {
+    id: 'gate_out_terminal',
+    label: 'GATE OUT TERMINAL',
+    showFileUpload: false,
+    status: StatusImport.GateOutTerminal,
+    filters: [],
+  },
+  {
+    id: 'depot_in',
+    label: 'DEPOT IN',
+    showFileUpload: false,
+    status: StatusImport.DepotIn,
+    filters: [],
+  },
+  {
+    id: 'invoiced',
+    label: 'INVOICED',
+    showFileUpload: false,
+    status: StatusImport.Invoiced,
+    filters: [],
+  },
+  {
+    id: 'other',
+    label: 'OTHER',
+    showFileUpload: true,
+    status: StatusImport.Other,
+    filters: [],
+  },
+];
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -195,7 +249,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop, onDelete }) => {
+const CheckListContent: React.FC<TableBodyProps> = ({
+  booking,
+  isAdmin,
+  onCheckboxChange,
+  onFilesDrop,
+  onDelete,
+  checklistItems,
+}) => {
   const classes = useStyles();
 
   const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
@@ -208,7 +269,6 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
     }
     return data[property];
   };
-
   const getCargoDetails = () => {
     if (Array.isArray(booking?.CargoDetails)) {
       return booking?.CargoDetails;
@@ -226,7 +286,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
   return (
     <TableBody>
       {/* Exception #2: Shipper's owned Container */}
-      {checklistItems.map(item => {
+      {checklistItemsExport.map(item => {
         let showField = item.filters.reduce(
           (accumulator, currentValue) => applyFilter(currentValue) && accumulator,
           true,
@@ -237,6 +297,7 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
               <Checkbox
                 checked={
                   getRowData(item.status, 'checked') ||
+                  // (booking?.DepotOut && booking?.DepotOut === 'TRUE') ||
                   // (item.additionalCondition && booking?.[item.additionalCondition] && booking?.[item.additionalCondition] === 'TRUE') ||
                   false
                 }
@@ -249,9 +310,9 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
             {item.showFileUpload ? (
               <TableCell>
                 <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, StatusExport.ShippingInstructions, false)}
-                  documents={getRowData(StatusExport.ShippingInstructions, 'documents', false) || []}
-                  onDelete={(name: string) => onDelete(StatusExport.ShippingInstructions, name)}
+                  onDrop={(files: []) => onFilesDrop(files, item.status, false)}
+                  documents={getRowData(item.status, 'documents', false) || []}
+                  onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
             ) : (
@@ -273,204 +334,6 @@ const ExportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChan
   );
 };
 
-const ImportBody: React.FC<TableBodyProps> = ({ booking, isAdmin, onCheckboxChange, onFilesDrop, onDelete }) => {
-  const classes = useStyles();
-
-  const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
-    const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-
-    if (!data || !(property in data)) return null;
-
-    if (typeof isAdminColumn === 'boolean') {
-      let collection = data[property] || [];
-
-      return collection.filter((item: any) => item.isAdmin === isAdminColumn);
-    }
-
-    return data[property];
-  };
-
-  return (
-    <TableBody>
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusImport.BillOfLandingCopy, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.BillOfLandingCopy)}
-          />
-        </TableCell>
-
-        <TableCell>BILL OF LANDING COPY</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, false)}
-            documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.BillOfLandingCopy, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.BillOfLandingCopy, true)}
-              documents={getRowData(StatusImport.BillOfLandingCopy, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.BillOfLandingCopy, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusImport.ReleaseInstructions, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.ReleaseInstructions)}
-          />
-        </TableCell>
-
-        <TableCell>RELEASE INSTRUCTIONS</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, false)}
-            documents={getRowData(StatusImport.ReleaseInstructions, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.ReleaseInstructions, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.ReleaseInstructions, true)}
-              documents={getRowData(StatusImport.ReleaseInstructions, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.ReleaseInstructions, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusImport.PinNumber, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.PinNumber)}
-          />
-        </TableCell>
-
-        <TableCell>PIN NUMBER</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.PinNumber, true)}
-              documents={getRowData(StatusImport.PinNumber, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.PinNumber, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusImport.GateOutTerminal, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.GateOutTerminal)}
-          />
-        </TableCell>
-
-        <TableCell>GATE OUT TERMINAL</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.GateOutTerminal, true)}
-              documents={getRowData(StatusImport.GateOutTerminal, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.GateOutTerminal, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={getRowData(StatusImport.DepotIn, 'checked') || false}
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.DepotIn)}
-          />
-        </TableCell>
-
-        <TableCell>DEPOT IN</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.DepotIn, true)}
-              documents={getRowData(StatusImport.DepotIn, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.DepotIn, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={true} className={classes.tableRow}>
-        <TableCell>
-          <Checkbox
-            checked={
-              getRowData(StatusImport.Invoiced, 'checked') ||
-              (booking?.Invoiced && booking?.Invoiced === 'TRUE') ||
-              false
-            }
-            disabled={!isAdmin}
-            onChange={event => onCheckboxChange(event, StatusImport.Invoiced)}
-          />
-        </TableCell>
-
-        <TableCell>INVOICED</TableCell>
-        <TableCell>&nbsp;</TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.Invoiced, true)}
-              documents={getRowData(StatusImport.Invoiced, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.Invoiced, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-
-      <TableRow selected={false} className={classes.tableRow}>
-        <TableCell>&nbsp;</TableCell>
-        <TableCell>OTHER</TableCell>
-
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, false)}
-            documents={getRowData(StatusImport.Other, 'documents', false) || []}
-            onDelete={(name: string) => onDelete(StatusImport.Other, name)}
-          />
-        </TableCell>
-
-        {isAdmin ? (
-          <TableCell>
-            <DropZone
-              onDrop={(files: []) => onFilesDrop(files, StatusImport.Other, true)}
-              documents={getRowData(StatusImport.Other, 'documents', true) || []}
-              onDelete={(name: string) => onDelete(StatusImport.Other, name)}
-            />
-          </TableCell>
-        ) : null}
-      </TableRow>
-    </TableBody>
-  );
-};
-
 const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheckboxChange, onFilesDrop, onDelete }) => {
   const classes = useStyles();
 
@@ -485,21 +348,23 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheck
         </TableRow>
       </TableHead>
       {booking?.Category === 'Export' ? (
-        <ExportBody
+        <CheckListContent
           booking={booking}
           isAdmin={showCompanyInfo}
           onCheckboxChange={onCheckboxChange}
           onFilesDrop={onFilesDrop}
           onDelete={onDelete}
+          checklistItems={checklistItemsExport}
         />
       ) : null}
       {booking?.Category === 'Import' ? (
-        <ImportBody
+        <CheckListContent
           booking={booking}
           isAdmin={showCompanyInfo}
           onCheckboxChange={onCheckboxChange}
           onFilesDrop={onFilesDrop}
           onDelete={onDelete}
+          checklistItems={checklistItemsImport}
         />
       ) : null}
     </Table>
