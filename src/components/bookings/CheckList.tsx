@@ -55,6 +55,8 @@ const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
 const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
   !Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
 
+const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
+
 const checklistItemsExport: ChecklistItem[] = [
   {
     id: 'depot_out',
@@ -98,6 +100,13 @@ const checklistItemsExport: ChecklistItem[] = [
     showFileUpload: false,
     status: StatusExport.OogApproved,
     filters: [isOverdimensionedContainer],
+  },
+  {
+    id: 'tank_certificate',
+    label: 'TANK CERTIFICATE',
+    showFileUpload: true,
+    status: StatusExport.tankCertificate,
+    filters: [is20TKContainer],
   },
   {
     id: 'gate_in_terminal',
@@ -173,17 +182,17 @@ const checklistItemsExport: ChecklistItem[] = [
 
 const checklistItemsImport: ChecklistItem[] = [
   {
-    id: 'bill_of_landing_copy',
-    label: 'BILL OF LANDING COPY',
+    id: 'bill_of_landing_surrendered',
+    label: 'BILL OF LANDING SURRENDERED',
     showFileUpload: true,
-    status: StatusImport.BillOfLandingCopy,
+    status: StatusImport.BillOfLandingSurrendered,
     filters: [],
   },
   {
-    id: 'release_instructions',
-    label: 'RELEASE INSTRUCTIONS',
+    id: 'release_done',
+    label: 'RELEASE DONE',
     showFileUpload: true,
-    status: StatusImport.ReleaseInstructions,
+    status: StatusImport.ReleaseDone,
     filters: [],
   },
   {
