@@ -81,6 +81,7 @@ export enum StatusExport {
   ShippedOnBoard = 'SHIPPED ON BOARD',
   FinalBlCopy = 'FINAL B/L COPY',
   Invoiced = 'INVOICED',
+  BhtNumberIssuance = 'B/BHT NUMBER ISSUANCE',
   Other = 'OTHER',
 }
 

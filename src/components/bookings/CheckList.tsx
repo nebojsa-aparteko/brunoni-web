@@ -107,6 +107,13 @@ const checklistItemsExport: ChecklistItem[] = [
     filters: [],
   },
   {
+    id: 'bht_number_issuance',
+    label: 'B/BHT NUMBER ISSUANCE',
+    showFileUpload: false,
+    status: StatusExport.BhtNumberIssuance,
+    filters: [],
+  },
+  {
     id: 'vgm_submission',
     label: 'VGM SUBMISSION',
     showFileUpload: false,
