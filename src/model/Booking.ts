@@ -86,8 +86,8 @@ export enum StatusExport {
 }
 
 export enum StatusImport {
-  BillOfLandingCopy = 'BILL OF LANDING COPY',
-  ReleaseInstructions = 'RELEASE INSTRUCTIONS',
+  BillOfLandingSurrendered = 'BILL OF LANDING SURRENDERED',
+  ReleaseDone = 'RELEASE DONE',
   PinNumber = 'PIN NUMBER',
   GateOutTerminal = 'GATE OUT TERMINAL',
   DepotIn = 'DEPOT IN',

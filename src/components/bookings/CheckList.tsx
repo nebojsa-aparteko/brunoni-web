@@ -175,17 +175,17 @@ const checklistItemsExport: ChecklistItem[] = [
 
 const checklistItemsImport: ChecklistItem[] = [
   {
-    id: 'bill_of_landing_copy',
-    label: 'BILL OF LANDING COPY',
+    id: 'bill_of_landing_surrendered',
+    label: 'BILL OF LANDING SURRENDERED',
     showFileUpload: true,
-    status: StatusImport.BillOfLandingCopy,
+    status: StatusImport.BillOfLandingSurrendered,
     filters: [],
   },
   {
-    id: 'release_instructions',
-    label: 'RELEASE INSTRUCTIONS',
+    id: 'release_done',
+    label: 'RELEASE DONE',
     showFileUpload: true,
-    status: StatusImport.ReleaseInstructions,
+    status: StatusImport.ReleaseDone,
     filters: [],
   },
   {
