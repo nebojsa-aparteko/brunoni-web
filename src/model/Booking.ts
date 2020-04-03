@@ -73,6 +73,7 @@ export enum StatusExport {
   ImoRequested = 'IMO REQUESTED',
   ImoApproved = 'IMO APPROVED',
   FinalDgdSheetAndDeliveryDetails = 'FINAL DGD SHEET AND DELIVERY DETAILS',
+  tankCertificate = 'TANK CERTIFICATE',
   GateInTerminal = 'GATE IN TERMINAL',
   VgmSubmission = 'VGM SUBMISSION',
   ShippingInstructions = 'SHIPPING INSTRUCTIONS',
