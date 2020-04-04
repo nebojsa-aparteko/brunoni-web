@@ -55,6 +55,8 @@ const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
 const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
   !Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
 
+const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
+
 const checklistItemsExport: ChecklistItem[] = [
   {
     id: 'depot_out',
@@ -98,6 +100,13 @@ const checklistItemsExport: ChecklistItem[] = [
     showFileUpload: false,
     status: StatusExport.OogApproved,
     filters: [isOverdimensionedContainer],
+  },
+  {
+    id: 'tank_certificate',
+    label: 'TANK CERTIFICATE',
+    showFileUpload: true,
+    status: StatusExport.tankCertificate,
+    filters: [is20TKContainer],
   },
   {
     id: 'gate_in_terminal',
@@ -166,17 +175,17 @@ const checklistItemsExport: ChecklistItem[] = [
 
 const checklistItemsImport: ChecklistItem[] = [
   {
-    id: 'bill_of_landing_copy',
-    label: 'BILL OF LANDING COPY',
+    id: 'bill_of_landing_surrendered',
+    label: 'BILL OF LANDING SURRENDERED',
     showFileUpload: true,
-    status: StatusImport.BillOfLandingCopy,
+    status: StatusImport.BillOfLandingSurrendered,
     filters: [],
   },
   {
-    id: 'release_instructions',
-    label: 'RELEASE INSTRUCTIONS',
+    id: 'release_done',
+    label: 'RELEASE DONE',
     showFileUpload: true,
-    status: StatusImport.ReleaseInstructions,
+    status: StatusImport.ReleaseDone,
     filters: [],
   },
   {
@@ -198,7 +207,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'DEPOT IN',
     showFileUpload: false,
     status: StatusImport.DepotIn,
-    filters: [],
+    filters: [isShipperOwnedContainer],
   },
   {
     id: 'invoiced',
@@ -346,26 +355,14 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheck
           {showCompanyInfo && <TableCell>Admin</TableCell>}
         </TableRow>
       </TableHead>
-      {booking?.Category === 'Export' ? (
-        <CheckListContent
-          booking={booking}
-          isAdmin={showCompanyInfo}
-          onCheckboxChange={onCheckboxChange}
-          onFilesDrop={onFilesDrop}
-          onDelete={onDelete}
-          checklistItems={checklistItemsExport}
-        />
-      ) : null}
-      {booking?.Category === 'Import' ? (
-        <CheckListContent
-          booking={booking}
-          isAdmin={showCompanyInfo}
-          onCheckboxChange={onCheckboxChange}
-          onFilesDrop={onFilesDrop}
-          onDelete={onDelete}
-          checklistItems={checklistItemsImport}
-        />
-      ) : null}
+      <CheckListContent
+        booking={booking}
+        isAdmin={showCompanyInfo}
+        onCheckboxChange={onCheckboxChange}
+        onFilesDrop={onFilesDrop}
+        onDelete={onDelete}
+        checklistItems={booking?.Category === 'Export' ? checklistItemsExport : checklistItemsImport}
+      />
     </Table>
   );
 };

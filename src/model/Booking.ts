@@ -73,6 +73,7 @@ export enum StatusExport {
   ImoRequested = 'IMO REQUESTED',
   ImoApproved = 'IMO APPROVED',
   FinalDgdSheetAndDeliveryDetails = 'FINAL DGD SHEET AND DELIVERY DETAILS',
+  tankCertificate = 'TANK CERTIFICATE',
   GateInTerminal = 'GATE IN TERMINAL',
   VgmSubmission = 'VGM SUBMISSION',
   ShippingInstructions = 'SHIPPING INSTRUCTIONS',
@@ -85,8 +86,8 @@ export enum StatusExport {
 }
 
 export enum StatusImport {
-  BillOfLandingCopy = 'BILL OF LANDING COPY',
-  ReleaseInstructions = 'RELEASE INSTRUCTIONS',
+  BillOfLandingSurrendered = 'BILL OF LANDING SURRENDERED',
+  ReleaseDone = 'RELEASE DONE',
   PinNumber = 'PIN NUMBER',
   GateOutTerminal = 'GATE OUT TERMINAL',
   DepotIn = 'DEPOT IN',
