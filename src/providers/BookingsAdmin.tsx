@@ -8,20 +8,26 @@ interface Props {
 }
 
 const BookingsAdmin: React.FC<Props> = ({ children }) => {
-  const bookingsSnapshot = useFirestoreCollection('bookings', (collection: firebase.firestore.CollectionReference) =>
-    collection.limit(500),
-  );
-  const bookingsExtensionSnapshot = useFirestoreCollection(
-    'bookings-extension',
-    (collection: firebase.firestore.CollectionReference) => collection.limit(500),
-  );
+  //
+  // FIXME: There is some issue with Firebase and it cannot use just a limit and as well orders do not work by document ID
+  //
+  // const bookingsSnapshot = useFirestoreCollection('bookings', (collection: firebase.firestore.CollectionReference) =>
+  //   collection.orderBy(firebase.firestore.FieldPath.documentId(), 'desc').limit(500)
+  // );
+  // const bookingsExtensionSnapshot = useFirestoreCollection(
+  //   'bookings-extension',
+  //   (collection: firebase.firestore.CollectionReference) => collection.limit(500),
+  // );
+
+  const bookingsSnapshot = useFirestoreCollection('bookings');
+  const bookingsExtensionSnapshot = useFirestoreCollection('bookings-extension');
 
   const bookingsResult = useMemo(() => {
     const bookingsExtension = bookingsExtensionSnapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() } as any)) as
       | BookingExtension[]
       | undefined;
 
-    const bookings = bookingsSnapshot?.docs.map(doc => {
+    return bookingsSnapshot?.docs.map(doc => {
       let ext = bookingsExtension?.find(ext => doc.id === ext.id);
 
       return {
@@ -30,8 +36,6 @@ const BookingsAdmin: React.FC<Props> = ({ children }) => {
         ...ext,
       } as Booking;
     }) as Booking[] | undefined;
-
-    return bookings;
   }, [bookingsSnapshot, bookingsExtensionSnapshot]);
 
   return <BookingsContext.Provider value={bookingsResult}>{children}</BookingsContext.Provider>;

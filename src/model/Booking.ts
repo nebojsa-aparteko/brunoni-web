@@ -124,6 +124,7 @@ export enum BookingVersion {
 }
 
 export interface Remark {
+  RemarkSeq: number;
   RemarkTxt: string;
   RemarkType: string;
 }

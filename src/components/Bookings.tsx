@@ -109,12 +109,6 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         compareDesc(new Date(booking.TimeStamp), dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(sortedBookings);
 
-    // if( !searchString || searchString.length <= 0 ) {
-    //   setFilteredResults(filteredBookings);
-    //
-    //   return chunk(rowsPerPage)(filteredBookings);
-    // }
-
     const result = filter(
       // TODO:
       // container number

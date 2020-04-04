@@ -55,20 +55,23 @@ firebase.firestore().settings({
   cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
 });
 
-// firebase.firestore().clearPersistence().catch(error => {
-//   console.error('Could not clear persistence:', error.code);
-// });
-
 firebase
   .firestore()
-  .enablePersistence({
-    synchronizeTabs: true,
-  })
-  .then(() => {
-    console.log('Enabled offline sync');
-  })
-  .catch(function(err) {
-    console.warn('Failed to enable firestore persistence', err);
+  .clearPersistence()
+  .catch(error => {
+    console.error('Could not clear persistence:', error.code);
   });
+
+// firebase
+//   .firestore()
+//   .enablePersistence({
+//     synchronizeTabs: true,
+//   })
+//   .then(() => {
+//     console.log('Enabled offline sync');
+//   })
+//   .catch(function(err) {
+//     console.warn('Failed to enable firestore persistence', err);
+//   });
 
 export default firebase;
