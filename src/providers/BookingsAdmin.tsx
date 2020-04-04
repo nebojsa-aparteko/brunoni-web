@@ -8,20 +8,27 @@ interface Props {
 }
 
 const BookingsAdmin: React.FC<Props> = ({ children }) => {
-  const bookingsSnapshot = useFirestoreCollection('bookings');
-  const bookingsExtensionSnapshot = useFirestoreCollection('bookings-extension');
+  const bookingsSnapshot = useFirestoreCollection('bookings', (collection: firebase.firestore.CollectionReference) =>
+    collection.limit(500),
+  );
+  const bookingsExtensionSnapshot = useFirestoreCollection(
+    'bookings-extension',
+    (collection: firebase.firestore.CollectionReference) => collection.limit(500),
+  );
 
   const bookingsResult = useMemo(() => {
-    const bookingsExtension = bookingsExtensionSnapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() } as any)) as BookingExtension[] | undefined;
+    const bookingsExtension = bookingsExtensionSnapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() } as any)) as
+      | BookingExtension[]
+      | undefined;
 
     const bookings = bookingsSnapshot?.docs.map(doc => {
       let ext = bookingsExtension?.find(ext => doc.id === ext.id);
 
-      return ({
+      return {
         id: doc.id,
         ...doc.data(),
-        ...ext
-      } as Booking);
+        ...ext,
+      } as Booking;
     }) as Booking[] | undefined;
 
     return bookings;
