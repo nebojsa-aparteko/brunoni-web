@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
@@ -34,6 +35,8 @@ import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import containsString from '../utilities/containsString';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -85,6 +88,14 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
+  const normalizedBookings = useMemo(
+    () =>
+      bookings
+        ? map(flow(update('BkgCreateTimeStamp', invoke('toDate')), update('TimeStamp', invoke('toDate'))))(bookings)
+        : [],
+    [bookings],
+  );
+
   const [importOrExport, setImportOrExport] = useState('Import');
 
   const [dateRange, setDateRange] = useState<DateRange>();
@@ -97,7 +108,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
 
   const resultChunks = useMemo(() => {
     // order bookings by date
-    const sortedBookings = orderBy(bookings, (booking: Booking) => new Date(booking.TimeStamp), ['desc']);
+    const sortedBookings = orderBy(normalizedBookings, (booking: Booking) => booking.BkgCreateTimeStamp, ['desc']);
 
     const filteredBookings = filter(
       (booking: Booking) =>
@@ -105,8 +116,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
         (originPort ? booking.POL === originPort.id : true) &&
         (destinationPort ? booking.POD === destinationPort.id : true) &&
-        compareAsc(new Date(booking.TimeStamp), dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(new Date(booking.TimeStamp), dateRange?.endDate || addDays(new Date(), 1)) !== -1,
+        compareAsc(booking.BkgCreateTimeStamp, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
+        compareDesc(booking.BkgCreateTimeStamp, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(sortedBookings);
 
     const result = filter(
@@ -142,7 +153,18 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort, importOrExport]);
+  }, [
+    bookings,
+    normalizedBookings,
+    searchString,
+    page,
+    rowsPerPage,
+    dateRange,
+    clientFilter,
+    originPort,
+    destinationPort,
+    importOrExport,
+  ]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setImportOrExport((event.target as HTMLInputElement).value);
@@ -162,7 +184,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     }
   };
 
-  if (!bookings) {
+  if (!normalizedBookings) {
     return (
       <MUIContainer maxWidth="lg">
         <Paper className={classes.root}>
@@ -218,7 +240,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         </CardContent>
 
         <CardActions className={classes.actions}>
-          {bookings && bookings.length > 0 && (
+          {normalizedBookings && normalizedBookings.length > 0 && (
             <TablePagination
               component="div"
               count={filteredResults ? filteredResults.length : 0}

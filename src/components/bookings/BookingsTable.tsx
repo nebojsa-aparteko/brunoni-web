@@ -1,3 +1,4 @@
+import Avatar from 'react-avatar';
 import React, { useMemo, useState, Fragment, useCallback } from 'react';
 import { useHistory } from 'react-router';
 import {
@@ -24,9 +25,8 @@ import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
 import firebase from '../../firebase';
-import { isNull } from 'util';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     button: {
       position: 'relative',
@@ -98,8 +98,6 @@ interface AddOrReplacePayload {
   value: boolean | CheckListDocument[];
 }
 
-const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
-
 const formatEstimatedDate = (date: string) => {
   if (date === null) {
     return 'NOT SET';
@@ -118,7 +116,7 @@ const ShipmentProgress: React.FC = () => {
 
   return (
     <div className={classes.progress}>
-      <div className={classes.progressBar} role="progressbar" style={{ width: '40%' }}></div>
+      <div className={classes.progressBar} role="progressbar" style={{ width: '40%' }} />
     </div>
   );
 };
@@ -360,7 +358,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           onDelete={handleFileRemoval}
         />
       </DialogContent>
-      <Backdrop open={isBusy} className={classes.checkListBackdrop}>
+      <Backdrop open={isBusy} className={classes.checkListBackdrop} timeout={300}>
         <CircularProgress color="inherit" />
       </Backdrop>
     </Dialog>
@@ -419,12 +417,13 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
       <TableCell>{booking.BkgStatusText}</TableCell>
-      <TableCell>{formatDateString(booking.TimeStamp)}</TableCell>
+      <TableCell>{formatDate(booking.BkgCreateTimeStamp, 'dd.MM.yy')}</TableCell>
       <TableCell className={classes.avatarCell}>
-        <img
-          className={classes.avatar}
-          src="https://trello-members.s3.amazonaws.com/5db6fc90458fa40143f689f3/85b18ae1d817ab32d6b577184905713e/170.png"
-          alt="Nenad"
+        <Avatar
+          name={booking.BkgAgentContactTxt}
+          title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
+          size="40"
+          round={true}
         />
       </TableCell>
       <TableCell onClick={onProgressClick}>

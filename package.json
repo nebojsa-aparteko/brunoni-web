@@ -40,6 +40,7 @@
     "mousetrap": "^1.6.3",
     "notistack": "^0.9.6",
     "react": "^16.11.0",
+    "react-avatar": "^3.9.2",
     "react-chartjs-2": "^2.8.0",
     "react-dom": "^16.11.0",
     "react-dropzone": "^10.2.1",

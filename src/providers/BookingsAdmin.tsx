@@ -10,13 +10,13 @@ interface Props {
 const BookingsAdmin: React.FC<Props> = ({ children }) => {
   //
   // FIXME: There is some issue with Firebase and it cannot use just a limit and as well orders do not work by document ID
-  //
+
   // const bookingsSnapshot = useFirestoreCollection('bookings', (collection: firebase.firestore.CollectionReference) =>
-  //   collection.orderBy(firebase.firestore.FieldPath.documentId(), 'desc').limit(500)
+  //   collection.orderBy('ERP-BkgRef', 'desc').limit(500)
   // );
   // const bookingsExtensionSnapshot = useFirestoreCollection(
   //   'bookings-extension',
-  //   (collection: firebase.firestore.CollectionReference) => collection.limit(500),
+  //   (collection: firebase.firestore.CollectionReference) => collection.orderBy('ERP-BkgRef', 'desc').limit(500),
   // );
 
   const bookingsSnapshot = useFirestoreCollection('bookings');
