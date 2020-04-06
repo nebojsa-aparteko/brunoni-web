@@ -13,8 +13,8 @@ const Bookings: React.FC<Props> = ({ children }) => {
 
   const query = userRecord?.alphacomClientId
     ? (collection: firebase.firestore.CollectionReference) =>
-        collection.where('ForwAdrId', '==', userRecord!.alphacomClientId).limit(500)
-    : (collection: firebase.firestore.CollectionReference) => collection.where('ForwAdrId', '>', '').limit(500);
+        collection.where('ForwAdrId', '==', userRecord!.alphacomClientId)
+    : (collection: firebase.firestore.CollectionReference) => collection.where('ForwAdrId', '>', '');
 
   const bookingsSnapshot = useFirestoreCollection('bookings', query);
   const bookingsExtensionSnapshot = useFirestoreCollection('bookings-extension', query);

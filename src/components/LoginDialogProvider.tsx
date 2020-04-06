@@ -45,8 +45,17 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
   const [params, setParams] = useState<Params | null>(null);
   const [activeStep, setActiveStep] = useState(0);
 
-  const handleOpen = (params?: Params) => setParams(params || {});
-  const handleClose = () => setParams(null);
+  const handleOpen = (params?: Params) => {
+    setActiveStep(0);
+    setParams(params || {});
+  };
+
+  const handleClose = () => {
+    setParams(null);
+    setTimeout(() => {
+      setActiveStep(0);
+    }, 1000);
+  };
 
   const handleFormComplete = () => setActiveStep(1);
 
