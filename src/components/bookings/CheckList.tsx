@@ -2,23 +2,24 @@ import React from 'react';
 import {
   Checkbox,
   createStyles,
-  Theme,
+  makeStyles,
   Table,
-  TableHead,
   TableBody,
   TableCell,
+  TableHead,
   TableRow,
-  makeStyles,
+  Theme,
 } from '@material-ui/core';
 import {
   Booking,
+  BookingVersion,
+  CargoDetail,
+  CargoOverdimension,
   CheckListData,
+  IMCO,
+  ShipperOwnedContainer,
   StatusExport,
   StatusImport,
-  ShipperOwnedContainer,
-  CargoOverdimension,
-  IMCO,
-  CargoDetail,
 } from '../../model/Booking';
 import DropZone from '../DropZone';
 
@@ -53,15 +54,28 @@ interface ChecklistItem {
 
 const someCargoDetailsMatch = (fn: CargoDetailFilter): BookingFilter => booking => booking.CargoDetails.some(fn);
 
+const isLongVersion = (booking: Booking): boolean => booking.Version === BookingVersion.long;
+const isShortVersion = (booking: Booking): boolean => booking.Version === BookingVersion.short;
+
 const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
 
 const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
   detail.Overdimension === CargoOverdimension.Trigger;
 
-const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
+const isNotShipperOwnedContainer = (detail: CargoDetail): boolean =>
   !Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
 
+const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
+  Object.values(ShipperOwnedContainer).includes(detail.CtypID as ShipperOwnedContainer);
+
 const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
+
+const isZIM = (booking: Booking): boolean => {
+  // console.log(booking.CarrierID);
+  return booking.CarrierID === 'ZIM SHIPPING LINE';
+};
+
+const isAllmarine = (): boolean => process.env.REACT_APP_BRAND === 'allmarine';
 
 const checklistItemsExport: ChecklistItem[] = [
   {
@@ -69,8 +83,16 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'DEPOT OUT',
     showFileUpload: false,
     status: StatusExport.DepotOut,
-    filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
+    filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
     additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE',
+  },
+  {
+    id: 'soc_certificate',
+    label: 'SOC CERTIFICATE',
+    showFileUpload: true,
+    status: StatusExport.SocCertificate,
+    filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
+    additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE', //TODO check if needed
   },
   {
     id: 'imo_requested',
@@ -98,21 +120,28 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'OOG REQUESTED',
     showFileUpload: false,
     status: StatusExport.OogRequested,
-    filters: [someCargoDetailsMatch(isOverdimensionedContainer)],
+    filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
   },
   {
     id: 'oog_approved',
     label: 'OOG APPROVED',
     showFileUpload: false,
     status: StatusExport.OogApproved,
-    filters: [someCargoDetailsMatch(isOverdimensionedContainer)],
+    filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
+  },
+  {
+    id: 'lashing_certificate',
+    label: 'LASHING CERTIFICATE',
+    showFileUpload: false,
+    status: StatusExport.OogApproved,
+    filters: [isAllmarine, isZIM, isLongVersion],
   },
   {
     id: 'tank_certificate',
     label: 'TANK CERTIFICATE',
     showFileUpload: true,
     status: StatusExport.tankCertificate,
-    filters: [someCargoDetailsMatch(is20TKContainer)],
+    filters: [someCargoDetailsMatch(is20TKContainer), isLongVersion],
   },
   {
     id: 'gate_in_terminal',
@@ -185,14 +214,14 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'BILL OF LANDING SURRENDERED',
     showFileUpload: true,
     status: StatusImport.BillOfLandingSurrendered,
-    filters: [],
+    filters: [isLongVersion],
   },
   {
     id: 'release_done',
     label: 'RELEASE DONE',
     showFileUpload: true,
     status: StatusImport.ReleaseDone,
-    filters: [],
+    filters: [isLongVersion],
   },
   {
     id: 'pin_number',
@@ -213,7 +242,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'DEPOT IN',
     showFileUpload: false,
     status: StatusImport.DepotIn,
-    filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
+    filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
   },
   {
     id: 'invoiced',
