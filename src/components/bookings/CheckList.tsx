@@ -59,6 +59,7 @@ interface ChecklistItem {
   label: string;
   type: FieldType;
   status: StatusExport | StatusImport;
+  selectedRow: boolean;
   filters: BookingFilter[];
   additionalCondition?: (booking: Booking | undefined) => boolean | undefined | '';
 }
@@ -96,6 +97,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'DEPOT OUT',
     type: FieldType.BASIC,
     status: StatusExport.DepotOut,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
     additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE',
   },
@@ -104,6 +106,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'SOC CERTIFICATE',
     type: FieldType.FILE,
     status: StatusExport.SocCertificate,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
     additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE', //TODO check if needed
   },
@@ -112,6 +115,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'IMO REQUESTED',
     type: FieldType.BASIC,
     status: StatusExport.ImoRequested,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
@@ -119,6 +123,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'IMO APPROVED',
     type: FieldType.BASIC,
     status: StatusExport.ImoApproved,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
@@ -126,6 +131,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'FINAL DGD SHEET & DELIVERY DETAILS',
     type: FieldType.FILE,
     status: StatusExport.FinalDgdSheetAndDeliveryDetails,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
@@ -133,6 +139,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'OOG REQUESTED',
     type: FieldType.BASIC,
     status: StatusExport.OogRequested,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
   },
   {
@@ -140,6 +147,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'OOG APPROVED',
     type: FieldType.BASIC,
     status: StatusExport.OogApproved,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
   },
   {
@@ -147,6 +155,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'LASHING CERTIFICATE',
     type: FieldType.BASIC,
     status: StatusExport.OogApproved,
+    selectedRow: false,
     filters: [isAllmarine, isZIM, isLongVersion],
   },
   {
@@ -154,6 +163,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'TANK CERTIFICATE',
     type: FieldType.FILE,
     status: StatusExport.tankCertificate,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(is20TKContainer), isLongVersion],
   },
   {
@@ -161,6 +171,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'GATE IN TERMINAL',
     type: FieldType.BASIC,
     status: StatusExport.GateInTerminal,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -168,13 +179,15 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'B/BHT NUMBER ISSUANCE',
     type: FieldType.TEXT,
     status: StatusExport.BhtNumberIssuance,
-    filters: [],
+    selectedRow: false,
+    filters: [isLongVersion, isGermanPort],
   },
   {
     id: 'vgm_submission',
     label: 'VGM SUBMISSION',
     type: FieldType.BASIC,
     status: StatusExport.VgmSubmission,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -182,6 +195,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'SHIPPING INSTRUCTIONS',
     type: FieldType.FILE,
     status: StatusExport.ShippingInstructions,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -189,6 +203,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'B/L DRAFT SENT',
     type: FieldType.FILE,
     status: StatusExport.BlDraftSent,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -196,6 +211,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'B/L DRAFT APPROVED',
     type: FieldType.BASIC,
     status: StatusExport.BlDraftApproved,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -203,6 +219,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'SHIPPED ON BOARD',
     type: FieldType.BASIC,
     status: StatusExport.ShippedOnBoard,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -210,6 +227,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'FINAL B/L COPY',
     type: FieldType.FILE,
     status: StatusExport.FinalBlCopy,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -217,6 +235,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'INVOICED',
     type: FieldType.BASIC,
     status: StatusExport.Invoiced,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -224,6 +243,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'OTHER',
     type: FieldType.FILE,
     status: StatusExport.Other,
+    selectedRow: false,
     filters: [],
   },
 ];
@@ -234,6 +254,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'BILL OF LANDING SURRENDERED',
     type: FieldType.FILE,
     status: StatusImport.BillOfLandingSurrendered,
+    selectedRow: false,
     filters: [isLongVersion],
   },
   {
@@ -241,6 +262,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'RELEASE DONE',
     type: FieldType.FILE,
     status: StatusImport.ReleaseDone,
+    selectedRow: true,
     filters: [isLongVersion],
   },
   {
@@ -248,6 +270,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'PIN NUMBER',
     type: FieldType.BASIC,
     status: StatusImport.PinNumber,
+    selectedRow: false,
     filters: [],
   },
   {
@@ -255,6 +278,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'GATE OUT TERMINAL',
     type: FieldType.BASIC,
     status: StatusImport.GateOutTerminal,
+    selectedRow: true,
     filters: [],
   },
   {
@@ -262,6 +286,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'DEPOT IN',
     type: FieldType.BASIC,
     status: StatusImport.DepotIn,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
   },
   {
@@ -269,6 +294,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'INVOICED',
     type: FieldType.BASIC,
     status: StatusImport.Invoiced,
+    selectedRow: true,
     filters: [],
   },
   {
@@ -276,6 +302,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'OTHER',
     type: FieldType.FILE,
     status: StatusImport.Other,
+    selectedRow: false,
     filters: [],
   },
 ];
@@ -343,7 +370,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
         const showField = item.filters.every(filter => (booking ? filter(booking) : false));
 
         return showField ? (
-          <TableRow selected={false} className={classes.tableRow} key={item.id}>
+          <TableRow selected={item.selectedRow} className={classes.tableRow} key={item.id}>
             <TableCell>
               <Checkbox
                 checked={
