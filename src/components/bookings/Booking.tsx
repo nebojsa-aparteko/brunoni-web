@@ -1,5 +1,8 @@
-import React, { useContext, useEffect, Fragment } from 'react';
+import React, { useContext, useEffect, Fragment, useMemo } from 'react';
 import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import filter from 'lodash/fp/filter';
+import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -56,7 +59,7 @@ interface Props {
 }
 
 const getBookingTitle = (booking: BookingModel | undefined) => {
-  return booking?.CarrierID.toUpperCase();
+  return booking?.CarrierID.toUpperCase() || '';
 };
 
 function ScrollToTopOnMount() {
@@ -81,13 +84,30 @@ export const isLongVersion = (version: BookingVersion) => {
 };
 
 const Booking: React.FC<Props> = ({ id }) => {
-  const bookings = useContext(Bookings);
-  const booking = bookings?.find(booking => booking.id === id);
-  const bookingTitle = getBookingTitle(booking) || '';
   const classes = useStyles();
+  const bookings = useContext(Bookings);
+  const booking = useMemo(() => bookings?.find(booking => booking.id === id), [bookings]);
 
-  let specialRemarks: Remark[] = [];
-  let finalRemarks: Remark[] = [];
+  const specialRemarks: Remark[] = useMemo(
+    () =>
+      booking
+        ? flow(
+            get('Remarks'),
+            filter((item: Remark) => item.RemarkType === remark.special),
+          )(booking)
+        : [],
+    [booking],
+  );
+  const finalRemarks: Remark[] = useMemo(
+    () =>
+      booking
+        ? flow(
+            get('Remarks'),
+            filter((item: Remark) => item.RemarkType === remark.final),
+          )(booking)
+        : [],
+    [booking],
+  );
 
   if (!booking) {
     return (
@@ -99,20 +119,9 @@ const Booking: React.FC<Props> = ({ id }) => {
     );
   }
 
-  console.log(booking);
-
-  if (booking.Remarks) {
-    booking.Remarks.forEach(remarkItem => {
-      if (remarkItem.RemarkType === remark.special) {
-        specialRemarks.push(remarkItem);
-      } else if (remarkItem.RemarkType === remark.final) {
-        finalRemarks.push(remarkItem);
-      }
-    });
-  }
-
+  console.log('booking ', booking);
   return (
-    <Page title={bookingTitle}>
+    <Page title={getBookingTitle(booking)}>
       <Container maxWidth="lg">
         <ScrollToTopOnMount />
 
@@ -121,7 +130,7 @@ const Booking: React.FC<Props> = ({ id }) => {
             <Box mb={2}>
               {/* <img
                 src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                alt={changeCase.titleCase(process.env.REACT_APP_BRAND || '')}
+                alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                 style={{ width: '5em' }}
               /> */}
             </Box>
@@ -129,7 +138,11 @@ const Booking: React.FC<Props> = ({ id }) => {
           </Box>
 
           <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-            <QuoteNav backTo="/bookings" subtitle={`File No. ${booking.id}`} title={`Booking - ${bookingTitle}`} />
+            <QuoteNav
+              backTo="/bookings"
+              subtitle={`File No. ${booking.id}`}
+              title={`Booking - ${getBookingTitle(booking)}`}
+            />
             <Box className={classes.actions} displayPrint="none">
               <Button
                 aria-label="print"
@@ -144,7 +157,7 @@ const Booking: React.FC<Props> = ({ id }) => {
           </Box>
 
           <Grid item xs={12}>
-            <Page title={bookingTitle}>
+            <Page title={getBookingTitle(booking)}>
               <Box marginTop="2em" marginBottom="2em">
                 <BookingSummary booking={booking} />
               </Box>

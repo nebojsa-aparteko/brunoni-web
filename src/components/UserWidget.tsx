@@ -1,10 +1,10 @@
-import React, { Fragment, useContext, useEffect, useMemo } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { useId } from 'react-id-generator';
-import changeCase from 'change-case';
+import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 
 import { useSnackbar } from 'notistack';
-import { Box, Chip, makeStyles, Menu, MenuItem, Theme, Typography } from '@material-ui/core';
+import { Box, Chip, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 
@@ -17,7 +17,7 @@ interface Props {
   active: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   chip: {
     '& > span': {
       display: 'block',
@@ -102,7 +102,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
               {actingAs!.isAdmin && (
                 <MenuItem onClick={handleSwitch}>
                   Switch to{' '}
-                  {[changeCase.titleCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </MenuItem>
@@ -114,7 +114,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
             <MenuItem disabled style={{ opacity: 'initial' }}>
               <Box>
                 <Typography variant="subtitle1">
-                  {[changeCase.titleCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </Typography>

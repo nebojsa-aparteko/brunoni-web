@@ -11,7 +11,8 @@ interface Props {
 const Quotes: React.FC<Props> = ({ children }) => {
   const date = process.env.REACT_APP_DEVELOPMENT ? subWeeks(new Date(), 1) : subMonths(new Date(), 3);
 
-  const query = (collection: firebase.firestore.CollectionReference) => collection.where('dateIssued', '>', date);
+  const query = (collection: firebase.firestore.CollectionReference) =>
+    collection.where('dateIssued', '>', date).limit(500);
 
   return (
     <FirestoreCollectionProvider name="quotes" query={query} context={QuotesContext}>

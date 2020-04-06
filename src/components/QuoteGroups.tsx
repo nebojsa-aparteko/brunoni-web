@@ -10,7 +10,6 @@ import {
   TablePagination,
   Typography,
   Container as MUIContainer,
-  Grid,
 } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroups';
@@ -19,31 +18,22 @@ import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
 import set from 'lodash/fp/set';
-import reduce from 'lodash/fp/reduce';
 import orderBy from 'lodash/fp/orderBy';
 import find from 'lodash/fp/find';
-import flatMap from 'lodash/fp/flatMap';
 import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
 import { QuoteListContext } from '../contexts/QuoteListContext';
-import SynchronizeButton from './SynchronizeButton';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
-import DateRangeInput from './inputs/DateRangeInput';
 import { DateRange } from './DateRangePicker/types';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
-import ClientInput from './inputs/ClientInput';
-import useClients from '../hooks/useClients';
-import Port from '../model/Port';
-import Client from '../model/Client';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
-import PortInput from './inputs/PortInput';
-import Ports from '../contexts/Ports';
 import FiltersBar from './SearchBar/FiltersBar';
+import containsString from '../utilities/containsString';
 
 interface Props {
   showGetQuoteButton?: boolean;
@@ -88,13 +78,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-end',
   },
 }));
-
-export const containsString = (prop: string, searchString: string) => {
-  const byMultiple = flatMap((value: string) => prop?.toLowerCase().indexOf(value.toLowerCase()) !== -1)(
-    searchString.split(' '),
-  );
-  return reduce((one: boolean, other: boolean) => one && other, true)(byMultiple);
-};
 
 const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyInfo, className, ...rest }) => {
   const classes = useStyles();

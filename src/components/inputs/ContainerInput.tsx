@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, Fragment } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, Fragment, ForwardRefRenderFunction } from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
@@ -55,7 +55,7 @@ const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
   />
 ));
 
-const ContainerInput: React.FC<Props> = ({ value, onChange, ...rest }, ref) => {
+const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();

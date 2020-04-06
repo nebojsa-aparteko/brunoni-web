@@ -65,7 +65,6 @@ const UserApp: React.FC = () => {
   const [actingAs] = useContext(ActingAs);
 
   if (userRecord) {
-    console.log('userRecord', userRecord);
     try {
       $crisp.push([
         'set',

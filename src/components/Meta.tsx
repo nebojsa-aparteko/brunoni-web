@@ -1,13 +1,13 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import changeCase from 'change-case';
+import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 
 interface Props {
   title: string;
 }
 
-const brandName = changeCase.titleCase(process.env.REACT_APP_BRAND || '').trim();
+const brandName = changeCase.capitalCase(process.env.REACT_APP_BRAND || '').trim();
 
 const platformName = brandName ? `My${brandName}` : '';
 

@@ -57,12 +57,12 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   };
 
   const importChargesModified = useMemo(() => !isEqual(carrier.sideCharges?.importCharges || [], importCharges), [
-    carrier.sideCharges?.importCharges,
+    carrier.sideCharges,
     importCharges,
   ]);
 
   const exportChargesModified = useMemo(() => !isEqual(carrier.sideCharges?.exportCharges || [], exportCharges), [
-    carrier.sideCharges?.exportCharges,
+    carrier.sideCharges,
     exportCharges,
   ]);
 

@@ -1,9 +1,8 @@
-import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, ForwardRefRenderFunction, useContext, useImperativeHandle, useRef, useState } from 'react';
 import InputProps from '../../model/InputProps';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
 import SelectInput from './SelectInput';
-import CommodityType from '../../model/CommodityType';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import intersectionWith from 'lodash/fp/intersectionWith';
@@ -42,7 +41,7 @@ const filterOptions = (options: ContainerType[], { inputValue }: { inputValue: s
   return filterFlow(searchWords, options, searchWords.length > 1);
 };
 
-const ContainerTypeInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
+const ContainerTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const containerTypes = useContext(ContainerTypes);
   const [open, setOpen] = useState(false);

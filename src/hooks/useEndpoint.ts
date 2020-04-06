@@ -5,7 +5,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
   const [user] = useUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<T>();
   const [request, setRequest] = useState(0);
 
   useEffect(() => {

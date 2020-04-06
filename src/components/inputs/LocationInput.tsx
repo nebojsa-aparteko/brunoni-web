@@ -1,4 +1,12 @@
-import React, { forwardRef, useContext, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useContext,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import InputProps from '../../model/InputProps';
 import Locations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
@@ -45,7 +53,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const LocationInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
+const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);

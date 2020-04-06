@@ -1,4 +1,11 @@
-import React, { ChangeEvent, forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import React, {
+  ChangeEvent,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import set from 'lodash/fp/set';
 import InputProps from '../../model/InputProps';
 import IMO from '../../model/IMO';
@@ -29,7 +36,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const IMOInput: React.FC<Props> = ({ value, onChange }, ref) => {
+const IMOInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref) => {
   const classes = inlineFormStyles();
   const input = useRef<HTMLInputElement>();
 

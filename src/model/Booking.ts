@@ -11,9 +11,12 @@ export interface Booking {
   ForwPersID: string;
   ETA: string;
   extensions?: BookingExtension[];
+  BkgCreateTimeStamp: Date;
+  BkgAgentContactEml: string;
+  BkgAgentContactTxt: string;
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
   BkgStatusText: string;
-  TimeStamp: string;
+  TimeStamp: Date;
   CargoDetails: CargoDetail[];
   FreightDetails: FreightDetail[];
   Category: BookingCategory;
@@ -125,6 +128,7 @@ export enum BookingVersion {
 }
 
 export interface Remark {
+  RemarkSeq: number;
   RemarkTxt: string;
   RemarkType: string;
 }
