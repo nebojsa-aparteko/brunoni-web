@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -264,6 +264,17 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const getRowData = (booking: Booking | undefined, label: string, property: string, isAdminColumn?: boolean): any => {
+  const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
+  if (!data || !(property in data)) return null;
+
+  if (typeof isAdminColumn === 'boolean') {
+    let collection = data[property] || [];
+    return collection.filter((item: any) => item.isAdmin === isAdminColumn);
+  }
+  return data[property];
+};
+
 const CheckListContent: React.FC<TableBodyProps> = ({
   booking,
   isAdmin,
@@ -273,17 +284,6 @@ const CheckListContent: React.FC<TableBodyProps> = ({
   checklistItems,
 }) => {
   const classes = useStyles();
-
-  const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
-    const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-    if (!data || !(property in data)) return null;
-
-    if (typeof isAdminColumn === 'boolean') {
-      let collection = data[property] || [];
-      return collection.filter((item: any) => item.isAdmin === isAdminColumn);
-    }
-    return data[property];
-  };
 
   return (
     <TableBody>
@@ -296,7 +296,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
             <TableCell>
               <Checkbox
                 checked={
-                  getRowData(item.status, 'checked') ||
+                  getRowData(booking, item.status, 'checked') ||
                   (item?.additionalCondition && item?.additionalCondition(booking)) ||
                   false
                 }
@@ -310,7 +310,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
               <TableCell>
                 <DropZone
                   onDrop={(files: []) => onFilesDrop(files, item.status, false)}
-                  documents={getRowData(item.status, 'documents', false) || []}
+                  documents={getRowData(booking, item.status, 'documents', false) || []}
                   onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
@@ -321,7 +321,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
               <TableCell>
                 <DropZone
                   onDrop={(files: []) => onFilesDrop(files, item.status, true)}
-                  documents={getRowData(item.status, 'documents', true) || []}
+                  documents={getRowData(booking, item.status, 'documents', true) || []}
                   onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
