@@ -1,4 +1,4 @@
-import React, { ChangeEvent, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { ChangeEvent, forwardRef, ForwardRefRenderFunction, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import InputProps from '../../model/InputProps';
 import OOG from '../../model/OOG';
@@ -12,7 +12,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const OOGInput: React.FC<Props> = ({ value, onChange }, ref) => {
+const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref) => {
   const classes = inlineFormStyles();
   const input = useRef();
 

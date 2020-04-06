@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, ForwardRefRenderFunction, useContext, useImperativeHandle, useRef, useState } from 'react';
 import InputProps from '../../model/InputProps';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
@@ -40,7 +40,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const CommodityTypeInput: React.FC<Props> = ({ value, onChange, margin }, ref) => {
+const CommodityTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
   const commodityTypes = useContext(CommodityTypes);
   const [open, setOpen] = useState(false);

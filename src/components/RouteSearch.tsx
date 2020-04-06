@@ -23,7 +23,6 @@ import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import SpecialOffers from './SpecialOffers';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
-import ContainerType from '../model/Container';
 
 interface Props {}
 
@@ -163,12 +162,14 @@ const RouteSearch: React.FC<Props> = () => {
 
   const results = useMemo(() => {
     return result
-      ? update('Routes', flow(carrierFilterFn(carrierFilter), sorting.sort))(result)
+      ? update('Routes', flow(carrierFilterFn(carrierFilter), sorting.sort))(result as any)
       : withTestData('routesSearch', update('Routes', sortingOptions[0].sort));
   }, [result, sorting.sort, carrierFilter]) as RouteSearchResults;
 
   const carriers = useMemo(() => {
-    return uniq(result?.Routes.map((route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier)) as string[];
+    return uniq(
+      (result as any)?.Routes.map((route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier),
+    ) as string[];
   }, [result]);
 
   const handleVisibility = (isVisible: boolean) => {
