@@ -55,7 +55,7 @@ interface ChecklistItem {
 const someCargoDetailsMatch = (fn: CargoDetailFilter): BookingFilter => booking => booking.CargoDetails.some(fn);
 
 const isLongVersion = (booking: Booking): boolean => booking.Version === BookingVersion.long;
-const isShortVersion = (booking: Booking): boolean => booking.Version === BookingVersion.short;
+// const isShortVersion = (booking: Booking): boolean => booking.Version === BookingVersion.short;
 
 const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
 
@@ -71,8 +71,7 @@ const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
 const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
 
 const isZIM = (booking: Booking): boolean => {
-  // console.log(booking.CarrierID);
-  return booking.CarrierID === 'ZIM SHIPPING LINE';
+  return booking.CarrierID === 'ZIM';
 };
 
 const isAllmarine = (): boolean => process.env.REACT_APP_BRAND === 'allmarine';
@@ -92,7 +91,6 @@ const checklistItemsExport: ChecklistItem[] = [
     showFileUpload: true,
     status: StatusExport.SocCertificate,
     filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
-    additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE', //TODO check if needed
   },
   {
     id: 'imo_requested',
@@ -214,35 +212,35 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'BILL OF LANDING SURRENDERED',
     showFileUpload: true,
     status: StatusImport.BillOfLandingSurrendered,
-    filters: [isLongVersion],
+    filters: [],
   },
   {
     id: 'release_done',
     label: 'RELEASE DONE',
     showFileUpload: true,
     status: StatusImport.ReleaseDone,
-    filters: [isLongVersion],
+    filters: [],
   },
   {
     id: 'pin_number',
     label: 'PIN NUMBER',
     showFileUpload: false,
     status: StatusImport.PinNumber,
-    filters: [],
+    filters: [isLongVersion],
   },
   {
     id: 'gate_out_terminal',
     label: 'GATE OUT TERMINAL',
     showFileUpload: false,
     status: StatusImport.GateOutTerminal,
-    filters: [],
+    filters: [isLongVersion],
   },
   {
     id: 'depot_in',
     label: 'DEPOT IN',
     showFileUpload: false,
     status: StatusImport.DepotIn,
-    filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
+    filters: [someCargoDetailsMatch(isNotShipperOwnedContainer), isLongVersion],
   },
   {
     id: 'invoiced',
