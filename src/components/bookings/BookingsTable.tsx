@@ -318,6 +318,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
       setIsBusy(true);
+      console.log('event', event.target.value);
       const checklistsData = addOrReplace(label, { key: 'bhtNumberValue', value: event.target.value });
 
       if (!checklistsData) {

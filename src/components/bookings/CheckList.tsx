@@ -82,7 +82,7 @@ const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
 const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
 
 const isZIM = (booking: Booking): boolean => {
-  return booking.CarrierID === 'ZIM SHIPPING LINE';
+  return booking.CarrierID === 'ZIM';
 };
 
 const isGermanPort = (booking: Booking): boolean =>
@@ -168,7 +168,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'B/BHT NUMBER ISSUANCE',
     type: FieldType.TEXT,
     status: StatusExport.BhtNumberIssuance,
-    filters: [isGermanPort, isLongVersion],
+    filters: [],
   },
   {
     id: 'vgm_submission',
@@ -374,7 +374,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
                   multiline
                   rowsMax="2"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event }, item.status)}
-                  value={getRowData(item.status, 'bhtNumberValue') || ''}
+                  defaultValue={getRowData(item.status, 'bhtNumberValue') || ''}
                 />
               </TableCell>
             ) : null}
