@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -24,6 +24,7 @@ import {
 } from '../../model/Booking';
 import DropZone from '../DropZone';
 import debounce from 'lodash/fp/debounce';
+import { showForCities, showForShortcut } from '../../utilities/portOfLoadingHelperData';
 
 enum FieldType {
   BASIC,
@@ -81,9 +82,11 @@ const isShipperOwnedContainer = (detail: CargoDetail): boolean =>
 const is20TKContainer = (detail: CargoDetail): boolean => detail.CtypID === ShipperOwnedContainer.The20TK;
 
 const isZIM = (booking: Booking): boolean => {
-  // console.log(booking.CarrierID);
   return booking.CarrierID === 'ZIM SHIPPING LINE';
 };
+
+const isGermanPort = (booking: Booking): boolean =>
+  showForCities.includes(booking.POLName.toLowerCase()) && showForShortcut.includes(booking.POL.toUpperCase());
 
 const isAllmarine = (): boolean => process.env.REACT_APP_BRAND === 'allmarine';
 
@@ -165,7 +168,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'B/BHT NUMBER ISSUANCE',
     type: FieldType.TEXT,
     status: StatusExport.BhtNumberIssuance,
-    filters: [],
+    filters: [isGermanPort, isLongVersion],
   },
   {
     id: 'vgm_submission',
@@ -371,7 +374,7 @@ const CheckListContent: React.FC<TableBodyProps> = ({
                   multiline
                   rowsMax="2"
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event }, item.status)}
-                  // defaultValue={getRowData(item.status, 'bhtNumberValue') || ''} // How to set default value from db
+                  value={getRowData(item.status, 'bhtNumberValue') || ''}
                 />
               </TableCell>
             ) : null}
