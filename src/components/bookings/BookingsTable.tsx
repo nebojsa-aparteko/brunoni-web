@@ -25,6 +25,7 @@ import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
 import firebase from '../../firebase';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -125,6 +126,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   const classes = useStyles();
   const [isBusy, setIsBusy] = useState(false);
   const clients = useClients();
+  const { enqueueSnackbar } = useSnackbar();
 
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
@@ -159,6 +161,12 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
                 });
             }
           })
+          .then(result =>
+            enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+              variant: 'success',
+              autoHideDuration: 1000,
+            }),
+          )
           .catch(error => console.log(error));
       } finally {
         setIsBusy(false);
