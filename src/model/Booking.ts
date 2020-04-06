@@ -71,6 +71,7 @@ export interface BookingDocument {
 
 export enum StatusExport {
   DepotOut = 'DEPOT OUT',
+  SocCertificate = 'SOC CERTIFICATE',
   OogRequested = 'OOG REQUESTED',
   OogApproved = 'OOG APPROVED',
   ImoRequested = 'IMO REQUESTED',
