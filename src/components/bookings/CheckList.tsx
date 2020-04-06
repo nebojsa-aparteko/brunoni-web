@@ -49,14 +49,20 @@ interface TableBodyProps {
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
 }
 
+type CargoDetailFilter = (detail: CargoDetail) => boolean;
+type BookingFilter = (booking: Booking) => boolean;
+
 interface ChecklistItem {
   id: string;
   label: string;
   type: FieldType;
   status: StatusExport | StatusImport;
-  filters: ((detail: CargoDetail) => boolean)[];
+  filters: BookingFilter[];
   additionalCondition?: (booking: Booking | undefined) => boolean | undefined | '';
 }
+
+const someCargoDetailsMatch = (fn: CargoDetailFilter): BookingFilter => booking => booking.CargoDetails.some(fn);
+
 const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
 
 const isOverdimensionedContainer = (detail: CargoDetail): boolean =>
@@ -73,7 +79,7 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'DEPOT OUT',
     type: FieldType.BASIC,
     status: StatusExport.DepotOut,
-    filters: [isShipperOwnedContainer],
+    filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
     additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE',
   },
   {
@@ -81,42 +87,42 @@ const checklistItemsExport: ChecklistItem[] = [
     label: 'IMO REQUESTED',
     type: FieldType.BASIC,
     status: StatusExport.ImoRequested,
-    filters: [isImcoContainer],
+    filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'imo_approved',
     label: 'IMO APPROVED',
     type: FieldType.BASIC,
     status: StatusExport.ImoApproved,
-    filters: [isImcoContainer],
+    filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'final_dgd_sheet_and_delivery_details',
     label: 'FINAL DGD SHEET & DELIVERY DETAILS',
     type: FieldType.FILE,
     status: StatusExport.FinalDgdSheetAndDeliveryDetails,
-    filters: [isImcoContainer],
+    filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'oog_requested',
     label: 'OOG REQUESTED',
     type: FieldType.BASIC,
     status: StatusExport.OogRequested,
-    filters: [isOverdimensionedContainer],
+    filters: [someCargoDetailsMatch(isOverdimensionedContainer)],
   },
   {
     id: 'oog_approved',
     label: 'OOG APPROVED',
     type: FieldType.BASIC,
     status: StatusExport.OogApproved,
-    filters: [isOverdimensionedContainer],
+    filters: [someCargoDetailsMatch(isOverdimensionedContainer)],
   },
   {
     id: 'tank_certificate',
     label: 'TANK CERTIFICATE',
     type: FieldType.FILE,
     status: StatusExport.tankCertificate,
-    filters: [is20TKContainer],
+    filters: [someCargoDetailsMatch(is20TKContainer)],
   },
   {
     id: 'gate_in_terminal',
@@ -224,7 +230,7 @@ const checklistItemsImport: ChecklistItem[] = [
     label: 'DEPOT IN',
     type: FieldType.BASIC,
     status: StatusImport.DepotIn,
-    filters: [isShipperOwnedContainer],
+    filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
   },
   {
     id: 'invoiced',
@@ -298,28 +304,13 @@ const CheckListContent: React.FC<TableBodyProps> = ({
     }
     return data[property];
   };
-  const getCargoDetails = () => {
-    if (Array.isArray(booking?.CargoDetails)) {
-      return booking?.CargoDetails;
-    } else {
-      return [];
-    }
-  };
-
-  const applyFilter = (filterMethod: (detail: CargoDetail) => boolean): boolean => {
-    let details = getCargoDetails();
-    let mainFilter = details?.find(detail => filterMethod(detail));
-    return Boolean(mainFilter);
-  };
 
   return (
     <TableBody>
       {/* Exception #2: Shipper's owned Container */}
       {checklistItems.map(item => {
-        let showField = item.filters.reduce(
-          (accumulator, currentValue) => applyFilter(currentValue) && accumulator,
-          true,
-        );
+        const showField = item.filters.every(filter => (booking ? filter(booking) : false));
+
         return showField ? (
           <TableRow selected={false} className={classes.tableRow} key={item.id}>
             <TableCell>
