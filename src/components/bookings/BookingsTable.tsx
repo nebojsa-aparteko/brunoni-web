@@ -23,7 +23,7 @@ import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
 import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
-import CheckList from './CheckList';
+import CheckList from './checklist/CheckList';
 import firebase from '../../firebase';
 import { useSnackbar } from 'notistack';
 
