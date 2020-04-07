@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Checkbox,
   createStyles,
@@ -9,6 +9,7 @@ import {
   TableHead,
   TableRow,
   Theme,
+  TextField,
 } from '@material-ui/core';
 import {
   Booking,
@@ -22,6 +23,14 @@ import {
   StatusImport,
 } from '../../model/Booking';
 import DropZone from '../DropZone';
+import debounce from 'lodash/fp/debounce';
+import { showForCities, showForShortcut } from '../../utilities/portOfLoadingHelperData';
+
+enum FieldType {
+  BASIC,
+  FILE,
+  TEXT,
+}
 
 interface CheckListProps {
   booking: Booking | undefined;
@@ -29,6 +38,7 @@ interface CheckListProps {
   onCheckboxChange: any;
   onFilesDrop: any;
   onDelete?: any;
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
 }
 
 interface TableBodyProps {
@@ -38,6 +48,7 @@ interface TableBodyProps {
   onFilesDrop: any;
   onDelete?: any;
   checklistItems: ChecklistItem[];
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
 }
 
 type CargoDetailFilter = (detail: CargoDetail) => boolean;
@@ -46,8 +57,9 @@ type BookingFilter = (booking: Booking) => boolean;
 interface ChecklistItem {
   id: string;
   label: string;
-  showFileUpload: boolean;
+  type: FieldType;
   status: StatusExport | StatusImport;
+  selectedRow: boolean;
   filters: BookingFilter[];
   additionalCondition?: (booking: Booking | undefined) => boolean | undefined | '';
 }
@@ -55,7 +67,7 @@ interface ChecklistItem {
 const someCargoDetailsMatch = (fn: CargoDetailFilter): BookingFilter => booking => booking.CargoDetails.some(fn);
 
 const isLongVersion = (booking: Booking): boolean => booking.Version === BookingVersion.long;
-// const isShortVersion = (booking: Booking): boolean => booking.Version === BookingVersion.short;
+const isShortVersion = (booking: Booking): boolean => booking.Version === BookingVersion.short;
 
 const isImcoContainer = (detail: CargoDetail): boolean => detail.IMCO === IMCO.Trigger;
 
@@ -74,134 +86,164 @@ const isZIM = (booking: Booking): boolean => {
   return booking.CarrierID === 'ZIM';
 };
 
+const isGermanPort = (booking: Booking): boolean =>
+  showForCities.includes(booking.POLName.toLowerCase()) && showForShortcut.includes(booking.POL.toUpperCase());
+
 const isAllmarine = (): boolean => process.env.REACT_APP_BRAND === 'allmarine';
 
 const checklistItemsExport: ChecklistItem[] = [
   {
     id: 'depot_out',
     label: 'DEPOT OUT',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.DepotOut,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isNotShipperOwnedContainer)],
     additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE',
   },
   {
     id: 'soc_certificate',
     label: 'SOC CERTIFICATE',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.SocCertificate,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isShipperOwnedContainer)],
+    additionalCondition: booking => booking?.DepotOut && booking?.DepotOut === 'TRUE', //TODO check if needed
   },
   {
     id: 'imo_requested',
     label: 'IMO REQUESTED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.ImoRequested,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'imo_approved',
     label: 'IMO APPROVED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.ImoApproved,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'final_dgd_sheet_and_delivery_details',
     label: 'FINAL DGD SHEET & DELIVERY DETAILS',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.FinalDgdSheetAndDeliveryDetails,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isImcoContainer)],
   },
   {
     id: 'oog_requested',
     label: 'OOG REQUESTED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.OogRequested,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
   },
   {
     id: 'oog_approved',
     label: 'OOG APPROVED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.OogApproved,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(isOverdimensionedContainer), isLongVersion],
   },
   {
     id: 'lashing_certificate',
     label: 'LASHING CERTIFICATE',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.OogApproved,
+    selectedRow: false,
     filters: [isAllmarine, isZIM, isLongVersion],
   },
   {
     id: 'tank_certificate',
     label: 'TANK CERTIFICATE',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.tankCertificate,
+    selectedRow: false,
     filters: [someCargoDetailsMatch(is20TKContainer), isLongVersion],
   },
   {
     id: 'gate_in_terminal',
     label: 'GATE IN TERMINAL',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.GateInTerminal,
+    selectedRow: false,
     filters: [],
+  },
+  {
+    id: 'bht_number_issuance',
+    label: 'B/BHT NUMBER ISSUANCE',
+    type: FieldType.TEXT,
+    status: StatusExport.BhtNumberIssuance,
+    selectedRow: false,
+    filters: [isLongVersion, isGermanPort],
   },
   {
     id: 'vgm_submission',
     label: 'VGM SUBMISSION',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.VgmSubmission,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'shipping_instructions',
     label: 'SHIPPING INSTRUCTIONS',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.ShippingInstructions,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'bl_draft_sent',
     label: 'B/L DRAFT SENT',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.BlDraftSent,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'bl_draft_approved',
     label: 'B/L DRAFT APPROVED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.BlDraftApproved,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'shipped_on_board',
     label: 'SHIPPED ON BOARD',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.ShippedOnBoard,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'final_bl_copy',
     label: 'FINAL B/L COPY',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.FinalBlCopy,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'invoiced',
     label: 'INVOICED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusExport.Invoiced,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'other',
     label: 'OTHER',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusExport.Other,
+    selectedRow: false,
     filters: [],
   },
 ];
@@ -210,50 +252,57 @@ const checklistItemsImport: ChecklistItem[] = [
   {
     id: 'bill_of_landing_surrendered',
     label: 'BILL OF LANDING SURRENDERED',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusImport.BillOfLandingSurrendered,
+    selectedRow: false,
     filters: [],
   },
   {
     id: 'release_done',
     label: 'RELEASE DONE',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusImport.ReleaseDone,
+    selectedRow: true,
     filters: [],
   },
   {
     id: 'pin_number',
     label: 'PIN NUMBER',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusImport.PinNumber,
     filters: [isLongVersion],
+    selectedRow: false,
   },
   {
     id: 'gate_out_terminal',
     label: 'GATE OUT TERMINAL',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusImport.GateOutTerminal,
     filters: [isLongVersion],
+    selectedRow: true,
   },
   {
     id: 'depot_in',
     label: 'DEPOT IN',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusImport.DepotIn,
     filters: [someCargoDetailsMatch(isNotShipperOwnedContainer), isLongVersion],
+    selectedRow: false,
   },
   {
     id: 'invoiced',
     label: 'INVOICED',
-    showFileUpload: false,
+    type: FieldType.BASIC,
     status: StatusImport.Invoiced,
+    selectedRow: true,
     filters: [],
   },
   {
     id: 'other',
     label: 'OTHER',
-    showFileUpload: true,
+    type: FieldType.FILE,
     status: StatusImport.Other,
+    selectedRow: false,
     filters: [],
   },
 ];
@@ -291,6 +340,17 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const getRowData = (booking: Booking | undefined, label: string, property: string, isAdminColumn?: boolean): any => {
+  const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
+  if (!data || !(property in data)) return null;
+
+  if (typeof isAdminColumn === 'boolean') {
+    let collection = data[property] || [];
+    return collection.filter((item: any) => item.isAdmin === isAdminColumn);
+  }
+  return data[property];
+};
+
 const CheckListContent: React.FC<TableBodyProps> = ({
   booking,
   isAdmin,
@@ -298,19 +358,10 @@ const CheckListContent: React.FC<TableBodyProps> = ({
   onFilesDrop,
   onDelete,
   checklistItems,
+  onInputChange,
 }) => {
   const classes = useStyles();
-
-  const getRowData = (label: string, property: string, isAdminColumn?: boolean): any => {
-    const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-    if (!data || !(property in data)) return null;
-
-    if (typeof isAdminColumn === 'boolean') {
-      let collection = data[property] || [];
-      return collection.filter((item: any) => item.isAdmin === isAdminColumn);
-    }
-    return data[property];
-  };
+  const saveInput = useMemo(() => debounce(250, onInputChange), [onInputChange]);
 
   return (
     <TableBody>
@@ -319,11 +370,11 @@ const CheckListContent: React.FC<TableBodyProps> = ({
         const showField = item.filters.every(filter => (booking ? filter(booking) : false));
 
         return showField ? (
-          <TableRow selected={false} className={classes.tableRow}>
+          <TableRow selected={item.selectedRow} className={classes.tableRow} key={item.id}>
             <TableCell>
               <Checkbox
                 checked={
-                  getRowData(item.status, 'checked') ||
+                  getRowData(booking, item.status, 'checked') ||
                   (item?.additionalCondition && item?.additionalCondition(booking)) ||
                   false
                 }
@@ -333,22 +384,33 @@ const CheckListContent: React.FC<TableBodyProps> = ({
             </TableCell>
 
             <TableCell>{item.label}</TableCell>
-            {item.showFileUpload ? (
+            {item.type === FieldType.FILE ? (
               <TableCell>
                 <DropZone
                   onDrop={(files: []) => onFilesDrop(files, item.status, false)}
-                  documents={getRowData(item.status, 'documents', false) || []}
+                  documents={getRowData(booking, item.status, 'documents', false) || []}
                   onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
-            ) : (
-              <TableCell>&nbsp; </TableCell>
-            )}
+            ) : null}
+            {item.type === FieldType.TEXT ? (
+              <TableCell>
+                <TextField
+                  variant="outlined"
+                  multiline
+                  rowsMax="2"
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event }, item.status)}
+                  defaultValue={getRowData(booking, item.status, 'bhtNumberValue') || ''}
+                />
+              </TableCell>
+            ) : null}
+            {item.type === FieldType.BASIC ? <TableCell>&nbsp; </TableCell> : null}
+
             {isAdmin ? (
               <TableCell>
                 <DropZone
                   onDrop={(files: []) => onFilesDrop(files, item.status, true)}
-                  documents={getRowData(item.status, 'documents', true) || []}
+                  documents={getRowData(booking, item.status, 'documents', true) || []}
                   onDelete={(name: string) => onDelete(item.status, name)}
                 />
               </TableCell>
@@ -360,7 +422,14 @@ const CheckListContent: React.FC<TableBodyProps> = ({
   );
 };
 
-const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheckboxChange, onFilesDrop, onDelete }) => {
+const CheckList: React.FC<CheckListProps> = ({
+  booking,
+  showCompanyInfo,
+  onCheckboxChange,
+  onFilesDrop,
+  onDelete,
+  onInputChange,
+}) => {
   const classes = useStyles();
 
   return (
@@ -380,6 +449,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo, onCheck
         onFilesDrop={onFilesDrop}
         onDelete={onDelete}
         checklistItems={booking?.Category === 'Export' ? checklistItemsExport : checklistItemsImport}
+        onInputChange={onInputChange}
       />
     </Table>
   );

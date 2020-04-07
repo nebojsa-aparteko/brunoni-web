@@ -25,6 +25,7 @@ import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './CheckList';
 import firebase from '../../firebase';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -95,7 +96,7 @@ interface ProgressDialogProps {
 
 interface AddOrReplacePayload {
   key: string;
-  value: boolean | CheckListDocument[];
+  value: boolean | CheckListDocument[] | string;
 }
 
 const formatEstimatedDate = (date: string) => {
@@ -125,6 +126,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   const classes = useStyles();
   const [isBusy, setIsBusy] = useState(false);
   const clients = useClients();
+  const { enqueueSnackbar } = useSnackbar();
 
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
@@ -159,6 +161,12 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
                 });
             }
           })
+          .then(result =>
+            enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+              variant: 'success',
+              autoHideDuration: 1000,
+            }),
+          )
           .catch(error => console.log(error));
       } finally {
         setIsBusy(false);
@@ -256,6 +264,10 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           value = [...(existingEntry.documents || []), ...data.value];
         }
 
+        if (typeof data.value === 'string') {
+          value = data.value;
+        }
+
         existingEntry[key] = value;
       } else {
         // create new entry
@@ -311,6 +323,22 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     [saveFiles, addOrReplace, saveCheckListChanges],
   );
 
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
+      setIsBusy(true);
+      console.log('event', event.target.value);
+      const checklistsData = addOrReplace(label, { key: 'bhtNumberValue', value: event.target.value });
+
+      if (!checklistsData) {
+        setIsBusy(false);
+        return;
+      }
+      saveCheckListChanges(checklistsData);
+      setIsBusy(false);
+    },
+    [addOrReplace, saveCheckListChanges],
+  );
+
   const handleFileRemoval = useCallback(
     (label: string, name: string) => {
       setIsBusy(true);
@@ -356,6 +384,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           onCheckboxChange={handleCheckboxChange}
           onFilesDrop={handleFilesDrop}
           onDelete={handleFileRemoval}
+          onInputChange={handleInputChange}
         />
       </DialogContent>
       <Backdrop open={isBusy} className={classes.checkListBackdrop} timeout={300}>
