@@ -91,7 +91,14 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const normalizedBookings = useMemo(
     () =>
       bookings
-        ? map(flow(update('BkgCreateTimeStamp', invoke('toDate')), update('TimeStamp', invoke('toDate'))))(bookings)
+        ? map(
+            flow(
+              update('BkgCreateTimeStamp', invoke('toDate')),
+              update('TimeStamp', invoke('toDate')),
+              update('PlaceOfReceiptETS', invoke('toDate')),
+              update('FinalDestinationETA', invoke('toDate')),
+            ),
+          )(bookings)
         : [],
     [bookings],
   );
