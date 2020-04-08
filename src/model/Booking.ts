@@ -4,12 +4,12 @@ export interface Booking {
   Vessel: string;
   Voyage: string;
   PlaceOfRecieptName: string;
-  PlaceOfReceiptETS: string;
-  FinalDestinationETA: string;
-  ETS: string;
+  PlaceOfReceiptETS: Date;
+  FinalDestinationETA: Date;
+  ETS: Date;
   FinalDestinationName: string;
   ForwPersID: string;
-  ETA: string;
+  ETA: Date;
   extensions?: BookingExtension[];
   BkgCreateTimeStamp: Date;
   BkgAgentContactEml: string;

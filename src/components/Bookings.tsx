@@ -88,23 +88,6 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
-  const normalizedBookings = useMemo(
-    () =>
-      bookings
-        ? map(
-            flow(
-              update('BkgCreateTimeStamp', invoke('toDate')),
-              update('TimeStamp', invoke('toDate')),
-              update('PlaceOfReceiptETS', invoke('toDate')),
-              update('FinalDestinationETA', invoke('toDate')),
-              update('ETS', invoke('toDate')),
-              update('ETA', invoke('toDate')),
-            ),
-          )(bookings)
-        : [],
-    [bookings],
-  );
-
   const [importOrExport, setImportOrExport] = useState('Import');
 
   const [dateRange, setDateRange] = useState<DateRange>();
@@ -117,7 +100,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
 
   const resultChunks = useMemo(() => {
     // order bookings by date
-    const sortedBookings = orderBy(normalizedBookings, (booking: Booking) => booking.BkgCreateTimeStamp, ['desc']);
+    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.BkgCreateTimeStamp, ['desc']);
 
     const filteredBookings = filter(
       (booking: Booking) =>
@@ -162,18 +145,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [
-    bookings,
-    normalizedBookings,
-    searchString,
-    page,
-    rowsPerPage,
-    dateRange,
-    clientFilter,
-    originPort,
-    destinationPort,
-    importOrExport,
-  ]);
+  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort, importOrExport]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setImportOrExport((event.target as HTMLInputElement).value);
@@ -193,7 +165,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
     }
   };
 
-  if (!normalizedBookings) {
+  if (!bookings) {
     return (
       <MUIContainer maxWidth="lg">
         <Paper className={classes.root}>
@@ -249,7 +221,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         </CardContent>
 
         <CardActions className={classes.actions}>
-          {normalizedBookings && normalizedBookings.length > 0 && (
+          {bookings && bookings.length > 0 && (
             <TablePagination
               component="div"
               count={filteredResults ? filteredResults.length : 0}

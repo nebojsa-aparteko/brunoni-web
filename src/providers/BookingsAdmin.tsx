@@ -2,6 +2,10 @@ import React, { useMemo } from 'react';
 import BookingsContext from '../contexts/Bookings';
 import { Booking, BookingExtension } from '../model/Booking';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
+import map from 'lodash/fp/map';
+import flow from 'lodash/fp/flow';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
 
 interface Props {
   children: React.ReactNode;
@@ -27,15 +31,27 @@ const BookingsAdmin: React.FC<Props> = ({ children }) => {
       | BookingExtension[]
       | undefined;
 
-    return bookingsSnapshot?.docs.map(doc => {
-      let ext = bookingsExtension?.find(ext => doc.id === ext.id);
+    const normalizedBookings = map(
+      flow(
+        update('BkgCreateTimeStamp', invoke('toDate')),
+        update('TimeStamp', invoke('toDate')),
+        update('PlaceOfReceiptETS', invoke('toDate')),
+        update('FinalDestinationETA', invoke('toDate')),
+        update('ETS', invoke('toDate')),
+        update('ETA', invoke('toDate')),
+      ),
+    );
 
-      return {
-        id: doc.id,
-        ...doc.data(),
-        ...ext,
-      } as Booking;
-    }) as Booking[] | undefined;
+    return normalizedBookings(
+      bookingsSnapshot?.docs.map(doc => {
+        let ext = bookingsExtension?.find(ext => doc.id === ext.id);
+        return {
+          id: doc.id,
+          ...doc.data(),
+          ...ext,
+        } as Booking;
+      }),
+    ) as Booking[] | undefined;
   }, [bookingsSnapshot, bookingsExtensionSnapshot]);
 
   return <BookingsContext.Provider value={bookingsResult}>{children}</BookingsContext.Provider>;

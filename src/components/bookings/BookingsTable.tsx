@@ -436,17 +436,17 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>
         {booking.PlaceOfRecieptName}
         <br />
-        ETS. {formatEstimatedDate(booking.ETS)}
+        ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}
       </TableCell>
       <TableCell>
         {booking.FinalDestinationName}
         <br />
-        ETA. {formatEstimatedDate(booking.ETA)}
+        ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}
       </TableCell>
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
       <TableCell>{booking.BkgStatusText}</TableCell>
-      <TableCell>{formatDate(booking.BkgCreateTimeStamp, 'dd.MM.yy')}</TableCell>
+      <TableCell>{formatDate(booking.BkgCreateTimeStamp, 'dd.MM.yyyy')}</TableCell>
       <TableCell className={classes.avatarCell}>
         <Avatar
           name={booking.BkgAgentContactTxt}
