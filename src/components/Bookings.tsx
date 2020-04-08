@@ -17,7 +17,6 @@ import {
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
-import map from 'lodash/fp/map';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
@@ -35,8 +34,7 @@ import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import containsString from '../utilities/containsString';
-import update from 'lodash/fp/update';
-import invoke from 'lodash/fp/invoke';
+import useLocalStorage from '../utilities/useLocalStorage';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -88,7 +86,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
-  const [importOrExport, setImportOrExport] = useState('Import');
+  const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Import', true);
 
   const [dateRange, setDateRange] = useState<DateRange>();
 

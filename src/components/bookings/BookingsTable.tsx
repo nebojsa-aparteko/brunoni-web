@@ -15,7 +15,6 @@ import {
   TableRow,
   createStyles,
   makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -98,19 +97,6 @@ interface AddOrReplacePayload {
   key: string;
   value: boolean | CheckListDocument[] | string;
 }
-
-const formatEstimatedDate = (date: string) => {
-  if (date === null) {
-    return 'NOT SET';
-  }
-  if (date?.indexOf('.') < 0) {
-    return date;
-  }
-
-  let dateParts = date.split('.');
-
-  return [dateParts[0], dateParts[1]].join('.');
-};
 
 const ShipmentProgress: React.FC = () => {
   const classes = useStyles();
