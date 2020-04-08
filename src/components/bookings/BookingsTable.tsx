@@ -526,7 +526,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
             <TableCell>Vessel</TableCell>
             <TableCell>Origin</TableCell>
             <TableCell>Destination</TableCell>
-            <TableCell>Booking Number</TableCell>
+            <TableCell>BL Number</TableCell>
             <TableCell>Your Reference</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Date</TableCell>
