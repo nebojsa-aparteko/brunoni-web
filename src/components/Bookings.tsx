@@ -97,6 +97,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
               update('TimeStamp', invoke('toDate')),
               update('PlaceOfReceiptETS', invoke('toDate')),
               update('FinalDestinationETA', invoke('toDate')),
+              update('ETS', invoke('toDate')),
+              update('ETA', invoke('toDate')),
             ),
           )(bookings)
         : [],
