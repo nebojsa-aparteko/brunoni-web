@@ -3,6 +3,10 @@ import BookingsContext from '../contexts/Bookings';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingExtension } from '../model/Booking';
+import map from 'lodash/fp/map';
+import flow from 'lodash/fp/flow';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
 
 interface Props {
   children: React.ReactNode;
@@ -34,7 +38,18 @@ const Bookings: React.FC<Props> = ({ children }) => {
       } as Booking;
     }) as Booking[] | undefined;
 
-    return bookings;
+    const normalizedBookings = map(
+      flow(
+        update('BkgCreateTimeStamp', invoke('toDate')),
+        update('TimeStamp', invoke('toDate')),
+        update('PlaceOfReceiptETS', invoke('toDate')),
+        update('FinalDestinationETA', invoke('toDate')),
+        update('ETS', invoke('toDate')),
+        update('ETA', invoke('toDate')),
+      ),
+    );
+
+    return normalizedBookings(bookings);
   }, [bookingsSnapshot, bookingsExtensionSnapshot]);
 
   return <BookingsContext.Provider value={bookingsResult}>{children}</BookingsContext.Provider>;

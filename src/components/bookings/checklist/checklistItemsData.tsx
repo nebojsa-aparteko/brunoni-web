@@ -1,60 +1,26 @@
-import React, { useMemo } from 'react';
-import {
-  Checkbox,
-  createStyles,
-  makeStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Theme,
-  TextField,
-} from '@material-ui/core';
 import {
   Booking,
   BookingVersion,
   CargoDetail,
   CargoOverdimension,
-  CheckListData,
   IMCO,
   ShipperOwnedContainer,
   StatusExport,
   StatusImport,
-} from '../../model/Booking';
-import DropZone from '../DropZone';
-import debounce from 'lodash/fp/debounce';
-import { showForCities, showForShortcut } from '../../utilities/portOfLoadingHelperData';
+} from '../../../model/Booking';
+import React from 'react';
+import { showForCities, showForShortcut } from '../../../utilities/portOfLoadingHelperData';
 
-enum FieldType {
+export enum FieldType {
   BASIC,
   FILE,
   TEXT,
 }
 
-interface CheckListProps {
-  booking: Booking | undefined;
-  showCompanyInfo?: boolean;
-  onCheckboxChange: any;
-  onFilesDrop: any;
-  onDelete?: any;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
-}
-
-interface TableBodyProps {
-  booking: Booking | undefined;
-  isAdmin?: boolean;
-  onCheckboxChange: any;
-  onFilesDrop: any;
-  onDelete?: any;
-  checklistItems: ChecklistItem[];
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
-}
-
 type CargoDetailFilter = (detail: CargoDetail) => boolean;
 type BookingFilter = (booking: Booking) => boolean;
 
-interface ChecklistItem {
+export interface ChecklistItem {
   id: string;
   label: string;
   type: FieldType;
@@ -91,7 +57,7 @@ const isGermanPort = (booking: Booking): boolean =>
 
 const isAllmarine = (): boolean => process.env.REACT_APP_BRAND === 'allmarine';
 
-const checklistItemsExport: ChecklistItem[] = [
+export const checklistItemsExport: ChecklistItem[] = [
   {
     id: 'depot_out',
     label: 'DEPOT OUT',
@@ -248,7 +214,7 @@ const checklistItemsExport: ChecklistItem[] = [
   },
 ];
 
-const checklistItemsImport: ChecklistItem[] = [
+export const checklistItemsImport: ChecklistItem[] = [
   {
     id: 'bill_of_landing_surrendered',
     label: 'BILL OF LANDING SURRENDERED',
@@ -307,152 +273,5 @@ const checklistItemsImport: ChecklistItem[] = [
   },
 ];
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-    paper: {
-      marginTop: theme.spacing(3),
-      width: '100%',
-      overflowX: 'auto',
-      marginBottom: theme.spacing(2),
-    },
-    table: {
-      overflowX: 'auto',
-      marginBottom: '1.5em',
-    },
-    tableRow: {
-      height: '55px',
-      '& td': {
-        whiteSpace: 'nowrap',
-        padding: '6px 12px',
-      },
-      ['@media print']: {
-        '& td': {
-          padding: theme.spacing(0),
-        },
-      },
-    },
-    tableWrapper: {
-      overflowX: 'auto',
-    },
-  }),
-);
-
-const getRowData = (booking: Booking | undefined, label: string, property: string, isAdminColumn?: boolean): any => {
-  const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-  if (!data || !(property in data)) return null;
-
-  if (typeof isAdminColumn === 'boolean') {
-    let collection = data[property] || [];
-    return collection.filter((item: any) => item.isAdmin === isAdminColumn);
-  }
-  return data[property];
-};
-
-const CheckListContent: React.FC<TableBodyProps> = ({
-  booking,
-  isAdmin,
-  onCheckboxChange,
-  onFilesDrop,
-  onDelete,
-  checklistItems,
-  onInputChange,
-}) => {
-  const classes = useStyles();
-  const saveInput = useMemo(() => debounce(250, onInputChange), [onInputChange]);
-
-  return (
-    <TableBody>
-      {/* Exception #2: Shipper's owned Container */}
-      {checklistItems.map(item => {
-        const showField = item.filters.every(filter => (booking ? filter(booking) : false));
-
-        return showField ? (
-          <TableRow selected={item.selectedRow} className={classes.tableRow} key={item.id}>
-            <TableCell>
-              <Checkbox
-                checked={
-                  getRowData(booking, item.status, 'checked') ||
-                  (item?.additionalCondition && item?.additionalCondition(booking)) ||
-                  false
-                }
-                disabled={!isAdmin}
-                onChange={event => onCheckboxChange(event, item.status)}
-              />
-            </TableCell>
-
-            <TableCell>{item.label}</TableCell>
-            {item.type === FieldType.FILE ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, item.status, false)}
-                  documents={getRowData(booking, item.status, 'documents', false) || []}
-                  onDelete={(name: string) => onDelete(item.status, name)}
-                />
-              </TableCell>
-            ) : null}
-            {item.type === FieldType.TEXT ? (
-              <TableCell>
-                <TextField
-                  variant="outlined"
-                  multiline
-                  rowsMax="2"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event }, item.status)}
-                  defaultValue={getRowData(booking, item.status, 'bhtNumberValue') || ''}
-                />
-              </TableCell>
-            ) : null}
-            {item.type === FieldType.BASIC ? <TableCell>&nbsp; </TableCell> : null}
-
-            {isAdmin ? (
-              <TableCell>
-                <DropZone
-                  onDrop={(files: []) => onFilesDrop(files, item.status, true)}
-                  documents={getRowData(booking, item.status, 'documents', true) || []}
-                  onDelete={(name: string) => onDelete(item.status, name)}
-                />
-              </TableCell>
-            ) : null}
-          </TableRow>
-        ) : null;
-      })}
-    </TableBody>
-  );
-};
-
-const CheckList: React.FC<CheckListProps> = ({
-  booking,
-  showCompanyInfo,
-  onCheckboxChange,
-  onFilesDrop,
-  onDelete,
-  onInputChange,
-}) => {
-  const classes = useStyles();
-
-  return (
-    <Table className={classes.table} size="small" aria-label="a dense table">
-      <TableHead>
-        <TableRow>
-          <TableCell align="center">&nbsp;</TableCell>
-          <TableCell>&nbsp;</TableCell>
-          <TableCell>Customer</TableCell>
-          {showCompanyInfo && <TableCell>Admin</TableCell>}
-        </TableRow>
-      </TableHead>
-      <CheckListContent
-        booking={booking}
-        isAdmin={showCompanyInfo}
-        onCheckboxChange={onCheckboxChange}
-        onFilesDrop={onFilesDrop}
-        onDelete={onDelete}
-        checklistItems={booking?.Category === 'Export' ? checklistItemsExport : checklistItemsImport}
-        onInputChange={onInputChange}
-      />
-    </Table>
-  );
-};
-
-export default CheckList;
+export const applyRule = (item: ChecklistItem, booking: Booking | undefined) =>
+  item.filters.every(filter => (booking ? filter(booking) : false));

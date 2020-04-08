@@ -3,10 +3,20 @@ import { Table, TableCell, TableRow, makeStyles, Typography } from '@material-ui
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
+import formatDate from 'date-fns/format';
 
 interface Props {
   booking: Booking;
 }
+
+const formatDateString = (date: Date) => {
+  try {
+    return formatDate(date, 'dd.MM.yyyy');
+  } catch (err) {
+    console.error(`Error formatting passed date ${date} `, err);
+    return '???';
+  }
+};
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -56,7 +66,7 @@ export const ClientDetails: React.FC<{
   return (
     <Typography variant="body2">
       {forwPersID && forwPersID}
-      {(forwPersID && bkgRef) ? <br /> : null}
+      {forwPersID && bkgRef ? <br /> : null}
       {bkgRef && bkgRef}
     </Typography>
   );
@@ -68,7 +78,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   return (
     <TableRow className={classes.tableRow}>
       <TableCell className={classes.tableCellLabel}>{label}</TableCell>
-      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content}} />
+      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content }} />
     </TableRow>
   );
 };
@@ -77,59 +87,50 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const clients = useClients();
 
-  const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [
-    clients,
-    booking.ForwAdrId,
-  ]);
+  const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [clients, booking.ForwAdrId]);
 
   const clientInfo = useMemo(() => {
-    if ( !client ) {
+    if (!client) {
       return booking.ForwAdrId;
     }
 
     return (
       <Fragment>
         {client.name}
-        <ClientDetails
-          forwPersID={booking.ForwPersID}
-          bkgRef={booking['Cust-BkgRef']}
-        />
+        <ClientDetails forwPersID={booking.ForwPersID} bkgRef={booking['Cust-BkgRef']} />
       </Fragment>
     );
   }, [client, booking]);
 
   return (
     <Table size="small" aria-label="a dense table">
-       <colgroup>
+      <colgroup>
         <col style={{ width: '40%' }} />
         <col style={{ width: '60%' }} />
       </colgroup>
       <TableBody>
-        <TableRowData
-          label={'Vessel'}
-          content={[booking.Vessel, booking.Voyage].join(' VOY. ')}
-        />
+        <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />
 
-        {(booking.POLName !== booking.PlaceOfRecieptName) ? (
+        {booking.POLName !== booking.PlaceOfRecieptName ? (
           <TableRowData
             label={'Place of Receipt'}
-            content={[ booking.PlaceOfRecieptName, booking.PlaceOfReceiptETS ].join('<br/>ETS: ')}
+            content={[booking.PlaceOfRecieptName, formatDateString(booking.PlaceOfReceiptETS)].join('<br/>ETS: ')}
           />
         ) : null}
 
         <TableRowData
           label={'Port of Loading'}
-          content={[ booking.POLName, booking.ETS ].join('<br/>ETS: ')}
+          content={[booking.POLName, formatDateString(booking.ETS)].join('<br/>ETS: ')}
         />
         <TableRowData
           label={'Port of Discharge'}
-          content={[booking.PODName, booking.ETA].join('<br/>ETA: ')}
+          content={[booking.PODName, formatDateString(booking.ETA)].join('<br/>ETA: ')}
         />
 
-        {(booking.PODName !== booking.FinalDestinationName) ? (
+        {booking.PODName !== booking.FinalDestinationName ? (
           <TableRowData
             label={'Place of Delivery'}
-            content={[booking.FinalDestinationName, booking.FinalDestinationETA].join('<br/>ETA: ')}
+            content={[booking.FinalDestinationName, formatDateString(booking.FinalDestinationETA)].join('<br/>ETA: ')}
           />
         ) : null}
 
@@ -143,9 +144,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
 
         <TableRow className={classes.tableRow}>
           <TableCell className={classes.tableCellLabel}>Client</TableCell>
-          <TableCell className={classes.tableCell}>
-            {clientInfo}
-          </TableCell>
+          <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
