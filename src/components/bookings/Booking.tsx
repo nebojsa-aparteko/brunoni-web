@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, Fragment, useMemo } from 'react';
+import React, { useContext, useEffect, Fragment, useMemo, useCallback } from 'react';
 import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
@@ -14,12 +14,13 @@ import ContainerDetails from './ContainerDetails';
 import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
+import CheckList from './checklist/CheckList';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
-    padding: theme.spacing(5),
+    padding: theme.spacing(3),
 
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(2),
@@ -40,6 +41,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     ['@media print']: {
       marginBottom: theme.spacing(0),
+    },
+  },
+  tableWrapper: {
+    overflowX: 'auto',
+    ['@media print']: {
+      width: '30%',
     },
   },
   actions: {
@@ -121,81 +128,97 @@ const Booking: React.FC<Props> = ({ id }) => {
 
   console.log('booking ', booking);
   return (
-    <Page title={getBookingTitle(booking)}>
-      <Container maxWidth="lg">
-        <ScrollToTopOnMount />
-
-        <Paper className={classes.root}>
-          <Box display="none" displayPrint="block" mb={2}>
-            <Box mb={2}>
-              {/* <img
-                src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
-                style={{ width: '5em' }}
-              /> */}
-            </Box>
-            <Divider />
-          </Box>
-
-          <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-            <QuoteNav
-              backTo="/bookings"
-              subtitle={`File No. ${booking.id}`}
-              title={`Booking - ${getBookingTitle(booking)}`}
-            />
-            <Box className={classes.actions} displayPrint="none">
-              <Button
-                aria-label="print"
-                variant="outlined"
-                size="small"
-                startIcon={<PrintIcon />}
-                onClick={handlePrint}
-              >
-                Print
-              </Button>
-            </Box>
-          </Box>
-
-          <Grid item xs={12}>
-            <Page title={getBookingTitle(booking)}>
-              <Box marginTop="2em" marginBottom="2em">
-                <BookingSummary booking={booking} />
+    <Grid container direction="row" spacing={1} justify="center" alignItems="flex-start">
+      <Grid item spacing={1} md={6} xs={12}>
+        <Page title={getBookingTitle(booking)}>
+          {/*<Container maxWidth="md">*/}
+          <ScrollToTopOnMount />
+          <Paper className={classes.root}>
+            <Box display="none" displayPrint="block" mb={2}>
+              <Box mb={2}>
+                {/* <img
+                  src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                  style={{ width: '5em' }}
+                /> */}
               </Box>
+              <Divider />
+            </Box>
 
-              <Box marginTop="2em" marginBottom="2em">
-                <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
+            <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+              <QuoteNav
+                backTo="/bookings"
+                subtitle={`File No. ${booking.id}`}
+                title={`Booking - ${getBookingTitle(booking)}`}
+              />
+              <Box className={classes.actions} displayPrint="none">
+                <Button
+                  aria-label="print"
+                  variant="outlined"
+                  size="small"
+                  startIcon={<PrintIcon />}
+                  onClick={handlePrint}
+                >
+                  Print
+                </Button>
               </Box>
+            </Box>
 
-              {isLongVersion(booking.Version) ? (
-                <Fragment>
-                  <Box marginTop="2em" marginBottom="2em">
-                    <PortTerms portTerms={booking.PortTerms} />
-                  </Box>
-
-                  <Box marginTop="2em" marginBottom="2em">
-                    <SpecialRemarks remarks={specialRemarks} />
-                  </Box>
-                </Fragment>
-              ) : null}
-
-              {booking.FreightDetails && (
+            <Grid item xs={12}>
+              <Page title={getBookingTitle(booking)}>
                 <Box marginTop="2em" marginBottom="2em">
-                  <BookingFreight freightDetails={booking.FreightDetails} />
+                  <BookingSummary booking={booking} />
                 </Box>
-              )}
 
-              {finalRemarks.map((item, index) => {
-                return (
-                  <Typography variant="body2" key={`final-remark-${index}`}>
-                    <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
-                  </Typography>
-                );
-              })}
-            </Page>
-          </Grid>
+                <Box marginTop="2em" marginBottom="2em">
+                  <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
+                </Box>
+
+                {isLongVersion(booking.Version) ? (
+                  <Fragment>
+                    <Box marginTop="2em" marginBottom="2em">
+                      <PortTerms portTerms={booking.PortTerms} />
+                    </Box>
+
+                    <Box marginTop="2em" marginBottom="2em">
+                      <SpecialRemarks remarks={specialRemarks} />
+                    </Box>
+                  </Fragment>
+                ) : null}
+
+                {booking.FreightDetails && (
+                  <Box marginTop="2em" marginBottom="2em">
+                    <BookingFreight freightDetails={booking.FreightDetails} />
+                  </Box>
+                )}
+
+                {finalRemarks.map((item, index) => {
+                  return (
+                    <Typography variant="body2" key={`final-remark-${index}`}>
+                      <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
+                    </Typography>
+                  );
+                })}
+              </Page>
+            </Grid>
+          </Paper>
+        </Page>
+      </Grid>
+      <Grid item spacing={1} md={5} xs={12}>
+        <Paper className={classes.root}>
+          <Box className={classes.tableWrapper}>
+            <CheckList
+              booking={booking}
+              showCompanyInfo={true}
+              onCheckboxChange={false}
+              onFilesDrop={false}
+              onDelete={false}
+              onInputChange={handlePrint}
+            />
+          </Box>
         </Paper>
-      </Container>
-    </Page>
+      </Grid>
+    </Grid>
   );
 };
 

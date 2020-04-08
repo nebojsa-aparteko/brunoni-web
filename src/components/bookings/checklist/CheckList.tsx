@@ -57,13 +57,20 @@ const useStyles = makeStyles((theme: Theme) =>
         padding: '6px 12px',
       },
       ['@media print']: {
-        '& td': {
+        [theme.breakpoints.down('xs')]: {
+          display: 'block',
+          marginTop: theme.spacing(0),
+          marginBottom: theme.spacing(0),
           padding: theme.spacing(0),
         },
       },
     },
-    tableWrapper: {
-      overflowX: 'auto',
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
+        width: '0',
+        height: '0',
+      },
     },
   }),
 );
@@ -129,10 +136,12 @@ const CheckList: React.FC<CheckListProps> = ({
     <Table className={classes.table} size="small" aria-label="a dense table">
       <TableHead>
         <TableRow>
-          <TableCell align="center">&nbsp;</TableCell>
-          <TableCell>&nbsp;</TableCell>
-          <TableCell>Customer</TableCell>
-          {showCompanyInfo && <TableCell>Admin</TableCell>}
+          <TableCell align="center" className={classes.hidePrint}>
+            &nbsp;
+          </TableCell>
+          <TableCell className={classes.hidePrint}>&nbsp;</TableCell>
+          <TableCell className={classes.hidePrint}>Customer</TableCell>
+          {showCompanyInfo && <TableCell className={classes.hidePrint}>Admin</TableCell>}
         </TableRow>
       </TableHead>
       <CheckListContent
@@ -187,7 +196,7 @@ const ChecklistItemRow = ({
 
       <TableCell>{checklistItem.label}</TableCell>
       {checklistItem.type === FieldType.FILE ? (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <DropZone
             onDrop={(files: []) => onFilesDrop(files, checklistItem.status, false)}
             documents={userDocuments || []}
@@ -196,7 +205,7 @@ const ChecklistItemRow = ({
         </TableCell>
       ) : null}
       {checklistItem.type === FieldType.TEXT ? (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <TextField
             variant="outlined"
             multiline
@@ -209,7 +218,7 @@ const ChecklistItemRow = ({
       {checklistItem.type === FieldType.BASIC ? <TableCell>&nbsp; </TableCell> : null}
 
       {isAdmin ? (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <DropZone
             onDrop={(files: []) => onFilesDrop(files, checklistItem.status, true)}
             documents={adminDocuments || []}
