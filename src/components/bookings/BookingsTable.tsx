@@ -2,8 +2,6 @@ import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
-  Backdrop,
-  CircularProgress,
   createStyles,
   Dialog,
   DialogContent,
@@ -15,15 +13,12 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  createStyles,
-  makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
 
@@ -92,11 +87,6 @@ interface ProgressDialogProps {
   booking: Booking | undefined;
   handleClose: any;
   showCompanyInfo?: boolean;
-}
-
-interface AddOrReplacePayload {
-  key: string;
-  value: boolean | CheckListDocument[] | string;
 }
 
 const ShipmentProgress: React.FC = () => {
