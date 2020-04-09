@@ -190,13 +190,13 @@ export interface FreightDetail {
 }
 
 export enum ShipperOwnedContainer {
-  The20TK = '20TK',
-  The20SO = '20SO',
-  The40SO = '40SO',
-  The40HS = '40HS',
-  The20OS = '20OS',
-  The20FS = '20FS',
-  The40FS = '40FS',
+  The20TK = '22T2S',
+  The20SO = '22G1S',
+  The40SO = '42G1S',
+  The40HS = '45G1S',
+  The20OS = '22U1S',
+  The20FS = '22P1S',
+  The40FS = '42P1S',
 }
 
 export enum CargoOverdimension {

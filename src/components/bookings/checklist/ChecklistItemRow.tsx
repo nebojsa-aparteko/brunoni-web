@@ -10,15 +10,26 @@ import ChecklistItemValueComponent from './ChecklistItemValueComponent';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     tableRow: {
-      height: '55px',
       '& td': {
         whiteSpace: 'nowrap',
-        padding: '6px 12px',
+        padding: '6px 6px',
       },
       ['@media print']: {
         '& td': {
           padding: theme.spacing(0),
+          width: '10%',
         },
+      },
+    },
+    itemLabel: {
+      whiteSpace: 'normal',
+      ['@media print']: {
+        whiteSpace: 'nowrap',
+      },
+    },
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
       },
     },
   }),
@@ -70,7 +81,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         <Checkbox checked={checklistItem.checked} disabled={!isAdmin} onChange={event => handleCheckboxChange(event)} />
       </TableCell>
 
-      <TableCell>{checklistItem.label}</TableCell>
+      <TableCell>
+        <div className={classes.itemLabel}>{checklistItem.label}</div>
+      </TableCell>
 
       {/*Customer Data*/}
 

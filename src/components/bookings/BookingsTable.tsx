@@ -23,6 +23,7 @@ import formatDate from 'date-fns/format';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
+import theme from '../../theme';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -69,6 +70,9 @@ const useStyles = makeStyles(() =>
     checkListBackdrop: {
       zIndex: 1,
     },
+    checklistDialog: {
+      paddingBottom: theme.spacing(3),
+    },
   }),
 );
 
@@ -112,7 +116,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className={classes.checklistDialog}>
         <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
       </DialogContent>
     </Dialog>

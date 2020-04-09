@@ -29,11 +29,15 @@ const useStyles = makeStyles((theme: Theme) =>
     tableHead: {
       fontWeight: theme.typography.fontWeightBold,
     },
+    portTermsTable: {
+      width: '100%',
+    },
     costUnitCell: {
       paddingLeft: 0,
       minWidth: '150px',
     },
     tableRow: {
+      verticalAlign: 'top',
       '& td': {
         whiteSpace: 'nowrap',
       },
@@ -75,10 +79,10 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
 
   return (
     <Fragment>
-      <Table size="small" aria-label="a dense table">
+      <Table size="small" aria-label="a dense table" className={classes.portTermsTable}>
         <colgroup>
-          <col style={{ width: '40%' }} />
-          <col style={{ width: '60%' }} />
+          <col style={{ width: '25%' }} />
+          <col style={{ width: '75%' }} />
         </colgroup>
         <TableBody>
           <TableRowData label={'Liner Port Agent'} content={portTerms.LinerPortAgent} />

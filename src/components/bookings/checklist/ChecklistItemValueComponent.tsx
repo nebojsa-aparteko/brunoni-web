@@ -1,5 +1,5 @@
 import { ChecklistItemValue, FieldType } from './checklistItemsData';
-import { TableCell, TextField } from '@material-ui/core';
+import { createStyles, makeStyles, TableCell, TextField, Theme } from '@material-ui/core';
 import DropZone from '../../DropZone';
 import React, { Fragment, useCallback, useMemo } from 'react';
 import debounce from 'lodash/fp/debounce';
@@ -13,12 +13,23 @@ interface Props {
   storageBasePath: string;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
+      },
+    },
+  }),
+);
+
 const ChecklistItemValueComponent: React.FC<Props> = ({
   valuePath,
   checklistValue,
   saveChecklistChanges,
   storageBasePath,
 }) => {
+  const classes = useStyles();
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       saveChecklistChanges('valueCustomer', {
@@ -123,7 +134,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
   return (
     <Fragment>
       {checklistValue.type === FieldType.FILE && (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <DropZone
             onDrop={(files: []) => handleFilesDrop(files)}
             documents={checklistValue.files || []}
@@ -132,7 +143,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
         </TableCell>
       )}
       {checklistValue.type === FieldType.TEXT && (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <TextField
             variant="outlined"
             multiline
@@ -143,7 +154,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
         </TableCell>
       )}
       {checklistValue.type === FieldType.CHECKMARK && (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <p>
             <a href={'#'}>Form to fill</a>
           </p>

@@ -31,7 +31,6 @@ const useStyles = makeStyles(theme => ({
         display: 'block',
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
-
         '& td': {
           display: 'block',
           padding: theme.spacing(0),
@@ -46,6 +45,9 @@ const useStyles = makeStyles(theme => ({
   },
   tableCell: {
     border: 'none',
+  },
+  summaryTable: {
+    width: '100%',
   },
   tableCellQuoteUserData: {
     ['@media not print']: {
@@ -103,10 +105,10 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
   }, [client, booking]);
 
   return (
-    <Table size="small" aria-label="a dense table">
+    <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
       <colgroup>
-        <col style={{ width: '40%' }} />
-        <col style={{ width: '60%' }} />
+        <col style={{ width: '20%' }} />
+        <col style={{ width: '80%' }} />
       </colgroup>
       <TableBody>
         <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />

@@ -17,9 +17,21 @@ import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
+  body: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
+
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      paddingTop: theme.spacing(3),
+    },
+
+    ['@media print']: {
+      marginTop: theme.spacing(0),
+      paddingTop: theme.spacing(0),
+    },
+  },
+  root: {
     padding: theme.spacing(3),
 
     [theme.breakpoints.down('sm')]: {
@@ -128,8 +140,8 @@ const Booking: React.FC<Props> = ({ id }) => {
 
   console.log('booking ', booking);
   return (
-    <Grid container direction="row" spacing={1} justify="center" alignItems="flex-start">
-      <Grid item spacing={1} md={6} xs={12}>
+    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      <Grid item spacing={1} md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           {/*<Container maxWidth="md">*/}
           <ScrollToTopOnMount />
@@ -163,30 +175,27 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Button>
               </Box>
             </Box>
-            <Grid item xs={12}>
+            <Grid item xs={12} spacing={0}>
               <Page title={getBookingTitle(booking)}>
-                <Box marginTop="2em" marginBottom="2em">
+                <Box marginTop="1em" marginBottom="0em">
                   <BookingSummary booking={booking} />
                 </Box>
-
-                <Box marginTop="2em" marginBottom="2em">
+                <Box marginTop="0em" marginBottom="0em">
                   <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
                 </Box>
-
                 {isLongVersion(booking.Version) ? (
                   <Fragment>
-                    <Box marginTop="2em" marginBottom="2em">
+                    <Box marginTop="0em" marginBottom="0em">
                       <PortTerms portTerms={booking.PortTerms} />
                     </Box>
-
-                    <Box marginTop="2em" marginBottom="2em">
+                    <Box marginTop="0em" marginBottom="0em">
                       <SpecialRemarks remarks={specialRemarks} />
                     </Box>
                   </Fragment>
                 ) : null}
 
                 {booking.FreightDetails && (
-                  <Box marginTop="2em" marginBottom="2em">
+                  <Box marginTop="0em" marginBottom="0em">
                     <BookingFreight freightDetails={booking.FreightDetails} />
                   </Box>
                 )}
@@ -203,8 +212,8 @@ const Booking: React.FC<Props> = ({ id }) => {
           </Paper>
         </Page>
       </Grid>
-      <Grid item spacing={1} md={5} xs={12}>
-        <Paper className={classes.root}>
+      <Grid item spacing={0} md={4} xs={12}>
+        <Paper>
           <Box className={classes.tableWrapper}>
             <CheckList booking={booking} showCompanyInfo={true} />
           </Box>

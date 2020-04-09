@@ -12,7 +12,11 @@ const useStyles = makeStyles(() =>
   createStyles({
     table: {
       overflowX: 'auto',
-      marginBottom: '1.5em',
+    },
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
+      },
     },
   }),
 );
@@ -26,8 +30,8 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
         <TableRow>
           <TableCell align="center">&nbsp;</TableCell>
           <TableCell>&nbsp;</TableCell>
-          <TableCell>Customer</TableCell>
-          {showCompanyInfo && <TableCell>Admin</TableCell>}
+          <TableCell className={classes.hidePrint}>Customer</TableCell>
+          {showCompanyInfo && <TableCell className={classes.hidePrint}>Admin</TableCell>}
         </TableRow>
       </TableHead>
       <ChecklistContent isAdmin={showCompanyInfo} booking={booking} />
