@@ -163,7 +163,6 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Button>
               </Box>
             </Box>
-
             <Grid item xs={12}>
               <Page title={getBookingTitle(booking)}>
                 <Box marginTop="2em" marginBottom="2em">
