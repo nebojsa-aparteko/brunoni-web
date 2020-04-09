@@ -5,17 +5,35 @@ export enum FieldType {
   TEXT,
 }
 
+export interface ChecklistItemValueDataText {
+  text: string;
+}
+
+export interface ChecklistItemValueForm {
+  url: string;
+  checked?: boolean;
+}
+
+export interface ChecklistItemValueForm {
+  url: string;
+  checked?: boolean;
+}
+
+export interface ChecklistItemValueDocuments {
+  url: string;
+  name: string;
+}
+
 export interface ChecklistItemValue {
   type: FieldType;
-  text?: string;
-  checked?: boolean;
-  files?: CheckListDocument[];
+  data: ChecklistItemValueDataText | ChecklistItemValueForm | ChecklistItemValueDocuments;
 }
 
 export interface ChecklistItem {
   id: string;
   label: string;
+  order: number;
   checked?: boolean;
-  valueCustomer?: ChecklistItemValue;
-  valueAdmin?: ChecklistItemValue;
+  values?: [ChecklistItemValue];
+  valuesAdmin?: [ChecklistItemValue];
 }

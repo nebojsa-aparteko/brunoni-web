@@ -11,7 +11,6 @@ export interface Booking {
   ForwPersID: string;
   ETA: Date;
   extensions?: BookingExtension[];
-  BkgCreateTimeStamp: Date;
   BkgAgentContactEml: string;
   BkgAgentContactTxt: string;
   BkgStatus: ExportShipmentStatusCode | ImportShipmentStatusCode | null;
@@ -44,6 +43,8 @@ export interface Booking {
   'Carrier-BkgRef': string | null;
   'Cust-BkgRef': string;
   'BL-No': string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CheckListData {
@@ -158,13 +159,9 @@ export interface CargoDetail {
   CtrQuantity: string;
   CommodityID: string;
   CtypID: string;
-  LocRefs: LocRefs;
+  LocRefs: LocRefItem[];
   IMCO: IMCO | null;
   Overdimension: CargoOverdimension | null;
-}
-
-export interface LocRefs {
-  LocRef: LocRefItem[];
 }
 
 export interface LocRefItem {

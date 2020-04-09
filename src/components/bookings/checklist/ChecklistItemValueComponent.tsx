@@ -1,6 +1,11 @@
-import { ChecklistItemValue, FieldType } from './checklistItemsData';
+import {
+  ChecklistItemValue,
+  ChecklistItemValueDataText,
+  ChecklistItemValueDocuments,
+  FieldType,
+} from './checklistItemsData';
 import { TableCell, TextField } from '@material-ui/core';
-import DropZone from '../../DropZone';
+import DropZone, { DropZoneDocument } from '../../DropZone';
 import React, { Fragment, useCallback, useMemo } from 'react';
 import debounce from 'lodash/fp/debounce';
 import firebase from '../../../firebase';
@@ -13,23 +18,54 @@ interface Props {
   storageBasePath: string;
 }
 
-const ChecklistItemValueComponent: React.FC<Props> = ({
-  valuePath,
+interface ItemValueTextProps {
+  valuePath: string;
+  checklistValue?: ChecklistItemValue;
+  saveChecklistChanges: any;
+}
+
+export const ChecklistItemValueText: React.FC<ItemValueTextProps> = ({
   checklistValue,
+  valuePath,
   saveChecklistChanges,
-  storageBasePath,
 }) => {
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      saveChecklistChanges('valueCustomer', {
-        type: FieldType.TEXT,
-        text: event.target.value,
-      });
+      console.log('Typed input', event.target.value);
+      // saveChecklistChanges(valuePath, {
+      //   type: FieldType.TEXT,
+      //   text: event.target.value,
+      // });
     },
     [saveChecklistChanges],
   );
   const saveInput = useMemo(() => debounce(300, handleInputChange), [handleInputChange]);
+  return (
+    <TableCell>
+      <TextField
+        variant="outlined"
+        multiline
+        rowsMax="2"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event })}
+        defaultValue={(checklistValue?.data as ChecklistItemValueDataText)?.text || ''}
+      />
+    </TableCell>
+  );
+};
 
+interface ItemValueFilesProps {
+  storageBasePath: string;
+  valuePath: string;
+  checklistValue?: ChecklistItemValue;
+  saveChecklistChanges: any;
+}
+
+export const CheckListItemValueFiles: React.FC<ItemValueFilesProps> = ({
+  storageBasePath,
+  valuePath,
+  checklistValue,
+  saveChecklistChanges,
+}) => {
   const saveFiles = useCallback(
     async (files: File[]): Promise<any> => {
       const uploadFile = async (file: File): Promise<any> => {
@@ -93,10 +129,11 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
     (acceptedFiles: File[]) => {
       saveFiles(acceptedFiles)
         .then((documents: CheckListDocument[]) => {
-          saveChecklistChanges(valuePath, {
-            files: [...(checklistValue.files ? checklistValue.files : []), ...documents],
-            type: FieldType.FILE,
-          });
+          console.log('Stored', documents);
+          // saveChecklistChanges(valuePath, {
+          //   files: [...(checklistValue.files ? checklistValue.files : []), ...documents],
+          //   type: FieldType.FILE,
+          // });
         })
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(checklistValue, null, 2)}`, err);
@@ -109,10 +146,10 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
     (name: string) => {
       deleteFile(name)
         .then(fileName => {
-          saveChecklistChanges(valuePath, {
-            type: FieldType.FILE,
-            files: checklistValue.files?.filter(file => file.url !== fileName),
-          });
+          console.log('File removed', fileName);
+          // saveChecklistChanges(valuePath, {
+          //   values: checklistValue.data?.filter(data => data.url !== fileName),
+          // });
         })
         .catch(error => {
           console.error('File not deleted due to an error: ', error);
@@ -120,27 +157,40 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
     },
     [deleteFile, saveChecklistChanges],
   );
+
+  return (
+    <TableCell>
+      <DropZone
+        onDrop={(files: []) => handleFilesDrop(files)}
+        documents={[checklistValue?.data as DropZoneDocument] || []}
+        onDelete={(name: string) => handleFileRemoval(name)}
+      />
+    </TableCell>
+  );
+};
+
+const ChecklistItemValueComponent: React.FC<Props> = ({
+  valuePath,
+  checklistValue,
+  saveChecklistChanges,
+  storageBasePath,
+}) => {
   return (
     <Fragment>
       {checklistValue.type === FieldType.FILE && (
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => handleFilesDrop(files)}
-            documents={checklistValue.files || []}
-            onDelete={(name: string) => handleFileRemoval(name)}
-          />
-        </TableCell>
+        <CheckListItemValueFiles
+          checklistValue={checklistValue}
+          valuePath={valuePath}
+          storageBasePath={storageBasePath}
+          saveChecklistChanges={saveChecklistChanges}
+        />
       )}
       {checklistValue.type === FieldType.TEXT && (
-        <TableCell>
-          <TextField
-            variant="outlined"
-            multiline
-            rowsMax="2"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event })}
-            defaultValue={checklistValue.text || ''}
-          />
-        </TableCell>
+        <ChecklistItemValueText
+          valuePath={valuePath}
+          checklistValue={checklistValue}
+          saveChecklistChanges={saveChecklistChanges}
+        />
       )}
       {checklistValue.type === FieldType.CHECKMARK && (
         <TableCell>

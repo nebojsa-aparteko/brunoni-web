@@ -171,7 +171,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
       <TableCell>{booking.BkgStatusText}</TableCell>
-      <TableCell>{formatDate(booking.BkgCreateTimeStamp, 'dd.MM.yyyy')}</TableCell>
+      <TableCell>{formatDate(booking.createdAt, 'dd.MM.yyyy')}</TableCell>
       <TableCell className={classes.avatarCell}>
         <Avatar
           name={booking.BkgAgentContactTxt}

@@ -1,11 +1,33 @@
-import React, { useCallback, useMemo } from 'react';
-import { Checkbox, createStyles, makeStyles, TableCell, TableRow, Theme, Typography } from '@material-ui/core';
-import { ChecklistItem, ChecklistItemValue } from './checklistItemsData';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Checkbox,
+  createStyles,
+  Divider,
+  Grid,
+  IconButton,
+  ListItemText,
+  makeStyles,
+  TableCell,
+  TableRow,
+  Theme,
+  Typography,
+} from '@material-ui/core';
+import { ChecklistItem, ChecklistItemValue, FieldType } from './checklistItemsData';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
-import ChecklistItemValueComponent from './ChecklistItemValueComponent';
+import ChecklistItemValueComponent, {
+  CheckListItemValueFiles,
+  ChecklistItemValueText,
+} from './ChecklistItemValueComponent';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import { forEach, uniqBy } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,6 +50,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const { enqueueSnackbar } = useSnackbar();
   const clients = useClients();
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
+
+  const [moreAnchorEl, setMoreAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const [showFiles, setShowFiles] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [showPrivateFiles, setShowPrivateFiles] = useState(false);
 
   const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', `${client?.id}`, 'bookings', `${booking?.id}`].join('/');
@@ -64,6 +92,53 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     [saveChecklistChanges],
   );
 
+  useEffect(() => {
+    // const uniqItems = uniqBy('type')(checklistItem?.values);
+    checklistItem &&
+      checklistItem.values &&
+      forEach((item: ChecklistItemValue) => {
+        switch (item.type) {
+          case FieldType.CHECKMARK:
+            setShowNotes(true);
+            break;
+          case FieldType.TEXT:
+            setShowNotes(true);
+            break;
+          case FieldType.FILE:
+            setShowFiles(true);
+            break;
+        }
+      })(checklistItem?.values);
+    if (checklistItem && checklistItem?.valuesAdmin && checklistItem?.valuesAdmin.length > 0) {
+      setShowPrivateFiles(true);
+    }
+  }, [checklistItem, booking]);
+
+  const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMoreAnchorEl(null);
+  };
+
+  const handleAddNote = () => {
+    setShowNotes(true);
+    handleClose();
+  };
+
+  const handleAddFile = () => {
+    setShowFiles(true);
+    handleClose();
+  };
+
+  const handleAddPrivateFile = () => {
+    setShowPrivateFiles(true);
+    handleClose();
+  };
+
   return (
     <TableRow selected={checklistItem.checked} className={classes.tableRow} key={checklistItem.id}>
       <TableCell>
@@ -73,29 +148,72 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       <TableCell>{checklistItem.label}</TableCell>
 
       {/*Customer Data*/}
+      <TableCell>
+        <Grid container spacing={2}>
+          <Grid item>
+            {showFiles && (
+              <CheckListItemValueFiles
+                storageBasePath={storageBasePath}
+                valuePath={'values'}
+                saveChecklistChanges={saveChecklistChanges}
+              />
+            )}
+            {showNotes && <ChecklistItemValueText valuePath={'values'} saveChecklistChanges={saveChecklistChanges} />}
 
-      {checklistItem.valueCustomer ? (
-        <ChecklistItemValueComponent
-          checklistValue={checklistItem.valueCustomer}
-          saveChecklistChanges={saveChecklistChanges}
-          storageBasePath={storageBasePath}
-          valuePath={'valueCustomer'}
-        />
-      ) : (
-        <TableCell>&nbsp; </TableCell>
-      )}
+            {checklistItem?.values &&
+              checklistItem.values.map(item => (
+                <ChecklistItemValueComponent
+                  checklistValue={item}
+                  saveChecklistChanges={saveChecklistChanges}
+                  storageBasePath={storageBasePath}
+                  valuePath={'values'}
+                />
+              ))}
 
-      {/*Admin Data*/}
-      {isAdmin && checklistItem.valueAdmin ? (
-        <ChecklistItemValueComponent
-          checklistValue={checklistItem.valueAdmin}
-          saveChecklistChanges={saveChecklistChanges}
-          storageBasePath={storageBasePath}
-          valuePath={'valueAdmin'}
-        />
-      ) : (
-        <TableCell>&nbsp; </TableCell>
-      )}
+            {/*Admin Data*/}
+            {isAdmin && (
+              <Fragment>
+                <Divider />
+                {checklistItem.valuesAdmin?.map(item => (
+                  <ChecklistItemValueComponent
+                    checklistValue={item}
+                    saveChecklistChanges={saveChecklistChanges}
+                    storageBasePath={storageBasePath}
+                    valuePath={'valuesAdmin'}
+                  />
+                ))}
+              </Fragment>
+            )}
+          </Grid>
+          <Grid item>
+            <IconButton aria-label="actions" onClick={onMoreButtonClick}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
+              <MenuItem onClick={handleAddNote}>
+                <ListItemIcon>
+                  <DirectionsBoatIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Add Note" />
+              </MenuItem>
+              <MenuItem onClick={handleAddFile}>
+                <ListItemIcon>
+                  <ListAltIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Add File" />
+              </MenuItem>
+              {isAdmin && (
+                <MenuItem onClick={handleAddPrivateFile}>
+                  <ListItemIcon>
+                    <ListAltIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Add Private File" />
+                </MenuItem>
+              )}
+            </Menu>
+          </Grid>
+        </Grid>
+      </TableCell>
     </TableRow>
   );
 };
