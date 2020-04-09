@@ -1,6 +1,6 @@
 import { CheckListDocument } from '../../../model/Booking';
 export enum FieldType {
-  BASIC,
+  CHECKMARK, // when item just needs to be confirmed that it has been done -- used mostly for customers
   FILE,
   TEXT,
 }

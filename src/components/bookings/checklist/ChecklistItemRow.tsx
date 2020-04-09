@@ -1,21 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import debounce from 'lodash/fp/debounce';
-import {
-  Checkbox,
-  createStyles,
-  makeStyles,
-  TableCell,
-  TableRow,
-  TextField,
-  Theme,
-  Typography,
-} from '@material-ui/core';
-import { ChecklistItem, ChecklistItemValue, FieldType } from './checklistItemsData';
-import DropZone from '../../DropZone';
+import React, { useCallback, useMemo } from 'react';
+import { Checkbox, createStyles, makeStyles, TableCell, TableRow, Theme, Typography } from '@material-ui/core';
+import { ChecklistItem, ChecklistItemValue } from './checklistItemsData';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
-import { Booking, CheckListDocument } from '../../../model/Booking';
+import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
+import ChecklistItemValueComponent from './ChecklistItemValueComponent';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,7 +29,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const clients = useClients();
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
-  const getStorageBasePath = useCallback((): string => {
+  const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', `${client?.id}`, 'bookings', `${booking?.id}`].join('/');
   }, [booking, client]);
 
@@ -64,7 +54,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         console.log(e);
       }
     },
-    [checklistItem],
+    [checklistItem, booking],
   );
 
   const handleCheckboxChange = useCallback(
@@ -73,122 +63,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     },
     [saveChecklistChanges],
   );
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      saveChecklistChanges('valueCustomer', {
-        type: FieldType.TEXT,
-        text: event.target.value,
-      });
-    },
-    [saveChecklistChanges],
-  );
-  const saveInput = useMemo(() => debounce(300, handleInputChange), [handleInputChange]);
 
-  const saveFiles = useCallback(
-    async (files: File[], isAdmin: boolean): Promise<any> => {
-      const uploadFile = async (file: File): Promise<any> => {
-        return new Promise((resolve, reject) => {
-          let path = [getStorageBasePath(), `${file.name}`].join('/');
-          let storageRef = firebase.storage().ref(encodeURI(path));
-          let uploadTask = storageRef.put(file);
-
-          uploadTask.on(
-            firebase.storage.TaskEvent.STATE_CHANGED,
-            snapshot => {
-              // in progress
-              // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
-              //   // ex. calculate progress
-              // }
-            },
-            error => {
-              reject(error);
-            },
-            () => {
-              // success
-              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
-                resolve(downloadURL);
-              });
-            },
-          );
-        });
-      };
-
-      const requests = files.map((file: File) => {
-        return uploadFile(file).then(downloadURL => {
-          return {
-            isAdmin: isAdmin,
-            name: file.name,
-            url: downloadURL,
-          };
-        });
-      });
-
-      return Promise.all(requests);
-    },
-    [getStorageBasePath],
-  );
-
-  const deleteFile = useCallback(
-    async (name: any): Promise<any> => {
-      return new Promise((resolve, reject) => {
-        const path = [getStorageBasePath(), `${name}`].join('/');
-        const storageRef = firebase.storage().ref();
-        const documentRef = storageRef.child(encodeURI(path));
-
-        documentRef
-          .delete()
-          .then(() => resolve(name))
-          .catch(error => reject(error));
-      });
-    },
-    [getStorageBasePath],
-  );
-
-  const handleFilesDrop = useCallback(
-    (acceptedFiles: File[], label: string, isAdmin: boolean) => {
-      saveFiles(acceptedFiles, isAdmin)
-        .then((documents: CheckListDocument[]) => {
-          if (isAdmin) {
-            saveChecklistChanges('valueAdmin', {
-              files: [...(checklistItem.valueAdmin?.files ? checklistItem.valueAdmin?.files : []), ...documents],
-              type: FieldType.FILE,
-            });
-          } else {
-            saveChecklistChanges('valueCustomer', {
-              files: [...(checklistItem.valueCustomer?.files ? checklistItem.valueCustomer?.files : []), ...documents],
-              type: FieldType.FILE,
-            });
-          }
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    },
-    [saveFiles, saveChecklistChanges],
-  );
-
-  const handleFileRemoval = useCallback(
-    (name: string, isAdmin: boolean) => {
-      deleteFile(name)
-        .then(fileName => {
-          if (isAdmin) {
-            saveChecklistChanges('valueAdmin', {
-              type: FieldType.FILE,
-              files: checklistItem.valueAdmin?.files?.filter(file => file.url !== fileName),
-            });
-          } else {
-            saveChecklistChanges('valueCustomer', {
-              type: FieldType.FILE,
-              files: checklistItem.valueCustomer?.files?.filter(file => file.url !== fileName),
-            });
-          }
-        })
-        .catch(error => {
-          console.error('File not deleted due to an error: ', error);
-        });
-    },
-    [deleteFile, saveChecklistChanges],
-  );
   return (
     <TableRow selected={checklistItem.checked} className={classes.tableRow} key={checklistItem.id}>
       <TableCell>
@@ -196,43 +71,39 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       </TableCell>
 
       <TableCell>{checklistItem.label}</TableCell>
-      {checklistItem.valueCustomer?.type === FieldType.FILE ? (
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => handleFilesDrop(files, checklistItem.id, false)}
-            documents={checklistItem.valueCustomer?.files || []}
-            onDelete={(name: string) => handleFileRemoval(name, false)}
-          />
-        </TableCell>
-      ) : null}
-      {checklistItem.valueCustomer?.type === FieldType.TEXT ? (
-        <TableCell>
-          <TextField
-            variant="outlined"
-            multiline
-            rowsMax="2"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event })}
-            defaultValue={checklistItem.valueCustomer?.text || ''}
-          />
-        </TableCell>
-      ) : null}
-      {checklistItem.valueCustomer?.type === FieldType.BASIC ? <TableCell>&nbsp; </TableCell> : null}
-      {/*{!checklistItem.valueCustomer ? }*/}
-      {isAdmin ? (
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => handleFilesDrop(files, checklistItem.id, true)}
-            documents={checklistItem.valueAdmin?.files || []}
-            onDelete={(name: string) => handleFileRemoval(name, isAdmin)}
-          />
-        </TableCell>
-      ) : null}
+
+      {/*Customer Data*/}
+
+      {checklistItem.valueCustomer ? (
+        <ChecklistItemValueComponent
+          checklistValue={checklistItem.valueCustomer}
+          saveChecklistChanges={saveChecklistChanges}
+          storageBasePath={storageBasePath}
+          valuePath={'valueCustomer'}
+        />
+      ) : (
+        <TableCell>&nbsp; </TableCell>
+      )}
+
+      {/*Admin Data*/}
+      {isAdmin && checklistItem.valueAdmin ? (
+        <ChecklistItemValueComponent
+          checklistValue={checklistItem.valueAdmin}
+          saveChecklistChanges={saveChecklistChanges}
+          storageBasePath={storageBasePath}
+          valuePath={'valueAdmin'}
+        />
+      ) : (
+        <TableCell>&nbsp; </TableCell>
+      )}
     </TableRow>
   );
 };
+
 interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking | undefined;
 }
+
 export default ChecklistItemRow;
