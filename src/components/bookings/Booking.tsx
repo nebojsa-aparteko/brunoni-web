@@ -206,14 +206,7 @@ const Booking: React.FC<Props> = ({ id }) => {
       <Grid item spacing={1} md={5} xs={12}>
         <Paper className={classes.root}>
           <Box className={classes.tableWrapper}>
-            <CheckList
-              booking={booking}
-              showCompanyInfo={true}
-              onCheckboxChange={false}
-              onFilesDrop={false}
-              onDelete={false}
-              onInputChange={handlePrint}
-            />
+            <CheckList booking={booking} showCompanyInfo={true} />
           </Box>
         </Paper>
       </Grid>
