@@ -14,9 +14,10 @@ const ChecklistContent: React.FC<TableBodyProps> = ({ isAdmin, booking }) => {
       .collection('bookings')
       .doc(booking?.id)
       .collection('checklist')
+      .orderBy('order')
       .get()
       .then(checklist => setChecklistItems(flow(get('docs'))(checklist).map((doc: any) => doc.data())));
-  }, []);
+  }, [booking]);
 
   return (
     <TableBody>
