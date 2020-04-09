@@ -135,7 +135,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
     return (
       <TableCell>
         {client.name}
-        {<Typography variant="body2">{booking.ForwPersID ? booking.ForwPersID : '-'}</Typography>}
+        {booking.ForwarderPersTxt ? <Typography variant="body2">{booking.ForwarderPersTxt}</Typography> : null}
       </TableCell>
     );
   }, [showCompanyInfo, client, booking]);
