@@ -101,7 +101,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                   <col style={{ width: '60%' }} />
                 </colgroup>
                 <TableBody>
-                  {detail.LocRefs.LocRef.map((ref: LocRefItem, index: number) => {
+                  {detail.LocRefs.map((ref: LocRefItem, index: number) => {
                     if (ref.LocType === 'PICK UP') {
                       return (
                         <Fragment key={`booking-loc-ref-${index}`}>

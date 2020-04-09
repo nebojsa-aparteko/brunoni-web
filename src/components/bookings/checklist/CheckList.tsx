@@ -1,128 +1,23 @@
-import React, { useMemo } from 'react';
-import {
-  Checkbox,
-  createStyles,
-  makeStyles,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Theme,
-  TextField,
-} from '@material-ui/core';
-import { Booking, CheckListData } from '../../../model/Booking';
-import DropZone from '../../DropZone';
-import debounce from 'lodash/fp/debounce';
-import { applyRule, ChecklistItem, checklistItemsExport, checklistItemsImport, FieldType } from './checklistItemsData';
+import React from 'react';
+import { createStyles, makeStyles, Table, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { Booking } from '../../../model/Booking';
+import ChecklistContent from './ChecklistContent';
 
 interface CheckListProps {
   booking: Booking | undefined;
   showCompanyInfo?: boolean;
-  onCheckboxChange: any;
-  onFilesDrop: any;
-  onDelete?: any;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
 }
 
-interface TableBodyProps {
-  booking: Booking | undefined;
-  isAdmin?: boolean;
-  onCheckboxChange: any;
-  onFilesDrop: any;
-  onDelete?: any;
-  checklistItems: ChecklistItem[];
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
-}
-
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
-    root: {
-      width: '100%',
-    },
-    paper: {
-      marginTop: theme.spacing(3),
-      width: '100%',
-      overflowX: 'auto',
-      marginBottom: theme.spacing(2),
-    },
     table: {
       overflowX: 'auto',
       marginBottom: '1.5em',
     },
-    tableRow: {
-      height: '55px',
-      '& td': {
-        whiteSpace: 'nowrap',
-        padding: '6px 12px',
-      },
-      ['@media print']: {
-        '& td': {
-          padding: theme.spacing(0),
-        },
-      },
-    },
-    tableWrapper: {
-      overflowX: 'auto',
-    },
   }),
 );
 
-const getRowData = (booking: Booking | undefined, label: string, property: string, isAdminColumn?: boolean): any => {
-  const data: any = booking?.checklists?.find((row: CheckListData) => row.label === label);
-  if (!data || !(property in data)) return null;
-
-  if (typeof isAdminColumn === 'boolean') {
-    let collection = data[property] || [];
-    return collection.filter((item: any) => item.isAdmin === isAdminColumn);
-  }
-  return data[property];
-};
-
-const CheckListContent: React.FC<TableBodyProps> = ({
-  booking,
-  isAdmin,
-  onCheckboxChange,
-  onFilesDrop,
-  onDelete,
-  checklistItems,
-  onInputChange,
-}) => {
-  return (
-    <TableBody>
-      {/* Exception #2: Shipper's owned Container */}
-      {checklistItems.map(item => {
-        return applyRule(item, booking) ? (
-          <ChecklistItemRow
-            checklistItem={item}
-            isAdmin={isAdmin}
-            isChecked={
-              getRowData(booking, item.status, 'checked') ||
-              (item?.additionalCondition && item?.additionalCondition(booking)) ||
-              false
-            }
-            adminDocuments={getRowData(booking, item.status, 'documents', true) || []}
-            userDocuments={getRowData(booking, item.status, 'documents', false) || []}
-            inputValue={getRowData(booking, item.status, 'bhtNumberValue') || ''}
-            onInputChange={onInputChange}
-            onCheckboxChange={onCheckboxChange}
-            onFilesDrop={onFilesDrop}
-            onDelete={onDelete}
-          />
-        ) : null;
-      })}
-    </TableBody>
-  );
-};
-
-const CheckList: React.FC<CheckListProps> = ({
-  booking,
-  showCompanyInfo,
-  onCheckboxChange,
-  onFilesDrop,
-  onDelete,
-  onInputChange,
-}) => {
+const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
   const classes = useStyles();
 
   return (
@@ -135,89 +30,8 @@ const CheckList: React.FC<CheckListProps> = ({
           {showCompanyInfo && <TableCell>Admin</TableCell>}
         </TableRow>
       </TableHead>
-      <CheckListContent
-        booking={booking}
-        isAdmin={showCompanyInfo}
-        onCheckboxChange={onCheckboxChange}
-        onFilesDrop={onFilesDrop}
-        onDelete={onDelete}
-        checklistItems={booking?.Category === 'Export' ? checklistItemsExport : checklistItemsImport}
-        onInputChange={onInputChange}
-      />
+      <ChecklistContent isAdmin={showCompanyInfo} booking={booking} />
     </Table>
-  );
-};
-
-interface ChecklistItemRowProp {
-  checklistItem: ChecklistItem;
-  isAdmin: boolean | undefined;
-  isChecked: boolean;
-  userDocuments: any;
-  adminDocuments: any;
-  inputValue: string;
-  onCheckboxChange: any;
-  onFilesDrop: any;
-  onDelete?: any;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>, label: string) => void;
-}
-const ChecklistItemRow = ({
-  checklistItem,
-  isAdmin,
-  isChecked,
-  userDocuments,
-  adminDocuments,
-  inputValue,
-  onCheckboxChange,
-  onDelete,
-  onFilesDrop,
-  onInputChange,
-}: ChecklistItemRowProp) => {
-  const classes = useStyles();
-  const saveInput = useMemo(() => debounce(250, onInputChange), [onInputChange]);
-
-  return (
-    <TableRow selected={checklistItem.selectedRow} className={classes.tableRow} key={checklistItem.id}>
-      <TableCell>
-        <Checkbox
-          checked={isChecked}
-          disabled={!isAdmin}
-          onChange={event => onCheckboxChange(event, checklistItem.status)}
-        />
-      </TableCell>
-
-      <TableCell>{checklistItem.label}</TableCell>
-      {checklistItem.type === FieldType.FILE ? (
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, checklistItem.status, false)}
-            documents={userDocuments || []}
-            onDelete={(name: string) => onDelete(checklistItem.status, name)}
-          />
-        </TableCell>
-      ) : null}
-      {checklistItem.type === FieldType.TEXT ? (
-        <TableCell>
-          <TextField
-            variant="outlined"
-            multiline
-            rowsMax="2"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event }, checklistItem.status)}
-            defaultValue={inputValue || ''}
-          />
-        </TableCell>
-      ) : null}
-      {checklistItem.type === FieldType.BASIC ? <TableCell>&nbsp; </TableCell> : null}
-
-      {isAdmin ? (
-        <TableCell>
-          <DropZone
-            onDrop={(files: []) => onFilesDrop(files, checklistItem.status, true)}
-            documents={adminDocuments || []}
-            onDelete={(name: string) => onDelete(checklistItem.status, name)}
-          />
-        </TableCell>
-      ) : null}
-    </TableRow>
   );
 };
 export default CheckList;

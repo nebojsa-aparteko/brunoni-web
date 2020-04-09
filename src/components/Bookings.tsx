@@ -98,7 +98,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
 
   const resultChunks = useMemo(() => {
     // order bookings by date
-    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.BkgCreateTimeStamp, ['desc']);
+    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.createdAt, ['desc']);
 
     const filteredBookings = filter(
       (booking: Booking) =>
@@ -106,8 +106,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
         (originPort ? booking.POL === originPort.id : true) &&
         (destinationPort ? booking.POD === destinationPort.id : true) &&
-        compareAsc(booking.BkgCreateTimeStamp, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(booking.BkgCreateTimeStamp, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
+        compareAsc(booking.createdAt, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
+        compareDesc(booking.createdAt, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(sortedBookings);
 
     const result = filter(

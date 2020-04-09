@@ -23,6 +23,7 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 0,
     border: 'none',
     fontWeight: 700,
+    verticalAlign: 'top',
   },
   tableRow: {
     ['@media not print']: {
@@ -60,13 +61,12 @@ interface TableRowProps {
 }
 
 export const ClientDetails: React.FC<{
-  forwPersID: string | null;
+  forwarderName: string | null;
   bkgRef: string;
-}> = ({ forwPersID, bkgRef }) => {
+}> = ({ forwarderName, bkgRef }) => {
   return (
     <Typography variant="body2">
-      {forwPersID && forwPersID}
-      {forwPersID && bkgRef ? <br /> : null}
+      {forwarderName && bkgRef ? <div>{forwarderName}</div> : null}
       {bkgRef && bkgRef}
     </Typography>
   );
@@ -82,7 +82,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
     </TableRow>
   );
 };
-
+const clientNameAndLoc = (name: string, location: string) => `${name}, ${location && location}`;
 const BookingSummary: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const clients = useClients();
@@ -96,8 +96,8 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
 
     return (
       <Fragment>
-        {client.name}
-        <ClientDetails forwPersID={booking.ForwPersID} bkgRef={booking['Cust-BkgRef']} />
+        {clientNameAndLoc(client.name, booking.ForwAdrCity)}
+        <ClientDetails forwarderName={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
       </Fragment>
     );
   }, [client, booking]);

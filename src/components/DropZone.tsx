@@ -9,7 +9,7 @@ interface DropZoneProps {
   onDelete?: any;
 }
 
-interface DropZoneDocument {
+export interface DropZoneDocument {
   url: string;
   name: string;
 }
@@ -112,14 +112,14 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
               onClose={handleClose}
             >
               <MenuItem onClick={handleClose}>
-                <Typography variant="body2">{item.name}</Typography>
+                <Typography variant="body2">{item?.name}</Typography>
               </MenuItem>
 
               <MenuItem>
                 <a
                   onClick={handleDownload}
-                  href={item.url}
-                  download={item.name}
+                  href={item?.url}
+                  download={item?.name}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={classes.menuLink}
@@ -129,7 +129,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
               </MenuItem>
 
               <Divider />
-              <MenuItem onClick={event => handleDelete(event, item.name)}>
+              <MenuItem onClick={event => handleDelete(event, item?.name)}>
                 <Typography color="error">Delete</Typography>
               </MenuItem>
             </Menu>
