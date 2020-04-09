@@ -1,31 +1,28 @@
 import Avatar from 'react-avatar';
-import React, { useMemo, useState, Fragment, useCallback } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
   Backdrop,
   CircularProgress,
+  createStyles,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
   IconButton,
+  makeStyles,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  createStyles,
-  makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking, CheckListData, CheckListDocument } from '../../model/Booking';
+import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
-import firebase from '../../firebase';
-import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -94,24 +91,6 @@ interface ProgressDialogProps {
   showCompanyInfo?: boolean;
 }
 
-interface AddOrReplacePayload {
-  key: string;
-  value: boolean | CheckListDocument[] | string;
-}
-
-const formatEstimatedDate = (date: string) => {
-  if (date === null) {
-    return 'NOT SET';
-  }
-  if (date?.indexOf('.') < 0) {
-    return date;
-  }
-
-  let dateParts = date.split('.');
-
-  return [dateParts[0], dateParts[1]].join('.');
-};
-
 const ShipmentProgress: React.FC = () => {
   const classes = useStyles();
 
@@ -124,250 +103,6 @@ const ShipmentProgress: React.FC = () => {
 
 const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
   const classes = useStyles();
-  const [isBusy, setIsBusy] = useState(false);
-  const clients = useClients();
-  const { enqueueSnackbar } = useSnackbar();
-
-  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
-
-  const saveCheckListChanges = useCallback(
-    async (data: CheckListData[]) => {
-      setIsBusy(true);
-
-      try {
-        await firebase
-          .firestore()
-          .collection('bookings-extension')
-          .doc(booking?.id)
-          .get()
-          .then(docRef => {
-            // update existing booking extension
-            if (docRef && docRef.data()) {
-              return firebase
-                .firestore()
-                .collection('bookings-extension')
-                .doc(booking?.id)
-                .update({
-                  checklists: data,
-                });
-            } else {
-              // create new booking extension
-              return firebase
-                .firestore()
-                .collection('bookings-extension')
-                .doc(booking?.id)
-                .set({
-                  checklists: data,
-                });
-            }
-          })
-          .then(result =>
-            enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-              variant: 'success',
-              autoHideDuration: 1000,
-            }),
-          )
-          .catch(error => console.log(error));
-      } finally {
-        setIsBusy(false);
-      }
-    },
-    [booking],
-  );
-
-  const getStorageBasePath = useCallback((): string => {
-    return ['booking-documents', 'clients', `${client?.id}`, 'bookings', `${booking?.id}`].join('/');
-  }, [booking, client]);
-
-  const saveFiles = useCallback(
-    async (files: File[], isAdmin: boolean): Promise<any> => {
-      const uploadFile = async (file: File): Promise<any> => {
-        return new Promise((resolve, reject) => {
-          let path = [getStorageBasePath(), `${file.name}`].join('/');
-          let storageRef = firebase.storage().ref(encodeURI(path));
-          let uploadTask = storageRef.put(file);
-
-          uploadTask.on(
-            firebase.storage.TaskEvent.STATE_CHANGED,
-            snapshot => {
-              // in progress
-              // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
-              //   // ex. calculate progress
-              // }
-            },
-            error => {
-              reject(error);
-            },
-            () => {
-              // success
-              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
-                resolve(downloadURL);
-              });
-            },
-          );
-        });
-      };
-
-      const requests = files.map((file: File) => {
-        return uploadFile(file).then(downloadURL => {
-          return {
-            isAdmin: isAdmin,
-            name: file.name,
-            url: downloadURL,
-          };
-        });
-      });
-
-      return Promise.all(requests);
-    },
-    [getStorageBasePath],
-  );
-
-  const deleteFile = useCallback(
-    async (name: any): Promise<any> => {
-      return new Promise((resolve, reject) => {
-        const path = [getStorageBasePath(), `${name}`].join('/');
-        const storageRef = firebase.storage().ref();
-        const documentRef = storageRef.child(encodeURI(path));
-
-        documentRef
-          .delete()
-          .then(() => resolve(name))
-          .catch(error => reject(error));
-      });
-    },
-    [getStorageBasePath],
-  );
-
-  const addOrReplace = useCallback(
-    (label: string, data: AddOrReplacePayload) => {
-      if (!booking) return;
-
-      if (!('checklists' in booking)) {
-        booking.checklists = [];
-      }
-
-      const index: number | undefined = booking?.checklists?.findIndex((item: CheckListData) => item.label === label);
-
-      const key: string = data.key;
-      let value: any;
-
-      if (booking.checklists && typeof index !== 'undefined' && index > -1) {
-        // update existing entry
-        let existingEntry: any = booking.checklists[index];
-
-        if (typeof data.value === 'boolean') {
-          value = data.value;
-        }
-
-        if (Array.isArray(data.value)) {
-          value = [...(existingEntry.documents || []), ...data.value];
-        }
-
-        if (typeof data.value === 'string') {
-          value = data.value;
-        }
-
-        existingEntry[key] = value;
-      } else {
-        // create new entry
-        let newEntry: any = {
-          [key]: data.value,
-          label,
-        };
-
-        if (booking && booking.checklists) {
-          booking.checklists.push(newEntry);
-        }
-      }
-
-      return booking.checklists;
-    },
-    [booking],
-  );
-
-  const handleCheckboxChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-      const checklistsData = addOrReplace(label, { key: 'checked', value: event.target.checked });
-
-      if (!checklistsData) return;
-
-      saveCheckListChanges(checklistsData);
-    },
-    [addOrReplace, saveCheckListChanges],
-  );
-
-  const handleFilesDrop = useCallback(
-    (acceptedFiles: File[], label: string, isAdmin: boolean) => {
-      setIsBusy(true);
-
-      saveFiles(acceptedFiles, isAdmin)
-        .then((documents: CheckListDocument[]) => {
-          const checklistsData = addOrReplace(label, { key: 'documents', value: documents });
-
-          if (!checklistsData) {
-            setIsBusy(false);
-            return;
-          }
-
-          setIsBusy(false);
-
-          saveCheckListChanges(checklistsData);
-        })
-        .catch(err => {
-          setIsBusy(false);
-
-          console.error(err);
-        });
-    },
-    [saveFiles, addOrReplace, saveCheckListChanges],
-  );
-
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, label: string) => {
-      setIsBusy(true);
-      console.log('event', event.target.value);
-      const checklistsData = addOrReplace(label, { key: 'bhtNumberValue', value: event.target.value });
-
-      if (!checklistsData) {
-        setIsBusy(false);
-        return;
-      }
-      saveCheckListChanges(checklistsData);
-      setIsBusy(false);
-    },
-    [addOrReplace, saveCheckListChanges],
-  );
-
-  const handleFileRemoval = useCallback(
-    (label: string, name: string) => {
-      setIsBusy(true);
-
-      deleteFile(name)
-        .then(fileName => {
-          const checklistsData = booking?.checklists?.map(item => {
-            if (item.label === label) {
-              item.documents = item?.documents?.filter(document => document.name !== fileName);
-            }
-
-            return item;
-          });
-
-          if (!checklistsData) {
-            setIsBusy(false);
-            return;
-          }
-
-          setIsBusy(false);
-          saveCheckListChanges(checklistsData);
-        })
-        .catch(error => {
-          console.error('File not deleted due to an error: ', error);
-          setIsBusy(false);
-        });
-    },
-    [booking, deleteFile, saveCheckListChanges],
-  );
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
@@ -378,18 +113,8 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CheckList
-          booking={booking}
-          showCompanyInfo={showCompanyInfo}
-          onCheckboxChange={handleCheckboxChange}
-          onFilesDrop={handleFilesDrop}
-          onDelete={handleFileRemoval}
-          onInputChange={handleInputChange}
-        />
+        <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
       </DialogContent>
-      <Backdrop open={isBusy} className={classes.checkListBackdrop} timeout={300}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
     </Dialog>
   );
 };
@@ -410,7 +135,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
     return (
       <TableCell>
         {client.name}
-        {booking.ForwPersID ? <Typography variant="body2">{booking.ForwPersID}</Typography> : null}
+        {<Typography variant="body2">{booking.ForwPersID ? booking.ForwPersID : '-'}</Typography>}
       </TableCell>
     );
   }, [showCompanyInfo, client, booking]);

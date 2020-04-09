@@ -82,7 +82,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
     </TableRow>
   );
 };
-
+const clientNameAndLoc = (name: string, location: string) => `${name}, ${location && location}`;
 const BookingSummary: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const clients = useClients();
@@ -96,7 +96,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
 
     return (
       <Fragment>
-        {client.name}
+        {clientNameAndLoc(client.name, booking.ForwAdrCity)}
         <ClientDetails forwPersID={booking.ForwPersID} bkgRef={booking['Cust-BkgRef']} />
       </Fragment>
     );

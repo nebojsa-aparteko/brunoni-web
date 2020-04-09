@@ -183,7 +183,6 @@ const Booking: React.FC<Props> = ({ id }) => {
                   <BookingFreight freightDetails={booking.FreightDetails} />
                 </Box>
               )}
-
               {finalRemarks.map((item, index) => {
                 return (
                   <Typography variant="body2" key={`final-remark-${index}`}>
