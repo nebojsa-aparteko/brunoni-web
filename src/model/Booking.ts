@@ -163,6 +163,7 @@ export interface CargoDetail {
   CtypID: string;
   LocRefs: LocRefItem[];
   IMCO: IMCO | null;
+  IMCOs: IMCOField[] | null;
   Overdimension: CargoOverdimension | null;
 }
 
@@ -204,4 +205,10 @@ export enum CargoOverdimension {
 
 export enum IMCO {
   Trigger = 'Yes',
+}
+export interface IMCOField {
+  IMOClass: string;
+  UNNumber: string;
+  PackingNumber: string;
+  FlashPoint: string;
 }

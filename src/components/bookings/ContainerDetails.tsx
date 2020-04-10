@@ -1,10 +1,10 @@
-import React, { useContext, Fragment } from 'react';
-import { Box, Divider, Grid, Typography, makeStyles, Table, TableBody, TableRow, TableCell } from '@material-ui/core';
-import isArray from 'lodash/fp/isArray';
-import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
+import React, { Fragment, useContext } from 'react';
+import { Box, Divider, Grid, makeStyles, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core';
+import { BookingVersion, CargoDetail, LocRefItem } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import { isLongVersion } from './Booking';
+import ImcoContainer from './ImcoContainer';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
+export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
   return (
@@ -89,6 +89,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                 {detail.CommodityTXT ? <TableRowData label={'Commodity'} content={detail.CommodityTXT} /> : null}
 
                 {detail.CtrWeight ? <TableRowData label={'Weight'} content={detail.CtrWeight} /> : null}
+
+                {detail.IMCO && detail.IMCOs ? detail.IMCOs?.map(imco => <ImcoContainer detail={imco} />) : null}
               </TableBody>
             </Table>
           </Grid>
