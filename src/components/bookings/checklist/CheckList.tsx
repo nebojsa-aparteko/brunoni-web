@@ -12,7 +12,11 @@ const useStyles = makeStyles(() =>
   createStyles({
     table: {
       overflowX: 'auto',
-      marginBottom: '1.5em',
+    },
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
+      },
     },
   }),
 );

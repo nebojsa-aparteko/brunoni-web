@@ -1,5 +1,5 @@
 import React from 'react';
-import Helmet from 'react-helmet';
+import { Helmet } from 'react-helmet';
 import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 

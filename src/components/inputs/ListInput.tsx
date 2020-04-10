@@ -1,11 +1,12 @@
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import { Box, Button, Paper, IconButton, makeStyles, Theme } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputProps from '../../model/InputProps';
 
-interface Props<T> extends InputProps<T[]> {
+interface Props<T> {
+  ref?: React.Ref<unknown>;
   listRef?: React.Ref<unknown>;
   addButtonRef?: React.Ref<unknown>;
   ItemInput: React.ComponentType<InputProps<T>>;

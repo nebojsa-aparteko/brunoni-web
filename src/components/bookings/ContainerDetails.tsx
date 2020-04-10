@@ -70,9 +70,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
   return (
     <Fragment>
-      <Typography variant="h4">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
+      <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
 
-      <Box marginTop="2em" marginBottom="2em">
+      <Box marginTop="0em" marginBottom="2em">
         <Grid container spacing={0}>
           <Grid item md={5} xs={12}>
             <Table size="small" aria-label="a dense table">

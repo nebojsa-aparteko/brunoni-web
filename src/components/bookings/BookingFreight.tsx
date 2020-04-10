@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Grid,
-  Table,
-  TableHead,
-  TableCell,
-  TableRow,
-  Theme,
-  createStyles,
-  makeStyles
-} from '@material-ui/core';
+import { Box, Grid, Table, TableHead, TableCell, TableRow, Theme, createStyles, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { FreightDetail } from '../../model/Booking';
 
@@ -40,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: '150px',
     },
     tableRow: {
+      verticalAlign: 'top',
       '& td': {
         whiteSpace: 'nowrap',
       },
@@ -60,33 +51,39 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
 
   return (
     <Grid item xs={12}>
-        <Box className={classes.tableWrapper}>
-          <Table className={classes.table} size="small">
-            <TableHead className={classes.tableHead}>
-              <TableRow className={classes.tableRow}>
-                <TableCell>Description</TableCell>
-                <TableCell align="right">Currency</TableCell>
-                <TableCell align="right">Cost Value</TableCell>
-                <TableCell>Cost Unit</TableCell>
-                <TableCell>Remark</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {freightDetails.map((freight, index) => {
-                return (
-                  <TableRow selected={(index + 1) % 2 === 0} key={`booking-freight-${index}`} className={classes.tableRow}>
-                    <TableCell component="th" scope="row">{freight.Txt}</TableCell>
-                    <TableCell align="right">{freight.Currency}</TableCell>
-                    <TableCell align="right">{freight.UnitValue}</TableCell>
-                    <TableCell>{freight.Unit}</TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      </Grid>
+      <Box className={classes.tableWrapper}>
+        <Table className={classes.table} size="small">
+          <TableHead className={classes.tableHead}>
+            <TableRow className={classes.tableRow}>
+              <TableCell>Description</TableCell>
+              <TableCell align="right">Currency</TableCell>
+              <TableCell align="right">Cost Value</TableCell>
+              <TableCell>Cost Unit</TableCell>
+              <TableCell>Remark</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {freightDetails.map((freight, index) => {
+              return (
+                <TableRow
+                  selected={(index + 1) % 2 === 0}
+                  key={`booking-freight-${index}`}
+                  className={classes.tableRow}
+                >
+                  <TableCell component="th" scope="row">
+                    {freight.Txt}
+                  </TableCell>
+                  <TableCell align="right">{freight.Currency}</TableCell>
+                  <TableCell align="right">{freight.UnitValue}</TableCell>
+                  <TableCell>{freight.Unit}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Box>
+    </Grid>
   );
 };
 

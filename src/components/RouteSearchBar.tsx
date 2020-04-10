@@ -54,8 +54,8 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
   const searchButton = useRef<HTMLButtonElement>();
 
   const { originPort, destinationPort, date, weeks } = value;
-  const setOriginPort = (port: Port) => onChange(set('originPort', port)(value));
-  const setDestinationPort = (port: Port) => onChange(set('destinationPort', port)(value));
+  const setOriginPort = (port: Port | null) => onChange(set('originPort', port)(value));
+  const setDestinationPort = (port: Port | null) => onChange(set('destinationPort', port)(value));
   const setDate = (date: Date) => onChange(set('date', date)(value));
   const setWeeks = (weeks: number) => onChange(set('weeks', weeks)(value));
 
@@ -72,12 +72,12 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
     };
   }, [originInput]);
 
-  const handleOriginPortChange = (port: Port) => {
+  const handleOriginPortChange = (port: Port | null) => {
     setOriginPort(port);
     focusAndSelect(destinationInput.current!);
   };
 
-  const handleDestinationPortChange = (port: Port) => {
+  const handleDestinationPortChange = (port: Port | null) => {
     setDestinationPort(port);
     searchButton.current!.focus();
     if (!date) {
@@ -122,7 +122,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
         <Grid item sm={3} xs={12}>
           <PortInput
             label="Origin"
-            ports={ports}
+            ports={ports || []}
             inputRef={originInput}
             value={originPort}
             onChange={handleOriginPortChange}
@@ -134,7 +134,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
         <Grid item sm={3} xs={12}>
           <PortInput
             label="Destination"
-            ports={ports}
+            ports={ports || []}
             inputRef={destinationInput}
             value={destinationPort}
             onChange={handleDestinationPortChange}

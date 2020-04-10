@@ -4,7 +4,7 @@ import {
   ChecklistItemValueDocuments,
   FieldType,
 } from './checklistItemsData';
-import { TableCell, TextField } from '@material-ui/core';
+import { createStyles, makeStyles, TableCell, TextField, Theme } from '@material-ui/core';
 import DropZone, { DropZoneDocument } from '../../DropZone';
 import React, { Fragment, useCallback, useMemo } from 'react';
 import debounce from 'lodash/fp/debounce';
@@ -17,6 +17,15 @@ interface Props {
   saveChecklistChanges: any;
   storageBasePath: string;
 }
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
+      },
+    },
+  }),
+);
 
 interface ItemValueTextProps {
   valuePath: string;
@@ -29,6 +38,7 @@ export const ChecklistItemValueTextComponent: React.FC<ItemValueTextProps> = ({
   valuePath,
   saveChecklistChanges,
 }) => {
+  const classes = useStyles();
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       console.log('Typed input', event.target.value);
@@ -66,6 +76,7 @@ export const CheckListItemValueFiles: React.FC<ItemValueFilesProps> = ({
   checklistValue,
   saveChecklistChanges,
 }) => {
+  const classes = useStyles();
   const saveFiles = useCallback(
     async (files: File[]): Promise<any> => {
       const uploadFile = async (file: File): Promise<any> => {
@@ -159,7 +170,7 @@ export const CheckListItemValueFiles: React.FC<ItemValueFilesProps> = ({
   );
 
   return (
-    <TableCell>
+    <TableCell className={classes.hidePrint}>
       <DropZone
         onDrop={(files: []) => handleFilesDrop(files)}
         documents={[checklistValue?.data as DropZoneDocument] || []}
@@ -175,6 +186,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
   saveChecklistChanges,
   storageBasePath,
 }) => {
+  const classes = useStyles();
   return (
     <Fragment>
       {checklistValue.type === FieldType.FILE && (
@@ -193,7 +205,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
         />
       )}
       {checklistValue.type === FieldType.CHECKMARK && (
-        <TableCell>
+        <TableCell className={classes.hidePrint}>
           <p>
             <a href={'#'}>Form to fill</a>
           </p>

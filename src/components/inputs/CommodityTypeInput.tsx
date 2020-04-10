@@ -9,7 +9,7 @@ import flatten from 'lodash/fp/flatten';
 import intersectionWith from 'lodash/fp/intersectionWith';
 import isEqual from 'lodash/fp/isEqual';
 
-interface Props extends InputProps<CommodityType | undefined> {
+interface Props extends InputProps<CommodityType> {
   margin: string;
 }
 
@@ -57,12 +57,12 @@ const CommodityTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onCha
       label="Commodity Type"
       margin={margin}
       filterOptions={filterOptions}
-      options={commodityTypes}
+      options={commodityTypes || []}
       getOptionLabel={getCommodityTypeLabel}
       open={open}
       setOpen={setOpen}
       value={value}
-      onChange={(commodityType: CommodityType | undefined) => onChange(commodityType)}
+      onChange={(commodityType: CommodityType | null) => onChange(commodityType)}
     />
   );
 };

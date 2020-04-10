@@ -21,6 +21,7 @@ import formatDate from 'date-fns/format';
 import { Booking, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
+import theme from '../../theme';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -34,6 +35,9 @@ const useStyles = makeStyles(() =>
       '& td': {
         whiteSpace: 'nowrap',
       },
+    },
+    clientNameLabel: {
+      whiteSpace: 'normal',
     },
     progress: {
       width: '100%',
@@ -66,6 +70,9 @@ const useStyles = makeStyles(() =>
     },
     checkListBackdrop: {
       zIndex: 1,
+    },
+    checklistDialog: {
+      paddingBottom: theme.spacing(3),
     },
   }),
 );
@@ -116,11 +123,12 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <DialogTitle disableTypography id="dialog-title-check-list">
         <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
+        {booking ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent className={classes.checklistDialog}>
         <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
       </DialogContent>
     </Dialog>
@@ -142,7 +150,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
 
     return (
       <TableCell>
-        {client.name}
+        <div className={classes.clientNameLabel}>{client.name}</div>
         {booking.ForwarderPersTxt ? <Typography variant="body2">{booking.ForwarderPersTxt}</Typography> : null}
       </TableCell>
     );
@@ -164,17 +172,17 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>
         {booking.Vessel}
         <br />
-        Voyage Number {booking.Voyage}
+        <Typography variant={'body2'}>Voyage Number {booking.Voyage}</Typography>
       </TableCell>
       <TableCell>
         {booking.PlaceOfRecieptName}
         <br />
-        ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}
+        <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
       </TableCell>
       <TableCell>
         {booking.FinalDestinationName}
         <br />
-        ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}
+        <Typography variant={'body2'}> ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
       </TableCell>
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
@@ -200,37 +208,37 @@ const BookingsTableBodySekeleton: React.FC = () => (
     {[...Array(10)].map((_, i) => (
       <TableRow key={i}>
         <TableCell>
-          <Skeleton width={50} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'20%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={65} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'5%'} height={16} style={{ margin: 0 }} />
         </TableCell>
         <TableCell>
-          <Skeleton width={140} height={16} style={{ margin: 0 }} />
+          <Skeleton width={'5%'} height={16} style={{ margin: 0 }} />
         </TableCell>
       </TableRow>
     ))}
@@ -268,17 +276,19 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
       <Table>
         <TableHead>
           <TableRow>
-            {showCompanyInfo && <TableCell>Client</TableCell>}
-            <TableCell>Carrier</TableCell>
-            <TableCell>Vessel</TableCell>
-            <TableCell>Origin</TableCell>
-            <TableCell>Destination</TableCell>
-            <TableCell>BL Number</TableCell>
-            <TableCell>Your Reference</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell className={classes.avatarCell}>Contact</TableCell>
-            <TableCell>Progress</TableCell>
+            {showCompanyInfo && <TableCell style={{ width: '20%' }}>Client</TableCell>}
+            <TableCell style={{ width: '10%' }}>Carrier</TableCell>
+            <TableCell style={{ width: '10%' }}>Vessel</TableCell>
+            <TableCell style={{ width: '10%' }}>Origin</TableCell>
+            <TableCell style={{ width: '10%' }}>Destination</TableCell>
+            <TableCell style={{ width: '10%' }}>BL Number</TableCell>
+            <TableCell style={{ width: '15%' }}>Your Reference</TableCell>
+            <TableCell style={{ width: '10%' }}>Status</TableCell>
+            <TableCell style={{ width: '5%' }}>Date</TableCell>
+            <TableCell className={classes.avatarCell} style={{ width: '5%' }}>
+              Contact
+            </TableCell>
+            <TableCell style={{ width: '5%' }}>Progress</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

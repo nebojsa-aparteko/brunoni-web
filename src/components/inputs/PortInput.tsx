@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
-import React, { HTMLAttributes, MutableRefObject, Ref } from 'react';
-import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme } from '@material-ui/core';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import Port from '../../model/Port';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
@@ -10,10 +10,10 @@ const getOptionLabel = (option: Port) => `${option.city} - ${option.country} (${
 
 interface Props {
   label: string;
-  ports: Port[] | undefined;
+  ports: Port[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Port;
-  onChange: (port: Port) => void;
+  onChange: (port: Port | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -32,7 +32,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
   return (
     <Autocomplete
       value={value}
-      onChange={(_, port: Port) => onChange(port)}
+      onChange={(_: ChangeEvent<{}>, port: Port | null) => onChange(port)}
       autoHighlight
       open={open}
       onOpen={onOpen}

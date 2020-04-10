@@ -4,6 +4,7 @@ import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import formatDate from 'date-fns/format';
+import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 
 interface Props {
   booking: Booking;
@@ -31,7 +32,6 @@ const useStyles = makeStyles(theme => ({
         display: 'block',
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
-
         '& td': {
           display: 'block',
           padding: theme.spacing(0),
@@ -46,6 +46,9 @@ const useStyles = makeStyles(theme => ({
   },
   tableCell: {
     border: 'none',
+  },
+  summaryTable: {
+    width: '100%',
   },
   tableCellQuoteUserData: {
     ['@media not print']: {
@@ -62,11 +65,19 @@ interface TableRowProps {
 
 export const ClientDetails: React.FC<{
   forwarderName: string | null;
+  forwarderID: string | undefined;
   bkgRef: string;
-}> = ({ forwarderName, bkgRef }) => {
+}> = ({ forwarderName, forwarderID, bkgRef }) => {
+  const forwarder = useUserByAlphacomId(forwarderID);
+  const forwarderEmail = forwarder?.emailAddress;
   return (
     <Typography variant="body2">
       {forwarderName && bkgRef ? <div>{forwarderName}</div> : null}
+      {forwarderEmail && forwarderEmail ? (
+        <div>
+          <a href={'mailto:' + forwarder?.emailAddress}>{forwarder?.emailAddress}</a>
+        </div>
+      ) : null}
       {bkgRef && bkgRef}
     </Typography>
   );
@@ -97,16 +108,20 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
     return (
       <Fragment>
         {clientNameAndLoc(client.name, booking.ForwAdrCity)}
-        <ClientDetails forwarderName={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
+        <ClientDetails
+          forwarderName={booking.ForwarderPersTxt}
+          forwarderID={booking.ForwAdrId + '-' + booking.ForwPersID.padStart(3, '0')}
+          bkgRef={booking['Cust-BkgRef']}
+        />
       </Fragment>
     );
   }, [client, booking]);
 
   return (
-    <Table size="small" aria-label="a dense table">
+    <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
       <colgroup>
-        <col style={{ width: '40%' }} />
-        <col style={{ width: '60%' }} />
+        <col style={{ width: '16.6%' }} />
+        <col style={{ width: '83.4%' }} />
       </colgroup>
       <TableBody>
         <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />

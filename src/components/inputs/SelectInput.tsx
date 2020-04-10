@@ -1,14 +1,14 @@
-import React, { HTMLAttributes, Ref } from 'react';
-import { Theme, makeStyles, TextField, CircularProgress, Popper, Paper } from '@material-ui/core';
+import React, { ChangeEvent, HTMLAttributes, Ref } from 'react';
+import { Theme, makeStyles, TextField, CircularProgress, Popper, Paper, PopperProps } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 interface Props<T> extends InputProps<T> {
   label: string;
   margin?: any;
-  options: T[] | undefined;
+  options: T[];
   filterOptions?: any;
   getOptionLabel: (value: T) => string;
   inputRef?: React.Ref<any>;
@@ -40,7 +40,7 @@ export default function SelectInput<T>({
   return (
     <Autocomplete
       value={value}
-      onChange={(_, value: T) => onChange(value)}
+      onChange={(_: ChangeEvent<{}>, value: T | null) => onChange(value)}
       autoSelect
       autoHighlight
       open={open}

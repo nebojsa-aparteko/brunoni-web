@@ -9,7 +9,7 @@ import intersectionWith from 'lodash/fp/intersectionWith';
 import isEqual from 'lodash/fp/isEqual';
 import flatten from 'lodash/fp/flatten';
 
-interface Props extends InputProps<ContainerType | undefined> {
+interface Props extends InputProps<ContainerType> {
   margin?: any;
 }
 
@@ -57,13 +57,13 @@ const ContainerTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onCha
       inputRef={input}
       label="Container Type"
       margin={margin}
-      options={containerTypes}
+      options={containerTypes || []}
       filterOptions={filterOptions}
       getOptionLabel={getContainerTypeLabel}
       open={open}
       setOpen={setOpen}
       value={value}
-      onChange={(containerType: ContainerType | undefined) => onChange(containerType)}
+      onChange={(containerType: ContainerType | null) => onChange(containerType)}
     />
   );
 };

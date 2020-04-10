@@ -33,9 +33,11 @@ const FiltersBar: React.FC<Props> = ({
 
   const { clientFilter, originPort, destinationPort } = listContextData;
 
-  const setOriginPort = (port: Port) => setQuoteListContextData(set('originPort', port)(listContextData));
-  const setDestinationPort = (port: Port) => setQuoteListContextData(set('destinationPort', port)(listContextData));
-  const setClientFilter = (client: Client) => setQuoteListContextData(set('clientFilter', client)(listContextData));
+  const setOriginPort = (port: Port | null) => setQuoteListContextData(set('originPort', port)(listContextData));
+  const setDestinationPort = (port: Port | null) =>
+    setQuoteListContextData(set('destinationPort', port)(listContextData));
+  const setClientFilter = (client: Client | null) =>
+    setQuoteListContextData(set('clientFilter', client)(listContextData));
 
   return (
     <Box
@@ -58,10 +60,10 @@ const FiltersBar: React.FC<Props> = ({
           </Grid>
         )}
         <Grid item sm={3} xs={12}>
-          <PortInput label="Origin" ports={ports} value={originPort} onChange={setOriginPort} />
+          <PortInput label="Origin" ports={ports || []} value={originPort} onChange={setOriginPort} />
         </Grid>
         <Grid item sm={3} xs={12}>
-          <PortInput label="Destination" ports={ports} value={destinationPort} onChange={setDestinationPort} />
+          <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
 
         {!showCompanyInfo && <Grid item sm={3} xs={12} />}

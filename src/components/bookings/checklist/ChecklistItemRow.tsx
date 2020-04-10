@@ -30,15 +30,26 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
     },
     tableRow: {
-      height: '55px',
       '& td': {
         whiteSpace: 'nowrap',
-        padding: '6px 12px',
+        padding: '6px 6px',
       },
       ['@media print']: {
         '& td': {
           padding: theme.spacing(0),
+          width: '10%',
         },
+      },
+    },
+    itemLabel: {
+      whiteSpace: 'normal',
+      ['@media print']: {
+        whiteSpace: 'nowrap',
+      },
+    },
+    hidePrint: {
+      ['@media print']: {
+        display: 'none',
       },
     },
   }),
