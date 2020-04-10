@@ -143,7 +143,6 @@ const Booking: React.FC<Props> = ({ id }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item spacing={1} md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
-          {/*<Container maxWidth="md">*/}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
