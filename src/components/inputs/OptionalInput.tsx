@@ -1,11 +1,17 @@
 import React, { useImperativeHandle, useRef } from 'react';
 import { Box, Checkbox, FormControlLabel } from '@material-ui/core';
-import InputProps from '../../model/InputProps';
 
-interface Props<T> extends InputProps<[false] | [true, T]> {
+export interface OptionalInputProps<T> {
+  ref?: React.Ref<unknown>;
+  value: T;
+  onChange: (value: T) => void;
+}
+
+interface Props<T> {
+  ref?: React.Ref<unknown>;
   label: string;
   itemRef?: React.Ref<unknown>;
-  ItemInput: React.ComponentType<InputProps<T>>;
+  ItemInput: React.ComponentType<OptionalInputProps<T>>;
   defaultItemValue: T;
   value: [false] | [true, T];
   onChange: (value: [false] | [true, T]) => void;

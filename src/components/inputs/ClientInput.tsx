@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
-import React, { HTMLAttributes, MutableRefObject, Ref } from 'react';
-import Autocomplete, { PopperProps } from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, TextField, Theme } from '@material-ui/core';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import Client from '../../model/Client';
@@ -10,10 +10,10 @@ const getOptionLabel = (option: Client) => `${option.name} - ${option.city} (${o
 
 interface Props {
   label: string;
-  clients: Client[] | undefined;
+  clients: Client[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Client;
-  onChange: (client: Client) => void;
+  onChange: (client: Client | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -47,7 +47,7 @@ const ClientInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value}
-      onChange={(_, client: Client) => onChange(client)}
+      onChange={(_: ChangeEvent<{}>, client: Client | null) => onChange(client)}
       autoSelect
       autoHighlight
       open={open}

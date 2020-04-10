@@ -4,7 +4,7 @@ import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
-import { Box, Grid, makeStyles, TextField, Theme, Paper } from '@material-ui/core';
+import { Grid, makeStyles, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
@@ -14,7 +14,7 @@ import LocationInput from './LocationInput';
 import ContainerType from '../../model/ContainerType';
 import CommodityType from '../../model/CommodityType';
 import PickupLocation from '../../model/PickupLocation';
-import OptionalInput from './OptionalInput';
+import OptionalInput, { OptionalInputProps } from './OptionalInput';
 import ListInput from './ListInput';
 import IMOInput from './IMOInput';
 import OOGInput from './OOGInput';
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const OOGListInput = forwardRef((props: InputProps<OOG[]>, ref) => (
+const OOGListInput = forwardRef((props: OptionalInputProps<OOG[]>, ref) => (
   <ListInput
     ref={ref}
     ItemInput={OOGInput}
@@ -45,7 +45,7 @@ const OOGListInput = forwardRef((props: InputProps<OOG[]>, ref) => (
   />
 ));
 
-const IMOListInput = forwardRef((props: InputProps<IMO[]>, ref) => (
+const IMOListInput = forwardRef((props: OptionalInputProps<IMO[]>, ref) => (
   <ListInput
     ref={ref}
     ItemInput={IMOInput}
@@ -79,7 +79,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     },
   }));
 
-  const handleContainerTypeChange = (v: ContainerType | undefined) => {
+  const handleContainerTypeChange = (v: ContainerType | null) => {
     onChange(
       flow(
         set('containerType', v),
@@ -90,18 +90,18 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     (commodityTypeInput.current! as { focus: () => void }).focus();
   };
 
-  const handleCommodityTypeChange = (v: CommodityType | undefined) => {
+  const handleCommodityTypeChange = (v: CommodityType | null) => {
     onChange(set('commodityType', v)(value));
     if (locationInput.current) {
       (locationInput.current! as { focus: () => void }).focus();
     }
   };
 
-  const handleLocationChange = (v: PickupLocation | undefined) => {
+  const handleLocationChange = (v: PickupLocation | null) => {
     onChange(set('pickupLocation', v)(value));
   };
 
-  const handleQuantityChange = (v: number) => {
+  const handleQuantityChange = (v: number | null) => {
     onChange(set('quantity', v)(value));
   };
 
@@ -120,7 +120,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           <ContainerTypeInput
             ref={containerTypeInput}
             margin="dense"
-            value={value.containerType}
+            value={value.containerType!}
             onChange={handleContainerTypeChange}
           />
         </Grid>
@@ -128,7 +128,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           <CommodityTypeInput
             ref={commodityTypeInput}
             margin="dense"
-            value={value.commodityType}
+            value={value.commodityType!}
             onChange={handleCommodityTypeChange}
           />
         </Grid>
@@ -137,7 +137,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             <LocationInput
               ref={locationInput}
               margin="dense"
-              value={value.pickupLocation}
+              value={value.pickupLocation!}
               onChange={handleLocationChange}
             />
           </Grid>

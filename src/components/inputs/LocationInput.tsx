@@ -21,7 +21,7 @@ import isEqual from 'lodash/fp/isEqual';
 import flatten from 'lodash/fp/flatten';
 import { adrNameToFilterOut, doNotShowCities } from '../../utilities/pickupDropOffHelperData';
 
-interface Props extends InputProps<PickupLocation | undefined> {
+interface Props extends InputProps<PickupLocation> {
   margin?: any;
 }
 
@@ -90,7 +90,7 @@ const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       open={open}
       setOpen={setOpen}
       value={value}
-      onChange={(location: PickupLocation | undefined) => onChange(location)}
+      onChange={(location: PickupLocation | null) => onChange(location)}
     />
   );
 };
