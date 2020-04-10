@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { TableBody } from '@material-ui/core';
+import React, { Fragment, useEffect, useState } from 'react';
 import ChecklistItemRow from './ChecklistItemRow';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
@@ -20,12 +19,11 @@ const ChecklistContent: React.FC<TableBodyProps> = ({ isAdmin, booking }) => {
   }, [booking]);
 
   return (
-    <TableBody>
-      {/* Exception #2: Shipper's owned Container */}
+    <Fragment>
       {checklistItems.map(item => (
         <ChecklistItemRow checklistItem={item} isAdmin={isAdmin} booking={booking} />
       ))}
-    </TableBody>
+    </Fragment>
   );
 };
 

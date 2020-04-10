@@ -1,6 +1,6 @@
 import {
   ChecklistItemValue,
-  ChecklistItemValueDataText,
+  ChecklistItemValueText,
   ChecklistItemValueDocuments,
   FieldType,
 } from './checklistItemsData';
@@ -24,7 +24,7 @@ interface ItemValueTextProps {
   saveChecklistChanges: any;
 }
 
-export const ChecklistItemValueText: React.FC<ItemValueTextProps> = ({
+export const ChecklistItemValueTextComponent: React.FC<ItemValueTextProps> = ({
   checklistValue,
   valuePath,
   saveChecklistChanges,
@@ -47,7 +47,7 @@ export const ChecklistItemValueText: React.FC<ItemValueTextProps> = ({
         multiline
         rowsMax="2"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => saveInput({ ...event })}
-        defaultValue={(checklistValue?.data as ChecklistItemValueDataText)?.text || ''}
+        defaultValue={(checklistValue?.data as ChecklistItemValueText)?.text || ''}
       />
     </TableCell>
   );
@@ -186,7 +186,7 @@ const ChecklistItemValueComponent: React.FC<Props> = ({
         />
       )}
       {checklistValue.type === FieldType.TEXT && (
-        <ChecklistItemValueText
+        <ChecklistItemValueTextComponent
           valuePath={valuePath}
           checklistValue={checklistValue}
           saveChecklistChanges={saveChecklistChanges}
