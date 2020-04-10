@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStyles, makeStyles, Table, TableCell, TableHead, TableRow } from '@material-ui/core';
+import { createStyles, makeStyles, Grid, Table, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
 import ChecklistContent from './ChecklistContent';
 
@@ -25,17 +25,9 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
   const classes = useStyles();
 
   return (
-    <Table className={classes.table} size="small" aria-label="a dense table">
-      <TableHead>
-        <TableRow>
-          <TableCell align="center">&nbsp;</TableCell>
-          <TableCell>&nbsp;</TableCell>
-          <TableCell className={classes.hidePrint}>Customer</TableCell>
-          {showCompanyInfo && <TableCell className={classes.hidePrint}>Admin</TableCell>}
-        </TableRow>
-      </TableHead>
+    <Grid container xs spacing={2} direction="column">
       <ChecklistContent isAdmin={showCompanyInfo} booking={booking} />
-    </Table>
+    </Grid>
   );
 };
 export default CheckList;

@@ -17,7 +17,6 @@ import {
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
-import map from 'lodash/fp/map';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
@@ -35,8 +34,7 @@ import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import containsString from '../utilities/containsString';
-import update from 'lodash/fp/update';
-import invoke from 'lodash/fp/invoke';
+import useLocalStorage from '../utilities/useLocalStorage';
 
 interface Props {
   showCompanyInfo?: boolean;
@@ -88,7 +86,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
-  const [importOrExport, setImportOrExport] = useState('Import');
+  const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Import', true);
 
   const [dateRange, setDateRange] = useState<DateRange>();
 
@@ -100,7 +98,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
 
   const resultChunks = useMemo(() => {
     // order bookings by date
-    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.BkgCreateTimeStamp, ['desc']);
+    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.createdAt, ['desc']);
 
     const filteredBookings = filter(
       (booking: Booking) =>
@@ -108,8 +106,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
         (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
         (originPort ? booking.POL === originPort.id : true) &&
         (destinationPort ? booking.POD === destinationPort.id : true) &&
-        compareAsc(booking.BkgCreateTimeStamp, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(booking.BkgCreateTimeStamp, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
+        compareAsc(booking.createdAt, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
+        compareDesc(booking.createdAt, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
     )(sortedBookings);
 
     const result = filter(

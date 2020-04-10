@@ -2,8 +2,6 @@ import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
-  Backdrop,
-  CircularProgress,
   createStyles,
   Dialog,
   DialogContent,
@@ -20,7 +18,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, CheckListDocument } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
 import theme from '../../theme';
@@ -90,17 +88,27 @@ interface BookingRowProps {
 
 interface ProgressDialogProps {
   isOpen: boolean;
-  booking: Booking | undefined;
+  booking: Booking;
   handleClose: any;
   showCompanyInfo?: boolean;
 }
 
-const ShipmentProgress: React.FC = () => {
+interface ShipmentProgressProps {
+  booking: Booking;
+}
+
+const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) => {
   const classes = useStyles();
+
+  const { checklistItemCount, checklistCheckedCount } = booking;
 
   return (
     <div className={classes.progress}>
-      <div className={classes.progressBar} role="progressbar" style={{ width: '40%' }} />
+      <div
+        className={classes.progressBar}
+        role="progressbar"
+        style={{ width: `${(checklistCheckedCount / checklistItemCount) * 100}%` }}
+      />
     </div>
   );
 };
@@ -175,7 +183,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>{booking['BL-No']}</TableCell>
       <TableCell>{booking['Cust-BkgRef']}</TableCell>
       <TableCell>{booking.BkgStatusText}</TableCell>
-      <TableCell>{formatDate(booking.BkgCreateTimeStamp, 'dd.MM.yyyy')}</TableCell>
+      <TableCell>{formatDate(booking.createdAt, 'dd.MM.yyyy')}</TableCell>
       <TableCell className={classes.avatarCell}>
         <Avatar
           name={booking.BkgAgentContactTxt}
@@ -185,7 +193,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
         />
       </TableCell>
       <TableCell onClick={onProgressClick}>
-        <ShipmentProgress />
+        <ShipmentProgress booking={booking!} />
       </TableCell>
     </TableRow>
   );
@@ -269,7 +277,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
             <TableCell>Vessel</TableCell>
             <TableCell>Origin</TableCell>
             <TableCell>Destination</TableCell>
-            <TableCell>Booking Number</TableCell>
+            <TableCell>BL Number</TableCell>
             <TableCell>Your Reference</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Date</TableCell>
@@ -296,7 +304,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
       <BoookingProgressDialog
         isOpen={isDialogOpen}
         handleClose={handleDialogClose}
-        booking={dialogData}
+        booking={dialogData!}
         showCompanyInfo={showCompanyInfo}
       />
     </Fragment>

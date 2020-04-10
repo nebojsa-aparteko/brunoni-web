@@ -1,21 +1,33 @@
-import { CheckListDocument } from '../../../model/Booking';
 export enum FieldType {
   CHECKMARK, // when item just needs to be confirmed that it has been done -- used mostly for customers
   FILE,
   TEXT,
 }
 
+export interface ChecklistItemValueText {
+  text: string;
+}
+
+export interface ChecklistItemValueForm {
+  url: string;
+  checked?: boolean;
+}
+
+export interface ChecklistItemValueDocuments {
+  url: string;
+  name: string;
+}
+
 export interface ChecklistItemValue {
   type: FieldType;
-  text?: string;
-  checked?: boolean;
-  files?: CheckListDocument[];
+  data?: ChecklistItemValueText | ChecklistItemValueForm | ChecklistItemValueDocuments;
 }
 
 export interface ChecklistItem {
   id: string;
   label: string;
+  order: number;
   checked?: boolean;
-  valueCustomer?: ChecklistItemValue;
-  valueAdmin?: ChecklistItemValue;
+  values?: Array<ChecklistItemValue>;
+  valuesAdmin?: Array<ChecklistItemValue>;
 }
