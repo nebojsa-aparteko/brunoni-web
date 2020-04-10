@@ -1,10 +1,5 @@
-import {
-  ChecklistItemValue,
-  ChecklistItemValueText,
-  ChecklistItemValueDocuments,
-  FieldType,
-} from './checklistItemsData';
-import { createStyles, makeStyles, TableCell, TextField, Theme } from '@material-ui/core';
+import { ChecklistItemValue, ChecklistItemValueText, FieldType } from './checklistItemsData';
+import { createStyles, makeStyles, TableCell, TextField } from '@material-ui/core';
 import DropZone, { DropZoneDocument } from '../../DropZone';
 import React, { Fragment, useCallback, useMemo } from 'react';
 import debounce from 'lodash/fp/debounce';
@@ -17,7 +12,7 @@ interface Props {
   saveChecklistChanges: any;
   storageBasePath: string;
 }
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     hidePrint: {
       ['@media print']: {
