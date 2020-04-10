@@ -45,6 +45,8 @@ export interface Booking {
   'BL-No': string;
   createdAt: Date;
   updatedAt: Date;
+  checklistCheckedCount: number;
+  checklistItemCount: number;
 }
 
 export interface CheckListData {

@@ -84,17 +84,27 @@ interface BookingRowProps {
 
 interface ProgressDialogProps {
   isOpen: boolean;
-  booking: Booking | undefined;
+  booking: Booking;
   handleClose: any;
   showCompanyInfo?: boolean;
 }
 
-const ShipmentProgress: React.FC = () => {
+interface ShipmentProgressProps {
+  booking: Booking;
+}
+
+const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) => {
   const classes = useStyles();
+
+  const { checklistItemCount, checklistCheckedCount } = booking;
 
   return (
     <div className={classes.progress}>
-      <div className={classes.progressBar} role="progressbar" style={{ width: '40%' }} />
+      <div
+        className={classes.progressBar}
+        role="progressbar"
+        style={{ width: `${(checklistCheckedCount / checklistItemCount) * 100}%` }}
+      />
     </div>
   );
 };
@@ -179,7 +189,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
         />
       </TableCell>
       <TableCell onClick={onProgressClick}>
-        <ShipmentProgress />
+        <ShipmentProgress booking={booking!} />
       </TableCell>
     </TableRow>
   );
@@ -290,7 +300,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
       <BoookingProgressDialog
         isOpen={isDialogOpen}
         handleClose={handleDialogClose}
-        booking={dialogData}
+        booking={dialogData!}
         showCompanyInfo={showCompanyInfo}
       />
     </Fragment>

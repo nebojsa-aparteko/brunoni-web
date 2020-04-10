@@ -57,6 +57,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
 
   const [checklistItemValues, setCheckListItemValues] = useState(checklistItem?.values || []);
   const [checklistItemValuesAdmin, setCheckListItemValuesAdmin] = useState(checklistItem?.valuesAdmin || []);
+  const [cheklistItemChecked, setCheklistItemChecked] = useState(checklistItem?.checked || false);
 
   const saveChecklistChanges = useCallback(
     (field: string, value: ChecklistItemValue[] | undefined | boolean) => {
@@ -80,6 +81,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCheklistItemChecked(event.target.checked);
       saveChecklistChanges('checked', event.target.checked);
     },
     [saveChecklistChanges],
@@ -123,7 +125,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   return (
     <Grid container spacing={2} className={classes.root}>
       <Grid item>
-        <Checkbox checked={checklistItem.checked} disabled={!isAdmin} onChange={event => handleCheckboxChange(event)} />
+        <Checkbox checked={cheklistItemChecked} disabled={!isAdmin} onChange={event => handleCheckboxChange(event)} />
       </Grid>
       <Grid item>
         <Typography variant="subtitle1">{checklistItem.label}</Typography>
