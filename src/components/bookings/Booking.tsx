@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, Fragment, useMemo, useCallback } from 'react';
+import React, { useContext, useEffect, Fragment, useMemo } from 'react';
 import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
@@ -141,7 +141,7 @@ const Booking: React.FC<Props> = ({ id }) => {
   console.log('booking ', booking);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Grid item spacing={1} md={7} xs={12}>
+      <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
@@ -174,7 +174,7 @@ const Booking: React.FC<Props> = ({ id }) => {
                 </Button>
               </Box>
             </Box>
-            <Grid item xs={12} spacing={0}>
+            <Grid item xs={12}>
               <Page title={getBookingTitle(booking)}>
                 <Box marginTop="1em" marginBottom="0em">
                   <BookingSummary booking={booking} />
@@ -211,12 +211,8 @@ const Booking: React.FC<Props> = ({ id }) => {
           </Paper>
         </Page>
       </Grid>
-      <Grid item spacing={0} md={4} xs={12}>
-        <Paper>
-          <Box className={classes.tableWrapper}>
-            <CheckList booking={booking} showCompanyInfo={true} />
-          </Box>
-        </Paper>
+      <Grid item md={4} xs={12}>
+        <CheckList booking={booking} showCompanyInfo={true} />
       </Grid>
     </Grid>
   );
