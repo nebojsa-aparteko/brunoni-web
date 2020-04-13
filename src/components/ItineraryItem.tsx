@@ -9,6 +9,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import InfoBoxItem from './InfoBoxItem';
+import { DateFormats } from '../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
@@ -35,7 +36,7 @@ interface Props {
   noLine: boolean;
 }
 
-const formatDateString = (date: string) => formatDate(new Date(date), 'd. MMMM');
+const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.SHORT_HUMAN);
 
 const isIntermediary = (itineraryItem: ItineraryItemModel) => itineraryItem.ArrivalDate && itineraryItem.DepartureDate;
 

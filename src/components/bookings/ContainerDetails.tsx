@@ -15,7 +15,7 @@ import isArray from 'lodash/fp/isArray';
 import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
-import { isLongVersion } from './Booking';
+import { isLongVersion } from './BookingView';
 import ImcoContainer from './ImcoContainer';
 import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';

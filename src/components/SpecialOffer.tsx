@@ -22,6 +22,7 @@ import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import LoginDialogContext from '../contexts/LoginDialog';
 import UserContext from '../contexts/User';
 import { useHistory } from 'react-router';
+import { DateFormats } from '../utilities/formattingHelpers';
 
 interface Props {
   id: string;
@@ -136,7 +137,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
                 {containerType.description} <br />
               </Fragment>
             ) : null}
-            {`Valid until ${formatDate(subDays(validUntil, 1), 'dd.MM.yyyy')}`}
+            {`Valid until ${formatDate(subDays(validUntil, 1), DateFormats.LONG)}`}
           </Typography>
           <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
             {user ? (

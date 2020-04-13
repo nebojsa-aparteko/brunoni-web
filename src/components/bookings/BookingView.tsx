@@ -7,7 +7,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import Bookings from '../../contexts/Bookings';
-import { Booking as BookingModel, Remark, BookingVersion } from '../../model/Booking';
+import { Booking, Remark, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
@@ -74,10 +74,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  id: string;
+  booking?: Booking;
 }
 
-const getBookingTitle = (booking: BookingModel | undefined) => {
+const getBookingTitle = (booking?: Booking) => {
   return booking?.CarrierID.toUpperCase() || '';
 };
 
@@ -102,10 +102,8 @@ export const isLongVersion = (version: BookingVersion) => {
   return version === 'Long';
 };
 
-const Booking: React.FC<Props> = ({ id }) => {
+const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
-  const bookings = useContext(Bookings);
-  const booking = useMemo(() => bookings?.find(booking => booking.id === id), [bookings]);
 
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -218,4 +216,4 @@ const Booking: React.FC<Props> = ({ id }) => {
   );
 };
 
-export default Booking;
+export default BookingView;
