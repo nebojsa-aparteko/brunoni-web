@@ -110,7 +110,11 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
         {clientNameAndLoc(client.name, booking.ForwAdrCity)}
         <ClientDetails
           forwarderName={booking.ForwarderPersTxt}
-          forwarderID={booking.ForwAdrId + '-' + booking.ForwPersID.padStart(3, '0')}
+          forwarderID={
+            booking.ForwPersID && booking.ForwAdrId
+              ? booking.ForwAdrId + '-' + booking.ForwPersID.padStart(3, '0')
+              : undefined
+          }
           bkgRef={booking['Cust-BkgRef']}
         />
       </Fragment>

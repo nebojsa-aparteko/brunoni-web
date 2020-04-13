@@ -1,10 +1,25 @@
-import React, { Fragment, useContext } from 'react';
-import { Box, Divider, Grid, makeStyles, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core';
-import { BookingVersion, CargoDetail, LocRefItem } from '../../model/Booking';
+import React, { useContext, Fragment } from 'react';
+import {
+  Box,
+  Divider,
+  Grid,
+  Typography,
+  makeStyles,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  SvgIcon,
+} from '@material-ui/core';
+import isArray from 'lodash/fp/isArray';
+import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import { isLongVersion } from './Booking';
 import ImcoContainer from './ImcoContainer';
+import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
+import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
+import theme from '../../theme';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -67,42 +82,56 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 
 const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version }) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
+  const classes = useStyles();
 
   return (
     <Fragment>
       <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
 
       <Box marginTop="0em" marginBottom="2em">
-        <Grid container spacing={0}>
-          <Grid item md={5} xs={12}>
+        <Grid container spacing={1}>
+          <Grid item md={4} xs={12}>
             <Table size="small" aria-label="a dense table">
               <colgroup>
-                <col style={{ width: '40%' }} />
-                <col style={{ width: '60%' }} />
+                <col style={{ width: '3%', paddingRight: theme.spacing(0) }} />
+                <col style={{ width: '97%' }} />
               </colgroup>
               <TableBody>
-                <TableRowData
-                  label={'Equipment'}
-                  content={`${detail.CtrQuantity} x ${cont?.description || detail.CtypID}`}
-                />
+                <TableRow className={classes.tableRow}>
+                  <TableCell className={classes.tableCell}>
+                    <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
+                  </TableCell>
+                  <TableCell className={classes.tableCell}>{`${detail.CtrQuantity} x ${cont?.description ||
+                    detail.CtypID}`}</TableCell>
+                </TableRow>
 
-                {detail.CommodityTXT ? <TableRowData label={'Commodity'} content={detail.CommodityTXT} /> : null}
+                {detail.CommodityTXT ? (
+                  <TableRow>
+                    <TableCell className={classes.tableCell}>
+                      <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>{detail.CommodityTXT}</TableCell>
+                  </TableRow>
+                ) : null}
 
-                {detail.CtrWeight ? <TableRowData label={'Weight'} content={detail.CtrWeight} /> : null}
-
-                {detail.IMCO && detail.IMCOs ? detail.IMCOs?.map(imco => <ImcoContainer detail={imco} />) : null}
-
-                {detail.Overdimension ? <OverdimensionComponent detail={detail} /> : null}
+                {detail.CtrWeight ? (
+                  <TableRow>
+                    <TableCell className={classes.tableCell}>
+                      <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>{detail.CtrWeight}</TableCell>
+                  </TableRow>
+                ) : null}
               </TableBody>
             </Table>
           </Grid>
 
           {isLongVersion(version) ? (
-            <Grid item md={7} xs={12}>
+            <Grid item md={8} xs={12}>
               <Table size="small" aria-label="a dense table">
                 <colgroup>
-                  <col style={{ width: '40%' }} />
-                  <col style={{ width: '60%' }} />
+                  <col style={{ width: '25%' }} />
+                  <col style={{ width: '75%' }} />
                 </colgroup>
                 <TableBody>
                   {detail.LocRefs.map((ref: LocRefItem, index: number) => {
