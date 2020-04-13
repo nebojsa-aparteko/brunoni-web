@@ -85,7 +85,6 @@ interface BookingsTableProps {
 interface BookingRowProps {
   booking: Booking;
   onProgressClick: any;
-  onClick: any;
   showCompanyInfo?: boolean;
 }
 
@@ -140,9 +139,17 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   );
 };
 
-const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onClick, onProgressClick }) => {
+const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onProgressClick }) => {
   const classes = useStyles();
   const clients = useClients();
+
+  const history = useHistory();
+  const handleRowClick = useCallback(
+    (id: string) => {
+      history.push(`/bookings/${id}`);
+    },
+    [history],
+  );
 
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
@@ -162,7 +169,13 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
   }, [showCompanyInfo, client, booking]);
 
   return (
-    <TableRow hover tabIndex={-1} className={classes.tableRow} onClick={onClick} key={booking.id}>
+    <TableRow
+      hover
+      tabIndex={-1}
+      className={classes.tableRow}
+      onClick={() => handleRowClick(booking.id)}
+      key={booking.id}
+    >
       {clientInfo}
       <TableCell className={classes.textEmphasized}>
         {booking.CarrierID.toUpperCase()}
@@ -177,7 +190,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
       <TableCell>
         {booking.Vessel}
         <br />
-        <Typography variant={'body2'}>Voyage Number {booking.Voyage}</Typography>
+        <Typography variant={'body2'}>{booking.Voyage}</Typography>
       </TableCell>
       <TableCell>
         {booking.PlaceOfRecieptName}
@@ -252,29 +265,25 @@ const BookingsTableBodySekeleton: React.FC = () => (
 
 const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo }) => {
   const classes = useStyles();
-  const history = useHistory();
+
   const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleRowClick = useCallback(
-    (event: React.MouseEvent<unknown>, id: string) => {
-      history.push(`/bookings/${id}`);
+  const handleProgressClick = useCallback(
+    (event: React.MouseEvent<unknown>, booking: Booking) => {
+      event.stopPropagation();
+
+      if (booking.Category === 'Export' || booking.Category === 'Import') {
+        setIsDialogOpen(true);
+        setDialogData(booking);
+      }
     },
-    [history],
+    [setIsDialogOpen, setDialogData],
   );
-
-  const handleProgressClick = useCallback((event: React.MouseEvent<unknown>, booking: Booking) => {
-    event.stopPropagation();
-
-    if (booking.Category === 'Export' || booking.Category === 'Import') {
-      setIsDialogOpen(true);
-      setDialogData(booking);
-    }
-  }, []);
 
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
-  }, []);
+  }, [setIsDialogOpen]);
 
   return (
     <Fragment>
@@ -289,7 +298,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
             <TableCell style={{ width: '10%' }}>BL Number</TableCell>
             <TableCell style={{ width: '15%' }}>Your Reference</TableCell>
             <TableCell style={{ width: '10%' }}>Status</TableCell>
-            <TableCell style={{ width: '5%' }}>Date</TableCell>
+            <TableCell style={{ width: '5%' }}>Created On</TableCell>
             <TableCell className={classes.avatarCell} style={{ width: '5%' }}>
               Contact
             </TableCell>
@@ -305,7 +314,6 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
                 key={`booking-row-${booking.id}`}
                 showCompanyInfo={showCompanyInfo}
                 booking={booking}
-                onClick={(event: React.MouseEvent<unknown>) => handleRowClick(event, booking.id)}
                 onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
               />
             ))
