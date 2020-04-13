@@ -8,7 +8,13 @@ interface Prop {
 const ImcoContainer: React.FC<Prop> = ({ detail }) => {
   return (
     <Fragment>
-      <TableRowData label="IMCO" content={`${detail.IMOClass} / ${detail.UNNumber} / ${detail.PackingNumber}`} />
+      <TableRowData
+        label="IMCO"
+        content={`${detail.IMOClass && `${detail.IMOClass}`} ${detail.UNNumber &&
+          `/ ${detail.UNNumber}`}  ${detail.PackingNumber && `/ ${detail.PackingNumber}`} ${(detail.FlashPoint &&
+          `/ ${detail.FlashPoint}`) ||
+          ''}`}
+      />
     </Fragment>
   );
 };

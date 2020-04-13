@@ -91,6 +91,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                 {detail.CtrWeight ? <TableRowData label={'Weight'} content={detail.CtrWeight} /> : null}
 
                 {detail.IMCO && detail.IMCOs ? detail.IMCOs?.map(imco => <ImcoContainer detail={imco} />) : null}
+
+                {detail.Overdimension ? <OverdimensionComponent detail={detail} /> : null}
               </TableBody>
             </Table>
           </Grid>
@@ -164,5 +166,15 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
     </Grid>
   );
 };
+interface Overdimension {
+  detail: CargoDetail;
+}
+const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => (
+  <TableRowData
+    label="Overdimension"
+    content={`${detail.Overwidth && `OW: ${detail.Overwidth}`} ${detail.Overheight &&
+      `OH: ${detail.Overheight}`} ${detail.Overlength && `OL: ${detail.Overlength}`}`}
+  />
+);
 
 export default ContainerDetails;

@@ -166,6 +166,9 @@ export interface CargoDetail {
   IMCO: IMCO | null;
   IMCOs: IMCOField[] | null;
   Overdimension: CargoOverdimension | null;
+  Overwidth: string | null;
+  Overheight: string | null;
+  Overlength: string | null;
 }
 
 export interface LocRefItem {
