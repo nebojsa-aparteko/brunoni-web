@@ -5,6 +5,7 @@ import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import formatDate from 'date-fns/format';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import { DateFormats } from '../../utilities/formattingHelpers';
 
 interface Props {
   booking: Booking;
@@ -12,7 +13,7 @@ interface Props {
 
 const formatDateString = (date: Date) => {
   try {
-    return formatDate(date, 'dd.MM.yyyy');
+    return formatDate(date, DateFormats.LONG);
   } catch (err) {
     console.error(`Error formatting passed date ${date} `, err);
     return '???';
