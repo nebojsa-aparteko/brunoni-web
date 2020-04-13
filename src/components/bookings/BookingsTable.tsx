@@ -71,7 +71,10 @@ const useStyles = makeStyles(() =>
     checkListBackdrop: {
       zIndex: 1,
     },
-    checklistDialog: {
+    checklistDialogBody: {
+      width: theme.spacing(100),
+    },
+    checklistDialogContent: {
       paddingBottom: theme.spacing(3),
     },
   }),
@@ -126,16 +129,18 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
-      <DialogTitle disableTypography id="dialog-title-check-list">
-        <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
-        {booking ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
-        <IconButton onClick={handleClose} className={classes.closeModal}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent className={classes.checklistDialog}>
-        <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
-      </DialogContent>
+      <span className={classes.checklistDialogBody}>
+        <DialogTitle disableTypography id="dialog-title-check-list">
+          <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
+          {booking ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
+          <IconButton onClick={handleClose} className={classes.closeModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent className={classes.checklistDialogContent}>
+          <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
+        </DialogContent>
+      </span>
     </Dialog>
   );
 };
@@ -155,7 +160,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onCli
 
     return (
       <TableCell>
-        <div className={classes.clientNameLabel}>{client.name}</div>
+        <span className={classes.clientNameLabel}>{client.name}</span>
         {booking.ForwarderPersTxt ? <Typography variant="body2">{booking.ForwarderPersTxt}</Typography> : null}
       </TableCell>
     );
