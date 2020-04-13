@@ -13,6 +13,7 @@ export interface ActivityLogUserData {
   alphacomClientId: string;
   alphacomId: string;
 }
+
 export interface ChecklistItem {
   id: string;
   label: string;
