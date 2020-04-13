@@ -81,7 +81,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
       setLabelValue(getLabelValue(dateRange));
       onChange(dateRange);
     }
-  }, [dateRange]);
+  }, [dateRange, onChange]);
 
   const handlePopoverClose = () => {
     setAnchorEl(null);

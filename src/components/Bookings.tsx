@@ -86,7 +86,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
   const classes = useStyles();
   const bookings = useContext(BookingsContext);
 
-  const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Import', true);
+  const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Export', true);
 
   const [dateRange, setDateRange] = useState<DateRange>();
 
@@ -200,8 +200,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
                 onChange={handleImportOrExportChange}
                 className={classes.importOrExport}
               >
-                <FormControlLabel value="Import" control={<Radio />} label="Import" />
                 <FormControlLabel value="Export" control={<Radio />} label="Export" />
+                <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
               </RadioGroup>
 
               <Box flex={1} />

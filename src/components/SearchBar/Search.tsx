@@ -53,7 +53,7 @@ const Search: React.FC<Props> = ({ onSearch, className, style }) => {
 
   useEffect(() => {
     startSearch(searchString);
-  }, [searchString]);
+  }, [searchString, startSearch]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(event.target.value);

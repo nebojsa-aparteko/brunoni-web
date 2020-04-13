@@ -70,15 +70,15 @@ export const ClientDetails: React.FC<{
 }> = ({ forwarderName, forwarderID, bkgRef }) => {
   const forwarder = useUserByAlphacomId(forwarderID);
   const forwarderEmail = forwarder?.emailAddress;
+  const forwarderFullName = `${forwarder?.firstName} ${forwarder?.lastName}`;
   return (
     <Typography variant="body2">
-      {forwarderName && bkgRef ? <div>{forwarderName}</div> : null}
-      {forwarderEmail && forwarderEmail ? (
-        <div>
-          <a href={'mailto:' + forwarder?.emailAddress}>{forwarder?.emailAddress}</a>
-        </div>
-      ) : null}
-      {bkgRef && bkgRef}
+      {forwarder && (
+        <span>
+          {forwarderEmail ? <a href={'mailto:' + forwarderEmail}>{forwarderFullName}</a> : { forwarderFullName }}
+        </span>
+      )}
+      ({bkgRef})
     </Typography>
   );
 };

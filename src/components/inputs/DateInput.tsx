@@ -27,7 +27,7 @@ const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose }) 
         onClose={onClose}
         value={value}
         onChange={date => onChange(date as Date)}
-        format="d. MMMM"
+        format="d.MMMM"
         PopoverProps={{
           anchorOrigin: {
             vertical: 'bottom',

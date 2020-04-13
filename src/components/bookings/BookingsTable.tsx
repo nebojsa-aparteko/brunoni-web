@@ -100,18 +100,23 @@ interface ShipmentProgressProps {
   booking: Booking;
 }
 
-const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) => {
+export const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) => {
   const classes = useStyles();
 
   const { checklistItemCount, checklistCheckedCount } = booking;
 
   return (
-    <div className={classes.progress}>
-      <div
-        className={classes.progressBar}
-        role="progressbar"
-        style={{ width: `${(checklistCheckedCount / checklistItemCount) * 100}%` }}
-      />
+    <div>
+      <div className={classes.progress}>
+        <div
+          className={classes.progressBar}
+          role="progressbar"
+          style={{ width: `${(checklistCheckedCount / checklistItemCount) * 100}%` }}
+        />
+      </div>
+      <Typography variant="subtitle2">
+        {checklistCheckedCount}/{checklistItemCount}
+      </Typography>
     </div>
   );
 };

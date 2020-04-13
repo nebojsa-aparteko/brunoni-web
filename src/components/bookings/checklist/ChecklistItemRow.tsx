@@ -1,33 +1,48 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import {
+  Avatar,
+  Box,
   Checkbox,
+  CircularProgress,
   createStyles,
-  Divider,
-  Grid,
   IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
   ListItemText,
   makeStyles,
   Theme,
   Typography,
 } from '@material-ui/core';
-import { ChecklistItem, ChecklistItemValue, FieldType } from './checklistItemsData';
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import { ActivityLogUserData, ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
+import CloseIcon from '@material-ui/icons/Close';
+import DeleteIcon from '@material-ui/icons/Delete';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { orderBy } from 'lodash/fp';
+import { green } from '@material-ui/core/colors';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
-import { Booking } from '../../../model/Booking';
+import { Booking, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
-import ChecklistItemValueComponent from './ChecklistItemValueComponent';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import set from 'lodash/fp/set';
+import DescriptionIcon from '@material-ui/icons/Description';
+import { useDropzone } from 'react-dropzone';
+import UserRecordContext from '../../../contexts/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
+      '&:focus': {
+        outline: 'none',
+      },
+    },
+    documentlist: {
+      width: '100%',
+      backgroundColor: theme.palette.background.paper,
     },
     tableRow: {
       '& td': {
@@ -52,26 +67,69 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'none',
       },
     },
+    dropZone: {
+      border: '1px dashed #ccc',
+      cursor: 'pointer',
+      borderColor: '#999',
+      '&:focus': {
+        outline: 'none',
+      },
+    },
+    dropZoneHint: {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    buttonLink: {
+      textTransform: 'none',
+      fontSize: '0.8em',
+    },
+    fileItemLink: {
+      textDecoration: 'none',
+      color: 'inherit',
+      cursor: 'pointer',
+      display: 'flex',
+    },
+    progressWrapper: {
+      margin: theme.spacing(1),
+      position: 'relative',
+    },
+    iconDeleteProgress: {
+      color: green[500],
+      position: 'absolute',
+      top: -6,
+      left: -6,
+      zIndex: 1,
+    },
+    tinyIconButton: {
+      '& svg': {
+        fontSize: 10,
+      },
+    },
   }),
 );
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const clients = useClients();
+  const userRecord = useContext(UserRecordContext);
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
-  const [moreAnchorEl, setMoreAnchorEl] = useState<HTMLButtonElement | null>(null);
-
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents', 'clients', `${client?.id}`, 'bookings', `${booking?.id}`].join('/');
-  }, [booking, client]);
+    return ['booking-documents', 'clients', client?.id, 'bookings', booking?.id, checklistItem.id].join('/');
+  }, [booking, client, checklistItem]);
+
+  const [item, setItem] = useState(checklistItem);
 
   const [checklistItemValues, setCheckListItemValues] = useState(checklistItem?.values || []);
   const [checklistItemValuesAdmin, setCheckListItemValuesAdmin] = useState(checklistItem?.valuesAdmin || []);
-  const [cheklistItemChecked, setCheklistItemChecked] = useState(checklistItem?.checked || false);
+  const [checklistItemChecked, setChecklistItemChecked] = useState(checklistItem?.checked || false);
+
+  // status indicators
+  const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
 
   const saveChecklistChanges = useCallback(
-    (field: string, value: ChecklistItemValue[] | undefined | boolean) => {
+    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean) => {
       firebase
         .firestore()
         .collection('bookings')
@@ -85,119 +143,237 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             autoHideDuration: 1000,
           }),
         )
-        .catch((error: any) => console.log(error));
+        .catch((error: any) => {
+          console.log(error);
+          enqueueSnackbar(<Typography color="inherit">Failed to save changes - {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 1000,
+          });
+        });
     },
     [checklistItem, booking],
   );
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCheklistItemChecked(event.target.checked);
+      setChecklistItemChecked(event.target.checked);
       saveChecklistChanges('checked', event.target.checked);
     },
     [saveChecklistChanges],
   );
 
   const saveItemValue = useCallback(
-    (isPrivate: boolean) => {
-      saveChecklistChanges(
-        isPrivate ? 'values' : 'valuesAdmin',
-        isPrivate ? checklistItem.values : checklistItem.valuesAdmin,
-      );
+    (isPrivate: boolean, itemValues: ChecklistItemValueDocument[]) => {
+      saveChecklistChanges(isPrivate ? 'valuesAdmin' : 'values', itemValues);
     },
-    [checklistItem],
+    [checklistItem, saveChecklistChanges, checklistItemValues, checklistItemValuesAdmin],
   );
 
-  const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setMoreAnchorEl(event.currentTarget);
-  };
+  const saveFiles = useCallback(
+    async (files: File[]): Promise<any> => {
+      const uploadFile = async (file: File): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          const storedFileName = `${file.name}_${new Date().getTime()}`;
+          let path = [storageBasePath, storedFileName].join('/');
 
-  const handleClose = () => {
-    setMoreAnchorEl(null);
-  };
+          let storageRef = firebase.storage().ref(encodeURI(path));
+          let uploadTask = storageRef.put(file);
+          setUploadTask(uploadTask);
 
-  const handleAddNote = () => {
-    setCheckListItemValues([...checklistItemValues, { type: FieldType.TEXT } as ChecklistItemValue]);
-    handleClose();
-  };
+          uploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+              console.log('progress: ', (snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              // in progress
+              // if(snapshot.state === firebase.storage.TaskState.RUNNING) {
+              //   // ex. calculate progress
+              // }
+            },
+            error => {
+              setUploadProgress(0);
+              reject(error);
+              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
+                variant: 'error',
+                autoHideDuration: 1000,
+              });
+            },
+            () => {
+              setUploadProgress(0);
+              // success
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+                resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
+              });
+            },
+          );
+        });
+      };
 
-  const handleAddFile = () => {
-    setCheckListItemValues([...checklistItemValues, { type: FieldType.FILE } as ChecklistItemValue]);
-    handleClose();
-  };
+      const requests = files.map((file: File) => {
+        return uploadFile(file).then(storedItem => {
+          return storedItem;
+        });
+      });
 
-  const handleAddPrivateFile = () => {
-    setCheckListItemValuesAdmin([...checklistItemValuesAdmin, { type: FieldType.FILE } as ChecklistItemValue]);
-    handleClose();
-  };
+      return Promise.all(requests);
+    },
+    [storageBasePath],
+  );
+
+  const deleteFile = useCallback(
+    async (item: ChecklistItemValueDocument): Promise<any> => {
+      setRemovalInProgress(true);
+      return new Promise((resolve, reject) => {
+        try {
+          const path = [storageBasePath, `${item.storedName}`].join('/');
+          const storageRef = firebase.storage().ref();
+          const documentRef = storageRef.child(encodeURI(path));
+
+          documentRef
+            .delete()
+            .then(() => {
+              const newItemArray = checklistItemValues.filter(chkItem => chkItem !== item);
+              console.log('new Item array', JSON.stringify(newItemArray, null, 2));
+              setCheckListItemValues(newItemArray);
+              saveItemValue(false, newItemArray);
+              resolve(item);
+              setRemovalInProgress(false);
+            })
+            .catch(error => {
+              reject(error);
+              setRemovalInProgress(false);
+              enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
+                variant: 'error',
+                autoHideDuration: 1000,
+              });
+            });
+        } catch (error) {
+          enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 1000,
+          });
+        }
+      });
+    },
+    [storageBasePath, checklistItemValues, removalInProgress],
+  );
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      saveFiles(acceptedFiles)
+        .then((documents: CheckListDocument[]) => {
+          const values = documents.map(item => {
+            const userActivityLogData = {
+              firstName: userRecord?.firstName,
+              lastName: userRecord?.lastName,
+              alphacomClientId: userRecord?.alphacomClientId,
+              alphacomId: userRecord?.alphacomId,
+              emailAddress: userRecord?.emailAddress,
+            } as ActivityLogUserData;
+            const checklistDocument = {
+              uploadedBy: userActivityLogData,
+              uploadedAt: new Date(),
+              name: item.name,
+              url: item.url,
+              storedName: item.storedName,
+            } as ChecklistItemValueDocument;
+            return checklistDocument;
+          });
+          // FIXME it needs to be updated only after successful DB store
+          const itemValues = checklistItemValues.concat(values);
+          setCheckListItemValues(itemValues);
+          saveItemValue(false, itemValues);
+        })
+        .catch(err => {
+          console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
+        });
+    },
+    [checklistItemValues, saveFiles, saveChecklistChanges],
+  );
+
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({ onDrop, noClick: true });
 
   return (
-    <Grid container spacing={2} className={classes.root}>
-      <Grid item>
-        <Checkbox checked={cheklistItemChecked} disabled={!isAdmin} onChange={event => handleCheckboxChange(event)} />
-      </Grid>
-      <Grid item>
-        <Typography variant="subtitle1">{checklistItem.label}</Typography>
-      </Grid>
-      {/*Customer Data*/}
-      <Grid item container spacing={2}>
-        <Grid item xs>
-          {checklistItemValues &&
-            checklistItemValues.map(item => (
-              <ChecklistItemValueComponent
-                checklistValue={item}
-                saveChecklistChanges={saveChecklistChanges}
-                storageBasePath={storageBasePath}
-                valuePath={'values'}
-              />
-            ))}
-
-          {/*Admin Data*/}
-          {isAdmin && checklistItemValuesAdmin && checklistItemValuesAdmin.length > 0 && (
-            <Fragment>
-              <Divider />
-              {checklistItemValuesAdmin.map(item => (
-                <ChecklistItemValueComponent
-                  checklistValue={item}
-                  saveChecklistChanges={saveChecklistChanges}
-                  storageBasePath={storageBasePath}
-                  valuePath={'valuesAdmin'}
-                />
-              ))}
-            </Fragment>
-          )}
-        </Grid>
-        <Grid item>
-          <IconButton aria-label="actions" onClick={onMoreButtonClick}>
-            <MoreVertIcon />
+    <Box {...getRootProps()} className={isDragActive ? classes.dropZone : ''} display="flex" flexDirection="column">
+      <input {...getInputProps()} />
+      {uploadProgress > 0 && (
+        <Box display="flex">
+          <div style={{ width: '100%', paddingTop: '14px' }}>
+            <LinearProgress variant="determinate" value={uploadProgress} />
+          </div>
+          <IconButton
+            className={classes.tinyIconButton}
+            aria-label="cancel upload"
+            onClick={() => {
+              uploadTask?.cancel();
+              setUploadTask(undefined);
+              setUploadProgress(0);
+            }}
+          >
+            <CloseIcon />
           </IconButton>
-          <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-            <MenuItem onClick={handleAddNote}>
-              <ListItemIcon>
-                <DirectionsBoatIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Add Note" />
-            </MenuItem>
-            <MenuItem onClick={handleAddFile}>
-              <ListItemIcon>
-                <ListAltIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText primary="Add File" />
-            </MenuItem>
-            {isAdmin && (
-              <MenuItem onClick={handleAddPrivateFile}>
-                <ListItemIcon>
-                  <ListAltIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Add Private File" />
-              </MenuItem>
-            )}
-          </Menu>
-        </Grid>
-      </Grid>
-    </Grid>
+        </Box>
+      )}
+
+      <Box display="flex" flexDirection="row">
+        <Box flexDirection="row">
+          <Checkbox
+            checked={checklistItemChecked}
+            disabled={!isAdmin}
+            onChange={event => handleCheckboxChange(event)}
+          />
+          <Typography display="inline">{checklistItem.label}</Typography>
+        </Box>
+        <Box flex="1" />
+        <Box display="flex">
+          <IconButton size="small" aria-label="Add Comment">
+            <AddCommentIcon />
+          </IconButton>
+          <IconButton size="small" aria-label="Add Files" onClick={open}>
+            <AttachFileIcon />
+          </IconButton>
+        </Box>
+      </Box>
+      {/*Customer Data*/}
+      <List className={classes.documentlist}>
+        {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
+          <ListItem key={`filelistitem-${booking?.id}-${index}`}>
+            <a
+              href={item.url}
+              download={item.name}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={classes.fileItemLink}
+            >
+              <ListItemAvatar>
+                <Avatar>
+                  <DescriptionIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                id={`filelistitem-${booking?.id}-${index}`}
+                primary={item.name}
+                secondary={`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
+              />
+            </a>
+            <ListItemSecondaryAction>
+              <div className={classes.progressWrapper}>
+                <IconButton
+                  edge="end"
+                  size="small"
+                  aria-label="Remove File"
+                  onClick={() => deleteFile(item)}
+                  aria-labelledby={`filelistitem-${booking?.id}-${index}`}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+              </div>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
   );
 };
 

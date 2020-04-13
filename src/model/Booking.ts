@@ -59,6 +59,7 @@ export interface CheckListDocument {
   isAdmin: boolean;
   url: string;
   name: string;
+  storedName: string;
 }
 
 export interface BookingExtension {
