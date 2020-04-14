@@ -1,5 +1,16 @@
 import React, { useContext, useEffect, Fragment, useMemo } from 'react';
-import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -15,6 +26,7 @@ import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -104,7 +116,10 @@ export const isLongVersion = (version: BookingVersion) => {
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
-
+  const bookings = useContext(Bookings);
+  const booking = useMemo(() => bookings?.find(booking => booking.id === id), [bookings]);
+  const agentMail = booking?.BkgAgentContactEml;
+  const agent = booking?.BkgAgentContactTxt;
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -135,7 +150,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       </Container>
     );
   }
-
+  const handleWatch = () => {};
   console.log('booking ', booking);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
@@ -160,6 +175,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 subtitle={`File No. ${booking.id}`}
                 title={`Booking - ${getBookingTitle(booking)}`}
               />
+              <Typography>
+                <span>{agentMail ? <a href={'mailto:' + agentMail}>{agentMail}</a> : { agent }}</span>
+              </Typography>
               <Box className={classes.actions} displayPrint="none">
                 <Button
                   aria-label="print"
@@ -171,7 +189,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   Print
                 </Button>
               </Box>
+              <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
+                <VisibilityIcon />
+              </IconButton>
             </Box>
+
             <Grid item xs={12}>
               <Page title={getBookingTitle(booking)}>
                 <Box marginTop="1em" marginBottom="0em">

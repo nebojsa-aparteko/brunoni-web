@@ -10,10 +10,9 @@ const ImcoContainer: React.FC<Prop> = ({ detail }) => {
     <Fragment>
       <TableRowData
         label="IMCO"
-        content={`${detail.IMOClass && `${detail.IMOClass}`} ${detail.UNNumber &&
-          `/ ${detail.UNNumber}`}  ${detail.PackingNumber && `/ ${detail.PackingNumber}`} ${(detail.FlashPoint &&
-          `/ ${detail.FlashPoint}`) ||
-          ''}`}
+        content={`${detail.IMOClass ? `${detail.IMOClass}` : ''} ${detail.UNNumber ? `/ ${detail.UNNumber}` : ''}  ${
+          detail.PackingNumber ? `/ ${detail.PackingNumber}` : ''
+        } ${detail.FlashPoint ? `/ ${detail.FlashPoint}` : ''}`}
       />
     </Fragment>
   );
