@@ -162,6 +162,7 @@ export interface CargoDetail {
   CtrQuantity: string;
   CommodityID: string;
   CtypID: string;
+  Equipment: EquipmentDetail[];
   LocRefs: LocRefItem[];
   IMCO: IMCO | null;
   IMCOs: IMCOField[] | null;
@@ -169,6 +170,20 @@ export interface CargoDetail {
   Overwidth: string | null;
   Overheight: string | null;
   Overlength: string | null;
+}
+
+export interface Equipment {
+  EquipmentDetails: EquipmentDetail[];
+}
+
+export interface EquipmentDetail {
+  ContainerNumber: string | null;
+  CtypID: string | null;
+  DropOffDate: string | null;
+  GateInDate: string | null;
+  GateOutDate: string | null;
+  PickUpDate: string | null;
+  CtrTariffs: string[] | null;
 }
 
 export interface LocRefItem {

@@ -122,8 +122,40 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                     <TableCell className={classes.tableCell}>{detail.CtrWeight}</TableCell>
                   </TableRow>
                 ) : null}
+
+                {detail.Equipment ? (
+                  <TableRow>
+                    <TableCell className={classes.tableCell}>
+                      <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {detail.Equipment
+                        ? detail.Equipment.length
+                        : // detail.Equipment.map(equipmentDetail => (
+                          //   equipmentDetail.ContainerNumber ? (
+                          //     <div>
+                          //       {equipmentDetail.ContainerNumber}
+                          //     </div>
+                          //   ) : null
+                          // ))
+                          null}
+                    </TableCell>
+                  </TableRow>
+                ) : null}
+
+                {/*<TableRowData label={'Containers:'} content={'N/A'} />*/}
+
+                {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} /> : null}
+
+                {isLongVersion(version) ? <TableRowData label={'Storage Tariff'} content={'N/A'} /> : null}
               </TableBody>
             </Table>
+            <span>
+              {detail.IMCOs?.map(imco => (
+                <ImcoContainer detail={imco} />
+              ))}
+              {<OverdimensionComponent detail={detail} />}
+            </span>
           </Grid>
 
           {isLongVersion(version) ? (
@@ -154,9 +186,6 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                       );
                     }
                   })}
-
-                  <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} />
-                  <TableRowData label={'Storage Tariff'} content={'N/A'} />
 
                   <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
                 </TableBody>
