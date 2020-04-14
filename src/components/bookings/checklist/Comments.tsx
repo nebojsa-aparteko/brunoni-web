@@ -1,12 +1,15 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { createStyles, makeStyles, Theme, Typography } from '@material-ui/core';
 import WriteComment from './WriteComment';
 import Comment from './Comment';
-import { ActivityLogUserData, ChecklistItem } from './ChecklistItemModel';
+import { ActivityLogUserData } from './ChecklistItemModel';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -16,30 +19,46 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
-const Comments = ({ booking }: CommentsProps) => {
+const Comments = ({ booking, isInternal }: CommentsProps) => {
   const classes = useStyles();
+  const [activitiesList, setActivitiesList] = useState<CommentEntity[]>([]);
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection('bookings')
-      .doc(booking?.id)
-      .collection('activity')
-      .get()
-      .then(activity => {
-        const activityItems = flow(get('docs'))(activity).map(
-          (doc: any) => doc.data() as CommentEntity,
-        ) as CommentEntity[];
-        console.log('Activity items', activityItems);
-      })
-      .catch(err => console.log(err));
+    (async () => {
+      const activityCollection = await firebase
+        .firestore()
+        .collection('bookings')
+        .doc(booking?.id)
+        .collection('activity')
+        .orderBy('commentedAt')
+        .get();
+      activityCollection.query.onSnapshot({
+        next: (snapshot: firebase.firestore.QuerySnapshot) => {
+          const activityItems = flow(get('docs'))(snapshot).map(
+            (doc: any) => doc.data() as CommentEntity,
+          ) as CommentEntity[];
+          const normalizeActivityItems = map(flow(update('commentedAt', invoke('toDate'))))(activityItems);
+          setActivitiesList(normalizeActivityItems.filter(item => item.isInternal === isInternal));
+        },
+      });
+    })();
+    // .query.onSnapshot()
+    // .then(activity => {
+    //   const activityItems = flow(get('docs'))(activity).map(
+    //     (doc: any) => doc.data() as CommentEntity,
+    //   ) as CommentEntity[];
+    //   setActivitiesList(activityItems.filter(item => item.isInternal === isInternal));
+    // })
+    // .catch(err => console.log(err));
   }, [booking]);
   return (
     <Fragment>
       <Typography component="h2" className={classes.title}>
         Activity
       </Typography>
-      <WriteComment bookingId={booking?.id} />
-      {/*<Comment comment={{} as CommentEntity} />*/}
+      {activitiesList.map(activity => (
+        <Comment comment={activity} />
+      ))}
+      <WriteComment bookingId={booking?.id} isInternal={isInternal} />
     </Fragment>
   );
 };
@@ -48,10 +67,18 @@ export default Comments;
 
 export interface CommentEntity {
   text: string;
-  uploadedBy: ActivityLogUserData;
+  commentedBy: ActivityLogUserData;
   commentedAt: Date;
+  type: ActivityType;
+  isInternal: boolean;
 }
 
 interface CommentsProps {
   booking: Booking | undefined;
+  isInternal: boolean;
+}
+
+export enum ActivityType {
+  COMMENT,
+  ACTIVITY,
 }

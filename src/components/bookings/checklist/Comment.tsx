@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { CommentEntity } from './Comments';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
@@ -29,11 +30,18 @@ const Comment = ({ comment }: CommentProp) => {
   return (
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
-        <Typography className={classes.name}>{comment.uploadedBy.firstName + comment.uploadedBy.lastName}</Typography>
-        <Typography>Apr 1 at 9:24 PM</Typography>
+        <Typography className={classes.name}>
+          {`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
+        </Typography>
+        <Typography>{`${formatDistanceToNow(comment.commentedAt)} ago`}</Typography>
       </Box>
       <Box className={classes.rowContainer}>
-        <Avatar name={'Filip Antic'} title={`Filip Antic`} size="40" round={true} />
+        <Avatar
+          name={comment.commentedBy.emailAddress}
+          title={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
+          size="40"
+          round={true}
+        />
         <Paper className={classes.comment}>
           <Typography>{comment.text}</Typography>
         </Paper>

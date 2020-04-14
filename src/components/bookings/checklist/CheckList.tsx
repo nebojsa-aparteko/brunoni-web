@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container,
-  Paper,
-  CardHeader,
-  Box,
-  Typography,
-  CardContent,
-  Card,
-  CardActions,
-  AppBar,
-  Tabs,
-  Tab,
-  Divider,
-} from '@material-ui/core';
+import { AppBar, Box, Card, CardActions, Container, Divider, Paper, Tab, Tabs, Typography } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import flow from 'lodash/fp/flow';
@@ -22,7 +9,6 @@ import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import ChecklistItemRow from './ChecklistItemRow';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
-import { ShipmentProgress } from '../BookingsTable';
 import { ChecklistItem } from './ChecklistItemModel';
 import InternalChecklist from './InternalChecklist';
 import Comments from './Comments';
@@ -48,7 +34,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{children}</Box>}
+      {value === index && <Box>{children}</Box>}
     </Typography>
   );
 }
@@ -93,18 +79,6 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
 
   return (
     <Card>
-      {/*<CardHeader*/}
-      {/*  title={*/}
-      {/*    // <Box display="flex">*/}
-      {/*      /!*<Typography variant="subtitle1" display="inline">*!/*/}
-      {/*      /!*  Checklist*!/*/}
-      {/*      /!*</Typography>*!/*/}
-      {/*      /!*<Box flex={1} />*!/*/}
-      {/*      /!*<ShipmentProgress booking={booking!} />*!/*/}
-      {/*      */}
-      {/*    /!*</Box>*!/*/}
-      {/*    */}
-      {/*  }*/}
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
@@ -112,7 +86,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <Box display="flex" flexDirection="column">
+        <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
           {checklistItems.map((item, index) => (
             <ChecklistItemRow
               key={`chkitem-${booking?.id}-${index}`}
@@ -123,14 +97,16 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
           ))}
         </Box>
         <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
+        <Divider />
+        <Comments booking={booking} isInternal={false} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Box display="flex" flexDirection="column">
+        <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
           <InternalChecklist />
         </Box>
+        <Divider />
+        <Comments booking={booking} isInternal={true} />
       </TabPanel>
-      <Divider />
-      <Comments booking={booking} />
     </Card>
   );
 };
