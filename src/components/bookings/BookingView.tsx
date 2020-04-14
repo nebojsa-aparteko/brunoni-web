@@ -116,8 +116,6 @@ export const isLongVersion = (version: BookingVersion) => {
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
-  const bookings = useContext(Bookings);
-  const booking = useMemo(() => bookings?.find(booking => booking.id === id), [bookings]);
   const agentMail = booking?.BkgAgentContactEml;
   const agent = booking?.BkgAgentContactTxt;
   const specialRemarks: Remark[] = useMemo(

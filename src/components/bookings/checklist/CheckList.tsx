@@ -108,7 +108,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
-          <Tab label="Internals" id="simple-tab-1" aria-controls="simple-tabpanel-1" />
+          <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
