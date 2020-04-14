@@ -79,7 +79,7 @@ export const ClientDetails: React.FC<{
           {forwarderEmail ? <a href={'mailto:' + forwarderEmail}>{forwarderFullName}</a> : { forwarderFullName }}
         </span>
       )}
-      ({bkgRef})
+      &nbsp; ({'REF. ' + bkgRef})
     </Typography>
   );
 };
