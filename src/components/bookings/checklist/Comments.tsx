@@ -38,7 +38,7 @@ const Comments = ({ booking }: CommentsProps) => {
       <Typography component="h2" className={classes.title}>
         Activity
       </Typography>
-      <WriteComment />
+      <WriteComment bookingId={booking?.id} />
       {/*<Comment comment={{} as CommentEntity} />*/}
     </Fragment>
   );
