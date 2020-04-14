@@ -32,6 +32,7 @@ const Comments = ({ booking, isInternal }: CommentsProps) => {
         .orderBy('commentedAt')
         .get();
       activityCollection.query.onSnapshot({
+        error: error => console.log(error),
         next: (snapshot: firebase.firestore.QuerySnapshot) => {
           const activityItems = flow(get('docs'))(snapshot).map(
             (doc: any) => doc.data() as CommentEntity,
@@ -41,14 +42,6 @@ const Comments = ({ booking, isInternal }: CommentsProps) => {
         },
       });
     })();
-    // .query.onSnapshot()
-    // .then(activity => {
-    //   const activityItems = flow(get('docs'))(activity).map(
-    //     (doc: any) => doc.data() as CommentEntity,
-    //   ) as CommentEntity[];
-    //   setActivitiesList(activityItems.filter(item => item.isInternal === isInternal));
-    // })
-    // .catch(err => console.log(err));
   }, [booking]);
   return (
     <Fragment>

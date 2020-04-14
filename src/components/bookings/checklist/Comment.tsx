@@ -3,6 +3,7 @@ import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@materi
 import Avatar from 'react-avatar';
 import { CommentEntity } from './Comments';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { capitalCase } from 'change-case';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
@@ -14,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
     rowContainer: {
       display: 'flex',
       flex: 1,
+      justifyContent: 'space-between',
     },
     name: {
       marginRight: theme.spacing(1),
@@ -21,6 +23,8 @@ const useStyles = makeStyles((theme: Theme) =>
     comment: {
       marginLeft: theme.spacing(1),
       padding: theme.spacing(1),
+      flex: 1,
+      whiteSpace: 'normal',
     },
   }),
 );
@@ -30,12 +34,6 @@ const Comment = ({ comment }: CommentProp) => {
   return (
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
-        <Typography className={classes.name}>
-          {`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
-        </Typography>
-        <Typography>{`${formatDistanceToNow(comment.commentedAt)} ago`}</Typography>
-      </Box>
-      <Box className={classes.rowContainer}>
         <Avatar
           name={comment.commentedBy.emailAddress}
           title={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
@@ -43,7 +41,15 @@ const Comment = ({ comment }: CommentProp) => {
           round={true}
         />
         <Paper className={classes.comment}>
-          <Typography>{comment.text}</Typography>
+          <Box className={classes.rowContainer}>
+            <Typography className={classes.name} color="textPrimary">
+              {`${capitalCase(comment.commentedBy.firstName)} ${capitalCase(comment.commentedBy.lastName)}`}
+            </Typography>
+            <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(
+              comment.commentedAt,
+            )} ago`}</Typography>
+          </Box>
+          <Typography style={{ wordBreak: 'break-all' }}>{comment.text}</Typography>
         </Paper>
       </Box>
     </Box>
