@@ -76,10 +76,10 @@ export const ClientDetails: React.FC<{
     <Typography variant="body2">
       {forwarder && (
         <span>
-          {forwarderEmail ? <a href={'mailto:' + forwarderEmail}>{forwarderFullName}</a> : { forwarderFullName }}
+          {forwarderEmail ? <a href={'mailto:' + forwarderEmail}>{forwarderFullName}</a> : { forwarderFullName }} &nbsp;
         </span>
       )}
-      &nbsp; ({'REF. ' + bkgRef})
+      ({'REF. ' + bkgRef})
     </Typography>
   );
 };
