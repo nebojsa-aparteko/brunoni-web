@@ -69,6 +69,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   tableCell: {
+    verticalAlign: 'top',
     border: 'none',
   },
 }));
@@ -86,6 +87,7 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 
 export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   const classes = useStyles();
+  const containerTypes = useContext(ContainerTypes);
 
   return (
     <TableRow>
@@ -96,7 +98,13 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
             <span>
-              {equipmentDetail.ContainerNumber + ' (' + equipmentDetail.CtypID + ')'}
+              {equipmentDetail.ContainerNumber +
+                (equipmentDetail.CtypID && equipmentDetail.CtypID
+                  ? ' (' +
+                    (containerTypes?.find(type => type.id === equipmentDetail.CtypID)?.description ||
+                      equipmentDetail.CtypID) +
+                    ')'
+                  : null)}
               <br />
             </span>
           ) : null,
@@ -119,8 +127,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
           <Grid item md={4} xs={12}>
             <Table size="small" aria-label="a dense table">
               <colgroup>
-                <col style={{ width: '3%', paddingRight: theme.spacing(0) }} />
-                <col style={{ width: '97%' }} />
+                <col style={{ width: '5%', paddingRight: theme.spacing(0) }} />
+                <col style={{ width: '95%' }} />
               </colgroup>
               <TableBody>
                 <TableRow className={classes.tableRow}>
