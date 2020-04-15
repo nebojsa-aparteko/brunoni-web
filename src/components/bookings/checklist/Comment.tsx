@@ -49,7 +49,7 @@ const Comment = ({ comment }: CommentProp) => {
               comment.commentedAt,
             )} ago`}</Typography>
           </Box>
-          <Typography style={{ wordBreak: 'break-all' }}>{comment.text}</Typography>
+          <Typography style={{ wordBreak: 'break-word' }}>{comment.text}</Typography>
         </Paper>
       </Box>
     </Box>

@@ -26,3 +26,10 @@ export interface ChecklistItem {
   values?: ChecklistItemValueDocument[];
   valuesAdmin?: ChecklistItemValueDocument[];
 }
+
+export enum ActivityText {
+  CHECKED = ' has checked ',
+  UNCHECKED = ' has unchecked ',
+  ADD_FILE = ' has added file ',
+  DELETE_FILE = ' has deleted file ',
+}

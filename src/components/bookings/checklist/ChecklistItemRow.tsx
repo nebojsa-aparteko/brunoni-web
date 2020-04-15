@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
-import { ActivityLogUserData, ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
+import { ActivityLogUserData, ActivityText, ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
@@ -31,6 +31,8 @@ import firebase from '../../../firebase';
 import DescriptionIcon from '@material-ui/icons/Description';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecord';
+import { ActivityType, CommentEntity } from './Comments';
+import { capitalCase } from 'change-case';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,11 +122,42 @@ const fileWithExt = (fileName: string): { name: string; ext: string } => {
       };
 };
 
-const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
+const getActivityObject = (
+  field: string,
+  value: ChecklistItemValueDocument[] | undefined | boolean,
+  userActivity: ActivityLogUserData,
+  checklistItemValues: ChecklistItem,
+) => {
+  const activityObj: CommentEntity = {
+    text: '',
+    commentedBy: userActivity,
+    commentedAt: new Date(),
+    type: ActivityType.ACTIVITY,
+    isInternal: false,
+  };
+  switch (field) {
+    case 'checked':
+      activityObj.text = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
+        value ? ActivityText.CHECKED : ActivityText.UNCHECKED
+      }${checklistItemValues.label}`;
+      break;
+    case 'values':
+      activityObj.text = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
+        (value as ChecklistItemValueDocument[]).length > (checklistItemValues.values?.length || 0)
+          ? ActivityText.ADD_FILE
+          : ActivityText.DELETE_FILE
+      }`;
+      break;
+  }
+
+  return activityObj;
+};
+
+const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedChecklist }: ChecklistItemRowProp) => {
   const classes = useStyles();
+  const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
   const clients = useClients();
-  const userRecord = useContext(UserRecordContext);
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
   const storageBasePath = useMemo((): string => {
@@ -142,6 +175,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
 
+  const handleMention = () => setMentionedChecklist(`[${checklistItem.id}]`);
+
   const saveChecklistChanges = useCallback(
     (field: string, value: ChecklistItemValueDocument[] | undefined | boolean) => {
       firebase
@@ -151,6 +186,23 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         .collection('checklist')
         .doc(checklistItem.id)
         .update(field, value)
+        .then(_ => {
+          const userActivityLogData = {
+            firstName: userRecord?.firstName,
+            lastName: userRecord?.lastName,
+            alphacomClientId: userRecord?.alphacomClientId,
+            alphacomId: userRecord?.alphacomId,
+            emailAddress: userRecord?.emailAddress,
+          } as ActivityLogUserData;
+
+          return firebase
+            .firestore()
+            .collection('bookings')
+            .doc(booking?.id)
+            .collection('activity')
+            .doc()
+            .set(getActivityObject(field, value, userActivityLogData, checklistItem));
+        })
         .then(() =>
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
@@ -285,14 +337,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
               alphacomId: userRecord?.alphacomId,
               emailAddress: userRecord?.emailAddress,
             } as ActivityLogUserData;
-            const checklistDocument = {
+            return {
               uploadedBy: userActivityLogData,
               uploadedAt: new Date(),
               name: item.name,
               url: item.url,
               storedName: item.storedName,
             } as ChecklistItemValueDocument;
-            return checklistDocument;
           });
           // FIXME it needs to be updated only after successful DB store
           const itemValues = checklistItemValues.concat(values);
@@ -346,7 +397,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         </Box>
         <Box flex="1" />
         <Box display="flex">
-          <IconButton size="small" aria-label="Add Comment">
+          <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
             <AddCommentIcon />
           </IconButton>
           <IconButton size="small" aria-label="Add Files" onClick={open}>
@@ -401,6 +452,7 @@ interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking | undefined;
+  setMentionedChecklist: any;
 }
 
 export default ChecklistItemRow;
