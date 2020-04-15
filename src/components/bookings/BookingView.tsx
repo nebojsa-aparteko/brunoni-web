@@ -1,3 +1,4 @@
+import Avatar from 'react-avatar';
 import React, { useContext, useEffect, Fragment, useMemo } from 'react';
 import {
   Box,
@@ -116,8 +117,6 @@ export const isLongVersion = (version: BookingVersion) => {
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
-  const agentMail = booking?.BkgAgentContactEml;
-  const agent = booking?.BkgAgentContactTxt;
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -150,6 +149,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   }
   const handleWatch = () => {};
   console.log('booking ', booking);
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
@@ -173,9 +173,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 subtitle={`File No. ${booking.id}`}
                 title={`Booking - ${getBookingTitle(booking)}`}
               />
-              <Typography>
-                <span>{agentMail ? <a href={'mailto:' + agentMail}>{agentMail}</a> : { agent }}</span>
-              </Typography>
+              <Box flex="1" />
+              <Box>
+                <Avatar
+                  name={booking?.BkgAgentContactTxt}
+                  title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
+                  size="30"
+                  round={true}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    window.open(
+                      `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
+                      '_blank',
+                    )
+                  }
+                />
+              </Box>
               <Box className={classes.actions} displayPrint="none">
                 <Button
                   aria-label="print"
@@ -187,9 +200,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   Print
                 </Button>
               </Box>
-              <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
+              {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
                 <VisibilityIcon />
-              </IconButton>
+              </IconButton>*/}
             </Box>
 
             <Grid item xs={12}>
