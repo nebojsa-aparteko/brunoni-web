@@ -230,8 +230,9 @@ interface Overdimension {
 const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => (
   <TableRowData
     label="Overdimension"
-    content={`${detail.Overwidth && `OW: ${detail.Overwidth}`} ${detail.Overheight &&
-      `OH: ${detail.Overheight}`} ${detail.Overlength && `OL: ${detail.Overlength}`}`}
+    content={`${detail.Overwidth ? `OW: ${detail.Overwidth}` : ''}
+    ${detail.Overheight ? `OH: ${detail.Overheight}` : ''}
+    ${detail.Overlength ? `OL: ${detail.Overlength}` : ''}`}
   />
 );
 

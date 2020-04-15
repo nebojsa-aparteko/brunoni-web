@@ -309,7 +309,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({ onDrop, noClick: true });
 
   return (
-    <Box {...getRootProps()} className={isDragActive ? classes.dropZone : ''} display="flex" flexDirection="column">
+    <Box
+      {...getRootProps()}
+      className={isDragActive ? classes.dropZone : classes.root}
+      display="flex"
+      flexDirection="column"
+    >
       <input {...getInputProps()} />
       {uploadProgress > 0 && (
         <Box display="flex">
