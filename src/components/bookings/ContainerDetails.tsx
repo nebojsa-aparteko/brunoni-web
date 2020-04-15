@@ -151,10 +151,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
               </TableBody>
             </Table>
             <span>
-              {detail.IMCOs?.map(imco => (
-                <ImcoContainer detail={imco} />
-              ))}
-              {<OverdimensionComponent detail={detail} />}
+              {detail.IMCO && detail.IMCOs?.map(imco => <ImcoContainer detail={imco} />)}
+              {detail.Overdimension && <OverdimensionComponent detail={detail} />}
             </span>
           </Grid>
 
