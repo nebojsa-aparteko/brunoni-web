@@ -117,12 +117,12 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
       <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
 
       <Box marginTop="0em" marginBottom="2em">
-        <Grid container spacing={1}>
-          <Grid item md={4} xs={12}>
+        <Grid container spacing={1} style={{ paddingTop: '10px' }}>
+          <Grid item md={5} xs={12}>
             <Table size="small" aria-label="a dense table">
               <colgroup>
-                <col style={{ width: '5%', paddingRight: theme.spacing(0) }} />
-                <col style={{ width: '95%' }} />
+                <col style={{ width: '35%', paddingRight: theme.spacing(0) }} />
+                <col style={{ width: '65%' }} />
               </colgroup>
               <TableBody>
                 <TableRow className={classes.tableRow}>
@@ -156,16 +156,16 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                 {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'ON REQUEST'} /> : null}
 
                 {isLongVersion(version) ? <TableRowData label={'Storage Tariff'} content={'ON REQUEST'} /> : null}
+
+                {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
+
+                {detail.Overdimension && <OverdimensionComponent detail={detail} />}
               </TableBody>
             </Table>
-            <span>
-              {detail.IMCO && detail.IMCOs?.map(imco => <ImcoContainer detail={imco} />)}
-              {detail.Overdimension && <OverdimensionComponent detail={detail} />}
-            </span>
           </Grid>
 
           {isLongVersion(version) ? (
-            <Grid item md={8} xs={12}>
+            <Grid item md={7} xs={12}>
               <Table size="small" aria-label="a dense table">
                 <colgroup>
                   <col style={{ width: '25%' }} />

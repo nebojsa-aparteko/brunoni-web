@@ -1,21 +1,42 @@
 import React, { Fragment } from 'react';
 import { TableRowData } from './ContainerDetails';
 import { IMCOField } from '../../model/Booking';
+import { makeStyles, TableCell, TableRow } from '@material-ui/core';
 
 interface Prop {
-  detail: IMCOField;
+  IMCOs: IMCOField[];
 }
 
-const ImcoContainer: React.FC<Prop> = ({ detail }) => {
+const useStyles = makeStyles(theme => ({
+  tableCellLabel: {
+    verticalAlign: 'top',
+    paddingLeft: 0,
+    border: 'none',
+    fontWeight: 700,
+  },
+  tableCell: {
+    verticalAlign: 'top',
+    border: 'none',
+  },
+}));
+
+const ImcoContainer: React.FC<Prop> = ({ IMCOs }) => {
+  const classes = useStyles();
+
   return (
-    <Fragment>
-      <TableRowData
-        label="IMCO"
-        content={`${detail.IMOClass || ''} ${detail.UNNumber ? `/ ${detail.UNNumber}` : ''}  ${
-          detail.PackingNumber ? `/ ${detail.PackingNumber}` : ''
-        } ${detail.FlashPoint ? `/ ${detail.FlashPoint}` : ''}`}
-      />
-    </Fragment>
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
+      <TableCell className={classes.tableCell}>
+        {IMCOs.map(detail => (
+          <span>
+            {detail.IMOClass || ''} {detail.UNNumber ? `/ ${detail.UNNumber}` : ''}{' '}
+            {detail.PackingNumber ? `/ ${detail.PackingNumber}` : ''}{' '}
+            {detail.FlashPoint ? `/ ${detail.FlashPoint}` : ''}
+            <br />
+          </span>
+        ))}
+      </TableCell>
+    </TableRow>
   );
 };
 
