@@ -19,6 +19,7 @@ import { isLongVersion } from './BookingView';
 import ImcoContainer from './ImcoContainer';
 import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
+import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
 
 interface Props {
@@ -44,6 +45,7 @@ interface ContainerItemProps {
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
+    verticalAlign: 'top',
     paddingLeft: 0,
     border: 'none',
     fontWeight: 700,
@@ -91,9 +93,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
 
   return (
     <TableRow>
-      <TableCell className={classes.tableCell}>
-        <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
-      </TableCell>
+      <TableCell className={classes.tableCellLabel}>Containers</TableCell>
       <TableCell className={classes.tableCell}>
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
@@ -151,7 +151,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                 {detail.CtrWeight ? (
                   <TableRow>
                     <TableCell className={classes.tableCell}>
-                      <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+                      <SvgIcon component={WeightIconSVG} viewBox="0 0 512 512" />
                     </TableCell>
                     <TableCell className={classes.tableCell}>{detail.CtrWeight}</TableCell>
                   </TableRow>
@@ -159,9 +159,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
                 {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
-                {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} /> : null}
+                {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'ON REQUEST'} /> : null}
 
-                {isLongVersion(version) ? <TableRowData label={'Storage Tariff'} content={'N/A'} /> : null}
+                {isLongVersion(version) ? <TableRowData label={'Storage Tariff'} content={'ON REQUEST'} /> : null}
               </TableBody>
             </Table>
             <span>
