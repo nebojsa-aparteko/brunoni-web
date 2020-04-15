@@ -98,13 +98,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
             <span>
-              {equipmentDetail.ContainerNumber +
-                (equipmentDetail.CtypID && equipmentDetail.CtypID
-                  ? ' (' +
-                    (containerTypes?.find(type => type.id === equipmentDetail.CtypID)?.description ||
-                      equipmentDetail.CtypID) +
-                    ')'
-                  : null)}
+              {equipmentDetail.ContainerNumber}
               <br />
             </span>
           ) : null,
