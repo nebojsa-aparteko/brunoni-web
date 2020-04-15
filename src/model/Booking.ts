@@ -172,10 +172,6 @@ export interface CargoDetail {
   Overlength: string | null;
 }
 
-export interface Equipment {
-  EquipmentDetails: EquipmentDetail[];
-}
-
 export interface EquipmentDetail {
   ContainerNumber: string | null;
   CtypID: string | null;
