@@ -165,7 +165,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
           <TableRowData label={'Booking Agent Contact'} content={booking.BkgAgentContact} />
         ) : null}
 
-        <TableRowData label={'Carrier'} content={booking.CarrierID} />
+        <TableRowData label={'Carrier'} content={booking.CarrierID.toUpperCase()} />
 
         <TableRow className={classes.tableRow}>
           <TableCell className={classes.tableCellLabel}>Client</TableCell>
