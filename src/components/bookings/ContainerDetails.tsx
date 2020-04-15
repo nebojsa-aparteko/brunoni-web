@@ -12,7 +12,7 @@ import {
   SvgIcon,
 } from '@material-ui/core';
 import isArray from 'lodash/fp/isArray';
-import { CargoDetail, BookingVersion, LocRefItem } from '../../model/Booking';
+import { CargoDetail, BookingVersion, LocRefItem, EquipmentDetail } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import { isLongVersion } from './BookingView';
@@ -29,6 +29,10 @@ interface Props {
 interface TableRowProps {
   label: string;
   content: string;
+}
+
+interface EquipmentProps {
+  equipment: EquipmentDetail[];
 }
 
 interface ContainerItemProps {
@@ -80,6 +84,28 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
+export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
+  const classes = useStyles();
+
+  return (
+    <TableRow>
+      <TableCell className={classes.tableCell}>
+        <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+      </TableCell>
+      <TableCell className={classes.tableCell}>
+        {equipment.map(equipmentDetail =>
+          equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
+            <span>
+              {equipmentDetail.ContainerNumber + ' (' + equipmentDetail.CtypID + ')'}
+              <br />
+            </span>
+          ) : null,
+        )}
+      </TableCell>
+    </TableRow>
+  );
+};
+
 const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version }) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
   const classes = useStyles();
@@ -123,27 +149,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                   </TableRow>
                 ) : null}
 
-                {detail.Equipment ? (
-                  <TableRow>
-                    <TableCell className={classes.tableCell}>
-                      <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
-                    </TableCell>
-                    <TableCell className={classes.tableCell}>
-                      {detail.Equipment
-                        ? detail.Equipment.length
-                        : // detail.Equipment.map(equipmentDetail => (
-                          //   equipmentDetail.ContainerNumber ? (
-                          //     <div>
-                          //       {equipmentDetail.ContainerNumber}
-                          //     </div>
-                          //   ) : null
-                          // ))
-                          null}
-                    </TableCell>
-                  </TableRow>
-                ) : null}
-
-                {/*<TableRowData label={'Containers:'} content={'N/A'} />*/}
+                {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
                 {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'N/A'} /> : null}
 
