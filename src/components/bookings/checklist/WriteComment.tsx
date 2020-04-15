@@ -70,7 +70,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   return (
     <Box className={classes.writeCommentContainer}>
       <Avatar
-        name={userRecord?.emailAddress}
+        name={`${userRecord?.firstName} ${userRecord?.lastName}`}
         title={`${userRecord?.firstName} ${userRecord?.lastName}`}
         size="30"
         round={true}

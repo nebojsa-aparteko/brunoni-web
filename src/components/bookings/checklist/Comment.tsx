@@ -35,7 +35,7 @@ const Comment = ({ comment }: CommentProp) => {
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
         <Avatar
-          name={comment.commentedBy.emailAddress}
+          name={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
           title={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
           size="30"
           round={true}

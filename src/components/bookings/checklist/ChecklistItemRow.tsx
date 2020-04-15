@@ -429,6 +429,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
             </a>
             <ListItemSecondaryAction>
               <div className={classes.progressWrapper}>
+                <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
+                  <AddCommentIcon />
+                </IconButton>
                 <IconButton
                   edge="end"
                   size="small"
