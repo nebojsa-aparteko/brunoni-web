@@ -15,6 +15,7 @@ import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
+import theme from '../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -125,10 +126,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     [booking],
   );
 
-  console.log('booking ', booking);
   if (!booking) {
     return (
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" style={{ paddingTop: theme.spacing(5) }}>
         <Paper className={classes.root}>
           <ChartsCircularProgress />
         </Paper>
