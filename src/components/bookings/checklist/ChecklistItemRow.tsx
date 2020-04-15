@@ -106,6 +106,20 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
+
+const fileWithExt = (fileName: string): { name: string; ext: string } => {
+  const dotIndex = fileName.lastIndexOf('.');
+  return dotIndex > -1
+    ? {
+        name: fileName.substr(0, dotIndex),
+        ext: fileName.substr(dotIndex + 1),
+      }
+    : {
+        name: fileName,
+        ext: '',
+      };
+};
+
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
@@ -173,7 +187,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     async (files: File[]): Promise<any> => {
       const uploadFile = async (file: File): Promise<any> => {
         return new Promise((resolve, reject) => {
-          const storedFileName = `${file.name}_${new Date().getTime()}`;
+          const fileWithExtension = fileWithExt(file.name);
+          const storedFileName = `${fileWithExtension.name}_${new Date().getTime()}.${fileWithExtension.ext}`;
           let path = [storageBasePath, storedFileName].join('/');
 
           let storageRef = firebase.storage().ref(encodeURI(path));
