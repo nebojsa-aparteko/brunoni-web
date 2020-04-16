@@ -31,8 +31,8 @@ import firebase from '../../../firebase';
 import DescriptionIcon from '@material-ui/icons/Description';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecord';
-import { ActivityType, CommentEntity } from './Comments';
 import { capitalCase } from 'change-case';
+import { ActivityLogItem, ActivityType } from './ActivityModel';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,21 +128,21 @@ const getActivityObject = (
   userActivity: ActivityLogUserData,
   checklistItemValues: ChecklistItem,
 ) => {
-  const activityObj: CommentEntity = {
-    text: '',
-    commentedBy: userActivity,
-    commentedAt: new Date(),
+  const activityObj: ActivityLogItem = {
+    comment: '',
+    by: userActivity,
+    at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: false,
   };
   switch (field) {
     case 'checked':
-      activityObj.text = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
+      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
         value ? ActivityText.CHECKED : ActivityText.UNCHECKED
       }${checklistItemValues.label}`;
       break;
     case 'values':
-      activityObj.text = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
+      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
         (value as ChecklistItemValueDocument[]).length > (checklistItemValues.values?.length || 0)
           ? ActivityText.ADD_FILE
           : ActivityText.DELETE_FILE
@@ -455,7 +455,7 @@ interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking | undefined;
-  setMentionedChecklist: any;
+  setMentionedChecklist?: any;
 }
 
 export default ChecklistItemRow;

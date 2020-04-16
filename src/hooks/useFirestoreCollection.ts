@@ -37,7 +37,7 @@ export default function useFirestoreCollection(
             : firebase.firestore().collection(name);
 
         const collection = await ((query || identity)(collectionReference) as any).get();
-
+        console.log(collection);
         return collection.query.onSnapshot({
           complete: () => {
             console.log('useFirestoreCollection', name, 'completed');

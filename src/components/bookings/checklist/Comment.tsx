@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@material-ui/core';
+import { Box, Typography, Paper, makeStyles, Theme, createStyles, Link } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
-import { CommentEntity } from './ActivityModel';
+import { ActivityLogItem } from './ActivityModel';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(1),
     },
     comment: {
-      marginLeft: theme.spacing(1),
       padding: theme.spacing(1),
       flex: 1,
       whiteSpace: 'normal',
@@ -35,22 +34,45 @@ const Comment = ({ comment }: CommentProp) => {
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
         <Avatar
-          name={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
-          title={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
+          name={`${comment.by.firstName} ${comment.by.lastName}`}
+          title={`${comment.by.firstName} ${comment.by.lastName}`}
           size="30"
           round={true}
         />
-        <Paper className={classes.comment}>
-          <Box className={classes.rowContainer}>
-            <Typography className={classes.name} color="textPrimary">
-              {`${capitalCase(comment.commentedBy.firstName)} ${capitalCase(comment.commentedBy.lastName)}`}
-            </Typography>
-            <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(
-              comment.commentedAt,
-            )} ago`}</Typography>
+        <Box display="flex" flexDirection="column" flex={1} ml={1}>
+          <Paper className={classes.comment}>
+            <Box className={classes.rowContainer}>
+              <Typography className={classes.name} color="textPrimary">
+                {`${capitalCase(comment.by.firstName)} ${capitalCase(comment.by.lastName)}`}
+              </Typography>
+              <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(
+                comment.at,
+              )} ago`}</Typography>
+            </Box>
+            <Typography style={{ wordBreak: 'break-word' }}>{comment.comment}</Typography>
+          </Paper>
+          <Box display="flex">
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => {
+                console.info("I'm a button.");
+              }}
+            >
+              Edit
+            </Link>
+            -
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => {
+                console.info("I'm a button.");
+              }}
+            >
+              Delete
+            </Link>
           </Box>
-          <Typography style={{ wordBreak: 'break-word' }}>{comment.text}</Typography>
-        </Paper>
+        </Box>
       </Box>
     </Box>
   );
@@ -59,5 +81,7 @@ const Comment = ({ comment }: CommentProp) => {
 export default Comment;
 
 interface CommentProp {
-  comment: CommentEntity;
+  comment: ActivityLogItem;
+  handleEdit?: () => void;
+  handleDelete?: () => void;
 }

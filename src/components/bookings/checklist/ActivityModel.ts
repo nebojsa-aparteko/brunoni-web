@@ -1,9 +1,11 @@
-import { ActivityLogUserData } from './ChecklistItemModel';
+import { ActivityLogUserData, ChecklistItemValueDocument } from './ChecklistItemModel';
 
-export interface CommentEntity {
-  text: string;
-  commentedBy: ActivityLogUserData;
-  commentedAt: Date;
+export interface ActivityLogItem {
+  comment?: string;
+  documents?: ChecklistItemValueDocument[];
+  checklistItemReferenceId?: string;
+  by: ActivityLogUserData;
+  at: Date;
   type: ActivityType;
   isInternal: boolean;
 }

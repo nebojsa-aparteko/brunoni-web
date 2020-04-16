@@ -1,22 +1,20 @@
 import React from 'react';
 import { Box, Typography } from '@material-ui/core';
-import { CommentEntity } from './Comments';
 import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { ActivityLogItem } from './ActivityModel';
 
 const Activity = ({ activity }: Props) => (
-  <Box display="flex" flexDirection="row" mx={1} my={3} alignContent="center">
+  <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center">
     <Avatar
-      name={`${activity.commentedBy.firstName} ${activity.commentedBy.lastName}`}
-      title={`${activity.commentedBy.firstName} ${activity.commentedBy.lastName}`}
+      name={`${activity.by.firstName} ${activity.by.lastName}`}
+      title={`${activity.by.firstName} ${activity.by.lastName}`}
       size="40"
       round={true}
     />
     <Box display="flex" flexDirection="column" ml={1}>
-      <Typography variant="body1">{activity.text}</Typography>
-      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(
-        activity.commentedAt,
-      )} ago`}</Typography>
+      <Typography variant="body1">{activity.comment}</Typography>
+      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(activity.at)} ago`}</Typography>
     </Box>
   </Box>
 );
@@ -24,5 +22,5 @@ const Activity = ({ activity }: Props) => (
 export default Activity;
 
 interface Props {
-  activity: CommentEntity;
+  activity: ActivityLogItem;
 }
