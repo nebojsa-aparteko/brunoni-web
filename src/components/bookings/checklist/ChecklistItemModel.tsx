@@ -32,4 +32,5 @@ export enum ActivityText {
   UNCHECKED = ' has unchecked ',
   ADD_FILE = ' has added file ',
   DELETE_FILE = ' has deleted file ',
+  DONE_BY_CUSTOMER = ' has marked done ',
 }

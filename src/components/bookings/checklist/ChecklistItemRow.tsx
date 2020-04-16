@@ -2,11 +2,13 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Avatar,
   Box,
+  Button,
   Checkbox,
   CircularProgress,
   createStyles,
   IconButton,
   LinearProgress,
+  Link,
   List,
   ListItem,
   ListItemAvatar,
@@ -109,6 +111,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const getFormLink = (): string =>
+  process.env.REACT_APP_BRAND === 'brunoni'
+    ? 'https://www.brunoni.ch/vgm/online-submission'
+    : process.env.REACT_APP_BRAND === 'allmarine'
+    ? 'https://allmarine.ch/vgm/online-submission'
+    : '#';
+
 const fileWithExt = (fileName: string): { name: string; ext: string } => {
   const dotIndex = fileName.lastIndexOf('.');
   return dotIndex > -1
@@ -124,7 +133,7 @@ const fileWithExt = (fileName: string): { name: string; ext: string } => {
 
 const getActivityObject = (
   field: string,
-  value: ChecklistItemValueDocument[] | undefined | boolean,
+  value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer,
   userActivity: ActivityLogUserData,
   checklistItemValues: ChecklistItem,
 ) => {
@@ -147,6 +156,11 @@ const getActivityObject = (
           ? ActivityText.ADD_FILE
           : ActivityText.DELETE_FILE
       }`;
+      break;
+    case 'confirmedByCustomer':
+      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
+        ActivityText.DONE_BY_CUSTOMER
+      }${checklistItemValues.label}`;
       break;
   }
 
@@ -175,10 +189,30 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
 
-  const handleMention = () => setMentionedChecklist(`[${checklistItem.id}]`);
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const handleMention = () => {};
+
+  const handleCompleted = () => {
+    console.log('Completed');
+    saveChecklistChanges('confirmedByCustomer', {
+      by: getActivityLogUserData(),
+      at: new Date(),
+    } as ConfirmedByCustomer);
+  };
 
   const saveChecklistChanges = useCallback(
-    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean) => {
+    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer) => {
       firebase
         .firestore()
         .collection('bookings')
@@ -187,21 +221,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         .doc(checklistItem.id)
         .update(field, value)
         .then(_ => {
-          const userActivityLogData = {
-            firstName: userRecord?.firstName,
-            lastName: userRecord?.lastName,
-            alphacomClientId: userRecord?.alphacomClientId,
-            alphacomId: userRecord?.alphacomId,
-            emailAddress: userRecord?.emailAddress,
-          } as ActivityLogUserData;
-
           return firebase
             .firestore()
             .collection('bookings')
             .doc(booking?.id)
             .collection('activity')
             .doc()
-            .set(getActivityObject(field, value, userActivityLogData, checklistItem));
+            .set(getActivityObject(field, value, getActivityLogUserData(), checklistItem));
         })
         .then(() =>
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
@@ -387,13 +413,24 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
       )}
 
       <Box display="flex" flexDirection="row">
-        <Box flexDirection="row">
+        <Box flexDirection="row" alignContent="center">
           <Checkbox
             checked={checklistItemChecked}
             disabled={!isAdmin}
             onChange={event => handleCheckboxChange(event)}
           />
           <Typography display="inline">{checklistItem.label}</Typography>
+          {checklistItem.label === 'VGM SUBMISSION' && (
+            <Button
+              variant="outlined"
+              size="small"
+              style={{ fontSize: '0.6rem', marginLeft: '8px' }}
+              onClick={handleCompleted}
+              disabled={!!checklistItem.confirmedByCustomer?.at}
+            >
+              {checklistItem.confirmedByCustomer?.at ? 'Done' : 'Mark Completed'}
+            </Button>
+          )}
         </Box>
         <Box flex="1" />
         <Box display="flex">
@@ -405,6 +442,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           </IconButton>
         </Box>
       </Box>
+      {checklistItem.label === 'VGM SUBMISSION' && (
+        <Typography>
+          Please fill <Link href={getFormLink()}>this</Link> form, and mark completed when done
+        </Typography>
+      )}
       {/*Customer Data*/}
       <List className={classes.documentlist}>
         {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
@@ -458,4 +500,8 @@ interface ChecklistItemRowProp {
   setMentionedChecklist?: any;
 }
 
+interface ConfirmedByCustomer {
+  by: ActivityLogUserData;
+  at: Date;
+}
 export default ChecklistItemRow;
