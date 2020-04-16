@@ -12,12 +12,7 @@ const Booking: React.FC<Props> = ({ match }) => {
   const bookingId = match.params.id;
   // FIXME change this to firebase.get() specific booking instance
 
-  const normalizedBookings = useMemo(() => (bookings ? normalizeBookings(bookings) : []), [bookings]);
-
-  const booking = useMemo(() => normalizedBookings?.find(booking => booking.id === bookingId), [
-    normalizedBookings,
-    bookingId,
-  ]);
+  const booking = useMemo(() => bookings?.find(booking => booking.id === bookingId), [bookingId]);
 
   return <BookingView booking={booking} />;
 };
