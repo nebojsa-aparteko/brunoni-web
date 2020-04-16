@@ -12,13 +12,29 @@ interface Props {
   children: React.ReactNode;
 }
 
+export const normalizeBookings = map(
+  flow(
+    update('createdAt', invoke('toDate')),
+    update('updatedAt', invoke('toDate')),
+    update('TimeStamp', invoke('toDate')),
+    update('PlaceOfReceiptETS', invoke('toDate')),
+    update('FinalDestinationETA', invoke('toDate')),
+    update('ETS', invoke('toDate')),
+    update('ETA', invoke('toDate')),
+  ),
+);
+
 const Bookings: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
 
-  const query = userRecord?.alphacomClientId
-    ? (collection: firebase.firestore.CollectionReference) =>
-        collection.where('ForwAdrId', '==', userRecord!.alphacomClientId)
-    : (collection: firebase.firestore.CollectionReference) => collection.where('ForwAdrId', '>', '');
+  const query = useMemo(
+    () =>
+      userRecord?.alphacomClientId
+        ? (collection: firebase.firestore.CollectionReference) =>
+            collection.where('ForwAdrId', '==', userRecord!.alphacomClientId)
+        : null,
+    [userRecord],
+  );
 
   const bookingsSnapshot = useFirestoreCollection('bookings', query);
 
@@ -30,20 +46,8 @@ const Bookings: React.FC<Props> = ({ children }) => {
       } as Booking;
     }) as Booking[] | undefined;
 
-    const normalizedBookings = map(
-      flow(
-        update('createdAt', invoke('toDate')),
-        update('updatedAt', invoke('toDate')),
-        update('TimeStamp', invoke('toDate')),
-        update('PlaceOfReceiptETS', invoke('toDate')),
-        update('FinalDestinationETA', invoke('toDate')),
-        update('ETS', invoke('toDate')),
-        update('ETA', invoke('toDate')),
-      ),
-    );
-
-    return normalizedBookings(bookings);
-  }, [bookingsSnapshot]);
+    return normalizeBookings(bookings);
+  }, [userRecord, bookingsSnapshot]);
 
   return <BookingsContext.Provider value={bookingsResult}>{children}</BookingsContext.Provider>;
 };

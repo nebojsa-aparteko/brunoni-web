@@ -1,11 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, createStyles, IconButton, Input, makeStyles, Paper, Theme, Tooltip } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import UserRecordContext from '../../../contexts/UserRecord';
-import firebase from '../../../firebase';
-import { ActivityType, CommentEntity } from './Comments';
-import { ActivityLogUserData } from './ChecklistItemModel';
 import SendIcon from '@material-ui/icons/Send';
+import debounce from 'lodash/fp/debounce';
+import Mousetrap from 'mousetrap';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,56 +27,67 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
-const WriteComment = ({ bookingId, isInternal }: WriteCommentProp) => {
+
+const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const classes = useStyles();
   const [messageText, setMessageText] = useState('');
-
   const userRecord = useContext(UserRecordContext);
-  const handleCommentSave = () => {
-    const userActivityLogData = {
-      firstName: userRecord?.firstName,
-      lastName: userRecord?.lastName,
-      alphacomClientId: userRecord?.alphacomClientId,
-      alphacomId: userRecord?.alphacomId,
-      emailAddress: userRecord?.emailAddress,
-    } as ActivityLogUserData;
-    firebase
-      .firestore()
-      .collection('bookings')
-      .doc(bookingId)
-      .collection('activity')
-      .doc()
-      .set({
-        type: ActivityType.COMMENT,
-        text: messageText,
-        commentedAt: new Date(),
-        commentedBy: userActivityLogData,
-        isInternal: isInternal,
-      } as CommentEntity)
-      .then(_ => setMessageText(''))
-      .catch(err => console.log(err));
+  const handleMessageTyping = useMemo(() => debounce(250, setMessageText), [setMessageText]);
+
+  const inputRef = useRef<HTMLInputElement>();
+
+  const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
+
+  useEffect(() => {
+    console.log('binding');
+    let moustrapInstance = new Mousetrap();
+    moustrapInstance.stopCallback = function() {
+      return false;
+    };
+    moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
+    setMousetrap(moustrapInstance);
+  }, [inputRef, messageText]);
+
+  useEffect(() => {
+    return () => {
+      mousetrap?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
+    };
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleMessageTyping(event.target.value);
   };
+
+  const saveMessage = () => {
+    onCommentSave(messageText);
+    setMessageText('');
+    // reset text on send
+    if (inputRef && inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+
   return (
     <Box className={classes.writeCommentContainer}>
       <Avatar
         name={userRecord?.emailAddress}
         title={`${userRecord?.firstName} ${userRecord?.lastName}`}
-        size="40"
+        size="30"
         round={true}
       />
       <Paper variant="outlined" component={Box} className={classes.writeComment}>
         <Input
           disableUnderline
           fullWidth
-          onChange={e => setMessageText(e.target.value)}
+          onChange={handleChange}
           multiline
           autoFocus
+          inputRef={inputRef}
           placeholder="Write a comment..."
-          value={messageText}
         />
       </Paper>
       <Tooltip title="Send">
-        <IconButton color="primary" disabled={messageText.length < 1} onClick={handleCommentSave}>
+        <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
           <SendIcon />
         </IconButton>
       </Tooltip>
@@ -88,6 +98,5 @@ const WriteComment = ({ bookingId, isInternal }: WriteCommentProp) => {
 export default WriteComment;
 
 interface WriteCommentProp {
-  bookingId: string | undefined;
-  isInternal: boolean;
+  onCommentSave: (messageBody: string) => void;
 }

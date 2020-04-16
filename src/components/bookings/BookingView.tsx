@@ -1,24 +1,12 @@
 import Avatar from 'react-avatar';
-import React, { useContext, useEffect, Fragment, useMemo } from 'react';
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Paper,
-  Theme,
-  Typography,
-} from '@material-ui/core';
+import React, { useEffect, Fragment, useMemo } from 'react';
+import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import Bookings from '../../contexts/Bookings';
 import { Booking, Remark, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
@@ -27,7 +15,6 @@ import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
-import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -138,6 +125,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     [booking],
   );
 
+  console.log('booking ', booking);
   if (!booking) {
     return (
       <Container maxWidth="lg">
@@ -146,107 +134,105 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         </Paper>
       </Container>
     );
-  }
-  const handleWatch = () => {};
-  console.log('booking ', booking);
-
-  return (
-    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Grid item md={7} xs={12}>
-        <Page title={getBookingTitle(booking)}>
-          <ScrollToTopOnMount />
-          <Paper className={classes.root}>
-            <Box display="none" displayPrint="block" mb={2}>
-              <Box mb={2}>
-                {/* <img
+  } else {
+    return (
+      <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+        <Grid item md={7} xs={12}>
+          <Page title={getBookingTitle(booking)}>
+            <ScrollToTopOnMount />
+            <Paper className={classes.root}>
+              <Box display="none" displayPrint="block" mb={2}>
+                <Box mb={2}>
+                  {/* <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
                   alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   style={{ width: '5em' }}
                 /> */}
+                </Box>
+                <Divider />
               </Box>
-              <Divider />
-            </Box>
 
-            <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-              <QuoteNav
-                backTo="/bookings"
-                subtitle={`File No. ${booking.id}`}
-                title={`Booking - ${getBookingTitle(booking)}`}
-              />
-              <Box flex="1" />
-              <Box>
-                <Avatar
-                  name={booking?.BkgAgentContactTxt}
-                  title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
-                  size="30"
-                  round={true}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    window.open(
-                      `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
-                      '_blank',
-                    )
-                  }
+              <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+                <QuoteNav
+                  backTo="/bookings"
+                  subtitle={`File No. ${booking.id}`}
+                  title={`Booking - ${getBookingTitle(booking)}`}
                 />
-              </Box>
-              <Box className={classes.actions} displayPrint="none">
-                <Button
-                  aria-label="print"
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PrintIcon />}
-                  onClick={handlePrint}
-                >
-                  Print
-                </Button>
-              </Box>
-              {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
+                <Box flex="1" />
+                <Box>
+                  <Avatar
+                    name={booking?.BkgAgentContactTxt}
+                    title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
+                    size="30"
+                    round={true}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() =>
+                      window.open(
+                        `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
+                        '_blank',
+                      )
+                    }
+                  />
+                </Box>
+                <Box className={classes.actions} displayPrint="none">
+                  <Button
+                    aria-label="print"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<PrintIcon />}
+                    onClick={handlePrint}
+                  >
+                    Print
+                  </Button>
+                </Box>
+                {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
                 <VisibilityIcon />
               </IconButton>*/}
-            </Box>
+              </Box>
 
-            <Grid item xs={12}>
-              <Page title={getBookingTitle(booking)}>
-                <Box marginTop="1em" marginBottom="0em">
-                  <BookingSummary booking={booking} />
-                </Box>
-                <Box marginTop="0em" marginBottom="0em">
-                  <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
-                </Box>
-                {isLongVersion(booking.Version) ? (
-                  <Fragment>
-                    <Box marginTop="0em" marginBottom="0em">
-                      <PortTerms portTerms={booking.PortTerms} />
-                    </Box>
-                    <Box marginTop="0em" marginBottom="0em">
-                      <SpecialRemarks remarks={specialRemarks} />
-                    </Box>
-                  </Fragment>
-                ) : null}
-
-                {booking.FreightDetails && (
-                  <Box marginTop="0em" marginBottom="0em">
-                    <BookingFreight freightDetails={booking.FreightDetails} />
+              <Grid item xs={12}>
+                <Page title={getBookingTitle(booking)}>
+                  <Box marginTop="1em" marginBottom="0em">
+                    <BookingSummary booking={booking} />
                   </Box>
-                )}
+                  <Box marginTop="0em" marginBottom="0em">
+                    <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
+                  </Box>
+                  {isLongVersion(booking.Version) ? (
+                    <Fragment>
+                      <Box marginTop="0em" marginBottom="0em">
+                        <PortTerms portTerms={booking.PortTerms} />
+                      </Box>
+                      <Box marginTop="0em" marginBottom="0em">
+                        <SpecialRemarks remarks={specialRemarks} />
+                      </Box>
+                    </Fragment>
+                  ) : null}
 
-                {finalRemarks.map((item, index) => {
-                  return (
-                    <Typography variant="body2" key={`final-remark-${index}`}>
-                      <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
-                    </Typography>
-                  );
-                })}
-              </Page>
-            </Grid>
-          </Paper>
-        </Page>
+                  {booking.FreightDetails && (
+                    <Box marginTop="0em" marginBottom="0em">
+                      <BookingFreight freightDetails={booking.FreightDetails} />
+                    </Box>
+                  )}
+
+                  {finalRemarks.map((item, index) => {
+                    return (
+                      <Typography variant="body2" key={`final-remark-${index}`}>
+                        <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
+                      </Typography>
+                    );
+                  })}
+                </Page>
+              </Grid>
+            </Paper>
+          </Page>
+        </Grid>
+        <Grid item md={4} xs={12}>
+          <CheckList booking={booking} showCompanyInfo={true} />
+        </Grid>
       </Grid>
-      <Grid item md={4} xs={12}>
-        <CheckList booking={booking} showCompanyInfo={true} />
-      </Grid>
-    </Grid>
-  );
+    );
+  }
 };
 
 export default BookingView;

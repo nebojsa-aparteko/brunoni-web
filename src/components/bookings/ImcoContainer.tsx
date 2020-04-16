@@ -1,5 +1,4 @@
-import React, { Fragment } from 'react';
-import { TableRowData } from './ContainerDetails';
+import React from 'react';
 import { IMCOField } from '../../model/Booking';
 import { makeStyles, TableCell, TableRow } from '@material-ui/core';
 
@@ -7,7 +6,7 @@ interface Prop {
   IMCOs: IMCOField[];
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   tableCellLabel: {
     verticalAlign: 'top',
     paddingLeft: 0,
@@ -27,8 +26,8 @@ const ImcoContainer: React.FC<Prop> = ({ IMCOs }) => {
     <TableRow>
       <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
       <TableCell className={classes.tableCell}>
-        {IMCOs.map(detail => (
-          <span>
+        {IMCOs.map((detail, index) => (
+          <span key={`imco-${index}`}>
             {detail.IMOClass || ''} {detail.UNNumber ? `/ ${detail.UNNumber}` : ''}{' '}
             {detail.PackingNumber ? `/ ${detail.PackingNumber}` : ''}{' '}
             {detail.FlashPoint ? `/ ${detail.FlashPoint}` : ''}

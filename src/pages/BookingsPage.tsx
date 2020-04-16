@@ -1,8 +1,9 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import BookingsView from '../components/Bookings';
 import Container from '@material-ui/core/Container';
 import { makeStyles, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';
+import Bookings from '../contexts/Bookings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -11,17 +12,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const BookingsAdmin: React.FC = () => {
+const BookingsPage: React.FC = () => {
   const classes = useStyles();
+
+  const bookings = useContext(Bookings);
 
   return (
     <Fragment>
       <Meta title="Bookings" />
       <Container maxWidth="xl" className={classes.root}>
-        <BookingsView showCompanyInfo />
+        <BookingsView bookings={bookings || []} />
       </Container>
     </Fragment>
   );
 };
 
-export default BookingsAdmin;
+export default BookingsPage;

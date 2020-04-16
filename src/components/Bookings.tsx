@@ -22,7 +22,6 @@ import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
 import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
-import BookingsContext from '../contexts/Bookings';
 import { QuoteListContext } from '../contexts/QuoteListContext';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
@@ -37,6 +36,7 @@ import containsString from '../utilities/containsString';
 import useLocalStorage from '../utilities/useLocalStorage';
 
 interface Props {
+  bookings: Booking[];
   showCompanyInfo?: boolean;
 }
 
@@ -82,9 +82,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Bookings: React.FC<Props> = ({ showCompanyInfo }) => {
+const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
   const classes = useStyles();
-  const bookings = useContext(BookingsContext);
 
   const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Export', true);
 

@@ -6,11 +6,13 @@ interface Props<T> {
   query?: QueryFunction | null;
   context: React.Context<T[] | undefined>;
   children: React.ReactNode;
+  documentPath?: string;
+  subCollection?: string;
 }
 
-function firestoreCollection<T>({ name, query, context, children }: Props<T>) {
+function firestoreCollection<T>({ name, query, documentPath, subCollection, context, children }: Props<T>) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const snapshot = useFirestoreCollection(name, query);
+  const snapshot = useFirestoreCollection(name, query, documentPath, subCollection);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const value = useMemo(() => {

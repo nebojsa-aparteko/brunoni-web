@@ -4,7 +4,19 @@ import firebase from '../firebase';
 
 export type QueryFunction = (collection: firebase.firestore.CollectionReference) => firebase.firestore.Query;
 
-export default function useFirestoreCollection(name: string, query?: QueryFunction | null) {
+/**
+ *
+ * @param name
+ * @param query
+ * @param documentPath - optional param if ther is a document to fetch, it should go with subcollection
+ * @param subCollection - subcollection to fetch
+ */
+export default function useFirestoreCollection(
+  name: string,
+  query?: QueryFunction | null,
+  documentPath?: string,
+  subCollection?: string,
+) {
   const [snapshot, setSnapshot] = useState<firebase.firestore.QuerySnapshot | undefined>();
 
   useEffect(() => {
@@ -15,7 +27,16 @@ export default function useFirestoreCollection(name: string, query?: QueryFuncti
 
     (async () => {
       try {
-        const collection = await ((query || identity)(firebase.firestore().collection(name)) as any).get();
+        const collectionReference =
+          documentPath && subCollection
+            ? firebase
+                .firestore()
+                .collection(name)
+                .doc(documentPath)
+                .collection(subCollection)
+            : firebase.firestore().collection(name);
+
+        const collection = await ((query || identity)(collectionReference) as any).get();
 
         return collection.query.onSnapshot({
           complete: () => {
@@ -33,7 +54,7 @@ export default function useFirestoreCollection(name: string, query?: QueryFuncti
         console.error('useFirestoreCollection', name, 'threw an error', error);
       }
     })();
-  }, [name, query]);
+  }, [name, query, documentPath, subCollection]);
 
   return snapshot;
 }

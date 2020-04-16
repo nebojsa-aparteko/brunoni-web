@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@material-ui/core';
 import Avatar from 'react-avatar';
-import { CommentEntity } from './Comments';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
+import { CommentEntity } from './ActivityModel';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
@@ -37,7 +37,7 @@ const Comment = ({ comment }: CommentProp) => {
         <Avatar
           name={comment.commentedBy.emailAddress}
           title={`${comment.commentedBy.firstName} ${comment.commentedBy.lastName}`}
-          size="40"
+          size="30"
           round={true}
         />
         <Paper className={classes.comment}>

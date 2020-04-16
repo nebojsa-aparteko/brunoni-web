@@ -1,6 +1,6 @@
 import React, { Fragment, useContext } from 'react';
 import { Route, Switch } from 'react-router';
-import { Button, makeStyles, Theme } from '@material-ui/core';
+import { makeStyles, Theme } from '@material-ui/core';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -9,8 +9,8 @@ import Quote from './pages/Quote';
 import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
-import Bookings from './pages/Bookings';
-import BookingsAdmin from './pages/BookingsAdmin';
+import BookingsPage from './pages/BookingsPage';
+import BookingsAdminPage from './pages/BookingsAdminPage';
 import Booking from './pages/Booking';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
@@ -50,7 +50,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
-    <Route exact path="/bookings" component={BookingsAdmin} />
+    <Route exact path="/bookings" component={BookingsAdminPage} />
     <Route exact path="/bookings/:id" component={Booking} />
     <Route exact path="/equipment" component={Unauthorized} />
     <Route path="/charges" component={AdminSideCharges} />
@@ -66,7 +66,7 @@ const userRoutes = (
     <Route exact path="/quotes/groups/:id" component={QuoteGroup} />
     <Route exact path="/quotes/get" component={GetQuotes} />
     <Route exact path="/quotes/:id" component={Quote} />
-    <Route exact path="/bookings" component={Bookings} />
+    <Route exact path="/bookings" component={BookingsPage} />
     <Route exact path="/bookings/:id" component={Booking} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route path="/charges" component={SideCharges} />
