@@ -12,17 +12,17 @@ interface Props {
   children: React.ReactNode;
 }
 
-export const normalizeBookings = map(
-  flow(
-    update('createdAt', invoke('toDate')),
-    update('updatedAt', invoke('toDate')),
-    update('TimeStamp', invoke('toDate')),
-    update('PlaceOfReceiptETS', invoke('toDate')),
-    update('FinalDestinationETA', invoke('toDate')),
-    update('ETS', invoke('toDate')),
-    update('ETA', invoke('toDate')),
-  ),
+export const normalizeBooking = flow(
+  update('createdAt', invoke('toDate')),
+  update('updatedAt', invoke('toDate')),
+  update('TimeStamp', invoke('toDate')),
+  update('PlaceOfReceiptETS', invoke('toDate')),
+  update('FinalDestinationETA', invoke('toDate')),
+  update('ETS', invoke('toDate')),
+  update('ETA', invoke('toDate')),
 );
+
+export const normalizeBookings = map(normalizeBooking);
 
 const Bookings: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
