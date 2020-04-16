@@ -179,7 +179,14 @@ export interface EquipmentDetail {
   GateInDate: string | null;
   GateOutDate: string | null;
   PickUpDate: string | null;
-  CtrTariffs: string[] | null;
+  CtrTariffs: CtrTariff[] | null;
+}
+
+export interface CtrTariff {
+  Amount: string | null;
+  Days: string | null;
+  ID: string | null;
+  Type: CtrTariffType;
 }
 
 export interface LocRefItem {
@@ -188,6 +195,11 @@ export interface LocRefItem {
   LocDet: string;
   LocType: BookingLocType;
   CargoDetailRermarks: string;
+}
+
+export enum CtrTariffType {
+  DemDet = 'DEM/DET',
+  Storage = 'STORAGE',
 }
 
 export enum BookingLocType {
