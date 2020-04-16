@@ -89,7 +89,6 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 
 export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   const classes = useStyles();
-  const containerTypes = useContext(ContainerTypes);
 
   return (
     <TableRow>
@@ -233,13 +232,19 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
 interface Overdimension {
   detail: CargoDetail;
 }
-const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => (
-  <TableRowData
-    label="Overdimension"
-    content={`${detail.Overwidth ? `OW: ${detail.Overwidth}` : ''}
-    ${detail.Overheight ? `OH: ${detail.Overheight}` : ''}
-    ${detail.Overlength ? `OL: ${detail.Overlength}` : ''}`}
-  />
-);
+export const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => {
+  const classes = useStyles();
+
+  return (
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
+      <TableCell className={classes.tableCell}>
+        {detail.Overwidth ? `OW: ${detail.Overwidth}` : ''}
+        {detail.Overheight ? `OH: ${detail.Overheight}` : ''}
+        {detail.Overlength ? `OL: ${detail.Overlength}` : ''}
+      </TableCell>
+    </TableRow>
+  );
+};
 
 export default ContainerDetails;
