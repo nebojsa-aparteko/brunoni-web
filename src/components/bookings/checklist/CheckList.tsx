@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import {
   AppBar,
   Box,
   Card,
-  CardContent,
   CardActions,
+  CardContent,
   Container,
   Divider,
   Paper,
@@ -13,9 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
-import firebase from '../../../firebase';
 import flow from 'lodash/fp/flow';
-import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -24,6 +22,7 @@ import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import { ChecklistItem } from './ChecklistItemModel';
 import InternalChecklist from './InternalChecklist';
 import ActivityLogContainer from './ActivityLogContainer';
+import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 
 interface CheckListProps {
   booking: Booking;
@@ -54,36 +53,30 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
-  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const checklistCollection = useFirestoreCollection(
+    'bookings',
+    query => query.orderBy('order', 'asc'),
+    booking.id,
+    'checklist',
+  );
+  const checklistItems = checklistCollection?.docs.map(doc => doc.data()) as ChecklistItem[];
+  // const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
-
-  useEffect(() => {
-    firebase
-      .firestore()
-      .collection('bookings')
-      .doc(booking?.id)
-      .collection('checklist')
-      .orderBy('order')
-      .get()
-      .then(checklist => {
-        const checklistItems = flow(get('docs'))(checklist).map(
-          (doc: any) => doc.data() as ChecklistItem,
-        ) as ChecklistItem[];
-        const normalizeChecklistItems = map(
-          flow(
-            update('confirmedByCustomer', update('at', invoke('toDate'))),
-            update('values', map(update('uploadedAt', invoke('toDate')))),
-          ),
-        );
-        setChecklistItems(normalizeChecklistItems(checklistItems));
-      });
-  }, [booking, setChecklistItems]);
-
-  if (checklistItems.length === 0) {
+  const normalizedChecklistItems = useMemo(
+    () =>
+      map(
+        flow(
+          update('confirmedByCustomer', update('at', invoke('toDate'))),
+          update('values', map(update('uploadedAt', invoke('toDate')))),
+        ),
+      )(checklistItems),
+    [checklistItems],
+  );
+  if (normalizedChecklistItems.length === 0) {
     return (
       <Container>
         <Paper>
@@ -105,7 +98,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
         <Card>
           <CardContent>
             <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-              {checklistItems.map((item, index) => (
+              {normalizedChecklistItems.map((item, index) => (
                 <ChecklistItemRow
                   key={`chkitem-${booking.id}-${index}`}
                   checklistItem={item}
