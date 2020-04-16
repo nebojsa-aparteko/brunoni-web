@@ -12,7 +12,7 @@ import {
   SvgIcon,
 } from '@material-ui/core';
 import isArray from 'lodash/fp/isArray';
-import { CargoDetail, BookingVersion, LocRefItem, EquipmentDetail } from '../../model/Booking';
+import { CargoDetail, BookingVersion, LocRefItem, EquipmentDetail, CtrTariff } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import { isLongVersion } from './BookingView';
@@ -34,6 +34,11 @@ interface TableRowProps {
 
 interface EquipmentProps {
   equipment: EquipmentDetail[];
+}
+
+interface CtrTariffProps {
+  tariff: CtrTariff;
+  numberOfContainers: string;
 }
 
 interface ContainerItemProps {
@@ -107,6 +112,28 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   );
 };
 
+export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContainers }) => {
+  const classes = useStyles();
+
+  return (
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>
+        {
+          {
+            'DEM/DET': 'Dem./Det. tariff',
+            STORAGE: 'Storage tariff',
+          }[tariff.Type]
+        }
+      </TableCell>
+      <TableCell className={classes.tableCell}>
+        {tariff.Amount && tariff.Amount != '0.00'
+          ? numberOfContainers + ' x ' + tariff.Amount + ' ' + tariff.Currency
+          : 'ON REQUEST'}
+      </TableCell>
+    </TableRow>
+  );
+};
+
 const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version }) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
   const classes = useStyles();
@@ -152,9 +179,13 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
                 {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
-                {isLongVersion(version) ? <TableRowData label={'Dem./Det. Tariff'} content={'ON REQUEST'} /> : null}
-
-                {isLongVersion(version) ? <TableRowData label={'Storage Tariff'} content={'ON REQUEST'} /> : null}
+                {isLongVersion(version) && detail.Equipment && detail.Equipment[0]
+                  ? detail.Equipment[0].CtrTariffs && detail.Equipment[0].CtrTariffs[0]
+                    ? detail.Equipment[0].CtrTariffs.map(tariff => (
+                        <CtrTariffData tariff={tariff} numberOfContainers={detail.CtrQuantity} />
+                      ))
+                    : null
+                  : null}
 
                 {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
 

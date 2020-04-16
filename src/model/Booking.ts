@@ -184,6 +184,7 @@ export interface EquipmentDetail {
 
 export interface CtrTariff {
   Amount: string | null;
+  Currency: string | null;
   Days: string | null;
   ID: string | null;
   Type: CtrTariffType;
