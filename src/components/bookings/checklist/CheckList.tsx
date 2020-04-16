@@ -60,7 +60,6 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
     'checklist',
   );
   const checklistItems = checklistCollection?.docs.map(doc => doc.data()) as ChecklistItem[];
-  // const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
