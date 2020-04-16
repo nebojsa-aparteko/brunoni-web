@@ -11,7 +11,6 @@ import {
   TableCell,
   SvgIcon,
 } from '@material-ui/core';
-import isArray from 'lodash/fp/isArray';
 import { CargoDetail, BookingVersion, LocRefItem, EquipmentDetail, CtrTariff } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
@@ -126,7 +125,7 @@ export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContai
         }
       </TableCell>
       <TableCell className={classes.tableCell}>
-        {tariff.Amount && tariff.Amount != '0.00'
+        {tariff.Amount && tariff.Amount !== '0.00'
           ? numberOfContainers + ' x ' + tariff.Amount + ' ' + tariff.Currency
           : 'ON REQUEST'}
       </TableCell>
@@ -181,8 +180,12 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
                 {isLongVersion(version) && detail.Equipment && detail.Equipment[0]
                   ? detail.Equipment[0].CtrTariffs && detail.Equipment[0].CtrTariffs[0]
-                    ? detail.Equipment[0].CtrTariffs.map(tariff => (
-                        <CtrTariffData tariff={tariff} numberOfContainers={detail.CtrQuantity} />
+                    ? detail.Equipment[0].CtrTariffs.map((tariff, index) => (
+                        <CtrTariffData
+                          key={`tarrif-${index}`}
+                          tariff={tariff}
+                          numberOfContainers={detail.CtrQuantity}
+                        />
                       ))
                     : null
                   : null}

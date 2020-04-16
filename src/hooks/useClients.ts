@@ -14,7 +14,7 @@ export default function useClients() {
       userRecord?.isAdmin
         ? q
         : q.where(firebase.firestore.FieldPath.documentId(), '==', userRecord?.alphacomClientId || ''),
-    [userRecord?.isAdmin, userRecord?.alphacomClientId],
+    [userRecord],
   );
 
   const clientsCollection = useFirestoreCollection('clients', query);

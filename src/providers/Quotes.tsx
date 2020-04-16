@@ -12,8 +12,11 @@ const Quotes: React.FC<Props> = ({ children }) => {
 
   const query = userRecord?.alphacomClientId
     ? (collection: firebase.firestore.CollectionReference) =>
-        collection.where('clientId', '==', userRecord!.alphacomClientId).limit(500)
-    : (collection: firebase.firestore.CollectionReference) => collection.limit(500);
+        collection
+          .where('clientId', '==', userRecord!.alphacomClientId)
+          .orderBy('dateIssued', 'desc')
+          .limit(500)
+    : (collection: firebase.firestore.CollectionReference) => collection.orderBy('dateIssued', 'desc').limit(500);
 
   return (
     <FirestoreCollectionProvider name="quotes" query={query} context={QuotesContext}>

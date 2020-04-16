@@ -49,7 +49,6 @@ import QuoteGroups from '../contexts/QuoteGroups';
 import { Quote, QuoteDetail } from '../providers/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
-import UserRecords from '../contexts/UserRecords';
 import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
@@ -188,9 +187,8 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
     if (quotesByCarrier && quotesByCarrier.length === 1) {
       setSelectedPanel(quotesByCarrier[0][0]);
     }
-  }, [quoteGroup]);
+  }, [quotesByCarrier]);
 
-  const users = useContext(UserRecords);
   const requestedBy = useUserByAlphacomId(quoteGroup?.quotes[0].userId);
 
   const clientInfo = useMemo(() => {
@@ -219,7 +217,7 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
         )}
       </Box>
     );
-  }, [showCompanyInfo, users, quoteGroup, client, requestedBy]);
+  }, [showCompanyInfo, quoteGroup, client, requestedBy]);
 
   if (!quoteGroup) {
     return (
@@ -397,7 +395,7 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
                                 <TableCell className={classes.noBorder} />
 
                                 {quotes.map((quote, index) => (
-                                  <Fragment key={quote.id}>
+                                  <Fragment key={`${quote.id}-${index}`}>
                                     <TableCell
                                       className={`${classes.buttonContainer} ${classes.borderCell}`}
                                       colSpan={3}

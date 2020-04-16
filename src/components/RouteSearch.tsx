@@ -144,7 +144,19 @@ const RouteSearch: React.FC<Props> = () => {
         alphacomClientId: get('alphacomClientId')(userData) || null,
         timestamp: new Date() || null,
       });
-  }, [busy, error, result, search, user]);
+  }, [
+    busy,
+    error,
+    result,
+    search,
+    user,
+    userData,
+    carrierFilter,
+    params.originPort,
+    params.destinationPort,
+    params.weeks,
+    params.date,
+  ]);
 
   useErrorMessage(error, error =>
     error instanceof RequestError && error.response.status === 504

@@ -8,7 +8,6 @@ import CarrierPerformance from './CarrierPerformance';
 import ContainerTypePerformance from './ContainerTypePerformance';
 import Top5PortsPerformance from './Top5PortsPerformance';
 import StatisticsContext from '../../contexts/Statistics';
-import SynchronizeButton from '../SynchronizeButton';
 
 const DashboardCharts: React.FC = () => {
   const currentYear = new Date().getFullYear();

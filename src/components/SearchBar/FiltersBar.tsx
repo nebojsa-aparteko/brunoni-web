@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
@@ -24,7 +24,6 @@ const FiltersBar: React.FC<Props> = ({
   listContextData,
   setQuoteListContextData,
   showCompanyInfo,
-  dateRange,
   setDateRange,
   showRefreshButton,
 }) => {

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
 import {
@@ -11,12 +11,10 @@ import {
   Chip,
   createStyles,
   makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroups';
-import UserRecords from '../../contexts/UserRecords';
 import { useHistory } from 'react-router';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 import useClients from '../../hooks/useClients';
@@ -25,7 +23,7 @@ import invoke from 'lodash/fp/invoke';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import UserRecord from '../../model/UserRecord';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     tableRow: {
       '& td': {
@@ -91,7 +89,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
         />
       </TableCell>
     );
-  }, [showCompanyInfo, client, quotes[0].clientId]);
+  }, [showCompanyInfo, client, quotes[0].clientId, quotes[0].userNameString]);
 
   const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
     history.push(pathToNavigate);
