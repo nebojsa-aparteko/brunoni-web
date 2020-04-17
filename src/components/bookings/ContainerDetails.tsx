@@ -226,7 +226,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                     }
                   })}
 
-                  <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
+                  {detail.CargoDetailRermarks && (
+                    <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
+                  )}
                 </TableBody>
               </Table>
             </Grid>
