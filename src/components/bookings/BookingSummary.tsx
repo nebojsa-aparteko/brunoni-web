@@ -21,7 +21,24 @@ const formatDateString = (date: Date) => {
 };
 
 const useStyles = makeStyles(theme => ({
+  summaryWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  firstColumn: {
+    paddingTop: 0,
+    verticalAlign: 'top',
+  },
+  secondColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyItems: 'flex-start',
+    paddingTop: 0,
+    verticalAlign: 'top',
+  },
   tableCellLabel: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
     paddingLeft: 0,
     border: 'none',
     fontWeight: 700,
@@ -46,6 +63,8 @@ const useStyles = makeStyles(theme => ({
     },
   },
   tableCell: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
     verticalAlign: 'top',
     border: 'none',
   },
@@ -104,7 +123,6 @@ const clientNameAndLoc = (name: string, location: string) => `${name}, ${locatio
 const BookingSummary: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const clients = useClients();
-
   const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [clients, booking.ForwAdrId]);
 
   const clientInfo = useMemo(() => {
@@ -129,51 +147,75 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
   }, [client, booking]);
 
   return (
-    <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
-      <colgroup>
-        <col style={{ width: '16.6%' }} />
-        <col style={{ width: '83.4%' }} />
-      </colgroup>
-      <TableBody>
-        <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />
+    <span className={classes.summaryWrapper}>
+      <span className={classes.firstColumn}>
+        <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
+          <colgroup>
+            <col style={{ width: '16.6%' }} />
+            <col style={{ width: '83.4%' }} />
+          </colgroup>
+          <TableBody>
+            <TableRowData label={'Carrier'} content={booking.CarrierID.toUpperCase()} />
 
-        {booking.POLName !== booking.PlaceOfRecieptName ? (
-          <TableRowData
-            label={'Place of Receipt'}
-            content={[booking.PlaceOfRecieptName, formatDateString(booking.PlaceOfReceiptETS)].join('<br/>ETS: ')}
-          />
-        ) : null}
+            <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />
 
-        <TableRowData
-          label={'Port of Loading'}
-          content={[booking.POLName, formatDateString(booking.ETS)].join('<br/>ETS: ')}
-        />
-        <TableRowData
-          label={'Port of Discharge'}
-          content={[booking.PODName, formatDateString(booking.ETA)].join('<br/>ETA: ')}
-        />
+            {booking.POLName !== booking.PlaceOfRecieptName ? (
+              <TableRowData
+                label={'Place of Receipt'}
+                content={[booking.PlaceOfRecieptName, formatDateString(booking.PlaceOfReceiptETS)].join('<br/>ETS: ')}
+              />
+            ) : null}
 
-        {booking.PODName !== booking.FinalDestinationName ? (
-          <TableRowData
-            label={'Place of Delivery'}
-            content={[booking.FinalDestinationName, formatDateString(booking.FinalDestinationETA)].join('<br/>ETA: ')}
-          />
-        ) : null}
+            <TableRowData
+              label={'Port of Loading'}
+              content={[booking.POLName, formatDateString(booking.ETS)].join('<br/>ETS: ')}
+            />
+            <TableRowData
+              label={'Port of Discharge'}
+              content={[booking.PODName, formatDateString(booking.ETA)].join('<br/>ETA: ')}
+            />
 
-        <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
+            {booking.PODName !== booking.FinalDestinationName ? (
+              <TableRowData
+                label={'Place of Delivery'}
+                content={[booking.FinalDestinationName, formatDateString(booking.FinalDestinationETA)].join(
+                  '<br/>ETA: ',
+                )}
+              />
+            ) : null}
+          </TableBody>
+        </Table>
+      </span>
+      <span className={classes.secondColumn}>
+        <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
+          <colgroup>
+            <col style={{ width: '16.6%' }} />
+            <col style={{ width: '83.4%' }} />
+          </colgroup>
+          <TableBody>
+            <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
+            <TableRowData label={'Status'} content={booking.BkgStatusText} />
+            {booking.BkgAgentContactTxt ? (
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>Booking Agent Contact</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {booking.BkgAgentContactEml ? (
+                    <a href={'mailto:' + booking.BkgAgentContactEml}>{booking.BkgAgentContactTxt.toUpperCase()}</a>
+                  ) : (
+                    booking.BkgAgentContactTxt.toUpperCase()
+                  )}{' '}
+                </TableCell>
+              </TableRow>
+            ) : null}
 
-        {booking.BkgAgentContact ? (
-          <TableRowData label={'Booking Agent Contact'} content={booking.BkgAgentContact} />
-        ) : null}
-
-        <TableRowData label={'Carrier'} content={booking.CarrierID.toUpperCase()} />
-
-        <TableRow className={classes.tableRow}>
-          <TableCell className={classes.tableCellLabel}>Client</TableCell>
-          <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+            <TableRow className={classes.tableRow}>
+              <TableCell className={classes.tableCellLabel}>Client</TableCell>
+              <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </span>
+    </span>
   );
 };
 
