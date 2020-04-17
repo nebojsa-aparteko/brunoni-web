@@ -28,7 +28,7 @@ import { orderBy } from 'lodash/fp';
 import { green } from '@material-ui/core/colors';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
-import { Booking, CheckListDocument } from '../../../model/Booking';
+import { Booking, CarrierId, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import DescriptionIcon from '@material-ui/icons/Description';
 import { useDropzone } from 'react-dropzone';
@@ -111,12 +111,24 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const getFormLink = (): string =>
-  process.env.REACT_APP_BRAND === 'brunoni'
-    ? 'https://www.brunoni.ch/vgm/online-submission'
-    : process.env.REACT_APP_BRAND === 'allmarine'
-    ? 'https://allmarine.ch/vgm/online-submission'
-    : '#';
+const getFormLink = (carrierId: any): string => {
+  switch (carrierId) {
+    case CarrierId.ALIANCA:
+      return 'https://ecom.alianca.com.br/ecom/en/ecommerce_portal_alianca/verifield_gross_mass_2/verifield_2/verifiedgrossmass.xhtml';
+    case CarrierId.HAMBURG_SUD:
+      return 'https://ecom.hamburgsud.com/ecom/de/ecommerce_portal/verifield_gross_mass/verifield_/verifiedgrossmass.xhtml?lang=DE';
+    case CarrierId.HYUNDAI_MERCHANT:
+      return 'http://www.hmm21.com/cms/business/ebiz/export/vgmWithoutLogin/index.jsp';
+    case CarrierId.MACS:
+      return 'https://www.macship.com/E-BUSINESS/SolasAccess.aspx';
+    case CarrierId.ZIM:
+      return 'https://www.zim.com/tools/solas-vgm';
+    case CarrierId.DEUTSCHE_AFRIKA:
+      return 'https://my.dal.biz/vgm#/login';
+    default:
+      return '#';
+  }
+};
 
 const fileWithExt = (fileName: string): { name: string; ext: string } => {
   const dotIndex = fileName.lastIndexOf('.');
@@ -420,7 +432,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
             onChange={event => handleCheckboxChange(event)}
           />
           <Typography display="inline">{checklistItem.label}</Typography>
-          {checklistItem.label === 'VGM SUBMISSION' && (
+          {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
             <Button
               variant="outlined"
               size="small"
@@ -442,9 +454,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           </IconButton>
         </Box>
       </Box>
-      {checklistItem.label === 'VGM SUBMISSION' && (
+      {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
         <Typography>
-          Please fill <Link href={getFormLink()}>this</Link> form, and mark completed when done
+          Please fill <Link href={getFormLink(booking?.CarrierID)}>this</Link> form, and mark completed when done
         </Typography>
       )}
       {/*Customer Data*/}

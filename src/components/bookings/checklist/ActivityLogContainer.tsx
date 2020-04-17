@@ -45,12 +45,12 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
     activityCollection,
   ]);
 
-  // const filteredActivityLog = useMemo(() => {
-  //   console.log(normalizedActivityLog);
-  //   return normalizedActivityLog?.filter((item: ActivityLogItem) =>
-  //     showMore ? true : item.type === ActivityType.COMMENT,
-  //   );
-  // }, [showMore, normalizedActivityLog]);
+  const filteredActivityLog = useMemo(() => {
+    console.log(normalizedActivityLog);
+    return normalizedActivityLog?.filter((item: ActivityLogItem) =>
+      showMore ? true : item.type === ActivityType.COMMENT,
+    );
+  }, [showMore, normalizedActivityLog]);
 
   const userRecord = useContext(UserRecordContext);
 
@@ -86,7 +86,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
   };
   return (
     <ActivityLogView
-      activityLog={normalizedActivityLog}
+      activityLog={filteredActivityLog}
       onCommentSave={handleCommentSave}
       showMore={showMore}
       onChange={handleShowMore}

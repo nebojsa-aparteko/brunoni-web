@@ -240,3 +240,12 @@ export interface IMCOField {
   PackingNumber: string;
   FlashPoint: string;
 }
+
+export enum CarrierId {
+  ALIANCA = 'ALIANCA',
+  HAMBURG_SUD = 'Hamburg Süd',
+  HYUNDAI_MERCHANT = 'HMM',
+  MACS = 'MACS',
+  ZIM = 'ZIM Shipping Line',
+  DEUTSCHE_AFRIKA = 'DAL DEUTSCHE AFRIKA-LINIEN',
+}

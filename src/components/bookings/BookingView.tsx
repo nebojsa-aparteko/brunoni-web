@@ -104,6 +104,9 @@ export const isLongVersion = (version: BookingVersion) => {
 };
 
 const BookingView: React.FC<Props> = ({ booking }) => {
+  {
+    console.log(booking);
+  }
   const classes = useStyles();
   const specialRemarks: Remark[] = useMemo(
     () =>
