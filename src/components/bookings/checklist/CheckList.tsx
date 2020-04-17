@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import {
   AppBar,
   Box,
@@ -55,7 +55,7 @@ function TabPanel(props: TabPanelProps) {
 const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
   const checklistCollection = useFirestoreCollection(
     'bookings',
-    query => query.orderBy('order', 'asc'),
+    useCallback(query => query.orderBy('order', 'asc'), []),
     booking.id,
     'checklist',
   );

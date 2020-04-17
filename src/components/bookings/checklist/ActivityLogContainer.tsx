@@ -1,5 +1,7 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import ActivityLogView from './ActivityLogView';
+import filter from 'lodash/fp/filter';
+import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -22,27 +24,26 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
   //
   // Text. matcher replace({INVOICE}}
 
+  const [showMore, setShowMore] = useState(false);
+
   const activityLogCollection = useFirestoreCollection(
     'bookings',
-    useCallback(query => query.where('isInternal', '==', isInternal).orderBy('at', 'desc'), [isInternal]),
+    useCallback(
+      query => {
+        const queryByItemFilter = showMore ? query : query.where('type', '==', ActivityType.COMMENT);
+        return queryByItemFilter.where('isInternal', '==', isInternal).orderBy('at', 'desc');
+      },
+      [isInternal, showMore],
+    ),
     bookingId,
     'activity',
   );
 
   const activityCollection = activityLogCollection?.docs.map(doc => doc.data()) as ActivityLogItem[];
 
-  const [showMore, setShowMore] = useState(false);
-
   const normalizedActivityLog = useMemo(() => map(update('at', invoke('toDate')))(activityCollection), [
     activityCollection,
   ]);
-
-  const filteredActivityLog = useMemo(() => {
-    console.log(normalizedActivityLog);
-    return normalizedActivityLog?.filter((item: ActivityLogItem) =>
-      showMore ? true : item.type === ActivityType.COMMENT,
-    );
-  }, [showMore, normalizedActivityLog]);
 
   const userRecord = useContext(UserRecordContext);
 
@@ -78,7 +79,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
   };
   return (
     <ActivityLogView
-      activityLog={filteredActivityLog}
+      activityLog={normalizedActivityLog}
       onCommentSave={handleCommentSave}
       showMore={showMore}
       onChange={handleShowMore}

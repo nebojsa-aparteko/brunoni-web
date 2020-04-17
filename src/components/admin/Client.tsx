@@ -37,7 +37,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const Client: React.FC<Props> = ({ match }) => {
-  const classes = useStyles();
   const history = useHistory();
   const clientId = match.params.id;
 

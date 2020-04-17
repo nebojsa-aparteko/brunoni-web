@@ -45,7 +45,13 @@ export default function useFirestoreCollection(
             console.error('useFirestoreCollection', name, 'threw an error', error);
           },
           next: (snapshot: firebase.firestore.QuerySnapshot) => {
-            console.debug('useFirestoreCollection', name, 'updated with', snapshot);
+            console.debug(
+              'useFirestoreCollection',
+              name,
+              documentPath ? `/${documentPath}/${subCollection}` : '',
+              'updated with',
+              snapshot,
+            );
             setSnapshot(snapshot);
           },
         });
