@@ -57,7 +57,6 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
               <TableCell align="right">Cost Value</TableCell>
               <TableCell align="right">Currency</TableCell>
               <TableCell align="right">Total</TableCell>
-              <TableCell>Remark</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,7 +75,6 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
                   <TableCell align="right">{freight.UnitValue}</TableCell>
                   <TableCell align="right">{freight.Currency}</TableCell>
                   <TableCell align="right">{freight.Total}</TableCell>
-                  <TableCell></TableCell>
                 </TableRow>
               );
             })}
