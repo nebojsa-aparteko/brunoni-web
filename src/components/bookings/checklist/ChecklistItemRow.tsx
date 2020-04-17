@@ -191,6 +191,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   }, [booking, client, checklistItem]);
 
   const [item, setItem] = useState(checklistItem);
+  const linkForm = getFormLink(booking?.CarrierID);
 
   const [checklistItemValues, setCheckListItemValues] = useState(checklistItem?.values || []);
   const [checklistItemValuesAdmin, setCheckListItemValuesAdmin] = useState(checklistItem?.valuesAdmin || []);
@@ -454,10 +455,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           </IconButton>
         </Box>
       </Box>
-      {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
+      {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && linkForm !== '#' ? (
         <Typography>
           Please fill <Link href={getFormLink(booking?.CarrierID)}>this</Link> form, and mark completed when done
         </Typography>
+      ) : (
+        <Typography> Please upload VGM document here.</Typography>
       )}
       {/*Customer Data*/}
       <List className={classes.documentlist}>
