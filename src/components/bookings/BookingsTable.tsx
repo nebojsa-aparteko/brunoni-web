@@ -137,7 +137,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.checklistDialogContent}>
-          <CheckList booking={booking} showCompanyInfo={showCompanyInfo} />
+          <CheckList booking={booking} />
         </DialogContent>
       </span>
     </Dialog>

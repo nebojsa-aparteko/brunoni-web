@@ -104,9 +104,8 @@ export const isLongVersion = (version: BookingVersion) => {
 };
 
 const BookingView: React.FC<Props> = ({ booking }) => {
-  {
-    console.log(booking);
-  }
+  console.log(booking);
+
   const classes = useStyles();
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -231,7 +230,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Page>
         </Grid>
         <Grid item md={4} xs={12}>
-          <CheckList booking={booking} showCompanyInfo={true} />
+          <CheckList booking={booking} />
         </Grid>
       </Grid>
     );

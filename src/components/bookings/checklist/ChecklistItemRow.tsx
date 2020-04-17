@@ -23,6 +23,7 @@ import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogUserData, ActivityText, ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
+import DoneIcon from '@material-ui/icons/Done';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { orderBy } from 'lodash/fp';
 import { green } from '@material-ui/core/colors';
@@ -114,9 +115,9 @@ const useStyles = makeStyles((theme: Theme) =>
 const getFormLink = (carrierId: any): string => {
   switch (carrierId) {
     case CarrierId.ALIANCA:
-      return 'https://ecom.alianca.com.br/ecom/en/ecommerce_portal_alianca/verifield_gross_mass_2/verifield_2/verifiedgrossmass.xhtml';
+      return 'https://www.hamburgsud-line.com/liner/en/liner_services/ecommerce/verified_gross_mass_ecommerce/index.html';
     case CarrierId.HAMBURG_SUD:
-      return 'https://ecom.hamburgsud.com/ecom/de/ecommerce_portal/verifield_gross_mass/verifield_/verifiedgrossmass.xhtml?lang=DE';
+      return 'https://www.hamburgsud-line.com/liner/de/liner_services/ecommerce/verified_gross_mass_ecommerce/index.html';
     case CarrierId.HYUNDAI_MERCHANT:
       return 'http://www.hmm21.com/cms/business/ebiz/export/vgmWithoutLogin/index.jsp';
     case CarrierId.MACS:
@@ -427,11 +428,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 
       <Box display="flex" flexDirection="row">
         <Box flexDirection="row" alignContent="center">
-          <Checkbox
-            checked={checklistItemChecked}
-            disabled={!isAdmin}
-            onChange={event => handleCheckboxChange(event)}
-          />
+          {isAdmin ? (
+            <Checkbox
+              checked={checklistItemChecked}
+              disabled={!isAdmin}
+              onChange={event => handleCheckboxChange(event)}
+            />
+          ) : (
+            checklistItemChecked && <DoneIcon />
+          )}
+
           <Typography display="inline">{checklistItem.label}</Typography>
           {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
             <Button
@@ -455,13 +461,20 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           </IconButton>
         </Box>
       </Box>
-      {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && linkForm !== '#' ? (
-        <Typography>
-          Please fill <Link href={getFormLink(booking?.CarrierID)}>this</Link> form, and mark completed when done
-        </Typography>
-      ) : (
-        <Typography> Please upload VGM document here.</Typography>
-      )}
+      {!isAdmin ? (
+        checklistItem.label === 'VGM SUBMISSION' && linkForm !== '#' ? (
+          <Typography>
+            Please fill{' '}
+            <Link href={getFormLink(booking?.CarrierID)} target="_blank">
+              this
+            </Link>{' '}
+            form, and mark completed when done
+          </Typography>
+        ) : (
+          <Typography> Please upload documents here.</Typography>
+        )
+      ) : null}
+
       {/*Customer Data*/}
       <List className={classes.documentlist}>
         {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
@@ -519,4 +532,5 @@ interface ConfirmedByCustomer {
   by: ActivityLogUserData;
   at: Date;
 }
+
 export default ChecklistItemRow;

@@ -119,6 +119,8 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
       // company name, incl. place
 
       (booking: Booking) =>
+        // booking id
+        (booking.id ? containsString(booking.id, searchString) : false) ||
         // voyage number
         (booking.Voyage ? containsString(booking.Voyage, searchString) : false) ||
         // vessel

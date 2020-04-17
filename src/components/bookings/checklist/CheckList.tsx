@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo } from 'react';
 import {
   AppBar,
   Box,
@@ -23,10 +23,10 @@ import { ChecklistItem } from './ChecklistItemModel';
 import InternalChecklist from './InternalChecklist';
 import ActivityLogContainer from './ActivityLogContainer';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
+import ActingAs from '../../../contexts/ActingAs';
 
 interface CheckListProps {
   booking: Booking;
-  showCompanyInfo?: boolean;
 }
 
 interface TabPanelProps {
@@ -52,7 +52,8 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
+const CheckList: React.FC<CheckListProps> = ({ booking }) => {
+  const [actingAs, setActingAs] = useContext(ActingAs);
   const checklistCollection = useFirestoreCollection(
     'bookings',
     useCallback(query => query.orderBy('order', 'asc'), []),
@@ -90,7 +91,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
-          <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />
+          {!actingAs && <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />}
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
@@ -101,7 +102,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
                 <ChecklistItemRow
                   key={`chkitem-${booking.id}-${index}`}
                   checklistItem={item}
-                  isAdmin={showCompanyInfo}
+                  isAdmin={!actingAs}
                   booking={booking}
                 />
               ))}
@@ -111,17 +112,19 @@ const CheckList: React.FC<CheckListProps> = ({ booking, showCompanyInfo }) => {
         </Card>
         <ActivityLogContainer bookingId={booking.id} isInternal={false} />
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        <Card>
-          <CardContent>
-            <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-              <InternalChecklist />
-            </Box>
-          </CardContent>
-        </Card>
-        <Divider />
-        <ActivityLogContainer bookingId={booking.id} isInternal={true} />
-      </TabPanel>
+      {!actingAs && (
+        <TabPanel value={value} index={1}>
+          <Card>
+            <CardContent>
+              <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
+                <InternalChecklist />
+              </Box>
+            </CardContent>
+          </Card>
+          <Divider />
+          <ActivityLogContainer bookingId={booking.id} isInternal={true} />
+        </TabPanel>
+      )}
     </Fragment>
   );
 };
