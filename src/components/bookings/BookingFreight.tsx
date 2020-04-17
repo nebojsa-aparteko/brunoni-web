@@ -75,11 +75,7 @@ const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
                   <TableCell align="right">{freight.Unit}</TableCell>
                   <TableCell align="right">{freight.UnitValue}</TableCell>
                   <TableCell align="right">{freight.Currency}</TableCell>
-                  <TableCell align="right">
-                    {freight.Unit === '%'
-                      ? ((parseFloat(freight.Anz) / 100) * parseFloat(freight.UnitValue)).toFixed(2)
-                      : (parseFloat(freight.Anz) * parseFloat(freight.UnitValue)).toFixed(2)}
-                  </TableCell>
+                  <TableCell align="right">{freight.Total}</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               );
