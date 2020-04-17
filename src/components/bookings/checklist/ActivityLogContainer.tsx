@@ -45,6 +45,13 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
     activityCollection,
   ]);
 
+  // const filteredActivityLog = useMemo(() => {
+  //   console.log(normalizedActivityLog);
+  //   return normalizedActivityLog?.filter((item: ActivityLogItem) =>
+  //     showMore ? true : item.type === ActivityType.COMMENT,
+  //   );
+  // }, [showMore, normalizedActivityLog]);
+
   const userRecord = useContext(UserRecordContext);
 
   const handleCommentSave = useCallback(

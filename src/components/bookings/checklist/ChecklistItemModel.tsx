@@ -13,7 +13,14 @@ export interface ActivityLogUserData {
   alphacomClientId: string;
   alphacomId: string;
 }
-
+export interface Stage {
+  id: string;
+  checked?: boolean;
+  label: string;
+  by?: ActivityLogUserData;
+  at?: Date;
+  order: number;
+}
 export interface ChecklistItem {
   id: string;
   label: string;
@@ -25,6 +32,7 @@ export interface ChecklistItem {
   };
   values?: ChecklistItemValueDocument[];
   valuesAdmin?: ChecklistItemValueDocument[];
+  stages: Stage[];
 }
 
 export enum ActivityText {
