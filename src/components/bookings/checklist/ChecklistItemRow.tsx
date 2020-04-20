@@ -433,6 +433,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 
       <Box display="flex" flexDirection="row">
         <Box flexDirection="row" alignContent="center">
+          <a id={checklistItem.id}></a>
           {isAdmin ? (
             <Checkbox
               checked={checklistItemChecked}
