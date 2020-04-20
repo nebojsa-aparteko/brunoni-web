@@ -170,6 +170,9 @@ export interface CargoDetail {
   Overwidth: string | null;
   Overheight: string | null;
   Overlength: string | null;
+  PINNr: string | null;
+  Stock: string | null;
+  DropOffRef: string | null;
 }
 
 export interface EquipmentDetail {
@@ -206,6 +209,8 @@ export enum CtrTariffType {
 export enum BookingLocType {
   pickUp = 'PICK UP',
   delivery = 'DELIVERY',
+  dropOff = 'DROP OFF',
+  gateOut = 'GATE OUT',
 }
 
 export interface FreightDetail {

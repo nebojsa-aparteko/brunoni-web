@@ -11,10 +11,18 @@ import {
   TableCell,
   SvgIcon,
 } from '@material-ui/core';
-import { CargoDetail, BookingVersion, LocRefItem, EquipmentDetail, CtrTariff } from '../../model/Booking';
+import {
+  CargoDetail,
+  BookingVersion,
+  LocRefItem,
+  EquipmentDetail,
+  CtrTariff,
+  BookingCategory,
+  BookingLocType,
+} from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
-import { isLongVersion } from './BookingView';
+import { isImport, isLongVersion } from './BookingView';
 import ImcoContainer from './ImcoContainer';
 import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
@@ -24,6 +32,7 @@ import theme from '../../theme';
 interface Props {
   cargoDetail: CargoDetail[];
   version: BookingVersion;
+  category: BookingCategory;
 }
 
 interface TableRowProps {
@@ -33,6 +42,10 @@ interface TableRowProps {
 
 interface EquipmentProps {
   equipment: EquipmentDetail[];
+}
+
+interface AdditionalCargoProps {
+  detail: CargoDetail;
 }
 
 interface CtrTariffProps {
@@ -45,6 +58,7 @@ interface ContainerItemProps {
   index?: number;
   containerTypes: ContainerType[] | undefined;
   version: BookingVersion;
+  category: BookingCategory;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -133,14 +147,40 @@ export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContai
   );
 };
 
-const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version }) => {
+export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) => {
+  const classes = useStyles();
+
+  const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
+    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff ? ref.LocDet : null))
+    : null
+  )?.join('');
+  const emptyReturnAdress = (detail.LocRefs && detail.LocRefs[0]
+    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.gateOut ? ref.LocDet : null))
+    : null
+  )?.join('');
+
+  return (
+    <Fragment>
+      {destinationTerminal ? <TableRowData label={'Destination Terminal'} content={destinationTerminal} /> : null}
+
+      {detail.PINNr ? <TableRowData label={'Pin Number'} content={detail.PINNr} /> : null}
+
+      {emptyReturnAdress ? <TableRowData label={'Empty Return Adress'} content={emptyReturnAdress} /> : null}
+
+      {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
+
+      {detail.DropOffRef ? <TableRowData label={'Drop Off Reference'} content={detail.DropOffRef} /> : null}
+    </Fragment>
+  );
+};
+
+const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version, category }) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
   const classes = useStyles();
 
   return (
     <Fragment>
       <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
-
       <Box marginTop="0em" marginBottom="2em">
         <Grid container spacing={1} style={{ paddingTop: '10px' }}>
           <Grid item md={5} xs={12}>
@@ -205,6 +245,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                   <col style={{ width: '75%' }} />
                 </colgroup>
                 <TableBody>
+                  {isImport(category) ? <AdditionalCargoData detail={detail} /> : null}
+
                   {detail.LocRefs.map((ref: LocRefItem, index: number) => {
                     if (ref.LocType === 'PICK UP') {
                       return (
@@ -243,7 +285,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
   );
 };
 
-const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
+const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category }) => {
   const containerTypes = useContext(ContainerTypes);
 
   return (
@@ -260,6 +302,7 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version }) => {
             detail={cargoDetailItem}
             containerTypes={containerTypes}
             version={version}
+            category={category}
           />
         ))}
     </Grid>

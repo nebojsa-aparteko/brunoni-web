@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import React, { useEffect, Fragment, useMemo } from 'react';
+import React, { Fragment, useEffect, useMemo } from 'react';
 import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
@@ -7,7 +7,7 @@ import get from 'lodash/fp/get';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import { Booking, Remark, BookingVersion } from '../../model/Booking';
+import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
@@ -101,6 +101,10 @@ const remark = {
 
 export const isLongVersion = (version: BookingVersion) => {
   return version === 'Long';
+};
+
+export const isImport = (category: BookingCategory) => {
+  return category === BookingCategory.Import;
 };
 
 const BookingView: React.FC<Props> = ({ booking }) => {
@@ -198,7 +202,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                     <BookingSummary booking={booking} />
                   </Box>
                   <Box marginTop="0em" marginBottom="0em">
-                    <ContainerDetails cargoDetail={booking.CargoDetails} version={booking.Version} />
+                    <ContainerDetails
+                      cargoDetail={booking.CargoDetails}
+                      version={booking.Version}
+                      category={booking?.Category}
+                    />
                   </Box>
                   {isLongVersion(booking.Version) ? (
                     <Fragment>
