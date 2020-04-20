@@ -152,7 +152,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             <col style={{ width: '83.4%' }} />
           </colgroup>
           <TableBody>
-            <TableRowData label={'Carrier'} content={booking.CarrierID.toUpperCase()} />
+            <TableRowData label={'Carrier'} content={booking?.CarrierID?.toUpperCase() || ''} />
 
             <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />
 

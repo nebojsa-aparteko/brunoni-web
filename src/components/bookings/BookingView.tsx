@@ -79,7 +79,7 @@ interface Props {
 }
 
 const getBookingTitle = (booking?: Booking) => {
-  return booking?.CarrierID.toUpperCase() || '';
+  return booking?.CarrierID?.toUpperCase() || '';
 };
 
 function ScrollToTopOnMount() {
@@ -104,7 +104,7 @@ export const isLongVersion = (version: BookingVersion) => {
 };
 
 const BookingView: React.FC<Props> = ({ booking }) => {
-  console.log(booking);
+  console.log('Booking object: ', booking);
 
   const classes = useStyles();
   const specialRemarks: Remark[] = useMemo(
