@@ -175,9 +175,10 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             {booking.PODName !== booking.FinalDestinationName ? (
               <TableRowData
                 label={'Place of Delivery'}
-                content={[booking.FinalDestinationName, formatDateString(booking.FinalDestinationETA)].join(
-                  '<br/>ETA: ',
-                )}
+                content={[
+                  booking.FinalDestinationName,
+                  formatDateString(booking.FinalDestinationETA ? booking.FinalDestinationETA : booking.ETA),
+                ].join('<br/>ETA: ')}
               />
             ) : null}
           </TableBody>
