@@ -1,9 +1,17 @@
-import { ActivityLogUserData, ChecklistItemValueDocument } from './ChecklistItemModel';
+import {
+  ActivityLogUserData,
+  ChecklistItem,
+  ChecklistItemValueDocument,
+  ShortChecklistItem,
+  ShortChecklistItemValueDocument,
+  Stage,
+} from './ChecklistItemModel';
 
 export interface ActivityLogItem {
   comment?: string;
-  documents?: ChecklistItemValueDocument[];
-  checklistItemReferenceId?: string;
+  documents?: ShortChecklistItemValueDocument[];
+  checklistItem: ShortChecklistItem;
+  stage?: Stage;
   by: ActivityLogUserData;
   at: Date;
   type: ActivityType;

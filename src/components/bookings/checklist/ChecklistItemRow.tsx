@@ -20,7 +20,15 @@ import {
 } from '@material-ui/core';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
-import { ActivityLogUserData, ActivityText, ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
+import {
+  ActivityLogUserData,
+  ActivityText,
+  ChecklistItem,
+  ChecklistItemValueDocument,
+  ShortChecklistItem,
+  ShortChecklistItemValueDocument,
+  Stage,
+} from './ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
@@ -36,6 +44,7 @@ import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecord';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
+import ChecklistStagesView from './ChecklistStagesView';
 import { useActivityLogState } from './ActivityLogContext';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -147,9 +156,10 @@ const fileWithExt = (fileName: string): { name: string; ext: string } => {
 
 const getActivityObject = (
   field: string,
-  value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer,
+  value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[],
   userActivity: ActivityLogUserData,
-  checklistItemValues: ChecklistItem,
+  checklistItem: ChecklistItem,
+  lastValue: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[],
 ) => {
   const activityObj: ActivityLogItem = {
     comment: '',
@@ -157,24 +167,54 @@ const getActivityObject = (
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: false,
+    checklistItem: { id: checklistItem.id, label: checklistItem.label } as ShortChecklistItem,
   };
+  console.log('Field', field, 'Value', value);
   switch (field) {
     case 'checked':
-      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
-        value ? ActivityText.CHECKED : ActivityText.UNCHECKED
-      }${checklistItemValues.label}`;
+      activityObj.comment = value ? ActivityText.CHECKED : ActivityText.UNCHECKED;
       break;
     case 'values':
-      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
-        (value as ChecklistItemValueDocument[]).length > (checklistItemValues.values?.length || 0)
-          ? ActivityText.ADD_FILE
-          : ActivityText.DELETE_FILE
-      }`;
+      const multipleFiles: boolean =
+        (value as ChecklistItemValueDocument[]).length - (checklistItem.values?.length || 0) > 1;
+      activityObj.comment =
+        (value as ChecklistItemValueDocument[]).length > (checklistItem.values?.length || 0)
+          ? multipleFiles
+            ? ActivityText.ADD_FILES
+            : ActivityText.ADD_FILE
+          : multipleFiles
+          ? ActivityText.DELETE_FILES
+          : ActivityText.DELETE_FILE;
+      const tempArr = [];
+      tempArr.push(
+        (value as ChecklistItemValueDocument[]).filter(
+          o => !(lastValue as ChecklistItemValueDocument[]).find(o2 => o.url === o2.url),
+        ),
+      );
+      tempArr.push(
+        (lastValue as ChecklistItemValueDocument[]).filter(
+          o => !(value as ChecklistItemValueDocument[]).find(o2 => o.url === o2.url),
+        ),
+      );
+      console.log(tempArr.flat());
+      activityObj.documents = tempArr
+        .flat()
+        .map(doc => ({ name: doc.name, url: doc.url } as ShortChecklistItemValueDocument));
       break;
     case 'confirmedByCustomer':
       activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
         ActivityText.DONE_BY_CUSTOMER
-      }${checklistItemValues.label}`;
+      }${checklistItem.label}`;
+      break;
+    case 'stages':
+      const temp: Stage[] = [];
+      (value as Stage[]).forEach((s, index) => {
+        if (s.checked !== (lastValue as Stage[])[index].checked) {
+          temp.push(s);
+        }
+      });
+      activityObj.comment = (temp[0] as Stage).checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
+      activityObj.stage = temp[0];
       break;
   }
 
@@ -222,6 +262,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     activityLogContext.setState({ checklistReference: checklistItem });
   };
 
+  const handleStageChange = (stage: Stage, checked: boolean) => {
+    console.log('Stage', stage, 'Checked', checked);
+    const newStage = { ...stage, checked: checked, by: getActivityLogUserData(), at: new Date() };
+    const newItemArray = [...checklistItem.stages];
+    newItemArray[newItemArray.findIndex(el => el.id === stage.id)] = newStage;
+    saveChecklistChanges('stages', newItemArray);
+  };
+
   const handleCompleted = () => {
     console.log('Completed');
     saveChecklistChanges('confirmedByCustomer', {
@@ -231,7 +279,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   };
 
   const saveChecklistChanges = useCallback(
-    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer) => {
+    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[]) => {
+      let lastValue: any;
+      if (field === 'stages') {
+        lastValue = checklistItem.stages || [];
+      } else if ('values') {
+        lastValue = checklistItem.values || [];
+      }
       firebase
         .firestore()
         .collection('bookings')
@@ -246,21 +300,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
             .doc(booking?.id)
             .collection('activity')
             .doc()
-            .set(getActivityObject(field, value, getActivityLogUserData(), checklistItem));
+            .set(getActivityObject(field, value, getActivityLogUserData(), checklistItem, lastValue));
         })
         .then(() =>
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
             autoHideDuration: 1000,
           }),
-        )
-        .catch((error: any) => {
-          console.log(error);
-          enqueueSnackbar(<Typography color="inherit">Failed to save changes - {error.message}!</Typography>, {
-            variant: 'error',
-            autoHideDuration: 1000,
-          });
-        });
+        );
     },
     [checklistItem, booking],
   );
@@ -410,6 +457,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
       className={isDragActive ? classes.dropZone : classes.root}
       display="flex"
       flexDirection="column"
+      id={checklistItem.id}
     >
       <input {...getInputProps()} />
       {uploadProgress > 0 && (
@@ -451,7 +499,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
               size="small"
               style={{ fontSize: '0.6rem', marginLeft: '8px' }}
               onClick={handleCompleted}
-              disabled={!!checklistItem.confirmedByCustomer?.at}
+              disabled={!!(checklistItem.confirmedByCustomer && checklistItem.confirmedByCustomer?.at)}
             >
               {checklistItem.confirmedByCustomer?.at ? 'Done' : 'Mark Completed'}
             </Button>
@@ -473,14 +521,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
             Please fill{' '}
             <Link href={getFormLink(booking?.CarrierID)} target="_blank">
               this
-            </Link>{' '}
+            </Link>
             form, and mark completed when done
           </Typography>
         ) : (
           <Typography> Please upload documents here.</Typography>
         )
       ) : null}
-
+      {isAdmin && checklistItem.stages && (
+        <ChecklistStagesView stages={checklistItem.stages} handleChange={handleStageChange} />
+      )}
       {/*Customer Data*/}
       <List className={classes.documentlist}>
         {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (

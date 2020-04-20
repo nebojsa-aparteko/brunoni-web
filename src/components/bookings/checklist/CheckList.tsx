@@ -71,7 +71,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
     () =>
       map(
         flow(
-          update('confirmedByCustomer', update('at', invoke('toDate'))),
+          // update('confirmedByCustomer', update('at', invoke('toDate'))),
           update('values', map(update('uploadedAt', invoke('toDate')))),
         ),
       )(checklistItems),

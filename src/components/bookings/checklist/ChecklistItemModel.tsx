@@ -6,6 +6,11 @@ export interface ChecklistItemValueDocument {
   storedName: string;
 }
 
+export interface ShortChecklistItemValueDocument {
+  url: string;
+  name: string;
+}
+
 export interface ActivityLogUserData {
   firstName: string;
   lastName: string;
@@ -35,10 +40,17 @@ export interface ChecklistItem {
   stages: Stage[];
 }
 
+export interface ShortChecklistItem {
+  id: string;
+  label: string;
+}
+
 export enum ActivityText {
   CHECKED = ' has checked ',
   UNCHECKED = ' has unchecked ',
   ADD_FILE = ' has added file ',
   DELETE_FILE = ' has deleted file ',
+  ADD_FILES = ' has added files ',
+  DELETE_FILES = ' has deleted files ',
   DONE_BY_CUSTOMER = ' has marked done ',
 }
