@@ -5,6 +5,7 @@ import UserRecordContext from '../../../contexts/UserRecord';
 import SendIcon from '@material-ui/icons/Send';
 import debounce from 'lodash/fp/debounce';
 import Mousetrap from 'mousetrap';
+import { useActivityLogState } from './ActivityLogContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       cursor: 'pointer',
       flex: 1,
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
     },
   }),
 );
@@ -38,6 +39,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
 
   const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
 
+  const activityLogContext = useActivityLogState();
+
   useEffect(() => {
     console.log('binding');
     let moustrapInstance = new Mousetrap();
@@ -47,6 +50,13 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
     moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
     setMousetrap(moustrapInstance);
   }, [inputRef, messageText]);
+
+  useEffect(() => {
+    if (!activityLogContext.state) return;
+    if (inputRef && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inputRef, activityLogContext.state]);
 
   useEffect(() => {
     return () => {
@@ -68,28 +78,38 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   };
 
   return (
-    <Box className={classes.writeCommentContainer}>
-      <Avatar
-        name={`${userRecord?.firstName} ${userRecord?.lastName}`}
-        title={`${userRecord?.firstName} ${userRecord?.lastName}`}
-        size="30"
-        round={true}
-      />
-      <Paper variant="outlined" component={Box} className={classes.writeComment}>
-        <Input
-          disableUnderline
-          fullWidth
-          onChange={handleChange}
-          multiline
-          inputRef={inputRef}
-          placeholder="Write a comment..."
+    <Box display="flex" flexDirection="column">
+      <Box className={classes.writeCommentContainer}>
+        <Avatar
+          name={`${userRecord?.firstName} ${userRecord?.lastName}`}
+          title={`${userRecord?.firstName} ${userRecord?.lastName}`}
+          size="30"
+          round={true}
         />
-      </Paper>
-      <Tooltip title="Send">
-        <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
-          <SendIcon />
-        </IconButton>
-      </Tooltip>
+        <Paper variant="outlined" component={Box} className={classes.writeComment}>
+          <Input
+            disableUnderline
+            fullWidth
+            onChange={handleChange}
+            multiline
+            inputRef={inputRef}
+            placeholder="Write a comment..."
+          />
+        </Paper>
+        <Tooltip title="Send">
+          <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
+            <SendIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      {activityLogContext.state?.checklistReference && (
+        <Box>
+          Ref -{' '}
+          <a href={`#${activityLogContext.state?.checklistReference?.id}`}>
+            {activityLogContext.state?.checklistReference?.label}
+          </a>
+        </Box>
+      )}
     </Box>
   );
 };

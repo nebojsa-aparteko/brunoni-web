@@ -36,6 +36,7 @@ import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecord';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
+import { useActivityLogState } from './ActivityLogContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -215,7 +216,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     [userRecord],
   );
 
-  const handleMention = () => {};
+  const activityLogContext = useActivityLogState();
+
+  const handleMention = () => {
+    activityLogContext.setState({ checklistReference: checklistItem });
+  };
 
   const handleCompleted = () => {
     console.log('Completed');

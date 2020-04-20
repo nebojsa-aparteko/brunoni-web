@@ -24,6 +24,7 @@ import InternalChecklist from './InternalChecklist';
 import ActivityLogContainer from './ActivityLogContainer';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 import ActingAs from '../../../contexts/ActingAs';
+import { ActivityLogProvider } from './ActivityLogContext';
 
 interface CheckListProps {
   booking: Booking;
@@ -88,43 +89,45 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
 
   return (
     <Fragment>
-      <AppBar position="static">
-        <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
-          {!actingAs && <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />}
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
-        <Card>
-          <CardContent>
-            <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-              {normalizedChecklistItems.map((item, index) => (
-                <ChecklistItemRow
-                  key={`chkitem-${booking.id}-${index}`}
-                  checklistItem={item}
-                  isAdmin={!actingAs}
-                  booking={booking}
-                />
-              ))}
-            </Box>
-          </CardContent>
-          <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
-        </Card>
-        <ActivityLogContainer bookingId={booking.id} isInternal={false} />
-      </TabPanel>
-      {!actingAs && (
-        <TabPanel value={value} index={1}>
+      <ActivityLogProvider>
+        <AppBar position="static">
+          <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+            <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
+            {!actingAs && <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />}
+          </Tabs>
+        </AppBar>
+        <TabPanel value={value} index={0}>
           <Card>
             <CardContent>
               <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-                <InternalChecklist />
+                {normalizedChecklistItems.map((item, index) => (
+                  <ChecklistItemRow
+                    key={`chkitem-${booking.id}-${index}`}
+                    checklistItem={item}
+                    isAdmin={!actingAs}
+                    booking={booking}
+                  />
+                ))}
               </Box>
             </CardContent>
+            <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
           </Card>
-          <Divider />
-          <ActivityLogContainer bookingId={booking.id} isInternal={true} />
+          <ActivityLogContainer bookingId={booking.id} isInternal={false} />
         </TabPanel>
-      )}
+        {!actingAs && (
+          <TabPanel value={value} index={1}>
+            <Card>
+              <CardContent>
+                <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
+                  <InternalChecklist />
+                </Box>
+              </CardContent>
+            </Card>
+            <Divider />
+            <ActivityLogContainer bookingId={booking.id} isInternal={true} />
+          </TabPanel>
+        )}
+      </ActivityLogProvider>
     </Fragment>
   );
 };
