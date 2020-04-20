@@ -4,7 +4,7 @@ import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
-import { ActivityChangeType } from './ChecklistItemModel';
+import { ActivityText } from './ChecklistItemModel';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -14,13 +14,11 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       <Link href={`mailto:${activity.by.emailAddress}`}>
         {`${capitalCase(activity.by.firstName)} ${capitalCase(activity.by.lastName)}`}
       </Link>
-      {activity.changeType}
+      {activity.comment}
       {activity.stage && ` '${activity.stage?.label}' stage in `}
       {activity.documents &&
         activity.documents.map((doc, index) => {
-          return [ActivityChangeType.ADD_FILE, ActivityChangeType.ADD_FILES].includes(
-            activity.changeType as ActivityChangeType,
-          ) ? (
+          return [ActivityText.ADD_FILE, ActivityText.ADD_FILES].includes(activity.comment as ActivityText) ? (
             <Fragment>
               <Link href={doc.url}>{doc.name}</Link>
               {makeStyledString(activity, index)}
