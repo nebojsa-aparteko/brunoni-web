@@ -148,8 +148,6 @@ export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContai
 };
 
 export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) => {
-  const classes = useStyles();
-
   const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
     ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff ? ref.LocDet : null))
     : null
