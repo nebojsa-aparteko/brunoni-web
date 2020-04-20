@@ -81,7 +81,6 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           fullWidth
           onChange={handleChange}
           multiline
-          autoFocus
           inputRef={inputRef}
           placeholder="Write a comment..."
         />
