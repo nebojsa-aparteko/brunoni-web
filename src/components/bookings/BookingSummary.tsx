@@ -1,5 +1,5 @@
 import React, { useMemo, Fragment } from 'react';
-import { Table, TableCell, TableRow, makeStyles, Typography } from '@material-ui/core';
+import { Table, TableCell, TableRow, makeStyles, Typography, Grid } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
@@ -30,9 +30,6 @@ const useStyles = makeStyles(theme => ({
     verticalAlign: 'top',
   },
   secondColumn: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyItems: 'flex-start',
     paddingTop: 0,
     verticalAlign: 'top',
   },
@@ -147,8 +144,8 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
   }, [client, booking]);
 
   return (
-    <span className={classes.summaryWrapper}>
-      <span className={classes.firstColumn}>
+    <Grid container spacing={1} style={{ paddingTop: '0px' }}>
+      <Grid item md={5} xs={12} className={classes.firstColumn}>
         <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
           <colgroup>
             <col style={{ width: '16.6%' }} />
@@ -185,8 +182,8 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             ) : null}
           </TableBody>
         </Table>
-      </span>
-      <span className={classes.secondColumn}>
+      </Grid>
+      <Grid item md={7} xs={12} className={classes.secondColumn}>
         <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
           <colgroup>
             <col style={{ width: '16.6%' }} />
@@ -197,7 +194,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             <TableRowData label={'Status'} content={booking.BkgStatusText} />
             {booking.BkgAgentContactTxt ? (
               <TableRow>
-                <TableCell className={classes.tableCellLabel}>Booking Agent Contact</TableCell>
+                <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
                 <TableCell className={classes.tableCell}>
                   {booking.BkgAgentContactEml ? (
                     <a href={'mailto:' + booking.BkgAgentContactEml}>{booking.BkgAgentContactTxt.toUpperCase()}</a>
@@ -214,8 +211,8 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             </TableRow>
           </TableBody>
         </Table>
-      </span>
-    </span>
+      </Grid>
+    </Grid>
   );
 };
 
