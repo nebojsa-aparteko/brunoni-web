@@ -176,6 +176,10 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                   </TableRow>
                 ) : null}
 
+                {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
+
+                {detail.Overdimension && <OverdimensionComponent detail={detail} />}
+
                 {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
                 {isLongVersion(version) && detail.Equipment && detail.Equipment[0]
@@ -189,10 +193,6 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
                       ))
                     : null
                   : null}
-
-                {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
-
-                {detail.Overdimension && <OverdimensionComponent detail={detail} />}
               </TableBody>
             </Table>
           </Grid>
