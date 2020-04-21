@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 0,
     border: 'none',
     fontWeight: 700,
-    verticalAlign: 'top'
+    verticalAlign: 'top',
   },
   tableRow: {
     ['@media not print']: {
@@ -35,26 +35,34 @@ const useStyles = makeStyles(theme => ({
   },
   tableCell: {
     border: 'none',
-  }
+  },
 }));
 
 const SpecialRemarks: React.FC<Props> = ({ remarks }) => {
   const classes = useStyles();
 
-  const remarkTexts = remarks.map(remark => {
-    return remark.RemarkTxt;
-  }).join('<br />');
+  const remarkTexts = remarks
+    .map(remark => {
+      return remark.RemarkTxt.split('<br/><br/>')
+        .map(remark => remark.split('<br/>').join(''))
+        .join('<br/><br/>');
+    })
+    .join('<br />');
 
   return (
     <Table size="small" aria-label="a dense table">
-       <colgroup>
-        <col style={{ width: '40%' }} />
-        <col style={{ width: '60%' }} />
+      <colgroup>
+        <col style={{ width: '20%' }} />
+        <col style={{ width: '80%' }} />
       </colgroup>
       <TableBody>
         <TableRow className={classes.tableRow}>
           <TableCell className={classes.tableCellLabel}>Special Remarks</TableCell>
-          <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: remarkTexts}} />
+          <TableCell
+            className={classes.tableCell}
+            dangerouslySetInnerHTML={{ __html: remarkTexts }}
+            style={{ paddingBottom: '20px', textAlign: 'justify' }}
+          />
         </TableRow>
       </TableBody>
     </Table>

@@ -224,14 +224,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                       <BookingFreight freightDetails={booking.FreightDetails} />
                     </Box>
                   )}
+                  <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
+                    {finalRemarks.map((item, index) => {
+                      const text = item.RemarkTxt.split('<br/><br/>'); // split the string into an array for each new paragraph
 
-                  {finalRemarks.map((item, index) => {
-                    return (
-                      <Typography variant="body2" key={`final-remark-${index}`}>
-                        <span dangerouslySetInnerHTML={{ __html: item.RemarkTxt }} />
-                      </Typography>
-                    );
-                  })}
+                      return item.RemarkTxt ? (
+                        <Typography variant="body2" key={`final-remark-${index}`}>
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: text.map(remark => remark.split('<br/>').join('')).join('<br/><br/>'),
+                            }}
+                          />
+                          {/* remove all <br/> from the elements of the string array to get rid of manual new rows and join the elements, aka paragraphs with <br/><br/> as they were initially */}
+                        </Typography>
+                      ) : null;
+                    })}
+                  </Box>
                 </Page>
               </Grid>
             </Paper>
