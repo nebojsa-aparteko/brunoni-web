@@ -208,7 +208,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                       category={booking?.Category}
                     />
                   </Box>
-                  {isLongVersion(booking.Version) ? (
+                  {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
                     <Fragment>
                       <Box marginTop="0em" marginBottom="0em">
                         <PortTerms portTerms={booking.PortTerms} />
