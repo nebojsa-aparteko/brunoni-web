@@ -148,11 +148,11 @@ export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContai
 };
 
 export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) => {
-  const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
+  const emptyReturnAddress = (detail.LocRefs && detail.LocRefs[0]
     ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff ? ref.LocDet : null))
     : null
   )?.join('');
-  const emptyReturnAdress = (detail.LocRefs && detail.LocRefs[0]
+  const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
     ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.gateOut ? ref.LocDet : null))
     : null
   )?.join('');
@@ -163,7 +163,7 @@ export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) 
 
       {detail.PINNr ? <TableRowData label={'Pin Number'} content={detail.PINNr} /> : null}
 
-      {emptyReturnAdress ? <TableRowData label={'Empty Return Adress'} content={emptyReturnAdress} /> : null}
+      {emptyReturnAddress ? <TableRowData label={'Empty Return Adress'} content={emptyReturnAddress} /> : null}
 
       {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
 
