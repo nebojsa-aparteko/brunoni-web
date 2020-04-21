@@ -159,7 +159,12 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             {booking.POLName !== booking.PlaceOfRecieptName ? (
               <TableRowData
                 label={'Place of Receipt'}
-                content={[booking.PlaceOfRecieptName, formatDateString(booking.PlaceOfReceiptETS)].join('<br/>ETS: ')}
+                content={[
+                  booking.PlaceOfRecieptName,
+                  booking.PlaceOfReceiptETS
+                    ? formatDateString(booking.PlaceOfReceiptETS)
+                    : formatDateString(booking.ETS),
+                ].join('<br/>ETS: ')}
               />
             ) : null}
 
