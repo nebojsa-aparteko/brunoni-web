@@ -1,21 +1,22 @@
 import {
+  ActivityChangeType,
   ActivityLogUserData,
-  ChecklistItem,
-  ChecklistItemValueDocument,
   ShortChecklistItem,
   ShortChecklistItemValueDocument,
   Stage,
 } from './ChecklistItemModel';
 
 export interface ActivityLogItem {
+  id?: string;
   comment?: string;
-  documents?: ShortChecklistItemValueDocument[];
+  documents?: ShortChecklistItemValueDocument[] | null;
   checklistItem: ShortChecklistItem;
   stage?: Stage;
   by: ActivityLogUserData;
   at: Date;
   type: ActivityType;
   isInternal: boolean;
+  changeType?: ActivityChangeType;
 }
 
 export enum ActivityType {

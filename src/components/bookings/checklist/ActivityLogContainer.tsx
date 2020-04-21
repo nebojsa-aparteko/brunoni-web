@@ -16,10 +16,20 @@ interface Props {
   isInternal: boolean;
 }
 
+export const addActivityItem = (bookingId: string, checklistId: string, activityLog: ActivityLogItem) => {
+  return firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('activity')
+    .doc()
+    .set(activityLog);
+};
+
 const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }) => {
   // TODO storing logic
 
-  // addActivityItem (ActivityItemDetails) // firestore.save
+  // addActivityItem (ActivityItemDetails) // firestore.saveW
 
   //
   // Text. matcher replace({INVOICE}}

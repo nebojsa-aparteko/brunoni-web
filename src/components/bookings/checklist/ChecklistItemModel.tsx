@@ -45,7 +45,7 @@ export interface ShortChecklistItem {
   label: string;
 }
 
-export enum ActivityText {
+export enum ActivityChangeType {
   CHECKED = ' has checked ',
   UNCHECKED = ' has unchecked ',
   ADD_FILE = ' has added file ',

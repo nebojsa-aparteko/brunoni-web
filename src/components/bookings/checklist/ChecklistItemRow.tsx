@@ -1,19 +1,12 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
-  Avatar,
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   createStyles,
   IconButton,
   LinearProgress,
   Link,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemSecondaryAction,
-  ListItemText,
   makeStyles,
   Theme,
   Typography,
@@ -21,31 +14,27 @@ import {
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import {
+  ActivityChangeType,
   ActivityLogUserData,
-  ActivityText,
   ChecklistItem,
   ChecklistItemValueDocument,
   ShortChecklistItem,
-  ShortChecklistItemValueDocument,
   Stage,
 } from './ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
-import DeleteIcon from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { orderBy } from 'lodash/fp';
-import { green } from '@material-ui/core/colors';
+import { flow, isNil, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
 import { Booking, CarrierId, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
-import DescriptionIcon from '@material-ui/icons/Description';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecord';
-import { capitalCase } from 'change-case';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import ChecklistStagesView from './ChecklistStagesView';
 import { useActivityLogState } from './ActivityLogContext';
+import { addActivityItem } from './ActivityLogContainer';
+import DocumentList from './DocumentList';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -54,10 +43,6 @@ const useStyles = makeStyles((theme: Theme) =>
       '&:focus': {
         outline: 'none',
       },
-    },
-    documentlist: {
-      width: '100%',
-      backgroundColor: theme.palette.background.paper,
     },
     tableRow: {
       '& td': {
@@ -103,17 +88,6 @@ const useStyles = makeStyles((theme: Theme) =>
       cursor: 'pointer',
       display: 'flex',
     },
-    progressWrapper: {
-      margin: theme.spacing(1),
-      position: 'relative',
-    },
-    iconDeleteProgress: {
-      color: green[500],
-      position: 'absolute',
-      top: -6,
-      left: -6,
-      zIndex: 1,
-    },
     tinyIconButton: {
       '& svg': {
         fontSize: 10,
@@ -154,71 +128,28 @@ const fileWithExt = (fileName: string): { name: string; ext: string } => {
       };
 };
 
-const getActivityObject = (
-  field: string,
-  value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[],
-  userActivity: ActivityLogUserData,
+const createActivityObject = (
+  changeType: ActivityChangeType,
+  by: ActivityLogUserData,
   checklistItem: ChecklistItem,
-  lastValue: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[],
-) => {
-  const activityObj: ActivityLogItem = {
-    comment: '',
-    by: userActivity,
+  documents?: ChecklistItemValueDocument[],
+  stage?: Stage,
+): ActivityLogItem =>
+  flow(omitBy(isNil))({
+    changeType: changeType,
+    by: by,
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: false,
     checklistItem: { id: checklistItem.id, label: checklistItem.label } as ShortChecklistItem,
-  };
-  console.log('Field', field, 'Value', value);
-  switch (field) {
-    case 'checked':
-      activityObj.comment = value ? ActivityText.CHECKED : ActivityText.UNCHECKED;
-      break;
-    case 'values':
-      const multipleFiles: boolean =
-        (value as ChecklistItemValueDocument[]).length - (checklistItem.values?.length || 0) > 1;
-      activityObj.comment =
-        (value as ChecklistItemValueDocument[]).length > (checklistItem.values?.length || 0)
-          ? multipleFiles
-            ? ActivityText.ADD_FILES
-            : ActivityText.ADD_FILE
-          : multipleFiles
-          ? ActivityText.DELETE_FILES
-          : ActivityText.DELETE_FILE;
-      const tempArr = [];
-      tempArr.push(
-        (value as ChecklistItemValueDocument[]).filter(
-          o => !(lastValue as ChecklistItemValueDocument[]).find(o2 => o.url === o2.url),
-        ),
-      );
-      tempArr.push(
-        (lastValue as ChecklistItemValueDocument[]).filter(
-          o => !(value as ChecklistItemValueDocument[]).find(o2 => o.url === o2.url),
-        ),
-      );
-      console.log(tempArr.flat());
-      activityObj.documents = tempArr
-        .flat()
-        .map(doc => ({ name: doc.name, url: doc.url } as ShortChecklistItemValueDocument));
-      break;
-    case 'confirmedByCustomer':
-      activityObj.comment = `${capitalCase(userActivity.firstName)} ${capitalCase(userActivity.lastName)}${
-        ActivityText.DONE_BY_CUSTOMER
-      }${checklistItem.label}`;
-      break;
-    case 'stages':
-      const temp: Stage[] = [];
-      (value as Stage[]).forEach((s, index) => {
-        if (s.checked !== (lastValue as Stage[])[index].checked) {
-          temp.push(s);
-        }
-      });
-      activityObj.comment = (temp[0] as Stage).checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
-      activityObj.stage = temp[0];
-      break;
-  }
+    documents: documents,
+    stage: stage,
+  } as ActivityLogItem);
 
-  return activityObj;
+const storeActivity = (activityFunction: () => Promise<any>) => {
+  activityFunction()
+    .then() //success
+    .catch(); //error
 };
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedChecklist }: ChecklistItemRowProp) => {
@@ -258,64 +189,119 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 
   const activityLogContext = useActivityLogState();
 
+  const storeActivity = (checklistItemActivityHandler: () => Promise<void>) => {
+    checklistItemActivityHandler()
+      .then(_ =>
+        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+          variant: 'success',
+          autoHideDuration: 1000,
+        }),
+      )
+      .catch(error => {
+        console.trace(error);
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      });
+  };
+
+  const saveChecklistChanges = useCallback(
+    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[]) => {
+      return firebase
+        .firestore()
+        .collection('bookings')
+        .doc(booking?.id)
+        .collection('checklist')
+        .doc(checklistItem?.id)
+        .update(field, value);
+    },
+    [booking?.id, checklistItem.id],
+  );
+
+  const checklistItemCheckedHandler = useCallback((checked: boolean) => {
+    return saveChecklistChanges('checked', checked).then(_ =>
+      addActivityItem(
+        booking!.id,
+        checklistItem!.id,
+        createActivityObject(
+          checked ? ActivityChangeType.CHECKED : ActivityChangeType.UNCHECKED,
+          getActivityLogUserData(),
+          checklistItem,
+        ),
+      ),
+    );
+  }, []);
+
+  const checklistItemFileDeletedHandler = useCallback(
+    (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument) => {
+      return saveChecklistChanges('values', documents).then(_ =>
+        addActivityItem(
+          booking!.id,
+          checklistItem!.id,
+          createActivityObject(ActivityChangeType.DELETE_FILE, getActivityLogUserData(), checklistItem, [deletedFile]),
+        ),
+      );
+    },
+    [],
+  );
+
+  const checklistItemFileAddedHandler = useCallback(
+    (documents: ChecklistItemValueDocument[], addedFiles: ChecklistItemValueDocument[]) => {
+      return saveChecklistChanges('values', documents).then(_ =>
+        addActivityItem(
+          booking!.id,
+          checklistItem!.id,
+          createActivityObject(
+            addedFiles.length > 1 ? ActivityChangeType.ADD_FILES : ActivityChangeType.ADD_FILE,
+            getActivityLogUserData(),
+            checklistItem,
+            addedFiles,
+          ),
+        ),
+      );
+    },
+    [],
+  );
+
+  const checklistItemStageChangeHandler = useCallback((stages: Stage[], stage: Stage) => {
+    return saveChecklistChanges('stages', stages).then(_ =>
+      addActivityItem(
+        booking!.id,
+        checklistItem!.id,
+        createActivityObject(
+          stage.checked ? ActivityChangeType.CHECKED : ActivityChangeType.UNCHECKED,
+          getActivityLogUserData(),
+          checklistItem,
+          undefined,
+          stage,
+        ),
+      ),
+    );
+  }, []);
+
   const handleMention = () => {
     activityLogContext.setState({ checklistReference: checklistItem });
   };
 
   const handleStageChange = (stage: Stage, checked: boolean) => {
-    console.log('Stage', stage, 'Checked', checked);
     const newStage = { ...stage, checked: checked, by: getActivityLogUserData(), at: new Date() };
     const newItemArray = [...checklistItem.stages];
     newItemArray[newItemArray.findIndex(el => el.id === stage.id)] = newStage;
-    saveChecklistChanges('stages', newItemArray);
+    storeActivity(() => checklistItemStageChangeHandler(newItemArray, stage));
   };
 
   const handleCompleted = () => {
-    console.log('Completed');
     saveChecklistChanges('confirmedByCustomer', {
       by: getActivityLogUserData(),
       at: new Date(),
     } as ConfirmedByCustomer);
   };
 
-  const saveChecklistChanges = useCallback(
-    (field: string, value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[]) => {
-      let lastValue: any;
-      if (field === 'stages') {
-        lastValue = checklistItem.stages || [];
-      } else if ('values') {
-        lastValue = checklistItem.values || [];
-      }
-      firebase
-        .firestore()
-        .collection('bookings')
-        .doc(booking?.id)
-        .collection('checklist')
-        .doc(checklistItem.id)
-        .update(field, value)
-        .then(_ => {
-          return firebase
-            .firestore()
-            .collection('bookings')
-            .doc(booking?.id)
-            .collection('activity')
-            .doc()
-            .set(getActivityObject(field, value, getActivityLogUserData(), checklistItem, lastValue));
-        })
-        .then(() =>
-          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-            variant: 'success',
-            autoHideDuration: 1000,
-          }),
-        );
-    },
-    [checklistItem, booking],
-  );
-
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setChecklistItemChecked(event.target.checked);
-      saveChecklistChanges('checked', event.target.checked);
+      storeActivity(() => checklistItemCheckedHandler(event.target.checked));
     },
     [saveChecklistChanges],
   );
@@ -394,8 +380,10 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
               const newItemArray = checklistItemValues.filter(chkItem => chkItem !== item);
               console.log('new Item array', JSON.stringify(newItemArray, null, 2));
               setCheckListItemValues(newItemArray);
-              saveItemValue(false, newItemArray);
+              // saveItemValue(false, newItemArray);
               resolve(item);
+              storeActivity(() => checklistItemFileDeletedHandler(newItemArray, item));
+
               setRemovalInProgress(false);
             })
             .catch(error => {
@@ -440,7 +428,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           // FIXME it needs to be updated only after successful DB store
           const itemValues = checklistItemValues.concat(values);
           setCheckListItemValues(itemValues);
-          saveItemValue(false, itemValues);
+          // saveItemValue(false, itemValues);
+          storeActivity(() => checklistItemFileAddedHandler(itemValues, values));
         })
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
@@ -532,47 +521,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         <ChecklistStagesView stages={checklistItem.stages} handleChange={handleStageChange} />
       )}
       {/*Customer Data*/}
-      <List className={classes.documentlist}>
-        {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
-          <ListItem key={`filelistitem-${booking?.id}-${index}`}>
-            <a
-              href={item.url}
-              download={item.name}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={classes.fileItemLink}
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  <DescriptionIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                id={`filelistitem-${booking?.id}-${index}`}
-                primary={item.name}
-                secondary={`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
-              />
-            </a>
-            <ListItemSecondaryAction>
-              <div className={classes.progressWrapper}>
-                <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-                  <AddCommentIcon />
-                </IconButton>
-                <IconButton
-                  edge="end"
-                  size="small"
-                  aria-label="Remove File"
-                  onClick={() => deleteFile(item)}
-                  aria-labelledby={`filelistitem-${booking?.id}-${index}`}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
-              </div>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
+      <DocumentList
+        checklistItemValues={checklistItemValues}
+        bookingId={booking!.id}
+        removalInProgress={removalInProgress}
+        deleteFile={deleteFile}
+        handleMention={handleMention}
+      />
     </Box>
   );
 };
@@ -580,7 +535,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
-  booking: Booking | undefined;
+  booking: Booking;
   setMentionedChecklist?: any;
 }
 
