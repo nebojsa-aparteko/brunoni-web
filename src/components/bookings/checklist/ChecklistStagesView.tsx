@@ -5,7 +5,7 @@ import ChecklistStageView from './ChecklistStageView';
 
 const ChecklistStagesView = ({ stages, handleChange }: Props) => {
   return (
-    <Box display="flex" flexWrap="wrap">
+    <Box display="flex" flexWrap="wrap" justifyContent="space-around">
       {stages.map((stage, index) => (
         <ChecklistStageView
           stage={stage}

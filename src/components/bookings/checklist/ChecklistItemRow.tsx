@@ -94,6 +94,26 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 10,
       },
     },
+    draftRoot: {
+      maxWidth: '150px',
+      border: '1px dashed #ccc',
+      cursor: 'pointer',
+      borderColor: '#999',
+      '&:focus': {
+        outline: 'none',
+      },
+    },
+    draftDragZone: {
+      border: '1px solid #ccc',
+      cursor: 'pointer',
+      borderColor: '#999',
+      '&:focus': {
+        outline: 'none',
+      },
+    },
+    draftEmpty: {
+      border: 'none',
+    },
   }),
 );
 
@@ -429,107 +449,135 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({ onDrop, noClick: true });
+  const {
+    getRootProps: getRootPropsDraft,
+    getInputProps: getInputPropsDraft,
+    open: openDraft,
+    isDragActive: isDragActiveDraft,
+  } = useDropzone({ onDrop });
 
   return (
-    <Box
-      {...getRootProps()}
-      className={isDragActive ? classes.dropZone : classes.root}
-      display="flex"
-      flexDirection="column"
-      id={checklistItem.id}
-    >
-      <input {...getInputProps()} />
-      {uploadProgress > 0 && (
-        <Box display="flex">
-          <div style={{ width: '100%', paddingTop: '14px' }}>
-            <LinearProgress variant="determinate" value={uploadProgress} />
-          </div>
-          <IconButton
-            className={classes.tinyIconButton}
-            aria-label="cancel upload"
-            onClick={() => {
-              uploadTask?.cancel();
-              setUploadTask(undefined);
-              setUploadProgress(0);
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      )}
-
-      <Box display="flex" flexDirection="row">
-        <Box flexDirection="row" alignContent="center">
-          <a id={checklistItem.id}></a>
-          {isAdmin ? (
-            <Checkbox
-              checked={checklistItemChecked}
-              disabled={!isAdmin}
-              onChange={event => handleCheckboxChange(event)}
-            />
-          ) : (
-            checklistItemChecked && <DoneIcon />
-          )}
-
-          <Typography display="inline">{checklistItem.label}</Typography>
-          {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
-            <Button
-              variant="outlined"
-              size="small"
-              style={{ fontSize: '0.6rem', marginLeft: '8px' }}
-              onClick={handleCompleted}
-              disabled={!!(checklistItem.confirmedByCustomer && checklistItem.confirmedByCustomer?.at)}
+    <Box display="flex" justifyContent="space-between" my={1}>
+      <Box
+        {...getRootProps()}
+        className={isDragActive ? classes.dropZone : classes.root}
+        display="flex"
+        flexDirection="column"
+        id={checklistItem.id}
+        flex={1}
+      >
+        <input {...getInputProps()} />
+        {uploadProgress > 0 && (
+          <Box display="flex">
+            <div style={{ width: '100%', paddingTop: '14px' }}>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+            </div>
+            <IconButton
+              className={classes.tinyIconButton}
+              aria-label="cancel upload"
+              onClick={() => {
+                uploadTask?.cancel();
+                setUploadTask(undefined);
+                setUploadProgress(0);
+              }}
             >
-              {checklistItem.confirmedByCustomer?.at ? 'Done' : 'Mark Completed'}
-            </Button>
-          )}
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        )}
+
+        <Box display="flex" flexDirection="row">
+          <Box flexDirection="row" alignContent="center">
+            <a id={checklistItem.id}></a>
+            {isAdmin ? (
+              <Checkbox
+                checked={checklistItemChecked}
+                disabled={!isAdmin}
+                onChange={event => handleCheckboxChange(event)}
+              />
+            ) : (
+              checklistItemChecked && <DoneIcon />
+            )}
+
+            <Typography display="inline">{checklistItem.label}</Typography>
+            {!isAdmin && checklistItem.label === 'VGM SUBMISSION' && (
+              <Button
+                variant="outlined"
+                size="small"
+                style={{ fontSize: '0.6rem', marginLeft: '8px' }}
+                onClick={handleCompleted}
+                disabled={!!(checklistItem.confirmedByCustomer && checklistItem.confirmedByCustomer?.at)}
+              >
+                {checklistItem.confirmedByCustomer?.at ? 'Done' : 'Mark Completed'}
+              </Button>
+            )}
+          </Box>
+          <Box flex="1" />
+          <Box display="flex">
+            <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
+              <AddCommentIcon />
+            </IconButton>
+            <IconButton size="small" aria-label="Add Files" onClick={open}>
+              <AttachFileIcon />
+            </IconButton>
+          </Box>
         </Box>
-        <Box flex="1" />
-        <Box display="flex">
-          <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-            <AddCommentIcon />
-          </IconButton>
-          <IconButton size="small" aria-label="Add Files" onClick={open}>
-            <AttachFileIcon />
-          </IconButton>
-        </Box>
+        {!isAdmin ? (
+          checklistItem.label === 'VGM SUBMISSION' && linkForm !== '#' ? (
+            <Typography>
+              Please fill{' '}
+              <Link href={getFormLink(booking?.CarrierID)} target="_blank">
+                this
+              </Link>
+              form, and mark completed when done
+            </Typography>
+          ) : (
+            <Typography> Please upload documents here.</Typography>
+          )
+        ) : null}
+        {isAdmin && checklistItem.stages && (
+          <ChecklistStagesView stages={checklistItem.stages} handleChange={handleStageChange} />
+        )}
+        {/*Customer Data*/}
+        <DocumentList
+          checklistItemValues={checklistItemValues}
+          bookingId={booking!.id}
+          removalInProgress={removalInProgress}
+          deleteFile={deleteFile}
+        />
+        {isAdmin && checklistItemValuesAdmin.length > 0 && (
+          <Fragment>
+            <Divider />
+            <Typography variant="caption">Drafts</Typography>
+            <DocumentList
+              checklistItemValues={checklistItemValuesAdmin}
+              bookingId={booking!.id}
+              removalInProgress={removalInProgress}
+              deleteFile={deleteFile}
+            />
+            )}
+          </Fragment>
+        )}
       </Box>
-      {!isAdmin ? (
-        checklistItem.label === 'VGM SUBMISSION' && linkForm !== '#' ? (
-          <Typography>
-            Please fill{' '}
-            <Link href={getFormLink(booking?.CarrierID)} target="_blank">
-              this
-            </Link>
-            form, and mark completed when done
-          </Typography>
-        ) : (
-          <Typography> Please upload documents here.</Typography>
-        )
-      ) : null}
-      {isAdmin && checklistItem.stages && (
-        <ChecklistStagesView stages={checklistItem.stages} handleChange={handleStageChange} />
-      )}
-      {/*Customer Data*/}
-      <DocumentList
-        checklistItemValues={checklistItemValues}
-        bookingId={booking!.id}
-        removalInProgress={removalInProgress}
-        deleteFile={deleteFile}
-        handleMention={handleMention}
-      />
-      {isAdmin && checklistItemValuesAdmin.length > 0 && (
+      {isAdmin && (
         <Fragment>
-          <Divider />
-          <Typography variant="caption">Drafts</Typography>
-          <DocumentList
-            checklistItemValues={checklistItemValuesAdmin}
-            bookingId={booking!.id}
-            removalInProgress={removalInProgress}
-            deleteFile={deleteFile}
-            handleMention={handleMention}
-          />
-          )}
+          <Divider orientation="vertical" flexItem={true} />
+          <Box
+            {...getRootPropsDraft()}
+            className={
+              isDragActiveDraft ? classes.draftDragZone : isDragActive ? classes.draftEmpty : classes.draftRoot
+            }
+            flexBasis="fit-content"
+            display="flex"
+            flexDirection="column"
+            id={checklistItem.id}
+            justifyContent="center"
+            alignItems="center"
+            px={1}
+          >
+            <input {...getInputPropsDraft()} />
+            Drafts
+          </Box>
         </Fragment>
       )}
     </Box>

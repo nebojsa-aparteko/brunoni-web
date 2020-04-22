@@ -17,6 +17,7 @@ import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { ChecklistItemValueDocument } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
+import { useActivityLogState } from './ActivityLogContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,8 +41,11 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentListItem = ({ item, bookingId, index, removalInProgress, deleteFile, handleMention }: Props) => {
+const DocumentListItem = ({ item, bookingId, index, removalInProgress, deleteFile }: Props) => {
   const classes = useStyles();
+  const activityLogContext = useActivityLogState();
+
+  const handleMention = () => activityLogContext.setState({ documentReference: item });
 
   return (
     <ListItem key={`filelistitem-${bookingId}-${index}`}>
@@ -92,5 +96,4 @@ export interface Props {
   index: number;
   removalInProgress: boolean;
   deleteFile: (item: ChecklistItemValueDocument) => void;
-  handleMention: () => void;
 }

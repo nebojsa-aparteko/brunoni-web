@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, deleteFile, handleMention }: Props) => {
+const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, deleteFile }: Props) => {
   const classes = useStyles();
 
   return (
@@ -26,7 +26,6 @@ const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, delet
           index={index}
           removalInProgress={removalInProgress}
           deleteFile={deleteFile}
-          handleMention={handleMention}
         />
       ))}
     </List>
@@ -40,5 +39,4 @@ export interface Props {
   bookingId: string;
   removalInProgress: boolean;
   deleteFile: (item: ChecklistItemValueDocument) => void;
-  handleMention: () => void;
 }

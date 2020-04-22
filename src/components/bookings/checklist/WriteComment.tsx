@@ -110,6 +110,14 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           </a>
         </Box>
       )}
+      {activityLogContext.state?.documentReference && (
+        <Box>
+          Doc -{' '}
+          <a href={`#${activityLogContext.state?.documentReference?.url}`}>
+            {activityLogContext.state?.documentReference?.name}
+          </a>
+        </Box>
+      )}
     </Box>
   );
 };
