@@ -14,7 +14,7 @@ import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
-import BookingsProvider from './providers/Bookings';
+import BookingsProvider from './providers/BookingsProvider';
 import BookingsAdminProvider from './providers/BookingsAdmin';
 import AdminQuotesProvider from './providers/AdminQuotes';
 import SpecialOffersProvider from './providers/SpecialOffers';

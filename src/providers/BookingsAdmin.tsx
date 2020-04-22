@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import BookingsContext from '../contexts/Bookings';
 import { Booking } from '../model/Booking';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
-import { normalizeBookings } from './Bookings';
+import { normalizeBookings } from './BookingsProvider';
 
 interface Props {
   children: React.ReactNode;
