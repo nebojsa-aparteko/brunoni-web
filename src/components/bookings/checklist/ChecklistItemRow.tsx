@@ -262,8 +262,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   );
 
   const checklistItemFileAddedHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], addedFiles: ChecklistItemValueDocument[]) => {
-      return saveChecklistChanges('values', documents).then(_ =>
+    (documents: ChecklistItemValueDocument[], addedFiles: ChecklistItemValueDocument[], internal: boolean) => {
+      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
         addActivityItem(
           booking!.id,
           checklistItem!.id,
@@ -376,7 +376,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   );
 
   const deleteFile = useCallback(
-    async (item: ChecklistItemValueDocument): Promise<any> => {
+    async (item: ChecklistItemValueDocument, internal: boolean): Promise<any> => {
       setRemovalInProgress(true);
       return new Promise((resolve, reject) => {
         try {
@@ -387,10 +387,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           documentRef
             .delete()
             .then(() => {
-              const newItemArray = checklistItemValues.filter(chkItem => chkItem !== item);
-              console.log('new Item array', JSON.stringify(newItemArray, null, 2));
-              setCheckListItemValues(newItemArray);
-              // saveItemValue(false, newItemArray);
+              let newItemArray: ChecklistItemValueDocument[];
+              if (internal) {
+                newItemArray = checklistItemValuesAdmin.filter(chkItem => chkItem !== item);
+                setCheckListItemValuesAdmin(newItemArray);
+              } else {
+                newItemArray = checklistItemValues.filter(chkItem => chkItem !== item);
+                setCheckListItemValues(newItemArray);
+              }
               resolve(item);
               storeActivity(() => checklistItemFileDeletedHandler(newItemArray, item));
 
@@ -412,23 +416,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         }
       });
     },
-    [storageBasePath, checklistItemValues, removalInProgress],
+    [storageBasePath, checklistItemValues, removalInProgress, checklistItemValuesAdmin],
   );
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    (acceptedFiles: File[], internal: boolean) => {
       saveFiles(acceptedFiles)
         .then((documents: CheckListDocument[]) => {
           const values = documents.map(item => {
-            const userActivityLogData = {
-              firstName: userRecord?.firstName,
-              lastName: userRecord?.lastName,
-              alphacomClientId: userRecord?.alphacomClientId,
-              alphacomId: userRecord?.alphacomId,
-              emailAddress: userRecord?.emailAddress,
-            } as ActivityLogUserData;
             return {
-              uploadedBy: userActivityLogData,
+              uploadedBy: getActivityLogUserData(),
               uploadedAt: new Date(),
               name: item.name,
               url: item.url,
@@ -436,25 +433,35 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
             } as ChecklistItemValueDocument;
           });
           // FIXME it needs to be updated only after successful DB store
-          const itemValues = checklistItemValues.concat(values);
-          setCheckListItemValues(itemValues);
+          let itemValues: ChecklistItemValueDocument[] = [];
+          if (internal) {
+            itemValues = checklistItemValuesAdmin.concat(values);
+            console.log('FILES', itemValues);
+            setCheckListItemValuesAdmin(itemValues);
+          } else {
+            itemValues = checklistItemValues.concat(values);
+            setCheckListItemValues(itemValues);
+          }
+          storeActivity(() => checklistItemFileAddedHandler(itemValues, values, internal));
           // saveItemValue(false, itemValues);
-          storeActivity(() => checklistItemFileAddedHandler(itemValues, values));
         })
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
         });
     },
-    [checklistItemValues, saveFiles, saveChecklistChanges],
+    [checklistItemValues, saveFiles, storeActivity, saveChecklistChanges, checklistItemValuesAdmin],
   );
 
-  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({ onDrop, noClick: true });
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, false),
+    noClick: true,
+  });
   const {
     getRootProps: getRootPropsDraft,
     getInputProps: getInputPropsDraft,
     open: openDraft,
     isDragActive: isDragActiveDraft,
-  } = useDropzone({ onDrop });
+  } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 
   return (
     <Box display="flex" justifyContent="space-between" my={1}>
@@ -543,7 +550,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           checklistItemValues={checklistItemValues}
           bookingId={booking!.id}
           removalInProgress={removalInProgress}
-          deleteFile={deleteFile}
+          deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, false)}
         />
         {isAdmin && checklistItemValuesAdmin.length > 0 && (
           <Fragment>
@@ -553,9 +560,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
               checklistItemValues={checklistItemValuesAdmin}
               bookingId={booking!.id}
               removalInProgress={removalInProgress}
-              deleteFile={deleteFile}
+              deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
             />
-            )}
           </Fragment>
         )}
       </Box>
