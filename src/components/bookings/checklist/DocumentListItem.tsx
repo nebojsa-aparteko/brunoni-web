@@ -15,7 +15,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { ChecklistItemValueDocument } from './ChecklistItemModel';
+import { ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
 
@@ -41,11 +41,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentListItem = ({ item, bookingId, index, removalInProgress, deleteFile }: Props) => {
+const DocumentListItem = ({ item, checklistItem, bookingId, index, removalInProgress, deleteFile }: Props) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
 
-  const handleMention = () => activityLogContext.setState({ documentReference: item });
+  const handleMention = () =>
+    activityLogContext.setState({ documentReference: item, checklistReference: checklistItem });
 
   return (
     <ListItem key={`filelistitem-${bookingId}-${index}`}>
@@ -92,6 +93,7 @@ export default DocumentListItem;
 
 export interface Props {
   item: ChecklistItemValueDocument;
+  checklistItem: ChecklistItem;
   bookingId: string;
   index: number;
   removalInProgress: boolean;

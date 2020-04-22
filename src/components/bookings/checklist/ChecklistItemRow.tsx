@@ -551,6 +551,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           bookingId={booking!.id}
           removalInProgress={removalInProgress}
           deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, false)}
+          checklistItem={checklistItem}
         />
         {isAdmin && checklistItemValuesAdmin.length > 0 && (
           <Fragment>
@@ -561,6 +562,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
               bookingId={booking!.id}
               removalInProgress={removalInProgress}
               deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
+              checklistItem={checklistItem}
             />
           </Fragment>
         )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { orderBy } from 'lodash/fp';
-import { ChecklistItemValueDocument } from './ChecklistItemModel';
+import { ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
 import DocumentListItem from './DocumentListItem';
 import { createStyles, List, makeStyles, Theme } from '@material-ui/core';
 
@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, deleteFile }: Props) => {
+const DocumentList = ({ checklistItem, checklistItemValues, bookingId, removalInProgress, deleteFile }: Props) => {
   const classes = useStyles();
 
   return (
@@ -26,6 +26,7 @@ const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, delet
           index={index}
           removalInProgress={removalInProgress}
           deleteFile={deleteFile}
+          checklistItem={checklistItem}
         />
       ))}
     </List>
@@ -35,6 +36,7 @@ const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, delet
 export default DocumentList;
 
 export interface Props {
+  checklistItem: ChecklistItem;
   checklistItemValues: ChecklistItemValueDocument[];
   bookingId: string;
   removalInProgress: boolean;
