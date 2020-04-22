@@ -20,6 +20,7 @@ const DocumentList = ({ checklistItemValues, bookingId, removalInProgress, delet
     <List className={classes.documentList}>
       {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
         <DocumentListItem
+          key={`chklistitem-${index}`}
           item={item}
           bookingId={bookingId}
           index={index}
