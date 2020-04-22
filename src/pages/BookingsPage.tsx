@@ -7,8 +7,8 @@ import Bookings from '../contexts/Bookings';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(4),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
 }));
 
@@ -20,7 +20,7 @@ const BookingsPage: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Bookings" />
-      <Container maxWidth="xl" className={classes.root}>
+      <Container maxWidth="lg" className={classes.root}>
         <BookingsView bookings={bookings || []} />
       </Container>
     </Fragment>

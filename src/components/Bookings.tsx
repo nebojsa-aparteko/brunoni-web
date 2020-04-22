@@ -37,7 +37,7 @@ import useLocalStorage from '../utilities/useLocalStorage';
 
 interface Props {
   bookings: Booking[];
-  showCompanyInfo?: boolean;
+  isAdmin?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -82,7 +82,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
+const Bookings: React.FC<Props> = ({ isAdmin, bookings }) => {
   const classes = useStyles();
 
   const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Export', true);
@@ -166,7 +166,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
 
   if (!bookings) {
     return (
-      <MUIContainer maxWidth="lg">
+      <MUIContainer maxWidth="md">
         <Paper className={classes.root}>
           <ChartsCircularProgress />
         </Paper>
@@ -181,7 +181,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
       <FiltersBar
         listContextData={bookingsContextData}
         setQuoteListContextData={setBookingsContextData}
-        showCompanyInfo={showCompanyInfo}
+        showCompanyInfo={isAdmin}
         dateRange={dateRange}
         setDateRange={setDateRange}
       />
@@ -216,7 +216,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
         />
 
         <CardContent className={classes.content}>
-          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} showCompanyInfo={showCompanyInfo} />
+          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
         </CardContent>
 
         <CardActions className={classes.actions}>
