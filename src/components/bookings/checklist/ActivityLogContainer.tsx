@@ -1,7 +1,5 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import ActivityLogView from './ActivityLogView';
-import filter from 'lodash/fp/filter';
-import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -27,13 +25,6 @@ export const addActivityItem = (bookingId: string, checklistId: string, activity
 };
 
 const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }) => {
-  // TODO storing logic
-
-  // addActivityItem (ActivityItemDetails) // firestore.saveW
-
-  //
-  // Text. matcher replace({INVOICE}}
-
   const [showMore, setShowMore] = useState(false);
 
   const activityLogCollection = useFirestoreCollection(
@@ -49,7 +40,10 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
     'activity',
   );
 
-  const activityCollection = activityLogCollection?.docs.map(doc => doc.data()) as ActivityLogItem[];
+  const activityCollection = activityLogCollection?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as ActivityLogItem[];
 
   const normalizedActivityLog = useMemo(() => map(update('at', invoke('toDate')))(activityCollection), [
     activityCollection,

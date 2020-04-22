@@ -43,9 +43,10 @@ export interface ChecklistItem {
 export interface ShortChecklistItem {
   id: string;
   label: string;
+  checked: boolean;
 }
 
-export enum ActivityChangeType {
+export enum ActivityText {
   CHECKED = ' has checked ',
   UNCHECKED = ' has unchecked ',
   ADD_FILE = ' has added file ',
@@ -53,4 +54,11 @@ export enum ActivityChangeType {
   ADD_FILES = ' has added files ',
   DELETE_FILES = ' has deleted files ',
   DONE_BY_CUSTOMER = ' has marked done ',
+}
+
+export enum ActivityChangeType {
+  CHECKED,
+  ADD_FILE,
+  DELETE_FILE,
+  STAGE_CHECKED,
 }

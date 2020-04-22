@@ -1,9 +1,10 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState, Fragment } from 'react';
 import {
   Box,
   Button,
   Checkbox,
   createStyles,
+  Divider,
   IconButton,
   LinearProgress,
   Link,
@@ -141,16 +142,14 @@ const createActivityObject = (
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: false,
-    checklistItem: { id: checklistItem.id, label: checklistItem.label } as ShortChecklistItem,
+    checklistItem: {
+      id: checklistItem.id,
+      label: checklistItem.label,
+      checked: checklistItem.checked,
+    } as ShortChecklistItem,
     documents: documents,
     stage: stage,
   } as ActivityLogItem);
-
-const storeActivity = (activityFunction: () => Promise<any>) => {
-  activityFunction()
-    .then() //success
-    .catch(); //error
-};
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedChecklist }: ChecklistItemRowProp) => {
   const classes = useStyles();
@@ -224,11 +223,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
       addActivityItem(
         booking!.id,
         checklistItem!.id,
-        createActivityObject(
-          checked ? ActivityChangeType.CHECKED : ActivityChangeType.UNCHECKED,
-          getActivityLogUserData(),
-          checklistItem,
-        ),
+        createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), checklistItem),
       ),
     );
   }, []);
@@ -252,12 +247,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         addActivityItem(
           booking!.id,
           checklistItem!.id,
-          createActivityObject(
-            addedFiles.length > 1 ? ActivityChangeType.ADD_FILES : ActivityChangeType.ADD_FILE,
-            getActivityLogUserData(),
-            checklistItem,
-            addedFiles,
-          ),
+          createActivityObject(ActivityChangeType.ADD_FILE, getActivityLogUserData(), checklistItem, addedFiles),
         ),
       );
     },
@@ -270,7 +260,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         booking!.id,
         checklistItem!.id,
         createActivityObject(
-          stage.checked ? ActivityChangeType.CHECKED : ActivityChangeType.UNCHECKED,
+          ActivityChangeType.STAGE_CHECKED,
           getActivityLogUserData(),
           checklistItem,
           undefined,
@@ -288,7 +278,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     const newStage = { ...stage, checked: checked, by: getActivityLogUserData(), at: new Date() };
     const newItemArray = [...checklistItem.stages];
     newItemArray[newItemArray.findIndex(el => el.id === stage.id)] = newStage;
-    storeActivity(() => checklistItemStageChangeHandler(newItemArray, stage));
+    storeActivity(() => checklistItemStageChangeHandler(newItemArray, newStage));
   };
 
   const handleCompleted = () => {
@@ -528,6 +518,23 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         deleteFile={deleteFile}
         handleMention={handleMention}
       />
+      {isAdmin && (
+        <Fragment>
+          <Divider />
+          <Typography variant="caption">Drafts</Typography>
+          {checklistItemValuesAdmin.length ? (
+            <DocumentList
+              checklistItemValues={checklistItemValuesAdmin}
+              bookingId={booking!.id}
+              removalInProgress={removalInProgress}
+              deleteFile={deleteFile}
+              handleMention={handleMention}
+            />
+          ) : (
+            <Typography>There are no drafts to show.</Typography>
+          )}
+        </Fragment>
+      )}
     </Box>
   );
 };

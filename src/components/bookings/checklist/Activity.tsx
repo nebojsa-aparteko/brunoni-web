@@ -4,21 +4,33 @@ import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
-import { ActivityText } from './ChecklistItemModel';
+import { ActivityChangeType, ActivityText } from './ChecklistItemModel';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
     activity.documents && index !== activity.documents?.length - 1 ? ', ' : ' ';
+  const mapChangeTypeToText = (): ActivityText | undefined => {
+    switch (activity.changeType) {
+      case ActivityChangeType.CHECKED:
+        return activity.checklistItem.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
+      case ActivityChangeType.ADD_FILE:
+        return activity.documents!.length > 1 ? ActivityText.ADD_FILES : ActivityText.ADD_FILE;
+      case ActivityChangeType.DELETE_FILE:
+        return ActivityText.DELETE_FILE;
+      case ActivityChangeType.STAGE_CHECKED:
+        return activity.stage!.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
+    }
+  };
   return (
     <Typography>
       <Link href={`mailto:${activity.by.emailAddress}`}>
         {`${capitalCase(activity.by.firstName)} ${capitalCase(activity.by.lastName)}`}
       </Link>
-      {activity.comment}
+      {mapChangeTypeToText()}
       {activity.stage && ` '${activity.stage?.label}' stage in `}
       {activity.documents &&
         activity.documents.map((doc, index) => {
-          return [ActivityText.ADD_FILE, ActivityText.ADD_FILES].includes(activity.comment as ActivityText) ? (
+          return [ActivityChangeType.ADD_FILE].includes(activity.changeType as ActivityChangeType) ? (
             <Fragment>
               <Link href={doc.url}>{doc.name}</Link>
               {makeStyledString(activity, index)}

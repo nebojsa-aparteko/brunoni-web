@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import firebase from '../firebase';
 
-export default function useFirestoreDocument(collection: string, id?: string) {
+export default function useFirestoreDocument(
+  collection: string,
+  id?: string,
+  documentPath?: string,
+  subCollection?: string,
+) {
   const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined>();
 
   useEffect(() => {
@@ -11,10 +16,18 @@ export default function useFirestoreDocument(collection: string, id?: string) {
 
     (async () => {
       try {
-        const document = await firebase
-          .firestore()
-          .collection(collection)
-          .doc(id);
+        const document =
+          (await documentPath) && subCollection
+            ? firebase
+                .firestore()
+                .collection(collection)
+                .doc(documentPath)
+                .collection(subCollection)
+                .doc(id)
+            : firebase
+                .firestore()
+                .collection(collection)
+                .doc(id);
 
         return document.onSnapshot({
           next: (snapshot: firebase.firestore.DocumentSnapshot) => {
