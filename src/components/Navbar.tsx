@@ -18,6 +18,7 @@ import {
   Input,
   FormControl,
   Menu,
+  Typography,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -200,22 +201,22 @@ const Navbar: React.FC = () => {
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/" underline="none">
-                        Dashboard
+                        <Typography variant="body1">Dashboard</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/schedule" underline="none">
-                        Schedule
+                        <Typography variant="body1">Schedule</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/quotes/groups" underline="none">
-                        Quotes
+                        <Typography variant="body1">Quotes</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/bookings" underline="none">
-                        Bookings
+                        <Typography variant="body1">Bookings</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
@@ -225,7 +226,7 @@ const Navbar: React.FC = () => {
                         aria-haspopup="true"
                         onClick={handleMenuClick}
                       >
-                        Other
+                        <Typography variant="body1">Other</Typography>
                       </Button>
                     </div>
 
@@ -250,22 +251,22 @@ const Navbar: React.FC = () => {
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/schedule" underline="none">
-                        Schedule
+                        <Typography variant="body1">Schedule</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/quotes/groups" underline="none">
-                        Quotes
+                        <Typography variant="body1">Quotes</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/bookings" underline="none">
-                        Bookings
+                        <Typography variant="body1">Bookings</Typography>
                       </Button>
                     </div>
                     <div className={classes.item}>
                       <Button component={Link} to="/charges" underline="none">
-                        Side Charges
+                        <Typography variant="body1">Side Charges</Typography>
                       </Button>
                     </div>
                   </Fragment>
@@ -277,7 +278,9 @@ const Navbar: React.FC = () => {
                       {formControl}
                       <div className={classes.item}>
                         <Button component={Link} to="/quotes/get" underline="none" variant="contained" color="primary">
-                          Get Quote
+                          <Typography variant="body1" style={{ color: 'white' }}>
+                            Get Quote
+                          </Typography>
                         </Button>
                       </div>
                     </Fragment>
@@ -287,13 +290,13 @@ const Navbar: React.FC = () => {
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">
-                      Visit brunoni.ch
+                      <Typography variant="body1">Visit brunoni.ch</Typography>
                     </Button>
                   </div>
                 ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://allmarine.ch">
-                      Visit allmarine.ch
+                      <Typography variant="body1">Visit allmarine.ch</Typography>
                     </Button>
                   </div>
                 ) : null}
