@@ -518,20 +518,17 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         deleteFile={deleteFile}
         handleMention={handleMention}
       />
-      {isAdmin && (
+      {isAdmin && checklistItemValuesAdmin.length > 0 && (
         <Fragment>
           <Divider />
           <Typography variant="caption">Drafts</Typography>
-          {checklistItemValuesAdmin.length ? (
-            <DocumentList
-              checklistItemValues={checklistItemValuesAdmin}
-              bookingId={booking!.id}
-              removalInProgress={removalInProgress}
-              deleteFile={deleteFile}
-              handleMention={handleMention}
-            />
-          ) : (
-            <Typography>There are no drafts to show.</Typography>
+          <DocumentList
+            checklistItemValues={checklistItemValuesAdmin}
+            bookingId={booking!.id}
+            removalInProgress={removalInProgress}
+            deleteFile={deleteFile}
+            handleMention={handleMention}
+          />
           )}
         </Fragment>
       )}
