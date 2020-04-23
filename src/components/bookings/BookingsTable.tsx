@@ -201,7 +201,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
             </Grid>
             <Grid item lg={12} xs={12}>
               <Grid container spacing={1}>
-                <Grid item md={3} xs={12}>
+                <Grid item md={4} xs={12}>
                   <InfoBoxItem
                     title="Client"
                     label1={client ? client.name : ''}
@@ -209,7 +209,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                     gutterBottom
                   />
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={2} xs={12}>
                   <InfoBoxItem
                     title="Carrier"
                     label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
@@ -247,7 +247,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                 <Grid item xs={12}>
                   <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={4} xs={12}>
                   <Fragment>
                     <Box style={{ display: 'flex', flexDirection: 'row' }}>
                       <Box style={{ width: '50%', paddingRight: '20px' }}>
@@ -281,7 +281,7 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                     </Box>
                   </Fragment>
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={2} xs={12}>
                   <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
                 </Grid>
                 <Grid item md={2} xs={12}>
