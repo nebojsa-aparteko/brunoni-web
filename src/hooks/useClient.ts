@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import UserRecord from '../contexts/UserRecord';
+import UserRecord from '../contexts/UserRecordContext';
 import useFirestoreDocument from './useFirestoreDocument';
 import Client from '../model/Client';
 

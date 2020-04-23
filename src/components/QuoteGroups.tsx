@@ -24,7 +24,7 @@ import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
-import { QuoteListContext } from '../contexts/QuoteListContext';
+import { QuoteListFilterContext } from '../providers/QuoteListFilterContext';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
 import { DateRange } from './DateRangePicker/types';
@@ -83,11 +83,17 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
-  const [dateRange, setDateRange] = useState<DateRange>();
+  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListFilterContext);
 
-  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
-
-  const { searchString, page, rowsPerPage, clientFilter, originPort, destinationPort } = quoteListContextData;
+  const {
+    searchString,
+    page,
+    rowsPerPage,
+    clientFilter,
+    originPort,
+    destinationPort,
+    dateRange,
+  } = quoteListContextData;
 
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
@@ -172,9 +178,8 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
       <FiltersBar
         listContextData={quoteListContextData}
         setQuoteListContextData={setQuoteListContextData}
-        showCompanyInfo={showCompanyInfo}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
+        showClientFilter={showCompanyInfo}
+        showDateRange={true}
         showRefreshButton
       />
 

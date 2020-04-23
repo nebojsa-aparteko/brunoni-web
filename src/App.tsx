@@ -10,7 +10,6 @@ import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
 import BookingsPage from './pages/BookingsPage';
-import BookingsAdminPage from './pages/BookingsAdminPage';
 import BookingContainer from './pages/BookingContainer';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
@@ -26,7 +25,7 @@ import AllmarineFooter from './components/AllmarineFooter';
 import BrunoniFooter from './components/BrunoniFooter';
 import ScrollToTop from './components/ScrollToTop';
 import ActingAs from './contexts/ActingAs';
-import UserRecord from './contexts/UserRecord';
+import UserRecord from './contexts/UserRecordContext';
 import ChartsCircularProgress from './components/dashboard/ChartsCircularProgress';
 
 const anonymousRoutes = (
@@ -50,7 +49,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={AdminQuote} />
-    <Route exact path="/bookings" component={BookingsAdminPage} />
+    <Route exact path="/bookings" component={BookingsPage} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={Unauthorized} />
     <Route path="/charges" component={AdminSideCharges} />

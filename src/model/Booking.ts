@@ -46,6 +46,8 @@ export interface Booking {
   'BL-No': string;
   createdAt: Date;
   updatedAt: Date;
+  archived: boolean;
+  pendingPayment: boolean;
   checklistCheckedCount: number;
   checklistItemCount: number;
 }

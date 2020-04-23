@@ -4,17 +4,17 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-import Client from '../../model/Client';
+import UserRecord from '../../model/UserRecord';
 
-const getOptionSelected = (option: Client, value: Client) => option.id === value?.id;
-const getOptionLabel = (option: Client) => `${option.name} - ${option.city} (${option.id})`;
+const getOptionSelected = (option: UserRecord, value: UserRecord) => option?.alphacomId === value?.alphacomId;
+const getOptionLabel = (option: UserRecord) => `${option.firstName} ${option.lastName} <${option.emailAddress}>`;
 
 interface Props {
   label: string;
-  clients: Client[];
+  users: UserRecord[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: Client;
-  onChange: (client: Client | null) => void;
+  value?: UserRecord;
+  onChange: (user: UserRecord | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -29,26 +29,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ClientInput: React.FC<Props> = ({
-  label,
-  clients,
-  inputRef,
-  value,
-  onChange,
-  open,
-  onOpen,
-  onClose,
-  ...rest
-}) => {
+const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, open, onOpen, onClose, ...rest }) => {
   const classes = useStyles();
-  const loading = open && !clients;
+  const loading = open && !users;
 
   return (
     <Autocomplete
       {...rest}
       className={classes.root}
       value={value}
-      onChange={(_: ChangeEvent<{}>, client: Client | null) => onChange(client)}
+      onChange={(_: ChangeEvent<{}>, user: UserRecord | null) => onChange(user)}
       autoSelect
       autoHighlight
       open={open}
@@ -56,7 +46,7 @@ const ClientInput: React.FC<Props> = ({
       onClose={onClose}
       getOptionSelected={getOptionSelected}
       getOptionLabel={getOptionLabel}
-      options={clients}
+      options={users}
       loading={loading}
       renderInput={params => (
         <TextField
@@ -122,4 +112,4 @@ function Popup(props: PopperProps) {
 
 const Papyrus: React.FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => <Paper {...props} />;
 
-export default ClientInput;
+export default UserInput;
