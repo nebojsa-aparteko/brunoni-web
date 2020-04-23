@@ -3,7 +3,7 @@ import { rangePredefinedValues } from '../components/inputs/DateRangeInput';
 import Client from '../model/Client';
 import Port from '../model/Port';
 
-interface QuoteListStateParams {
+export interface QuoteListStateParams {
   searchString: string;
   page: number;
   rowsPerPage: number;
@@ -12,7 +12,7 @@ interface QuoteListStateParams {
   originPort?: Port;
   destinationPort?: Port;
 }
-const QuoteListContext = React.createContext<[QuoteListStateParams, any]>([
+const QuoteListFilterContext = React.createContext<[QuoteListStateParams, any]>([
   { searchString: '', page: 0, rowsPerPage: 10, dateRange: rangePredefinedValues[3] },
   (state: QuoteListStateParams) => {},
 ]);
@@ -27,7 +27,9 @@ const QuoteListProvider = (props: any) => {
   const setStateFn = (state: QuoteListStateParams) => {
     setState(state);
   };
-  return <QuoteListContext.Provider value={[state, setStateFn]}>{props.children}</QuoteListContext.Provider>;
+  return (
+    <QuoteListFilterContext.Provider value={[state, setStateFn]}>{props.children}</QuoteListFilterContext.Provider>
+  );
 };
 
-export { QuoteListContext, QuoteListProvider };
+export { QuoteListFilterContext, QuoteListProvider };

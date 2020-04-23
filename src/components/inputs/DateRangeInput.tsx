@@ -15,8 +15,6 @@ import formatDate from 'date-fns/format';
 import endOfDay from 'date-fns/endOfDay';
 import subYears from 'date-fns/subYears';
 import endOfYear from 'date-fns/endOfYear';
-import { QuoteListContext } from '../../contexts/QuoteListContext';
-import set from 'lodash/fp/set';
 
 interface Props {
   value?: DateRange;
@@ -70,18 +68,9 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
 };
 
 const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
-  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
-  const { dateRange } = quoteListContextData;
-  const [labelValue, setLabelValue] = useState(getLabelValue(dateRange));
+  const [labelValue, setLabelValue] = useState(getLabelValue(value));
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (dateRange) {
-      setLabelValue(getLabelValue(dateRange));
-      onChange(dateRange);
-    }
-  }, [dateRange, onChange]);
 
   const handlePopoverClose = () => {
     setAnchorEl(null);
@@ -93,7 +82,8 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
 
   const onRangeChange = (range: DateRange) => {
     if (range.endDate) range.endDate = endOfDay(range.endDate);
-    setQuoteListContextData(set('dateRange', range)(quoteListContextData));
+    onChange(range);
+    setLabelValue(getLabelValue(range));
     setAnchorEl(null);
   };
 
@@ -134,7 +124,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
         <ClickAwayListener onClickAway={handleClickAway}>
           <DateRangePicker
             open
-            initialDateRange={dateRange}
+            initialDateRange={value}
             onChange={range => onRangeChange(range)}
             definedRanges={rangePredefinedValues}
             maxDate={new Date()}

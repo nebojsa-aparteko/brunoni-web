@@ -15,7 +15,6 @@ import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/Quotes';
 import QuoteGroupsProvider from './providers/QuoteGroups';
 import BookingsProvider from './providers/BookingsProvider';
-import BookingsAdminProvider from './providers/BookingsAdmin';
 import AdminQuotesProvider from './providers/AdminQuotes';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
@@ -30,9 +29,9 @@ import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
-import { QuoteListProvider } from './contexts/QuoteListContext';
+import { QuoteListProvider } from './providers/QuoteListFilterContext';
 import ActingAs from './contexts/ActingAs';
-import UserRecordContext from './contexts/UserRecord';
+import UserRecordContext from './contexts/UserRecordContext';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -131,9 +130,9 @@ const UserApp: React.FC = () => {
               <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
-                    <BookingsAdminProvider>
+                    <BookingsProvider>
                       <App />
-                    </BookingsAdminProvider>
+                    </BookingsProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>

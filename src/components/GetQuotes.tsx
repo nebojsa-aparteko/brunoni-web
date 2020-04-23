@@ -36,7 +36,7 @@ import { buildMailToLink } from '../utilities/quoteRequestEmail';
 import Meta from '../components/Meta';
 import { europeanCountries } from '../utilities/pickupDropOffHelperData';
 import focusAndSelect from '../utilities/focusAndSelect';
-import { QuoteListContext } from '../contexts/QuoteListContext';
+import { QuoteListFilterContext } from '../providers/QuoteListFilterContext';
 import useClients from '../hooks/useClients';
 import formatDate from 'date-fns/format';
 
@@ -105,7 +105,7 @@ const GetQuotes: React.FC<Props> = () => {
 
   const closeDialog = () => setDialogOpen(false);
 
-  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListContext);
+  const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListFilterContext);
 
   useEffect(() => {
     setShowContainerLocations(checkIfPortsInEurope(originPort, destinationPort));
