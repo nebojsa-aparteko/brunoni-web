@@ -201,14 +201,6 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
             </Grid>
             <Grid item lg={12} xs={12}>
               <Grid container spacing={1}>
-                <Grid item md={4} xs={12}>
-                  <InfoBoxItem
-                    title="Client"
-                    label1={client ? client.name : ''}
-                    label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
-                    gutterBottom
-                  />
-                </Grid>
                 <Grid item md={2} xs={12}>
                   <InfoBoxItem
                     title="Carrier"
@@ -227,7 +219,15 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                     gutterBottom
                   />
                 </Grid>
-                <Grid item md={2} xs={12}>
+                <Grid item md={3} xs={12}>
+                  <InfoBoxItem
+                    title="Client"
+                    label1={client ? client.name : ''}
+                    label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
                   <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
                 </Grid>
                 <Grid item md={2} xs={12}>
@@ -247,7 +247,17 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                 <Grid item xs={12}>
                   <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
                 </Grid>
-                <Grid item md={4} xs={12}>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <InfoBoxItem
+                    title={isAdmin ? 'Customer reference' : 'Reference'}
+                    label1={booking['Cust-BkgRef']}
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
                   <Fragment>
                     <Box style={{ display: 'flex', flexDirection: 'row' }}>
                       <Box style={{ width: '50%', paddingRight: '20px' }}>
@@ -281,17 +291,6 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                     </Box>
                   </Fragment>
                 </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem
-                    title={isAdmin ? 'Customer reference' : 'Reference'}
-                    label1={booking['Cust-BkgRef']}
-                    gutterBottom
-                  />
-                </Grid>
-
                 <Grid item md={2} xs={12}>
                   <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
                 </Grid>
