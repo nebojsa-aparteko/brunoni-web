@@ -1,5 +1,5 @@
 import React, { useMemo, Fragment } from 'react';
-import { Table, TableCell, TableRow, makeStyles, Typography, Grid } from '@material-ui/core';
+import { Table, TableCell, TableRow, makeStyles, Typography, Grid, Paper } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
@@ -72,6 +72,16 @@ const useStyles = makeStyles(theme => ({
     ['@media not print']: {
       display: 'none',
     },
+  },
+  statusContainer: {
+    backgroundColor: 'rgb(43,132,215)',
+    paddingLeft: '5px',
+    paddingRight: '5px',
+    width: 'fit-content',
+  },
+  statusText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 }));
 
@@ -196,8 +206,15 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
             <col style={{ width: '83.4%' }} />
           </colgroup>
           <TableBody>
+            <TableRow>
+              <TableCell className={classes.tableCellLabel}>Status</TableCell>
+              <TableCell className={classes.tableCell}>
+                <Paper elevation={0} className={classes.statusContainer}>
+                  <Typography className={classes.statusText}>{booking.BkgStatusText}</Typography>
+                </Paper>
+              </TableCell>
+            </TableRow>
             <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
-            <TableRowData label={'Status'} content={booking.BkgStatusText} />
             {booking.BkgAgentContactTxt ? (
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
