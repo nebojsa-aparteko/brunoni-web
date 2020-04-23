@@ -19,6 +19,7 @@ export interface Booking {
   CargoDetails: CargoDetail[];
   FreightDetails: FreightDetail[];
   Category: BookingCategory;
+  CtrTariffsDetails: CtrTariffDetail[];
   BkgAgentContact: string | null;
   ForwAdrId: string;
   ForwAdrCity: string;
@@ -187,10 +188,22 @@ export interface EquipmentDetail {
 
 export interface CtrTariff {
   Amount: string | null;
-  Currency: string | null;
   Days: string | null;
   ID: string | null;
   Type: CtrTariffType;
+}
+
+export interface CtrTariffDetail {
+  DaysFree: string | null;
+  ID: string | null;
+  Txt: string | null;
+  Type: CtrTariffType;
+}
+
+export enum CtrTariffType {
+  DemDet = 'DEM/DET',
+  Storage = 'STORAGE',
+  PlugIn = 'PLUGIN',
 }
 
 export interface LocRefItem {
@@ -199,11 +212,6 @@ export interface LocRefItem {
   LocDet: string;
   LocType: BookingLocType;
   CargoDetailRermarks: string;
-}
-
-export enum CtrTariffType {
-  DemDet = 'DEM/DET',
-  Storage = 'STORAGE',
 }
 
 export enum BookingLocType {
