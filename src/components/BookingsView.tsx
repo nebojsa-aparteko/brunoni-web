@@ -175,7 +175,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
   return (
     <Fragment>
-      <Meta title={`Bookings ${archived && '- Archive'}`} />
+      <Meta title={`Bookings`} />
 
       <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
 
