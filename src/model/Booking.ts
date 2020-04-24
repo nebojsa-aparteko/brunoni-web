@@ -20,6 +20,8 @@ export interface Booking {
   FreightDetails: FreightDetail[];
   Category: BookingCategory;
   CtrTariffsDetails: CtrTariffDetail[];
+  Agreement: string | null;
+  StatClientRef: string | null;
   BkgAgentContact: string | null;
   ForwAdrId: string;
   ForwAdrCity: string;
