@@ -21,7 +21,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import formatDate from 'date-fns/format';
-import { Booking } from '../../model/Booking';
+import { Booking, CargoDetail } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
 import theme from '../../theme';
@@ -30,6 +30,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { isImport } from './BookingView';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -46,6 +47,11 @@ const useStyles = makeStyles(() =>
       '&:hover': {
         backgroundColor: 'rgba(161,213,255,0.15) !important',
       },
+    },
+    tableRowHeader: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'flex-end',
     },
     progress: {
       width: '100%',
@@ -108,6 +114,13 @@ interface BookingRowProps {
   onProgressClick: any;
   isAdmin?: boolean;
 }
+interface LocRefProps {
+  cargoDetails: CargoDetail[];
+}
+
+interface CargoDetailLocRefProps {
+  cargoDetail: CargoDetail;
+}
 
 interface ProgressDialogProps {
   isOpen: boolean;
@@ -148,7 +161,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       <span className={classes.checklistDialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
-          {booking ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
+          {booking && booking['BL-No'] ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
           <IconButton onClick={handleClose} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
@@ -159,6 +172,23 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
       </span>
     </Dialog>
   );
+};
+
+const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
+  return cargoDetails && cargoDetails[0] ? (
+    <Fragment>
+      {cargoDetails
+        .map(cargoDetail =>
+          cargoDetail
+            ? cargoDetail.LocRefs && cargoDetail.LocRefs[0]
+              ? cargoDetail.LocRefs.map(locRef => (locRef && locRef.LocRef ? ' / ' + locRef.LocRef : '')).join('')
+              : ''
+            : '',
+        )
+        .join('')
+        .substring(3)}
+    </Fragment>
+  ) : null;
 };
 
 const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
@@ -197,7 +227,20 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
         <Box className={classes.rowWrapper}>
           <Grid container spacing={2} style={{ paddingTop: '10px' }}>
             <Grid item lg={12} xs={12}>
-              <Typography variant={'h5'}>Booking No. {booking['ERP-BkgRef']}</Typography>
+              {isImport(booking.Category) ? (
+                booking && booking['ERP-BkgRef'] ? (
+                  <Typography variant="h5">BL Number: {booking['ERP-BkgRef']}</Typography>
+                ) : null
+              ) : booking && booking['ERP-BkgRef'] ? (
+                <Fragment>
+                  <span className={classes.tableRowHeader}>
+                    <Typography variant="h5">BL Number: {booking['ERP-BkgRef']}</Typography>
+                    <Typography variant="body2" style={{ paddingLeft: '20px' }}>
+                      Refs: <LocRefs cargoDetails={booking.CargoDetails} />
+                    </Typography>
+                  </span>
+                </Fragment>
+              ) : null}
             </Grid>
             <Grid item lg={12} xs={12}>
               <Grid container spacing={1}>
