@@ -43,7 +43,7 @@ function a11yProps(index: any) {
   };
 }
 
-function TabPanel(props: TabPanelProps) {
+export function TabPanel(props: TabPanelProps) {
   const classes = useStyles();
   const { children, value, index, ...other } = props;
 

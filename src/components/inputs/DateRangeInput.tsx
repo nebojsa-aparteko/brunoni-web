@@ -1,7 +1,7 @@
 import 'date-fns';
-import React, { useState, Fragment, useEffect, useContext } from 'react';
-import { DateRangePicker } from '../DateRangePicker';
-import { DateRange, DefinedRange } from '../DateRangePicker/types';
+import React, { useState, Fragment } from 'react';
+import { DateRangePicker } from '../daterangepicker';
+import { DateRange, DefinedRange } from '../daterangepicker/types';
 import { ClickAwayListener, FormControl, Input, InputAdornment, Popover } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import DateRangeIcon from '@material-ui/icons/DateRange';

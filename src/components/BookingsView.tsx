@@ -20,20 +20,15 @@ import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
-import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
 import { BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
-import Search from './SearchBar/Search';
-import { DateRange } from './DateRangePicker/types';
-import compareAsc from 'date-fns/compareAsc';
-import compareDesc from 'date-fns/compareDesc';
-import addDays from 'date-fns/addDays';
+import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
 import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/BookingsProvider';
-import BookingsFiltersBar from './SearchBar/BookingsFiltersBar';
+import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 
 interface Props {
   bookings: Booking[];

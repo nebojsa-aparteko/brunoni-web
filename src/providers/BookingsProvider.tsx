@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -7,7 +7,7 @@ import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import set from 'lodash/fp/set';
-import { DateRange } from '../components/DateRangePicker/types';
+import { DateRange } from '../components/daterangepicker/types';
 import ActingAs from '../contexts/ActingAs';
 import Client from '../model/Client';
 import Port from '../model/Port';

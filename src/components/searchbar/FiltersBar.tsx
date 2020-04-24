@@ -4,56 +4,44 @@ import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
 import PortInput from '../inputs/PortInput';
 import DateRangeInput from '../inputs/DateRangeInput';
-import { DateRange } from '../DateRangePicker/types';
+import { DateRange } from '../daterangepicker/types';
 import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import set from 'lodash/fp/set';
 import Client from '../../model/Client';
-import { useBookingsContext, useBookingsFilterDispatch } from '../../providers/BookingsProvider';
-import UserInput from '../inputs/UserInput';
-import UserRecord from '../../model/UserRecord';
-import useAdminUsers from '../../hooks/useAdminUsers';
+import { QuoteListStateParams } from '../../providers/QuoteListFilterContext';
 
 interface Props {
+  listContextData: QuoteListStateParams;
+  setQuoteListContextData: any;
   showClientFilter?: boolean;
-  showDateRange?: boolean;
   showRefreshButton?: boolean;
-  showAssigneeFilter?: boolean;
+  showDateRange?: boolean;
 }
 
-const BookingsFiltersBar: React.FC<Props> = ({
+const FiltersBar: React.FC<Props> = ({
+  listContextData,
+  setQuoteListContextData,
   showClientFilter,
   showDateRange,
   showRefreshButton,
-  showAssigneeFilter,
 }) => {
   const clients = useClients();
-  const users = useAdminUsers();
   const ports = useContext(Ports);
 
-  const bookingFilterDispach = useBookingsFilterDispatch();
+  const { clientFilter, originPort, destinationPort, dateRange } = listContextData;
 
-  const filters = useBookingsContext()[1];
-
-  const { clientFilter, originPort, destinationPort, assignee } = filters;
-
-  const setOriginPort = (port: Port | null) =>
-    bookingFilterDispach({
-      type: port ? 'set' : 'clear',
-      field: 'originPort',
-      value: port || undefined,
-    });
+  const setOriginPort = (port: Port | null) => setQuoteListContextData(set('originPort', port)(listContextData));
   const setDestinationPort = (port: Port | null) =>
-    bookingFilterDispach({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
+    setQuoteListContextData(set('destinationPort', port)(listContextData));
   const setClientFilter = (client: Client | null) =>
-    bookingFilterDispach({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
+    setQuoteListContextData(set('clientFilter', client)(listContextData));
 
-  const setUserFilter = (user: UserRecord | null) =>
-    bookingFilterDispach({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
+  const setDateRange = (dateRange: DateRange) => {
+    setQuoteListContextData(set('dateRange', dateRange)(listContextData));
+  };
 
-  const setDateRange = (dateRange: DateRange) =>
-    bookingFilterDispach({ type: 'set', field: 'dateRange', value: dateRange });
   return (
     <Box
       display="flex"
@@ -85,26 +73,13 @@ const BookingsFiltersBar: React.FC<Props> = ({
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-              <DateRangeInput onChange={setDateRange} />
+              <DateRangeInput onChange={setDateRange} value={dateRange} />
             </Box>
           </Grid>
         )}
-        {showAssigneeFilter && !showDateRange && (
-          <Grid item sm={3} xs={12}>
-            <UserInput label="Choose User" users={users} onChange={setUserFilter} value={assignee} />
-          </Grid>
-        )}
       </Grid>
-      {showAssigneeFilter && showDateRange && users && (
-        <Grid container spacing={2} style={{ marginTop: 8 }}>
-          <Grid item sm={9} xs={12} />
-          <Grid item sm={3} xs={12}>
-            <UserInput label="Choose User" users={users} onChange={setUserFilter} value={assignee} />
-          </Grid>
-        </Grid>
-      )}
     </Box>
   );
 };
 
-export default BookingsFiltersBar;
+export default FiltersBar;

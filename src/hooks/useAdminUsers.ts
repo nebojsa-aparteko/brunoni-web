@@ -1,10 +1,10 @@
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 
-import UserRecord from '../model/UserRecord';
+import UserRecord, { ADMIN_ROLES } from '../model/UserRecord';
 import useFirestoreCollection from './useFirestoreCollection';
 
 export default function useAdminUsers() {
-  const query = useCallback(q => q.where('isAdmin', '==', true), []);
+  const query = useCallback(q => q.where('role', 'in', ADMIN_ROLES), []); //'isAdmin', '==', true), []);
 
   const usersCollection = useFirestoreCollection('users', query);
 
