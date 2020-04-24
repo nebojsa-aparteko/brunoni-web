@@ -52,6 +52,7 @@ export default function useFirestoreCollection(
               'updated with',
               snapshot,
             );
+
             setSnapshot(snapshot);
           },
         });

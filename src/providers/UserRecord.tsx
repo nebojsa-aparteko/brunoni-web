@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import Context from '../contexts/UserRecord';
+import Context from '../contexts/UserRecordContext';
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
 import UserRecord from '../model/UserRecord';

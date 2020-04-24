@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import React, { Fragment, useEffect, useMemo } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo } from 'react';
 import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
@@ -16,6 +16,9 @@ import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
 import theme from '../../theme';
+import ArchiveIcon from '@material-ui/icons/Archive';
+import firebase from '../../firebase';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -110,6 +113,7 @@ export const isImport = (category: BookingCategory) => {
 const BookingView: React.FC<Props> = ({ booking }) => {
   console.log('Booking object: ', booking);
 
+  const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -131,6 +135,14 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         : [],
     [booking],
   );
+
+  const onArchiveClick = useCallback(() => {
+    firebase
+      .firestore()
+      .collection('bookings')
+      .doc(booking?.id)
+      .update('archived', !booking?.archived);
+  }, [booking]);
 
   if (!booking) {
     return (
@@ -190,6 +202,18 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   >
                     Print
                   </Button>
+
+                  {!actingAs && (booking.pendingPayment || booking.archived) && (
+                    <Button
+                      aria-label="archive"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ArchiveIcon />}
+                      onClick={onArchiveClick}
+                    >
+                      {booking.archived ? 'Restore' : 'Archive'}
+                    </Button>
+                  )}
                 </Box>
                 {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
                 <VisibilityIcon />
@@ -206,6 +230,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                       cargoDetail={booking.CargoDetails}
                       version={booking.Version}
                       category={booking?.Category}
+                      tariffDetails={booking?.CtrTariffsDetails}
                     />
                   </Box>
                   {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (

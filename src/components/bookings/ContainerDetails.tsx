@@ -19,6 +19,7 @@ import {
   CtrTariff,
   BookingCategory,
   BookingLocType,
+  CtrTariffDetail,
 } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
@@ -33,6 +34,7 @@ interface Props {
   cargoDetail: CargoDetail[];
   version: BookingVersion;
   category: BookingCategory;
+  tariffDetails: CtrTariffDetail[];
 }
 
 interface TableRowProps {
@@ -49,8 +51,7 @@ interface AdditionalCargoProps {
 }
 
 interface CtrTariffProps {
-  tariff: CtrTariff;
-  numberOfContainers: string;
+  tariffDetails: CtrTariffDetail[];
 }
 
 interface ContainerItemProps {
@@ -59,6 +60,7 @@ interface ContainerItemProps {
   containerTypes: ContainerType[] | undefined;
   version: BookingVersion;
   category: BookingCategory;
+  tariffDetails: CtrTariffDetail[];
 }
 
 const useStyles = makeStyles(theme => ({
@@ -125,7 +127,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   );
 };
 
-export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContainers }) => {
+export const CtrTariffDetailType: React.FC<CtrTariffProps> = ({ tariffDetails }) => {
   const classes = useStyles();
 
   return (
@@ -135,15 +137,43 @@ export const CtrTariffData: React.FC<CtrTariffProps> = ({ tariff, numberOfContai
           {
             'DEM/DET': 'Dem./Det. tariff',
             STORAGE: 'Storage tariff',
-          }[tariff.Type]
+            PLUGIN: 'Plug-in tariff',
+          }[tariffDetails[0].Type]
         }
       </TableCell>
       <TableCell className={classes.tableCell}>
-        {tariff.Amount && tariff.Amount !== '0.00'
-          ? numberOfContainers + ' x ' + tariff.Amount + ' ' + tariff.Currency
-          : 'ON REQUEST'}
+        {tariffDetails.map(tariff =>
+          tariff.DaysFree && tariff.Txt ? (
+            <Fragment>
+              {tariff.DaysFree + ' ' + tariff.Txt}
+              <br />
+            </Fragment>
+          ) : (
+            'ON REQUEST'
+          ),
+        )}
       </TableCell>
     </TableRow>
+  );
+};
+
+export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails }) => {
+  const demDetTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'DEM/DET');
+  const storageTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'STORAGE');
+  const pluginTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'PLUGIN');
+
+  return (
+    <Fragment>
+      <Fragment>
+        {demDetTariffs && demDetTariffs[0] ? <CtrTariffDetailType tariffDetails={demDetTariffs} /> : null}
+      </Fragment>
+      <Fragment>
+        {storageTariffs && storageTariffs[0] ? <CtrTariffDetailType tariffDetails={storageTariffs} /> : null}
+      </Fragment>
+      <Fragment>
+        {pluginTariffs && pluginTariffs[0] ? <CtrTariffDetailType tariffDetails={pluginTariffs} /> : null}
+      </Fragment>
+    </Fragment>
   );
 };
 
@@ -172,7 +202,14 @@ export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) 
   );
 };
 
-const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, index, version, category }) => {
+const ContainerItem: React.FC<ContainerItemProps> = ({
+  detail,
+  containerTypes,
+  index,
+  version,
+  category,
+  tariffDetails,
+}) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
   const classes = useStyles();
 
@@ -180,7 +217,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
     <Fragment>
       <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
       <Box marginTop="0em" marginBottom="2em">
-        <Grid container spacing={1} style={{ paddingTop: '10px' }}>
+        <Grid container spacing={2} style={{ paddingTop: '10px' }}>
           <Grid item md={5} xs={12}>
             <Table size="small" aria-label="a dense table">
               <colgroup>
@@ -220,17 +257,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
 
                 {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
-                {isLongVersion(version) && detail.Equipment && detail.Equipment[0]
-                  ? detail.Equipment[0].CtrTariffs && detail.Equipment[0].CtrTariffs[0]
-                    ? detail.Equipment[0].CtrTariffs.map((tariff, index) => (
-                        <CtrTariffData
-                          key={`tarrif-${index}`}
-                          tariff={tariff}
-                          numberOfContainers={detail.CtrQuantity}
-                        />
-                      ))
-                    : null
-                  : null}
+                {isLongVersion(version) && tariffDetails ? (
+                  <CtrTariffDetails key={`tarrif-${index}`} tariffDetails={tariffDetails} />
+                ) : null}
               </TableBody>
             </Table>
           </Grid>
@@ -283,7 +312,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({ detail, containerTypes, i
   );
 };
 
-const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category }) => {
+const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tariffDetails }) => {
   const containerTypes = useContext(ContainerTypes);
 
   return (
@@ -301,6 +330,7 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category }) =
             containerTypes={containerTypes}
             version={version}
             category={category}
+            tariffDetails={tariffDetails}
           />
         ))}
     </Grid>

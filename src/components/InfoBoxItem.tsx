@@ -5,7 +5,7 @@ import { SvgIconProps } from '@material-ui/core/SvgIcon';
 interface Props {
   IconComponent?: React.ComponentType<SvgIconProps>;
   title?: React.ReactNode;
-  label1?: React.ReactNode;
+  label1?: React.ReactNode | string;
   label1HTML?: any;
   label2?: React.ReactNode;
   gutterBottom?: boolean;
@@ -22,6 +22,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: '29px', // theme.typography.subtitle2.lineHeight + '8',
   },
 }));
+
+function isString(x: React.ReactNode | string): boolean {
+  return typeof x === 'string';
+}
 
 const InfoBoxItem: React.FC<Props> = ({
   IconComponent,
@@ -45,10 +49,12 @@ const InfoBoxItem: React.FC<Props> = ({
         </Typography>
       )}
       {occupySpaceForTitle && <Box className={classes.titleBox} />}
-      {hasLabel1 && (
+      {hasLabel1 && isString(label1) ? (
         <Typography variant="body1" display="block" className={classes.printText}>
           {label1HTML ? <span dangerouslySetInnerHTML={label1HTML} /> : <span>{label1}</span>}
         </Typography>
+      ) : (
+        label1
       )}
       {label2 && (
         <Typography variant="body2" display="block" gutterBottom={gutterBottom} className={classes.printText}>

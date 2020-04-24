@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useCallback, useContext } from 'react';
 import { useId } from 'react-id-generator';
 import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
@@ -39,12 +39,13 @@ const UserWidget: React.FC<Props> = ({ active }) => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const isMenuOpen = Boolean(anchorEl);
+  const handleProfileMenuOpen = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget),
+    [setAnchorEl],
+  );
+  const handleMenuClose = useCallback(() => setAnchorEl(null), [setAnchorEl]);
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
-
-  const handleSwitch = () => {
+  const handleSwitch = useCallback(() => {
     setAnchorEl(null);
     if (actingAs) {
       setActingAs(null);
@@ -52,9 +53,9 @@ const UserWidget: React.FC<Props> = ({ active }) => {
       setActingAs(user.uid);
     }
     history.push('/');
-  };
+  }, [setAnchorEl, setActingAs, user, history]);
 
-  const handleLogOut = async () => {
+  const handleLogOut = useCallback(async () => {
     try {
       await firebase.auth().signOut();
       setAnchorEl(null);
@@ -65,7 +66,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         variant: 'error',
       });
     }
-  };
+  }, [setAnchorEl]);
 
   return (
     <Fragment>
@@ -87,7 +88,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
         id={menuId}
         keepMounted
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={isMenuOpen}
+        open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
         {actingAs ? (

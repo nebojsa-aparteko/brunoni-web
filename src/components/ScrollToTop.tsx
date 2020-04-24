@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { Box, Fab } from '@material-ui/core';
 
@@ -8,40 +8,45 @@ interface Props {
   className: any;
 }
 
-class ScrollToTop extends React.Component<Props> {
-  state = {
-    intervalId: 0,
-    thePosition: false,
-  };
+const ScrollToTop: React.FC<Props> = ({ scrollStepInPx, delayInMs, className }) => {
+  const [shouldShow, setShouldShow] = useState(false);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timer | undefined>(undefined);
 
-  componentDidMount() {
-    document.addEventListener('scroll', () => {
-      if (window.scrollY > 170) {
-        this.setState({ thePosition: true });
-      } else {
-        this.setState({ thePosition: false });
-      }
-    });
-    window.scrollTo(0, 0);
-  }
-
-  onScrollStep = () => {
-    if (window.pageYOffset === 0) {
-      clearInterval(this.state.intervalId);
+  const scrollListener = useCallback(() => {
+    if (window.scrollY > 170) {
+      setShouldShow(true);
+    } else {
+      setShouldShow(false);
     }
-    window.scroll(0, window.pageYOffset - this.props.scrollStepInPx);
-  };
+  }, [setShouldShow]);
 
-  scrollToTop = () => {
-    let intervalId = setInterval(this.onScrollStep, this.props.delayInMs);
-    this.setState({ intervalId: intervalId });
-  };
+  const onScrollStep = useCallback(() => {
+    if (window.pageYOffset === 0 && intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(undefined);
+    }
+    window.scroll(0, window.pageYOffset - scrollStepInPx);
+  }, [scrollStepInPx, intervalId]);
 
-  renderGoTopIcon = () => {
-    if (this.state.thePosition) {
+  useEffect(() => {
+    document.addEventListener('scroll', scrollListener);
+    window.scrollTo(0, 0);
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      document.removeEventListener('scroll', scrollListener);
+    };
+  }, [scrollListener]);
+
+  const scrollToTop = useCallback(() => {
+    let intervalId = setInterval(onScrollStep, delayInMs);
+    setIntervalId(intervalId);
+  }, [setIntervalId, delayInMs, onScrollStep]);
+
+  const renderGoTopIcon = () => {
+    if (shouldShow) {
       return (
         <Box displayPrint="none">
-          <Fab onClick={this.scrollToTop} color="primary" className={this.props.className}>
+          <Fab onClick={scrollToTop} color="primary" className={className}>
             <KeyboardArrowUpIcon />
           </Fab>
         </Box>
@@ -49,9 +54,7 @@ class ScrollToTop extends React.Component<Props> {
     }
   };
 
-  render() {
-    return <React.Fragment>{this.renderGoTopIcon()}</React.Fragment>;
-  }
-}
+  return <React.Fragment>{renderGoTopIcon()}</React.Fragment>;
+};
 
 export default ScrollToTop;

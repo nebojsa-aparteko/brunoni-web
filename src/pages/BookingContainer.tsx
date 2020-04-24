@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { RouteComponentProps } from 'react-router';
 import BookingView from '../components/bookings/BookingView';
-import { normalizeBooking } from '../providers/Bookings';
+import { normalizeBooking } from '../providers/BookingsProvider';
 import useFirestoreDocument from '../hooks/useFirestoreDocument';
 import { Booking } from '../model/Booking';
 

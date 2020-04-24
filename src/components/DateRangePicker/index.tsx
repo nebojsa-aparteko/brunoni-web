@@ -32,7 +32,7 @@ interface DateRangePickerProps {
   onChange: (dateRange: DateRange) => void;
 }
 
-const DateRangePickerImpl: React.FunctionComponent<DateRangePickerProps> = props => {
+const DateRangePickerImpl: React.FunctionComponent<DateRangePickerProps> = React.forwardRef((props, ref) => {
   const today = new Date();
 
   const { open, onChange, initialDateRange, minDate, maxDate, definedRanges = defaultRanges } = props;
@@ -137,6 +137,6 @@ const DateRangePickerImpl: React.FunctionComponent<DateRangePickerProps> = props
       handlers={handlers}
     />
   ) : null;
-};
+});
 
 export const DateRangePicker = DateRangePickerImpl;

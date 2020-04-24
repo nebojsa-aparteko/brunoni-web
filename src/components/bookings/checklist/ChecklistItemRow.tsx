@@ -32,7 +32,7 @@ import useClients from '../../../hooks/useClients';
 import { Booking, CarrierId, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
-import UserRecordContext from '../../../contexts/UserRecord';
+import UserRecordContext from '../../../contexts/UserRecordContext';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import ChecklistStagesView from './ChecklistStagesView';
 import { useActivityLogState } from './ActivityLogContext';

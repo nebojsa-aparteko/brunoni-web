@@ -12,7 +12,7 @@ import {
   FormControlLabel,
 } from '@material-ui/core';
 import Avatar from 'react-avatar';
-import UserRecordContext from '../../../contexts/UserRecord';
+import UserRecordContext from '../../../contexts/UserRecordContext';
 import SendIcon from '@material-ui/icons/Send';
 import debounce from 'lodash/fp/debounce';
 import Mousetrap from 'mousetrap';

@@ -1,9 +1,17 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, Theme, Typography, FormControlLabel, Switch } from '@material-ui/core';
+import {
+  makeStyles,
+  Card,
+  CardContent,
+  CardHeader,
+  Theme,
+  Typography,
+  FormControlLabel,
+  Switch,
+} from '@material-ui/core';
 import WriteComment from './WriteComment';
 import Comment from './Comment';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
-import { makeStyles } from '@material-ui/core/styles';
 import Activity from './Activity';
 
 interface Props {

@@ -2,26 +2,34 @@ import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
+  Box,
+  Container as MUIContainer,
   createStyles,
   Dialog,
   DialogContent,
   DialogTitle,
+  Divider,
+  Grid,
   IconButton,
   makeStyles,
+  Paper,
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableRow,
+  Theme,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { Skeleton } from '@material-ui/lab';
 import formatDate from 'date-fns/format';
-import { Booking, CheckListDocument } from '../../model/Booking';
+import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
 import theme from '../../theme';
+import InfoBoxItem from '../InfoBoxItem';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import { withStyles } from '@material-ui/styles';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -35,9 +43,9 @@ const useStyles = makeStyles(() =>
       '& td': {
         whiteSpace: 'nowrap',
       },
-    },
-    clientNameLabel: {
-      whiteSpace: 'normal',
+      '&:hover': {
+        backgroundColor: 'rgba(161,213,255,0.15) !important',
+      },
     },
     progress: {
       width: '100%',
@@ -77,25 +85,34 @@ const useStyles = makeStyles(() =>
     checklistDialogContent: {
       paddingBottom: theme.spacing(3),
     },
+    actionBarGridItem: {
+      marginRight: 0,
+      textAlign: 'right',
+    },
+    rowWrapper: {
+      paddingTop: '10px',
+      paddingLeft: '20px',
+      paddingRight: '20px',
+      paddingBottom: '10px',
+    },
   }),
 );
 
 interface BookingsTableProps {
   bookings: Booking[] | undefined;
-  showCompanyInfo?: boolean;
+  isAdmin?: boolean;
 }
 
 interface BookingRowProps {
   booking: Booking;
   onProgressClick: any;
-  showCompanyInfo?: boolean;
+  isAdmin?: boolean;
 }
 
 interface ProgressDialogProps {
   isOpen: boolean;
   booking: Booking;
   handleClose: any;
-  showCompanyInfo?: boolean;
 }
 
 interface ShipmentProgressProps {
@@ -123,7 +140,7 @@ export const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) =
   );
 };
 
-const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking, showCompanyInfo }) => {
+const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
   const classes = useStyles();
 
   return (
@@ -144,7 +161,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
   );
 };
 
-const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onProgressClick }) => {
+const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
   const classes = useStyles();
   const clients = useClients();
 
@@ -158,119 +175,150 @@ const BookingRow: React.FC<BookingRowProps> = ({ showCompanyInfo, booking, onPro
 
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
-  const clientInfo = useMemo(() => {
-    if (!showCompanyInfo) return null;
-
-    if (!client) {
-      return <TableCell>{booking.ForwAdrId}</TableCell>;
-    }
-
-    return (
-      <TableCell>
-        <span className={classes.clientNameLabel}>{client.name}</span>
-        {booking.ForwarderPersTxt ? <Typography variant="body2">{booking.ForwarderPersTxt}</Typography> : null}
-      </TableCell>
-    );
-  }, [showCompanyInfo, client, booking]);
+  const StyledTableRow = withStyles((theme: Theme) =>
+    createStyles({
+      root: {
+        '&:nth-of-type(even)': {
+          backgroundColor: theme.palette.background.default,
+        },
+      },
+    }),
+  )(TableRow);
 
   return (
-    <TableRow
+    <StyledTableRow
       hover
       tabIndex={-1}
       className={classes.tableRow}
       onClick={() => handleRowClick(booking.id)}
       key={booking.id}
     >
-      {clientInfo}
-      <TableCell className={classes.textEmphasized}>
-        {booking.CarrierID.toUpperCase()}
-        {showCompanyInfo && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
-          <Typography variant="body2">
-            {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
-            {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
-            {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
-          </Typography>
-        ) : null}
-      </TableCell>
-      <TableCell>
-        {booking.Vessel}
-        <br />
-        <Typography variant={'body2'}>{booking.Voyage}</Typography>
-      </TableCell>
-      <TableCell>
-        {booking.PlaceOfRecieptName}
-        <br />
-        <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
-      </TableCell>
-      <TableCell>
-        {booking.FinalDestinationName}
-        <br />
-        <Typography variant={'body2'}> ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
-      </TableCell>
-      <TableCell>{booking['BL-No']}</TableCell>
-      <TableCell>{booking['Cust-BkgRef']}</TableCell>
-      <TableCell>{booking.BkgStatusText}</TableCell>
-      <TableCell>{formatDate(booking.createdAt, 'dd.MM.yyyy')}</TableCell>
-      <TableCell className={classes.avatarCell}>
-        <Avatar
-          name={booking.BkgAgentContactTxt}
-          title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
-          size="40"
-          round={true}
-        />
-      </TableCell>
-      <TableCell onClick={onProgressClick}>
-        <ShipmentProgress booking={booking!} />
-      </TableCell>
-    </TableRow>
+      <Box mb={1}>
+        <Box className={classes.rowWrapper}>
+          <Grid container spacing={2} style={{ paddingTop: '10px' }}>
+            <Grid item lg={12} xs={12}>
+              <Typography variant={'h5'}>Booking No. {booking['ERP-BkgRef']}</Typography>
+            </Grid>
+            <Grid item lg={12} xs={12}>
+              <Grid container spacing={1}>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem
+                    title="Carrier"
+                    label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
+                    label2={
+                      isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
+                        <Typography variant="body2">
+                          {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
+                          {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
+                          {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
+                        </Typography>
+                      ) : (
+                        ''
+                      )
+                    }
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <InfoBoxItem
+                    title="Client"
+                    label1={client ? client.name : ''}
+                    label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem
+                    title="Progress"
+                    label1={
+                      <Box onClick={onProgressClick} style={{ width: '64px' }}>
+                        <ShipmentProgress booking={booking!} />
+                      </Box>
+                    }
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <InfoBoxItem
+                    title={isAdmin ? 'Customer reference' : 'Reference'}
+                    label1={booking['Cust-BkgRef']}
+                    gutterBottom
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <Fragment>
+                    <Box style={{ display: 'flex', flexDirection: 'row' }}>
+                      <Box style={{ width: '50%', paddingRight: '20px' }}>
+                        <InfoBoxItem
+                          IconComponent={ChevronRightIcon}
+                          title="Departure"
+                          label1={
+                            <Fragment>
+                              {booking.PlaceOfRecieptName}
+                              <br />
+                              <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
+                            </Fragment>
+                          }
+                          gutterBottom
+                        />
+                      </Box>
+                      <Box style={{ width: '50%' }}>
+                        <InfoBoxItem
+                          IconComponent={LastPageIcon}
+                          title="Arrival"
+                          label1={
+                            <Fragment>
+                              {booking.FinalDestinationName}
+                              <br />
+                              <Typography variant={'body2'}>ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
+                            </Fragment>
+                          }
+                          gutterBottom
+                        />
+                      </Box>
+                    </Box>
+                  </Fragment>
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <InfoBoxItem
+                    title="Contact"
+                    label1={
+                      <Avatar
+                        name={booking.BkgAgentContactTxt}
+                        title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
+                        size="40"
+                        round={true}
+                      />
+                    }
+                    gutterBottom
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+      <Divider />
+    </StyledTableRow>
   );
 };
 
-const BookingsTableBodySekeleton: React.FC = () => (
-  <Fragment>
-    {[...Array(10)].map((_, i) => (
-      <TableRow key={i}>
-        <TableCell>
-          <Skeleton width={'20%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'10%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'5%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-        <TableCell>
-          <Skeleton width={'5%'} height={16} style={{ margin: 0 }} />
-        </TableCell>
-      </TableRow>
-    ))}
-  </Fragment>
-);
-
-const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo }) => {
-  const classes = useStyles();
-
+const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
   const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -293,31 +341,18 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
   return (
     <Fragment>
       <Table>
-        <TableHead>
-          <TableRow>
-            {showCompanyInfo && <TableCell style={{ width: '20%' }}>Client</TableCell>}
-            <TableCell style={{ width: '10%' }}>Carrier</TableCell>
-            <TableCell style={{ width: '10%' }}>Vessel</TableCell>
-            <TableCell style={{ width: '10%' }}>Origin</TableCell>
-            <TableCell style={{ width: '10%' }}>Destination</TableCell>
-            <TableCell style={{ width: '10%' }}>BL Number</TableCell>
-            <TableCell style={{ width: '15%' }}>Your Reference</TableCell>
-            <TableCell style={{ width: '10%' }}>Status</TableCell>
-            <TableCell style={{ width: '5%' }}>Created On</TableCell>
-            <TableCell className={classes.avatarCell} style={{ width: '5%' }}>
-              Contact
-            </TableCell>
-            <TableCell style={{ width: '5%' }}>Progress</TableCell>
-          </TableRow>
-        </TableHead>
         <TableBody>
           {!bookings ? (
-            <BookingsTableBodySekeleton />
+            <MUIContainer maxWidth="md">
+              <Paper>
+                <ChartsCircularProgress />
+              </Paper>
+            </MUIContainer>
           ) : (
             bookings.map(booking => (
               <BookingRow
                 key={`booking-row-${booking.id}`}
-                showCompanyInfo={showCompanyInfo}
+                isAdmin={isAdmin}
                 booking={booking}
                 onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
               />
@@ -325,12 +360,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, showCompanyInfo
           )}
         </TableBody>
       </Table>
-      <BoookingProgressDialog
-        isOpen={isDialogOpen}
-        handleClose={handleDialogClose}
-        booking={dialogData!}
-        showCompanyInfo={showCompanyInfo}
-      />
+      <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />
     </Fragment>
   );
 };

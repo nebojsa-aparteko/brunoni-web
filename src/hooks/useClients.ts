@@ -1,6 +1,6 @@
 import { useCallback, useContext } from 'react';
 
-import UserRecord from '../contexts/UserRecord';
+import UserRecord from '../contexts/UserRecordContext';
 import useFirestoreCollection from './useFirestoreCollection';
 
 import firebase from '../firebase';

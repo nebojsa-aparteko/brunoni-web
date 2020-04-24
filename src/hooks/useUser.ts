@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import firebase from '../firebase';
 
 import User from '../contexts/User';
-import UserRecordContext from '../contexts/UserRecord';
+import UserRecordContext from '../contexts/UserRecordContext';
 
 import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';

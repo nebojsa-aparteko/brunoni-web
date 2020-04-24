@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import {
   Box,
   makeStyles,
@@ -22,22 +22,25 @@ import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
 import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
-import { QuoteListContext } from '../contexts/QuoteListContext';
+import { BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
 import Search from './SearchBar/Search';
 import { DateRange } from './DateRangePicker/types';
-import FiltersBar from './SearchBar/FiltersBar';
 import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import containsString from '../utilities/containsString';
-import useLocalStorage from '../utilities/useLocalStorage';
+import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/BookingsProvider';
+import BookingsFiltersBar from './SearchBar/BookingsFiltersBar';
 
 interface Props {
   bookings: Booking[];
-  showCompanyInfo?: boolean;
+  bookingContextFilters: BookingContextFilters;
+  isAdmin?: boolean;
+  archived?: boolean;
+  showDateRangeFilter?: boolean;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -82,33 +85,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
+const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilters, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
-  const [importOrExport, setImportOrExport] = useLocalStorage('bookingImportOrExport', 'Export', true);
+  const [bookingsContextData, setBookingsContextData] = useContext(BookingListFilterContext);
 
-  const [dateRange, setDateRange] = useState<DateRange>();
-
-  const [bookingsContextData, setBookingsContextData] = useContext(QuoteListContext);
-
-  const { searchString, page, rowsPerPage, clientFilter, originPort, destinationPort } = bookingsContextData;
+  const { searchString, page, rowsPerPage } = bookingsContextData;
 
   const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
 
+  const bookingFilterDispach = useBookingsFilterDispatch();
+
   const resultChunks = useMemo(() => {
-    // order bookings by date
-    const sortedBookings = orderBy(bookings, (booking: Booking) => booking.createdAt, ['desc']);
-
-    const filteredBookings = filter(
-      (booking: Booking) =>
-        booking.Category === importOrExport &&
-        (clientFilter ? booking.ForwAdrId === clientFilter.id : true) &&
-        (originPort ? booking.POL === originPort.id : true) &&
-        (destinationPort ? booking.POD === destinationPort.id : true) &&
-        compareAsc(booking.createdAt, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(booking.createdAt, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
-    )(sortedBookings);
-
     const result = filter(
       // TODO:
       // container number
@@ -139,34 +127,45 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
         // booking number
         ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false),
-    )(filteredBookings);
+    )(bookings);
 
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort, importOrExport]);
+  }, [bookings, searchString, page, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setImportOrExport((event.target as HTMLInputElement).value);
+    bookingFilterDispach({ type: 'set', field: 'category', value: (event.target as HTMLInputElement).value });
   };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-    setBookingsContextData(set('page', page)(bookingsContextData));
-  };
+  const handleChangePage = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+      setBookingsContextData(set('page', page)(bookingsContextData));
+    },
+    [setBookingsContextData, bookingsContextData],
+  );
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingsContextData(flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData));
-  };
+  const handleChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      setBookingsContextData(
+        flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
+      );
+    },
+    [setBookingsContextData, bookingsContextData],
+  );
 
-  const handleSearch = (searchStringNew: string) => {
-    if (searchStringNew !== searchString) {
-      setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
-    }
-  };
+  const handleSearch = useCallback(
+    (searchStringNew: string) => {
+      if (searchStringNew !== searchString) {
+        setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
+      }
+    },
+    [setBookingsContextData, bookingsContextData, searchString],
+  );
 
   if (!bookings) {
     return (
-      <MUIContainer maxWidth="lg">
+      <MUIContainer maxWidth="md">
         <Paper className={classes.root}>
           <ChartsCircularProgress />
         </Paper>
@@ -176,28 +175,22 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
 
   return (
     <Fragment>
-      <Meta title={'Bookings'} />
+      <Meta title={`Bookings`} />
 
-      <FiltersBar
-        listContextData={bookingsContextData}
-        setQuoteListContextData={setBookingsContextData}
-        showCompanyInfo={showCompanyInfo}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-      />
+      <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
 
       <Card>
         <CardHeader
           title={
             <Box display="flex" alignItems="center">
               <Typography variant="subtitle1" display="inline">
-                Bookings
+                Bookings {archived && '- Archive'}
               </Typography>
               <Divider orientation="vertical" style={{ height: '100%' }} />
               <RadioGroup
                 aria-label="importexport"
                 name="importexport"
-                value={importOrExport}
+                value={bookingContextFilters.category}
                 onChange={handleImportOrExportChange}
                 className={classes.importOrExport}
               >
@@ -216,7 +209,7 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
         />
 
         <CardContent className={classes.content}>
-          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} showCompanyInfo={showCompanyInfo} />
+          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
         </CardContent>
 
         <CardActions className={classes.actions}>
@@ -237,4 +230,4 @@ const Bookings: React.FC<Props> = ({ showCompanyInfo, bookings }) => {
   );
 };
 
-export default Bookings;
+export default BookingsView;

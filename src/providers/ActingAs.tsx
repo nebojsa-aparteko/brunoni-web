@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import firebase from '../firebase';
 import Context from '../contexts/ActingAs';
 import useLocalStorage from '../utilities/useLocalStorage';
-import UserRecordContext from '../contexts/UserRecord';
+import UserRecordContext from '../contexts/UserRecordContext';
 import UserRecord from '../model/UserRecord';
 
 interface Props {
