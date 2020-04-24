@@ -122,11 +122,19 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
         // origin (port of loading)
         (booking.POLName ? containsString(booking.POLName, searchString) : false) ||
         // container number
-        (booking.CargoDetails ? containsString(booking.POLName, searchString) : false) ||
+        (booking.CargoDetails && booking.CargoDetails[0]
+          ? booking.CargoDetails.every(cargoDetail =>
+              cargoDetail.Equipment && cargoDetail.Equipment[0]
+                ? cargoDetail.Equipment.every(equipment =>
+                    equipment.ContainerNumber ? containsString(equipment.ContainerNumber, searchString) : false,
+                  ).valueOf()
+                : false,
+            )
+          : false) ||
         // customer reference
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
         // booking number
-        ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false),
+        ('BL-No' in booking ? containsString(booking['BL-No'], searchString) : false),
     )(bookings);
 
     setFilteredResults(result);
