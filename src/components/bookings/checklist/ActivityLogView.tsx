@@ -8,7 +8,7 @@ import Activity from './Activity';
 
 interface Props {
   activityLog?: ActivityLogItem[];
-  onCommentSave: (messageBody: string) => void;
+  onCommentSave: (messageBody: string, internal: boolean) => void;
   showMore: boolean;
   onChange: () => void;
 }

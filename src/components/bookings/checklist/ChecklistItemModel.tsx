@@ -4,11 +4,25 @@ export interface ChecklistItemValueDocument {
   url: string;
   name: string;
   storedName: string;
+  status?: ChecklistItemValueDocumentStatus;
+}
+
+export enum ChecklistItemValueDocumentStatusType {
+  DEFAULT,
+  APPROVED,
+  REJECTED,
+}
+
+export interface ChecklistItemValueDocumentStatus {
+  type: ChecklistItemValueDocumentStatusType;
+  at?: Date;
+  by?: ActivityLogUserData;
 }
 
 export interface ShortChecklistItemValueDocument {
   url: string;
   name: string;
+  status?: ChecklistItemValueDocumentStatus;
 }
 
 export interface ActivityLogUserData {
@@ -35,9 +49,24 @@ export interface ChecklistItem {
     by: ActivityLogUserData;
     at: Date;
   };
+  customerAction?: CustomerAction;
   values?: ChecklistItemValueDocument[];
   valuesAdmin?: ChecklistItemValueDocument[];
   stages: Stage[];
+}
+
+export enum CustomerChecklistActionType {
+  markCompleted,
+  uploadFile,
+  fillForm,
+}
+
+export interface CustomerAction {
+  id: string;
+  action: CustomerChecklistActionType;
+  stageId?: string;
+  by?: ActivityLogUserData;
+  at?: Date;
 }
 
 export interface ShortChecklistItem {
@@ -54,6 +83,9 @@ export enum ActivityText {
   ADD_FILES = ' has added files ',
   DELETE_FILES = ' has deleted files ',
   DONE_BY_CUSTOMER = ' has marked done ',
+  DEFAULTED_FILE = ' has undo changes on ',
+  APPROVED_FILE = ' has approved ',
+  REJECTED_FILE = ' has rejected ',
 }
 
 export enum ActivityChangeType {
@@ -61,4 +93,6 @@ export enum ActivityChangeType {
   ADD_FILE,
   DELETE_FILE,
   STAGE_CHECKED,
+  DOCUMENT_STATUS_CHANGED,
+  DONE_BY_CUSTOMER,
 }

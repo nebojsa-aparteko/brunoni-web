@@ -1,8 +1,7 @@
 import { ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
 import React, { createContext, useContext, useState } from 'react';
-import { act } from 'react-dom/test-utils';
 
-type State = { checklistReference?: ChecklistItem; documentReference?: ChecklistItemValueDocument };
+type State = { checklistReference?: ChecklistItem; documentReference?: ChecklistItemValueDocument; rejected?: boolean };
 
 const ActivityLogStateContext = createContext<
   { state: State | undefined; setState: (state: State | undefined) => void } | undefined

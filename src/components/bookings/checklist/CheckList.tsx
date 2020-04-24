@@ -20,7 +20,7 @@ import invoke from 'lodash/fp/invoke';
 import ChecklistItemRow from './ChecklistItemRow';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import { ChecklistItem } from './ChecklistItemModel';
-import InternalChecklist from './InternalChecklist';
+import { differenceInMilliseconds } from 'date-fns';
 import ActivityLogContainer from './ActivityLogContainer';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 import ActingAs from '../../../contexts/ActingAs';
@@ -53,6 +53,10 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+const safeInvoke = (method: string) => (object: any) => (object ? invoke(method)(object) : null);
+
+export const editRestriction = (date: Date) => differenceInMilliseconds(new Date(), date) <= 30000;
+
 const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const [actingAs, setActingAs] = useContext(ActingAs);
   const checklistCollection = useFirestoreCollection(
@@ -67,11 +71,13 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
+
   const normalizedChecklistItems = useMemo(
     () =>
       map(
         flow(
-          // update('confirmedByCustomer', update('at', invoke('toDate'))),
+          update('status', map(update('at', safeInvoke('toDate')))),
+          // update('customerAction', update('at', safeInvoke('toDate'))),
           update('values', map(update('uploadedAt', invoke('toDate')))),
           update('valuesAdmin', map(update('uploadedAt', invoke('toDate')))),
         ),
@@ -94,7 +100,6 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
         <AppBar position="static">
           <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
             <Tab label="Checklist" id="simple-tab-0" aria-controls="simple-tabpanel-0" />
-            {!actingAs && <Tab label="Internal" id="simple-tab-1" aria-controls="simple-tabpanel-1" />}
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
@@ -113,21 +118,8 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
             </CardContent>
             <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
           </Card>
-          <ActivityLogContainer bookingId={booking.id} isInternal={false} />
+          <ActivityLogContainer bookingId={booking.id} isAdmin={!actingAs} />
         </TabPanel>
-        {!actingAs && (
-          <TabPanel value={value} index={1}>
-            <Card>
-              <CardContent>
-                <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-                  <InternalChecklist />
-                </Box>
-              </CardContent>
-            </Card>
-            <Divider />
-            <ActivityLogContainer bookingId={booking.id} isInternal={true} />
-          </TabPanel>
-        )}
       </ActivityLogProvider>
     </Fragment>
   );

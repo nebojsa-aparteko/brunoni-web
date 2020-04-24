@@ -4,7 +4,7 @@ import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
-import { ActivityChangeType, ActivityText } from './ChecklistItemModel';
+import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -19,6 +19,12 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.DELETE_FILE;
       case ActivityChangeType.STAGE_CHECKED:
         return activity.stage!.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
+      case ActivityChangeType.DOCUMENT_STATUS_CHANGED:
+        return activity.documents![0].status?.type === ChecklistItemValueDocumentStatusType.DEFAULT
+          ? ActivityText.DEFAULTED_FILE
+          : activity.documents![0].status?.type === ChecklistItemValueDocumentStatusType.APPROVED
+          ? ActivityText.APPROVED_FILE
+          : ActivityText.REJECTED_FILE;
     }
   };
   return (
@@ -32,7 +38,9 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         activity.documents.map((doc, index) => {
           return [ActivityChangeType.ADD_FILE].includes(activity.changeType as ActivityChangeType) ? (
             <Fragment>
-              <Link href={doc.url}>{doc.name}</Link>
+              <Link href={doc.url} target="_blank">
+                {doc.name}
+              </Link>
               {makeStyledString(activity, index)}
             </Fragment>
           ) : (

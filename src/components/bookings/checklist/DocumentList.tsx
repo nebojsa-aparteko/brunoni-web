@@ -13,7 +13,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentList = ({ checklistItem, checklistItemValues, bookingId, removalInProgress, deleteFile }: Props) => {
+const DocumentList = ({
+  checklistItem,
+  checklistItemValues,
+  bookingId,
+  removalInProgress,
+  deleteFile,
+  changeStatus,
+  internal,
+}: Props) => {
   const classes = useStyles();
 
   return (
@@ -27,6 +35,8 @@ const DocumentList = ({ checklistItem, checklistItemValues, bookingId, removalIn
           removalInProgress={removalInProgress}
           deleteFile={deleteFile}
           checklistItem={checklistItem}
+          changeStatus={changeStatus}
+          internal={internal}
         />
       ))}
     </List>
@@ -41,4 +51,6 @@ export interface Props {
   bookingId: string;
   removalInProgress: boolean;
   deleteFile: (item: ChecklistItemValueDocument) => void;
+  changeStatus: (item: ChecklistItemValueDocument) => void;
+  internal: boolean;
 }
