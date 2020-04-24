@@ -85,6 +85,19 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+export const getContainersString = (booking: Booking) => {
+  return booking.CargoDetails.map(cargoDetail =>
+    cargoDetail.Equipment && cargoDetail.Equipment[0]
+      ? cargoDetail.Equipment.map(equipment => (equipment.ContainerNumber ? '/' + equipment.ContainerNumber : '')).join(
+          '',
+        )
+      : '',
+  )
+    .join('')
+    .substring(1)
+    .split('/');
+};
+
 const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilters, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
@@ -123,13 +136,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
         (booking.POLName ? containsString(booking.POLName, searchString) : false) ||
         // container number
         (booking.CargoDetails && booking.CargoDetails[0]
-          ? booking.CargoDetails.every(cargoDetail =>
-              cargoDetail.Equipment && cargoDetail.Equipment[0]
-                ? cargoDetail.Equipment.every(equipment =>
-                    equipment.ContainerNumber ? containsString(equipment.ContainerNumber, searchString) : false,
-                  ).valueOf()
-                : false,
-            )
+          ? getContainersString(booking).some(containerString => containsString(containerString, searchString))
           : false) ||
         // customer reference
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
