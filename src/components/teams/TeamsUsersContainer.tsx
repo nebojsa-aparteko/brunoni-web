@@ -16,7 +16,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function TeamsUsersContainer() {
+const TeamsUsersContainer: React.FC = () => {
   const classes = useStyles();
   const adminUsers = useAdminUsers();
 
@@ -34,10 +34,12 @@ export default function TeamsUsersContainer() {
         </TableHead>
         <TableBody>
           {adminUsers?.map((user, index) => (
-            <TeamUserRow user={user} />
+            <TeamUserRow user={user} key={`adminuser-${index}`} />
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
-}
+};
+
+export default TeamsUsersContainer;

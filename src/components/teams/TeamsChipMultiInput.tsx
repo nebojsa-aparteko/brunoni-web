@@ -3,7 +3,7 @@ import React from 'react';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import UserRecord from '../../model/UserRecord';
-import { Input } from '@material-ui/core';
+import { Input, TextField } from '@material-ui/core';
 
 interface Props {
   options: UserRecord[];
@@ -14,7 +14,6 @@ const TeamsChipMultiInput: React.FC<Props> = ({ options, values }) => {
   return (
     <Autocomplete
       multiple
-      id="fixed-tags-demo"
       options={options}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
       defaultValue={values}
@@ -23,10 +22,7 @@ const TeamsChipMultiInput: React.FC<Props> = ({ options, values }) => {
           <Chip label={`${option.firstName} ${option.lastName}`} {...getTagProps({ index })} />
         ))
       }
-      style={{ width: 500 }}
-      renderInput={params => (
-        <Input placeholder="Type to filter" inputProps={{ 'aria-label': 'description' }} {...params} />
-      )}
+      renderInput={params => <TextField {...params} label="Teams" placeholder="Type to filter" variant="outlined" />}
     />
   );
 };

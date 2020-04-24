@@ -16,7 +16,7 @@ export default interface UserRecord {
   emailAddress: string;
   role: Role;
   lastSession: Date;
-  teams: string[];
+  teams: UserRecord[];
 }
 
 type Role = 'superadmin' | 'sales' | 'operations';

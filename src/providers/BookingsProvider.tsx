@@ -168,7 +168,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     }) as Booking[] | undefined;
 
     return normalizeBookings(bookings);
-  }, [userRecord, bookingsSnapshot, filters]);
+  }, [bookingsSnapshot]);
 
   return (
     <BookingsContext.Provider value={[bookingsResult, filters]}>
