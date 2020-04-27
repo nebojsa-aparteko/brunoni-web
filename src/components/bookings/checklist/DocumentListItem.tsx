@@ -27,9 +27,9 @@ import {
 } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
-import UserRecordContext from '../../../contexts/UserRecord';
 import ActingAs from '../../../contexts/ActingAs';
 import { editRestriction } from './CheckList';
+import UserRecordContext from '../../../contexts/UserRecordContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -10,7 +10,8 @@ import { ActivityLogUserData, ShortChecklistItem, ShortChecklistItemValueDocumen
 import firebase from '../../../firebase';
 import { useActivityLogState } from './ActivityLogContext';
 import { flow, omitBy, isNil } from 'lodash/fp';
-import { shortenedChecklist } from '../../../utilities/shortenedModel';
+import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
+import { MentionItem } from 'react-mentions';
 
 interface Props {
   bookingId: string;
@@ -64,7 +65,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
   const userRecord = useContext(UserRecordContext);
 
   const handleCommentSave = useCallback(
-    (messageBody: string, internal: boolean) => {
+    (messageBody: string, mentions: MentionItem[], internal: boolean) => {
       const userActivityLogData = {
         firstName: userRecord?.firstName,
         lastName: userRecord?.lastName,
@@ -72,7 +73,19 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
       } as ActivityLogUserData;
-      console.log(activityLogContext);
+      console.log(
+        flow(omitBy(isNil))({
+          type: ActivityType.COMMENT,
+          comment: messageBody,
+          at: new Date(),
+          by: userActivityLogData,
+          isInternal: internal,
+          checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
+          documents: [flow(omitBy(isNil))(shortenedDocumentValue(activityLogContext.state?.documentReference))],
+          mentions: mentions,
+        } as ActivityLogItem),
+        'ITEM',
+      );
       firebase
         .firestore()
         .collection('bookings')
@@ -86,6 +99,8 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
             by: userActivityLogData,
             isInternal: internal,
             checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
+            documents: shortenedDocumentValue(activityLogContext.state?.documentReference),
+            mentions: mentions,
           } as ActivityLogItem),
         )
         .then(_ => {

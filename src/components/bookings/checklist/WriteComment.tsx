@@ -19,6 +19,9 @@ import Mousetrap from 'mousetrap';
 import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
 import CloseIcon from '@material-ui/icons/Close';
+import { MentionsInput, Mention, MentionItem } from 'react-mentions';
+import useAdminUsers from '../../../hooks/useAdminUsers';
+import defaultStyleMentions from './defaultStyleMentions';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,6 +49,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const classes = useStyles();
   const [actingAs, setActingAs] = useContext(ActingAs);
   const [messageText, setMessageText] = useState('');
+  const [mentions, setMentions] = useState<MentionItem[]>([]);
   const userRecord = useContext(UserRecordContext);
   const handleMessageTyping = useMemo(() => debounce(250, setMessageText), [setMessageText]);
   const [isAdmin, setIsAdmin] = useState(!actingAs);
@@ -53,12 +57,16 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
     setIsAdmin(!actingAs);
   }, [actingAs]);
   const [isCustomerMessage, setIsCustomerMessage] = useState(!isAdmin);
-  const inputRef = useRef<HTMLInputElement>();
-
+  const inputRef = useRef<HTMLInputElement>(null);
+  const admins = useAdminUsers();
   const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
 
   const activityLogContext = useActivityLogState();
-
+  const normalizedAdmins = useMemo(() => {
+    return admins?.map(
+      admin => ({ id: admin.emailAddress, display: `${admin.firstName} ${admin.lastName}` } as MentionItem),
+    );
+  }, [admins]);
   useEffect(() => {
     console.log('binding');
     let moustrapInstance = new Mousetrap();
@@ -82,16 +90,15 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
     };
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: any) => {
     handleMessageTyping(event.target.value);
   };
 
   const handleDeleteReferences = () => activityLogContext.setState({});
 
   const saveMessage = () => {
-    onCommentSave(messageText, !isCustomerMessage);
+    onCommentSave(messageText, mentions, !isCustomerMessage);
     setMessageText('');
-
     // reset text on send
     if (inputRef && inputRef.current) {
       inputRef.current.value = '';
@@ -109,14 +116,28 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           round={true}
         />
         <Paper variant="outlined" component={Box} className={classes.writeComment}>
-          <Input
-            disableUnderline
-            fullWidth
-            onChange={handleChange}
-            multiline
-            inputRef={inputRef}
+          {/*<Input*/}
+          {/*  disableUnderline*/}
+          {/*  fullWidth*/}
+          {/*  onChange={handleChange}*/}
+          {/*  multiline*/}
+          {/*  inputRef={inputRef}*/}
+          {/*  placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}*/}
+          {/*/>*/}
+          <MentionsInput
+            style={defaultStyleMentions}
             placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
-          />
+            inputRef={inputRef}
+            onChange={(event, newValue, newPlainTextValue, mentions) => {
+              setMessageText(event.target.value);
+              setMentions(mentions);
+            }}
+            value={messageText}
+            allowSuggestionsAboveCursor={true}
+          >
+            {/*<Mention trigger="@" data={normalizedAdmins} />*/}
+            <Mention trigger="@" data={normalizedAdmins} style={{ color: '#ccc' }} />
+          </MentionsInput>
         </Paper>
         <Tooltip title="Send">
           <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
@@ -167,5 +188,5 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
 export default WriteComment;
 
 interface WriteCommentProp {
-  onCommentSave: (messageBody: string, internal: boolean) => void;
+  onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
 }

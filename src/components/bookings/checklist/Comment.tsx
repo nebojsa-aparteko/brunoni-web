@@ -33,8 +33,24 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const wrapTags = (text: string, regex: RegExp) => {
+  const textArray = text.split(regex);
+  console.log(textArray, 'TEXT');
+  let mail;
+  let name;
+  return textArray.map(str => {
+    if (regex.test(str)) {
+      mail = str.match(/\((.*)\)/i);
+      name = str.match(/\[(.*)\]/i);
+      return <Link href={`mailto:${mail && mail[1]}`}>{`@${name && name[1]}`}</Link>;
+    }
+    return str;
+  });
+};
+
 const Comment = ({ comment }: CommentProp) => {
   const classes = useStyles();
+
   return (
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
@@ -54,7 +70,9 @@ const Comment = ({ comment }: CommentProp) => {
                 comment.at,
               )} ago`}</Typography>
             </Box>
-            <Typography style={{ wordBreak: 'break-word' }}>{comment.comment}</Typography>
+            <Typography style={{ wordBreak: 'break-word' }}>
+              {comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9]*@[a-zA-Z]*.\w*\))/)}
+            </Typography>
             {comment.checklistItem && (
               <Box>
                 Ref - <a href={`#${comment.checklistItem.id}`}>{comment.checklistItem.label}</a>
