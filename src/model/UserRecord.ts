@@ -14,4 +14,15 @@ export default interface UserRecord {
   firstName: string;
   lastName: string;
   emailAddress: string;
+  role: Role;
+  lastSession: Date;
+  teams: UserRecord[];
+}
+
+type Role = 'superadmin' | 'sales' | 'operations';
+
+export const ADMIN_ROLES = ['superadmin', 'sales', 'operations'];
+
+export function isAdmin(userRecord: UserRecord) {
+  return userRecord.role ? ADMIN_ROLES.includes(userRecord.role) : false;
 }

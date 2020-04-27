@@ -20,20 +20,15 @@ import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
-import orderBy from 'lodash/orderBy';
 import Meta from './Meta';
 import { BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
-import Search from './SearchBar/Search';
-import { DateRange } from './DateRangePicker/types';
-import compareAsc from 'date-fns/compareAsc';
-import compareDesc from 'date-fns/compareDesc';
-import addDays from 'date-fns/addDays';
+import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
 import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/BookingsProvider';
-import BookingsFiltersBar from './SearchBar/BookingsFiltersBar';
+import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 
 interface Props {
   bookings: Booking[];
@@ -85,6 +80,19 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+export const getContainersString = (booking: Booking) => {
+  return booking.CargoDetails.map(cargoDetail =>
+    cargoDetail.Equipment && cargoDetail.Equipment[0]
+      ? cargoDetail.Equipment.map(equipment => (equipment.ContainerNumber ? '/' + equipment.ContainerNumber : '')).join(
+          '',
+        )
+      : '',
+  )
+    .join('')
+    .substring(1)
+    .split('/');
+};
+
 const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilters, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
@@ -122,11 +130,13 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
         // origin (port of loading)
         (booking.POLName ? containsString(booking.POLName, searchString) : false) ||
         // container number
-        (booking.CargoDetails ? containsString(booking.POLName, searchString) : false) ||
+        (booking.CargoDetails && booking.CargoDetails[0]
+          ? getContainersString(booking).some(containerString => containsString(containerString, searchString))
+          : false) ||
         // customer reference
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
         // booking number
-        ('BL-No' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false),
+        ('BL-No' in booking ? containsString(booking['BL-No'], searchString) : false),
     )(bookings);
 
     setFilteredResults(result);

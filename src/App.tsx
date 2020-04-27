@@ -27,6 +27,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ActingAs from './contexts/ActingAs';
 import UserRecord from './contexts/UserRecordContext';
 import ChartsCircularProgress from './components/dashboard/ChartsCircularProgress';
+import TeamManagementPage from './pages/TeamManagementPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -52,6 +53,7 @@ const adminRoutes = (
     <Route exact path="/bookings" component={BookingsPage} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={Unauthorized} />
+    <Route exact path="/teams" component={TeamManagementPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route component={NotFound} />
   </Switch>

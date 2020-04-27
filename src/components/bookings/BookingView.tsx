@@ -171,11 +171,27 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               </Box>
 
               <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-                <QuoteNav
-                  backTo="/bookings"
-                  subtitle={`File No. ${booking.id}`}
-                  title={`Booking - ${getBookingTitle(booking)}`}
-                />
+                <Box
+                  className={classes.actionBar}
+                  mb={2}
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="end"
+                  justifyContent="space-between"
+                >
+                  <QuoteNav
+                    backTo="/bookings"
+                    title={`Booking - ${getBookingTitle(booking)}`}
+                    subtitle={`File No. ${booking.id}`}
+                  />
+                  <Typography variant={'h5'} style={{ paddingLeft: '20px' }}>
+                    {booking?.Agreement
+                      ? 'Agreement No. ' + booking?.Agreement
+                      : booking?.StatClientRef
+                      ? 'Agreement No. ' + booking.StatClientRef
+                      : null}
+                  </Typography>
+                </Box>
                 <Box flex="1" />
                 <Box>
                   <Avatar

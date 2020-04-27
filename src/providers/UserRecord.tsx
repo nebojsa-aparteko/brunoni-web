@@ -23,6 +23,12 @@ const UserProvider: React.FC<Props> = ({ children }) => {
         break;
       default:
         setUserRecord(undefined);
+        firebase
+          .firestore()
+          .collection('users')
+          .doc(user.uid)
+          .update({ lastSession: new Date() })
+          .catch(error => console.error('Failed to update session ', error));
         return firebase
           .firestore()
           .collection('users')

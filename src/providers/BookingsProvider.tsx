@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -7,7 +7,7 @@ import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import set from 'lodash/fp/set';
-import { DateRange } from '../components/DateRangePicker/types';
+import { DateRange } from '../components/daterangepicker/types';
 import ActingAs from '../contexts/ActingAs';
 import Client from '../model/Client';
 import Port from '../model/Port';
@@ -137,7 +137,9 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.assignee) {
-        query = query.where('BkgAgentContact', '==', filters.assignee.alphacomId);
+        const splituserId = filters.assignee.alphacomId.split('-');
+        const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
+        query = query.where('BkgAgentContact', '==', normalizedUserId);
       }
 
       if (filters.originPort) {
@@ -168,7 +170,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     }) as Booking[] | undefined;
 
     return normalizeBookings(bookings);
-  }, [userRecord, bookingsSnapshot, filters]);
+  }, [bookingsSnapshot]);
 
   return (
     <BookingsContext.Provider value={[bookingsResult, filters]}>

@@ -4,44 +4,55 @@ import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
 import PortInput from '../inputs/PortInput';
 import DateRangeInput from '../inputs/DateRangeInput';
-import { DateRange } from '../DateRangePicker/types';
+import { DateRange } from '../daterangepicker/types';
 import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
-import set from 'lodash/fp/set';
 import Client from '../../model/Client';
-import { QuoteListStateParams } from '../../providers/QuoteListFilterContext';
+import { useBookingsContext, useBookingsFilterDispatch } from '../../providers/BookingsProvider';
+import UserInput from '../inputs/UserInput';
+import UserRecord from '../../model/UserRecord';
+import useAdminUsers from '../../hooks/useAdminUsers';
 
 interface Props {
-  listContextData: QuoteListStateParams;
-  setQuoteListContextData: any;
   showClientFilter?: boolean;
-  showRefreshButton?: boolean;
   showDateRange?: boolean;
+  showRefreshButton?: boolean;
+  showAssigneeFilter?: boolean;
 }
 
-const FiltersBar: React.FC<Props> = ({
-  listContextData,
-  setQuoteListContextData,
+const BookingsFiltersBar: React.FC<Props> = ({
   showClientFilter,
   showDateRange,
   showRefreshButton,
+  showAssigneeFilter,
 }) => {
   const clients = useClients();
+  const users = useAdminUsers();
   const ports = useContext(Ports);
 
-  const { clientFilter, originPort, destinationPort, dateRange } = listContextData;
+  const bookingFilterDispach = useBookingsFilterDispatch();
 
-  const setOriginPort = (port: Port | null) => setQuoteListContextData(set('originPort', port)(listContextData));
+  const filters = useBookingsContext()[1];
+
+  const { clientFilter, originPort, destinationPort, assignee } = filters;
+
+  const setOriginPort = (port: Port | null) =>
+    bookingFilterDispach({
+      type: port ? 'set' : 'clear',
+      field: 'originPort',
+      value: port || undefined,
+    });
   const setDestinationPort = (port: Port | null) =>
-    setQuoteListContextData(set('destinationPort', port)(listContextData));
+    bookingFilterDispach({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
   const setClientFilter = (client: Client | null) =>
-    setQuoteListContextData(set('clientFilter', client)(listContextData));
+    bookingFilterDispach({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
 
-  const setDateRange = (dateRange: DateRange) => {
-    setQuoteListContextData(set('dateRange', dateRange)(listContextData));
-  };
+  const setUserFilter = (user: UserRecord | null) =>
+    bookingFilterDispach({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
 
+  const setDateRange = (dateRange: DateRange) =>
+    bookingFilterDispach({ type: 'set', field: 'dateRange', value: dateRange });
   return (
     <Box
       display="flex"
@@ -73,13 +84,26 @@ const FiltersBar: React.FC<Props> = ({
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-              <DateRangeInput onChange={setDateRange} value={dateRange} />
+              <DateRangeInput onChange={setDateRange} />
             </Box>
           </Grid>
         )}
+        {showAssigneeFilter && !showDateRange && (
+          <Grid item sm={3} xs={12}>
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
+          </Grid>
+        )}
       </Grid>
+      {showAssigneeFilter && showDateRange && users && (
+        <Grid container spacing={2} style={{ marginTop: 8 }}>
+          <Grid item sm={9} xs={12} />
+          <Grid item sm={3} xs={12}>
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 };
 
-export default FiltersBar;
+export default BookingsFiltersBar;
