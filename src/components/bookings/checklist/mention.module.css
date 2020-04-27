@@ -1,5 +1,6 @@
 .mentions {
-  margin: 1em 0;
+  flex: 1;
+  margin: 1em 1em;
 }
 
 .mentions--singleLine .mentions__control {
@@ -16,8 +17,8 @@
 }
 
 .mentions--multiLine .mentions__control {
-  font-family: monospace;
-  font-size: 14pt;
+  /*font-family: monospace;
+  font-size: 14pt;*/
 }
 .mentions--multiLine .mentions__highlighter {
   border: 1px solid transparent;
@@ -28,6 +29,7 @@
   border: 1px solid silver;
   padding: 9px;
   outline: 0;
+  line-height: 21px; /* TODO DANGER DANGER this is related to MUI Typography LineHeight in order to match the styles*/
 }
 
 .mentions__suggestions__list {

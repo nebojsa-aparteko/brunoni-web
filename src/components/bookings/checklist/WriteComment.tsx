@@ -21,7 +21,6 @@ import ActingAs from '../../../contexts/ActingAs';
 import CloseIcon from '@material-ui/icons/Close';
 import { MentionsInput, Mention, MentionItem } from 'react-mentions';
 import useAdminUsers from '../../../hooks/useAdminUsers';
-import defaultStyleMentions from './defaultStyleMentions';
 import mentionsClassNames from './mention.module.css';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -116,15 +115,6 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           size="30"
           round={true}
         />
-        {/*<Paper variant="outlined" component={Box} className={classes.writeComment}>*/}
-        {/*<Input*/}
-        {/*  disableUnderline*/}
-        {/*  fullWidth*/}
-        {/*  onChange={handleChange}*/}
-        {/*  multiline*/}
-        {/*  inputRef={inputRef}*/}
-        {/*  placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}*/}
-        {/*/>*/}
         <MentionsInput
           classNames={mentionsClassNames}
           className="mentions"
@@ -137,10 +127,13 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           value={messageText}
           allowSuggestionsAboveCursor={true}
         >
-          {/*<Mention trigger="@" data={normalizedAdmins} />*/}
-          <Mention trigger="@" data={normalizedAdmins} className={mentionsClassNames.mentions__mention} />
+          <Mention
+            trigger="@"
+            data={normalizedAdmins}
+            className={mentionsClassNames.mentions__mention}
+            displayTransform={(id, display) => '@' + display}
+          />
         </MentionsInput>
-        {/*</Paper>*/}
         <Tooltip title="Send">
           <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
             <SendIcon />
