@@ -90,7 +90,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
         )}
         {showAssigneeFilter && !showDateRange && (
           <Grid item sm={3} xs={12}>
-            <UserInput label="Choose User" users={users} onChange={setUserFilter} value={assignee} />
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
           </Grid>
         )}
       </Grid>
@@ -98,7 +98,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
         <Grid container spacing={2} style={{ marginTop: 8 }}>
           <Grid item sm={9} xs={12} />
           <Grid item sm={3} xs={12}>
-            <UserInput label="Choose User" users={users} onChange={setUserFilter} value={assignee} />
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
           </Grid>
         </Grid>
       )}

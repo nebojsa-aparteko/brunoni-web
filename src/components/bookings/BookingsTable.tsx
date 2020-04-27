@@ -40,14 +40,6 @@ const useStyles = makeStyles(() =>
     progressButton: {
       position: 'absolute',
     },
-    tableRow: {
-      '& td': {
-        whiteSpace: 'nowrap',
-      },
-      '&:hover': {
-        backgroundColor: 'rgba(161,213,255,0.15) !important',
-      },
-    },
     tableRowHeader: {
       display: 'flex',
       flexDirection: 'row',
@@ -95,11 +87,8 @@ const useStyles = makeStyles(() =>
       marginRight: 0,
       textAlign: 'right',
     },
-    rowWrapper: {
-      paddingTop: '10px',
-      paddingLeft: '20px',
-      paddingRight: '20px',
-      paddingBottom: '10px',
+    divider: {
+      marginTop: theme.spacing(2),
     },
   }),
 );
@@ -208,155 +197,156 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
       root: {
+        cursor: 'pointer',
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
+        '&:hover': {
+          backgroundColor: 'rgba(161,213,255,0.15) !important',
+        },
+        '&:focus': {
+          outline: 'none',
+        },
         '&:nth-of-type(even)': {
           backgroundColor: theme.palette.background.default,
         },
       },
     }),
-  )(TableRow);
+  )(Box);
 
   return (
-    <StyledTableRow
-      hover
-      tabIndex={-1}
-      className={classes.tableRow}
-      onClick={() => handleRowClick(booking.id)}
-      key={booking.id}
-    >
-      <Box mb={1}>
-        <Box className={classes.rowWrapper}>
-          <Grid container spacing={2} style={{ paddingTop: '10px' }}>
-            <Grid item lg={12} xs={12}>
-              {isImport(booking.Category) ? (
-                booking && booking['ERP-BkgRef'] ? (
-                  <Typography variant="h5">BL Number: {booking['ERP-BkgRef']}</Typography>
-                ) : null
-              ) : booking && booking['ERP-BkgRef'] ? (
-                <Fragment>
-                  <span className={classes.tableRowHeader}>
-                    <Typography variant="h5">BL Number: {booking['ERP-BkgRef']}</Typography>
-                    <Typography variant="body2" style={{ paddingLeft: '20px' }}>
-                      Refs: <LocRefs cargoDetails={booking.CargoDetails} />
+    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(booking.id)} key={booking.id}>
+      <Grid container spacing={2} style={{ paddingTop: '10px' }}>
+        <Grid item lg={12} xs={12}>
+          {isImport(booking.Category) ? (
+            booking && booking['ERP-BkgRef'] ? (
+              <Typography variant="h5">#: {booking['ERP-BkgRef']}</Typography>
+            ) : null
+          ) : booking && booking['ERP-BkgRef'] ? (
+            <Fragment>
+              <span className={classes.tableRowHeader}>
+                <Typography variant="h5">#: {booking['ERP-BkgRef']}</Typography>
+                <Typography variant="body2" style={{ paddingLeft: '20px' }}>
+                  Refs: <LocRefs cargoDetails={booking.CargoDetails} />
+                </Typography>
+              </span>
+            </Fragment>
+          ) : null}
+        </Grid>
+        <Grid item lg={12} xs={12}>
+          <Grid container spacing={1}>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem
+                title="Carrier"
+                label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
+                label2={
+                  isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
+                    <Typography variant="body2">
+                      {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
+                      {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
+                      {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
                     </Typography>
-                  </span>
-                </Fragment>
-              ) : null}
+                  ) : (
+                    ''
+                  )
+                }
+                gutterBottom
+              />
             </Grid>
-            <Grid item lg={12} xs={12}>
-              <Grid container spacing={1}>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem
-                    title="Carrier"
-                    label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
-                    label2={
-                      isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
-                        <Typography variant="body2">
-                          {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
-                          {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
-                          {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
-                        </Typography>
-                      ) : (
-                        ''
-                      )
-                    }
-                    gutterBottom
+            <Grid item md={3} xs={12}>
+              <InfoBoxItem
+                title="Client"
+                label1={client ? client.name : ''}
+                label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
+                gutterBottom
+              />
+            </Grid>
+            <Grid item md={3} xs={12}>
+              <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem
+                title="Progress"
+                label1={
+                  <Box onClick={onProgressClick} style={{ width: '64px' }}>
+                    <ShipmentProgress booking={booking!} />
+                  </Box>
+                }
+                gutterBottom
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
+            </Grid>
+            <Grid item md={3} xs={12}>
+              <InfoBoxItem
+                title={isAdmin ? 'Customer reference' : 'Reference'}
+                label1={booking['Cust-BkgRef']}
+                gutterBottom
+              />
+            </Grid>
+            <Grid item md={3} xs={12}>
+              <Fragment>
+                <Box style={{ display: 'flex', flexDirection: 'row' }}>
+                  <Box style={{ width: '50%', paddingRight: '20px' }}>
+                    <InfoBoxItem
+                      IconComponent={ChevronRightIcon}
+                      title="Departure"
+                      label1={
+                        <Fragment>
+                          {booking.PlaceOfRecieptName}
+                          <br />
+                          <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
+                        </Fragment>
+                      }
+                      gutterBottom
+                    />
+                  </Box>
+                  <Box style={{ width: '50%' }}>
+                    <InfoBoxItem
+                      IconComponent={LastPageIcon}
+                      title="Arrival"
+                      label1={
+                        <Fragment>
+                          {booking.FinalDestinationName}
+                          <br />
+                          <Typography variant={'body2'}>ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
+                        </Fragment>
+                      }
+                      gutterBottom
+                    />
+                  </Box>
+                </Box>
+              </Fragment>
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem
+                title="Contact"
+                label1={
+                  <Avatar
+                    name={booking.BkgAgentContactTxt}
+                    title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
+                    size="40"
+                    round={true}
                   />
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <InfoBoxItem
-                    title="Client"
-                    label1={client ? client.name : ''}
-                    label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
-                    gutterBottom
-                  />
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem
-                    title="Progress"
-                    label1={
-                      <Box onClick={onProgressClick} style={{ width: '64px' }}>
-                        <ShipmentProgress booking={booking!} />
-                      </Box>
-                    }
-                    gutterBottom
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem title="BL Number" label1={booking['BL-No']} gutterBottom />
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <InfoBoxItem
-                    title={isAdmin ? 'Customer reference' : 'Reference'}
-                    label1={booking['Cust-BkgRef']}
-                    gutterBottom
-                  />
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <Fragment>
-                    <Box style={{ display: 'flex', flexDirection: 'row' }}>
-                      <Box style={{ width: '50%', paddingRight: '20px' }}>
-                        <InfoBoxItem
-                          IconComponent={ChevronRightIcon}
-                          title="Departure"
-                          label1={
-                            <Fragment>
-                              {booking.PlaceOfRecieptName}
-                              <br />
-                              <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
-                            </Fragment>
-                          }
-                          gutterBottom
-                        />
-                      </Box>
-                      <Box style={{ width: '50%' }}>
-                        <InfoBoxItem
-                          IconComponent={LastPageIcon}
-                          title="Arrival"
-                          label1={
-                            <Fragment>
-                              {booking.FinalDestinationName}
-                              <br />
-                              <Typography variant={'body2'}>ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
-                            </Fragment>
-                          }
-                          gutterBottom
-                        />
-                      </Box>
-                    </Box>
-                  </Fragment>
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
-                </Grid>
-                <Grid item md={2} xs={12}>
-                  <InfoBoxItem
-                    title="Contact"
-                    label1={
-                      <Avatar
-                        name={booking.BkgAgentContactTxt}
-                        title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
-                        size="40"
-                        round={true}
-                      />
-                    }
-                    gutterBottom
-                  />
-                </Grid>
-              </Grid>
+                }
+                gutterBottom
+              />
             </Grid>
           </Grid>
-        </Box>
-      </Box>
-      <Divider />
+        </Grid>
+      </Grid>
+      <Divider className={classes.divider} />
     </StyledTableRow>
   );
 };
@@ -383,26 +373,22 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
 
   return (
     <Fragment>
-      <Table>
-        <TableBody>
-          {!bookings ? (
-            <MUIContainer maxWidth="md">
-              <Paper>
-                <ChartsCircularProgress />
-              </Paper>
-            </MUIContainer>
-          ) : (
-            bookings.map(booking => (
-              <BookingRow
-                key={`booking-row-${booking.id}`}
-                isAdmin={isAdmin}
-                booking={booking}
-                onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
-              />
-            ))
-          )}
-        </TableBody>
-      </Table>
+      {!bookings ? (
+        <MUIContainer maxWidth="md">
+          <Paper>
+            <ChartsCircularProgress />
+          </Paper>
+        </MUIContainer>
+      ) : (
+        bookings.map(booking => (
+          <BookingRow
+            key={`booking-row-${booking.id}`}
+            isAdmin={isAdmin}
+            booking={booking}
+            onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
+          />
+        ))
+      )}
       <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />
     </Fragment>
   );

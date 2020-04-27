@@ -137,7 +137,9 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.assignee) {
-        query = query.where('BkgAgentContact', '==', filters.assignee.alphacomId);
+        const splituserId = filters.assignee.alphacomId.split('-');
+        const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
+        query = query.where('BkgAgentContact', '==', normalizedUserId);
       }
 
       if (filters.originPort) {
