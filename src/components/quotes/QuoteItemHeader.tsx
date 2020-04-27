@@ -5,7 +5,7 @@ import invoke from 'lodash/fp/invoke';
 import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
-import { Quote } from '../../providers/QuoteGroups';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
 import UserRecords from '../../contexts/UserRecords';
 import useClients from '../../hooks/useClients';

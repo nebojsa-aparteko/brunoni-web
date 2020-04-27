@@ -12,7 +12,7 @@ import uniqBy from 'lodash/fp/uniqBy';
 import groupBy from 'lodash/fp/groupBy';
 import flatMap from 'lodash/fp/flatMap';
 import values from 'lodash/fp/values';
-import Context from '../contexts/QuoteGroups';
+import Context from '../contexts/QuoteGroupsContext';
 import asArray from '../utilities/asArray';
 import PickupLocation from '../model/PickupLocation';
 import ContainerType from '../model/ContainerType';
@@ -25,7 +25,7 @@ import Port from '../model/Port';
 import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
-import Quotes from '../contexts/Quotes';
+import { useQuotesContext } from './QuotesProvider';
 
 interface Props {
   children: React.ReactNode;
@@ -106,7 +106,7 @@ const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', i
 
 const uniqueCommodityTypes = flow(map(get('commodityType')), filter(identity), uniqBy('id'));
 
-const normalizeQuoteGroups = (
+export const normalizeQuote = (
   getContainerType: (id: string) => ContainerType | null,
   getCommodityType: (id: string) => CommodityType | null,
   getPickupLocation: (id: string | null) => PickupLocation | null,
@@ -130,7 +130,7 @@ const normalizeQuoteGroups = (
     filter(container => container.containerType !== null),
   );
 
-  const normalizeQuote = flow(
+  return flow(
     update('carrier', getCarrier),
     update('dateIssued', invoke('toDate')),
     update('validityPeriod', normalizeDateRange),
@@ -139,8 +139,19 @@ const normalizeQuoteGroups = (
     update('containers', normalizeContainers),
     quote => set('commodityTypes', uniqueCommodityTypes(get('containers')(quote)))(quote),
   );
+};
 
-  const normalizeQuotes = flow(map(normalizeQuote), orderBy(get('validityPeriod.from'), 'asc'));
+const normalizeQuoteGroups = (
+  getContainerType: (id: string) => ContainerType | null,
+  getCommodityType: (id: string) => CommodityType | null,
+  getPickupLocation: (id: string | null) => PickupLocation | null,
+  getPort: (id: string) => Port | null,
+  getCarrier: (name: string) => Carrier | null,
+) => {
+  const normalizeQuotes = flow(
+    map(normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier)),
+    orderBy(get('validityPeriod.from'), 'asc'),
+  );
 
   const normalizeQuoteGroup = flow(quotes => {
     const normalizedQuotes = normalizeQuotes(quotes) as Quote[];
@@ -170,19 +181,19 @@ const normalizeQuoteGroups = (
   ) as (result: Quote[]) => QuoteGroup[];
 };
 
-const QuoteGroups: React.FC<Props> = ({ children }) => {
+export const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
+  id: string | null | undefined,
+) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
+
+const QuoteGroupsProvider: React.FC<Props> = ({ children }) => {
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
-  const quotes = useContext(Quotes);
+  const quotes = useQuotesContext()[0];
 
   const normalize = useMemo(() => {
-    const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
-      id: string | null | undefined,
-    ) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
-
     const getContainerType = getEntity(containerTypes, containerType => containerType.id);
     const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
     const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
@@ -197,4 +208,4 @@ const QuoteGroups: React.FC<Props> = ({ children }) => {
   return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
 };
 
-export default QuoteGroups;
+export default QuoteGroupsProvider;

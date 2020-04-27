@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, { createContext, Reducer, useContext, useMemo, useReducer } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -6,12 +6,8 @@ import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
-import set from 'lodash/fp/set';
-import { DateRange } from '../components/DateRangePicker/types';
 import ActingAs from '../contexts/ActingAs';
-import Client from '../model/Client';
-import Port from '../model/Port';
-import UserRecord from '../model/UserRecord';
+import { Action, ContextFilters, reducer } from './filterActions';
 
 interface Props {
   children: React.ReactNode;
@@ -29,46 +25,10 @@ export const normalizeBooking = flow(
 
 export const normalizeBookings = map(normalizeBooking);
 
-type Dispatch = (action: Action) => void;
-type ActionType = 'set' | 'clear';
-type FilterFields =
-  | 'dateRange'
-  | 'archived'
-  | 'category'
-  | 'pendingPayment'
-  | 'assignee'
-  | 'originPort'
-  | 'destinationPort'
-  | 'clientFilter';
-
-// filters by which we can filter bookings
-export type BookingContextFilters = {
-  dateRange?: DateRange;
-  archived?: boolean;
+export type BookingsDispatch = (action: Action) => void;
+export interface BookingContextFilters extends ContextFilters {
   category: string;
-  pendingPayment?: boolean;
-  assignee?: UserRecord;
-  clientFilter?: Client;
-  originPort?: Port;
-  destinationPort?: Port;
-};
-
-type Action = {
-  type: ActionType;
-  field: FilterFields;
-  value?: DateRange | boolean | string | undefined | Port | Client | UserRecord;
-};
-
-const reducer = (state: BookingContextFilters, action: Action) => {
-  switch (action.type) {
-    case 'set':
-      return set(action.field, action.value)(state);
-    case 'clear':
-      return set(action.field, undefined)(state);
-    default:
-      return state;
-  }
-};
+}
 
 const defaultFilters = { archived: false, category: BookingCategory.Export } as BookingContextFilters;
 
@@ -76,7 +36,7 @@ const BookingsContext = createContext<[Booking[], BookingContextFilters] | [unde
   undefined,
   defaultFilters,
 ]);
-const BookingsFilterDispatchContext = createContext<Dispatch | undefined>(undefined);
+const BookingsFilterDispatchContext = createContext<BookingsDispatch | undefined>(undefined);
 
 export const useBookingsContext = () => {
   const context = React.useContext(BookingsContext);
@@ -98,7 +58,10 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
 
-  const [filters, dispatch] = useReducer(reducer, { archived: false, category: BookingCategory.Export });
+  const [filters, dispatch] = useReducer<Reducer<BookingContextFilters, Action>>(reducer, {
+    archived: false,
+    category: BookingCategory.Export,
+  } as BookingContextFilters);
 
   // in case of admins set assignee filter automatically
   // TODO activate this when it starts having sense :)

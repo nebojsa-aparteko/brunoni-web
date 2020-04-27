@@ -6,15 +6,13 @@ import useUser from '../hooks/useUser';
 
 import UserWidget from './UserWidget';
 
-interface Props {}
-
 const useStyles = makeStyles((theme: Theme) => ({
   progress: {
     marginLeft: theme.spacing(1),
   },
 }));
 
-const IdentityWidget: React.FC<Props> = () => {
+const IdentityWidget: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
 
@@ -24,7 +22,7 @@ const IdentityWidget: React.FC<Props> = () => {
     return (
       <Fragment>
         {user === null && <LoginWidget />}
-        <UserWidget active={user !== null} />
+        {user && <UserWidget />}
       </Fragment>
     );
   }

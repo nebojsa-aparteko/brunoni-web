@@ -8,39 +8,42 @@ import { DateRange } from '../DateRangePicker/types';
 import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
-import set from 'lodash/fp/set';
 import Client from '../../model/Client';
-import { QuoteListStateParams } from '../../providers/QuoteListFilterContext';
+import { useQuotesContext, useQuotesFilterDispatch } from '../../providers/QuotesProvider';
+import UserRecord from '../../model/UserRecord';
 
 interface Props {
-  listContextData: QuoteListStateParams;
-  setQuoteListContextData: any;
   showClientFilter?: boolean;
   showRefreshButton?: boolean;
   showDateRange?: boolean;
 }
 
-const FiltersBar: React.FC<Props> = ({
-  listContextData,
-  setQuoteListContextData,
-  showClientFilter,
-  showDateRange,
-  showRefreshButton,
-}) => {
+const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, showRefreshButton }) => {
   const clients = useClients();
   const ports = useContext(Ports);
 
-  const { clientFilter, originPort, destinationPort, dateRange } = listContextData;
+  const quotesFilterDispatch = useQuotesFilterDispatch();
 
-  const setOriginPort = (port: Port | null) => setQuoteListContextData(set('originPort', port)(listContextData));
+  const filters = useQuotesContext()[1];
+
+  const { clientFilter, originPort, destinationPort, dateRange } = filters;
+
+  const setOriginPort = (port: Port | null) =>
+    quotesFilterDispatch({
+      type: port ? 'set' : 'clear',
+      field: 'originPort',
+      value: port || undefined,
+    });
   const setDestinationPort = (port: Port | null) =>
-    setQuoteListContextData(set('destinationPort', port)(listContextData));
+    quotesFilterDispatch({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
   const setClientFilter = (client: Client | null) =>
-    setQuoteListContextData(set('clientFilter', client)(listContextData));
+    quotesFilterDispatch({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
 
-  const setDateRange = (dateRange: DateRange) => {
-    setQuoteListContextData(set('dateRange', dateRange)(listContextData));
-  };
+  const setUserFilter = (user: UserRecord | null) =>
+    quotesFilterDispatch({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
+
+  const setDateRange = (dateRange: DateRange) =>
+    quotesFilterDispatch({ type: 'set', field: 'dateRange', value: dateRange });
 
   return (
     <Box
@@ -55,7 +58,12 @@ const FiltersBar: React.FC<Props> = ({
         {showClientFilter && (
           <Grid item sm={3} xs={12}>
             <Box display="flex">
-              <ClientInput label="Choose Client" clients={clients} onChange={setClientFilter} value={clientFilter} />
+              <ClientInput
+                label="Choose Client"
+                clients={clients || []}
+                onChange={setClientFilter}
+                value={clientFilter}
+              />
               {showRefreshButton && clientFilter && (
                 <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />
               )}
@@ -82,4 +90,4 @@ const FiltersBar: React.FC<Props> = ({
   );
 };
 
-export default FiltersBar;
+export default QuotesFiltersBar;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Container,
@@ -27,16 +27,16 @@ import formatDate from 'date-fns/format';
 import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
-import QuoteGroups from '../contexts/QuoteGroups';
 import QuoteNav from './quotes/QuoteItemNav';
 import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
-import { Quote as QuoteModel } from '../providers/QuoteGroups';
+import { Quote, Quote as QuoteModel } from '../providers/QuoteGroupsProvider';
 
 interface Props {
-  id: string;
+  quote?: Quote;
+  loading?: boolean;
   showCompanyInfo?: boolean;
 }
 
@@ -113,17 +113,16 @@ const handleSpecialRequest = (quote: QuoteModel) => {
   }
 };
 
-const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
+const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const classes = useStyles();
 
-  const quoteGroups = useContext(QuoteGroups);
   const [user, userData] = useUser();
   const clients = useClients();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
 
-  if (!quoteGroups) {
+  if (loading) {
     return (
       <Container maxWidth="lg">
         <Paper className={classes.root}>
@@ -133,11 +132,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
     );
   }
 
-  const quoteGroup = (quoteGroups || []).find(group => Boolean(group.quotes.find(quote => quote.id === id)));
-
-  const quote = quoteGroup?.quotes.find(quote => quote.id === id);
-
-  if (!quoteGroup || !quote) {
+  if (!quote) {
     return (
       <SearchEmptyResults
         message={
@@ -227,11 +222,7 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
           </Box>
           <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
             <QuoteNav
-              backTo={
-                quote.groupId !== quote.id && quoteGroup.quotes.length > 1
-                  ? `/quotes/groups/${quote.groupId}`
-                  : `/quotes/groups`
-              }
+              backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
               title={`Quotation - ${quoteTitle}`}
               subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
             />
@@ -334,4 +325,4 @@ const Quote: React.FC<Props> = ({ id, showCompanyInfo }) => {
   );
 };
 
-export default Quote;
+export default QuoteView;

@@ -12,10 +12,9 @@ import ActingAsProvider from './providers/ActingAs';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
 import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument';
 import UserRecordProvider from './providers/UserRecord';
-import QuotesProvider from './providers/Quotes';
-import QuoteGroupsProvider from './providers/QuoteGroups';
+import QuotesProvider from './providers/QuotesProvider';
+import QuoteGroupsProvider from './providers/QuoteGroupsProvider';
 import BookingsProvider from './providers/BookingsProvider';
-import AdminQuotesProvider from './providers/AdminQuotes';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
@@ -126,7 +125,7 @@ const UserApp: React.FC = () => {
             showCrispChat(true);
           }
           return userRecord.isAdmin ? (
-            <AdminQuotesProvider>
+            <QuotesProvider>
               <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
@@ -136,7 +135,7 @@ const UserApp: React.FC = () => {
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>
-            </AdminQuotesProvider>
+            </QuotesProvider>
           ) : (
             <App />
           );

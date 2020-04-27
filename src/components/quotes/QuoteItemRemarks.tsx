@@ -3,7 +3,7 @@ import Linkify from 'react-linkify';
 import { Grid, Link, useMediaQuery, useTheme } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import InfoBoxItem from '../InfoBoxItem';
-import { Remark } from '../../providers/QuoteGroups';
+import { Remark } from '../../providers/QuoteGroupsProvider';
 
 interface Props {
   remarks: Remark[];
