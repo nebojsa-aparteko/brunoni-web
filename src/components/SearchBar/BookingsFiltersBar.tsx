@@ -4,7 +4,7 @@ import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
 import PortInput from '../inputs/PortInput';
 import DateRangeInput from '../inputs/DateRangeInput';
-import { DateRange } from '../daterangepicker/types';
+import { DateRange } from '../DateRangePicker/types';
 import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';

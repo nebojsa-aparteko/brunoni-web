@@ -20,7 +20,7 @@ import filter from 'lodash/fp/filter';
 import set from 'lodash/fp/set';
 import orderBy from 'lodash/fp/orderBy';
 import find from 'lodash/fp/find';
-import Search from './searchbar/Search';
+import Search from './SearchBar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
 import { Quote, QuoteGroup } from '../providers/QuoteGroups';
@@ -31,7 +31,7 @@ import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
-import FiltersBar from './searchbar/FiltersBar';
+import FiltersBar from './SearchBar/FiltersBar';
 import containsString from '../utilities/containsString';
 
 interface Props {

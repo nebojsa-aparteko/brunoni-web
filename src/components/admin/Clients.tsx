@@ -27,7 +27,7 @@ import filter from 'lodash/fp/filter';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import UserRecord from '../../model/UserRecord';
 import Container from '../Container';
-import Search from '../searchbar/Search';
+import Search from '../SearchBar/Search';
 import { Skeleton } from '@material-ui/lab';
 
 interface Props {}
