@@ -51,7 +51,14 @@ interface AdditionalCargoProps {
 }
 
 interface CtrTariffProps {
+  ctrTariffs: CtrTariff[] | null;
   tariffDetails: CtrTariffDetail[];
+}
+
+interface CtrTariffDetailProps {
+  ctrTariffs: CtrTariff[] | null;
+  tariffDetails: CtrTariffDetail[];
+  type: string;
 }
 
 interface ContainerItemProps {
@@ -127,37 +134,39 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   );
 };
 
-export const CtrTariffDetailType: React.FC<CtrTariffProps> = ({ tariffDetails }) => {
+export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDetails, ctrTariffs, type }) => {
   const classes = useStyles();
-
-  return (
-    <TableRow>
-      <TableCell className={classes.tableCellLabel}>
-        {
-          {
-            'DEM/DET': 'Dem./Det. tariff',
-            STORAGE: 'Storage tariff',
-            PLUGIN: 'Plug-in tariff',
-          }[tariffDetails[0].Type]
-        }
-      </TableCell>
-      <TableCell className={classes.tableCell}>
-        {tariffDetails.map(tariff =>
-          tariff.DaysFree && tariff.Txt ? (
+  const data =
+    ctrTariffs && ctrTariffs[0] && tariffDetails && tariffDetails[0]
+      ? tariffDetails.map(tariff =>
+          tariff.DaysFree &&
+          tariff.Txt &&
+          ctrTariffs &&
+          ctrTariffs.some(ctrTariff => ctrTariff.ID === tariff.ID && ctrTariff.Type === tariff.Type) ? (
             <Fragment>
               {tariff.DaysFree + ' ' + tariff.Txt}
               <br />
             </Fragment>
-          ) : (
-            'ON REQUEST'
-          ),
-        )}
+          ) : null,
+        )
+      : null;
+
+  return ctrTariffs && ctrTariffs[0] && tariffDetails && tariffDetails[0] ? (
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>{type}</TableCell>
+      <TableCell className={classes.tableCell}>
+        {data && !data.every(item => item === null) ? data : 'ON REQUEST'}
       </TableCell>
+    </TableRow>
+  ) : (
+    <TableRow>
+      <TableCell className={classes.tableCellLabel}>{type}</TableCell>
+      <TableCell className={classes.tableCell}>{'ON REQUEST'}</TableCell>
     </TableRow>
   );
 };
 
-export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails }) => {
+export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrTariffs }) => {
   const demDetTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'DEM/DET');
   const storageTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'STORAGE');
   const pluginTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'PLUGIN');
@@ -165,13 +174,25 @@ export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails }) =>
   return (
     <Fragment>
       <Fragment>
-        {demDetTariffs && demDetTariffs[0] ? <CtrTariffDetailType tariffDetails={demDetTariffs} /> : null}
+        {demDetTariffs && demDetTariffs[0] ? (
+          <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={ctrTariffs} type={'Dem./Det. tariff'} />
+        ) : (
+          <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={null} type={'Dem./Det. tariff'} />
+        )}
       </Fragment>
       <Fragment>
-        {storageTariffs && storageTariffs[0] ? <CtrTariffDetailType tariffDetails={storageTariffs} /> : null}
+        {storageTariffs && storageTariffs[0] ? (
+          <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={ctrTariffs} type={'Storage tariff'} />
+        ) : (
+          <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={null} type={'Storage tariff'} />
+        )}
       </Fragment>
       <Fragment>
-        {pluginTariffs && pluginTariffs[0] ? <CtrTariffDetailType tariffDetails={pluginTariffs} /> : null}
+        {pluginTariffs && pluginTariffs[0] ? (
+          <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={ctrTariffs} type={'Plug-in tariff'} />
+        ) : (
+          <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={null} type={'Plug-in tariff'} />
+        )}
       </Fragment>
     </Fragment>
   );
@@ -257,8 +278,12 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
 
                 {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
 
-                {isLongVersion(version) && tariffDetails ? (
-                  <CtrTariffDetails key={`tarrif-${index}`} tariffDetails={tariffDetails} />
+                {isLongVersion(version) && tariffDetails && detail.Equipment && detail.Equipment[0] ? (
+                  <CtrTariffDetails
+                    key={`tarrif-${index}`}
+                    tariffDetails={tariffDetails}
+                    ctrTariffs={detail.Equipment[0].CtrTariffs}
+                  />
                 ) : null}
               </TableBody>
             </Table>
