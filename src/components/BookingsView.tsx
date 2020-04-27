@@ -25,10 +25,10 @@ import { BookingListFilterContext } from '../providers/BookingListFilterProvider
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
-import Search from './SearchBar/Search';
+import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
 import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/BookingsProvider';
-import BookingsFiltersBar from './SearchBar/BookingsFiltersBar';
+import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 
 interface Props {
   bookings: Booking[];

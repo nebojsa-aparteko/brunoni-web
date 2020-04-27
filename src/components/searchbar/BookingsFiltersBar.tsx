@@ -4,47 +4,55 @@ import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
 import PortInput from '../inputs/PortInput';
 import DateRangeInput from '../inputs/DateRangeInput';
-import { DateRange } from '../DateRangePicker/types';
+import { DateRange } from '../daterangepicker/types';
 import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
-import { useQuotesContext, useQuotesFilterDispatch } from '../../providers/QuotesProvider';
+import { useBookingsContext, useBookingsFilterDispatch } from '../../providers/BookingsProvider';
+import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
+import useAdminUsers from '../../hooks/useAdminUsers';
 
 interface Props {
   showClientFilter?: boolean;
-  showRefreshButton?: boolean;
   showDateRange?: boolean;
+  showRefreshButton?: boolean;
+  showAssigneeFilter?: boolean;
 }
 
-const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, showRefreshButton }) => {
+const BookingsFiltersBar: React.FC<Props> = ({
+  showClientFilter,
+  showDateRange,
+  showRefreshButton,
+  showAssigneeFilter,
+}) => {
   const clients = useClients();
+  const users = useAdminUsers();
   const ports = useContext(Ports);
 
-  const quotesFilterDispatch = useQuotesFilterDispatch();
+  const bookingFilterDispach = useBookingsFilterDispatch();
 
-  const filters = useQuotesContext()[1];
+  const filters = useBookingsContext()[1];
 
-  const { clientFilter, originPort, destinationPort, dateRange } = filters;
+  const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
 
   const setOriginPort = (port: Port | null) =>
-    quotesFilterDispatch({
+    bookingFilterDispach({
       type: port ? 'set' : 'clear',
       field: 'originPort',
       value: port || undefined,
     });
   const setDestinationPort = (port: Port | null) =>
-    quotesFilterDispatch({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
+    bookingFilterDispach({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
   const setClientFilter = (client: Client | null) =>
-    quotesFilterDispatch({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
+    bookingFilterDispach({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
 
   const setUserFilter = (user: UserRecord | null) =>
-    quotesFilterDispatch({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
+    bookingFilterDispach({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
 
   const setDateRange = (dateRange: DateRange) =>
-    quotesFilterDispatch({ type: 'set', field: 'dateRange', value: dateRange });
-
+    bookingFilterDispach({ type: 'set', field: 'dateRange', value: dateRange });
   return (
     <Box
       display="flex"
@@ -58,12 +66,7 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
         {showClientFilter && (
           <Grid item sm={3} xs={12}>
             <Box display="flex">
-              <ClientInput
-                label="Choose Client"
-                clients={clients || []}
-                onChange={setClientFilter}
-                value={clientFilter}
-              />
+              <ClientInput label="Choose Client" clients={clients} onChange={setClientFilter} value={clientFilter} />
               {showRefreshButton && clientFilter && (
                 <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />
               )}
@@ -85,9 +88,22 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
             </Box>
           </Grid>
         )}
+        {showAssigneeFilter && !showDateRange && (
+          <Grid item sm={3} xs={12}>
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
+          </Grid>
+        )}
       </Grid>
+      {showAssigneeFilter && showDateRange && users && (
+        <Grid container spacing={2} style={{ marginTop: 8 }}>
+          <Grid item sm={9} xs={12} />
+          <Grid item sm={3} xs={12}>
+            <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 };
 
-export default QuotesFiltersBar;
+export default BookingsFiltersBar;

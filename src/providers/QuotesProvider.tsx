@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, { createContext, Reducer, useContext, useMemo, useReducer } from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
 import { Booking, BookingCategory } from '../model/Booking';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
-import { normalizeBookings } from './BookingsProvider';
+import { BookingContextFilters, normalizeBookings } from './BookingsProvider';
 import { Quote } from './QuoteGroupsProvider';
 import { subMonths } from 'date-fns';
 
@@ -31,7 +31,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
 
-  const [filters, dispatch] = useReducer(reducer, defaultFilters);
+  const [filters, dispatch] = useReducer<Reducer<QuoteContextFilters, Action>>(reducer, defaultFilters);
 
   // in case of admins set assignee filter automatically
   // TODO activate this when it starts having sense :)
@@ -85,18 +85,18 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
     [userRecord, filters, actingAs],
   );
 
-  const bookingsSnapshot = useFirestoreCollection('quotes', query);
+  const quotesSnapshot = useFirestoreCollection('quotes', query);
 
   const quotesResult = useMemo(() => {
-    const bookings = bookingsSnapshot?.docs.map(doc => {
+    const quotes = quotesSnapshot?.docs.map(doc => {
       return {
         id: doc.id,
         ...doc.data(),
       } as Quote;
-    }) as Booking[] | undefined;
+    }) as Quote[] | undefined;
 
-    return normalizeBookings(bookings);
-  }, [bookingsSnapshot]);
+    return quotes as any;
+  }, [quotesSnapshot]);
 
   return (
     <QuotesContext.Provider value={[quotesResult, filters]}>

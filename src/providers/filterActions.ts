@@ -1,4 +1,4 @@
-import { DateRange } from '../components/DateRangePicker/types';
+import { DateRange } from '../components/daterangepicker/types';
 import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 import Port from '../model/Port';
