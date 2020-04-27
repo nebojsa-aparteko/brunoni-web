@@ -2,9 +2,7 @@ import React, { createContext, Reducer, useContext, useMemo, useReducer } from '
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
-import { Booking, BookingCategory } from '../model/Booking';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
-import { BookingContextFilters, normalizeBookings } from './BookingsProvider';
 import { Quote } from './QuoteGroupsProvider';
 import { subMonths } from 'date-fns';
 
