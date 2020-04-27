@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import QuoteGroupsView from '../components/QuoteGroups';
+import QuoteGroupsView from '../components/QuoteGroupsView';
 import Container from '@material-ui/core/Container';
 import { makeStyles, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';

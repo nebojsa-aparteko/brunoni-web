@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useState } from 'react';
-import QuoteGroupsView from '../components/QuoteGroups';
+import QuoteGroupsView from '../components/QuoteGroupsView';
 import Container from '@material-ui/core/Container';
 import { Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';
@@ -11,7 +11,8 @@ import TocIcon from '@material-ui/icons/Toc';
 import BookingsView from '../components/BookingsView';
 import { TabPanel } from './BookingsPage';
 import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
-import { INITIAL_DATERANGE_FILTER } from '../providers/QuotesProvider';
+import { INITIAL_DATERANGE_FILTER, useQuotesFilterDispatch } from '../providers/QuotesProvider';
+import QuoteGroupsContext from '../contexts/QuoteGroupsContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -41,18 +42,18 @@ const QuoteGroups: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const actingAs = useContext(ActingAs)[0];
 
-  const bookingFilterDispach = useBookingsFilterDispatch();
+  const quoteFilterDispach = useQuotesFilterDispatch();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
-        bookingFilterDispach({ type: 'set', field: 'archived', value: false });
-        bookingFilterDispach({ type: 'clear', field: 'dateRange' });
+        quoteFilterDispach({ type: 'set', field: 'archived', value: false });
+        quoteFilterDispach({ type: 'clear', field: 'dateRange' });
         break;
       case 1:
-        bookingFilterDispach({ type: 'set', field: 'archived', value: true });
-        bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+        quoteFilterDispach({ type: 'set', field: 'archived', value: true });
+        quoteFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
         break;
       default:
         break;

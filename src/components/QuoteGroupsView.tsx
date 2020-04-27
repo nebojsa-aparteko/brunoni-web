@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, Fragment } from 'react';
+import React, { useContext, useMemo, useState, Fragment, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -80,8 +80,15 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showDateFilter, showCompanyInfo, className, ...rest }) => {
+const QuoteGroupsView: React.FC<Props> = ({
+  showGetQuoteButton,
+  showDateFilter,
+  showCompanyInfo,
+  className,
+  ...rest
+}) => {
   const classes = useStyles();
+
   const quoteGroups = useContext(QuoteGroupsContext);
 
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListFilterContext);
@@ -206,4 +213,4 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showDateFilter, show
   );
 };
 
-export default QuoteGroups;
+export default QuoteGroupsView;
