@@ -6,12 +6,16 @@ import invoke from 'lodash/fp/invoke';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import UserRecordContext from '../../../contexts/UserRecordContext';
-import { ActivityLogUserData } from './ChecklistItemModel';
+import { ActivityLogUserData, ShortChecklistItem, ShortChecklistItemValueDocument } from './ChecklistItemModel';
 import firebase from '../../../firebase';
+import { useActivityLogState } from './ActivityLogContext';
+import { flow, omitBy, isNil } from 'lodash/fp';
+import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
+import { MentionItem } from 'react-mentions';
 
 interface Props {
   bookingId: string;
-  isInternal: boolean;
+  isAdmin: boolean;
 }
 
 export const addActivityItem = (bookingId: string, checklistId: string, activityLog: ActivityLogItem) => {
@@ -24,17 +28,19 @@ export const addActivityItem = (bookingId: string, checklistId: string, activity
     .set(activityLog);
 };
 
-const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }) => {
+const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
   const [showMore, setShowMore] = useState(false);
+  const activityLogContext = useActivityLogState();
 
   const activityLogCollection = useFirestoreCollection(
     'bookings',
     useCallback(
       query => {
         const queryByItemFilter = showMore ? query : query.where('type', '==', ActivityType.COMMENT);
-        return queryByItemFilter.where('isInternal', '==', isInternal).orderBy('at', 'desc');
+        const queryByAdminRole = isAdmin ? query : queryByItemFilter.where('isInternal', '==', isAdmin);
+        return queryByAdminRole.orderBy('at', 'desc');
       },
-      [isInternal, showMore],
+      [isAdmin, showMore],
     ),
     bookingId,
     'activity',
@@ -59,7 +65,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
   const userRecord = useContext(UserRecordContext);
 
   const handleCommentSave = useCallback(
-    (messageBody: string) => {
+    (messageBody: string, mentions: MentionItem[], internal: boolean) => {
       const userActivityLogData = {
         firstName: userRecord?.firstName,
         lastName: userRecord?.lastName,
@@ -67,22 +73,43 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isInternal = false }
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
       } as ActivityLogUserData;
+      console.log(
+        flow(omitBy(isNil))({
+          type: ActivityType.COMMENT,
+          comment: messageBody,
+          at: new Date(),
+          by: userActivityLogData,
+          isInternal: internal,
+          checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
+          documents: [flow(omitBy(isNil))(shortenedDocumentValue(activityLogContext.state?.documentReference))],
+          mentions: mentions,
+        } as ActivityLogItem),
+        'ITEM',
+      );
       firebase
         .firestore()
         .collection('bookings')
         .doc(bookingId)
         .collection('activity')
-        .add({
-          type: ActivityType.COMMENT,
-          comment: messageBody,
-          at: new Date(),
-          by: userActivityLogData,
-          isInternal: isInternal,
-        } as ActivityLogItem)
-        .then(_ => console.log('Success saving message'))
+        .add(
+          flow(omitBy(isNil))({
+            type: ActivityType.COMMENT,
+            comment: messageBody,
+            at: new Date(),
+            by: userActivityLogData,
+            isInternal: internal,
+            checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
+            documents: shortenedDocumentValue(activityLogContext.state?.documentReference),
+            mentions: mentions,
+          } as ActivityLogItem),
+        )
+        .then(_ => {
+          console.log('Success saving message');
+          activityLogContext.setState({});
+        })
         .catch(err => console.log(err));
     },
-    [bookingId, userRecord, isInternal],
+    [bookingId, userRecord, isAdmin, activityLogContext],
   );
 
   const handleShowMore = () => {

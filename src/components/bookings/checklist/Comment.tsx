@@ -4,6 +4,8 @@ import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem } from './ActivityModel';
+import classNames from 'classnames';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
@@ -25,11 +27,30 @@ const useStyles = makeStyles((theme: Theme) =>
       flex: 1,
       whiteSpace: 'normal',
     },
+    adminMessage: {
+      backgroundColor: '#ccc',
+    },
   }),
 );
 
+const wrapTags = (text: string, regex: RegExp) => {
+  const textArray = text.split(regex);
+  console.log(textArray, 'TEXT');
+  let mail;
+  let name;
+  return textArray.map(str => {
+    if (regex.test(str)) {
+      mail = str.match(/\((.*)\)/i);
+      name = str.match(/\[(.*)\]/i);
+      return <Link href={`mailto:${mail && mail[1]}`}>{`@${name && name[1]}`}</Link>;
+    }
+    return str;
+  });
+};
+
 const Comment = ({ comment }: CommentProp) => {
   const classes = useStyles();
+
   return (
     <Box className={classes.container}>
       <Box className={classes.rowContainer}>
@@ -40,7 +61,7 @@ const Comment = ({ comment }: CommentProp) => {
           round={true}
         />
         <Box display="flex" flexDirection="column" flex={1} ml={1}>
-          <Paper className={classes.comment}>
+          <Paper className={classNames(classes.comment, comment.isInternal ? classes.adminMessage : '')}>
             <Box className={classes.rowContainer}>
               <Typography className={classes.name} color="textPrimary">
                 {`${capitalCase(comment.by.firstName)} ${capitalCase(comment.by.lastName)}`}
@@ -49,29 +70,43 @@ const Comment = ({ comment }: CommentProp) => {
                 comment.at,
               )} ago`}</Typography>
             </Box>
-            <Typography style={{ wordBreak: 'break-word' }}>{comment.comment}</Typography>
+            <Typography style={{ wordBreak: 'break-word' }}>
+              {comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9]*@[a-zA-Z]*.\w*\))/)}
+            </Typography>
+            {comment.checklistItem && (
+              <Box>
+                Ref - <a href={`#${comment.checklistItem.id}`}>{comment.checklistItem.label}</a>
+              </Box>
+            )}
+            {comment.documents && (
+              <Box>
+                Doc - <a href={`#${comment.documents[0].url}`}>{comment.documents[0].name}</a>
+              </Box>
+            )}
           </Paper>
-          <Box display="flex">
-            <Link
-              component="button"
-              variant="body2"
-              onClick={() => {
-                console.info("I'm a button.");
-              }}
-            >
-              Edit
-            </Link>
-            -
-            <Link
-              component="button"
-              variant="body2"
-              onClick={() => {
-                console.info("I'm a button.");
-              }}
-            >
-              Delete
-            </Link>
-          </Box>
+          {false && (
+            <Box display="flex">
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  console.info("I'm a button.");
+                }}
+              >
+                Edit
+              </Link>
+              -
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  console.info("I'm a button.");
+                }}
+              >
+                Delete
+              </Link>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

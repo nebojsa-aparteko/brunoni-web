@@ -5,6 +5,7 @@ import {
   ShortChecklistItemValueDocument,
   Stage,
 } from './ChecklistItemModel';
+import { MentionItem } from 'react-mentions';
 
 export interface ActivityLogItem {
   id?: string;
@@ -17,6 +18,7 @@ export interface ActivityLogItem {
   type: ActivityType;
   isInternal: boolean;
   changeType?: ActivityChangeType;
+  mentions?: MentionItem[];
 }
 
 export enum ActivityType {

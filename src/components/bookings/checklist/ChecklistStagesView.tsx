@@ -5,12 +5,14 @@ import ChecklistStageView from './ChecklistStageView';
 
 const ChecklistStagesView = ({ stages, handleChange }: Props) => {
   return (
-    <Box display="flex" flexWrap="wrap">
+    <Box display="flex" flexWrap="wrap" justifyContent="flex-start" ml={1}>
       {stages.map((stage, index) => (
         <ChecklistStageView
           stage={stage}
           handleChange={handleChange}
-          disabled={index > 0 && !stages[index - 1].checked}
+          disabled={
+            (index > 0 && !stages[index - 1].checked) || (index < stages.length - 1 && stages[index + 1].checked)
+          }
         />
       ))}
     </Box>

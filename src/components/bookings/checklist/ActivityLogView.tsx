@@ -13,10 +13,11 @@ import WriteComment from './WriteComment';
 import Comment from './Comment';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import Activity from './Activity';
+import { MentionItem } from 'react-mentions';
 
 interface Props {
   activityLog?: ActivityLogItem[];
-  onCommentSave: (messageBody: string) => void;
+  onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
   showMore: boolean;
   onChange: () => void;
 }
