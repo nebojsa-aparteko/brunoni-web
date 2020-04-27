@@ -7,7 +7,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const Quotes: React.FC<Props> = ({ children }) => {
+const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
 
   const query = userRecord?.alphacomClientId
@@ -15,8 +15,8 @@ const Quotes: React.FC<Props> = ({ children }) => {
         collection
           .where('clientId', '==', userRecord!.alphacomClientId)
           .orderBy('dateIssued', 'desc')
-          .limit(500)
-    : (collection: firebase.firestore.CollectionReference) => collection.orderBy('dateIssued', 'desc').limit(500);
+          .limit(800)
+    : (collection: firebase.firestore.CollectionReference) => collection.orderBy('dateIssued', 'desc').limit(800);
 
   return (
     <FirestoreCollectionProvider name="quotes" query={query} context={QuotesContext}>
@@ -25,4 +25,4 @@ const Quotes: React.FC<Props> = ({ children }) => {
   );
 };
 
-export default Quotes;
+export default QuotesProvider;

@@ -12,7 +12,7 @@ import ActingAsProvider from './providers/ActingAs';
 import FirestoreCollectionProvider from './providers/FirestoreCollection';
 import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument';
 import UserRecordProvider from './providers/UserRecord';
-import QuotesProvider from './providers/Quotes';
+import QuotesProvider from './providers/QuotesProvider';
 import QuoteGroupsProvider from './providers/QuoteGroups';
 import BookingsProvider from './providers/BookingsProvider';
 import AdminQuotesProvider from './providers/AdminQuotes';

@@ -21,7 +21,9 @@ import useClients from '../../hooks/useClients';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import UserInput from '../inputs/UserInput';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -63,6 +65,8 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
   const clients = useClients();
   const history = useHistory();
 
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+
   const requestedBy = useUserByAlphacomId(quotes[0].userId);
 
   const client = useMemo(() => clients?.find(client => client.id === quotes[0].clientId), [
@@ -93,6 +97,10 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
 
   const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
     history.push(pathToNavigate);
+  };
+
+  const setAssignedUser = (user: UserRecord | null) => {
+    // do something with this
   };
 
   return (
@@ -139,6 +147,9 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
+      <TableCell>
+        <UserInput label="Choose user" users={assignableUsers || []} onChange={setAssignedUser} />
+      </TableCell>
     </TableRow>
   );
 };

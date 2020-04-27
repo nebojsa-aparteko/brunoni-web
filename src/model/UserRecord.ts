@@ -22,6 +22,7 @@ export default interface UserRecord {
 type Role = 'superadmin' | 'sales' | 'operations';
 
 export const ADMIN_ROLES = ['superadmin', 'sales', 'operations'];
+export const CUSTOMER_FACING_ROLES = ['superadmin', 'sales'];
 
 export function isAdmin(userRecord: UserRecord) {
   return userRecord.role ? ADMIN_ROLES.includes(userRecord.role) : false;
