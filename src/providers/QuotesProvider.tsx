@@ -4,7 +4,7 @@ import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
-import { subMonths } from 'date-fns';
+import { subMonths, subWeeks } from 'date-fns';
 
 interface Props {
   children: React.ReactNode;
@@ -14,9 +14,12 @@ export type QuoteDispatch = (action: Action) => void;
 
 interface QuoteContextFilters extends ContextFilters {}
 
-const defaultFilters = {
-  dateRange: { startDate: subMonths(new Date(), 2), endDate: new Date() },
-} as QuoteContextFilters;
+export const INITIAL_DATERANGE_FILTER = {
+  startDate: subWeeks(new Date(), 2),
+  endDate: new Date(),
+};
+
+const defaultFilters = {} as QuoteContextFilters;
 
 export const QuotesContext = createContext<[Quote[], QuoteContextFilters] | [undefined, QuoteContextFilters]>([
   undefined,
@@ -41,7 +44,10 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
-      let query = collection.orderBy('dateIssued', 'desc');
+      let query = filters.dateRange
+        ? collection.orderBy('dateIssued', 'desc')
+        : // active quotes, filter the ones that are not archived and validity is still valid
+          collection.where('validityPeriod.to', '>=', subMonths(new Date(), 1)).orderBy('validityPeriod.to', 'desc');
 
       if (actingAs && userRecord?.alphacomClientId) {
         query = query.where('clientId', '==', userRecord!.alphacomClientId);

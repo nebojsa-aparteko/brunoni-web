@@ -38,6 +38,7 @@ import { useQuotesContext } from '../providers/QuotesProvider';
 interface Props {
   showGetQuoteButton?: boolean;
   showCompanyInfo?: boolean;
+  showDateFilter?: boolean;
   className?: string;
 }
 
@@ -79,7 +80,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyInfo, className, ...rest }) => {
+const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton, showDateFilter, showCompanyInfo, className, ...rest }) => {
   const classes = useStyles();
   const quoteGroups = useContext(QuoteGroupsContext);
 
@@ -159,7 +160,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
 
   return (
     <Fragment>
-      <QuotesFiltersBar showClientFilter={showCompanyInfo} showDateRange={true} showRefreshButton />
+      <QuotesFiltersBar showClientFilter={showCompanyInfo} showDateRange={showDateFilter} showRefreshButton />
 
       <Card className={className} {...rest}>
         <CardHeader
@@ -203,10 +204,6 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
       </Card>
     </Fragment>
   );
-};
-
-QuoteGroups.defaultProps = {
-  showGetQuoteButton: true,
 };
 
 export default QuoteGroups;

@@ -13,7 +13,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const AdminQuoteGroups: React.FC = () => {
   const classes = useStyles();
-
   return (
     <Fragment>
       <Meta title="Quotes" />

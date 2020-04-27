@@ -13,7 +13,6 @@ import BookingsPage from './pages/BookingsPage';
 import BookingContainer from './pages/BookingContainer';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminQuoteGroups from './pages/AdminQuoteGroups';
 import AdminQuoteGroup from './pages/AdminQuoteGroup';
 import AdminSideCharges from './pages/AdminSideCharges';
 import NotFound from './pages/NotFound';
@@ -46,7 +45,7 @@ const adminRoutes = (
   <Switch>
     <Route exact path="/" component={AdminDashboard} />
     <Route exact path="/schedule" component={Routes} />
-    <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
+    <Route exact path="/quotes/groups" component={QuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/bookings" component={BookingsPage} />

@@ -36,7 +36,7 @@ interface TabPanelProps {
   value: any;
 }
 
-function a11yProps(index: any) {
+export function a11yProps(index: any) {
   return {
     id: `scrollable-prevent-tab-${index}`,
     'aria-controls': `scrollable-prevent-tabpanel-${index}`,
