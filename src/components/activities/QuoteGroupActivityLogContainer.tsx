@@ -5,24 +5,25 @@ import invoke from 'lodash/fp/invoke';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import { MentionItem } from 'react-mentions';
 import ActivityLogView from '../bookings/checklist/ActivityLogView';
-import { ActivityType, QuoteActivityModel } from '../bookings/checklist/ActivityModel';
+import { ActivityType, QuoteActivityModel, QuoteGroupActivityModel } from '../bookings/checklist/ActivityModel';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 
 interface Props {
-  quoteId: string;
+  groupId: string;
 }
 
-const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
+const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId }) => {
   const quoteActivityLogCollection = useFirestoreCollection(
-    'quotes',
-    useCallback(query => {
-      return query.orderBy('at', 'desc');
-    }, []),
-    quoteId,
-    'activity',
+    'quotes-group-comments',
+    useCallback(
+      query => {
+        return query.where('groupId', '==', groupId).orderBy('at', 'desc');
+      },
+      [groupId],
+    ),
   );
 
   const quoteActivityCollection = quoteActivityLogCollection?.docs.map(doc => ({
@@ -47,9 +48,7 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
       } as ActivityLogUserData;
       firebase
         .firestore()
-        .collection('quotes')
-        .doc(quoteId)
-        .collection('activity')
+        .collection('quotes-group-comments')
         .add(
           flow(omitBy(isNil))({
             type: ActivityType.COMMENT,
@@ -58,14 +57,15 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
             by: userActivityLogData,
             isInternal: true,
             mentions: mentions,
-          } as QuoteActivityModel),
+            groupId: groupId,
+          } as QuoteGroupActivityModel),
         )
         .then(_ => {
           console.log('Success saving message');
         })
         .catch(err => console.log(err));
     },
-    [quoteId, userRecord],
+    [groupId, userRecord],
   );
 
   return (
@@ -73,4 +73,4 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
   );
 };
 
-export default QuoteActivityLogContainer;
+export default QuoteGroupActivityLogContainer;

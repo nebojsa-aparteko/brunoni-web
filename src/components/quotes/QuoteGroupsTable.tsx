@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useEffect, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
 import {
@@ -103,6 +103,11 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
     // do something with this
   };
 
+  const onUserInputClick = (event: React.MouseEvent<unknown>) => {
+    event.stopPropagation();
+    console.log('User');
+  };
+
   return (
     <TableRow
       hover
@@ -147,7 +152,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
-      <TableCell>
+      <TableCell onClick={onUserInputClick}>
         <UserInput label="Choose user" users={assignableUsers || []} onChange={setAssignedUser} />
       </TableCell>
     </TableRow>
@@ -194,6 +199,7 @@ const QuoteGroupsTable: React.FC<Props> = ({ showCompanyInfo, quoteGroups }) => 
           <TableCell>Cargo</TableCell>
           <TableCell>Commodities</TableCell>
           <TableCell>Issue Date</TableCell>
+          <TableCell>Assigned user</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>

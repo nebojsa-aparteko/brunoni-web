@@ -52,6 +52,9 @@ import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
+import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
+import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
+import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogContainer';
 
 interface Props {
   id: string;
@@ -416,6 +419,7 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
             );
           })}
         </Box>
+        <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />
       </Container>
     </Fragment>
   );

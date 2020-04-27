@@ -14,9 +14,11 @@ import Comment from './Comment';
 import { ActivityLogItem, ActivityType, QuoteActivityModel } from './ActivityModel';
 import Activity from './Activity';
 import { MentionItem } from 'react-mentions';
+import QuoteWriteComment from '../../activities/QuoteWriteComment';
 
 interface Props {
   activityLog?: ActivityLogItem[];
+  quoteActivityLog?: boolean;
   onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
   showMore?: boolean;
   onChange?: () => void;
@@ -28,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore, onChange }) => {
+const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore, onChange, quoteActivityLog }) => {
   const classes = useStyles();
 
   return (
@@ -38,7 +40,11 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
         title={<Typography variant="subtitle1">Activity</Typography>}
       />
       <CardContent>
-        <WriteComment onCommentSave={onCommentSave} />
+        {quoteActivityLog ? (
+          <QuoteWriteComment onCommentSave={onCommentSave} />
+        ) : (
+          <WriteComment onCommentSave={onCommentSave} />
+        )}
         {activityLog?.map((activity: any) =>
           activity.type === ActivityType.COMMENT ? <Comment comment={activity} /> : <Activity activity={activity} />,
         )}
