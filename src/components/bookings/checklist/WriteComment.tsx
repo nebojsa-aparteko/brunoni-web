@@ -22,6 +22,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { MentionsInput, Mention, MentionItem } from 'react-mentions';
 import useAdminUsers from '../../../hooks/useAdminUsers';
 import defaultStyleMentions from './defaultStyleMentions';
+import mentionsClassNames from './mention.module.css';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -115,30 +116,31 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           size="30"
           round={true}
         />
-        <Paper variant="outlined" component={Box} className={classes.writeComment}>
-          {/*<Input*/}
-          {/*  disableUnderline*/}
-          {/*  fullWidth*/}
-          {/*  onChange={handleChange}*/}
-          {/*  multiline*/}
-          {/*  inputRef={inputRef}*/}
-          {/*  placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}*/}
-          {/*/>*/}
-          <MentionsInput
-            style={defaultStyleMentions}
-            placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
-            inputRef={inputRef}
-            onChange={(event, newValue, newPlainTextValue, mentions) => {
-              setMessageText(event.target.value);
-              setMentions(mentions);
-            }}
-            value={messageText}
-            allowSuggestionsAboveCursor={true}
-          >
-            {/*<Mention trigger="@" data={normalizedAdmins} />*/}
-            <Mention trigger="@" data={normalizedAdmins} style={{ color: '#ccc' }} />
-          </MentionsInput>
-        </Paper>
+        {/*<Paper variant="outlined" component={Box} className={classes.writeComment}>*/}
+        {/*<Input*/}
+        {/*  disableUnderline*/}
+        {/*  fullWidth*/}
+        {/*  onChange={handleChange}*/}
+        {/*  multiline*/}
+        {/*  inputRef={inputRef}*/}
+        {/*  placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}*/}
+        {/*/>*/}
+        <MentionsInput
+          classNames={mentionsClassNames}
+          className="mentions"
+          placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
+          inputRef={inputRef}
+          onChange={(event, newValue, newPlainTextValue, mentions) => {
+            setMessageText(event.target.value);
+            setMentions(mentions);
+          }}
+          value={messageText}
+          allowSuggestionsAboveCursor={true}
+        >
+          {/*<Mention trigger="@" data={normalizedAdmins} />*/}
+          <Mention trigger="@" data={normalizedAdmins} className={mentionsClassNames.mentions__mention} />
+        </MentionsInput>
+        {/*</Paper>*/}
         <Tooltip title="Send">
           <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
             <SendIcon />
