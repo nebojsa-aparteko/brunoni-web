@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import { QuoteGroup } from '../../providers/QuoteGroups';
+import { QuoteGroup } from '../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 import useClients from '../../hooks/useClients';

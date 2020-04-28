@@ -13,10 +13,6 @@ import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { useHistory } from 'react-router';
 
-interface Props {
-  active: boolean;
-}
-
 const useStyles = makeStyles(() => ({
   chip: {
     '& > span': {
@@ -29,7 +25,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const UserWidget: React.FC<Props> = ({ active }) => {
+const UserWidget: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const [menuId] = useId();
@@ -70,17 +66,15 @@ const UserWidget: React.FC<Props> = ({ active }) => {
 
   return (
     <Fragment>
-      {active && (
-        <Chip
-          avatar={userData?.isAdmin ? <SupervisedUserCircle /> : <AccountCircle />}
-          aria-label="User menu"
-          aria-controls={menuId}
-          aria-haspopup="true"
-          label={user?.email || '???'}
-          onClick={handleProfileMenuOpen}
-          className={classes.chip}
-        />
-      )}
+      <Chip
+        avatar={userData?.isAdmin ? <SupervisedUserCircle /> : <AccountCircle />}
+        aria-label="User menu"
+        aria-controls={menuId}
+        aria-haspopup="true"
+        label={user?.email || '???'}
+        onClick={handleProfileMenuOpen}
+        className={classes.chip}
+      />
       <Menu
         anchorEl={anchorEl}
         getContentAnchorEl={null}
@@ -110,7 +104,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
               )}
             </div>
           )
-        ) : actingAs === null ? (
+        ) : (
           <div>
             <MenuItem disabled style={{ opacity: 'initial' }}>
               <Box>
@@ -123,7 +117,7 @@ const UserWidget: React.FC<Props> = ({ active }) => {
             </MenuItem>
             {client && <MenuItem onClick={handleSwitch}>Switch to {client.name}</MenuItem>}
           </div>
-        ) : null}
+        )}
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
       </Menu>
     </Fragment>

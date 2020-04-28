@@ -1,7 +1,7 @@
 import React from 'react';
 import { Theme, makeStyles } from '@material-ui/core';
 import Container from '../components/Container';
-import QuoteGroups from '../components/QuoteGroups';
+import QuoteGroupsView from '../components/QuoteGroupsView';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
   return (
     <Container className={classes.root}>
       <DashboardCharts />
-      <QuoteGroups showGetQuoteButton={true} className={classes.quoteDetails} />
+      <QuoteGroupsView showGetQuoteButton={true} className={classes.quoteDetails} />
     </Container>
   );
 };

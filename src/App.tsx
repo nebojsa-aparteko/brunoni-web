@@ -5,7 +5,7 @@ import { makeStyles, Theme } from '@material-ui/core';
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
 import EquipmentSituation from './pages/EquipmentSituation';
-import Quote from './pages/Quote';
+import QuotePageContainer from './pages/QuotePageContainer';
 import GetQuotes from './pages/GetQuotes';
 import QuoteGroups from './pages/QuoteGroups';
 import QuoteGroup from './pages/QuoteGroup';
@@ -13,9 +13,7 @@ import BookingsPage from './pages/BookingsPage';
 import BookingContainer from './pages/BookingContainer';
 import SideCharges from './pages/SideCharges';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminQuoteGroups from './pages/AdminQuoteGroups';
 import AdminQuoteGroup from './pages/AdminQuoteGroup';
-import AdminQuote from './pages/AdminQuote';
 import AdminSideCharges from './pages/AdminSideCharges';
 import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
@@ -47,9 +45,9 @@ const adminRoutes = (
   <Switch>
     <Route exact path="/" component={AdminDashboard} />
     <Route exact path="/schedule" component={Routes} />
-    <Route exact path="/quotes/groups" component={AdminQuoteGroups} />
+    <Route exact path="/quotes/groups" component={QuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
-    <Route exact path="/quotes/:id" component={AdminQuote} />
+    <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/bookings" component={BookingsPage} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={Unauthorized} />
@@ -66,7 +64,7 @@ const userRoutes = (
     <Route exact path="/quotes/groups" component={QuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={QuoteGroup} />
     <Route exact path="/quotes/get" component={GetQuotes} />
-    <Route exact path="/quotes/:id" component={Quote} />
+    <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/bookings" component={BookingsPage} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />

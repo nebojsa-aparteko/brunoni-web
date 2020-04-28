@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, Fragment } from 'react';
+import React, { useContext, useMemo, useState, Fragment, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -12,7 +12,7 @@ import {
   Container as MUIContainer,
 } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
-import QuoteGroupsContext from '../contexts/QuoteGroups';
+import QuoteGroupsContext from '../contexts/QuoteGroupsContext';
 import QuoteGroupsTable from './quotes/QuoteGroupsTable';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
@@ -23,7 +23,7 @@ import find from 'lodash/fp/find';
 import Search from './searchbar/Search';
 import Container from '../model/Container';
 import CommodityType from '../model/CommodityType';
-import { Quote, QuoteGroup } from '../providers/QuoteGroups';
+import { Quote, QuoteGroup } from '../providers/QuoteGroupsProvider';
 import { QuoteListFilterContext } from '../providers/QuoteListFilterContext';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
@@ -31,12 +31,14 @@ import compareAsc from 'date-fns/compareAsc';
 import compareDesc from 'date-fns/compareDesc';
 import addDays from 'date-fns/addDays';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
-import FiltersBar from './searchbar/FiltersBar';
+import QuotesFiltersBar from './searchbar/QuotesFiltersBar';
 import containsString from '../utilities/containsString';
+import { useQuotesContext } from '../providers/QuotesProvider';
 
 interface Props {
   showGetQuoteButton?: boolean;
   showCompanyInfo?: boolean;
+  showDateFilter?: boolean;
   className?: string;
 }
 
@@ -78,34 +80,25 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyInfo, className, ...rest }) => {
+const QuoteGroupsView: React.FC<Props> = ({
+  showGetQuoteButton,
+  showDateFilter,
+  showCompanyInfo,
+  className,
+  ...rest
+}) => {
   const classes = useStyles();
+
   const quoteGroups = useContext(QuoteGroupsContext);
 
   const [quoteListContextData, setQuoteListContextData] = useContext(QuoteListFilterContext);
 
-  const {
-    searchString,
-    page,
-    rowsPerPage,
-    clientFilter,
-    originPort,
-    destinationPort,
-    dateRange,
-  } = quoteListContextData;
+  const { searchString, page, rowsPerPage } = quoteListContextData;
 
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    const dateFilteredQuoteGroups = filter(
-      (quoteGroup: QuoteGroup) =>
-        !quoteGroup.quotes[0].archived &&
-        (clientFilter ? quoteGroup.quotes[0].clientId === clientFilter.id : true) &&
-        (originPort ? quoteGroup.origin?.id === originPort.id : true) &&
-        (destinationPort ? quoteGroup.destination?.id === destinationPort.id : true) &&
-        compareAsc(quoteGroup.dateIssued, dateRange?.startDate || new Date(1970, 1, 1)) !== -1 &&
-        compareDesc(quoteGroup.dateIssued, dateRange?.endDate || addDays(new Date(), 1)) !== -1,
-    )(quoteGroups);
+    const dateFilteredQuoteGroups = filter((quoteGroup: QuoteGroup) => !quoteGroup.quotes[0].archived)(quoteGroups);
 
     const filteredResults =
       searchString && searchString.length > 0 && dateFilteredQuoteGroups
@@ -144,7 +137,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
     setFilteredResults(sortedFiltered);
 
     return chunk(rowsPerPage)(sortedFiltered);
-  }, [quoteGroups, searchString, page, rowsPerPage, dateRange, clientFilter, originPort, destinationPort]);
+  }, [quoteGroups, searchString, page, rowsPerPage]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));
@@ -174,13 +167,7 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
 
   return (
     <Fragment>
-      <FiltersBar
-        listContextData={quoteListContextData}
-        setQuoteListContextData={setQuoteListContextData}
-        showClientFilter={showCompanyInfo}
-        showDateRange={true}
-        showRefreshButton
-      />
+      <QuotesFiltersBar showClientFilter={showCompanyInfo} showDateRange={showDateFilter} showRefreshButton />
 
       <Card className={className} {...rest}>
         <CardHeader
@@ -226,8 +213,4 @@ const QuoteGroups: React.FC<Props> = ({ showGetQuoteButton = true, showCompanyIn
   );
 };
 
-QuoteGroups.defaultProps = {
-  showGetQuoteButton: true,
-};
-
-export default QuoteGroups;
+export default QuoteGroupsView;

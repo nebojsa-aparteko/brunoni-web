@@ -6,6 +6,7 @@ import { TypographyProps } from '@material-ui/core/Typography';
 interface Props extends RouterLinkProps {
   TypographyClasses?: TypographyProps['classes'];
   underline?: 'none' | 'hover' | 'always';
+  ref?: any;
 }
 
 const Link: React.FC<Props> = props => (

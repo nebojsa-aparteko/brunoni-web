@@ -2,7 +2,7 @@ import formatDate from 'date-fns/format';
 import flatMap from 'lodash/fp/flatMap';
 import firebase from '../../firebase';
 import UserRecord from '../../model/UserRecord';
-import { Quote } from '../../providers/QuoteGroups';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 import Container from '../../model/Container';
 import { portLongFormatLabel, portShortFormatLabel } from '../../utilities/formattedPortDisplay';
 import { getLocationLabel } from '../inputs/LocationInput';

@@ -177,8 +177,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     return ['booking-documents', 'clients', client?.id, 'bookings', booking?.id, checklistItem.id].join('/');
   }, [booking, client, checklistItem]);
 
-  const [item, setItem] = useState(checklistItem);
-
   const [checklistItemValues, setCheckListItemValues] = useState(checklistItem?.values || []);
   const [checklistItemValuesAdmin, setCheckListItemValuesAdmin] = useState(checklistItem?.valuesAdmin || []);
   const [checklistItemChecked, setChecklistItemChecked] = useState(checklistItem?.checked || false);

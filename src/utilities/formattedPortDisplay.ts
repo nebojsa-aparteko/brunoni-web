@@ -1,5 +1,5 @@
 import Port from '../model/Port';
-import { Quote, QuoteGroup } from '../providers/QuoteGroups';
+import { Quote, QuoteGroup } from '../providers/QuoteGroupsProvider';
 
 export const portShortFormatLabel = (port: Port | undefined): string => port?.city || port?.id || '?';
 

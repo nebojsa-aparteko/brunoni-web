@@ -37,6 +37,7 @@ import Mousetrap from 'mousetrap';
 import focusAndSelect from '../utilities/focusAndSelect';
 import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import { LinkProps } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -342,7 +343,11 @@ const Navbar: React.FC = () => {
             <List>
               {user !== undefined && user !== null && (
                 <Fragment>
-                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/" />}>
+                  <ListItem
+                    button
+                    onClick={handleDrawerToggle}
+                    component={props => <Link {...props} to="/" {...props} />}
+                  >
                     <ListItemText primary="Dashboard" />
                   </ListItem>
                   <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/schedule" />}>
@@ -379,7 +384,7 @@ const Navbar: React.FC = () => {
                 <ListItem
                   button
                   onClick={handleDrawerToggle}
-                  component={props => <a {...props} href="https://brunoni.ch" />}
+                  component={props => <Link {...props} href="https://brunoni.ch" />}
                 >
                   <ListItemText primary="Visit brunoni.ch" />
                 </ListItem>
@@ -387,7 +392,7 @@ const Navbar: React.FC = () => {
                 <ListItem
                   button
                   onClick={handleDrawerToggle}
-                  component={props => <a {...props} href="https://allmarine.ch" />}
+                  component={props => <Link {...props} href="https://allmarine.ch" />}
                 >
                   <ListItemText primary="Visit allmarine.ch" />
                 </ListItem>
@@ -395,7 +400,7 @@ const Navbar: React.FC = () => {
 
               <Divider />
 
-              {user !== undefined && user !== null ? (
+              {user ? (
                 <div className={classes.item}>
                   <IdentityWidget />
                 </div>

@@ -13,9 +13,6 @@ import {
   IconButton,
   makeStyles,
   Paper,
-  Table,
-  TableBody,
-  TableRow,
   Theme,
   Typography,
 } from '@material-ui/core';

@@ -35,7 +35,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const filters = useBookingsContext()[1];
 
-  const { clientFilter, originPort, destinationPort, assignee } = filters;
+  const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
 
   const setOriginPort = (port: Port | null) =>
     bookingFilterDispach({
@@ -84,7 +84,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-              <DateRangeInput onChange={setDateRange} />
+              <DateRangeInput onChange={setDateRange} value={dateRange} />
             </Box>
           </Grid>
         )}

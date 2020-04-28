@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Typography } from '@material-ui/core';
-import { CostDetailRemark } from '../../providers/QuoteGroups';
+import { CostDetailRemark } from '../../providers/QuoteGroupsProvider';
 
 interface Props {
   costDetailRemarks: CostDetailRemark[];

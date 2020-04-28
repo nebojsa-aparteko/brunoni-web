@@ -1,3 +1,5 @@
+import { Team } from './Teams';
+
 export default interface UserRecord {
   alphacomClientId: string;
   alphacomId: string;
@@ -16,7 +18,7 @@ export default interface UserRecord {
   emailAddress: string;
   role: Role;
   lastSession: Date;
-  teams: UserRecord[];
+  teams: Team[];
 }
 
 type Role = 'superadmin' | 'sales' | 'operations';
