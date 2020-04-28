@@ -104,10 +104,6 @@ interface LocRefProps {
   cargoDetails: CargoDetail[];
 }
 
-interface CargoDetailLocRefProps {
-  cargoDetail: CargoDetail;
-}
-
 interface ProgressDialogProps {
   isOpen: boolean;
   booking: Booking;
