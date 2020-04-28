@@ -49,10 +49,19 @@ interface TableRowProps {
 
 interface ContainerDatesProps {
   equipment: EquipmentDetail;
+  bookingCategory: BookingCategory;
+}
+
+interface ContainerDatesContentProps {
+  firstDate: string | null;
+  secondDate: string | null;
+  firstLabel: string;
+  secondLabel: string;
 }
 
 interface EquipmentProps {
   equipment: EquipmentDetail[];
+  bookingCategory: BookingCategory;
 }
 
 interface AdditionalCargoProps {
@@ -112,6 +121,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+export const HtmlTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    width: 'fit-content',
+    fontSize: theme.typography.pxToRem(14),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
@@ -123,53 +142,64 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-export const ContainerDates: React.FC<ContainerDatesProps> = ({ equipment }) => {
+export const ContainerDatesContent: React.FC<ContainerDatesContentProps> = ({
+  firstDate,
+  secondDate,
+  firstLabel,
+  secondLabel,
+}) => {
   return (
-    <Grid container style={{ display: 'block' }}>
-      {equipment.PickUpDate ? (
+    <Grid container>
+      {firstDate ? (
         <Grid container style={{ display: 'flex', flexDirection: 'column' }}>
           <Grid container>
-            <Grid item style={{ paddingRight: '5px' }}>
-              Drop Off Date:
+            <Grid item style={{ width: '75px' }}>
+              {firstLabel}
             </Grid>
-            <Grid item style={{ float: 'right' }}>
-              {formatDateString(invoke('toDate')(equipment.PickUpDate))}
+            <Grid item style={{ width: '80px', paddingRight: '0px' }}>
+              {formatDateString(invoke('toDate')(firstDate))}
             </Grid>
           </Grid>
-          {equipment.GateInDate ? (
-            <Grid container style={{ width: '100%' }} alignItems={'stretch'}>
-              <Grid item style={{ paddingRight: '16px' }}>
-                Gate in date:
+          {secondDate ? (
+            <Grid container spacing={0}>
+              <Grid item style={{ width: '75px', paddingRight: '0px' }}>
+                {secondLabel}
               </Grid>
-              <Grid item style={{ justifyContent: 'flex-end' }}>
-                {formatDateString(invoke('toDate')(equipment.GateInDate))}
+              <Grid item style={{ width: '80px' }}>
+                {formatDateString(invoke('toDate')(secondDate))}
               </Grid>
             </Grid>
           ) : null}
         </Grid>
-      ) : equipment.GateInDate ? (
-        <Grid container>
-          <Grid item style={{ paddingRight: '5px' }}>
-            Pick Up Date:
-          </Grid>
-          <Grid item>{formatDateString(invoke('toDate')(equipment.GateInDate))}</Grid>
+      ) : secondDate ? (
+        <Grid container spacing={1}>
+          <Grid item>{secondLabel}</Grid>
+          <Grid item>{formatDateString(invoke('toDate')(secondDate))}</Grid>
         </Grid>
       ) : null}
     </Grid>
   );
 };
 
-const HtmlTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
-    backgroundColor: '#f5f5f9',
-    color: 'rgba(0, 0, 0, 0.87)',
-    width: 'fit-content',
-    fontSize: theme.typography.pxToRem(14),
-    border: '1px solid #dadde9',
-  },
-}))(Tooltip);
+export const ContainerDates: React.FC<ContainerDatesProps> = ({ equipment, bookingCategory }) => {
+  return isImport(bookingCategory) ? (
+    <ContainerDatesContent
+      firstDate={equipment.GateOutDate}
+      firstLabel={'Gate Out:'}
+      secondDate={equipment.DropOffDate}
+      secondLabel={'Drop Off:'}
+    />
+  ) : (
+    <ContainerDatesContent
+      firstDate={equipment.PickUpDate}
+      firstLabel={'Pick Up:'}
+      secondDate={equipment.GateInDate}
+      secondLabel={'Gate In:'}
+    />
+  );
+};
 
-export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
+export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCategory }) => {
   const classes = useStyles();
 
   return (
@@ -179,8 +209,14 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
             <span>
-              {equipmentDetail.GateInDate || equipmentDetail.PickUpDate ? (
-                <HtmlTooltip title={<ContainerDates equipment={equipmentDetail} />} placement={'right'}>
+              {equipmentDetail.GateInDate ||
+              equipmentDetail.PickUpDate ||
+              equipmentDetail.DropOffDate ||
+              equipmentDetail.GateOutDate ? (
+                <HtmlTooltip
+                  title={<ContainerDates equipment={equipmentDetail} bookingCategory={bookingCategory} />}
+                  placement={'right'}
+                >
                   <Box style={{ width: 'fit-content' }}>{equipmentDetail.ContainerNumber}</Box>
                 </HtmlTooltip>
               ) : (
@@ -274,7 +310,7 @@ export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) 
 
       {detail.PINNr ? <TableRowData label={'Pin Number'} content={detail.PINNr} /> : null}
 
-      {emptyReturnAddress ? <TableRowData label={'Empty Return Adress'} content={emptyReturnAddress} /> : null}
+      {emptyReturnAddress ? <TableRowData label={'Empty Return 7Adress'} content={emptyReturnAddress} /> : null}
 
       {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
 
@@ -336,11 +372,13 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
 
                 {detail.Overdimension && <OverdimensionComponent detail={detail} />}
 
-                {detail.Equipment && detail.Equipment[0] ? <EquipmentData equipment={detail.Equipment} /> : null}
+                {detail.Equipment && detail.Equipment[0] ? (
+                  <EquipmentData equipment={detail.Equipment} bookingCategory={category} />
+                ) : null}
 
                 {isLongVersion(version) && tariffDetails && detail.Equipment && detail.Equipment[0] ? (
                   <CtrTariffDetails
-                    key={`tarrif-${index}`}
+                    key={`tariff-${index}`}
                     tariffDetails={tariffDetails}
                     ctrTariffs={detail.Equipment[0].CtrTariffs}
                   />
