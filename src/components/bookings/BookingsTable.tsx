@@ -221,12 +221,12 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
         <Grid item lg={12} xs={12}>
           {isImport(booking.Category) ? (
             booking && booking['ERP-BkgRef'] ? (
-              <Typography variant="h5">#: {booking['ERP-BkgRef']}</Typography>
+              <Typography variant="h5">File No. {booking['ERP-BkgRef']}</Typography>
             ) : null
           ) : booking && booking['ERP-BkgRef'] ? (
             <Fragment>
               <span className={classes.tableRowHeader}>
-                <Typography variant="h5">#: {booking['ERP-BkgRef']}</Typography>
+                <Typography variant="h5">File No. {booking['ERP-BkgRef']}</Typography>
                 <Typography variant="body2" style={{ paddingLeft: '20px' }}>
                   Refs: <LocRefs cargoDetails={booking.CargoDetails} />
                 </Typography>
