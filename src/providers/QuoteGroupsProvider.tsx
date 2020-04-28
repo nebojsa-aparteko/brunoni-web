@@ -67,6 +67,27 @@ export interface Quote {
   terms: Term[];
   archived?: boolean;
   assignedTo?: UserRecord;
+  status?: QuoteStatus;
+}
+
+export enum QuoteStatus {
+  BOOKED,
+  LOST_COS_PRICE_DIFF,
+  LOST_COS_EQP_AVAIL,
+  LOST_COS_SPACE_AVAIL,
+  WAIT_FOR_BOOKING,
+  SPACE_CHECKING,
+  INDICATION,
+}
+
+export enum QuoteStatusText {
+  BOOKED = 'Secured, won or booked',
+  LOST_COS_PRICE_DIFF = 'Lost because of price difference',
+  LOST_COS_EQP_AVAIL = 'Lost because of equipment availability',
+  LOST_COS_SPACE_AVAIL = 'Lost because of space availability',
+  WAIT_FOR_BOOKING = 'In negotiations - price ok - waiting for booking',
+  SPACE_CHECKING = 'Checking space and/or equipment',
+  INDICATION = 'Indication only',
 }
 
 export interface Term {

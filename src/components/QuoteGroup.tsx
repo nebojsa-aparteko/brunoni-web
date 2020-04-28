@@ -46,7 +46,7 @@ import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroupsContext';
-import { Quote, QuoteDetail } from '../providers/QuoteGroupsProvider';
+import { Quote, QuoteDetail, QuoteStatus } from '../providers/QuoteGroupsProvider';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useClients from '../hooks/useClients';
@@ -208,13 +208,15 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const setAssignedUser = (user: UserRecord | null, quotes: any) => {
     // do something with this
-    addAssignee(user, quotes[0].id)
-      .then(_ => {
-        {
-          console.log('Success assignee');
-        }
-      })
-      .catch(error => console.log(`Error while assignment in quote ${error}`));
+    quotes.forEach((quote: Quote) =>
+      addAssignee(user, quote.id)
+        .then(_ => {
+          {
+            console.log('Success assignee');
+          }
+        })
+        .catch(error => console.log(`Error while assignment in quote ${error}`)),
+    );
 
     console.log(quotes);
   };

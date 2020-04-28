@@ -11,6 +11,10 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
@@ -32,13 +36,14 @@ import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
-import { Quote, Quote as QuoteModel } from '../providers/QuoteGroupsProvider';
+import { Quote, Quote as QuoteModel, QuoteStatus, QuoteStatusText } from '../providers/QuoteGroupsProvider';
 import ActingAs from '../contexts/ActingAs';
 import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
 import UserInput from './inputs/UserInput';
 import useAdminUsers from '../hooks/useAdminUsers';
 import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
 import { addAssignee } from './QuoteGroup';
+import firebase from '../firebase';
 
 interface Props {
   quote?: Quote;
@@ -117,6 +122,14 @@ const handleSpecialRequest = (quote: QuoteModel) => {
   } catch (e) {
     console.warn('Failed to push crisp command.');
   }
+};
+
+export const addStatus = (status: QuoteStatus | null, quoteId: string) => {
+  return firebase
+    .firestore()
+    .collection('quotes')
+    .doc(quoteId)
+    .update('status', status);
 };
 
 const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
@@ -228,6 +241,11 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
       })
       .catch(error => console.log(`Error while assignment in quote ${error}`));
   };
+
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {
+    addStatus(event.target.value as QuoteStatus, quoteId).then(_ => console.log('Successful status change'));
+  };
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start">
       <Grid item md={isAdmin ? 7 : 12} xs={12}>
@@ -253,13 +271,6 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 />
 
                 <Box className={classes.actions} displayPrint="none">
-                  <UserInput
-                    label="Assigned To"
-                    users={assignableUsers || []}
-                    onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
-                    value={quote?.assignedTo}
-                  />
-
                   <Button
                     color="primary"
                     variant="contained"
@@ -355,8 +366,34 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           </Container>
         </Page>
       </Grid>
-      {!isAdmin && (
-        <Grid item md={4} xs={12}>
+      {isAdmin && (
+        <Grid item md={4} xs={12} style={{ marginTop: theme.spacing(2) }}>
+          <Box display="flex" justifyContent="center" flexDirection="column">
+            <UserInput
+              label="Assigned To"
+              users={assignableUsers || []}
+              onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
+              value={quote?.assignedTo}
+            />
+            <FormControl>
+              <InputLabel id="quote-status-select-label">Quote Status</InputLabel>
+              <Select
+                labelId="quote-status-select-label"
+                id="quote-status-select"
+                value={quote!.status}
+                onChange={event => handleChange(event, quote.id)}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {Object.keys(QuoteStatus)
+                  .filter(key => typeof QuoteStatus[key as any] !== 'number')
+                  .map((status: string | QuoteStatus, index) => (
+                    <MenuItem value={Number(status)}>{Object.values(QuoteStatusText)[index]}</MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Box>
           <QuoteActivityLogContainer quoteId={quote.id} />
         </Grid>
       )}
