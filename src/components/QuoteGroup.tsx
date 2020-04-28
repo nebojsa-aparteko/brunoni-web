@@ -1,4 +1,4 @@
-import React, { useContext, Fragment, useState, useEffect, useMemo } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import formatDate from 'date-fns/format';
 import {
   Box,
@@ -52,9 +52,12 @@ import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
-import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
-import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
 import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogContainer';
+import UserInput from './inputs/UserInput';
+import useAdminUsers from '../hooks/useAdminUsers';
+import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
+import firebase from '../firebase';
+import useFirestoreDocument from '../hooks/useFirestoreDocument';
 
 interface Props {
   id: string;
@@ -163,6 +166,14 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   );
 };
 
+export const addAssignee = (user: UserRecord | null, quoteId: string) => {
+  return firebase
+    .firestore()
+    .collection('quotes')
+    .doc(quoteId)
+    .update('assignedTo', user);
+};
+
 const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
@@ -194,6 +205,19 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const requestedBy = useUserByAlphacomId(quoteGroup?.quotes[0].userId);
 
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const setAssignedUser = (user: UserRecord | null, quotes: any) => {
+    // do something with this
+    addAssignee(user, quotes[0].id)
+      .then(_ => {
+        {
+          console.log('Success assignee');
+        }
+      })
+      .catch(error => console.log(`Error while assignment in quote ${error}`));
+
+    console.log(quotes);
+  };
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
       return null;
@@ -297,6 +321,12 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
                     <Typography variant="h4">
                       {carriers?.find(carrier => carrier.id === carrierId)?.name || carrierId}
                     </Typography>
+                    <UserInput
+                      label="Assigned To"
+                      users={assignableUsers || []}
+                      onChange={(user: UserRecord | null) => setAssignedUser(user, quotes)}
+                      value={(quotes[0] as Quote).assignedTo}
+                    />
                   </ExpansionPanelSummary>
 
                   <ExpansionPanelDetails>

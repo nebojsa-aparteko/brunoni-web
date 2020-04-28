@@ -26,6 +26,7 @@ import Container from '../model/Container';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import { useQuotesContext } from './QuotesProvider';
+import UserRecord from '../model/UserRecord';
 
 interface Props {
   children: React.ReactNode;
@@ -65,6 +66,7 @@ export interface Quote {
   remarks: Remark[];
   terms: Term[];
   archived?: boolean;
+  assignedTo?: UserRecord;
 }
 
 export interface Term {

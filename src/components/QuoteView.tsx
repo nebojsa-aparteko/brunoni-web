@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
   Box,
+  Button,
   Container,
   Divider,
   Grid,
@@ -8,7 +9,6 @@ import {
   Paper,
   Theme,
   Typography,
-  Button,
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
@@ -34,8 +34,11 @@ import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
 import { Quote, Quote as QuoteModel } from '../providers/QuoteGroupsProvider';
 import ActingAs from '../contexts/ActingAs';
-import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
 import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
+import UserInput from './inputs/UserInput';
+import useAdminUsers from '../hooks/useAdminUsers';
+import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
+import { addAssignee } from './QuoteGroup';
 
 interface Props {
   quote?: Quote;
@@ -121,6 +124,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   const [user, userData] = useUser();
   const clients = useClients();
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -214,6 +218,16 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
     console.warn('Failed to push crisp command.');
   }
 
+  const setAssignedUser = (user: UserRecord | null, quoteId: any) => {
+    // do something with this
+    addAssignee(user, quoteId)
+      .then(_ => {
+        {
+          console.log('Success assignee');
+        }
+      })
+      .catch(error => console.log(`Error while assignment in quote ${error}`));
+  };
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start">
       <Grid item md={isAdmin ? 7 : 12} xs={12}>
@@ -239,6 +253,13 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 />
 
                 <Box className={classes.actions} displayPrint="none">
+                  <UserInput
+                    label="Assigned To"
+                    users={assignableUsers || []}
+                    onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
+                    value={quote?.assignedTo}
+                  />
+
                   <Button
                     color="primary"
                     variant="contained"
