@@ -167,7 +167,9 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
         .map(cargoDetail =>
           cargoDetail
             ? cargoDetail.LocRefs && cargoDetail.LocRefs[0]
-              ? cargoDetail.LocRefs.map(locRef => (locRef && locRef.LocRef ? ' / ' + locRef.LocRef : '')).join('')
+              ? cargoDetail.LocRefs.map(locRef =>
+                  locRef && locRef.LocType === 'DELIVERY' && locRef.LocRef ? ' / ' + locRef.LocRef : '',
+                ).join('')
               : ''
             : '',
         )
@@ -216,17 +218,15 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
     <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(booking.id)} key={booking.id}>
       <Grid container spacing={2} style={{ paddingTop: '10px' }}>
         <Grid item lg={12} xs={12}>
-          {isImport(booking.Category) ? (
-            booking && booking['ERP-BkgRef'] ? (
-              <Typography variant="h5">File No. {booking['ERP-BkgRef']}</Typography>
-            ) : null
-          ) : booking && booking['ERP-BkgRef'] ? (
+          {booking && booking['ERP-BkgRef'] ? (
             <Fragment>
               <span className={classes.tableRowHeader}>
                 <Typography variant="h5">File No. {booking['ERP-BkgRef']}</Typography>
-                <Typography variant="body2" style={{ paddingLeft: '20px' }}>
-                  Refs: <LocRefs cargoDetails={booking.CargoDetails} />
-                </Typography>
+                {!isImport(booking.Category) ? (
+                  <Typography variant="body2" style={{ paddingLeft: '20px' }}>
+                    Refs: <LocRefs cargoDetails={booking.CargoDetails} />
+                  </Typography>
+                ) : null}
               </span>
             </Fragment>
           ) : null}
