@@ -1,9 +1,7 @@
 import React from 'react';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import UserRecord from '../../model/UserRecord';
 import { TextField } from '@material-ui/core';
-import { AutocompleteChangeDetails, AutocompleteChangeReason } from '@material-ui/lab/useAutocomplete/useAutocomplete';
 import { Team } from '../../model/Teams';
 
 interface Props {
