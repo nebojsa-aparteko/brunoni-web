@@ -11,7 +11,7 @@ interface Props {
   booking: Booking;
 }
 
-const formatDateString = (date: Date) => {
+export const formatDateString = (date: Date) => {
   try {
     return formatDate(date, DateFormats.LONG);
   } catch (err) {

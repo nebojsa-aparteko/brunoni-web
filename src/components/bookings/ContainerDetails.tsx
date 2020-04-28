@@ -10,6 +10,9 @@ import {
   TableRow,
   TableCell,
   SvgIcon,
+  Tooltip,
+  Theme,
+  withStyles,
 } from '@material-ui/core';
 import {
   CargoDetail,
@@ -29,6 +32,8 @@ import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
 import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
+import invoke from 'lodash/fp/invoke';
+import { formatDateString } from './BookingSummary';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -40,6 +45,10 @@ interface Props {
 interface TableRowProps {
   label: string;
   content: string;
+}
+
+interface ContainerDatesProps {
+  equipment: EquipmentDetail;
 }
 
 interface EquipmentProps {
@@ -114,6 +123,52 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
+export const ContainerDates: React.FC<ContainerDatesProps> = ({ equipment }) => {
+  return (
+    <Grid container style={{ display: 'block' }}>
+      {equipment.PickUpDate ? (
+        <Grid container style={{ display: 'flex', flexDirection: 'column' }}>
+          <Grid container>
+            <Grid item style={{ paddingRight: '5px' }}>
+              Drop Off Date:
+            </Grid>
+            <Grid item style={{ float: 'right' }}>
+              {formatDateString(invoke('toDate')(equipment.PickUpDate))}
+            </Grid>
+          </Grid>
+          {equipment.GateInDate ? (
+            <Grid container style={{ width: '100%' }} alignItems={'stretch'}>
+              <Grid item style={{ paddingRight: '16px' }}>
+                Gate in date:
+              </Grid>
+              <Grid item style={{ justifyContent: 'flex-end' }}>
+                {formatDateString(invoke('toDate')(equipment.GateInDate))}
+              </Grid>
+            </Grid>
+          ) : null}
+        </Grid>
+      ) : equipment.GateInDate ? (
+        <Grid container>
+          <Grid item style={{ paddingRight: '5px' }}>
+            Pick Up Date:
+          </Grid>
+          <Grid item>{formatDateString(invoke('toDate')(equipment.GateInDate))}</Grid>
+        </Grid>
+      ) : null}
+    </Grid>
+  );
+};
+
+const HtmlTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    width: 'fit-content',
+    fontSize: theme.typography.pxToRem(14),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
   const classes = useStyles();
 
@@ -124,8 +179,13 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment }) => {
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
             <span>
-              {equipmentDetail.ContainerNumber}
-              <br />
+              {equipmentDetail.GateInDate || equipmentDetail.PickUpDate ? (
+                <HtmlTooltip title={<ContainerDates equipment={equipmentDetail} />} placement={'right'}>
+                  <Box style={{ width: 'fit-content' }}>{equipmentDetail.ContainerNumber}</Box>
+                </HtmlTooltip>
+              ) : (
+                <Box style={{ width: 'fit-content' }}>{equipmentDetail.ContainerNumber}</Box>
+              )}
             </span>
           ) : null,
         )}
