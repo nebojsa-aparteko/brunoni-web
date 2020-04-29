@@ -7,7 +7,6 @@ import {
   Divider,
   IconButton,
   LinearProgress,
-  Link,
   makeStyles,
   Theme,
   Typography,
@@ -26,10 +25,10 @@ import {
 } from './ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
-import { flow, isNil, omitBy, omit } from 'lodash/fp';
+import { flow, isNil, omit, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
-import { Booking, CarrierId, CheckListDocument } from '../../../model/Booking';
+import { Booking, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';

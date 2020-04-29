@@ -51,6 +51,7 @@ const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, o
       renderInput={params => (
         <TextField
           {...params}
+          onClick={event => event.stopPropagation()}
           inputRef={inputRef}
           label={label}
           fullWidth
@@ -106,6 +107,7 @@ function Popup(props: PopperProps) {
       open={open}
       children={children}
       className={classes.popper}
+      onClick={event => event.stopPropagation()}
     />
   );
 }

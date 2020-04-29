@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box,
+  Button,
   Container,
   Divider,
   Grid,
@@ -8,9 +9,12 @@ import {
   Paper,
   Theme,
   Typography,
-  Button,
   useMediaQuery,
   useTheme,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
@@ -32,7 +36,14 @@ import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
-import { Quote, Quote as QuoteModel } from '../providers/QuoteGroupsProvider';
+import { Quote, Quote as QuoteModel, QuoteStatus, QuoteStatusText } from '../providers/QuoteGroupsProvider';
+import ActingAs from '../contexts/ActingAs';
+import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
+import UserInput from './inputs/UserInput';
+import useAdminUsers from '../hooks/useAdminUsers';
+import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
+import { addAssignee } from './QuoteGroup';
+import firebase from '../firebase';
 
 interface Props {
   quote?: Quote;
@@ -113,14 +124,29 @@ const handleSpecialRequest = (quote: QuoteModel) => {
   }
 };
 
+export const addStatus = (status: QuoteStatus | null, quoteId: string) => {
+  return firebase
+    .firestore()
+    .collection('quotes')
+    .doc(quoteId)
+    .update('status', status);
+};
+
 const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const classes = useStyles();
 
   const [user, userData] = useUser();
   const clients = useClients();
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
+  const [actingAs, setActingAs] = useContext(ActingAs);
+
+  const [isAdmin, setIsAdmin] = useState(!actingAs);
+  useEffect(() => {
+    setIsAdmin(!actingAs);
+  }, [actingAs]);
 
   if (loading) {
     return (
@@ -205,123 +231,173 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
     console.warn('Failed to push crisp command.');
   }
 
+  const setAssignedUser = (user: UserRecord | null, quoteId: any) => {
+    // do something with this
+    addAssignee(user, quoteId)
+      .then(_ => {
+        {
+          console.log('Success assignee');
+        }
+      })
+      .catch(error => console.log(`Error while assignment in quote ${error}`));
+  };
+
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {
+    addStatus(event.target.value as QuoteStatus, quoteId).then(_ => console.log('Successful status change'));
+  };
+
   return (
-    <Page title={quoteTitle}>
-      <Container maxWidth="lg">
-        <ScrollToTopOnMount />
-        <Paper className={classes.root}>
-          <Box display="none" displayPrint="block" mb={2}>
-            <Box mb={2}>
-              <img
-                src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
-                style={{ width: '5em' }}
-              />
-            </Box>
-            <Divider />
-          </Box>
-          <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-            <QuoteNav
-              backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
-              title={`Quotation - ${quoteTitle}`}
-              subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
-            />
-
-            <Box className={classes.actions} displayPrint="none">
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                href={buildMailToLink(quote, [user, userData, client!])}
-                target="_blank"
-              >
-                Book Now
-              </Button>
-
-              <Button
-                aria-label="print"
-                variant="outlined"
-                size="small"
-                startIcon={<PrintIcon />}
-                onClick={handlePrint}
-              >
-                Print
-              </Button>
-              <Button
-                aria-label="special request"
-                variant="outlined"
-                size="small"
-                startIcon={<FlareIcon />}
-                onClick={() => handleSpecialRequest(quote)}
-                href={buildSpecialRequestLink(quote, [user, userData, client!])}
-                target="_blank"
-              >
-                {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
-              </Button>
-            </Box>
-          </Box>
-          <Grid item xs={12}>
-            <Page title={quoteTitle}>
-              <Grid container spacing={2}>
-                <Grid item md={6} xs={12} className={classes.hidePrint}>
-                  <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
-                </Grid>
-                <Grid item md={6} xs={12} className={classes.hidePrint}>
-                  <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Box display="none" displayPrint="block" width="100%">
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <QuoteItemHeader quote={quote} userData={userData} />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <QuoteItemTerms terms={quote.terms} />
-                <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
-                <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
-                <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
-                <QuoteItemRemarks remarks={quote.remarks} />
-              </Grid>
-
-              <Box displayPrint="block" display="none" marginTop="1em">
+    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start">
+      <Grid item md={isAdmin ? 7 : 12} xs={12}>
+        <Page title={quoteTitle}>
+          <Container maxWidth="lg">
+            <ScrollToTopOnMount />
+            <Paper className={classes.root}>
+              <Box display="none" displayPrint="block" mb={2}>
+                <Box mb={2}>
+                  <img
+                    src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                    alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                    style={{ width: '5em' }}
+                  />
+                </Box>
                 <Divider />
-                <Typography variant="body1">
-                  <br />
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>Your Brunoni-Team</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>Your Allmarine-Team</span>
-                  ) : null}
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>Tel. 044 455 58 58</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>Tel. 044 533 38 48</span>
-                  ) : null}
-                  <br />
-                  {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                    <span>info@brunoni.ch</span>
-                  ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                    <span>info@allmarine.ch</span>
-                  ) : null}
-                </Typography>
               </Box>
-            </Page>
-          </Grid>
-        </Paper>
-      </Container>
-    </Page>
+              <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+                <QuoteNav
+                  backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
+                  title={`Quotation - ${quoteTitle}`}
+                  subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
+                />
+
+                <Box className={classes.actions} displayPrint="none">
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="small"
+                    href={buildMailToLink(quote, [user, userData, client!])}
+                    target="_blank"
+                  >
+                    Book Now
+                  </Button>
+
+                  <Button
+                    aria-label="print"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<PrintIcon />}
+                    onClick={handlePrint}
+                  >
+                    Print
+                  </Button>
+                  <Button
+                    aria-label="special request"
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FlareIcon />}
+                    onClick={() => handleSpecialRequest(quote)}
+                    href={buildSpecialRequestLink(quote, [user, userData, client!])}
+                    target="_blank"
+                  >
+                    {isSmAndDown ? 'SPEC REQ' : 'SPECIAL REQUEST'}
+                  </Button>
+                </Box>
+              </Box>
+              <Grid item xs={12}>
+                <Page title={quoteTitle}>
+                  <Grid container spacing={2}>
+                    <Grid item md={6} xs={12} className={classes.hidePrint}>
+                      <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
+                    </Grid>
+                    <Grid item md={6} xs={12} className={classes.hidePrint}>
+                      <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Box display="none" displayPrint="block" width="100%">
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <QuoteItemHeader quote={quote} userData={userData} />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Divider />
+                    </Grid>
+                    <QuoteItemTerms terms={quote.terms} />
+                    <QuoteItemQuoteDetails quoteDetails={quote.quoteDetails} />
+                    <QuoteItemCostDetailsRemark costDetailRemarks={quote.costDetailRemarks} />
+                    <QuoteItemServiceDetail serviceDetails={quote.serviceDetails} />
+                    <QuoteItemRemarks remarks={quote.remarks} />
+                  </Grid>
+
+                  <Box displayPrint="block" display="none" marginTop="1em">
+                    <Divider />
+                    <Typography variant="body1">
+                      <br />
+                      <br />
+                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                        <span>Your Brunoni-Team</span>
+                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                        <span>Your Allmarine-Team</span>
+                      ) : null}
+                      <br />
+                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                        <span>Tel. 044 455 58 58</span>
+                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                        <span>Tel. 044 533 38 48</span>
+                      ) : null}
+                      <br />
+                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                        <span>info@brunoni.ch</span>
+                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                        <span>info@allmarine.ch</span>
+                      ) : null}
+                    </Typography>
+                  </Box>
+                </Page>
+              </Grid>
+            </Paper>
+          </Container>
+        </Page>
+      </Grid>
+      {isAdmin && (
+        <Grid item md={4} xs={12} style={{ marginTop: theme.spacing(2) }}>
+          <Box display="flex" justifyContent="center" flexDirection="column">
+            <UserInput
+              label="Assigned To"
+              users={assignableUsers || []}
+              onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
+              value={quote?.assignedTo}
+            />
+            <FormControl>
+              <InputLabel id="quote-status-select-label">Quote Status</InputLabel>
+              <Select
+                labelId="quote-status-select-label"
+                id="quote-status-select"
+                value={quote!.status}
+                onChange={event => handleChange(event, quote.id)}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {Object.keys(QuoteStatus)
+                  .filter(key => typeof QuoteStatus[key as any] !== 'number')
+                  .map((status: string | QuoteStatus, index) => (
+                    <MenuItem value={Number(status)}>{Object.values(QuoteStatusText)[index]}</MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <QuoteActivityLogContainer quoteId={quote.id} />
+        </Grid>
+      )}
+    </Grid>
   );
 };
 

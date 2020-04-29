@@ -25,3 +25,23 @@ export enum ActivityType {
   COMMENT,
   ACTIVITY,
 }
+
+export interface QuoteActivityModel {
+  id?: string;
+  comment: string;
+  by: ActivityLogUserData;
+  at: Date;
+  type: ActivityType;
+  isInternal: boolean;
+  mentions?: MentionItem[];
+}
+export interface QuoteGroupActivityModel {
+  id?: string;
+  comment: string;
+  by: ActivityLogUserData;
+  at: Date;
+  type: ActivityType;
+  isInternal: boolean;
+  mentions?: MentionItem[];
+  groupId: string;
+}
