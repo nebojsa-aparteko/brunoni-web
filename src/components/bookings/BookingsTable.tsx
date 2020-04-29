@@ -28,6 +28,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -258,19 +259,36 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
             <Grid item md={3} xs={12}>
               <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
             </Grid>
-            <Grid item md={2} xs={12}>
-              <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
-            </Grid>
-            <Grid item md={2} xs={12}>
-              <InfoBoxItem
-                title="Progress"
-                label1={
-                  <Box onClick={onProgressClick} style={{ width: '64px' }}>
-                    <ShipmentProgress booking={booking!} />
-                  </Box>
-                }
-                gutterBottom
-              />
+            <Grid item spacing={2} md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
+              <Grid item style={{ width: '45%' }}>
+                <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
+              </Grid>
+              <Grid item style={{ width: '25%' }}>
+                <InfoBoxItem
+                  title="Contact"
+                  label1={
+                    <Avatar
+                      name={booking.BkgAgentContactTxt}
+                      title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
+                      size="40"
+                      round={true}
+                      style={{ paddingLeft: '9px' }}
+                    />
+                  }
+                  gutterBottom
+                />
+              </Grid>
+              <Grid item style={{ width: '30%' }}>
+                <InfoBoxItem
+                  title="Progress"
+                  label1={
+                    <Box onClick={onProgressClick} style={{ width: '64px' }}>
+                      <ShipmentProgress booking={booking!} />
+                    </Box>
+                  }
+                  gutterBottom
+                />
+              </Grid>
             </Grid>
             <Grid item xs={12}>
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
@@ -319,22 +337,17 @@ const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressCli
                 </Box>
               </Fragment>
             </Grid>
-            <Grid item md={2} xs={12}>
-              <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
-            </Grid>
-            <Grid item md={2} xs={12}>
-              <InfoBoxItem
-                title="Contact"
-                label1={
-                  <Avatar
-                    name={booking.BkgAgentContactTxt}
-                    title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
-                    size="40"
-                    round={true}
-                  />
-                }
-                gutterBottom
-              />
+            <Grid item md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
+              <Grid item style={{ width: '45%' }}>
+                <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
+              </Grid>
+              <Grid item style={{ width: '55%' }}>
+                <InfoBoxItem
+                  title="Last updated"
+                  label1={formatDistanceToNow(booking.updatedAt) + ' ago'}
+                  gutterBottom
+                />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
