@@ -169,6 +169,9 @@ export interface CargoDetail {
   CtypID: string;
   Equipment: EquipmentDetail[];
   LocRefs: LocRefItem[];
+  Temperature: string | null;
+  Dehumidification: string | null;
+  Ventilation: string | null;
   IMCO: IMCO | null;
   IMCOs: IMCOField[] | null;
   Overdimension: CargoOverdimension | null;

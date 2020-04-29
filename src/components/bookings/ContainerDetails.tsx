@@ -368,6 +368,16 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   </TableRow>
                 ) : null}
 
+                {detail.Temperature ? (
+                  <TableRowData label={'Temperature'} content={detail.Temperature?.toUpperCase()} />
+                ) : null}
+
+                {detail.Dehumidification ? (
+                  <TableRowData label={'Dehumidification'} content={detail.Dehumidification} />
+                ) : null}
+
+                {detail.Ventilation ? <TableRowData label={'Ventilation'} content={detail.Ventilation} /> : null}
+
                 {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
 
                 {detail.Overdimension && <OverdimensionComponent detail={detail} />}
