@@ -16,7 +16,7 @@ interface Props {
 }
 
 const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
-  const teams = useTeams();
+  const teams = useTeams(user);
 
   const [activeUser, setActiveUser] = useState(user);
   const [changed, setChanged] = useState(false);
@@ -47,9 +47,7 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
       </TableCell>
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
-      <TableCell align="right">
-        <TeamsTeamsChipMultiInput options={teams || []} values={user.teams || []} onChange={onTeamsChanged} />
-      </TableCell>
+      <TableCell align="right">{teams && teams.map(team => team.name).join(',')}</TableCell>
       <TableCell align="right">
         {user.lastSession ? formatDistanceToNow(invoke('toDate')(user.lastSession)) : 'never'}
       </TableCell>

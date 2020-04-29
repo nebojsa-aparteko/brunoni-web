@@ -2,9 +2,10 @@ import { useCallback } from 'react';
 
 import useFirestoreCollection from './useFirestoreCollection';
 import { Team } from '../model/Teams';
+import UserRecord from '../model/UserRecord';
 
-export default function useTeams() {
-  const query = useCallback(q => q.orderBy('name', 'asc'), []);
+export default function useTeams(user: UserRecord | undefined = undefined) {
+  let query = useCallback(q => (user ? q.where('users', 'array-contains', user) : q).orderBy('name', 'asc'), [user]);
 
   const teamsCollection = useFirestoreCollection('teams', query);
 
