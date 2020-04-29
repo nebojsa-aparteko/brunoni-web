@@ -53,11 +53,9 @@ import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
 import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogContainer';
-import UserInput from './inputs/UserInput';
-import useAdminUsers from '../hooks/useAdminUsers';
-import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
+import UserRecord from '../model/UserRecord';
 import firebase from '../firebase';
-import useFirestoreDocument from '../hooks/useFirestoreDocument';
+import UserAssignment from './UserAssignment';
 
 interface Props {
   id: string;
@@ -205,21 +203,29 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const requestedBy = useUserByAlphacomId(quoteGroup?.quotes[0].userId);
 
-  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const setAssignedUser = (user: UserRecord | null, quotes: any) => {
     // do something with this
-    quotes.forEach((quote: Quote) =>
-      addAssignee(user, quote.id)
-        .then(_ => {
-          {
-            console.log('Success assignee');
-          }
-        })
-        .catch(error => console.log(`Error while assignment in quote ${error}`)),
-    );
 
-    console.log(quotes);
+    const updateBatch = firebase.firestore().batch();
+
+    quotes.map((quote: Quote) => {
+      updateBatch.update(
+        firebase
+          .firestore()
+          .collection('quotes')
+          .doc(quote.id),
+        { assignedTo: user },
+      );
+    });
+
+    updateBatch
+      .commit()
+      .then(_ => {
+        console.log('Success assignee');
+      })
+      .catch(error => console.log(`Error while assignment in quote ${error}`));
   };
+
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
       return null;
@@ -323,9 +329,8 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
                     <Typography variant="h4">
                       {carriers?.find(carrier => carrier.id === carrierId)?.name || carrierId}
                     </Typography>
-                    <UserInput
-                      label="Assigned To"
-                      users={assignableUsers || []}
+                    <Box flex="1" />
+                    <UserAssignment
                       onChange={(user: UserRecord | null) => setAssignedUser(user, quotes)}
                       value={(quotes[0] as Quote).assignedTo}
                     />

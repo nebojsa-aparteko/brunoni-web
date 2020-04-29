@@ -44,6 +44,7 @@ import useAdminUsers from '../hooks/useAdminUsers';
 import UserRecord, { CUSTOMER_FACING_ROLES } from '../model/UserRecord';
 import { addAssignee } from './QuoteGroup';
 import firebase from '../firebase';
+import UserAssignment from './UserAssignment';
 
 interface Props {
   quote?: Quote;
@@ -137,7 +138,6 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   const [user, userData] = useUser();
   const clients = useClients();
-  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -369,9 +369,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
       {isAdmin && (
         <Grid item md={4} xs={12} style={{ marginTop: theme.spacing(2) }}>
           <Box display="flex" justifyContent="center" flexDirection="column">
-            <UserInput
-              label="Assigned To"
-              users={assignableUsers || []}
+            <UserAssignment
               onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
               value={quote?.assignedTo}
             />
