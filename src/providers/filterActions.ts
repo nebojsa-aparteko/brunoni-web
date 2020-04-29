@@ -3,6 +3,7 @@ import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
+import { subWeeks } from 'date-fns';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =
@@ -14,6 +15,11 @@ export type FilterFields =
   | 'originPort'
   | 'destinationPort'
   | 'clientFilter';
+
+export const INITIAL_DATERANGE_FILTER = {
+  startDate: subWeeks(new Date(), 2),
+  endDate: new Date(),
+};
 
 // filters by which we can filter bookings
 export interface ContextFilters {

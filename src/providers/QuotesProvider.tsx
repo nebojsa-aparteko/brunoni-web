@@ -14,11 +14,6 @@ export type QuoteDispatch = (action: Action) => void;
 
 interface QuoteContextFilters extends ContextFilters {}
 
-export const INITIAL_DATERANGE_FILTER = {
-  startDate: subWeeks(new Date(), 2),
-  endDate: new Date(),
-};
-
 const defaultFilters = {} as QuoteContextFilters;
 
 export const QuotesContext = createContext<[Quote[], QuoteContextFilters] | [undefined, QuoteContextFilters]>([

@@ -5,14 +5,10 @@ import { Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';
 import ActingAs from '../contexts/ActingAs';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
-import PaymentIcon from '@material-ui/icons/Payment';
 import ArchiveIcon from '@material-ui/icons/Archive';
-import TocIcon from '@material-ui/icons/Toc';
-import BookingsView from '../components/BookingsView';
 import { TabPanel } from './BookingsPage';
-import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
-import { INITIAL_DATERANGE_FILTER, useQuotesFilterDispatch } from '../providers/QuotesProvider';
-import QuoteGroupsContext from '../contexts/QuoteGroupsContext';
+import { useQuotesFilterDispatch } from '../providers/QuotesProvider';
+import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

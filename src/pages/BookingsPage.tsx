@@ -9,6 +9,7 @@ import Meta from '../components/Meta';
 import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { BookingListFilterProvider } from '../providers/BookingListFilterProvider';
+import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -86,6 +87,7 @@ const BookingsPage: React.FC = () => {
       case 2:
         bookingFilterDispach({ type: 'set', field: 'archived', value: true });
         bookingFilterDispach({ type: 'set', field: 'pendingPayment', value: undefined });
+        bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
         break;
       default:
         break;
@@ -111,14 +113,14 @@ const BookingsPage: React.FC = () => {
               <Tab icon={<TocIcon />} label="Loading List" {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={selectedTab} index={0}>
-              <BookingsView bookings={bookings || []} bookingContextFilters={filters} isAdmin={!actingAs} />
+              <BookingsView bookings={bookings} bookingContextFilters={filters} isAdmin={!actingAs} />
             </TabPanel>
             <TabPanel value={selectedTab} index={1}>
-              <BookingsView bookings={bookings || []} bookingContextFilters={filters} isAdmin={!actingAs} />
+              <BookingsView bookings={bookings} bookingContextFilters={filters} isAdmin={!actingAs} />
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
               <BookingsView
-                bookings={bookings || []}
+                bookings={bookings}
                 bookingContextFilters={filters}
                 isAdmin={!actingAs}
                 archived
@@ -130,7 +132,7 @@ const BookingsPage: React.FC = () => {
             </TabPanel>
           </Box>
         ) : (
-          <BookingsView bookings={bookings || []} bookingContextFilters={filters} showDateRangeFilter />
+          <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
         )}
       </BookingListFilterProvider>
     </Fragment>

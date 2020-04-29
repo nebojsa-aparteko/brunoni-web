@@ -31,7 +31,7 @@ import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/B
 import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 
 interface Props {
-  bookings: Booking[];
+  bookings?: Booking[];
   bookingContextFilters: BookingContextFilters;
   isAdmin?: boolean;
   archived?: boolean;
