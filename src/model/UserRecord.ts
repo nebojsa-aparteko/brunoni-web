@@ -21,7 +21,7 @@ export default interface UserRecord {
   teams: Team[];
 }
 
-type Role = 'superadmin' | 'sales' | 'operations';
+export type Role = 'superadmin' | 'sales' | 'operations';
 
 export const ADMIN_ROLES = ['superadmin', 'sales', 'operations'];
 export const CUSTOMER_FACING_ROLES = ['superadmin', 'sales'];

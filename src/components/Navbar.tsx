@@ -115,8 +115,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Navbar: React.FC = () => {
   const classes = useStyles();
-  const [user] = useUser();
-  const [userRecord] = useContext(ActingAs);
+  const [user, userRecord] = useUser();
+  const [actingAs] = useContext(ActingAs);
   const { open } = useContext(LoginDialog);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -198,7 +198,7 @@ const Navbar: React.FC = () => {
                 />
               </Link>
               <Box displayPrint="none" width="100%" display="flex">
-                {user !== undefined && user !== null && userRecord && (
+                {user !== undefined && user !== null && actingAs && (
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/" underline="none">
@@ -248,7 +248,7 @@ const Navbar: React.FC = () => {
                     </Menu>
                   </Fragment>
                 )}
-                {user !== undefined && user !== null && userRecord === null && (
+                {user !== undefined && user !== null && actingAs === null && (
                   <Fragment>
                     <div className={classes.item}>
                       <Button component={Link} to="/schedule" underline="none">
@@ -270,16 +270,18 @@ const Navbar: React.FC = () => {
                         <Typography variant="body1">Side Charges</Typography>
                       </Button>
                     </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/teams" underline="none">
-                        <Typography variant="body1">Teams</Typography>
-                      </Button>
-                    </div>
+                    {userRecord?.role === 'superadmin' && (
+                      <div className={classes.item}>
+                        <Button component={Link} to="/teams" underline="none">
+                          <Typography variant="body1">Teams</Typography>
+                        </Button>
+                      </div>
+                    )}
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
-                  userRecord ? (
+                  actingAs ? (
                     <Fragment>
                       {formControl}
                       <div className={classes.item}>
