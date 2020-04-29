@@ -36,7 +36,9 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
   return (
     <Card className={classes.spacing}>
       <CardHeader
-        action={showMore ? <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" /> : null}
+        action={
+          !quoteActivityLog ? <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" /> : null
+        }
         title={<Typography variant="subtitle1">Activity</Typography>}
       />
       <CardContent>
