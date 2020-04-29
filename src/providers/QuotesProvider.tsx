@@ -42,7 +42,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       let query = filters.dateRange
         ? collection.orderBy('dateIssued', 'desc')
         : // active quotes, filter the ones that are not archived and validity is still valid
-          collection.where('validityPeriod.to', '>=', subMonths(new Date(), 1)).orderBy('validityPeriod.to', 'desc');
+          collection.where('validityPeriod.to', '>=', subWeeks(new Date(), 1)).orderBy('validityPeriod.to', 'desc');
 
       if (actingAs && userRecord?.alphacomClientId) {
         query = query.where('clientId', '==', userRecord!.alphacomClientId);
