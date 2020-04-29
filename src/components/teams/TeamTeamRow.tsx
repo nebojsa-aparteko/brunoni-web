@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team } from '../../model/Teams';
-import { Checkbox, FormControl, Input, ListItemText, MenuItem, Select, TextField } from '@material-ui/core';
+import { Button, Checkbox, FormControl, Input, ListItemText, MenuItem, Select, TextField } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
 import { firestore } from 'firebase';
@@ -96,13 +96,6 @@ const TeamTeamRow: React.FC<Props> = ({ team, ...other }) => {
       <TableCell align="right">
         <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
       </TableCell>
-      {/*<TableCell align="right">*/}
-      {/*  {changed && (*/}
-      {/*    <Button onClick={onSave} size="small" color="primary" variant="contained">*/}
-      {/*      Save*/}
-      {/*    </Button>*/}
-      {/*  )}*/}
-      {/*</TableCell>*/}
       <TableCell align="right">
         <FormControl>
           <Select
@@ -177,6 +170,13 @@ const TeamTeamRow: React.FC<Props> = ({ team, ...other }) => {
             ))}
           </Select>
         </FormControl>
+      </TableCell>
+      <TableCell align="right">
+        {changed && (
+          <Button onClick={onSave} size="small" color="primary" variant="contained">
+            Save
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );

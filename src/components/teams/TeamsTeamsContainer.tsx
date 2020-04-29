@@ -46,6 +46,7 @@ const TeamsTeamsContainer: React.FC = () => {
               <TableCell align="right">Carriers</TableCell>
               <TableCell align="right">Categories</TableCell>
               <TableCell align="right">Checklist Items</TableCell>
+              <TableCell align="right" />
             </TableRow>
           </TableHead>
           <TableBody>
