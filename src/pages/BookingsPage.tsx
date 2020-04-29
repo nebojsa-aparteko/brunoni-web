@@ -10,6 +10,7 @@ import { useBookingsContext, useBookingsFilterDispatch } from '../providers/Book
 import ActingAs from '../contexts/ActingAs';
 import { BookingListFilterProvider } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
+import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -128,7 +129,7 @@ const BookingsPage: React.FC = () => {
               />
             </TabPanel>
             <TabPanel value={selectedTab} index={3}>
-              <Typography variant="h3">...Coming soon ..</Typography>
+              <LoadListContainer />
             </TabPanel>
           </Box>
         ) : (
