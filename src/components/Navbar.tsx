@@ -270,6 +270,11 @@ const Navbar: React.FC = () => {
                         <Typography variant="body1">Side Charges</Typography>
                       </Button>
                     </div>
+                    <div className={classes.item}>
+                      <Button component={Link} to="/teams" underline="none">
+                        <Typography variant="body1">Teams</Typography>
+                      </Button>
+                    </div>
                   </Fragment>
                 )}
                 <div className={classes.spacer} />

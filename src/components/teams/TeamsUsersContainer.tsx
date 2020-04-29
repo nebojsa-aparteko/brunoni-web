@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamUserRow from './TeamUserRow';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const useStyles = makeStyles({
   table: {
@@ -21,24 +22,30 @@ const TeamsUsersContainer: React.FC = () => {
   const adminUsers = useAdminUsers();
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} size="small" aria-label="a dense table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">email</TableCell>
-            <TableCell align="right">Role</TableCell>
-            <TableCell align="right">Assigned Teams</TableCell>
-            <TableCell align="right">Last Login</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {adminUsers?.map((user, index) => (
-            <TeamUserRow user={user} key={`adminuser-${index}`} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Fragment>
+      {!adminUsers ? (
+        <ChartsCircularProgress />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table className={classes.table} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell align="right">email</TableCell>
+                <TableCell align="right">Role</TableCell>
+                <TableCell align="right">Assigned Teams</TableCell>
+                <TableCell align="right">Last Login</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {adminUsers?.map((user, index) => (
+                <TeamUserRow user={user} key={`adminuser-${index}`} />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Fragment>
   );
 };
 
