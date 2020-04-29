@@ -46,7 +46,7 @@ const TeamManagementPage: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Team Management" />
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Box className={classes.tabContainer}>
           <Paper square>
             <Tabs
@@ -56,16 +56,16 @@ const TeamManagementPage: React.FC = () => {
               aria-label="Team management tabs"
               className={classes.tabs}
             >
-              <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
               <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(1)} />
+              <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>
-            <TeamsUsersContainer />
+            <TeamsTeamsContainer />
           </TabPanel>
 
           <TabPanel value={selectedTab} index={1}>
-            <TeamsTeamsContainer />
+            <TeamsUsersContainer />
           </TabPanel>
         </Box>
       </Container>

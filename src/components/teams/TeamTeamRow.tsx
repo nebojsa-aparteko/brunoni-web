@@ -4,7 +4,17 @@ import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team } from '../../model/Teams';
-import { Button, Checkbox, FormControl, Input, ListItemText, MenuItem, Select, TextField } from '@material-ui/core';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  Input,
+  ListItemText,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
 import { firestore } from 'firebase';
@@ -13,10 +23,15 @@ import Carriers from '../../contexts/Carriers';
 import firebase from '../../firebase';
 import { BookingCategory } from '../../model/Booking';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import Chip from '@material-ui/core/Chip';
+import Carrier from '../../model/Carrier';
+import { useSnackbar } from 'notistack';
 
-interface Props {
+interface Props extends React.Attributes {
   team: Team;
 }
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -36,38 +51,30 @@ const saveChanges = (field: string, value: any, teamId: string) => {
     .update(field, value);
 };
 
-const TeamTeamRow: React.FC<Props> = ({ team, ...other }) => {
+const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   const adminUsers = useAdminUsers();
 
   const [activeTeam, setActiveTeam] = useState(team);
+
   const [changed, setChanged] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
+
   const carriers = useContext(Carriers);
   const categories = Object.keys(BookingCategory);
   const checklistItems = Object.keys(ChecklistNames);
-  const [selectedCarriers, setSelectedCarriers] = React.useState<string[]>(
-    (team.carriers?.map(c => c.name) as string[]) || [],
-  );
-  const [selectedCategories, setSelectedCategories] = React.useState<string[]>((team.categories as string[]) || []);
-  const [selectedChecklists, setSelectedChecklists] = React.useState<string[]>((team.checklistItems as string[]) || []);
-  const handleCarrierChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedCarriers(event.target.value as string[]);
-    saveChanges(
-      'carriers',
-      carriers?.filter(c => (event.target.value as string[]).includes(c.name)).map(c => ({ id: c.id, name: c.name })),
-      team.id as string,
-    ).then(_ => console.log('Saved Carriers'));
+
+  const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
+    setActiveTeam(set('carriers', asArray(value))(activeTeam));
+    setChanged(true);
   };
-  const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedCategories(event.target.value as string[]);
-    saveChanges('categories', event.target.value as string[], team.id as string).then(_ =>
-      console.log('Saved Carriers'),
-    );
+  const handleCategoryChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
+    setActiveTeam(set('categories', asArray(value))(activeTeam));
+    setChanged(true);
   };
-  const handleChecklistItemChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedChecklists(event.target.value as string[]);
-    saveChanges('checklistItems', event.target.value as string[], team.id as string).then(_ =>
-      console.log('Saved Carriers'),
-    );
+  const handleChecklistItemChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
+    setActiveTeam(set('checklistItems', asArray(value))(activeTeam));
+    setChanged(true);
   };
   const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setActiveTeam(set('name', event.target.value)(activeTeam));
@@ -81,95 +88,80 @@ const TeamTeamRow: React.FC<Props> = ({ team, ...other }) => {
 
   const onSave = useCallback(() => {
     const teamsCollection = firestore().collection('teams');
-    if (activeTeam.id) {
-      teamsCollection.doc(activeTeam.id).update(activeTeam);
-    } else {
-      teamsCollection.add(activeTeam);
-    }
+
+    teamsCollection
+      .doc(activeTeam.id)
+      .update(activeTeam)
+      .then(_ => {
+        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+          variant: 'success',
+          autoHideDuration: 1000,
+        });
+      })
+      .catch(error => {
+        console.trace(error);
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      });
   }, [activeTeam]);
 
   return (
-    <TableRow {...other}>
+    <TableRow key={key} {...other}>
       <TableCell component="th" scope="row">
-        <TextField defaultValue={team.name} placeholder="Team name" onChange={onNameChange} />
+        <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
       <TableCell align="right">
-        <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
+        <TeamsUsersChipMultiInput
+          options={adminUsers || []}
+          values={activeTeam.users || []}
+          onChange={onTeamsChanged}
+        />
       </TableCell>
       <TableCell align="right">
-        <FormControl>
-          <Select
-            id="carriers-multiple-checkbox"
-            multiple
-            displayEmpty
-            value={selectedCarriers}
-            onChange={handleCarrierChange}
-            input={<Input />}
-            renderValue={_ => {
-              return <em>Choose carriers</em>;
-            }}
-            MenuProps={MenuProps}
-          >
-            <MenuItem disabled value="">
-              <em>Choose carriers</em>
-            </MenuItem>
-            {carriers?.map(carrier => (
-              <MenuItem key={carrier.id} value={carrier.name}>
-                <Checkbox checked={selectedCarriers.indexOf(carrier.name) > -1} />
-                <ListItemText primary={carrier.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          multiple
+          options={carriers || []}
+          getOptionLabel={option => option.name}
+          defaultValue={activeTeam.carriers}
+          onChange={handleCarrierChange}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)
+          }
+          renderInput={params => (
+            <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />
+          )}
+        />
       </TableCell>
       <TableCell align="right">
-        <FormControl>
-          <Select
-            id="categories-multiple-checkbox"
-            multiple
-            displayEmpty
-            value={team?.categories || []}
-            onChange={handleCategoryChange}
-            input={<Input />}
-            renderValue={_ => <em>Choose categories</em>}
-            MenuProps={MenuProps}
-          >
-            <MenuItem disabled value="">
-              <em>Choose categories</em>
-            </MenuItem>
-            {categories?.map(category => (
-              <MenuItem key={category} value={category}>
-                <Checkbox checked={selectedCategories.indexOf(category) > -1} />
-                <ListItemText primary={category} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          multiple
+          options={categories || []}
+          defaultValue={activeTeam.categories}
+          onChange={handleCategoryChange}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
+          }
+          renderInput={params => (
+            <TextField {...params} label="Categories" placeholder="Type to filter" variant="outlined" />
+          )}
+        />
       </TableCell>
 
       <TableCell align="right">
-        <FormControl>
-          <Select
-            id="checklist-item-multiple-checkbox"
-            multiple
-            displayEmpty
-            value={team?.checklistItems || []}
-            onChange={handleChecklistItemChange}
-            input={<Input />}
-            renderValue={_ => <em>Choose checklist items</em>}
-            MenuProps={MenuProps}
-          >
-            <MenuItem disabled value="">
-              <em>Choose checklist items</em>
-            </MenuItem>
-            {checklistItems?.map(checklistItem => (
-              <MenuItem key={checklistItem} value={checklistItem}>
-                <Checkbox checked={selectedChecklists.indexOf(checklistItem) > -1} />
-                <ListItemText primary={checklistItem} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          multiple
+          options={checklistItems || []}
+          defaultValue={activeTeam.checklistItems}
+          onChange={handleChecklistItemChange}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
+          }
+          renderInput={params => (
+            <TextField {...params} label="Checklist" placeholder="Type to filter" variant="outlined" />
+          )}
+        />
       </TableCell>
       <TableCell align="right">
         {changed && (

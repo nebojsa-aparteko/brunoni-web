@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,6 +11,8 @@ import useTeams from '../../hooks/useTeams';
 import { Box, Button, Container } from '@material-ui/core';
 import { Team } from '../../model/Teams';
 import TeamTeamRow from './TeamTeamRow';
+import { firestore } from 'firebase';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const useStyles = makeStyles({
   table: {
@@ -23,41 +25,56 @@ const TeamsTeamsContainer: React.FC = () => {
 
   const teams = useTeams();
 
-  const [newItem, setNewItem] = useState<Team>();
-
   const onAdd = () => {
-    setNewItem({} as Team);
+    firestore()
+      .collection('teams')
+      .add({ name: '' })
+      .then(docRef => console.log('Added doc ref ', docRef.id))
+      .catch(err => console.error('Failed to add new item ', err));
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box display="flex" flexDirection="row-reverse">
-        <Button onClick={onAdd} size="small" color="primary" variant="contained">
-          Add
-        </Button>
-      </Box>
+    <Fragment>
+      {!teams ? (
+        <ChartsCircularProgress />
+      ) : (
+        <Container maxWidth="xl">
+          <Box display="flex" flexDirection="row-reverse">
+            <Button onClick={onAdd} size="small" color="primary" variant="contained">
+              Add
+            </Button>
+          </Box>
 
-      <TableContainer component={Paper}>
-        <Table className={classes.table} size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Members</TableCell>
-              <TableCell align="right">Carriers</TableCell>
-              <TableCell align="right">Categories</TableCell>
-              <TableCell align="right">Checklist Items</TableCell>
-              <TableCell align="right" />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {teams?.map((team, index) => (
-              <TeamTeamRow team={team} key={`teams-${index}`} />
-            ))}
-            {newItem && <TeamTeamRow team={newItem} key={`teams-new`} />}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Container>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} size="small" aria-label="a dense table">
+              <colgroup>
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '5%' }} />
+              </colgroup>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="right">Members</TableCell>
+                  <TableCell align="right">Carriers</TableCell>
+                  <TableCell align="right">Categories</TableCell>
+                  <TableCell align="right">Checklist Items</TableCell>
+                  <TableCell align="right" />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {teams?.map((team, index) => (
+                  <TeamTeamRow team={team} key={`teams-${team.id}`} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
+      )}
+    </Fragment>
   );
 };
 
