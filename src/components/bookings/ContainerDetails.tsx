@@ -310,7 +310,7 @@ export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) 
 
       {detail.PINNr ? <TableRowData label={'Pin Number'} content={detail.PINNr} /> : null}
 
-      {emptyReturnAddress ? <TableRowData label={'Empty Return 7Adress'} content={emptyReturnAddress} /> : null}
+      {emptyReturnAddress ? <TableRowData label={'Empty Return Address'} content={emptyReturnAddress} /> : null}
 
       {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
 
