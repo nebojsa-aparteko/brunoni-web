@@ -14,7 +14,7 @@ import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     margin: theme.spacing(2),
-    maxWidth: theme.breakpoints.values.lg,
+    maxWidth: theme.breakpoints.values.xl,
     backgroundColor: theme.palette.background.paper,
     width: '100%',
   },

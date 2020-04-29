@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
 import {
@@ -21,9 +21,7 @@ import useClients from '../../hooks/useClients';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import UserRecord, { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
-import useAdminUsers from '../../hooks/useAdminUsers';
-import UserInput from '../inputs/UserInput';
+import UserRecord from '../../model/UserRecord';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -60,12 +58,18 @@ export const ClientRequestedByLabel: React.FC<{
   );
 };
 
-const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, containers, commodityTypes, quotes }) => {
+const QuoteGroupRow: React.FC<RowProps> = ({
+  showCompanyInfo,
+  id,
+  dateIssued,
+  containers,
+  commodityTypes,
+  quotes,
+  assignedUsers,
+}) => {
   const classes = useStyles();
   const clients = useClients();
   const history = useHistory();
-
-  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
 
   const requestedBy = useUserByAlphacomId(quotes[0].userId);
 
@@ -152,9 +156,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({ showCompanyInfo, id, dateIssued, co
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
-      <TableCell onClick={onUserInputClick}>
-        <UserInput label="Choose user" users={assignableUsers || []} onChange={setAssignedUser} />
-      </TableCell>
+      <TableCell>{assignedUsers.map(user => `${user?.firstName} ${user?.lastName}`).join(',')}</TableCell>
     </TableRow>
   );
 };

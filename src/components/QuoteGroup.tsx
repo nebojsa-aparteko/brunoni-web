@@ -204,8 +204,6 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const requestedBy = useUserByAlphacomId(quoteGroup?.quotes[0].userId);
 
   const setAssignedUser = (user: UserRecord | null, quotes: any) => {
-    // do something with this
-
     const updateBatch = firebase.firestore().batch();
 
     quotes.map((quote: Quote) => {

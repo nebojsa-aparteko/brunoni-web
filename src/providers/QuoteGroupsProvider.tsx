@@ -2,6 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import update from 'lodash/fp/update';
 import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
+import compact from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import map from 'lodash/fp/map';
@@ -43,6 +44,7 @@ export interface QuoteGroup {
   containers: Container[];
   commodityTypes: CommodityType[];
   quotes: Quote[];
+  assignedUsers: UserRecord[];
 }
 
 export interface Quote {
@@ -191,6 +193,7 @@ const normalizeQuoteGroups = (
       placeOfDeliveryName: normalizedQuote.placeOfDeliveryName,
       placeOfReceiptName: normalizedQuote.placeOfReceiptName,
       commodityTypes: normalizedQuote.commodityTypes,
+      assignedUsers: normalizedQuotes.filter(quote => quote.assignedTo).map(quote => quote.assignedTo),
       quotes: normalizedQuotes,
     };
   });

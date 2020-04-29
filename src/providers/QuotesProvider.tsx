@@ -4,7 +4,7 @@ import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
-import { subMonths, subWeeks } from 'date-fns';
+import { subWeeks } from 'date-fns';
 
 interface Props {
   children: React.ReactNode;
