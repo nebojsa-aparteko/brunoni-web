@@ -75,12 +75,12 @@ const Comment = ({ comment }: CommentProp) => {
             </Typography>
             {comment.checklistItem && (
               <Box>
-                Ref - <a href={`#${comment.checklistItem.id}`}>{comment.checklistItem.label}</a>
+                Ref - <a href={`#${comment.checklistItem?.id}`}>{comment.checklistItem?.label}</a>
               </Box>
             )}
             {comment.documents && (
               <Box>
-                Doc - <a href={`#${comment.documents[0].url}`}>{comment.documents[0].name}</a>
+                Doc - <a href={`#${comment.documents[0]?.url}`}>{comment.documents[0]?.name}</a>
               </Box>
             )}
           </Paper>
