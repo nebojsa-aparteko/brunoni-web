@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import * as changeCase from 'change-case';
 import { useHistory } from 'react-router';
 import {
@@ -37,6 +37,7 @@ import Mousetrap from 'mousetrap';
 import focusAndSelect from '../utilities/focusAndSelect';
 import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import NavBarQuickSearchDialog from './NavBarQuickSearchDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -117,7 +118,10 @@ const Navbar: React.FC = () => {
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
   const { open } = useContext(LoginDialog);
-
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
+  const handleDialogClose = useCallback(() => {
+    setIsSearchDialogOpen(false);
+  }, [setIsSearchDialogOpen]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -271,11 +275,17 @@ const Navbar: React.FC = () => {
                     </div>
                     {userRecord?.role === 'superadmin' && (
                       <div className={classes.item}>
-                        <Button component={Link} to="/teams" underline="none">
-                          <Typography variant="body1">Teams</Typography>
+                        <Button variant="outlined" color="primary">
+                          <Typography variant="body1">Quick Search</Typography>
                         </Button>
                       </div>
                     )}
+                    <div className={classes.item}>
+                      <Button component={Link} to="/charges" underline="none">
+                        <Typography variant="body1">Side Charges</Typography>
+                      </Button>
+                    </div>
+                    <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
