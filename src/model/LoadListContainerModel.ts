@@ -10,4 +10,5 @@ export default interface LoadListContainerModel {
   vessel?: string;
   sealNum?: string;
   status?: string;
+  deliveryRef?: string;
 }

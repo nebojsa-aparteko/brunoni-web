@@ -1,34 +1,21 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import useContainers from '../../../hooks/useContainers';
 import map from 'lodash/fp/map';
 import invoke from 'lodash/fp/invoke';
 import {
-  Button,
   Card,
   CardContent,
   CardHeader,
-  TextField,
-  Typography,
-  TableCell,
-  TableRow,
-  TableHead,
-  TableBody,
   Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
 } from '@material-ui/core';
-import Papa, { ParseConfig } from 'papaparse';
-import firebase from '../../../firebase';
-import LoadListContainerModel from '../../../model/LoadListContainerModel';
-import formatDate from 'date-fns/format';
+import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
-
-const saveLoadListChanges = (containerId: string, item: LoadListContainerModel) => {
-  if (!containerId) return;
-  return firebase
-    .firestore()
-    .collection('containers')
-    .doc(containerId)
-    .set(item, { merge: true });
-};
+import formatDate from 'date-fns/format';
 
 const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
 
@@ -49,7 +36,10 @@ const groups = ['ets', 'vesselWithVoyage', 'carrierId'];
 
 const LoadListContainer = () => {
   const containers = useContainers();
-  const [loadListInput, setLoadListInput] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
 
   const normalizedContainers = useMemo(
     () =>
@@ -65,42 +55,9 @@ const LoadListContainer = () => {
     [containers],
   );
 
-  const handleLoadListPaste = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoadListInput(event.target.value);
-    console.log(event.target.value);
-  };
-  const handleLoadListSave = () => {
-    console.log(
-      Papa.parse(loadListInput, {
-        delimiter: ',',
-        header: false,
-        columns: ['container', 'sealNum', 'status'],
-        skipEmptyLines: true,
-      } as ParseConfig),
-    );
-    Papa.parse(loadListInput, {
-      delimiter: ',',
-      header: false,
-      columns: ['container', 'sealNum', 'status'],
-      skipEmptyLines: true,
-    } as ParseConfig).data.map(c =>
-      saveLoadListChanges(normalizedContainers.find((normCont: any) => normCont.container === c.container)?.id, c),
-    );
-  };
-
   return (
     <Fragment>
-      <TextField
-        id="load-list-text-field"
-        label="Add load list input"
-        variant="outlined"
-        multiline
-        rows={10}
-        onChange={handleLoadListPaste}
-        style={{ width: '100%' }}
-      />
-
-      <Button onClick={handleLoadListSave}>Add load list</Button>
+      <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
         Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (
