@@ -175,7 +175,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
   if (!bookings) {
     return (
-      <MUIContainer maxWidth="md">
+      <MUIContainer maxWidth="lg">
         <Paper className={classes.root}>
           <ChartsCircularProgress />
         </Paper>

@@ -1,10 +1,7 @@
 import React, { Fragment, useMemo, useState } from 'react';
 import useContainers from '../../../hooks/useContainers';
 import map from 'lodash/fp/map';
-import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
-import { flow, groupBy } from 'lodash/fp';
-import LoadListItem from './LoadListItem';
 import {
   Button,
   Card,
@@ -12,14 +9,11 @@ import {
   CardHeader,
   TextField,
   Typography,
-  TableContainer,
-  Paper,
   TableCell,
   TableRow,
   TableHead,
   TableBody,
   Table,
-  Grid,
 } from '@material-ui/core';
 import Papa, { ParseConfig } from 'papaparse';
 import firebase from '../../../firebase';
@@ -114,10 +108,10 @@ const LoadListContainer = () => {
             <CardHeader title={date} />
             <CardContent>
               {Object.entries(items).map(([vesselWithVoyage, items]: any, index: number) => (
-                <Fragment>
+                <Fragment key={`vesselWithVoyageItems-${index}`}>
                   <Typography>{vesselWithVoyage}</Typography>
                   {Object.entries(items).map(([carrierId, items]: any, index: number) => (
-                    <Fragment>
+                    <Fragment key={`carrierIdItems-${index}`}>
                       <Typography>{carrierId}</Typography>
                       <Table>
                         <TableHead>

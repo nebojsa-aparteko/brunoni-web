@@ -1,4 +1,4 @@
-import React, { createContext, Reducer, useContext, useMemo, useReducer } from 'react';
+import React, { createContext, Reducer, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -32,10 +32,9 @@ export interface BookingContextFilters extends ContextFilters {
 
 const defaultFilters = { archived: false, category: BookingCategory.Export } as BookingContextFilters;
 
-const BookingsContext = createContext<[Booking[], BookingContextFilters] | [undefined, BookingContextFilters]>([
-  undefined,
-  defaultFilters,
-]);
+const BookingsContext = createContext<
+  [Booking[], boolean, BookingContextFilters] | [undefined, boolean, BookingContextFilters]
+>([undefined, true, defaultFilters]);
 const BookingsFilterDispatchContext = createContext<BookingsDispatch | undefined>(undefined);
 
 export const useBookingsContext = () => {
@@ -58,21 +57,17 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [filters, dispatch] = useReducer<Reducer<BookingContextFilters, Action>>(reducer, {
     archived: false,
     category: BookingCategory.Export,
+    // assignee: !actingAs && userRecord,
   } as BookingContextFilters);
-
-  // in case of admins set assignee filter automatically
-  // TODO activate this when it starts having sense :)
-  // useEffect(() => {
-  //   if (userRecord && userRecord.isAdmin && !actingAs && dispatch) {
-  //     dispatch({type: 'set', field: 'assignee', value: userRecord})
-  //   }
-  // }, [userRecord, actingAs, dispatch]);
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
+      setIsLoading(true);
       let query = filters.dateRange
         ? collection.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : collection.orderBy('updatedAt', 'desc');
@@ -100,9 +95,9 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.assignee) {
-        const splituserId = filters.assignee.alphacomId.split('-');
-        const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
-        query = query.where('BkgAgentContact', '==', normalizedUserId);
+        // const splituserId = filters.assignee.alphacomId.split('-');
+        // const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
+        query = query.where('BkgAgentContact', '==', filters.assignee.alphacomId);
       }
 
       if (filters.originPort) {
@@ -125,6 +120,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   const bookingsSnapshot = useFirestoreCollection('bookings', query);
 
   const bookingsResult = useMemo(() => {
+    setIsLoading(false);
     const bookings = bookingsSnapshot?.docs.map(doc => {
       return {
         id: doc.id,
@@ -136,7 +132,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   }, [bookingsSnapshot]);
 
   return (
-    <BookingsContext.Provider value={[bookingsResult, filters]}>
+    <BookingsContext.Provider value={[bookingsResult, isLoading, filters]}>
       <BookingsFilterDispatchContext.Provider value={dispatch}>{children}</BookingsFilterDispatchContext.Provider>
     </BookingsContext.Provider>
   );
