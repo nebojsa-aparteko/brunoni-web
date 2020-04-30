@@ -19,11 +19,13 @@ import {
   TableHead,
   TableBody,
   Table,
+  Grid,
 } from '@material-ui/core';
 import Papa, { ParseConfig } from 'papaparse';
 import firebase from '../../../firebase';
 import LoadListContainerModel from '../../../model/LoadListContainerModel';
 import formatDate from 'date-fns/format';
+import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 
 const saveLoadListChanges = (containerId: string, item: LoadListContainerModel) => {
   if (!containerId) return;
@@ -33,17 +35,39 @@ const saveLoadListChanges = (containerId: string, item: LoadListContainerModel) 
     .doc(containerId)
     .set(item, { merge: true });
 };
+
+const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
+
+const normalizeContainerRecord = (item: any) => {
+  return {
+    id: item.id,
+    ets: safeDateFormat(item.ets),
+    gateIn: safeDateFormat(item.gateIn),
+    pickUp: safeDateFormat(item.pickUp),
+    vesselWithVoyage: `${item.vessel} ${item.voyage}`,
+    bookingId: item.bookingId,
+    container: item.container,
+    carrierId: item.carrierId,
+  };
+};
+
+const groups = ['ets', 'vesselWithVoyage', 'carrierId'];
+
 const LoadListContainer = () => {
   const containers = useContainers();
   const [loadListInput, setLoadListInput] = useState('');
+
   const normalizedContainers = useMemo(
     () =>
-      flow([
-        map(
-          flow(update('ets', invoke('toDate')), update('pickUp', invoke('toDate')), update('gateIn', invoke('toDate'))),
-        ),
-        groupBy('ets'),
-      ])(containers),
+      map(normalizeContainerRecord)(containers).reduce((r: any, o: any) => {
+        groups
+          .reduce(
+            (group: any, key: any, i, { length }) => (group[o[key]] = group[o[key]] || (i + 1 === length ? [] : {})),
+            r,
+          )
+          .push(o);
+        return r;
+      }, {}),
     [containers],
   );
 
@@ -83,14 +107,65 @@ const LoadListContainer = () => {
       />
 
       <Button onClick={handleLoadListSave}>Add load list</Button>
-      <Card>
-        <CardHeader title={` 20.20.2020 (ETS)`} />
-        <CardContent>
-          <Typography>CAP SAN AUGUSTIN VOY. 007 S</Typography>
-          <Typography>HAMBURG SÜD</Typography>
-        </CardContent>
-      </Card>
-      {Object.values(normalizedContainers).map((c: any) => c.map((b: any) => <LoadListItem item={b} key={b.id} />))}
+      {!containers && <ChartsCircularProgress />}
+      {normalizedContainers &&
+        Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (
+          <Card key={`mapitemid-${index}`}>
+            <CardHeader title={date} />
+            <CardContent>
+              {Object.entries(items).map(([vesselWithVoyage, items]: any, index: number) => (
+                <Fragment>
+                  <Typography>{vesselWithVoyage}</Typography>
+                  {Object.entries(items).map(([carrierId, items]: any, index: number) => (
+                    <Fragment>
+                      <Typography>{carrierId}</Typography>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell align="right">Container</TableCell>
+                            <TableCell align="right">Seal No</TableCell>
+                            <TableCell align="right">Delivery Ref</TableCell>
+                            <TableCell align="right">Booking #</TableCell>
+                            <TableCell align="right">Status</TableCell>
+                            <TableCell align="right">Pick up Date</TableCell>
+                            <TableCell align="right">Gate in Date</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {items.map((item: any, index: number) => (
+                            <TableRow key={`index-${index}`}>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.container}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.sealNo || ''}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.deliveryRef || ''}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.bookingId || ''}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.status || ''}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.pickUp || ''}
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                {item.gateIn || ''}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Fragment>
+                  ))}
+                </Fragment>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
     </Fragment>
   );
 };
