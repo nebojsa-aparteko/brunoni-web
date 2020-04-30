@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Button,
 } from '@material-ui/core';
 import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
@@ -57,6 +58,7 @@ const LoadListContainer = () => {
 
   return (
     <Fragment>
+      <Button onClick={() => setIsDialogOpen(true)}>Add load list</Button>
       <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
