@@ -10,6 +10,6 @@ export default function useContainers() {
   const containersCollection = useFirestoreCollection('containers', query);
 
   return containersCollection?.docs.map(doc => {
-    return { id: doc.id, ...doc.data() } as LoadListContainerModel;
+    return doc.data() as LoadListContainerModel;
   }) as LoadListContainerModel[];
 }

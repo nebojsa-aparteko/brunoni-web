@@ -116,12 +116,20 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         },
         complete(results: ParseResult, file?: File): void {
           console.log(results.data);
+          const batch = firebase.firestore().batch();
+
           results.data.map(c =>
-            saveLoadListChanges(
-              containers?.find((normCont: any) => normCont.container && normCont.container === c.container)?.id,
+            batch.set(
+              firebase
+                .firestore()
+                .collection('containers')
+                .doc(c.container),
               c,
+              { merge: true },
             ),
           );
+
+          batch.commit().then(_ => console.log('Successfully saved'));
         },
       } as ParseConfig),
     [containers],
