@@ -5,7 +5,7 @@ import LoadListContainerModel from '../model/LoadListContainerModel';
 import subWeeks from 'date-fns/subWeeks';
 
 export default function useContainers() {
-  const query = useCallback(q => q.where('ets', '>=', subWeeks(new Date(), 2)).orderBy('ets', 'desc'), []);
+  const query = useCallback(q => q.where('ets', '>=', subWeeks(new Date(), 4)).orderBy('ets', 'asc'), []);
 
   const teamsCollection = useFirestoreCollection('containers', query);
 
