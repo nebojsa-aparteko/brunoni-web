@@ -58,7 +58,9 @@ const LoadListContainer = () => {
 
   return (
     <Fragment>
-      <Button onClick={() => setIsDialogOpen(true)}>Add load list</Button>
+      <Button onClick={() => setIsDialogOpen(true)} color={'primary'}>
+        Add load list
+      </Button>
       <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
