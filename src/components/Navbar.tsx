@@ -1,23 +1,23 @@
-import React, { forwardRef, Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import * as changeCase from 'change-case';
 import { useHistory } from 'react-router';
 import {
-  makeStyles,
-  Theme,
   AppBar,
-  Toolbar,
-  createStyles,
-  Button,
   Box,
+  Button,
+  createStyles,
   Drawer,
+  FormControl,
+  Input,
+  InputAdornment,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  InputAdornment,
-  Input,
-  FormControl,
+  makeStyles,
   Menu,
+  Theme,
+  Toolbar,
   Typography,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
@@ -37,7 +37,6 @@ import Mousetrap from 'mousetrap';
 import focusAndSelect from '../utilities/focusAndSelect';
 import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import { LinkProps } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
