@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import {
   Avatar,
   Box,
@@ -33,6 +33,7 @@ import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
 import { editRestriction } from './CheckList';
 import UserRecordContext from '../../../contexts/UserRecordContext';
+import { flow, invoke } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -110,7 +111,6 @@ const DocumentListItem = ({
   );
   const handleMention = () =>
     activityLogContext.setState({ documentReference: item, checklistReference: checklistItem });
-
   const checklistCheckedRule = () => checklistItem.checked;
 
   return (
@@ -138,9 +138,9 @@ const DocumentListItem = ({
                 </Typography>
                 {item.status?.at && (
                   <Typography variant="caption">
-                    {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(new Date())} by ${
-                      item.status?.by?.firstName
-                    }`}
+                    {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(
+                      invoke('toDate')(item.status.at),
+                    )} by ${item.status?.by?.firstName}`}
                   </Typography>
                 )}
               </Box>
@@ -175,73 +175,67 @@ const DocumentListItem = ({
         (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
         !checklistCheckedRule() && (
           <Box display="flex" ml={2} flexBasis="fit-content">
-            <Box display="flex" ml={2} mb={2}>
-              <AccessTimeIcon style={{ color: '#5f91c5' }} />
-              <Link
-                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT}
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  changeStatus({
-                    ...item,
-                    status: {
+            {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
+              <Box display="flex" ml={2} mb={2}>
+                <AccessTimeIcon style={{ color: '#5f91c5' }} />
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    changeStatus(item, {
                       type: ChecklistItemValueDocumentStatusType.DEFAULT,
                       by: getActivityLogUserData(),
                       at: new Date(),
-                    },
-                  });
-                  activityLogContext.setState(undefined);
-                }}
-              >
-                Pending
-              </Link>
-            </Box>
-            <Box display="flex" ml={2} mb={2}>
-              <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
-              <Link
-                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.APPROVED}
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  changeStatus({
-                    ...item,
-                    status: {
+                    });
+                    activityLogContext.setState(undefined);
+                  }}
+                >
+                  Undo
+                </Link>
+              </Box>
+            )}
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+              <Box display="flex" ml={2} mb={2}>
+                <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    changeStatus(item, {
                       type: ChecklistItemValueDocumentStatusType.APPROVED,
                       by: getActivityLogUserData(),
                       at: new Date(),
-                    },
-                  });
-                  activityLogContext.setState(undefined);
-                }}
-              >
-                Approve
-              </Link>
-            </Box>
-            <Box display="flex" ml={2} mb={2}>
-              <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
-              <Link
-                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.REJECTED}
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  changeStatus({
-                    ...item,
-                    status: {
+                    });
+                    activityLogContext.setState(undefined);
+                  }}
+                >
+                  Approve
+                </Link>
+              </Box>
+            )}
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+              <Box display="flex" ml={2} mb={2}>
+                <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    changeStatus(item, {
                       type: ChecklistItemValueDocumentStatusType.REJECTED,
                       by: getActivityLogUserData(),
                       at: new Date(),
-                    },
-                  });
-                  activityLogContext.setState({
-                    rejected: true,
-                    documentReference: item,
-                    checklistReference: checklistItem,
-                  });
-                }}
-              >
-                Reject
-              </Link>
-            </Box>
+                    });
+                    activityLogContext.setState({
+                      rejected: true,
+                      documentReference: item,
+                      checklistReference: checklistItem,
+                    });
+                  }}
+                >
+                  Reject
+                </Link>
+              </Box>
+            )}
           </Box>
         )}
     </div>
@@ -257,6 +251,6 @@ export interface Props {
   index: number;
   removalInProgress: boolean;
   deleteFile: (item: ChecklistItemValueDocument) => void;
-  changeStatus: (item: ChecklistItemValueDocument) => void;
+  changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { orderBy } from 'lodash/fp';
-import { ChecklistItem, ChecklistItemValueDocument } from './ChecklistItemModel';
+import { ChecklistItem, ChecklistItemValueDocument, ChecklistItemValueDocumentStatus } from './ChecklistItemModel';
 import DocumentListItem from './DocumentListItem';
 import { createStyles, List, makeStyles, Theme } from '@material-ui/core';
 
@@ -51,6 +51,6 @@ export interface Props {
   bookingId: string;
   removalInProgress: boolean;
   deleteFile: (item: ChecklistItemValueDocument) => void;
-  changeStatus: (item: ChecklistItemValueDocument) => void;
+  changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
 }

@@ -18,6 +18,7 @@ import {
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
+  ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
   CustomerAction,
   ShortChecklistItem,
@@ -412,12 +413,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     [storageBasePath],
   );
 
-  const handleDocumentStatusChange = (item: ChecklistItemValueDocument, internal: boolean) => {
+  const handleDocumentStatusChange = (
+    item: ChecklistItemValueDocument,
+    status: ChecklistItemValueDocumentStatus,
+    internal: boolean,
+  ) => {
     let newItemArray: ChecklistItemValueDocument[];
     if (!editRestriction(item.status!.at as Date)) {
       return enqueueSnackbar(
         <Typography color="inherit">
-          Failed to edit item - You cant change status after 30sec from last change!
+          {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
         </Typography>,
         {
           variant: 'error',
@@ -426,7 +431,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
       );
     }
     if (internal) {
-      const newDocument = { ...item };
+      const newDocument = { ...item, status: status };
       newItemArray = [...(checklistItem.valuesAdmin || [])];
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = newDocument;
       setCheckListItemValuesAdmin(newItemArray);
@@ -446,10 +451,20 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           .then(_ => console.log('Delete rejected file'))
           .catch(err => console.log(err));
         setCheckListItemValues(newValues);
+      } else if (
+        isAdmin &&
+        newDocument.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT &&
+        item.status?.type === ChecklistItemValueDocumentStatusType.APPROVED
+      ) {
+        const newValues = checklistItemValues.filter(doc => doc.url !== item.url);
+        saveChecklistChanges('values', newValues)
+          .then(_ => console.log('Delete rejected file'))
+          .catch(err => console.log(err));
+        setCheckListItemValues(newValues);
       }
     } else {
       newItemArray = [...(checklistItem.values || [])];
-      newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item };
+      newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item, status: status };
       setCheckListItemValues(newItemArray);
       console.log(newItemArray, 'NEW ITEM ARRAY');
     }
@@ -640,7 +655,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           removalInProgress={removalInProgress}
           deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, false)}
           checklistItem={checklistItem}
-          changeStatus={(item: ChecklistItemValueDocument) => handleDocumentStatusChange(item, false)}
+          changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+            handleDocumentStatusChange(item, status, false)
+          }
           internal={false}
         />
         {isAdmin && checklistItemValuesAdmin.length > 0 && (
@@ -654,7 +671,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
                 removalInProgress={removalInProgress}
                 deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
                 checklistItem={checklistItem}
-                changeStatus={(item: ChecklistItemValueDocument) => handleDocumentStatusChange(item, true)}
+                changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+                  handleDocumentStatusChange(item, status, true)
+                }
                 internal={true}
               />
               <Fragment>
