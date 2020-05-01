@@ -12,7 +12,6 @@ import {
 import Avatar from 'react-avatar';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import SendIcon from '@material-ui/icons/Send';
-import debounce from 'lodash/fp/debounce';
 import Mousetrap from 'mousetrap';
 import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
@@ -50,7 +49,6 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const [messageText, setMessageText] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const userRecord = useContext(UserRecordContext);
-  const handleMessageTyping = useMemo(() => debounce(250, setMessageText), [setMessageText]);
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
     setIsAdmin(!actingAs);

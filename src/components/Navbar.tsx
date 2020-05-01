@@ -251,8 +251,13 @@ const Navbar: React.FC = () => {
                     </Fragment>
                   ) : (
                     <Fragment>
-                      <IconButton buttonRef={quickSearchButtonRef} onClick={() => setIsSearchDialogOpen(true)}>
-                        <SearchIcon />
+                      <IconButton
+                        buttonRef={quickSearchButtonRef}
+                        onClick={() => setIsSearchDialogOpen(true)}
+                        style={{ padding: 8 }}
+                        title={'Hey hey you can use your keyboard as well. Try it out >> ctrl+g <<'}
+                      >
+                        <SearchIcon fontSize="small" />
                       </IconButton>
                       <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
                     </Fragment>
