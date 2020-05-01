@@ -98,7 +98,7 @@ interface BookingsTableProps {
 
 interface BookingRowProps {
   booking: Booking;
-  onProgressClick: any;
+  onProgressClick?: any;
   isAdmin?: boolean;
 }
 interface LocRefProps {
@@ -176,7 +176,7 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
   ) : null;
 };
 
-const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
+export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
   const classes = useStyles();
   const clients = useClients();
 

@@ -27,7 +27,8 @@ const useStyles = makeStyles(theme =>
       height: '47px',
     },
     dialogBody: {
-      width: theme.spacing(100),
+      minWidth: theme.spacing(100),
+      width: 'auto',
     },
     dialogContent: {
       paddingBottom: theme.spacing(3),
@@ -64,38 +65,14 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Typography>Find quote by:</Typography>
-          <QuickSearchQuote label="Quote Id" fieldPath="id" />
+          <QuickSearchQuote label="Quote Id" fieldPath="id" handleClose={handleClose} />
           <Typography>Find booking by:</Typography>
-          <QuickSearchBooking label="File number" fieldPath="ERP-BkgRef" />
-          <QuickSearchBooking label="BL number" fieldPath="BL-No" />
-          <QuickSearchBooking label="Customer's reference" fieldPath="StatClientRef" />
-          <QuickSearchContainer label="Container number" fieldPath="container" />
-          <QuickSearchContainer label="Delivery reference" fieldPath="deliveryRef" />
-
-          <FormControl className={classes.formControl}>
-            <TextField
-              id="input-pickup-ref"
-              label="Pickup reference"
-              margin="normal"
-              variant="outlined"
-              className={classes.searchInput}
-            />
-            <IconButton aria-label="delete" color="primary">
-              <SearchIcon />
-            </IconButton>
-          </FormControl>
-          <FormControl className={classes.formControl}>
-            <TextField
-              id="input-voyage-vessel"
-              label="Vessel including Voyage"
-              margin="normal"
-              variant="outlined"
-              className={classes.searchInput}
-            />
-            <IconButton aria-label="delete" color="primary">
-              <SearchIcon />
-            </IconButton>
-          </FormControl>
+          <QuickSearchBooking label="File number" fieldPath="ERP-BkgRef" handleClose={handleClose} />
+          <QuickSearchBooking label="BL number" fieldPath="BL-No" handleClose={handleClose} />
+          <QuickSearchBooking label="Customer's reference" fieldPath="StatClientRef" handleClose={handleClose} />
+          <QuickSearchContainer label="Container number" fieldPath="container" handleClose={handleClose} />
+          <QuickSearchContainer label="Delivery reference" fieldPath="deliveryRef" handleClose={handleClose} />
+          <QuickSearchContainer label="Pickup reference" fieldPath="pickupRef" handleClose={handleClose} />
         </DialogContent>
       </Box>
     </Dialog>
