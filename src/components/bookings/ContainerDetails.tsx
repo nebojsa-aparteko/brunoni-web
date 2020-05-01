@@ -408,7 +408,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   {isImport(category) ? <AdditionalCargoData detail={detail} /> : null}
 
                   {detail.LocRefs.map((ref: LocRefItem, index: number) => {
-                    if (ref.LocType === 'PICK UP') {
+                    if (ref.LocType === 'PICK UP' && ref.LocDate) {
+                      console.log('Ref', ref);
                       return (
                         <Fragment key={`booking-loc-ref-${index}`}>
                           <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />
@@ -469,9 +470,11 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tar
     </Grid>
   );
 };
+
 interface Overdimension {
   detail: CargoDetail;
 }
+
 export const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => {
   const classes = useStyles();
 
