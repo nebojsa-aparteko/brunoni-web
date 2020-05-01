@@ -46,6 +46,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import { DateFormats } from '../../utilities/formattingHelpers';
 
 interface Props {
   route?: RouteSearchResult;
@@ -87,7 +88,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const formatDateString = (date: string) => formatDate(new Date(date), 'dd.MM.yyyy');
+const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.LONG);
 
 const Route: React.FC<Props> = ({ route }) => {
   const classes = useStyles();

@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const classes = useStyles();
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const userRecord = useContext(UserRecordContext);
@@ -59,7 +59,6 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const admins = useAdminUsers();
   const teams = useTeams();
-  const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
 
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
@@ -69,14 +68,15 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   }, [admins, teams]);
 
   useEffect(() => {
-    console.log('binding');
     let moustrapInstance = new Mousetrap();
     moustrapInstance.stopCallback = function() {
       return false;
     };
     moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
-    setMousetrap(moustrapInstance);
-  }, [inputRef, messageText]);
+    return () => {
+      moustrapInstance?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
+    };
+  }, [inputRef]);
 
   useEffect(() => {
     if (!activityLogContext.state) return;
@@ -84,16 +84,6 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
       inputRef.current.focus();
     }
   }, [inputRef, activityLogContext.state]);
-
-  useEffect(() => {
-    return () => {
-      mousetrap?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
-    };
-  }, []);
-
-  const handleChange = (event: any) => {
-    handleMessageTyping(event.target.value);
-  };
 
   const handleDeleteReferences = () => activityLogContext.setState({});
 

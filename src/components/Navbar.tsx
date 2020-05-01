@@ -1,15 +1,11 @@
 import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import * as changeCase from 'change-case';
-import { useHistory } from 'react-router';
 import {
   AppBar,
   Box,
   Button,
   createStyles,
   Drawer,
-  FormControl,
-  Input,
-  InputAdornment,
   List,
   ListItem,
   ListItemIcon,
@@ -32,12 +28,11 @@ import Divider from '@material-ui/core/Divider';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LoginDialog from '../contexts/LoginDialog';
 import ActingAs from '../contexts/ActingAs';
-import LaunchIcon from '@material-ui/icons/Launch';
 import Mousetrap from 'mousetrap';
-import focusAndSelect from '../utilities/focusAndSelect';
 import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -125,21 +120,15 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const gotoQuoteInputRef = useRef<HTMLInputElement>();
-
-  const history = useHistory();
+  const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
   useEffect(() => {
-    const focusGoToQuote = () => {
-      focusAndSelect(gotoQuoteInputRef.current!);
-    };
-
-    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], focusGoToQuote);
+    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], () => setIsSearchDialogOpen(true));
 
     return () => {
       Mousetrap.unbind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q']);
     };
-  }, [gotoQuoteInputRef]);
+  }, [quickSearchButtonRef]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -152,40 +141,6 @@ const Navbar: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
-  const handleGoToQuoteOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.keyCode == 13) {
-      history.push(`/quotes/${gotoQuoteInputRef.current?.value}`);
-    }
-  };
-
-  const handleGoToQuoteButtonClick = () => {
-    history.push(`/quotes/${gotoQuoteInputRef.current?.value}`);
-  };
-
-  const formControl = (
-    <FormControl>
-      <Input
-        id="gotoquoteinput"
-        placeholder="Quote # "
-        onKeyDown={handleGoToQuoteOnKeyDown}
-        className={classes.goToQuote}
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton aria-label="toggle password visibility" onClick={handleGoToQuoteButtonClick}>
-              <LaunchIcon />
-            </IconButton>
-          </InputAdornment>
-        }
-        aria-describedby="gotoquoteinput-helper-text"
-        inputRef={gotoQuoteInputRef}
-        inputProps={{
-          'aria-label': 'Go to quote',
-        }}
-        margin="dense"
-      />
-    </FormControl>
-  );
 
   return (
     <Fragment>
@@ -280,19 +235,12 @@ const Navbar: React.FC = () => {
                         </Button>
                       </div>
                     )}
-                    <div className={classes.item}>
-                      <Button variant="outlined" color="primary" onClick={() => setIsSearchDialogOpen(true)}>
-                        <Typography variant="body1">Quick Search</Typography>
-                      </Button>
-                    </div>
-                    <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
                   </Fragment>
                 )}
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
                   actingAs ? (
                     <Fragment>
-                      {formControl}
                       <div className={classes.item}>
                         <Button component={Link} to="/quotes/get" underline="none" variant="contained" color="primary">
                           <Typography variant="body1" style={{ color: 'white' }}>
@@ -302,7 +250,12 @@ const Navbar: React.FC = () => {
                       </div>
                     </Fragment>
                   ) : (
-                    formControl
+                    <Fragment>
+                      <IconButton buttonRef={quickSearchButtonRef} onClick={() => setIsSearchDialogOpen(true)}>
+                        <SearchIcon />
+                      </IconButton>
+                      <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                    </Fragment>
                   )
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
