@@ -4,17 +4,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team } from '../../model/Teams';
-import {
-  Button,
-  Checkbox,
-  FormControl,
-  Input,
-  ListItemText,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from '@material-ui/core';
+import { Button, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
 import { firestore } from 'firebase';

@@ -37,7 +37,7 @@ import Mousetrap from 'mousetrap';
 import focusAndSelect from '../utilities/focusAndSelect';
 import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import NavBarQuickSearchDialog from './NavBarQuickSearchDialog';
+import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

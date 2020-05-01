@@ -1,17 +1,8 @@
 import React from 'react';
-import {
-  makeStyles,
-  Card,
-  CardContent,
-  CardHeader,
-  Theme,
-  Typography,
-  FormControlLabel,
-  Switch,
-} from '@material-ui/core';
+import { Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
 import WriteComment from './WriteComment';
 import Comment from './Comment';
-import { ActivityLogItem, ActivityType, QuoteActivityModel } from './ActivityModel';
+import { ActivityLogItem, ActivityType } from './ActivityModel';
 import Activity from './Activity';
 import { MentionItem } from 'react-mentions';
 import QuoteWriteComment from '../../activities/QuoteWriteComment';

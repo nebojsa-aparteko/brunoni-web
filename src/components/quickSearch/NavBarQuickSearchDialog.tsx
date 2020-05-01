@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormLabel,
   IconButton,
   makeStyles,
   TextField,
@@ -14,6 +13,9 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
+import QuickSearchBooking from './QuickSearchBooking';
+import QuickSearchContainer from './QuickSearchContainer';
+import QuickSearchQuote from './QuickSearchQuote';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -33,15 +35,6 @@ const useStyles = makeStyles(theme =>
       flexWrap: 'wrap',
       justifyContent: 'flex-start',
       flexDirection: 'column',
-    },
-    dropZone: {
-      border: '1px dashed black',
-    },
-    dropZoneDefault: {
-      border: '1px solid transparent',
-    },
-    addBtn: {
-      margin: theme.spacing(1),
     },
     formControl: {
       display: 'flex',
@@ -70,19 +63,19 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
+          <Typography>Find quote by:</Typography>
+          <QuickSearchQuote label="Quote Id" fieldPath="id" />
           <Typography>Find booking by:</Typography>
-          <TextField
-            label="Normal"
-            id="outlined-margin-normal"
-            defaultValue="Default Value"
-            margin="normal"
-            variant="outlined"
-          />
+          <QuickSearchBooking label="File number" fieldPath="ERP-BkgRef" />
+          <QuickSearchBooking label="BL number" fieldPath="BL-No" />
+          <QuickSearchBooking label="Customer's reference" fieldPath="StatClientRef" />
+          <QuickSearchContainer label="Container number" fieldPath="container" />
+          <QuickSearchContainer label="Delivery reference" fieldPath="deliveryRef" />
+
           <FormControl className={classes.formControl}>
-            <FormLabel>File number</FormLabel>
             <TextField
-              id="input-file-number"
-              label="File number"
+              id="input-pickup-ref"
+              label="Pickup reference"
               margin="normal"
               variant="outlined"
               className={classes.searchInput}
@@ -91,13 +84,18 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               <SearchIcon />
             </IconButton>
           </FormControl>
-
-          <TextField id="input-bl-number" label="BL number" margin="normal" variant="outlined" />
-          <TextField id="input-customer-ref" label="Customer's reference" margin="normal" variant="outlined" />
-          <TextField id="input-container-number" label="Container number" margin="normal" variant="outlined" />
-          <TextField id="input-delivery-ref" label="Delivery reference" margin="normal" variant="outlined" />
-          <TextField id="input-pickup-ref" label="Pickup reference" margin="normal" variant="outlined" />
-          <TextField id="input-voyage-vessel" label="Vessel including Voyage" margin="normal" variant="outlined" />
+          <FormControl className={classes.formControl}>
+            <TextField
+              id="input-voyage-vessel"
+              label="Vessel including Voyage"
+              margin="normal"
+              variant="outlined"
+              className={classes.searchInput}
+            />
+            <IconButton aria-label="delete" color="primary">
+              <SearchIcon />
+            </IconButton>
+          </FormControl>
         </DialogContent>
       </Box>
     </Dialog>
