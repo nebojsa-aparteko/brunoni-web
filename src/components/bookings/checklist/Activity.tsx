@@ -53,8 +53,8 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
   );
 };
 
-const Activity = ({ activity }: Props) => (
-  <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center">
+const Activity = ({ activity, ...other }: Props) => (
+  <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
     <Avatar
       name={`${activity.by.firstName} ${activity.by.lastName}`}
       title={`${activity.by.firstName} ${activity.by.lastName}`}

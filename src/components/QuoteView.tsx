@@ -387,7 +387,9 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 {Object.keys(QuoteStatus)
                   .filter(key => typeof QuoteStatus[key as any] !== 'number')
                   .map((status: string | QuoteStatus, index) => (
-                    <MenuItem value={Number(status)}>{Object.values(QuoteStatusText)[index]}</MenuItem>
+                    <MenuItem value={Number(status)} key={`menuItem ${index}`}>
+                      {Object.values(QuoteStatusText)[index]}
+                    </MenuItem>
                   ))}
               </Select>
             </FormControl>

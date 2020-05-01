@@ -39,7 +39,11 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
           <WriteComment onCommentSave={onCommentSave} />
         )}
         {activityLog?.map((activity: any) =>
-          activity.type === ActivityType.COMMENT ? <Comment comment={activity} /> : <Activity activity={activity} />,
+          activity.type === ActivityType.COMMENT ? (
+            <Comment comment={activity} key={activity.id} />
+          ) : (
+            <Activity activity={activity} key={activity.id} />
+          ),
         )}
       </CardContent>
     </Card>
