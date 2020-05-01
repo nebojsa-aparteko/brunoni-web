@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import useTeams from '../../hooks/useTeams';
 import { Box, Button, Container } from '@material-ui/core';
-import { Team } from '../../model/Teams';
 import TeamTeamRow from './TeamTeamRow';
 import { firestore } from 'firebase';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';

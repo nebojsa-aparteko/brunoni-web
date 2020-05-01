@@ -1,15 +1,13 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
+  Checkbox,
   createStyles,
+  FormControlLabel,
   IconButton,
-  Input,
   makeStyles,
-  Paper,
   Theme,
   Tooltip,
-  Checkbox,
-  FormControlLabel,
 } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import UserRecordContext from '../../../contexts/UserRecordContext';
@@ -19,9 +17,10 @@ import Mousetrap from 'mousetrap';
 import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
 import CloseIcon from '@material-ui/icons/Close';
-import { MentionsInput, Mention, MentionItem } from 'react-mentions';
+import { Mention, MentionItem, MentionsInput } from 'react-mentions';
 import useAdminUsers from '../../../hooks/useAdminUsers';
 import mentionsClassNames from './mention.module.css';
+import useTeams from '../../../hooks/useTeams';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,14 +58,16 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const [isCustomerMessage, setIsCustomerMessage] = useState(!isAdmin);
   const inputRef = useRef<HTMLInputElement>(null);
   const admins = useAdminUsers();
+  const teams = useTeams();
   const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
 
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
-    return admins?.map(
-      admin => ({ id: admin.emailAddress, display: `${admin.firstName} ${admin.lastName}` } as MentionItem),
-    );
-  }, [admins]);
+    return admins
+      ?.map(admin => ({ id: admin.emailAddress, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+      .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
+  }, [admins, teams]);
+
   useEffect(() => {
     console.log('binding');
     let moustrapInstance = new Mousetrap();

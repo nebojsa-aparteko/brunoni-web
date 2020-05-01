@@ -35,14 +35,18 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const wrapTags = (text: string, regex: RegExp) => {
   const textArray = text.split(regex);
-  console.log(textArray, 'TEXT');
-  let mail;
+  let identifier;
   let name;
   return textArray.map(str => {
     if (regex.test(str)) {
-      mail = str.match(/\((.*)\)/i);
+      identifier = str.match(/\((.*)\)/i);
       name = str.match(/\[(.*)\]/i);
-      return <Link href={`mailto:${mail && mail[1]}`}>{`@${name && name[1]}`}</Link>;
+      console.log('IDENTIFIER', name);
+      return identifier && identifier[0]?.indexOf('@') === -1 ? (
+        <Typography style={{ fontWeight: 'bold' }}>{`@${name && name[1]}`}</Typography>
+      ) : (
+        <Link href={`mailto:${identifier && identifier[1]}`}>{`@${name && name[1]}`}</Link>
+      );
     }
     return str;
   });
@@ -71,7 +75,8 @@ const Comment = ({ comment }: CommentProp) => {
               )} ago`}</Typography>
             </Box>
             <Typography style={{ wordBreak: 'break-word' }}>
-              {comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9]*@[a-zA-Z]*.\w*\))/)}
+              {/*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*/}
+              {comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)}
             </Typography>
             {comment.checklistItem && (
               <Box>
