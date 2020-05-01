@@ -136,7 +136,7 @@ export const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) =
   );
 };
 
-const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
+export const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
   const classes = useStyles();
 
   return (

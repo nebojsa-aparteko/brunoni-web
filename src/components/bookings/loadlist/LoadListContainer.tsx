@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import useContainers from '../../../hooks/useContainers';
 import map from 'lodash/fp/map';
 import invoke from 'lodash/fp/invoke';
@@ -13,10 +14,15 @@ import {
   TableRow,
   Typography,
   Button,
+  Box,
 } from '@material-ui/core';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import formatDate from 'date-fns/format';
+import { BoookingProgressDialog, ShipmentProgress } from '../BookingsTable';
+import { Booking } from '../../../model/Booking';
+import firebase from '../../../firebase';
 
 const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
 
@@ -38,6 +44,29 @@ const groups = ['ets', 'vesselWithVoyage', 'carrierId'];
 const LoadListContainer = () => {
   const containers = useContainers();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
+  const [isProgressDialogOpen, setIsProgressDialogOpen] = useState(false);
+
+  const handleProgressClick = useCallback(
+    async (event: React.MouseEvent<unknown>, bookingId: string) => {
+      const bookingRef = await firebase
+        .firestore()
+        .collection('bookings')
+        .doc(bookingId)
+        .get();
+      const booking: Booking = { id: bookingId, ...(bookingRef.data() as Booking) };
+      if (booking.Category === 'Export' || booking.Category === 'Import') {
+        setIsProgressDialogOpen(true);
+        setDialogData(booking);
+      }
+    },
+    [setIsProgressDialogOpen, setDialogData, firebase],
+  );
+
+  const handleProgressDialogClose = useCallback(() => {
+    setIsProgressDialogOpen(false);
+  }, [setIsProgressDialogOpen]);
+
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
@@ -81,6 +110,7 @@ const LoadListContainer = () => {
                             <TableCell align="right">Seal No</TableCell>
                             <TableCell align="right">Delivery Ref</TableCell>
                             <TableCell align="right">Booking #</TableCell>
+                            <TableCell align="right">Checklist</TableCell>
                             <TableCell align="right">Status</TableCell>
                             <TableCell align="right">Pick up Date</TableCell>
                             <TableCell align="right">Gate in Date</TableCell>
@@ -99,7 +129,16 @@ const LoadListContainer = () => {
                                 {item.deliveryRef || ''}
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
-                                {item.bookingId || ''}
+                                <Link to={`/bookings/${item.bookingId}`}>{item.bookingId || ''}</Link>
+                              </TableCell>
+                              <TableCell component="th" scope="row" align="right">
+                                <ListAltIcon
+                                  onClick={(event: React.MouseEvent<unknown>) =>
+                                    handleProgressClick(event, item.bookingId)
+                                  }
+                                  style={{ cursor: 'pointer', color: '#7E878C' }}
+                                  fontSize="large"
+                                />
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
                                 {item.status || ''}
@@ -121,6 +160,13 @@ const LoadListContainer = () => {
             </CardContent>
           </Card>
         ))}
+      {dialogData && (
+        <BoookingProgressDialog
+          isOpen={isProgressDialogOpen}
+          handleClose={handleProgressDialogClose}
+          booking={dialogData!}
+        />
+      )}
     </Fragment>
   );
 };
