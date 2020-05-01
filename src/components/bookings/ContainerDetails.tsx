@@ -286,9 +286,7 @@ export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrT
       <Fragment>
         {pluginTariffs && pluginTariffs[0] ? (
           <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={ctrTariffs} type={'Plug-in tariff'} />
-        ) : (
-          <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={null} type={'Plug-in tariff'} />
-        )}
+        ) : null}
       </Fragment>
     </Fragment>
   );
