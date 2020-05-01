@@ -275,14 +275,14 @@ const Navbar: React.FC = () => {
                     </div>
                     {userRecord?.emailAddress.indexOf('@spfr.co') !== -1 && (
                       <div className={classes.item}>
-                        <Button variant="outlined" color="primary">
-                          <Typography variant="body1">Quick Search</Typography>
+                        <Button component={Link} to="/teams" underline="none">
+                          <Typography variant="body1">Teams</Typography>
                         </Button>
                       </div>
                     )}
                     <div className={classes.item}>
-                      <Button component={Link} to="/charges" underline="none">
-                        <Typography variant="body1">Side Charges</Typography>
+                      <Button variant="outlined" color="primary" onClick={() => setIsSearchDialogOpen(true)}>
+                        <Typography variant="body1">Quick Search</Typography>
                       </Button>
                     </div>
                     <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
