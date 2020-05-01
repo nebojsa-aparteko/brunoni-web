@@ -33,7 +33,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const bookingFilterDispach = useBookingsFilterDispatch();
 
-  const filters = useBookingsContext()[1];
+  const filters = useBookingsContext()[2];
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
 

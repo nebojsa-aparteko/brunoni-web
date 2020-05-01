@@ -1,17 +1,5 @@
 import React, { Fragment, useCallback, useContext, useMemo } from 'react';
-import {
-  AppBar,
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  Container,
-  Divider,
-  Paper,
-  Tab,
-  Tabs,
-  Typography,
-} from '@material-ui/core';
+import { AppBar, Box, Card, CardActions, CardContent, Container, Paper, Tab, Tabs } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
@@ -57,7 +45,7 @@ const safeInvoke = (method: string) => (object: any) => (object ? invoke(method)
 export const editRestriction = (date: Date) => differenceInMilliseconds(new Date(), date) <= 30000;
 
 const CheckList: React.FC<CheckListProps> = ({ booking }) => {
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const actingAs = useContext(ActingAs)[0];
   const checklistCollection = useFirestoreCollection(
     'bookings',
     useCallback(query => query.orderBy('order', 'asc'), []),

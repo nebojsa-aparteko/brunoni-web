@@ -70,7 +70,7 @@ const BookingsPage: React.FC = () => {
 
   const bookingFilterDispach = useBookingsFilterDispatch();
 
-  const [bookings, filters] = useBookingsContext();
+  const [bookings, isLoading, filters] = useBookingsContext();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
@@ -114,14 +114,22 @@ const BookingsPage: React.FC = () => {
               <Tab icon={<TocIcon />} label="Loading List" {...a11yProps(3)} />
             </Tabs>
             <TabPanel value={selectedTab} index={0}>
-              <BookingsView bookings={bookings} bookingContextFilters={filters} isAdmin={!actingAs} />
+              <BookingsView
+                bookings={isLoading ? undefined : bookings}
+                bookingContextFilters={filters}
+                isAdmin={!actingAs}
+              />
             </TabPanel>
             <TabPanel value={selectedTab} index={1}>
-              <BookingsView bookings={bookings} bookingContextFilters={filters} isAdmin={!actingAs} />
+              <BookingsView
+                bookings={isLoading ? undefined : bookings}
+                bookingContextFilters={filters}
+                isAdmin={!actingAs}
+              />
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
               <BookingsView
-                bookings={bookings}
+                bookings={isLoading ? undefined : bookings}
                 bookingContextFilters={filters}
                 isAdmin={!actingAs}
                 archived

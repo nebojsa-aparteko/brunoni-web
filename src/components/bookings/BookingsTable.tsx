@@ -75,10 +75,10 @@ const useStyles = makeStyles(() =>
     checkListBackdrop: {
       zIndex: 1,
     },
-    checklistDialogBody: {
+    dialogBody: {
       width: theme.spacing(100),
     },
-    checklistDialogContent: {
+    dialogContent: {
       paddingBottom: theme.spacing(3),
     },
     actionBarGridItem: {
@@ -141,7 +141,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
-      <span className={classes.checklistDialogBody}>
+      <span className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
           {booking && booking['BL-No'] ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
@@ -149,7 +149,7 @@ const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleC
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent className={classes.checklistDialogContent}>
+        <DialogContent className={classes.dialogContent}>
           <CheckList booking={booking} />
         </DialogContent>
       </span>
