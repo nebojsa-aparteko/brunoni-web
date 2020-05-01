@@ -273,7 +273,7 @@ const Navbar: React.FC = () => {
                         <Typography variant="body1">Side Charges</Typography>
                       </Button>
                     </div>
-                    {userRecord?.role === 'superadmin' && (
+                    {userRecord?.emailAddress.indexOf('@spfr.co') !== -1 && (
                       <div className={classes.item}>
                         <Button variant="outlined" color="primary">
                           <Typography variant="body1">Quick Search</Typography>
