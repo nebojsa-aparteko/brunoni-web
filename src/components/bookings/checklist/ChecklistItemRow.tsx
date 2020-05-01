@@ -644,22 +644,43 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
           internal={false}
         />
         {isAdmin && checklistItemValuesAdmin.length > 0 && (
-          <Fragment>
+          <Box>
             <Divider />
-            <Typography variant="caption">Drafts</Typography>
-            <DocumentList
-              checklistItemValues={checklistItemValuesAdmin}
-              bookingId={booking!.id}
-              removalInProgress={removalInProgress}
-              deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
-              checklistItem={checklistItem}
-              changeStatus={(item: ChecklistItemValueDocument) => handleDocumentStatusChange(item, true)}
-              internal={true}
-            />
-          </Fragment>
+            <Box display="flex" flexDirection="row">
+              <Typography variant="caption">Drafts</Typography>
+              <DocumentList
+                checklistItemValues={checklistItemValuesAdmin}
+                bookingId={booking!.id}
+                removalInProgress={removalInProgress}
+                deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
+                checklistItem={checklistItem}
+                changeStatus={(item: ChecklistItemValueDocument) => handleDocumentStatusChange(item, true)}
+                internal={true}
+              />
+              <Fragment>
+                <Divider orientation="vertical" flexItem={true} />
+                <Box
+                  {...getRootPropsDraft()}
+                  className={
+                    isDragActiveDraft ? classes.draftDragZone : isDragActive ? classes.draftEmpty : classes.draftRoot
+                  }
+                  flexBasis="fit-content"
+                  display="flex"
+                  flexDirection="column"
+                  id={checklistItem.id}
+                  justifyContent="center"
+                  alignItems="center"
+                  px={1}
+                >
+                  <input {...getInputPropsDraft()} />
+                  Drafts
+                </Box>
+              </Fragment>
+            </Box>
+          </Box>
         )}
       </Box>
-      {isAdmin && (
+      {isAdmin && checklistItemValuesAdmin.length === 0 && (
         <Fragment>
           <Divider orientation="vertical" flexItem={true} />
           <Box

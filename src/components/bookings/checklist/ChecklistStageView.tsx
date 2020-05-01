@@ -6,7 +6,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
 const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
   return (
-    <Box display="flex" flexBasis="fit-content" flexDirection="column" ml={1}>
+    <Box display="flex" flexBasis="fit-content" flexDirection="column" ml={2}>
       <FormControlLabel
         disabled={disabled}
         control={

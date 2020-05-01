@@ -18,6 +18,9 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
+import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import {
   ActivityLogUserData,
   ChecklistItem,
@@ -111,126 +114,137 @@ const DocumentListItem = ({
   const checklistCheckedRule = () => checklistItem.checked;
 
   return (
-    <ListItem key={`filelistitem-${bookingId}-${index}`}>
-      <a
-        href={item.url}
-        download={item.name}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={classes.fileItemLink}
-      >
-        <ListItemAvatar>
-          <Avatar color="primary" className={findClassName(item.status, classes)}>
-            <DescriptionIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          id={`filelistitem-${bookingId}-${index}`}
-          primary={item.name}
-          secondary={
-            <Box display="flex" flexDirection="column">
-              <Typography variant="caption">
-                {`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
-              </Typography>
-              {item.status?.at && (
-                <Typography variant="caption">
-                  {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(new Date())} by ${
-                    item.status?.by?.firstName
-                  }`}
-                </Typography>
-              )}
-            </Box>
-          }
-        />
-      </a>
-      <ListItemSecondaryAction>
-        <div className={classes.progressWrapper}>
-          <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-            <AddCommentIcon />
-          </IconButton>
-          {userRecord?.emailAddress === item.uploadedBy.emailAddress &&
-            item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
-            editRestriction(item.uploadedAt) && (
-              <IconButton
-                edge="end"
-                size="small"
-                aria-label="Remove File"
-                onClick={() => deleteFile(item)}
-                aria-labelledby={`filelistitem-${bookingId}-${index}`}
-                disabled={checklistCheckedRule()}
-              >
-                <DeleteIcon />
-              </IconButton>
-            )}
-          {((internal && isAdmin) || (!internal && !isAdmin)) &&
-            (item.status?.at ? editRestriction(item.status.at) : true) &&
-            (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
-            !checklistCheckedRule() && (
+    <div>
+      <ListItem key={`filelistitem-${bookingId}-${index}`}>
+        <a
+          href={item.url}
+          download={item.name}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={classes.fileItemLink}
+        >
+          <ListItemAvatar>
+            <Avatar color="primary" className={findClassName(item.status, classes)}>
+              <DescriptionIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            id={`filelistitem-${bookingId}-${index}`}
+            primary={item.name}
+            secondary={
               <Box display="flex" flexDirection="column">
-                <Link
-                  disabled={item.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT}
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    changeStatus({
-                      ...item,
-                      status: {
-                        type: ChecklistItemValueDocumentStatusType.DEFAULT,
-                        by: getActivityLogUserData(),
-                        at: new Date(),
-                      },
-                    });
-                    activityLogContext.setState(undefined);
-                  }}
-                >
-                  Pending
-                </Link>
-                <Link
-                  disabled={item.status?.type === ChecklistItemValueDocumentStatusType.APPROVED}
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    changeStatus({
-                      ...item,
-                      status: {
-                        type: ChecklistItemValueDocumentStatusType.APPROVED,
-                        by: getActivityLogUserData(),
-                        at: new Date(),
-                      },
-                    });
-                    activityLogContext.setState(undefined);
-                  }}
-                >
-                  Approve
-                </Link>
-                <Link
-                  disabled={item.status?.type === ChecklistItemValueDocumentStatusType.REJECTED}
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    changeStatus({
-                      ...item,
-                      status: {
-                        type: ChecklistItemValueDocumentStatusType.REJECTED,
-                        by: getActivityLogUserData(),
-                        at: new Date(),
-                      },
-                    });
-                    activityLogContext.setState({
-                      rejected: true,
-                      documentReference: item,
-                      checklistReference: checklistItem,
-                    });
-                  }}
-                >
-                  Reject
-                </Link>
+                <Typography variant="caption">
+                  {`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
+                </Typography>
+                {item.status?.at && (
+                  <Typography variant="caption">
+                    {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(new Date())} by ${
+                      item.status?.by?.firstName
+                    }`}
+                  </Typography>
+                )}
               </Box>
-            )}
-          {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
-        </div>
-      </ListItemSecondaryAction>
-    </ListItem>
+            }
+          />
+        </a>
+        <ListItemSecondaryAction>
+          <div className={classes.progressWrapper}>
+            <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
+              <AddCommentIcon />
+            </IconButton>
+            {userRecord?.emailAddress === item.uploadedBy.emailAddress &&
+              item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
+              editRestriction(item.uploadedAt) && (
+                <IconButton
+                  edge="end"
+                  size="small"
+                  aria-label="Remove File"
+                  onClick={() => deleteFile(item)}
+                  aria-labelledby={`filelistitem-${bookingId}-${index}`}
+                  disabled={checklistCheckedRule()}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+          </div>
+        </ListItemSecondaryAction>
+      </ListItem>
+      {((internal && isAdmin) || (!internal && !isAdmin)) &&
+        (item.status?.at ? editRestriction(item.status.at) : true) &&
+        (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
+        !checklistCheckedRule() && (
+          <Box display="flex" ml={2} flexBasis="fit-content">
+            <Box display="flex" ml={2} mb={2}>
+              <AccessTimeIcon style={{ color: '#5f91c5' }} />
+              <Link
+                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT}
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  changeStatus({
+                    ...item,
+                    status: {
+                      type: ChecklistItemValueDocumentStatusType.DEFAULT,
+                      by: getActivityLogUserData(),
+                      at: new Date(),
+                    },
+                  });
+                  activityLogContext.setState(undefined);
+                }}
+              >
+                Pending
+              </Link>
+            </Box>
+            <Box display="flex" ml={2} mb={2}>
+              <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
+              <Link
+                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.APPROVED}
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  changeStatus({
+                    ...item,
+                    status: {
+                      type: ChecklistItemValueDocumentStatusType.APPROVED,
+                      by: getActivityLogUserData(),
+                      at: new Date(),
+                    },
+                  });
+                  activityLogContext.setState(undefined);
+                }}
+              >
+                Approve
+              </Link>
+            </Box>
+            <Box display="flex" ml={2} mb={2}>
+              <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
+              <Link
+                disabled={item.status?.type === ChecklistItemValueDocumentStatusType.REJECTED}
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  changeStatus({
+                    ...item,
+                    status: {
+                      type: ChecklistItemValueDocumentStatusType.REJECTED,
+                      by: getActivityLogUserData(),
+                      at: new Date(),
+                    },
+                  });
+                  activityLogContext.setState({
+                    rejected: true,
+                    documentReference: item,
+                    checklistReference: checklistItem,
+                  });
+                }}
+              >
+                Reject
+              </Link>
+            </Box>
+          </Box>
+        )}
+    </div>
   );
 };
 
