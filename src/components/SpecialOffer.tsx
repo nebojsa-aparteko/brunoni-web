@@ -20,7 +20,7 @@ import Port from '../model/Port';
 import firebase from '../firebase';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import LoginDialogContext from '../contexts/LoginDialog';
-import UserContext from '../contexts/User';
+import UserContext from '../contexts/UserContext';
 import { useHistory } from 'react-router';
 import { DateFormats } from '../utilities/formattingHelpers';
 

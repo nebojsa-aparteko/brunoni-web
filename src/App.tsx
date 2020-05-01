@@ -26,6 +26,7 @@ import ActingAs from './contexts/ActingAs';
 import UserRecord from './contexts/UserRecordContext';
 import ChartsCircularProgress from './components/dashboard/ChartsCircularProgress';
 import TeamManagementPage from './pages/TeamManagementPage';
+import { isDashboardUser } from './model/UserRecord';
 
 const anonymousRoutes = (
   <Switch>
@@ -87,7 +88,7 @@ const UserRoutes: React.FC = () => {
         case null:
           return userRoutes;
         default:
-          return userRecord.isAdmin ? adminRoutes : <Unauthorized />;
+          return isDashboardUser(userRecord) ? adminRoutes : <Unauthorized />;
       }
     default:
       return userRoutes;

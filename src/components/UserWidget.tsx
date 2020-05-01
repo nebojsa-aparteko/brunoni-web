@@ -12,6 +12,7 @@ import firebase from '../firebase';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { useHistory } from 'react-router';
+import { isSuperAdmin } from '../model/UserRecord';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -67,7 +68,7 @@ const UserWidget: React.FC = () => {
   return (
     <Fragment>
       <Chip
-        avatar={userData?.isAdmin ? <SupervisedUserCircle /> : <AccountCircle />}
+        avatar={isSuperAdmin(userData) ? <SupervisedUserCircle /> : <AccountCircle />}
         aria-label="User menu"
         aria-controls={menuId}
         aria-haspopup="true"
@@ -94,7 +95,7 @@ const UserWidget: React.FC = () => {
                   {client.city && <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>}
                 </Box>
               </MenuItem>
-              {actingAs!.isAdmin && (
+              {isSuperAdmin(actingAs) && (
                 <MenuItem onClick={handleSwitch}>
                   Switch to{' '}
                   {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']

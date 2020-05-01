@@ -4,7 +4,7 @@ import firebase from '../firebase';
 import Context from '../contexts/ActingAs';
 import useLocalStorage from '../utilities/useLocalStorage';
 import UserRecordContext from '../contexts/UserRecordContext';
-import UserRecord from '../model/UserRecord';
+import UserRecord, { isDashboardUser } from '../model/UserRecord';
 
 interface Props {
   anonymous?: boolean;
@@ -24,7 +24,7 @@ const ActingAsUser: React.FC<Props> = ({ children }) => {
         setActingAs(undefined);
       } else if (userRecord === null) {
         setActingAs(null);
-      } else if (userRecord.isAdmin) {
+      } else if (isDashboardUser(userRecord)) {
         setActingAs(null);
       } else {
         setActingAs(userRecord);

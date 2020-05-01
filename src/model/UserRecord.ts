@@ -24,8 +24,12 @@ export default interface UserRecord {
 export type Role = 'superadmin' | 'sales' | 'operations';
 
 export const ADMIN_ROLES = ['superadmin', 'sales', 'operations'];
-export const CUSTOMER_FACING_ROLES = ['superadmin', 'sales'];
+export const CUSTOMER_FACING_ROLES = ['sales'];
 
-export function isAdmin(userRecord: UserRecord) {
-  return userRecord.role ? ADMIN_ROLES.includes(userRecord.role) : false;
+export function isDashboardUser(userRecord?: UserRecord | null) {
+  return isSuperAdmin(userRecord) || (userRecord?.role ? ADMIN_ROLES.includes(userRecord.role) : false);
+}
+
+export function isSuperAdmin(userRecord?: UserRecord | null) {
+  return userRecord?.isAdmin;
 }

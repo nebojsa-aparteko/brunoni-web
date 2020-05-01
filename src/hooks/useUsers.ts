@@ -3,7 +3,7 @@ import { useCallback, useContext } from 'react';
 import useFirestoreCollection from './useFirestoreCollection';
 
 import firebase from '../firebase';
-import UserRecord from '../model/UserRecord';
+import UserRecord, { isDashboardUser } from '../model/UserRecord';
 import UserRecordContext from '../contexts/UserRecordContext';
 
 export default function useUsers() {
@@ -11,7 +11,9 @@ export default function useUsers() {
 
   const query = useCallback(
     q =>
-      userRecord?.isAdmin ? q : q.where(firebase.firestore.FieldPath.documentId(), '==', userRecord?.alphacomId || ''),
+      isDashboardUser(userRecord)
+        ? q
+        : q.where(firebase.firestore.FieldPath.documentId(), '==', userRecord?.alphacomId || ''),
     [userRecord],
   );
 

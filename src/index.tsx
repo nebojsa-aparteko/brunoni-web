@@ -22,7 +22,7 @@ import PickupLocationsContext from './contexts/PickupLocations';
 import StatisticsContext from './contexts/Statistics';
 import CarriersContext from './contexts/Carriers';
 import PortsContext from './contexts/Ports';
-import UserContext from './contexts/User';
+import UserContext from './contexts/UserContext';
 import UserRecordsContext from './contexts/UserRecords';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
@@ -32,6 +32,7 @@ import { QuoteListProvider } from './providers/QuoteListFilterContext';
 import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecordContext';
 import { BookingListFilterProvider } from './providers/BookingListFilterProvider';
+import { isDashboardUser } from './model/UserRecord';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -122,12 +123,12 @@ const UserApp: React.FC = () => {
             </FirestoreClientDocumentProvider>
           );
         default:
-          if (userRecord.isAdmin) {
+          if (isDashboardUser(userRecord)) {
             showCrispChat(false);
           } else {
             showCrispChat(true);
           }
-          return userRecord.isAdmin ? (
+          return isDashboardUser(userRecord) ? (
             <QuotesProvider>
               <QuoteGroupsProvider>
                 <QuoteListProvider>
