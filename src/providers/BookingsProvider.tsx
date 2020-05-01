@@ -62,6 +62,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   const [filters, dispatch] = useReducer<Reducer<BookingContextFilters, Action>>(reducer, {
     archived: false,
     category: BookingCategory.Export,
+    pendingPayment: false,
     // assignee: !actingAs && userRecord,
   } as BookingContextFilters);
 

@@ -8,9 +8,10 @@ import TocIcon from '@material-ui/icons/Toc';
 import Meta from '../components/Meta';
 import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
-import { BookingListFilterProvider } from '../providers/BookingListFilterProvider';
+import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
 import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
+import { useLocalStorage } from 'react-use';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -65,14 +66,19 @@ export function TabPanel(props: TabPanelProps) {
 
 const BookingsPage: React.FC = () => {
   const classes = useTabStyles();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useLocalStorage('bookingsPageSelectedTab', 0);
   const actingAs = useContext(ActingAs)[0];
+
+  const setBookingsContextData = useContext(BookingListFilterContext)[1];
 
   const bookingFilterDispach = useBookingsFilterDispatch();
 
   const [bookings, isLoading, filters] = useBookingsContext();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    if (newValue !== selectedTab && setBookingsContextData) {
+      setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
+    }
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
@@ -87,8 +93,8 @@ const BookingsPage: React.FC = () => {
         break;
       case 2:
         bookingFilterDispach({ type: 'set', field: 'archived', value: true });
-        bookingFilterDispach({ type: 'set', field: 'pendingPayment', value: undefined });
         bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+        bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
         break;
       default:
         break;
@@ -97,53 +103,51 @@ const BookingsPage: React.FC = () => {
 
   return (
     <Fragment>
-      <BookingListFilterProvider>
-        <Meta title="Bookings" />
-        {!actingAs ? (
-          <Box className={classes.tabContainer}>
-            <Tabs
-              value={selectedTab}
-              onChange={handleTabChange}
-              orientation="vertical"
-              aria-label="Booking tabs"
-              className={classes.tabs}
-            >
-              <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
-              <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
-              <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
-              <Tab icon={<TocIcon />} label="Loading List" {...a11yProps(3)} />
-            </Tabs>
-            <TabPanel value={selectedTab} index={0}>
-              <BookingsView
-                bookings={isLoading ? undefined : bookings}
-                bookingContextFilters={filters}
-                isAdmin={!actingAs}
-              />
-            </TabPanel>
-            <TabPanel value={selectedTab} index={1}>
-              <BookingsView
-                bookings={isLoading ? undefined : bookings}
-                bookingContextFilters={filters}
-                isAdmin={!actingAs}
-              />
-            </TabPanel>
-            <TabPanel value={selectedTab} index={2}>
-              <BookingsView
-                bookings={isLoading ? undefined : bookings}
-                bookingContextFilters={filters}
-                isAdmin={!actingAs}
-                archived
-                showDateRangeFilter
-              />
-            </TabPanel>
-            <TabPanel value={selectedTab} index={3}>
-              <LoadListContainer />
-            </TabPanel>
-          </Box>
-        ) : (
-          <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
-        )}
-      </BookingListFilterProvider>
+      <Meta title="Bookings" />
+      {!actingAs ? (
+        <Box className={classes.tabContainer}>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+            orientation="vertical"
+            aria-label="Booking tabs"
+            className={classes.tabs}
+          >
+            <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
+            <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
+            <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
+            <Tab icon={<TocIcon />} label="Loading List" {...a11yProps(3)} />
+          </Tabs>
+          <TabPanel value={selectedTab} index={0}>
+            <BookingsView
+              bookings={isLoading ? undefined : bookings}
+              bookingContextFilters={filters}
+              isAdmin={!actingAs}
+            />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={1}>
+            <BookingsView
+              bookings={isLoading ? undefined : bookings}
+              bookingContextFilters={filters}
+              isAdmin={!actingAs}
+            />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={2}>
+            <BookingsView
+              bookings={isLoading ? undefined : bookings}
+              bookingContextFilters={filters}
+              isAdmin={!actingAs}
+              archived
+              showDateRangeFilter
+            />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={3}>
+            <LoadListContainer />
+          </TabPanel>
+        </Box>
+      ) : (
+        <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
+      )}
     </Fragment>
   );
 };

@@ -7,23 +7,20 @@ interface BookingListStateParams {
   searchString: string;
   page: number;
   rowsPerPage: number;
-  dateRange: any;
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
 }
+
+export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 10 };
+
 const BookingListFilterContext = React.createContext<[BookingListStateParams, any]>([
-  { searchString: '', page: 0, rowsPerPage: 10, dateRange: rangePredefinedValues[3] },
+  BOOKING_FILTERS_INITIAL_STATE,
   (state: BookingListStateParams) => {},
 ]);
 
 const BookingListFilterProvider = (props: any) => {
-  const [state, setState] = useState({
-    searchString: '',
-    page: 0,
-    rowsPerPage: 10,
-    dateRange: rangePredefinedValues[3],
-  });
+  const [state, setState] = useState(BOOKING_FILTERS_INITIAL_STATE);
   const setStateFn = (state: BookingListStateParams) => {
     setState(state);
   };

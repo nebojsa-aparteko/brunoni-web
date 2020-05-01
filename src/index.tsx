@@ -31,6 +31,7 @@ import { RouteSearchProvider } from './contexts/RouteSearchContext';
 import { QuoteListProvider } from './providers/QuoteListFilterContext';
 import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecordContext';
+import { BookingListFilterProvider } from './providers/BookingListFilterProvider';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -111,7 +112,9 @@ const UserApp: React.FC = () => {
                 <QuoteGroupsProvider>
                   <QuoteListProvider>
                     <BookingsProvider>
-                      <App />
+                      <BookingListFilterProvider>
+                        <App />
+                      </BookingListFilterProvider>
                     </BookingsProvider>
                   </QuoteListProvider>
                 </QuoteGroupsProvider>
@@ -130,7 +133,9 @@ const UserApp: React.FC = () => {
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
                     <BookingsProvider>
-                      <App />
+                      <BookingListFilterProvider>
+                        <App />
+                      </BookingListFilterProvider>
                     </BookingsProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
@@ -148,7 +153,9 @@ const UserApp: React.FC = () => {
             <QuoteGroupsProvider>
               <QuoteListProvider>
                 <BookingsProvider>
-                  <App />
+                  <BookingListFilterProvider>
+                    <App />
+                  </BookingListFilterProvider>
                 </BookingsProvider>
               </QuoteListProvider>
             </QuoteGroupsProvider>
