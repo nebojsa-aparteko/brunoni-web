@@ -1,8 +1,8 @@
-import React, { useContext, Fragment } from 'react';
-import { Box, createStyles, Divider, makeStyles, Typography } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { createStyles, makeStyles } from '@material-ui/core';
 import NotificationsView from './NotificationsView';
-import UserRecordContext from '../../contexts/UserRecordContext';
-import useNotifications from '../../hooks/useNotifications';
+import Notification from '../../model/Notification';
+
 const useStyles = makeStyles(theme =>
   createStyles({
     title: {
@@ -11,11 +11,10 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const NotificationsContainer: React.FC<Props> = ({ handleShow }) => {
+const NotificationsContainer: React.FC<Props> = ({ handleShow, notifications }) => {
   const classes = useStyles();
   //get notifications and pass to view
-  const userRecord = useContext(UserRecordContext);
-  const notifications = useNotifications('a.zeric@brunoni.ch');
+  // const notifications = useNotifications('a.zeric@brunoni.ch');
 
   return (
     <Fragment>{notifications && <NotificationsView notifications={notifications} handleShow={handleShow} />}</Fragment>
@@ -25,5 +24,6 @@ const NotificationsContainer: React.FC<Props> = ({ handleShow }) => {
 export default NotificationsContainer;
 
 interface Props {
+  notifications: Notification[];
   handleShow: () => void;
 }

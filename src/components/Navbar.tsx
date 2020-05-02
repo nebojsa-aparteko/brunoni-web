@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Navbar: React.FC<Props> = ({ handleShow }) => {
+const Navbar: React.FC<Props> = ({ handleShow, notificationCount }) => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
@@ -280,7 +280,7 @@ const Navbar: React.FC<Props> = ({ handleShow }) => {
                 ) : null}
                 <div className={classes.item}>
                   <IconButton aria-label="notification-button-icon" onClick={handleShow}>
-                    <Badge badgeContent={4} color="secondary">
+                    <Badge badgeContent={notificationCount} color="secondary">
                       <NotificationsIcon color="primary" />
                     </Badge>
                   </IconButton>
@@ -405,4 +405,5 @@ const Navbar: React.FC<Props> = ({ handleShow }) => {
 export default Navbar;
 interface Props {
   handleShow: () => void;
+  notificationCount: number;
 }

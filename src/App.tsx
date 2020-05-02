@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Route, Switch } from 'react-router';
 import { makeStyles, Theme, Drawer, Typography, ClickAwayListener } from '@material-ui/core';
 
@@ -28,6 +28,7 @@ import ChartsCircularProgress from './components/dashboard/ChartsCircularProgres
 import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
 import NotificationsContainer from './components/notifications/NotificationsContainer';
+import useNotifications from './hooks/useNotifications';
 
 const anonymousRoutes = (
   <Switch>
@@ -113,18 +114,25 @@ const App: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-
+  const [notificationCount, setNotificationCount] = useState(0);
   const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
-
+  const notifications = useNotifications('a.zeric@brunoni.ch');
+  useEffect(() => {
+    setNotificationCount(
+      (prevState: number) =>
+        notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
+        prevState,
+    );
+  }, [notifications]);
   return (
     <Fragment>
-      <Navbar handleShow={handleShowNotifications} />
+      <Navbar handleShow={handleShowNotifications} notificationCount={notificationCount} />
       <div className={classes.deviceControl}>
         {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
         {user && (
           // <ClickAwayListener onClickAway={() => setIsNotificationDrawerOpen(false)}>
           <Drawer open={isNotificationDrawerOpen} anchor="right">
-            <NotificationsContainer handleShow={handleShowNotifications} />
+            <NotificationsContainer handleShow={handleShowNotifications} notifications={notifications} />
           </Drawer>
           // </ClickAwayListener>
         )}
