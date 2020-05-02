@@ -3,8 +3,6 @@ import { Card, CardContent, CardHeader, createStyles, makeStyles, IconButton } f
 import Comment from '../bookings/checklist/Comment';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import Notification from '../../model/Notification';
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import firebase from 'firebase';
 
 const useStyles = makeStyles(theme =>
@@ -12,9 +10,7 @@ const useStyles = makeStyles(theme =>
     root: {
       margin: theme.spacing(2),
     },
-    header: {
-      backgroundColor: '#ccc',
-    },
+    header: {},
   }),
 );
 
@@ -34,12 +30,12 @@ const NotificationItemView: React.FC<Props> = ({ notification }) => {
       <CardHeader
         title="New mention"
         subheader="In booking: 2223333"
-        action={
-          <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
-            {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
-          </IconButton>
-        }
         className={classes.header}
+        /*action={
+        <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
+          {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
+        </IconButton>
+        }*/
       />
       <CardContent>
         <Comment

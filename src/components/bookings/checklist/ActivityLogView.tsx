@@ -1,11 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
 import WriteComment from './WriteComment';
-import Comment from './Comment';
-import { ActivityLogItem, ActivityType } from './ActivityModel';
-import Activity from './Activity';
+import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
 import QuoteWriteComment from '../../activities/QuoteWriteComment';
+import ActivityLogItemView from './ActivityLogItemView';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -38,13 +37,9 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
         ) : (
           <WriteComment onCommentSave={onCommentSave} />
         )}
-        {activityLog?.map((activity: any) =>
-          activity.type === ActivityType.COMMENT ? (
-            <Comment comment={activity} key={activity.id} />
-          ) : (
-            <Activity activity={activity} key={activity.id} />
-          ),
-        )}
+        {activityLog?.map((activity: ActivityLogItem) => (
+          <ActivityLogItemView activityItem={activity} />
+        ))}
       </CardContent>
     </Card>
   );

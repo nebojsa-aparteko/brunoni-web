@@ -41,6 +41,7 @@ const wrapTags = (text: string, regex: RegExp) => {
     if (regex.test(str)) {
       identifier = str.match(/\((.*)\)/i);
       name = str.match(/\[(.*)\]/i);
+
       console.log('IDENTIFIER', name);
       return identifier && identifier[0]?.indexOf('@') === -1 ? (
         <Typography key={`typ-${index}`} style={{ fontWeight: 'bold' }}>{`@${name && name[1]}`}</Typography>
@@ -89,29 +90,6 @@ const Comment = ({ comment, ...other }: CommentProp) => {
               </Box>
             )}
           </Paper>
-          {false && (
-            <Box display="flex">
-              <Link
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  console.info("I'm a button.");
-                }}
-              >
-                Edit
-              </Link>
-              -
-              <Link
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  console.info("I'm a button.");
-                }}
-              >
-                Delete
-              </Link>
-            </Box>
-          )}
         </Box>
       </Box>
     </Box>

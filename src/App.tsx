@@ -1,6 +1,6 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Route, Switch } from 'react-router';
-import { makeStyles, Theme, Drawer, Typography, ClickAwayListener } from '@material-ui/core';
+import { makeStyles, Theme } from '@material-ui/core';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -27,8 +27,6 @@ import UserRecord from './contexts/UserRecordContext';
 import ChartsCircularProgress from './components/dashboard/ChartsCircularProgress';
 import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
-import NotificationsContainer from './components/notifications/NotificationsContainer';
-import useNotifications from './hooks/useNotifications';
 
 const anonymousRoutes = (
   <Switch>
@@ -113,29 +111,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 const App: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
-  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
-  const notifications = useNotifications('a.zeric@brunoni.ch');
-  useEffect(() => {
-    setNotificationCount(
-      (prevState: number) =>
-        notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
-        prevState,
-    );
-  }, [notifications]);
+
   return (
     <Fragment>
-      <Navbar handleShow={handleShowNotifications} notificationCount={notificationCount} />
+      <Navbar />
       <div className={classes.deviceControl}>
         {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
-        {user && (
-          // <ClickAwayListener onClickAway={() => setIsNotificationDrawerOpen(false)}>
-          <Drawer open={isNotificationDrawerOpen} anchor="right">
-            <NotificationsContainer handleShow={handleShowNotifications} notifications={notifications} />
-          </Drawer>
-          // </ClickAwayListener>
-        )}
       </div>
       <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
       {process.env.REACT_APP_BRAND === 'brunoni' ? (

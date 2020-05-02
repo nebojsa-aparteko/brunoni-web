@@ -2,7 +2,6 @@ import React, { Fragment, useCallback, useContext, useEffect, useRef, useState }
 import * as changeCase from 'change-case';
 import {
   AppBar,
-  Badge,
   Box,
   Button,
   createStyles,
@@ -16,7 +15,6 @@ import {
   Theme,
   Toolbar,
   Typography,
-  withStyles,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -35,7 +33,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import NotificationsButton from './notifications/NotificationsButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -81,7 +79,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     item: {
       display: 'flex',
-      marginLeft: theme.spacing(2),
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
       [theme.breakpoints.down('sm')]: {
         marginTop: theme.spacing(2),
       },
@@ -111,7 +110,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Navbar: React.FC<Props> = ({ handleShow, notificationCount }) => {
+const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
@@ -279,11 +278,9 @@ const Navbar: React.FC<Props> = ({ handleShow, notificationCount }) => {
                   </div>
                 ) : null}
                 <div className={classes.item}>
-                  <IconButton aria-label="notification-button-icon" onClick={handleShow}>
-                    <Badge badgeContent={notificationCount} color="secondary">
-                      <NotificationsIcon color="primary" />
-                    </Badge>
-                  </IconButton>
+                  <NotificationsButton />
+                </div>
+                <div className={classes.item}>
                   <IdentityWidget />
                 </div>
               </Box>
@@ -403,7 +400,3 @@ const Navbar: React.FC<Props> = ({ handleShow, notificationCount }) => {
 };
 
 export default Navbar;
-interface Props {
-  handleShow: () => void;
-  notificationCount: number;
-}

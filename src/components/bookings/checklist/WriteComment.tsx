@@ -55,6 +55,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   }, [actingAs]);
   const [isCustomerMessage, setIsCustomerMessage] = useState(!isAdmin);
   const inputRef = useRef<HTMLInputElement>(null);
+  const submitButtonRf = useRef<HTMLButtonElement>(null);
   const admins = useAdminUsers();
   const teams = useTeams();
 
@@ -66,17 +67,17 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   }, [admins, teams]);
 
   useEffect(() => {
-    if (inputRef && inputRef.current) {
+    if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {
       let moustrapInstance = new Mousetrap(inputRef.current);
       moustrapInstance.stopCallback = function() {
         return false;
       };
-      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
+      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => submitButtonRf?.current?.click());
       return () => {
-        moustrapInstance?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
+        moustrapInstance?.unbind(['ctrl+enter', 'command+enter']);
       };
     }
-  }, [inputRef, messageText, mentions, isCustomerMessage]);
+  }, [inputRef, submitButtonRf]);
 
   useEffect(() => {
     if (!activityLogContext.state) return;
@@ -112,7 +113,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
           inputRef={inputRef}
           onChange={(event, newValue, newPlainTextValue, mentions) => {
-            setMessageText(event.target.value);
+            setMessageText(newPlainTextValue);
             setMentions(mentions);
           }}
           value={messageText}
@@ -126,7 +127,12 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           />
         </MentionsInput>
         <Tooltip title="Send">
-          <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
+          <IconButton
+            color="primary"
+            disabled={messageText.length < 1}
+            onClick={saveMessage}
+            buttonRef={submitButtonRf}
+          >
             <SendIcon />
           </IconButton>
         </Tooltip>

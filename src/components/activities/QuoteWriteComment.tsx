@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, createStyles, IconButton, makeStyles, Theme, Tooltip } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import SendIcon from '@material-ui/icons/Send';
-import debounce from 'lodash/fp/debounce';
 import Mousetrap from 'mousetrap';
 import { Mention, MentionItem, MentionsInput } from 'react-mentions';
 import mentionsClassNames from '../bookings/checklist/mention.module.css';
@@ -34,19 +33,18 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const QuoteWriteComment: React.FC<QuoteWriteCommentProp> = ({ onCommentSave }) => {
   const classes = useStyles();
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const userRecord = useContext(UserRecordContext);
-  const handleMessageTyping = useMemo(() => debounce(250, setMessageText), [setMessageText]);
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
     setIsAdmin(!actingAs);
   }, [actingAs]);
   const [isCustomerMessage, setIsCustomerMessage] = useState(!isAdmin);
   const inputRef = useRef<HTMLInputElement>(null);
+  const submitButtonRf = useRef<HTMLButtonElement>(null);
   const admins = useAdminUsers();
-  const [mousetrap, setMousetrap] = useState<MousetrapInstance>();
 
   const normalizedAdmins = useMemo(() => {
     return admins?.map(
@@ -55,26 +53,23 @@ const QuoteWriteComment: React.FC<QuoteWriteCommentProp> = ({ onCommentSave }) =
   }, [admins]);
 
   useEffect(() => {
-    console.log('binding');
-    let moustrapInstance = new Mousetrap();
-    moustrapInstance.stopCallback = function() {
-      return false;
-    };
-    moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
-    setMousetrap(moustrapInstance);
-  }, [inputRef, messageText]);
+    if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {
+      let moustrapInstance = new Mousetrap(inputRef.current);
+      moustrapInstance.stopCallback = function() {
+        return false;
+      };
+      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => submitButtonRf?.current?.click());
+      return () => {
+        moustrapInstance?.unbind(['ctrl+enter', 'command+enter']);
+      };
+    }
+  }, [inputRef, submitButtonRf]);
 
   useEffect(() => {
     if (inputRef && inputRef.current) {
       inputRef.current.focus();
     }
   }, [inputRef]);
-
-  useEffect(() => {
-    return () => {
-      mousetrap?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
-    };
-  }, []);
 
   const saveMessage = () => {
     onCommentSave(messageText, mentions, !isCustomerMessage);
@@ -101,7 +96,7 @@ const QuoteWriteComment: React.FC<QuoteWriteCommentProp> = ({ onCommentSave }) =
           placeholder={'Write a comment...'}
           inputRef={inputRef}
           onChange={(event, newValue, newPlainTextValue, mentions) => {
-            setMessageText(event.target.value);
+            setMessageText(newPlainTextValue);
             setMentions(mentions);
           }}
           value={messageText}
@@ -115,7 +110,12 @@ const QuoteWriteComment: React.FC<QuoteWriteCommentProp> = ({ onCommentSave }) =
           />
         </MentionsInput>
         <Tooltip title="Send">
-          <IconButton color="primary" disabled={messageText.length < 1} onClick={() => saveMessage()}>
+          <IconButton
+            color="primary"
+            disabled={messageText.length < 1}
+            onClick={saveMessage}
+            buttonRef={submitButtonRf}
+          >
             <SendIcon />
           </IconButton>
         </Tooltip>

@@ -1,5 +1,5 @@
 import { ActivityLogUserData } from '../components/bookings/checklist/ChecklistItemModel';
-import { MentionItem } from 'react-mentions';
+import { ActivityLogItem } from '../components/bookings/checklist/ActivityModel';
 
 export enum NotificationType {
   MENTIONED,
@@ -8,10 +8,12 @@ export enum NotificationType {
 export default interface Notification {
   userEmail: string;
   at: Date;
-  notification: NotificationType;
   by: ActivityLogUserData;
+  notification: NotificationType;
+  activityLogItem?: ActivityLogItem;
   comment: string;
-  mentions: any;
+  title?: string;
+  referenceUrl?: string;
   seen?: boolean;
   id?: string;
 }
