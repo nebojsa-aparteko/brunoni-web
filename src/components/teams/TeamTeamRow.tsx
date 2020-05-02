@@ -103,18 +103,16 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
         <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
       <TableCell align="right">
-        <TeamsUsersChipMultiInput
-          options={adminUsers || []}
-          values={activeTeam.users || []}
-          onChange={onTeamsChanged}
-        />
+        <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
       </TableCell>
       <TableCell align="right">
         <Autocomplete
           multiple
+          autoHighlight
           options={carriers || []}
+          getOptionSelected={(option, value) => option.name === value.name}
           getOptionLabel={option => option.name}
-          defaultValue={activeTeam.carriers}
+          defaultValue={team.carriers}
           onChange={handleCarrierChange}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)
@@ -127,8 +125,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       <TableCell align="right">
         <Autocomplete
           multiple
+          autoHighlight
           options={categories || []}
-          defaultValue={activeTeam.categories}
+          getOptionSelected={(option, value) => option === value}
+          defaultValue={team.categories}
           onChange={handleCategoryChange}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
@@ -142,8 +142,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       <TableCell align="right">
         <Autocomplete
           multiple
+          autoHighlight
           options={checklistItems || []}
-          defaultValue={activeTeam.checklistItems}
+          defaultValue={team.checklistItems}
+          getOptionSelected={(option, value) => option === value}
           onChange={handleChecklistItemChange}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)

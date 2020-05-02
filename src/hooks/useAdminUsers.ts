@@ -8,5 +8,5 @@ export default function useAdminUsers(roles: string[] = ADMIN_ROLES) {
 
   const usersCollection = useFirestoreCollection('users', query);
 
-  return usersCollection?.docs.map(doc => doc.data()) as UserRecord[];
+  return usersCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserRecord)) as UserRecord[];
 }

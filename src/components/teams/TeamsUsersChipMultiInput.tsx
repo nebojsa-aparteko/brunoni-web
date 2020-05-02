@@ -15,7 +15,9 @@ const TeamsUsersChipMultiInput: React.FC<Props> = ({ options, values, onChange }
   return (
     <Autocomplete
       multiple
+      autoHighlight
       options={options}
+      getOptionSelected={(option, value) => option.alphacomId === value.alphacomId}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
       defaultValue={values}
       onChange={onChange}

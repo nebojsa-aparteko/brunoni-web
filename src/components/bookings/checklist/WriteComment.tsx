@@ -47,6 +47,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
+  const [messageTextPlain, setMessageTextPlain] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const userRecord = useContext(UserRecordContext);
   const [isAdmin, setIsAdmin] = useState(!actingAs);
@@ -62,7 +63,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
     return admins
-      ?.map(admin => ({ id: admin.emailAddress, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+      ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
       .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
   }, [admins, teams]);
 
@@ -89,13 +90,19 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   const handleDeleteReferences = () => activityLogContext.setState({});
 
   const saveMessage = () => {
-    onCommentSave(messageText, mentions, !isCustomerMessage);
-    setMessageText('');
+    onCommentSave(messageTextPlain, mentions, !isCustomerMessage);
+    updateMessageText('', '', []);
     // reset text on send
     if (inputRef && inputRef.current) {
       inputRef.current.value = '';
     }
     setIsCustomerMessage(!isAdmin);
+  };
+
+  const updateMessageText = (message: string, messagePlain: string, mentions: MentionItem[]) => {
+    setMessageText(message);
+    setMessageTextPlain(messagePlain);
+    setMentions(mentions);
   };
 
   return (
@@ -113,8 +120,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
           inputRef={inputRef}
           onChange={(event, newValue, newPlainTextValue, mentions) => {
-            setMessageText(newPlainTextValue);
-            setMentions(mentions);
+            updateMessageText(newValue, newPlainTextValue, mentions);
           }}
           value={messageText}
           allowSuggestionsAboveCursor={true}

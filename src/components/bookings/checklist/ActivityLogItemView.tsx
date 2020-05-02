@@ -7,13 +7,13 @@ export interface ActivityLogItemViewProps {
   activityItem: ActivityLogItem;
 }
 
-const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem }) => {
+const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem, ...other }) => {
   return (
-    <Fragment>
+    <Fragment {...other}>
       {activityItem.type === ActivityType.COMMENT ? (
-        <Comment comment={activityItem} key={activityItem.id} />
+        <Comment comment={activityItem} />
       ) : (
-        <Activity activity={activityItem} key={activityItem.id} />
+        <Activity activity={activityItem} />
       )}
     </Fragment>
   );

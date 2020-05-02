@@ -1,6 +1,7 @@
 import { Team } from './Teams';
 
 export default interface UserRecord {
+  id: string;
   alphacomClientId: string;
   alphacomId: string;
   company: {

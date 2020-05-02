@@ -1,28 +1,28 @@
-import React, { useContext, Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import {
   Box,
   Divider,
   Grid,
-  Typography,
   makeStyles,
+  SvgIcon,
   Table,
   TableBody,
-  TableRow,
   TableCell,
-  SvgIcon,
-  Tooltip,
+  TableRow,
   Theme,
+  Tooltip,
+  Typography,
   withStyles,
 } from '@material-ui/core';
 import {
-  CargoDetail,
-  BookingVersion,
-  LocRefItem,
-  EquipmentDetail,
-  CtrTariff,
   BookingCategory,
   BookingLocType,
+  BookingVersion,
+  CargoDetail,
+  CtrTariff,
   CtrTariffDetail,
+  EquipmentDetail,
+  LocRefItem,
 } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
@@ -33,7 +33,7 @@ import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
 import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
 import invoke from 'lodash/fp/invoke';
-import { formatDateString } from './BookingSummary';
+import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -157,7 +157,7 @@ export const ContainerDatesContent: React.FC<ContainerDatesContentProps> = ({
               {firstLabel}
             </Grid>
             <Grid item style={{ width: '80px', paddingRight: '0px' }}>
-              {formatDateString(invoke('toDate')(firstDate))}
+              {formatDateSafe(invoke('toDate')(firstDate), DateFormats.LONG)}
             </Grid>
           </Grid>
           {secondDate ? (
@@ -166,7 +166,7 @@ export const ContainerDatesContent: React.FC<ContainerDatesContentProps> = ({
                 {secondLabel}
               </Grid>
               <Grid item style={{ width: '80px' }}>
-                {formatDateString(invoke('toDate')(secondDate))}
+                {formatDateSafe(invoke('toDate')(secondDate), DateFormats.LONG)}
               </Grid>
             </Grid>
           ) : null}
@@ -174,7 +174,7 @@ export const ContainerDatesContent: React.FC<ContainerDatesContentProps> = ({
       ) : secondDate ? (
         <Grid container spacing={1}>
           <Grid item>{secondLabel}</Grid>
-          <Grid item>{formatDateString(invoke('toDate')(secondDate))}</Grid>
+          <Grid item>{formatDateSafe(invoke('toDate')(secondDate), DateFormats.LONG)}</Grid>
         </Grid>
       ) : null}
     </Grid>

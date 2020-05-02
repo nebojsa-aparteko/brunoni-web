@@ -77,7 +77,7 @@ const Comment = ({ comment, ...other }: CommentProp) => {
             </Box>
             <Typography style={{ wordBreak: 'break-word' }}>
               {/*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*/}
-              {comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)}
+              {comment?.comment} {/*&& wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)*/}
             </Typography>
             {comment.checklistItem && (
               <Box>

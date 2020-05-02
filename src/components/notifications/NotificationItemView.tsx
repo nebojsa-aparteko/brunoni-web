@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Card, CardContent, CardHeader, createStyles, makeStyles, IconButton } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import Notification from '../../model/Notification';
 import firebase from 'firebase';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -13,6 +15,24 @@ const useStyles = makeStyles(theme =>
     header: {},
   }),
 );
+
+const NotificationTitle: React.FC<Props> = ({ notification }) => {
+  const history = useHistory();
+
+  return (
+    <Fragment>
+      Comment left at{' '}
+      <a
+        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+        onClick={() =>
+          notification.referenceObject && history.push(`/${notification.referenceObject}/${notification.referenceID}`)
+        }
+      >
+        {notification.referenceID}
+      </a>
+    </Fragment>
+  );
+};
 
 const NotificationItemView: React.FC<Props> = ({ notification }) => {
   const classes = useStyles();
@@ -28,8 +48,8 @@ const NotificationItemView: React.FC<Props> = ({ notification }) => {
   return (
     <Card className={classes.root}>
       <CardHeader
-        title="New mention"
-        subheader="In booking: 2223333"
+        title={<NotificationTitle notification={notification} />}
+        subheader={formatDistanceToNow(notification.at)}
         className={classes.header}
         /*action={
         <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>

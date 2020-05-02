@@ -1,24 +1,14 @@
-import React, { useMemo, Fragment } from 'react';
-import { Table, TableCell, TableRow, makeStyles, Typography, Grid, Paper } from '@material-ui/core';
+import React, { Fragment, useMemo } from 'react';
+import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
-import formatDate from 'date-fns/format';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import { DateFormats } from '../../utilities/formattingHelpers';
+import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 
 interface Props {
   booking: Booking;
 }
-
-export const formatDateString = (date: Date) => {
-  try {
-    return formatDate(date, DateFormats.LONG);
-  } catch (err) {
-    console.error(`Error formatting passed date ${date} `, err);
-    return '???';
-  }
-};
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -172,19 +162,19 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
                 content={[
                   booking.PlaceOfRecieptName,
                   booking.PlaceOfReceiptETS
-                    ? formatDateString(booking.PlaceOfReceiptETS)
-                    : formatDateString(booking.ETS),
+                    ? formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG)
+                    : formatDateSafe(booking.ETS, DateFormats.LONG),
                 ].join('<br/>ETS: ')}
               />
             ) : null}
 
             <TableRowData
               label={'Port of Loading'}
-              content={[booking.POLName, formatDateString(booking.ETS)].join('<br/>ETS: ')}
+              content={[booking.POLName, formatDateSafe(booking.ETS, DateFormats.LONG)].join('<br/>ETS: ')}
             />
             <TableRowData
               label={'Port of Discharge'}
-              content={[booking.PODName, formatDateString(booking.ETA)].join('<br/>ETA: ')}
+              content={[booking.PODName, formatDateSafe(booking.ETA, DateFormats.LONG)].join('<br/>ETA: ')}
             />
 
             {booking.PODName !== booking.FinalDestinationName ? (
@@ -192,7 +182,10 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
                 label={'Place of Delivery'}
                 content={[
                   booking.FinalDestinationName,
-                  formatDateString(booking.FinalDestinationETA ? booking.FinalDestinationETA : booking.ETA),
+                  formatDateSafe(
+                    booking.FinalDestinationETA ? booking.FinalDestinationETA : booking.ETA,
+                    DateFormats.LONG,
+                  ),
                 ].join('<br/>ETA: ')}
               />
             ) : null}

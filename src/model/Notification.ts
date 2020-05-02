@@ -6,14 +6,15 @@ export enum NotificationType {
 }
 
 export default interface Notification {
+  userId: string;
   userEmail: string;
   at: Date;
   by: ActivityLogUserData;
   notification: NotificationType;
   activityLogItem?: ActivityLogItem;
   comment: string;
-  title?: string;
-  referenceUrl?: string;
+  referenceObject?: string;
+  referenceID?: string;
   seen?: boolean;
   id?: string;
 }

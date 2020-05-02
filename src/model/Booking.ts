@@ -8,7 +8,7 @@ export interface Booking {
   FinalDestinationETA: Date;
   ETS: Date;
   FinalDestinationName: string;
-  ForwPersID: string;
+  ForwPersID?: string;
   ETA: Date;
   extensions?: BookingExtension[];
   BkgAgentContactEml: string;
