@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useContext, useEffect, useRef, useState }
 import * as changeCase from 'change-case';
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   createStyles,
@@ -15,6 +16,7 @@ import {
   Theme,
   Toolbar,
   Typography,
+  withStyles,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -33,6 +35,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<Props> = ({ handleShow }) => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
@@ -276,6 +279,11 @@ const Navbar: React.FC = () => {
                   </div>
                 ) : null}
                 <div className={classes.item}>
+                  <IconButton aria-label="notification-button-icon" onClick={handleShow}>
+                    <Badge badgeContent={4} color="secondary">
+                      <NotificationsIcon color="primary" />
+                    </Badge>
+                  </IconButton>
                   <IdentityWidget />
                 </div>
               </Box>
@@ -395,3 +403,6 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+interface Props {
+  handleShow: () => void;
+}

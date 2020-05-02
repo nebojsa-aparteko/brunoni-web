@@ -1,6 +1,6 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Route, Switch } from 'react-router';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles, Theme, Drawer, Typography, ClickAwayListener } from '@material-ui/core';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +27,7 @@ import UserRecord from './contexts/UserRecordContext';
 import ChartsCircularProgress from './components/dashboard/ChartsCircularProgress';
 import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
+import NotificationsContainer from './components/notifications/NotificationsContainer';
 
 const anonymousRoutes = (
   <Switch>
@@ -111,12 +112,22 @@ const useStyles = makeStyles((theme: Theme) => ({
 const App: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
+
+  const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
 
   return (
     <Fragment>
-      <Navbar />
+      <Navbar handleShow={handleShowNotifications} />
       <div className={classes.deviceControl}>
         {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+        {user && (
+          // <ClickAwayListener onClickAway={() => setIsNotificationDrawerOpen(false)}>
+          <Drawer open={isNotificationDrawerOpen} anchor="right">
+            <NotificationsContainer handleShow={handleShowNotifications} />
+          </Drawer>
+          // </ClickAwayListener>
+        )}
       </div>
       <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
       {process.env.REACT_APP_BRAND === 'brunoni' ? (
