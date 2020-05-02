@@ -13,4 +13,5 @@ export default interface Notification {
   comment: string;
   mentions: any;
   seen?: boolean;
+  id?: string;
 }

@@ -3,7 +3,10 @@ import { Card, CardContent, CardHeader, createStyles, makeStyles, IconButton } f
 import Comment from '../bookings/checklist/Comment';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import Notification from '../../model/Notification';
-import CloseIcon from '@material-ui/icons/Close';
+import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import firebase from 'firebase';
+
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
@@ -17,15 +20,23 @@ const useStyles = makeStyles(theme =>
 
 const NotificationItemView: React.FC<Props> = ({ notification }) => {
   const classes = useStyles();
-
+  const handleSeenStatusChange = () => {
+    return firebase
+      .firestore()
+      .collection('notifications')
+      .doc(notification.id)
+      .set({ ...notification, seen: !notification.seen }, { merge: true })
+      .then(_ => console.log('Successfully saved'))
+      .catch(err => console.log(err));
+  };
   return (
     <Card className={classes.root}>
       <CardHeader
         title="New mention"
         subheader="In booking: 2223333"
         action={
-          <IconButton aria-label="close-button-notification-center">
-            <CloseIcon />
+          <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
+            {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
           </IconButton>
         }
         className={classes.header}
