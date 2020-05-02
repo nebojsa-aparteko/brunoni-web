@@ -29,6 +29,7 @@ import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -314,7 +315,9 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                         <Fragment>
                           {booking.PlaceOfRecieptName}
                           <br />
-                          <Typography variant={'body2'}>ETS. {formatDate(booking.ETS, 'dd.MM.yyyy')}</Typography>
+                          <Typography variant={'body2'}>
+                            ETS. {formatDateSafe(booking.ETS, DateFormats.LONG)}
+                          </Typography>
                         </Fragment>
                       }
                       gutterBottom
@@ -328,7 +331,9 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                         <Fragment>
                           {booking.FinalDestinationName}
                           <br />
-                          <Typography variant={'body2'}>ETA. {formatDate(booking.ETA, 'dd.MM.yyyy')}</Typography>
+                          <Typography variant={'body2'}>
+                            ETA. {formatDateSafe(booking.ETA, DateFormats.LONG)}
+                          </Typography>
                         </Fragment>
                       }
                       gutterBottom

@@ -66,15 +66,17 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
   }, [admins, teams]);
 
   useEffect(() => {
-    let moustrapInstance = new Mousetrap();
-    moustrapInstance.stopCallback = function() {
-      return false;
-    };
-    moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
-    return () => {
-      moustrapInstance?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
-    };
-  }, [inputRef]);
+    if (inputRef && inputRef.current) {
+      let moustrapInstance = new Mousetrap(inputRef.current);
+      moustrapInstance.stopCallback = function() {
+        return false;
+      };
+      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => saveMessage());
+      return () => {
+        moustrapInstance?.unbind(['ctrl+enter', 'command+enter']); // componentWillUnmount
+      };
+    }
+  }, [inputRef, messageText, mentions, isCustomerMessage]);
 
   useEffect(() => {
     if (!activityLogContext.state) return;
