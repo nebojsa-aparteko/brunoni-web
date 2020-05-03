@@ -29,12 +29,12 @@ const useStyles = makeStyles((theme: Theme) =>
       whiteSpace: 'normal',
     },
     adminMessage: {
-      backgroundColor: '#ccc',
+      backgroundColor: '#eee',
     },
   }),
 );
 
-const wrapTags = (text: string, regex: RegExp) => {
+/*const wrapTags = (text: string, regex: RegExp) => {
   const textArray = text.split(regex);
   let identifier;
   let name;
@@ -52,7 +52,7 @@ const wrapTags = (text: string, regex: RegExp) => {
     }
     return str;
   });
-};
+};*/
 
 const Comment = ({ comment, ...other }: CommentProp) => {
   const classes = useStyles();
