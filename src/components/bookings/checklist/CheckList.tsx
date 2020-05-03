@@ -43,7 +43,7 @@ function TabPanel(props: TabPanelProps) {
 const safeInvoke = (method: string) => (object: any) => (object ? invoke(method)(object) : null);
 
 export const editRestriction = (date: Date) =>
-  differenceInMilliseconds(new Date(), date) <= Number(process.env.EDIT_RESTRICTION_TIME) || 30000;
+  differenceInMilliseconds(new Date(), date) <= Number(process.env.EDIT_RESTRICTION_TIME) || 600000;
 
 const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];

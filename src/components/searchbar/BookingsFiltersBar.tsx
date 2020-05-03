@@ -66,7 +66,12 @@ const BookingsFiltersBar: React.FC<Props> = ({
         {showClientFilter && (
           <Grid item sm={3} xs={12}>
             <Box display="flex">
-              <ClientInput label="Choose Client" clients={clients} onChange={setClientFilter} value={clientFilter} />
+              <ClientInput
+                label="Choose Client"
+                clients={clients || []}
+                onChange={setClientFilter}
+                value={clientFilter}
+              />
               {showRefreshButton && clientFilter && (
                 <SynchronizeButton collection="quotes" alphacomClientId={clientFilter.id} />
               )}
