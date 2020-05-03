@@ -143,7 +143,7 @@ const checkStageDependency = (stages: Stage[], stageId: string) => {
   } else return stages[index - 1].checked;
 };
 
-const createActivityObject = (
+export const createActivityObject = (
   changeType: ActivityChangeType,
   by: ActivityLogUserData,
   checklistItem: ChecklistItem,
@@ -166,7 +166,7 @@ const createActivityObject = (
     stage: stage,
   } as ActivityLogItem);
 
-const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedChecklist }: ChecklistItemRowProp) => {
+const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -177,12 +177,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     return ['booking-documents', 'clients', client?.id, 'bookings', booking?.id, checklistItem.id].join('/');
   }, [booking, client, checklistItem]);
 
-  const [checklistItemValues, setCheckListItemValues] = useState(checklistItem?.values || []);
-  const [checklistItemValuesAdmin, setCheckListItemValuesAdmin] = useState(checklistItem?.valuesAdmin || []);
-  const [checklistItemChecked, setChecklistItemChecked] = useState(checklistItem?.checked || false);
-
   // status indicators
-  const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
 
@@ -209,7 +204,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         });
       })
       .catch(error => {
-        console.trace(error);
+        console.error('error storing activity', error);
         enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
@@ -233,49 +228,36 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     [booking?.id, checklistItem.id],
   );
 
-  const checklistItemCheckedHandler = useCallback((checked: boolean) => {
-    return saveChecklistChanges('checked', checked).then(_ =>
-      addActivityItem(
-        booking!.id,
-        checklistItem!.id,
-        createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), checklistItem),
-      ),
-    );
-  }, []);
-
-  const checklistItemMarkCompletedHandler = useCallback((action: CustomerAction) => {
-    return saveChecklistChanges('customerAction', action).then(_ =>
-      addActivityItem(
-        booking!.id,
-        checklistItem!.id,
-        createActivityObject(ActivityChangeType.DONE_BY_CUSTOMER, getActivityLogUserData(), checklistItem),
-      ),
-    );
-  }, []);
-
-  const checklistItemFileDeletedHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument, internal: boolean) => {
-      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
+  const checklistItemCheckedHandler = useCallback(
+    (checked: boolean) => {
+      return saveChecklistChanges('checked', checked).then(_ =>
         addActivityItem(
           booking!.id,
           checklistItem!.id,
-          createActivityObject(
-            ActivityChangeType.DELETE_FILE,
-            getActivityLogUserData(),
-            checklistItem,
-            [deletedFile],
-            undefined,
-            internal,
-          ),
+          createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), checklistItem),
         ),
       );
     },
-    [],
+    [booking?.id, checklistItem.id],
+  );
+
+  const checklistItemMarkCompletedHandler = useCallback(
+    (action: CustomerAction) => {
+      return saveChecklistChanges('customerAction', action).then(_ =>
+        addActivityItem(
+          booking!.id,
+          checklistItem!.id,
+          createActivityObject(ActivityChangeType.DONE_BY_CUSTOMER, getActivityLogUserData(), checklistItem),
+        ),
+      );
+    },
+    [booking?.id, checklistItem.id],
   );
 
   const checklistItemFileAddedHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], addedFiles: ChecklistItemValueDocument[], internal: boolean) => {
-      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
+    (addedFiles: ChecklistItemValueDocument[], internal: boolean) => {
+      const newDocuments = ((internal ? checklistItem.valuesAdmin : checklistItem.values) || []).concat(addedFiles);
+      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', newDocuments).then(_ =>
         addActivityItem(
           booking!.id,
           checklistItem!.id,
@@ -290,25 +272,28 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         ),
       );
     },
-    [],
+    [booking?.id, checklistItem.id],
   );
 
-  const checklistItemStageChangeHandler = useCallback((stages: Stage[], stage: Stage) => {
-    console.log(stage, 'STAGE');
-    return saveChecklistChanges('stages', stages).then(_ =>
-      addActivityItem(
-        booking!.id,
-        checklistItem!.id,
-        createActivityObject(
-          ActivityChangeType.STAGE_CHECKED,
-          getActivityLogUserData(),
-          checklistItem,
-          undefined,
-          stage,
+  const checklistItemStageChangeHandler = useCallback(
+    (stages: Stage[], stage: Stage) => {
+      console.log(stage, 'STAGE');
+      return saveChecklistChanges('stages', stages).then(_ =>
+        addActivityItem(
+          booking!.id,
+          checklistItem!.id,
+          createActivityObject(
+            ActivityChangeType.STAGE_CHECKED,
+            getActivityLogUserData(),
+            checklistItem,
+            undefined,
+            stage,
+          ),
         ),
-      ),
-    );
-  }, []);
+      );
+    },
+    [booking?.id, checklistItem.id],
+  );
 
   const checklistItemDocumentStatusChangeHandler = useCallback(
     (documents: ChecklistItemValueDocument[], document: ChecklistItemValueDocument, internal: boolean) => {
@@ -322,7 +307,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         ),
       );
     },
-    [],
+    [booking?.id, checklistItem.id],
   );
   const handleMention = () => {
     activityLogContext.setState({ checklistReference: checklistItem });
@@ -348,17 +333,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 
   const handleCheckboxChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setChecklistItemChecked(event.target.checked);
       storeActivity(() => checklistItemCheckedHandler(event.target.checked));
     },
     [checklistItemCheckedHandler],
-  );
-
-  const saveItemValue = useCallback(
-    (isPrivate: boolean, itemValues: ChecklistItemValueDocument[]) => {
-      saveChecklistChanges(isPrivate ? 'valuesAdmin' : 'values', itemValues);
-    },
-    [checklistItem, saveChecklistChanges, checklistItemValues, checklistItemValuesAdmin],
   );
 
   const saveFiles = useCallback(
@@ -419,7 +396,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
     internal: boolean,
   ) => {
     let newItemArray: ChecklistItemValueDocument[];
-    if (!editRestriction(item.status!.at as Date)) {
+    if (item.status && !editRestriction(item.status!.at as Date)) {
       return enqueueSnackbar(
         <Typography color="inherit">
           {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
@@ -434,9 +411,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
       const newDocument = { ...item, status: status };
       newItemArray = [...(checklistItem.valuesAdmin || [])];
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = newDocument;
-      setCheckListItemValuesAdmin(newItemArray);
       if (isAdmin && newDocument.status?.type === ChecklistItemValueDocumentStatusType.APPROVED) {
-        const newValues = checklistItemValues.filter(doc => doc.url !== item.url);
+        const newValues = checklistItem.values?.filter(doc => doc.url !== item.url) || [];
         newValues.push({
           ...newDocument,
           status: { type: ChecklistItemValueDocumentStatusType.DEFAULT },
@@ -444,86 +420,27 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         saveChecklistChanges('values', newValues)
           .then(_ => console.log('Approved file'))
           .catch(err => console.log(err));
-        setCheckListItemValues(newValues);
       } else if (isAdmin && newDocument.status?.type === ChecklistItemValueDocumentStatusType.REJECTED) {
-        const newValues = checklistItemValues.filter(doc => doc.url !== item.url);
+        const newValues = checklistItem.values?.filter(doc => doc.url !== item.url);
         saveChecklistChanges('values', newValues)
           .then(_ => console.log('Delete rejected file'))
           .catch(err => console.log(err));
-        setCheckListItemValues(newValues);
       } else if (
         isAdmin &&
         newDocument.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT &&
         item.status?.type === ChecklistItemValueDocumentStatusType.APPROVED
       ) {
-        const newValues = checklistItemValues.filter(doc => doc.url !== item.url);
+        const newValues = checklistItem.values?.filter(doc => doc.url !== item.url);
         saveChecklistChanges('values', newValues)
           .then(_ => console.log('Delete rejected file'))
           .catch(err => console.log(err));
-        setCheckListItemValues(newValues);
       }
     } else {
       newItemArray = [...(checklistItem.values || [])];
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item, status: status };
-      setCheckListItemValues(newItemArray);
-      console.log(newItemArray, 'NEW ITEM ARRAY');
     }
     storeActivity(() => checklistItemDocumentStatusChangeHandler(newItemArray, item, internal));
   };
-
-  const deleteFile = useCallback(
-    async (item: ChecklistItemValueDocument, internal: boolean): Promise<any> => {
-      setRemovalInProgress(true);
-      return new Promise((resolve, reject) => {
-        try {
-          if (!editRestriction(item.status!.at as Date)) {
-            return enqueueSnackbar(
-              <Typography color="inherit">
-                Failed to edit item - You cant change status after 30sec from last change!
-              </Typography>,
-              {
-                variant: 'error',
-                autoHideDuration: 1000,
-              },
-            );
-          }
-          const path = [storageBasePath, `${item.storedName}`].join('/');
-          const storageRef = firebase.storage().ref();
-          const documentRef = storageRef.child(encodeURI(path));
-
-          documentRef
-            .delete()
-            .then(() => {
-              let newItemArray: ChecklistItemValueDocument[];
-              if (internal) {
-                newItemArray = checklistItemValuesAdmin.filter(chkItem => chkItem !== item);
-                setCheckListItemValuesAdmin(newItemArray);
-              } else {
-                newItemArray = checklistItemValues.filter(chkItem => chkItem !== item);
-                setCheckListItemValues(newItemArray);
-              }
-              resolve(item);
-              storeActivity(() => checklistItemFileDeletedHandler(newItemArray, item, internal));
-              setRemovalInProgress(false);
-            })
-            .catch(error => {
-              reject(error);
-              setRemovalInProgress(false);
-              enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
-            });
-        } catch (error) {
-          enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
-            variant: 'error',
-            autoHideDuration: 1000,
-          });
-        }
-      });
-    },
-    [storageBasePath, checklistItemValues, removalInProgress, checklistItemValuesAdmin],
-  );
 
   const onDrop = useCallback(
     (acceptedFiles: File[], internal: boolean) => {
@@ -538,30 +455,20 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
               storedName: item.storedName,
             } as ChecklistItemValueDocument;
           });
-          // FIXME it needs to be updated only after successful DB store
-          let itemValues: ChecklistItemValueDocument[] = [];
-          if (internal) {
-            itemValues = checklistItemValuesAdmin.concat(values);
-            console.log('FILES', itemValues);
-            setCheckListItemValuesAdmin(itemValues);
-          } else {
-            itemValues = checklistItemValues.concat(values);
-            setCheckListItemValues(itemValues);
-          }
-          storeActivity(() => checklistItemFileAddedHandler(itemValues, values, internal));
-          // saveItemValue(false, itemValues);
+          storeActivity(() => checklistItemFileAddedHandler(values, internal));
         })
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
         });
     },
-    [checklistItemValues, saveFiles, storeActivity, saveChecklistChanges, checklistItemValuesAdmin],
+    [checklistItem, saveFiles, storeActivity],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, false),
     noClick: true,
   });
+
   const {
     getRootProps: getRootPropsDraft,
     getInputProps: getInputPropsDraft,
@@ -570,7 +477,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
   } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 
   return (
-    <Box display="flex" justifyContent="space-between" my={1}>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      my={1}
+      flexDirection={isAdmin && checklistItem.valuesAdmin?.length === 0 ? 'row' : 'column'}
+    >
       <Box
         {...getRootProps()}
         className={isDragActive ? classes.dropZone : classes.root}
@@ -601,15 +513,15 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
 
         <Box display="flex" flexDirection="row">
           <Box flexDirection="row" alignContent="center">
-            <a id={checklistItem.id}></a>
+            <a id={checklistItem.id} />
             {isAdmin ? (
               <Checkbox
-                checked={checklistItemChecked}
+                checked={checklistItem.checked}
                 disabled={!isAdmin}
                 onChange={event => handleCheckboxChange(event)}
               />
             ) : (
-              checklistItemChecked && <DoneIcon />
+              checklistItem.checked && <DoneIcon />
             )}
 
             <Typography display="inline">{checklistItem.label}</Typography>
@@ -650,56 +562,46 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, setMentionedCheckli
         )}
         {/*Customer Data*/}
         <DocumentList
-          checklistItemValues={checklistItemValues}
+          storageBasePath={storageBasePath}
+          checklistItemValues={checklistItem.values || []}
           bookingId={booking!.id}
-          removalInProgress={removalInProgress}
-          deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, false)}
           checklistItem={checklistItem}
           changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
             handleDocumentStatusChange(item, status, false)
           }
           internal={false}
         />
-        {isAdmin && checklistItemValuesAdmin.length > 0 && (
-          <Box>
+      </Box>
+      <Box>
+        {isAdmin && checklistItem.valuesAdmin && checklistItem.valuesAdmin?.length > 0 && (
+          <Box
+            {...getRootProps()}
+            className={isDragActiveDraft ? classes.dropZone : classes.root}
+            flexBasis="fit-content"
+            display="flex"
+            flexDirection="column"
+            flex={1}
+            id={checklistItem.id}
+            px={1}
+          >
+            <input {...getInputProps()} />
             <Divider />
-            <Box display="flex" flexDirection="row">
-              <Typography variant="caption">Drafts</Typography>
-              <DocumentList
-                checklistItemValues={checklistItemValuesAdmin}
-                bookingId={booking!.id}
-                removalInProgress={removalInProgress}
-                deleteFile={(item: ChecklistItemValueDocument) => deleteFile(item, true)}
-                checklistItem={checklistItem}
-                changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
-                  handleDocumentStatusChange(item, status, true)
-                }
-                internal={true}
-              />
-              <Fragment>
-                <Divider orientation="vertical" flexItem={true} />
-                <Box
-                  {...getRootPropsDraft()}
-                  className={
-                    isDragActiveDraft ? classes.draftDragZone : isDragActive ? classes.draftEmpty : classes.draftRoot
-                  }
-                  flexBasis="fit-content"
-                  display="flex"
-                  flexDirection="column"
-                  id={checklistItem.id}
-                  justifyContent="center"
-                  alignItems="center"
-                  px={1}
-                >
-                  <input {...getInputPropsDraft()} />
-                  Drafts
-                </Box>
-              </Fragment>
-            </Box>
+            <Typography variant="caption">Drafts</Typography>
+
+            <DocumentList
+              storageBasePath={storageBasePath}
+              checklistItemValues={checklistItem.valuesAdmin || []}
+              bookingId={booking!.id}
+              checklistItem={checklistItem}
+              changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+                handleDocumentStatusChange(item, status, true)
+              }
+              internal={true}
+            />
           </Box>
         )}
       </Box>
-      {isAdmin && checklistItemValuesAdmin.length === 0 && (
+      {isAdmin && checklistItem.valuesAdmin?.length === 0 && (
         <Fragment>
           <Divider orientation="vertical" flexItem={true} />
           <Box
@@ -728,7 +630,6 @@ interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking;
-  setMentionedChecklist?: any;
 }
 
 interface ConfirmedByCustomer {

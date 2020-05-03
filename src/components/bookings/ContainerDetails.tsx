@@ -407,7 +407,6 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
 
                   {detail.LocRefs.map((ref: LocRefItem, index: number) => {
                     if (ref.LocType === 'PICK UP' && ref.LocDate) {
-                      console.log('Ref', ref);
                       return (
                         <Fragment key={`booking-loc-ref-${index}`}>
                           <TableRowData label={'Pick Up Reference'} content={ref.LocRef} />

@@ -132,16 +132,9 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
             displayTransform={(id, display) => '@' + display}
           />
         </MentionsInput>
-        <Tooltip title="Send">
-          <IconButton
-            color="primary"
-            disabled={messageText.length < 1}
-            onClick={saveMessage}
-            buttonRef={submitButtonRf}
-          >
-            <SendIcon />
-          </IconButton>
-        </Tooltip>
+        <IconButton color="primary" disabled={messageText.length < 1} onClick={saveMessage} buttonRef={submitButtonRf}>
+          <SendIcon />
+        </IconButton>
       </Box>
       {isAdmin && (
         <FormControlLabel

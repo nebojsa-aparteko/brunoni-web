@@ -5,6 +5,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem } from './ActivityModel';
 import classNames from 'classnames';
+import asArray from '../../../utilities/asArray';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -86,7 +87,12 @@ const Comment = ({ comment, ...other }: CommentProp) => {
             )}
             {comment.documents && (
               <Box>
-                Doc - <a href={`#${comment.documents[0]?.url}`}>{comment.documents[0]?.name}</a>
+                Doc -{' '}
+                {asArray(comment.documents).map(item => (
+                  <a href={`#${item.url}`} key={`doc-${item.url}`}>
+                    {item.name}
+                  </a>
+                ))}
               </Box>
             )}
           </Paper>

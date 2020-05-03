@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -22,6 +22,7 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import {
+  ActivityChangeType,
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
@@ -34,6 +35,10 @@ import ActingAs from '../../../contexts/ActingAs';
 import { editRestriction } from './CheckList';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { flow, invoke } from 'lodash/fp';
+import firebase from '../../../firebase';
+import { useSnackbar } from 'notistack';
+import { addActivityItem } from './ActivityLogContainer';
+import { createActivityObject } from './ChecklistItemRow';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -87,17 +92,55 @@ const DocumentListItem = ({
   item,
   checklistItem,
   bookingId,
-  index,
-  removalInProgress,
-  deleteFile,
   changeStatus,
+  storageBasePath,
   internal,
-}: Props) => {
+}: DocumentListItemProps) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const checklistItemFileDeletedHandler = useCallback(
+    (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument, internal: boolean) => {
+      firebase
+        .firestore()
+        .collection('bookings')
+        .doc(bookingId)
+        .collection('checklist')
+        .doc(checklistItem?.id)
+        .update(internal ? 'valuesAdmin' : 'values', documents)
+        .then(_ => {
+          console.log('File deleted', deletedFile, documents, internal, checklistItem);
+          return addActivityItem(
+            bookingId,
+            checklistItem!.id,
+            createActivityObject(
+              ActivityChangeType.DELETE_FILE,
+              getActivityLogUserData(),
+              checklistItem,
+              [deletedFile],
+              undefined,
+              internal,
+            ),
+          );
+        })
+        .catch(error => {
+          console.error('failed to update deleted items', error);
+          enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
+            variant: 'error',
+            autoHideDuration: 1000,
+          });
+        });
+    },
+    [],
+  );
+
+  const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
+
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -113,9 +156,55 @@ const DocumentListItem = ({
     activityLogContext.setState({ documentReference: item, checklistReference: checklistItem });
   const checklistCheckedRule = () => checklistItem.checked;
 
+  const deleteFile = useCallback(
+    (item: ChecklistItemValueDocument, internal: boolean) => {
+      setRemovalInProgress(true);
+      try {
+        if (!editRestriction(item.uploadedAt as Date)) {
+          return enqueueSnackbar(
+            <Typography color="inherit">
+              Failed to edit item - You cant change status after 30sec from last change!
+            </Typography>,
+            {
+              variant: 'error',
+              autoHideDuration: 1000,
+            },
+          );
+        }
+        const path = [storageBasePath, `${item.storedName}`].join('/');
+        const storageRef = firebase.storage().ref();
+        const documentRef = storageRef.child(encodeURI(path));
+
+        documentRef
+          .delete()
+          .then(() => {
+            console.debug('file deleted from storage ', item);
+          })
+          .catch(error => {
+            console.error('Failed to remove item - {error.message}', error);
+          })
+          .finally(() => {
+            // remove item from the list in any case since if it is an error with the storage means file is alrady out
+            setRemovalInProgress(false);
+            const newItemArray = internal
+              ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
+              : checklistItem.values?.filter(chkItem => chkItem !== item);
+            checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+          });
+      } catch (error) {
+        setRemovalInProgress(false);
+        enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 1000,
+        });
+      }
+    },
+    [storageBasePath, checklistItem, removalInProgress],
+  );
+
   return (
     <div>
-      <ListItem key={`filelistitem-${bookingId}-${index}`}>
+      <ListItem>
         <a
           href={item.url}
           download={item.name}
@@ -129,10 +218,10 @@ const DocumentListItem = ({
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            id={`filelistitem-${bookingId}-${index}`}
+            id={`filelistitem-${item.storedName}`}
             primary={item.name}
             secondary={
-              <Box display="flex" flexDirection="column">
+              <span>
                 <Typography variant="caption">
                   {`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
                 </Typography>
@@ -143,7 +232,7 @@ const DocumentListItem = ({
                     )} by ${item.status?.by?.firstName}`}
                   </Typography>
                 )}
-              </Box>
+              </span>
             }
           />
         </a>
@@ -152,16 +241,18 @@ const DocumentListItem = ({
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
               <AddCommentIcon />
             </IconButton>
-            {userRecord?.emailAddress === item.uploadedBy.emailAddress &&
-              item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
-              editRestriction(item.uploadedAt) && (
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
+              editRestriction(item.uploadedAt) &&
+              !checklistCheckedRule() && (
                 <IconButton
                   edge="end"
                   size="small"
                   aria-label="Remove File"
-                  onClick={() => deleteFile(item)}
-                  aria-labelledby={`filelistitem-${bookingId}-${index}`}
-                  disabled={checklistCheckedRule()}
+                  onClick={event => {
+                    event.stopPropagation();
+                    deleteFile(item, internal);
+                  }}
+                  aria-labelledby={`filelistitem-${item.storedName}`}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -244,13 +335,14 @@ const DocumentListItem = ({
 
 export default DocumentListItem;
 
-export interface Props {
-  item: ChecklistItemValueDocument;
+export interface DocumentListItemPropsBase {
   checklistItem: ChecklistItem;
   bookingId: string;
-  index: number;
-  removalInProgress: boolean;
-  deleteFile: (item: ChecklistItemValueDocument) => void;
+  storageBasePath: string;
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
+}
+
+interface DocumentListItemProps extends DocumentListItemPropsBase {
+  item: ChecklistItemValueDocument;
 }

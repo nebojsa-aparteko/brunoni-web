@@ -1,7 +1,7 @@
 import React from 'react';
 import { orderBy } from 'lodash/fp';
-import { ChecklistItem, ChecklistItemValueDocument, ChecklistItemValueDocumentStatus } from './ChecklistItemModel';
-import DocumentListItem from './DocumentListItem';
+import { ChecklistItemValueDocument } from './ChecklistItemModel';
+import DocumentListItem, { DocumentListItemPropsBase } from './DocumentListItem';
 import { createStyles, List, makeStyles, Theme } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -17,8 +17,7 @@ const DocumentList = ({
   checklistItem,
   checklistItemValues,
   bookingId,
-  removalInProgress,
-  deleteFile,
+  storageBasePath,
   changeStatus,
   internal,
 }: Props) => {
@@ -28,12 +27,10 @@ const DocumentList = ({
     <List className={classes.documentList}>
       {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
         <DocumentListItem
-          key={`chklistitem-${index}`}
+          key={`chklistitem-${item.storedName}`}
           item={item}
           bookingId={bookingId}
-          index={index}
-          removalInProgress={removalInProgress}
-          deleteFile={deleteFile}
+          storageBasePath={storageBasePath}
           checklistItem={checklistItem}
           changeStatus={changeStatus}
           internal={internal}
@@ -45,12 +42,6 @@ const DocumentList = ({
 
 export default DocumentList;
 
-export interface Props {
-  checklistItem: ChecklistItem;
+export interface Props extends DocumentListItemPropsBase {
   checklistItemValues: ChecklistItemValueDocument[];
-  bookingId: string;
-  removalInProgress: boolean;
-  deleteFile: (item: ChecklistItemValueDocument) => void;
-  changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
-  internal: boolean;
 }
