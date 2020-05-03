@@ -72,19 +72,6 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
       } as ActivityLogUserData;
-      console.log(
-        flow(omitBy(isNil))({
-          type: ActivityType.COMMENT,
-          comment: messageBody,
-          at: new Date(),
-          by: userActivityLogData,
-          isInternal: internal,
-          checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
-          documents: [flow(omitBy(isNil))(shortenedDocumentValue(activityLogContext.state?.documentReference))],
-          mentions: mentions,
-        } as ActivityLogItem),
-        'ITEM',
-      );
       firebase
         .firestore()
         .collection('bookings')

@@ -1,15 +1,17 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState, Fragment, useContext } from 'react';
 import { Badge, Drawer, IconButtonProps } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import useNotifications from '../../hooks/useNotifications';
 import NotificationsContainer from './NotificationsContainer';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
-  const notifications = useNotifications('a.zeric@brunoni.ch');
+  const userRecord = useContext(UserRecordContext);
+  const notifications = useNotifications(userRecord?.alphacomId || '');
 
   useEffect(() => {
     setNotificationCount(

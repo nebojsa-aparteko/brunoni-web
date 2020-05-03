@@ -4,11 +4,11 @@ import useFirestoreCollection from './useFirestoreCollection';
 
 import Notification from '../model/Notification';
 import { invoke, update } from 'lodash/fp';
-export default function useNotifications(userEmail: string) {
+export default function useNotifications(userId: string) {
   const query = useCallback(
     q =>
       q
-        .where('userEmail', '==', userEmail)
+        .where('userAlphacomId', '==', userId)
         .orderBy('at', 'desc')
         .limit(50),
     [],
