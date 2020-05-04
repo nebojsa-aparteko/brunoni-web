@@ -184,7 +184,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   }
 
   return (
-    <Fragment>
+    <MUIContainer maxWidth="lg">
       <Meta title={`Bookings`} />
 
       <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
@@ -238,7 +238,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
           )}
         </CardActions>
       </div>
-    </Fragment>
+    </MUIContainer>
   );
 };
 
