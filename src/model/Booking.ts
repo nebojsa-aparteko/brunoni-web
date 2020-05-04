@@ -154,8 +154,7 @@ export interface PortTerms {
 }
 
 export interface Closing {
-  ClosingDate: string;
-  ClosingTime: string;
+  ClosingDate: Date;
   ClosingTxt: string;
   ClosingType: string;
 }
