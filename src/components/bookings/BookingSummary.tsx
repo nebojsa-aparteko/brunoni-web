@@ -30,6 +30,7 @@ const useStyles = makeStyles(theme => ({
     border: 'none',
     fontWeight: 700,
     verticalAlign: 'top',
+    maxWidth: '8em',
   },
   tableRow: {
     ['@media not print']: {
@@ -144,7 +145,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
   }, [client, booking]);
 
   return (
-    <Grid container spacing={1} style={{ paddingTop: '0px' }}>
+    <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
       <Grid item md={5} xs={12} className={classes.firstColumn}>
         <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
           <colgroup>

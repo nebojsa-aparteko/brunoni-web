@@ -13,6 +13,7 @@ const useStyles = makeStyles(theme => ({
     border: 'none',
     fontWeight: 700,
     verticalAlign: 'top',
+    maxWidth: '8em',
   },
   tableRow: {
     ['@media not print']: {
@@ -52,8 +53,8 @@ const SpecialRemarks: React.FC<Props> = ({ remarks }) => {
   return (
     <Table size="small" aria-label="a dense table">
       <colgroup>
-        <col style={{ width: '20%' }} />
-        <col style={{ width: '80%' }} />
+        <col style={{ width: '14%' }} />
+        <col style={{ width: '86%' }} />
       </colgroup>
       <TableBody>
         <TableRow className={classes.tableRow}>

@@ -94,6 +94,7 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: 0,
     border: 'none',
     fontWeight: 700,
+    maxWidth: '8em',
   },
   tableRow: {
     verticalAlign: 'top',
@@ -399,8 +400,8 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
             <Grid item md={7} xs={12}>
               <Table size="small" aria-label="a dense table">
                 <colgroup>
-                  <col style={{ width: '25%' }} />
-                  <col style={{ width: '75%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '80%' }} />
                 </colgroup>
                 <TableBody>
                   {isImport(category) ? <AdditionalCargoData detail={detail} /> : null}
