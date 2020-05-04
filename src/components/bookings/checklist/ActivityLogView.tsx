@@ -32,12 +32,11 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
         title={<Typography variant="subtitle1">Activity</Typography>}
       />
       <CardContent>
-        <WriteComment onCommentSave={onCommentSave} />
-        {/*{quoteActivityLog ? (
+        {quoteActivityLog ? (
           <QuoteWriteComment onCommentSave={onCommentSave} />
         ) : (
-
-        )}*/}
+          <WriteComment onCommentSave={onCommentSave} />
+        )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <ActivityLogItemView activityItem={activity} key={`act-${activity.id}`} />
         ))}
