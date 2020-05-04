@@ -209,7 +209,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCate
       <TableCell className={classes.tableCell}>
         {equipment.map(equipmentDetail =>
           equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
-            <span>
+            <span key={`ctdet-${equipmentDetail.ContainerNumber}`}>
               {equipmentDetail.GateInDate ||
               equipmentDetail.PickUpDate ||
               equipmentDetail.DropOffDate ||
@@ -240,7 +240,7 @@ export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDeta
           tariff.Txt &&
           ctrTariffs &&
           ctrTariffs.some(ctrTariff => ctrTariff.ID === tariff.ID && ctrTariff.Type === tariff.Type) ? (
-            <Fragment>
+            <Fragment key={`tariffId-${tariff.ID}`}>
               {tariff.DaysFree + ' ' + tariff.Txt}
               <br />
             </Fragment>

@@ -14,11 +14,15 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   const notifications = useNotifications(userRecord?.alphacomId || '');
 
   useEffect(() => {
-    setNotificationCount(
-      (prevState: number) =>
-        notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
-        prevState,
-    );
+    if (notifications) {
+      setNotificationCount(
+        (prevState: number) =>
+          notifications?.reduce(
+            (accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator),
+            0,
+          ) || prevState,
+      );
+    }
   }, [notifications]);
 
   return (
