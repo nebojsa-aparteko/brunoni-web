@@ -34,6 +34,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
+import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -175,11 +176,13 @@ const Navbar: React.FC = () => {
                         <Typography variant="body1">Quotes</Typography>
                       </Button>
                     </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/bookings" underline="none">
-                        <Typography variant="body1">Bookings</Typography>
-                      </Button>
-                    </div>
+                    {isDashboardUser(userRecord) && (
+                      <div className={classes.item}>
+                        <Button component={Link} to="/bookings" underline="none">
+                          <Typography variant="body1">Bookings</Typography>
+                        </Button>
+                      </div>
+                    )}
                     <div className={classes.item}>
                       <Button
                         endIcon={<KeyboardArrowDownIcon />}
@@ -277,9 +280,11 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                <div className={classes.item}>
-                  <NotificationsButton />
-                </div>
+                {isDashboardUser(userRecord) && (
+                  <div className={classes.item}>
+                    <NotificationsButton />
+                  </div>
+                )}
                 <div className={classes.item}>
                   <IdentityWidget />
                 </div>
