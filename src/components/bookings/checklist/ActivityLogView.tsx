@@ -5,6 +5,7 @@ import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
 import QuoteWriteComment from '../../activities/QuoteWriteComment';
 import ActivityLogItemView from './ActivityLogItemView';
+import { ActivityLogProvider } from './ActivityLogContext';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -33,7 +34,9 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
       />
       <CardContent>
         {quoteActivityLog ? (
-          <QuoteWriteComment onCommentSave={onCommentSave} />
+          <ActivityLogProvider>
+            <WriteComment onCommentSave={onCommentSave} />
+          </ActivityLogProvider>
         ) : (
           <WriteComment onCommentSave={onCommentSave} />
         )}

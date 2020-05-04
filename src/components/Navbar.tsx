@@ -34,7 +34,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
-import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
+import { isDashboardUser } from '../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
