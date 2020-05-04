@@ -15,6 +15,7 @@ import {
   Paper,
   Theme,
   Typography,
+  Card,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import formatDate from 'date-fns/format';
@@ -89,6 +90,12 @@ const useStyles = makeStyles(() =>
     divider: {
       marginTop: theme.spacing(2),
     },
+    card: {
+      marginTop: '2em',
+      marginLeft: '1px',
+      marginRight: '1px',
+      marginBottom: '1px',
+    },
   }),
 );
 
@@ -102,6 +109,7 @@ interface BookingRowProps {
   onProgressClick?: any;
   isAdmin?: boolean;
 }
+
 interface LocRefProps {
   cargoDetails: CargoDetail[];
 }
@@ -357,7 +365,6 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
           </Grid>
         </Grid>
       </Grid>
-      <Divider className={classes.divider} />
     </StyledTableRow>
   );
 };
@@ -365,6 +372,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
 const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
   const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const classes = useStyles();
 
   const handleProgressClick = useCallback(
     (event: React.MouseEvent<unknown>, booking: Booking) => {
@@ -392,12 +400,14 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
         </MUIContainer>
       ) : (
         bookings.map(booking => (
-          <BookingRow
-            key={`booking-row-${booking.id}`}
-            isAdmin={isAdmin}
-            booking={booking}
-            onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
-          />
+          <Card className={classes.card}>
+            <BookingRow
+              key={`booking-row-${booking.id}`}
+              isAdmin={isAdmin}
+              booking={booking}
+              onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
+            />
+          </Card>
         ))
       )}
       <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />

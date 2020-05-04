@@ -189,34 +189,36 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
       <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
 
-      <Card>
-        <CardHeader
-          title={
-            <Box display="flex" alignItems="center">
-              <Typography variant="subtitle1" display="inline">
-                Bookings {archived && '- Archive'}
-              </Typography>
-              <Divider orientation="vertical" style={{ height: '100%' }} />
-              <RadioGroup
-                aria-label="importexport"
-                name="importexport"
-                value={bookingContextFilters.category}
-                onChange={handleImportOrExportChange}
-                className={classes.importOrExport}
-              >
-                <FormControlLabel value="Export" control={<Radio />} label="Export" />
-                <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
-              </RadioGroup>
+      <div>
+        <Card>
+          <CardHeader
+            title={
+              <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" display="inline">
+                  Bookings {archived && '- Archive'}
+                </Typography>
+                <Divider orientation="vertical" style={{ height: '100%' }} />
+                <RadioGroup
+                  aria-label="importexport"
+                  name="importexport"
+                  value={bookingContextFilters.category}
+                  onChange={handleImportOrExportChange}
+                  className={classes.importOrExport}
+                >
+                  <FormControlLabel value="Export" control={<Radio />} label="Export" />
+                  <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
+                </RadioGroup>
 
-              <Box flex={1} />
+                <Box flex={1} />
 
-              <Search
-                onSearch={handleSearch}
-                style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
-              />
-            </Box>
-          }
-        />
+                <Search
+                  onSearch={handleSearch}
+                  style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
+                />
+              </Box>
+            }
+          />
+        </Card>
 
         <CardContent className={classes.content}>
           <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
@@ -235,7 +237,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
             />
           )}
         </CardActions>
-      </Card>
+      </div>
     </Fragment>
   );
 };
