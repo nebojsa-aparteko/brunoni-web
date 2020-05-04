@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } 
 import WriteComment from './WriteComment';
 import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
-import QuoteWriteComment from '../../activities/QuoteWriteComment';
 import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
 
