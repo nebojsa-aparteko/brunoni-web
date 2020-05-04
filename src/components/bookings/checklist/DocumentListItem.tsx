@@ -225,6 +225,7 @@ const DocumentListItem = ({
                 <Typography variant="caption">
                   {`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
                 </Typography>
+                <br />
                 {item.status?.at && (
                   <Typography variant="caption">
                     {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(
