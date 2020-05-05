@@ -61,13 +61,15 @@
   "scripts": {
     "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
     "build": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
+    "build:stage": "REACT_APP_ENV=stage REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "npm run prettier:base -- --list-different \"src/**/*.{ts,tsx}\"",
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\"",
     "select:brunoni": "rm -f public && ln -s public.brunoni public",
-    "select:allmarine": "rm -f public && ln -s public.allmarine public"
+    "select:allmarine": "rm -f public && ln -s public.allmarine public",
+    "select:brunoni-allmarine": "rm -f public && ln -s public.brunoni public"
   },
   "eslintConfig": {
     "extends": "react-app"
