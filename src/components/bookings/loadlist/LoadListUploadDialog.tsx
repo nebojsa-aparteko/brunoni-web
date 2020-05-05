@@ -129,18 +129,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               c,
               { merge: true },
             );
-            const bookingRef = await firebase
-              .firestore()
-              .collection('bookings')
-              .doc(c.bookingId)
-              .get();
-            const booking = bookingRef.data() as Booking;
-            booking.CargoDetails.map(cargoDetail =>
-              merge(
-                cargoDetail.Equipment.findIndex(obj => obj.ContainerNumber == c.container),
-                c,
-              ),
-            );
+            console.log(c);
           });
 
           batch.commit().then(_ => console.log('Successfully saved'));
