@@ -18,6 +18,8 @@ import firebase from '../../../firebase';
 import useContainers from '../../../hooks/useContainers';
 import { useDropzone } from 'react-dropzone';
 import { useSnackbar } from 'notistack';
+import { Booking } from '../../../model/Booking';
+import { merge } from 'lodash/fp';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -118,7 +120,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           console.log(results.data);
           const batch = firebase.firestore().batch();
 
-          results.data.map(c =>
+          results.data.map(async (c: LoadListContainerModel) => {
             batch.set(
               firebase
                 .firestore()
@@ -126,8 +128,20 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                 .doc(c.container),
               c,
               { merge: true },
-            ),
-          );
+            );
+            const bookingRef = await firebase
+              .firestore()
+              .collection('bookings')
+              .doc(c.bookingId)
+              .get();
+            const booking = bookingRef.data() as Booking;
+            booking.CargoDetails.map(cargoDetail =>
+              merge(
+                cargoDetail.Equipment.findIndex(obj => obj.ContainerNumber == c.container),
+                c,
+              ),
+            );
+          });
 
           batch.commit().then(_ => console.log('Successfully saved'));
         },
