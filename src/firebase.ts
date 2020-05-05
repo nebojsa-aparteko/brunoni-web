@@ -62,16 +62,16 @@ firebase.firestore().settings({
 //     console.error('Could not clear persistence:', error.code);
 //   });
 
-firebase
-  .firestore()
-  .enablePersistence({
-    synchronizeTabs: true,
-  })
-  .then(() => {
-    console.log('Enabled offline sync');
-  })
-  .catch(function(err) {
-    console.warn('Failed to enable firestore persistence', err);
-  });
+// firebase
+//   .firestore()
+//   .enablePersistence({
+//     synchronizeTabs: true,
+//   })
+//   .then(() => {
+//     console.log('Enabled offline sync');
+//   })
+//   .catch(function(err) {
+//     console.warn('Failed to enable firestore persistence', err);
+//   });
 
 export default firebase;
