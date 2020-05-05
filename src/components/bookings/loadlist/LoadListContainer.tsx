@@ -15,14 +15,30 @@ import {
   Typography,
   Button,
   Box,
+  makeStyles,
+  createStyles,
 } from '@material-ui/core';
-import ListAltIcon from '@material-ui/icons/ListAlt';
 import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import formatDate from 'date-fns/format';
-import { BoookingProgressDialog, ShipmentProgress } from '../BookingsTable';
+import { BoookingProgressDialog } from '../BookingsTable';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
+
+const useStyles = makeStyles(() =>
+  createStyles({
+    progress: {
+      width: '100%',
+      backgroundColor: 'white',
+      border: '1px solid #ccc',
+    },
+    progressBar: {
+      width: '0%',
+      height: '20px',
+      backgroundColor: 'green',
+    },
+  }),
+);
 
 const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
 
@@ -36,6 +52,8 @@ const normalizeContainerRecord = (item: any) => {
     bookingId: item.bookingId,
     container: item.container,
     carrierId: item.carrierId,
+    checklistCheckedCount: item.checklistCheckedCount,
+    checklistItemCount: item.checklistItemCount,
   };
 };
 
@@ -46,6 +64,7 @@ const LoadListContainer = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
   const [isProgressDialogOpen, setIsProgressDialogOpen] = useState(false);
+  const classes = useStyles();
 
   const handleProgressClick = useCallback(
     async (event: React.MouseEvent<unknown>, bookingId: string) => {
@@ -60,7 +79,7 @@ const LoadListContainer = () => {
         setDialogData(booking);
       }
     },
-    [setIsProgressDialogOpen, setDialogData, firebase],
+    [setIsProgressDialogOpen, setDialogData],
   );
 
   const handleProgressDialogClose = useCallback(() => {
@@ -110,7 +129,7 @@ const LoadListContainer = () => {
                             <TableCell align="right">Seal No</TableCell>
                             <TableCell align="right">Delivery Ref</TableCell>
                             <TableCell align="right">Booking #</TableCell>
-                            <TableCell align="right">Checklist</TableCell>
+                            <TableCell align="center">Progress</TableCell>
                             <TableCell align="right">Status</TableCell>
                             <TableCell align="right">Pick up Date</TableCell>
                             <TableCell align="right">Gate in Date</TableCell>
@@ -132,13 +151,29 @@ const LoadListContainer = () => {
                                 <Link to={`/bookings/${item.bookingId}`}>{item.bookingId || ''}</Link>
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
-                                <ListAltIcon
+                                <Box
                                   onClick={(event: React.MouseEvent<unknown>) =>
                                     handleProgressClick(event, item.bookingId)
                                   }
-                                  style={{ cursor: 'pointer', color: '#7E878C' }}
-                                  fontSize="large"
-                                />
+                                  style={{ marginTop: '1em', marginLeft: '4em', cursor: 'pointer', width: '64px' }}
+                                >
+                                  <div>
+                                    <div className={classes.progress}>
+                                      <div
+                                        className={classes.progressBar}
+                                        role="progressbar"
+                                        style={{
+                                          width: `${(item.checklistCheckedCount / item.checklistItemCount) * 100}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    {item.checklistCheckedCount && item.checklistItemCount && (
+                                      <Typography variant="subtitle2">
+                                        {item.checklistCheckedCount}/{item.checklistItemCount}
+                                      </Typography>
+                                    )}
+                                  </div>
+                                </Box>
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
                                 {item.status || ''}
