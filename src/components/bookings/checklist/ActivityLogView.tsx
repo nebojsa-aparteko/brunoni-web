@@ -24,7 +24,7 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
   const classes = useStyles();
 
   return (
-    <Card className={classes.spacing}>
+    <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
         action={
           !quoteActivityLog ? <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" /> : null
