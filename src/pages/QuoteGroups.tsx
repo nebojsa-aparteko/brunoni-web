@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import QuoteGroupsView from '../components/QuoteGroupsView';
 import Container from '@material-ui/core/Container';
 import { Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
@@ -55,6 +55,14 @@ const QuoteGroups: React.FC = () => {
         break;
     }
   };
+
+  useEffect(() => {
+    if (actingAs) {
+      // we are acting as a customer set a date range:
+      quoteFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+      quoteFilterDispach({ type: 'clear', field: 'archived' });
+    }
+  }, [actingAs]);
 
   return (
     <Fragment>
