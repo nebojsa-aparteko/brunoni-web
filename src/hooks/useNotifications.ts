@@ -4,7 +4,7 @@ import useFirestoreCollection from './useFirestoreCollection';
 
 import Notification from '../model/Notification';
 import { invoke, update } from 'lodash/fp';
-export default function useNotifications(userId: string) {
+export default function useNotifications(userId?: string) {
   const query = useCallback(
     q =>
       q

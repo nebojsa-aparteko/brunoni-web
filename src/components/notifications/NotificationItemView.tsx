@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Card, CardContent, CardHeader, createStyles, makeStyles, IconButton } from '@material-ui/core';
+import { Card, CardContent, CardHeader, createStyles, makeStyles } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import Notification from '../../model/Notification';
@@ -34,7 +34,7 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
   );
 };
 
-const NotificationItemView: React.FC<Props> = ({ notification }) => {
+const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
   const classes = useStyles();
   const handleSeenStatusChange = () => {
     return firebase
@@ -46,7 +46,7 @@ const NotificationItemView: React.FC<Props> = ({ notification }) => {
       .catch(err => console.log(err));
   };
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} {...other}>
       <CardHeader
         title={<NotificationTitle notification={notification} />}
         subheader={formatDistanceToNow(notification.at)}

@@ -6,7 +6,7 @@ import invoke from 'lodash/fp/invoke';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import UserRecordContext from '../../../contexts/UserRecordContext';
-import { ActivityLogUserData, ShortChecklistItem, ShortChecklistItemValueDocument } from './ChecklistItemModel';
+import { ActivityLogUserData } from './ChecklistItemModel';
 import firebase from '../../../firebase';
 import { useActivityLogState } from './ActivityLogContext';
 import { flow, omitBy, isNil } from 'lodash/fp';

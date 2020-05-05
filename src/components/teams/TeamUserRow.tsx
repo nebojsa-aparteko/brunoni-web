@@ -8,7 +8,6 @@ import UserRecord from '../../model/UserRecord';
 import { firestore } from 'firebase';
 import asArray from '../../utilities/asArray';
 import useTeams from '../../hooks/useTeams';
-import TeamsTeamsChipMultiInput from './TeamsTeamsChipMultiInput';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Props {

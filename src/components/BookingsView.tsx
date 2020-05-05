@@ -2,7 +2,6 @@ import React, { Fragment, useCallback, useContext, useMemo, useState } from 'rea
 import {
   Box,
   makeStyles,
-  Container as MUIContainer,
   Divider,
   Paper,
   Card,
@@ -175,16 +174,14 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
   if (!bookings) {
     return (
-      <MUIContainer maxWidth="lg">
-        <Paper className={classes.root}>
-          <ChartsCircularProgress />
-        </Paper>
-      </MUIContainer>
+      <Paper className={classes.root}>
+        <ChartsCircularProgress />
+      </Paper>
     );
   }
 
   return (
-    <MUIContainer maxWidth="lg">
+    <Fragment>
       <Meta title={`Bookings`} />
 
       <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
@@ -238,7 +235,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
           )}
         </CardActions>
       </div>
-    </MUIContainer>
+    </Fragment>
   );
 };
 

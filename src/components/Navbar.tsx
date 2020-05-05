@@ -147,7 +147,7 @@ const Navbar: React.FC = () => {
 
   return (
     <Fragment>
-      <Hidden smDown implementation="css">
+      <Hidden smDown implementation="js">
         <AppBar position="relative" className={classes.appBar}>
           <Container>
             <Toolbar className={classes.toolbar} disableGutters>

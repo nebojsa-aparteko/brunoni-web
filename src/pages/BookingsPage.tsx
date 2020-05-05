@@ -1,7 +1,7 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import BookingsView from '../components/BookingsView';
-import { Box, makeStyles, Tab, Tabs, Theme, Typography } from '@material-ui/core';
+import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import TocIcon from '@material-ui/icons/Toc';
@@ -101,6 +101,15 @@ const BookingsPage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (actingAs) {
+      // we are acting as a customer set a date range:
+      bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+      bookingFilterDispach({ type: 'clear', field: 'archived' });
+      bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
+    }
+  }, [actingAs]);
+
   return (
     <Fragment>
       <Meta title="Bookings" />
@@ -146,7 +155,9 @@ const BookingsPage: React.FC = () => {
           </TabPanel>
         </Box>
       ) : (
-        <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
+        <Container maxWidth="lg">
+          <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
+        </Container>
       )}
     </Fragment>
   );

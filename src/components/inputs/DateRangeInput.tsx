@@ -1,5 +1,5 @@
 import 'date-fns';
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { DateRangePicker } from '../daterangepicker';
 import { DateRange, DefinedRange } from '../daterangepicker/types';
 import { ClickAwayListener, FormControl, Input, InputAdornment, Popover } from '@material-ui/core';
@@ -68,9 +68,15 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
 };
 
 const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
-  const [labelValue, setLabelValue] = useState(getLabelValue(value));
+  const [labelValue, setLabelValue] = useState();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (value) {
+      setLabelValue(getLabelValue(value));
+    }
+  }, [value]);
 
   const handlePopoverClose = () => {
     setAnchorEl(null);

@@ -268,7 +268,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
             <Grid item md={3} xs={12}>
               <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
             </Grid>
-            <Grid item spacing={2} md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
+            <Grid item container spacing={2} md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
               <Grid item style={{ width: '45%' }}>
                 <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
               </Grid>
@@ -400,9 +400,8 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
         </MUIContainer>
       ) : (
         bookings.map(booking => (
-          <Card className={classes.card}>
+          <Card className={classes.card} key={`booking-row-${booking.id}`}>
             <BookingRow
-              key={`booking-row-${booking.id}`}
               isAdmin={isAdmin}
               booking={booking}
               onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}

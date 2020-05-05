@@ -11,7 +11,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
   const userRecord = useContext(UserRecordContext);
-  const notifications = useNotifications(userRecord?.alphacomId || '');
+  const notifications = useNotifications(userRecord?.alphacomId);
 
   useEffect(() => {
     if (notifications) {
@@ -23,7 +23,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
           ) || prevState,
       );
     }
-  }, [notifications]);
+  }, [notifications, setNotificationCount]);
 
   return (
     <Fragment>

@@ -13,7 +13,7 @@ export default function useUsers() {
     q =>
       isDashboardUser(userRecord)
         ? q
-        : q.where(firebase.firestore.FieldPath.documentId(), '==', userRecord?.alphacomId || ''),
+        : q.where(firebase.firestore.FieldPath.documentId(), '==', userRecord?.alphacomId),
     [userRecord],
   );
 

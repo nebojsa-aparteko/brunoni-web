@@ -29,7 +29,7 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
       </Box>
       <Divider />
       {notifications.map(notification => (
-        <NotificationItemView notification={notification} />
+        <NotificationItemView notification={notification} key={notification.id} />
       ))}
     </Box>
   );
