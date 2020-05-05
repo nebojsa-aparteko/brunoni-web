@@ -41,9 +41,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tableRow: {
       verticalAlign: 'top',
-      // '& td': {
-      //   whiteSpace: 'nowrap',
-      // },
       ['@media print']: {
         '& td': {
           padding: theme.spacing(0),
@@ -84,8 +81,8 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
     <Fragment>
       <Table size="small" aria-label="a dense table" className={classes.portTermsTable}>
         <colgroup>
-          <col style={{ width: '10%' }} />
-          <col style={{ width: '90%' }} />
+          <col style={{ width: '14%' }} />
+          <col style={{ width: '86%' }} />
         </colgroup>
         <TableBody>
           <TableRowData label={'Liner Port Agent'} content={portTerms.LinerPortAgent} />
