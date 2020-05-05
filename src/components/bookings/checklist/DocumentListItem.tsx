@@ -277,7 +277,6 @@ const DocumentListItem = ({
                     changeStatus(item, {
                       type: ChecklistItemValueDocumentStatusType.DEFAULT,
                       by: getActivityLogUserData(),
-                      at: new Date(),
                     });
                     activityLogContext.setState(undefined);
                   }}
