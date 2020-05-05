@@ -1,14 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Box,
-  Checkbox,
-  createStyles,
-  FormControlLabel,
-  IconButton,
-  makeStyles,
-  Theme,
-  Tooltip,
-} from '@material-ui/core';
+import { Box, Checkbox, createStyles, FormControlLabel, IconButton, makeStyles, Theme } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import SendIcon from '@material-ui/icons/Send';

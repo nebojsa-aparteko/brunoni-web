@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, Fragment, useEffect } from 'react';
+import React, { useContext, useMemo, useState, Fragment } from 'react';
 import {
   Box,
   Card,
@@ -27,13 +27,9 @@ import { Quote, QuoteGroup } from '../providers/QuoteGroupsProvider';
 import { QuoteListFilterContext } from '../providers/QuoteListFilterContext';
 import flow from 'lodash/fp/flow';
 import padStart from 'lodash/fp/padStart';
-import compareAsc from 'date-fns/compareAsc';
-import compareDesc from 'date-fns/compareDesc';
-import addDays from 'date-fns/addDays';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import QuotesFiltersBar from './searchbar/QuotesFiltersBar';
 import containsString from '../utilities/containsString';
-import { useQuotesContext } from '../providers/QuotesProvider';
 
 interface Props {
   showGetQuoteButton?: boolean;

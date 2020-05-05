@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, MouseEventHandler, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import * as changeCase from 'change-case';
 import {
   AppBar,
@@ -34,7 +34,10 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
-import { isDashboardUser } from '../model/UserRecord';
+import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
+import { Route, MemoryRouter } from 'react-router';
+import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
+import { Omit } from '@material-ui/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -111,6 +114,82 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
+  item: {
+    display: 'flex',
+    textStyle: 'none',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    [theme.breakpoints.down('sm')]: {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
+
+interface ListItemLinkProps {
+  icon?: React.ReactElement;
+  primary: string;
+  to: string;
+  onClick?: MouseEventHandler;
+  variant?: 'text' | 'outlined' | 'contained';
+  color?: 'inherit' | 'default' | 'primary' | 'secondary' | undefined;
+  typographyStyle?: any;
+}
+
+function ListItemLink(props: ListItemLinkProps) {
+  const { icon, primary, to, onClick } = props;
+
+  const renderLink = React.useMemo(
+    () =>
+      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
+        <RouterLink to={to} ref={ref} {...itemProps} />
+      )),
+    [to],
+  );
+
+  return (
+    <li>
+      <ListItem button component={renderLink} onClick={onClick}>
+        {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+        <ListItemText primary={primary} />
+      </ListItem>
+    </li>
+  );
+}
+
+function ButtonMenuItem(props: ListItemLinkProps) {
+  const classes = useStylesButtonMenuItem();
+  const { primary, to, variant, typographyStyle, color } = props;
+
+  return (
+    <div className={classes.item}>
+      <Button component={RouterLink} variant={variant} color={color} to={to}>
+        <Typography variant="body1" style={typographyStyle}>
+          {primary}
+        </Typography>
+      </Button>
+    </div>
+  );
+}
+
+function MenuItemLink(props: ListItemLinkProps) {
+  const { primary, to, onClick } = props;
+
+  const renderLink = React.useMemo(
+    () =>
+      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
+        <RouterLink to={to} ref={ref} {...itemProps} />
+      )),
+    [to],
+  );
+
+  return (
+    <MenuItem onClick={onClick} component={renderLink}>
+      {primary}
+    </MenuItem>
+  );
+}
+
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
@@ -147,7 +226,7 @@ const Navbar: React.FC = () => {
 
   return (
     <Fragment>
-      <Hidden smDown implementation="js">
+      <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
           <Container>
             <Toolbar className={classes.toolbar} disableGutters>
@@ -159,101 +238,59 @@ const Navbar: React.FC = () => {
                 />
               </Link>
               <Box displayPrint="none" width="100%" display="flex">
-                {user !== undefined && user !== null && actingAs && (
+                {user !== undefined && user !== null && (
                   <Fragment>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/" underline="none">
-                        <Typography variant="body1">Dashboard</Typography>
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/schedule" underline="none">
-                        <Typography variant="body1">Schedule</Typography>
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/quotes/groups" underline="none">
-                        <Typography variant="body1">Quotes</Typography>
-                      </Button>
-                    </div>
-                    {isDashboardUser(userRecord) && (
-                      <div className={classes.item}>
-                        <Button component={Link} to="/bookings" underline="none">
-                          <Typography variant="body1">Bookings</Typography>
-                        </Button>
-                      </div>
-                    )}
-                    <div className={classes.item}>
-                      <Button
-                        endIcon={<KeyboardArrowDownIcon />}
-                        aria-controls="simple-menu"
-                        aria-haspopup="true"
-                        onClick={handleMenuClick}
-                      >
-                        <Typography variant="body1">Other</Typography>
-                      </Button>
-                    </div>
+                    {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
+                    <ButtonMenuItem primary="Schedule" to="/schedule" />
+                    <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
 
-                    <Menu
-                      id="simple-menu"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                      className={classes.menu}
-                    >
-                      <MenuItem onClick={handleMenuClose} component={props => <Link {...props} to="/equipment" />}>
-                        Equipment Situation
-                      </MenuItem>
-                      <MenuItem onClick={handleMenuClose} component={props => <Link {...props} to="/charges" />}>
-                        Side Charges
-                      </MenuItem>
-                    </Menu>
-                  </Fragment>
-                )}
-                {user !== undefined && user !== null && actingAs === null && (
-                  <Fragment>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/schedule" underline="none">
-                        <Typography variant="body1">Schedule</Typography>
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/quotes/groups" underline="none">
-                        <Typography variant="body1">Quotes</Typography>
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/bookings" underline="none">
-                        <Typography variant="body1">Bookings</Typography>
-                      </Button>
-                    </div>
-                    <div className={classes.item}>
-                      <Button component={Link} to="/charges" underline="none">
-                        <Typography variant="body1">Side Charges</Typography>
-                      </Button>
-                    </div>
-                    {userRecord?.emailAddress.indexOf('@spfr.co') !== -1 && (
-                      <div className={classes.item}>
-                        <Button component={Link} to="/teams" underline="none">
-                          <Typography variant="body1">Teams</Typography>
-                        </Button>
-                      </div>
+                    {isDashboardUser(userRecord) && <ButtonMenuItem primary="Bookings" to="/bookings" />}
+
+                    {actingAs !== null && (
+                      <Fragment>
+                        <div className={classes.item}>
+                          <Button
+                            endIcon={<KeyboardArrowDownIcon />}
+                            aria-controls="simple-menu"
+                            aria-haspopup="true"
+                            onClick={handleMenuClick}
+                          >
+                            <Typography variant="body1">Other</Typography>
+                          </Button>
+                        </div>
+                        <Menu
+                          id="simple-menu"
+                          anchorEl={anchorEl}
+                          keepMounted
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                          className={classes.menu}
+                        >
+                          <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="Equipment Situation" />
+                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
+                        </Menu>
+                      </Fragment>
+                    )}
+
+                    {actingAs === null && (
+                      <Fragment>
+                        <ButtonMenuItem primary="Side Charges" to="/charges" />
+                        {isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}
+                      </Fragment>
                     )}
                   </Fragment>
                 )}
+
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
                   actingAs ? (
-                    <Fragment>
-                      <div className={classes.item}>
-                        <Button component={Link} to="/quotes/get" underline="none" variant="contained" color="primary">
-                          <Typography variant="body1" style={{ color: 'white' }}>
-                            Get Quote
-                          </Typography>
-                        </Button>
-                      </div>
-                    </Fragment>
+                    <ButtonMenuItem
+                      primary="Get Quote"
+                      to="/quotes/get"
+                      variant="contained"
+                      color="primary"
+                      typographyStyle={{ color: 'white' }}
+                    />
                   ) : (
                     <Fragment>
                       <IconButton
@@ -327,59 +364,24 @@ const Navbar: React.FC = () => {
             <List>
               {user !== undefined && user !== null && (
                 <Fragment>
-                  <ListItem
-                    button
-                    onClick={handleDrawerToggle}
-                    component={props => <Link {...props} to="/" {...props} />}
-                  >
-                    <ListItemText primary="Dashboard" />
-                  </ListItem>
-                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/schedule" />}>
-                    <ListItemText primary="Schedule" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={handleDrawerToggle}
-                    component={props => <Link {...props} to="/quotes/groups" />}
-                  >
-                    <ListItemText primary="Quotes" />
-                  </ListItem>
-                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/bookings" />}>
-                    <ListItemText primary="Bookings" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={handleDrawerToggle}
-                    component={props => <Link {...props} to="/equipment" />}
-                  >
-                    <ListItemText primary="Equipment Situation" />
-                  </ListItem>
-                  <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/charges" />}>
-                    <ListItemText primary="Side Charges" />
-                  </ListItem>
+                  <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
+                  <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
+                  <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
+
+                  {isDashboardUser(userRecord) && (
+                    <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
+                  )}
+                  <ListItemLink primary="Equipment Situation" to="/equipment" onClick={handleDrawerToggle} />
+                  <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />
                 </Fragment>
               )}
 
               {user !== undefined && user !== null ? (
-                <ListItem button onClick={handleDrawerToggle} component={props => <Link {...props} to="/quotes/get" />}>
-                  <ListItemText primary="Get Quote" />
-                </ListItem>
+                <ListItemLink primary="Get Quote" to="/quotes/get" onClick={handleDrawerToggle} />
               ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <ListItem
-                  button
-                  onClick={handleDrawerToggle}
-                  component={props => <Link {...props} href="https://brunoni.ch" />}
-                >
-                  <ListItemText primary="Visit brunoni.ch" />
-                </ListItem>
+                <ListItemLink primary="Visit brunoni.ch" to="https://brunoni.ch" onClick={handleDrawerToggle} />
               ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <ListItem
-                  button
-                  onClick={handleDrawerToggle}
-                  component={props => <Link {...props} href="https://allmarine.ch" />}
-                >
-                  <ListItemText primary="Visit allmarine.ch" />
-                </ListItem>
+                <ListItemLink primary="Visit  allmarine.ch" to="https://allmarine.ch" onClick={handleDrawerToggle} />
               ) : null}
 
               <Divider />

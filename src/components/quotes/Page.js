@@ -14,7 +14,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Page({ title, children, ...rest }) {
-  const classes = useStyles();
   const location = useLocation();
 
   useEffect(() => {

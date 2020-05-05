@@ -45,7 +45,7 @@ export default function useFirestoreDocument(
         console.error('useFirestoreDocument', `/${collection}/${id}`, 'threw an error', error);
       }
     })();
-  }, [collection, id]);
+  }, [collection, id, documentPath, , subCollection]);
 
   return snapshot;
 }

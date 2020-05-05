@@ -18,11 +18,8 @@ import TableBody from '@material-ui/core/TableBody';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
 import Ports from '../../contexts/Ports';
-import filter from 'lodash/fp/filter';
 import Port from '../../model/Port';
 import TextSkeleton from '../TextSkeleton';
-import match from 'autosuggest-highlight/match';
-import logAs from '../../utilities/logAs';
 
 interface Props {
   clientPerformance: any;

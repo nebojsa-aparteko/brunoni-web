@@ -19,12 +19,7 @@ const IdentityWidget: React.FC = () => {
   if (user === undefined) {
     return <CircularProgress size={24} className={classes.progress} />;
   } else {
-    return (
-      <Fragment>
-        {user === null && <LoginWidget />}
-        {user && <UserWidget />}
-      </Fragment>
-    );
+    return <Fragment>{user === null ? <LoginWidget /> : <UserWidget />}</Fragment>;
   }
 };
 

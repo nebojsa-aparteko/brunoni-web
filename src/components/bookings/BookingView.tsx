@@ -19,7 +19,6 @@ import theme from '../../theme';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
-import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
