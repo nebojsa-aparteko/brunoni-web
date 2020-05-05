@@ -113,7 +113,7 @@ const LoadListContainer = () => {
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
         Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (
-          <Card key={`mapitemid-${index}`}>
+          <Card key={`mapitemid-${index}`} style={{ marginBottom: '2em' }}>
             <CardHeader title={date} />
             <CardContent>
               {Object.entries(items).map(([vesselWithVoyage, items]: any, index: number) => (
