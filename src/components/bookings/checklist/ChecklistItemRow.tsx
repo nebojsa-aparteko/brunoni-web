@@ -234,7 +234,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         addActivityItem(
           booking!.id,
           checklistItem!.id,
-          createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), checklistItem),
+          createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), { ...checklistItem, checked }),
         ),
       );
     },
