@@ -10,9 +10,6 @@
         "production": [
           "brunoni"
         ],
-        "stage": [
-          "brunoni-stage"
-        ]
       }
     },
     "allmarine": {
@@ -24,6 +21,13 @@
           "allmarine-stage"
         ]
       }
-    }
+    },
+    "default": {
+          "hosting": {
+            "stage": [
+              "brunoni-stage"
+            ]
+          }
+      }
   }
 }
