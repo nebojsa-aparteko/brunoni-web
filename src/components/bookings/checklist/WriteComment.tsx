@@ -153,7 +153,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
       {activityLogContext.state?.documentReference && (
         <Box>
           Doc -{' '}
-          <a href={`#${activityLogContext.state?.documentReference?.url}`}>
+          <a href={`${activityLogContext.state?.documentReference?.url}`} target="_blank">
             {activityLogContext.state?.documentReference?.name}
           </a>
         </Box>
