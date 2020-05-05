@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useRef, useEffect } from 'react';
 import { Box, CircularProgress, createStyles, FormControl, IconButton, makeStyles, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import firebase from '../../firebase';
@@ -7,6 +7,7 @@ import { Booking } from '../../model/Booking';
 import { useHistory } from 'react-router';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import { BookingRow } from '../bookings/BookingsTable';
+import Mousetrap from 'mousetrap';
 const useStyles = makeStyles(theme =>
   createStyles({
     formControl: {
@@ -31,6 +32,22 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
     history.push(`/bookings/${searchResult?.id}`);
     handleClose();
   };
+
+  const inputRef = useRef();
+
+  useEffect(() => {
+    if (inputRef) {
+      let moustrapInstance = new Mousetrap(inputRef.current);
+      moustrapInstance.stopCallback = function() {
+        return false;
+      };
+      moustrapInstance.bind(['enter', 'enter'], () => handleBookingSearch(fieldPath));
+      return () => {
+        moustrapInstance?.unbind(['enter', 'enter']);
+      };
+    }
+  }, [inputRef, inputValue]);
+
   const handleBookingSearch = (fieldPath: string) => {
     setIsLoading(true);
     firebase
@@ -61,6 +78,7 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
           label={label}
           margin="normal"
           variant="outlined"
+          inputRef={inputRef}
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
