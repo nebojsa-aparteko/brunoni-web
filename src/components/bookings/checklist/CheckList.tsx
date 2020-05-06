@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo } from 'react';
+import React, { Fragment, useContext } from 'react';
 import {
   Box,
   Card,
@@ -6,8 +6,8 @@ import {
   CardContent,
   CardHeader,
   Container,
-  Paper,
   Divider,
+  Paper,
   Typography,
 } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
@@ -18,6 +18,7 @@ import ActivityLogContainer from './ActivityLogContainer';
 import ActingAs from '../../../contexts/ActingAs';
 import { ActivityLogProvider } from './ActivityLogContext';
 import useChecklist from '../../../hooks/useChecklist';
+import InternalStorage from '../InternalStorage';
 
 interface CheckListProps {
   booking: Booking;
@@ -67,6 +68,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
           </CardContent>
           <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
         </Card>
+        {!actingAs && <InternalStorage bookingId={booking!.id} />}
         <ActivityLogContainer bookingId={booking.id} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>

@@ -1,0 +1,278 @@
+import React, { useCallback, useContext, useMemo, useState } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  LinearProgress,
+  List,
+  makeStyles,
+  Theme,
+  Typography,
+} from '@material-ui/core';
+import { useDropzone } from 'react-dropzone';
+import { ActivityLogUserData, ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
+import { orderBy } from 'lodash/fp';
+import InternalStorageItem from './InternalStorageItem';
+import firebase from '../../firebase';
+import { fileWithExt } from './checklist/ChecklistItemRow';
+import { useSnackbar } from 'notistack';
+import UserRecordContext from '../../contexts/UserRecordContext';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import CloseIcon from '@material-ui/icons/Close';
+import { useActivityLogState } from './checklist/ActivityLogContext';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    flexGrow: 1,
+    border: '1px dashed #ccc',
+    cursor: 'pointer',
+    borderColor: '#999',
+    '&:focus': {
+      outline: 'none',
+    },
+  },
+  dropZone: {
+    border: '1px solid #ccc',
+    cursor: 'pointer',
+    borderColor: '#999',
+    '&:focus': {
+      outline: 'none',
+    },
+  },
+  documentList: {
+    width: '100%',
+    backgroundColor: theme.palette.background.paper,
+  },
+  tinyIconButton: {
+    '& svg': {
+      fontSize: 10,
+    },
+  },
+}));
+
+const saveFilesToFirestore = (bookingId: string, files: ChecklistItemValueDocument) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('internal-documents')
+    .doc()
+    .set(files);
+
+const deleteFileFromFirebase = (deletedFile: ChecklistItemValueDocument, bookingId: string) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('internal-documents')
+    .doc(deletedFile?.id)
+    .delete();
+
+const InternalStorage: React.FC<Props> = ({ bookingId }) => {
+  const classes = useStyles();
+  const query = useCallback(q => q.orderBy('uploadedAt', 'desc'), []);
+  // status indicators
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
+
+  const filesCollection = useFirestoreCollection('bookings', query, bookingId, 'internal-documents');
+  const activityLogContext = useActivityLogState();
+
+  const normalizedFiles =
+    (filesCollection?.docs.map(doc => {
+      return { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
+    }) as ChecklistItemValueDocument[]) || [];
+
+  const { enqueueSnackbar } = useSnackbar();
+  const userRecord = useContext(UserRecordContext);
+  const storageBasePath = useMemo((): string => {
+    return ['booking-documents-internal', bookingId].join('/');
+  }, [bookingId]);
+  const saveFiles = useCallback(
+    async (files: File[]): Promise<any> => {
+      const uploadFile = async (file: File): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          const fileWithExtension = fileWithExt(file.name);
+          const storedFileName = `${fileWithExtension.name}_${new Date().getTime()}.${fileWithExtension.ext}`;
+          let path = [storageBasePath, storedFileName].join('/');
+
+          let storageRef = firebase.storage().ref(encodeURI(path));
+          let uploadTask = storageRef.put(file);
+          setUploadTask(uploadTask);
+
+          uploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+              console.log('progress: ', (snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            },
+            error => {
+              setUploadProgress(0);
+              reject(error);
+              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
+                variant: 'error',
+                autoHideDuration: 1000,
+              });
+            },
+            () => {
+              setUploadProgress(0);
+              // success
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+                resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
+              });
+            },
+          );
+        });
+      };
+
+      const requests = files.map((file: File) => {
+        return uploadFile(file).then(storedItem => {
+          return storedItem;
+        });
+      });
+
+      return Promise.all(requests);
+    },
+    [storageBasePath],
+  );
+
+  const onDeleteFile = useCallback(
+    (item: ChecklistItemValueDocument, setRemovalInProgress: any) => {
+      setRemovalInProgress(true);
+      try {
+        const path = [storageBasePath, `${item.storedName}`].join('/');
+        const storageRef = firebase.storage().ref();
+        const documentRef = storageRef.child(encodeURI(path));
+
+        documentRef
+          .delete()
+          .then(() => {
+            console.debug('File deleted from storage ', item);
+          })
+          .catch(error => {
+            console.error('Failed to remove item - {error.message}', error);
+          })
+          .finally(() => {
+            // remove item from the list in any case since if it is an error with the storage means file is alrady out
+            setRemovalInProgress(false);
+            deleteFileFromFirebase(item, bookingId)
+              .then(_ => {
+                console.log('File deleted', item, bookingId);
+              })
+              .catch(error => {
+                console.error('failed to update deleted items', error);
+                enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                });
+              });
+          });
+      } catch (error) {
+        setRemovalInProgress(false);
+        enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 1000,
+        });
+      }
+    },
+    [storageBasePath],
+  );
+
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      saveFiles(acceptedFiles)
+        .then((documents: ChecklistItemValueDocument[]) => {
+          const values = documents.map(
+            item =>
+              ({
+                uploadedBy: getActivityLogUserData(),
+                uploadedAt: new Date(),
+                name: item.name,
+                url: item.url,
+                storedName: item.storedName,
+              } as ChecklistItemValueDocument),
+          );
+          return values.map(value => saveFilesToFirestore(bookingId, value));
+        })
+        .catch(err => {
+          console.error(`Error while storing files ${JSON.stringify(bookingId, null, 2)}`, err);
+        });
+    },
+    [saveFiles, bookingId],
+  );
+  const onMentionFile = (item: ChecklistItemValueDocument) =>
+    activityLogContext.setState({ documentReference: item, internal: true });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+  });
+  return (
+    <Box
+      {...getRootProps()}
+      className={isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? '' : classes.root}
+      my={2}
+      py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
+      display="flex"
+      justifyContent="center"
+      flexDirection="column"
+    >
+      <input {...getInputProps()} />
+      {uploadProgress > 0 && (
+        <Box display="flex">
+          <div style={{ width: '100%', paddingTop: '14px' }}>
+            <LinearProgress variant="determinate" value={uploadProgress} />
+          </div>
+          <IconButton
+            className={classes.tinyIconButton}
+            aria-label="cancel upload"
+            onClick={() => {
+              uploadTask?.cancel();
+              setUploadTask(undefined);
+              setUploadProgress(0);
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      )}
+
+      {normalizedFiles && normalizedFiles.length > 0 ? (
+        <Card>
+          <CardHeader title="Internal documents" />
+          <CardContent>
+            <List className={classes.documentList}>
+              {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
+                <InternalStorageItem
+                  key={`chklistitem-${item.storedName}`}
+                  item={item}
+                  handleDelete={onDeleteFile}
+                  handleMention={onMentionFile}
+                />
+              ))}
+            </List>
+          </CardContent>
+        </Card>
+      ) : (
+        <Typography>Drag 'n' Drop files or click here</Typography>
+      )}
+    </Box>
+  );
+};
+
+export default InternalStorage;
+
+interface Props {
+  bookingId: string;
+}

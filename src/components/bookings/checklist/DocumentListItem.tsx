@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -34,7 +34,7 @@ import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
 import { editRestriction } from './CheckList';
 import UserRecordContext from '../../../contexts/UserRecordContext';
-import { flow, invoke } from 'lodash/fp';
+import { invoke } from 'lodash/fp';
 import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
 import { addActivityItem } from './ActivityLogContainer';
@@ -153,7 +153,7 @@ const DocumentListItem = ({
     [userRecord],
   );
   const handleMention = () =>
-    activityLogContext.setState({ documentReference: item, checklistReference: checklistItem });
+    activityLogContext.setState({ documentReference: item, checklistReference: checklistItem, internal: internal });
   const checklistCheckedRule = () => checklistItem.checked;
 
   const deleteFile = useCallback(

@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const fileWithExt = (fileName: string): { name: string; ext: string } => {
+export const fileWithExt = (fileName: string): { name: string; ext: string } => {
   const dotIndex = fileName.lastIndexOf('.');
   return dotIndex > -1
     ? {
@@ -472,7 +472,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const {
     getRootProps: getRootPropsDraft,
     getInputProps: getInputPropsDraft,
-    open: openDraft,
     isDragActive: isDragActiveDraft,
   } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 

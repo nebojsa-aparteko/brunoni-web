@@ -132,6 +132,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
           control={
             <Checkbox
               checked={isCustomerMessage}
+              disabled={activityLogContext.state?.internal}
               onChange={_ => {
                 setIsCustomerMessage(prevState => !prevState);
               }}
@@ -139,7 +140,11 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
               color="primary"
             />
           }
-          label="Share publicly"
+          label={
+            activityLogContext.state?.internal
+              ? 'To share publicly, remove internal document mention'
+              : 'Share publicly'
+          }
         />
       )}
       {activityLogContext.state?.checklistReference && (

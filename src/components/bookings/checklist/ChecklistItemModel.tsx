@@ -5,6 +5,7 @@ export interface ChecklistItemValueDocument {
   name: string;
   storedName: string;
   status?: ChecklistItemValueDocumentStatus;
+  id: string;
 }
 
 export enum ChecklistItemValueDocumentStatusType {
