@@ -89,7 +89,7 @@ const Comment = ({ comment, ...other }: CommentProp) => {
               <Box>
                 Doc -{' '}
                 {asArray(comment.documents).map(item => (
-                  <a href={`#${item.url}`} key={`doc-${item.url}`}>
+                  <a href={`${item.url}`} key={`doc-${item.url}`}>
                     {item.name}
                   </a>
                 ))}
