@@ -439,7 +439,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       newItemArray = [...(checklistItem.values || [])];
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item, status: status };
     }
-    storeActivity(() => checklistItemDocumentStatusChangeHandler(newItemArray, item, internal));
+    storeActivity(() => checklistItemDocumentStatusChangeHandler(newItemArray, { ...item, status: status }, internal));
   };
 
   const onDrop = useCallback(
