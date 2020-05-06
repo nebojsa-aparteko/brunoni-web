@@ -219,6 +219,7 @@ export interface LocRefItem {
   LocRef: string;
   LocDate: string;
   LocDet: string;
+  LocID: string;
   LocType: BookingLocType;
   CargoDetailRermarks: string;
 }

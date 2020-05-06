@@ -299,7 +299,7 @@ export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrT
 
 export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) => {
   const emptyReturnAddress = (detail.LocRefs && detail.LocRefs[0]
-    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff ? ref.LocDet : null))
+    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff && ref.LocID !== '0' ? ref.LocDet : null))
     : null
   )?.join('');
   const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
