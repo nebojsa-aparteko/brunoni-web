@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,8 +18,6 @@ import firebase from '../../../firebase';
 import useContainers from '../../../hooks/useContainers';
 import { useDropzone } from 'react-dropzone';
 import { useSnackbar } from 'notistack';
-import { Booking } from '../../../model/Booking';
-import { merge } from 'lodash/fp';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -86,6 +84,17 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     },
     [isHeaderValid],
   );
+
+  useEffect(() => {
+    if (!isHeaderValid) {
+      enqueueSnackbar(
+        <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
+        {
+          variant: 'error',
+        },
+      );
+    }
+  }, [isHeaderValid]);
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop,
     noClick: true,
@@ -94,52 +103,56 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     setLoadListInput(event.target.value);
     console.log(event.target.value);
   };
-  const parseCSV = useCallback(
-    (input: string | File) =>
-      Papa.parse(input, {
-        delimiter: ',',
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: header => {
-          switch (header) {
-            case 'Container number':
-            case 'container':
-              return 'container';
-            case 'Seal number':
-            case 'sealNum':
-              return 'sealNum';
-            case 'Status':
-            case 'status':
-              return 'status';
-            default:
-              setIsHeaderValid(false);
-              return header;
-          }
-        },
-        complete(results: ParseResult, file?: File): void {
-          console.log(results.data);
-          const batch = firebase.firestore().batch();
+  const parseCSV = (input: string | File) =>
+    Papa.parse(input, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: header => {
+        switch (header) {
+          case 'Container number':
+          case 'container':
+            return 'container';
+          case 'Seal number':
+          case 'sealNum':
+            return 'sealNum';
+          case 'Status':
+          case 'status':
+            return 'status';
+          default:
+            setIsHeaderValid(false);
+            return header;
+        }
+      },
+      complete(results: ParseResult, file?: File): void {
+        console.log(results.data);
+        const batch = firebase.firestore().batch();
 
-          results.data.map(async (c: LoadListContainerModel) => {
-            batch.set(
-              firebase
-                .firestore()
-                .collection('containers')
-                .doc(c.container),
-              c,
-              { merge: true },
-            );
-            console.log(c);
-          });
+        results.data.map(async (c: LoadListContainerModel) => {
+          batch.set(
+            firebase
+              .firestore()
+              .collection('containers')
+              .doc(c.container),
+            c,
+            { merge: true },
+          );
+          console.log(c);
+        });
 
-          batch.commit().then(_ => console.log('Successfully saved'));
-        },
-      } as ParseConfig),
-    [containers],
-  );
+        batch
+          .commit()
+          .then(_ =>
+            enqueueSnackbar(<Typography color="inherit">Saved load list successfully!</Typography>, {
+              variant: 'success',
+            }),
+          )
+          .catch(err => console.trace(err));
+      },
+    } as ParseConfig);
+
   const handleLoadListSave = useCallback(() => {
     parseCSV(loadListInput);
-  }, [containers, loadListInput]);
+  }, [containers, loadListInput, setIsHeaderValid]);
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <Box className={classes.dialogBody}>
@@ -154,8 +167,12 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <Box className={isDragActive ? classes.dropZone : classes.dropZoneDefault}>
             <TextField
               id="load-list-text-field"
-              label="Add load list input"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              label={`Load list value`}
               variant="outlined"
+              placeholder={`Please paste load list in this format:\nContainer number\tSeal number\tStatus`}
               multiline
               rows={10}
               onChange={handleLoadListPaste}
