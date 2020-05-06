@@ -31,6 +31,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -197,6 +198,9 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
     [history],
   );
 
+  const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
+  const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
+
   const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
 
   const StyledTableRow = withStyles((theme: Theme) =>
@@ -276,13 +280,25 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                 <InfoBoxItem
                   title="Contact"
                   label1={
-                    <Avatar
-                      name={booking.BkgAgentContactTxt}
-                      title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
-                      size="40"
-                      round={true}
-                      style={{ paddingLeft: '9px' }}
-                    />
+                    bookingAgent ? (
+                      <Avatar
+                        name={bookingAgent?.firstName + ' ' + bookingAgent?.lastName}
+                        title={`${bookingAgent?.firstName + ' ' + bookingAgent?.lastName} <${
+                          bookingAgent?.emailAddress ? bookingAgent?.emailAddress : null
+                        }>`}
+                        size="40"
+                        round={true}
+                        style={{ paddingLeft: '9px' }}
+                      />
+                    ) : (
+                      <Avatar
+                        name={booking.BkgAgentContactTxt}
+                        title={`${booking.BkgAgentContactTxt} <${booking.BkgAgentContactEml}>`}
+                        size="40"
+                        round={true}
+                        style={{ paddingLeft: '9px' }}
+                      />
+                    )
                   }
                   gutterBottom
                 />

@@ -5,9 +5,11 @@ import { Booking } from '../../model/Booking';
 import useClients from '../../hooks/useClients';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import UserRecord from '../../model/UserRecord';
 
 interface Props {
   booking: Booking;
+  bookingAgent: UserRecord | null | undefined;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -83,24 +85,27 @@ interface TableRowProps {
 }
 
 export const ClientDetails: React.FC<{
-  forwarderName: string | null;
-  forwarderID: string | undefined;
+  forwarder: UserRecord | null | undefined;
+  forwarderTex: string | null;
   bkgRef: string;
-}> = ({ forwarderName, forwarderID, bkgRef }) => {
-  const forwarder = useUserByAlphacomId(forwarderID);
-  const forwarderEmail = forwarder?.emailAddress;
-  const forwarderFullName = `${forwarder?.firstName} ${forwarder?.lastName}`;
+}> = ({ forwarder, bkgRef, forwarderTex }) => {
+  const forwarderEmail = forwarder ? forwarder?.emailAddress : null;
+  const forwarderFullName = forwarder ? `${forwarder?.firstName} ${forwarder?.lastName}` : null;
   return (
     <Typography variant="body2">
-      {forwarder && (
+      {forwarder ? (
         <span>
           {forwarderEmail ? (
-            <a href={'mailto:' + forwarderEmail}>{forwarderFullName.toUpperCase()}</a>
-          ) : (
-            { forwarderFullName }
-          )}{' '}
+            <a href={'mailto:' + forwarderEmail}>
+              {forwarderFullName ? forwarderFullName.toUpperCase() : forwarderEmail?.toUpperCase()}
+            </a>
+          ) : forwarderFullName ? (
+            forwarderFullName.toUpperCase()
+          ) : null}{' '}
           &nbsp;
         </span>
+      ) : (
+        <span>{forwarderTex}</span>
       )}
       ({'REF. ' + bkgRef})
     </Typography>
@@ -118,10 +123,13 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 const clientNameAndLoc = (name: string, location: string) => `${name}, ${location && location}`;
-const BookingSummary: React.FC<Props> = ({ booking }) => {
+const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
   const classes = useStyles();
   const clients = useClients();
   const client = useMemo(() => clients?.find(client => client.id === booking.ForwAdrId), [clients, booking.ForwAdrId]);
+  const checkedForwarderID =
+    booking.ForwAdrId && booking.ForwPersID ? booking.ForwAdrId + '-' + booking.ForwPersID.padStart(3, '0') : undefined;
+  const forwarder = useUserByAlphacomId(checkedForwarderID);
 
   const clientInfo = useMemo(() => {
     if (!client) {
@@ -131,15 +139,7 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
     return (
       <Fragment>
         {clientNameAndLoc(client.name, booking.ForwAdrCity)}
-        <ClientDetails
-          forwarderName={booking.ForwarderPersTxt}
-          forwarderID={
-            booking.ForwPersID && booking.ForwAdrId
-              ? booking.ForwAdrId + '-' + booking.ForwPersID.padStart(3, '0')
-              : undefined
-          }
-          bkgRef={booking['Cust-BkgRef']}
-        />
+        <ClientDetails forwarder={forwarder} forwarderTex={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
       </Fragment>
     );
   }, [client, booking]);
@@ -209,7 +209,30 @@ const BookingSummary: React.FC<Props> = ({ booking }) => {
               </TableCell>
             </TableRow>
             <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
-            {booking.BkgAgentContactTxt ? (
+            {bookingAgent ? (
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {bookingAgent?.firstName || bookingAgent?.lastName ? (
+                    bookingAgent?.emailAddress ? (
+                      <a href={'mailto:' + bookingAgent?.emailAddress}>
+                        {(bookingAgent?.firstName + ' ' + bookingAgent?.lastName).toUpperCase()}
+                      </a>
+                    ) : bookingAgent?.alphacomId ? (
+                      bookingAgent?.alphacomId.toUpperCase()
+                    ) : (
+                      booking.BkgAgentContactTxt
+                    )
+                  ) : bookingAgent?.emailAddress ? (
+                    <a href={'mailto:' + bookingAgent?.emailAddress}>{bookingAgent?.emailAddress.toUpperCase()}</a>
+                  ) : bookingAgent?.alphacomId ? (
+                    bookingAgent?.alphacomId.toUpperCase()
+                  ) : (
+                    booking.BkgAgentContactTxt
+                  )}{' '}
+                </TableCell>
+              </TableRow>
+            ) : booking.BkgAgentContactTxt ? (
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
                 <TableCell className={classes.tableCell}>

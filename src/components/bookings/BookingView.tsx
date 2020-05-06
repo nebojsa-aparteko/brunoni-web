@@ -115,6 +115,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
+
+  const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
+  const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
+
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -194,19 +198,40 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 </Box>
                 <Box flex="1" />
                 <Box>
-                  <Avatar
-                    name={booking?.BkgAgentContactTxt}
-                    title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
-                    size="30"
-                    round={true}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() =>
-                      window.open(
-                        `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
-                        '_blank',
-                      )
-                    }
-                  />
+                  {bookingAgent ? (
+                    <Avatar
+                      name={bookingAgent?.firstName + ' ' + bookingAgent?.lastName}
+                      title={`${bookingAgent?.firstName + ' ' + bookingAgent?.lastName} <${
+                        bookingAgent?.emailAddress ? bookingAgent?.emailAddress : null
+                      }>`}
+                      size="30"
+                      round={true}
+                      style={{ cursor: 'pointer' }}
+                      onClick={
+                        bookingAgent?.emailAddress
+                          ? () =>
+                              window.open(
+                                `mailto:${bookingAgent?.emailAddress}?subject=Booking - ${booking?.id} - question`,
+                                '_blank',
+                              )
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    <Avatar
+                      name={booking?.BkgAgentContactTxt}
+                      title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
+                      size="30"
+                      round={true}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        window.open(
+                          `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
+                          '_blank',
+                        )
+                      }
+                    />
+                  )}
                 </Box>
                 <Box className={classes.actions} displayPrint="none">
                   <Button
@@ -239,7 +264,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               <Grid item xs={12}>
                 <Page title={getBookingTitle(booking)}>
                   <Box marginTop="1em" marginBottom="0em">
-                    <BookingSummary booking={booking} />
+                    <BookingSummary booking={booking} bookingAgent={bookingAgent} />
                   </Box>
                   <Box marginTop="0em" marginBottom="0em">
                     <ContainerDetails
