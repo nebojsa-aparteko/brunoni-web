@@ -180,6 +180,9 @@ export interface CargoDetail {
   PINNr: string | null;
   Stock: string | null;
   DropOffRef: string | null;
+  DemDetTariff: string;
+  PluginTariff: string;
+  StorageTariff: string;
 }
 
 export interface EquipmentDetail {

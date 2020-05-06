@@ -71,6 +71,7 @@ interface AdditionalCargoProps {
 interface CtrTariffProps {
   ctrTariffs: CtrTariff[] | null;
   tariffDetails: CtrTariffDetail[];
+  detail: CargoDetail;
 }
 
 interface CtrTariffDetailProps {
@@ -255,40 +256,43 @@ export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDeta
         {data && !data.every(item => item === null) ? data : 'ON REQUEST'}
       </TableCell>
     </TableRow>
-  ) : (
-    <TableRow>
-      <TableCell className={classes.tableCellLabel}>{type}</TableCell>
-      <TableCell className={classes.tableCell}>{'ON REQUEST'}</TableCell>
-    </TableRow>
-  );
+  ) : null;
 };
 
-export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrTariffs }) => {
+export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrTariffs, detail }) => {
   const demDetTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'DEM/DET');
   const storageTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'STORAGE');
   const pluginTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'PLUGIN');
 
   return (
     <Fragment>
-      <Fragment>
-        {demDetTariffs && demDetTariffs[0] ? (
-          <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={ctrTariffs} type={'Dem./Det. tariff'} />
-        ) : (
-          <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={null} type={'Dem./Det. tariff'} />
-        )}
-      </Fragment>
-      <Fragment>
-        {storageTariffs && storageTariffs[0] ? (
-          <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={ctrTariffs} type={'Storage tariff'} />
-        ) : (
-          <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={null} type={'Storage tariff'} />
-        )}
-      </Fragment>
-      <Fragment>
-        {pluginTariffs && pluginTariffs[0] ? (
-          <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={ctrTariffs} type={'Plug-in tariff'} />
-        ) : null}
-      </Fragment>
+      {detail.DemDetTariff !== '0' && (
+        <Fragment>
+          {demDetTariffs && demDetTariffs[0] ? (
+            <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={ctrTariffs} type={'Dem./Det. tariff'} />
+          ) : (
+            <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={null} type={'Dem./Det. tariff'} />
+          )}
+        </Fragment>
+      )}
+      {detail.StorageTariff !== '0' && (
+        <Fragment>
+          {storageTariffs && storageTariffs[0] ? (
+            <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={ctrTariffs} type={'Storage tariff'} />
+          ) : (
+            <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={null} type={'Storage tariff'} />
+          )}
+        </Fragment>
+      )}
+      {detail.PluginTariff !== '0' && (
+        <Fragment>
+          {pluginTariffs && pluginTariffs[0] ? (
+            <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={ctrTariffs} type={'Plug-in tariff'} />
+          ) : (
+            <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={null} type={'Plug-in tariff'} />
+          )}
+        </Fragment>
+      )}
     </Fragment>
   );
 };
@@ -390,6 +394,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                     key={`tariff-${index}`}
                     tariffDetails={tariffDetails}
                     ctrTariffs={detail.Equipment[0].CtrTariffs}
+                    detail={detail}
                   />
                 ) : null}
               </TableBody>
