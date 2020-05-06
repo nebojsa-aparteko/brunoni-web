@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Badge, Drawer, IconButtonProps } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -16,11 +16,8 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   useEffect(() => {
     if (notifications) {
       setNotificationCount(
-        (prevState: number) =>
-          notifications?.reduce(
-            (accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator),
-            0,
-          ) || prevState,
+        notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
+          0,
       );
     }
   }, [notifications, setNotificationCount]);

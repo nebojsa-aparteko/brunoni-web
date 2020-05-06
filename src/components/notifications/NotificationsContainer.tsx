@@ -1,21 +1,25 @@
-import React, { Fragment } from 'react';
-import { createStyles, makeStyles } from '@material-ui/core';
+import React, { Fragment, useEffect } from 'react';
 import NotificationsView from './NotificationsView';
 import Notification from '../../model/Notification';
-
-const useStyles = makeStyles(theme =>
-  createStyles({
-    title: {
-      margin: theme.spacing(1),
-    },
-  }),
-);
+import firebase from '../../firebase';
 
 const NotificationsContainer: React.FC<Props> = ({ handleShow, notifications }) => {
-  const classes = useStyles();
-  //get notifications and pass to view
-  // const notifications = useNotifications('a.zeric@brunoni.ch');
+  useEffect(() => {
+    const batch = firebase.firestore().batch();
 
+    notifications
+      .filter(notification => !notification.seen)
+      .map(notification =>
+        batch.update(
+          firebase
+            .firestore()
+            .collection('notifications')
+            .doc(notification.id),
+          { seen: true },
+        ),
+      );
+    batch.commit().catch(err => console.log(err));
+  }, []);
   return (
     <Fragment>{notifications && <NotificationsView notifications={notifications} handleShow={handleShow} />}</Fragment>
   );
