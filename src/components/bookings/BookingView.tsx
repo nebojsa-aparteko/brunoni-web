@@ -25,6 +25,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   body: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
+    width: '100%',
+    margin: 0,
 
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(2),
