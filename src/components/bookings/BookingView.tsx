@@ -20,6 +20,10 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import WatchersBookingMultiInput from './WatchersBookingMultiInput';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import UserRecord from '../../model/UserRecord';
+import UserAssignment from '../UserAssignment';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -121,7 +125,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
-
+  const admins = useAdminUsers();
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -315,6 +319,21 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Page>
         </Grid>
         <Grid item md={4} xs={12}>
+          {/*<UserAssignment*/}
+          {/*  onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}*/}
+          {/*  value={bookingAgent ? bookingAgent : undefined}*/}
+          {/*/>*/}
+          <WatchersBookingMultiInput
+            options={admins || []}
+            values={booking?.watchers || []}
+            onChange={(event, value) =>
+              firebase
+                .firestore()
+                .collection('bookings')
+                .doc(booking?.id)
+                .update('watchers', value)
+            }
+          />
           <CheckList booking={booking} />
         </Grid>
       </Grid>
