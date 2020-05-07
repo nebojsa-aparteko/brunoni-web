@@ -215,7 +215,7 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
   );
   const onMentionFile = (item: ChecklistItemValueDocument) =>
     activityLogContext.setState({ documentReference: item, internal: true });
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop,
   });
   return (
