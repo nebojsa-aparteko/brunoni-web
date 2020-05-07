@@ -1,3 +1,5 @@
+import UserRecord from './UserRecord';
+
 export interface Booking {
   id: string;
   CarrierID: string;
@@ -52,6 +54,7 @@ export interface Booking {
   pendingPayment: boolean;
   checklistCheckedCount: number;
   checklistItemCount: number;
+  watchers: UserRecord[];
 }
 
 export interface CheckListData {
@@ -154,9 +157,11 @@ export interface PortTerms {
 }
 
 export interface Closing {
-  ClosingDate: Date;
+  ClosingDate: string;
+  ClosingTime: string;
   ClosingTxt: string;
   ClosingType: string;
+  ClosingDateObject: Date;
 }
 
 export interface CargoDetail {
