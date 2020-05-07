@@ -2,8 +2,6 @@ import React, { Fragment } from 'react';
 import { Box, createStyles, makeStyles, Table, TableCell, TableHead, TableRow, Theme } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { PortTerms } from '../../model/Booking';
-import formatDate from 'date-fns/format';
-import safeInvoke from '../../utilities/safeInvoke';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -107,9 +105,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
                 return (
                   <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
                     <TableCell>{item.ClosingType}</TableCell>
-                    {item.ClosingDate && (
-                      <TableCell>{formatDate(safeInvoke('toDate')(item.ClosingDate), 'dd.MM.yyyy')}</TableCell>
-                    )}
+                    <TableCell>{`${item.ClosingDate} ${item.ClosingTime}`}</TableCell>
                     <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
                   </TableRow>
                 );
