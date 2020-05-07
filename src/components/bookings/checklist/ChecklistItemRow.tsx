@@ -29,7 +29,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import { flow, isNil, omit, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import useClients from '../../../hooks/useClients';
-import { Booking, CheckListDocument } from '../../../model/Booking';
+import { Booking, BookingLocType, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';
@@ -371,6 +371,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             () => {
               setUploadProgress(0);
               // success
+              storageRef.updateMetadata({
+                contentDisposition: ['IMO', 'OGG'].includes(checklistItem.id)
+                  ? `attachment; filename=${booking.CargoDetails[0].LocRefs.find(
+                      f => f.LocType === BookingLocType.delivery,
+                    )?.LocRef || file.name};`
+                  : `attachment; filename=${file.name}`,
+              });
               uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
                 resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
               });

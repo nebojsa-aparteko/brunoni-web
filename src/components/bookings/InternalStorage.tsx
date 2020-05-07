@@ -22,13 +22,21 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
+  rootEmpty: {
     flexGrow: 1,
     border: '1px dashed #ccc',
     cursor: 'pointer',
     borderColor: '#999',
+    '&:focus': {
+      outline: 'none',
+    },
+  },
+  root: {
+    flexGrow: 1,
     '&:focus': {
       outline: 'none',
     },
@@ -217,11 +225,14 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
     activityLogContext.setState({ documentReference: item, internal: true });
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop,
+    noClick: normalizedFiles.length > 0,
   });
   return (
     <Box
       {...getRootProps()}
-      className={isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? '' : classes.root}
+      className={
+        isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
+      }
       my={2}
       py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
       display="flex"
@@ -250,7 +261,14 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
 
       {normalizedFiles && normalizedFiles.length > 0 ? (
         <Card>
-          <CardHeader title="Internal documents" />
+          <CardHeader
+            title="Internal documents"
+            action={
+              <IconButton size="small" aria-label="Add Comment" onClick={open}>
+                <AttachFileIcon />
+              </IconButton>
+            }
+          />
           <CardContent>
             <List className={classes.documentList}>
               {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (

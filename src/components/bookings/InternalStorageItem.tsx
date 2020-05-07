@@ -47,8 +47,8 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
     <ListItem>
       <a
         href={item.url}
-        download={item.name}
-        target="_blank"
+        download={'AAAA' + item.name}
+        // target="_blank"
         rel="noopener noreferrer"
         className={classes.fileItemLink}
       >
