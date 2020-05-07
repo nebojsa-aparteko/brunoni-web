@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team } from '../../model/Teams';
-import { Button, TextField, Typography } from '@material-ui/core';
+import { Button, IconButton, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord from '../../model/UserRecord';
 import { firestore } from 'firebase';
@@ -17,6 +17,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
 import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -40,6 +41,13 @@ const saveChanges = (field: string, value: any, teamId: string) => {
     .doc(teamId)
     .update(field, value);
 };
+
+const deleteTeam = (teamId: string) =>
+  firebase
+    .firestore()
+    .collection('teams')
+    .doc(teamId)
+    .delete();
 
 const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   const adminUsers = useAdminUsers();
@@ -161,6 +169,9 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
             Save
           </Button>
         )}
+        <IconButton onClick={() => deleteTeam(team.id || '')}>
+          <DeleteIcon />
+        </IconButton>
       </TableCell>
     </TableRow>
   );
