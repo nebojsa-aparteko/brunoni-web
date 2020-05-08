@@ -165,6 +165,16 @@ export const createActivityObject = (
     stage: stage,
   } as ActivityLogItem);
 
+const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: Booking, file: File) => {
+  if (['IMO', 'OGG'].includes(checklistItem.id)) {
+    const deliveryRef = booking.CargoDetails[0].LocRefs.find(f => f.LocType === BookingLocType.delivery);
+    if (deliveryRef) {
+      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
+    }
+  }
+  return `attachment; filename=${file.name}`;
+};
+
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
@@ -369,11 +379,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
               setUploadProgress(0);
               // success
               storageRef.updateMetadata({
-                contentDisposition: ['IMO', 'OGG'].includes(checklistItem.id)
-                  ? `attachment; filename=${booking.CargoDetails[0].LocRefs.find(
-                      f => f.LocType === BookingLocType.delivery,
-                    )?.LocRef || file.name};`
-                  : `attachment; filename=${file.name}`,
+                contentDisposition: makeContentDispositionFileName(checklistItem, booking, file),
               });
               uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
                 resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
@@ -450,6 +456,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     (acceptedFiles: File[], internal: boolean) => {
       saveFiles(acceptedFiles)
         .then((documents: CheckListDocument[]) => {
+          console.log(documents, 'DOCUMENTS');
           const values = documents.map(item => {
             return {
               uploadedBy: getActivityLogUserData(),
@@ -476,6 +483,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const {
     getRootProps: getRootPropsDraft,
     getInputProps: getInputPropsDraft,
+    open: openDraft,
     isDragActive: isDragActiveDraft,
   } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 
@@ -589,7 +597,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
           >
             <input {...getInputProps()} />
             <Divider />
-            <Typography variant="caption">Drafts</Typography>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="caption">Drafts</Typography>
+              <IconButton size="small" aria-label="Add Draft Files" onClick={openDraft}>
+                <AttachFileIcon />
+              </IconButton>
+            </Box>
 
             <DocumentList
               storageBasePath={storageBasePath}

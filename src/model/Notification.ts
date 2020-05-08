@@ -2,7 +2,9 @@ import { ActivityLogUserData } from '../components/bookings/checklist/ChecklistI
 import { ActivityLogItem } from '../components/bookings/checklist/ActivityModel';
 
 export enum NotificationType {
-  MENTIONED,
+  COMMENT,
+  ACTIVITY,
+  ALERT,
 }
 
 export default interface Notification {
