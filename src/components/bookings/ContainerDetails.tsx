@@ -215,7 +215,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCate
           <TableCell className={classes.tableCellLabel}>Containers</TableCell>
           <TableCell className={classes.tableCell}>
             {containersToDisplay.map(equipmentDetail => (
-              <span key={`ctdet-${equipmentDetail.ContainerNumber}`}>
+              <div key={`ctdet-${equipmentDetail.ContainerNumber}`}>
                 {equipmentDetail.GateInDate ||
                 equipmentDetail.PickUpDate ||
                 equipmentDetail.DropOffDate ||
@@ -229,7 +229,7 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCate
                 ) : (
                   equipmentDetail.ContainerNumber
                 )}
-              </span>
+              </div>
             ))}
           </TableCell>
         </TableRow>
