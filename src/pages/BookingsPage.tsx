@@ -108,7 +108,7 @@ const BookingsPage: React.FC = () => {
       bookingFilterDispach({ type: 'clear', field: 'archived' });
       bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
     }
-  }, [actingAs]);
+  }, [actingAs, bookingFilterDispach]);
 
   return (
     <Fragment>

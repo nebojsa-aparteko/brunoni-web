@@ -28,7 +28,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import { flow, isNil, omit, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
-import useClients from '../../../hooks/useClients';
 import { Booking, BookingLocType, CheckListDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
@@ -40,6 +39,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import DocumentList from './DocumentList';
 import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
+import { useClientById } from '../../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -170,8 +170,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
-  const clients = useClients();
-  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
+  const client = useClientById(booking.ForwAdrId);
 
   const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', client?.id, 'bookings', booking?.id, checklistItem.id].join('/');

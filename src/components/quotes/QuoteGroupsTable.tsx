@@ -17,11 +17,11 @@ import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
-import useClients from '../../hooks/useClients';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import UserRecord from '../../model/UserRecord';
+import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -68,15 +68,11 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   assignedUsers,
 }) => {
   const classes = useStyles();
-  const clients = useClients();
   const history = useHistory();
 
   const requestedBy = useUserByAlphacomId(quotes[0].userId);
 
-  const client = useMemo(() => clients?.find(client => client.id === quotes[0].clientId), [
-    clients,
-    quotes[0].clientId,
-  ]);
+  const client = useClientById(quotes[0].clientId);
 
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
@@ -101,15 +97,6 @@ const QuoteGroupRow: React.FC<RowProps> = ({
 
   const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
     history.push(pathToNavigate);
-  };
-
-  const setAssignedUser = (user: UserRecord | null) => {
-    // do something with this
-  };
-
-  const onUserInputClick = (event: React.MouseEvent<unknown>) => {
-    event.stopPropagation();
-    console.log('User');
   };
 
   return (

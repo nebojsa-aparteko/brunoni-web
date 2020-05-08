@@ -105,7 +105,7 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
                 return (
                   <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
                     <TableCell>{item.ClosingType}</TableCell>
-                    <TableCell>{`${item.ClosingDate} ${item.ClosingTime}`}</TableCell>
+                    <TableCell>{`${item.ClosingDate} ${item.ClosingTime || ''}`}</TableCell>
                     <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
                   </TableRow>
                 );

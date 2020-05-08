@@ -46,16 +46,16 @@ import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroupsContext';
-import { Quote, QuoteDetail, QuoteStatus } from '../providers/QuoteGroupsProvider';
+import { Quote, QuoteDetail } from '../providers/QuoteGroupsProvider';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
-import useClients from '../hooks/useClients';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
 import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogContainer';
 import UserRecord from '../model/UserRecord';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
+import { useClientById } from '../hooks/useClient';
 
 interface Props {
   id: string;
@@ -177,15 +177,11 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const carriers = useContext(Carriers);
   const quoteGroups = useContext(QuoteGroups);
-  const clients = useClients();
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
   const quoteGroup = useMemo(() => quoteGroups?.find(quoteGroup => quoteGroup.id === id), [quoteGroups, id]);
-  const client = useMemo(() => clients?.find(client => client.id === quoteGroup?.quotes[0].clientId), [
-    quoteGroup,
-    clients,
-  ]);
+  const client = useClientById(quoteGroup?.quotes[0].clientId);
 
   const quotesByCarrier = useMemo(
     () =>

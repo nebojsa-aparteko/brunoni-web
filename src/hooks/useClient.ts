@@ -11,3 +11,9 @@ export default function useClient() {
 
   return clientDoc?.data() as Client;
 }
+
+export function useClientById(id?: string) {
+  const clientDoc = useFirestoreDocument('clients', id);
+
+  return clientDoc?.data() as Client;
+}

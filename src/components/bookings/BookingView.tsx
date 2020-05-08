@@ -1,12 +1,11 @@
 import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useContext, useEffect, useMemo } from 'react';
-import { Box, Button, Container, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import { Box, Button, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
@@ -15,15 +14,12 @@ import BookingFreight from './BookingFreight';
 import PortTerms from './PortTerms';
 import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
-import theme from '../../theme';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import WatchersBookingMultiInput from './WatchersBookingMultiInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import UserRecord from '../../model/UserRecord';
-import UserAssignment from '../UserAssignment';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -85,7 +81,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  booking?: Booking;
+  booking: Booking;
 }
 
 const getBookingTitle = (booking?: Booking) => {
@@ -123,9 +119,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
 
-  const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
-  const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
+  const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
+
   const admins = useAdminUsers();
+
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -155,190 +152,165 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       .update('archived', !booking?.archived);
   }, [booking]);
 
-  if (!booking) {
-    return (
-      <Container maxWidth="lg" style={{ paddingTop: theme.spacing(5) }}>
-        <Paper className={classes.root}>
-          <ChartsCircularProgress />
-        </Paper>
-      </Container>
-    );
-  } else {
-    return (
-      <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-        <Grid item md={7} xs={12}>
-          <Page title={getBookingTitle(booking)}>
-            <ScrollToTopOnMount />
-            <Paper className={classes.root}>
-              <Box display="none" displayPrint="block" mb={2}>
-                <Box mb={2}>
-                  {/* <img
+  return (
+    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      <Grid item md={7} xs={12}>
+        <Page title={getBookingTitle(booking)}>
+          <ScrollToTopOnMount />
+          <Paper className={classes.root}>
+            <Box display="none" displayPrint="block" mb={2}>
+              <Box mb={2}>
+                {/* <img
                   src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
                   alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   style={{ width: '5em' }}
                 /> */}
-                </Box>
-                <Divider />
               </Box>
+              <Divider />
+            </Box>
 
-              <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
-                <Box
-                  className={classes.actionBar}
-                  mb={2}
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="end"
-                  justifyContent="space-between"
+            <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+              <Box
+                className={classes.actionBar}
+                mb={2}
+                display="flex"
+                flexDirection="row"
+                alignItems="end"
+                justifyContent="space-between"
+              >
+                <QuoteNav
+                  backTo="/bookings"
+                  title={`Booking - ${getBookingTitle(booking)}`}
+                  subtitle={`File No. ${booking.id}`}
+                />
+                <Typography variant={'h5'} style={{ paddingLeft: '20px' }}>
+                  {booking?.Agreement
+                    ? 'Agreement No. ' + booking?.Agreement
+                    : booking?.StatClientRef
+                    ? 'Agreement No. ' + booking.StatClientRef
+                    : null}
+                </Typography>
+              </Box>
+              <Box flex="1" />
+              <Box>
+                <Avatar
+                  name={
+                    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt
+                  }
+                  title={
+                    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt
+                  }
+                  size="30"
+                  round={true}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    window.open(
+                      `mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}?subject=Booking - ${
+                        booking?.id
+                      } - question`,
+                      '_blank',
+                    )
+                  }
+                />
+              </Box>
+              <Box className={classes.actions} displayPrint="none">
+                <Button
+                  aria-label="print"
+                  variant="outlined"
+                  size="small"
+                  startIcon={<PrintIcon />}
+                  onClick={handlePrint}
                 >
-                  <QuoteNav
-                    backTo="/bookings"
-                    title={`Booking - ${getBookingTitle(booking)}`}
-                    subtitle={`File No. ${booking.id}`}
-                  />
-                  <Typography variant={'h5'} style={{ paddingLeft: '20px' }}>
-                    {booking?.Agreement
-                      ? 'Agreement No. ' + booking?.Agreement
-                      : booking?.StatClientRef
-                      ? 'Agreement No. ' + booking.StatClientRef
-                      : null}
-                  </Typography>
-                </Box>
-                <Box flex="1" />
-                <Box>
-                  {bookingAgent ? (
-                    <Avatar
-                      name={bookingAgent?.firstName + ' ' + bookingAgent?.lastName}
-                      title={`${bookingAgent?.firstName + ' ' + bookingAgent?.lastName} <${
-                        bookingAgent?.emailAddress ? bookingAgent?.emailAddress : null
-                      }>`}
-                      size="30"
-                      round={true}
-                      style={{ cursor: 'pointer' }}
-                      onClick={
-                        bookingAgent?.emailAddress
-                          ? () =>
-                              window.open(
-                                `mailto:${bookingAgent?.emailAddress}?subject=Booking - ${booking?.id} - question`,
-                                '_blank',
-                              )
-                          : undefined
-                      }
-                    />
-                  ) : (
-                    <Avatar
-                      name={booking?.BkgAgentContactTxt}
-                      title={`${booking?.BkgAgentContactTxt} <${booking?.BkgAgentContactEml}>`}
-                      size="30"
-                      round={true}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() =>
-                        window.open(
-                          `mailto:${booking?.BkgAgentContactEml}?subject=Booking - ${booking?.id} - question`,
-                          '_blank',
-                        )
-                      }
-                    />
-                  )}
-                </Box>
-                <Box className={classes.actions} displayPrint="none">
+                  Print
+                </Button>
+
+                {!actingAs && (booking.pendingPayment || booking.archived) && (
                   <Button
-                    aria-label="print"
+                    aria-label="archive"
                     variant="outlined"
                     size="small"
-                    startIcon={<PrintIcon />}
-                    onClick={handlePrint}
+                    startIcon={<ArchiveIcon />}
+                    onClick={onArchiveClick}
                   >
-                    Print
+                    {booking.archived ? 'Restore' : 'Archive'}
                   </Button>
-
-                  {!actingAs && (booking.pendingPayment || booking.archived) && (
-                    <Button
-                      aria-label="archive"
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ArchiveIcon />}
-                      onClick={onArchiveClick}
-                    >
-                      {booking.archived ? 'Restore' : 'Archive'}
-                    </Button>
-                  )}
-                </Box>
-                {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
+                )}
+              </Box>
+              {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
                 <VisibilityIcon />
               </IconButton>*/}
-              </Box>
+            </Box>
 
-              <Grid item xs={12}>
-                <Page title={getBookingTitle(booking)}>
-                  <Box marginTop="1em" marginBottom="0em">
-                    <BookingSummary booking={booking} bookingAgent={bookingAgent} />
-                  </Box>
-                  <Box marginTop="0em" marginBottom="0em">
-                    <ContainerDetails
-                      cargoDetail={booking.CargoDetails}
-                      version={booking.Version}
-                      category={booking?.Category}
-                      tariffDetails={booking?.CtrTariffsDetails}
-                    />
-                  </Box>
-                  {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
-                    <Fragment>
-                      <Box marginTop="0em" marginBottom="0em">
-                        <PortTerms portTerms={booking.PortTerms} />
-                      </Box>
-                      <Box marginTop="0em" marginBottom="0em">
-                        <SpecialRemarks remarks={specialRemarks} />
-                      </Box>
-                    </Fragment>
-                  ) : null}
-
-                  {booking.FreightDetails && (
+            <Grid item xs={12}>
+              <Page title={getBookingTitle(booking)}>
+                <Box marginTop="1em" marginBottom="0em">
+                  <BookingSummary booking={booking} bookingAgent={bookingAgent} />
+                </Box>
+                <Box marginTop="0em" marginBottom="0em">
+                  <ContainerDetails
+                    cargoDetail={booking.CargoDetails}
+                    version={booking.Version}
+                    category={booking?.Category}
+                    tariffDetails={booking?.CtrTariffsDetails}
+                  />
+                </Box>
+                {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
+                  <Fragment>
                     <Box marginTop="0em" marginBottom="0em">
-                      <BookingFreight freightDetails={booking.FreightDetails} />
+                      <PortTerms portTerms={booking.PortTerms} />
                     </Box>
-                  )}
-                  <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
-                    {finalRemarks.map((item, index) => {
-                      const text = item.RemarkTxt.split('<br/><br/>'); // split the string into an array for each new paragraph
+                    <Box marginTop="0em" marginBottom="0em">
+                      <SpecialRemarks remarks={specialRemarks} />
+                    </Box>
+                  </Fragment>
+                ) : null}
 
-                      return item.RemarkTxt ? (
-                        <Typography variant="body2" key={`final-remark-${index}`}>
-                          <span
-                            dangerouslySetInnerHTML={{
-                              __html: text.map(remark => remark.split('<br/>').join('')).join('<br/><br/>'),
-                            }}
-                          />
-                          {/* remove all <br/> from the elements of the string array to get rid of manual new rows and join the elements, aka paragraphs with <br/><br/> as they were initially */}
-                        </Typography>
-                      ) : null;
-                    })}
+                {booking.FreightDetails && (
+                  <Box marginTop="0em" marginBottom="0em">
+                    <BookingFreight freightDetails={booking.FreightDetails} />
                   </Box>
-                </Page>
-              </Grid>
-            </Paper>
-          </Page>
-        </Grid>
-        <Grid item md={4} xs={12}>
-          {/*<UserAssignment*/}
-          {/*  onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}*/}
-          {/*  value={bookingAgent ? bookingAgent : undefined}*/}
-          {/*/>*/}
-          <WatchersBookingMultiInput
-            options={admins || []}
-            values={booking?.watchers || []}
-            onChange={(event, value) =>
-              firebase
-                .firestore()
-                .collection('bookings')
-                .doc(booking?.id)
-                .update('watchers', value)
-            }
-          />
-          <CheckList booking={booking} />
-        </Grid>
+                )}
+                <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
+                  {finalRemarks.map((item, index) => {
+                    const text = item.RemarkTxt.split('<br/><br/>'); // split the string into an array for each new paragraph
+
+                    return item.RemarkTxt ? (
+                      <Typography variant="body2" key={`final-remark-${index}`}>
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: text.map(remark => remark.split('<br/>').join('')).join('<br/><br/>'),
+                          }}
+                        />
+                        {/* remove all <br/> from the elements of the string array to get rid of manual new rows and join the elements, aka paragraphs with <br/><br/> as they were initially */}
+                      </Typography>
+                    ) : null;
+                  })}
+                </Box>
+              </Page>
+            </Grid>
+          </Paper>
+        </Page>
       </Grid>
-    );
-  }
+      <Grid item md={4} xs={12}>
+        {/*<UserAssignment*/}
+        {/*  onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}*/}
+        {/*  value={bookingAgent ? bookingAgent : undefined}*/}
+        {/*/>*/}
+        <WatchersBookingMultiInput
+          options={admins || []}
+          values={booking?.watchers || []}
+          onChange={(event, value) =>
+            firebase
+              .firestore()
+              .collection('bookings')
+              .doc(booking?.id)
+              .update('watchers', value)
+          }
+        />
+        <CheckList booking={booking} />
+      </Grid>
+    </Grid>
+  );
 };
 
 export default BookingView;

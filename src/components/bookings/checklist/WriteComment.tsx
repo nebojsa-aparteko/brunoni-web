@@ -158,7 +158,11 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
       {activityLogContext.state?.documentReference && (
         <Box>
           Doc -{' '}
-          <a href={`${activityLogContext.state?.documentReference?.url}`} target="_blank">
+          <a
+            href={`${activityLogContext.state?.documentReference?.url}`}
+            download={activityLogContext.state?.documentReference?.name}
+            rel="noopener noreferrer"
+          >
             {activityLogContext.state?.documentReference?.name}
           </a>
         </Box>

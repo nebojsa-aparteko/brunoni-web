@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
   Box,
@@ -20,7 +20,6 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import formatDate from 'date-fns/format';
 import { Booking, CargoDetail } from '../../model/Booking';
-import useClients from '../../hooks/useClients';
 import CheckList from './checklist/CheckList';
 import theme from '../../theme';
 import InfoBoxItem from '../InfoBoxItem';
@@ -32,6 +31,7 @@ import { isImport } from './BookingView';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -188,7 +188,6 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
 
 export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
   const classes = useStyles();
-  const clients = useClients();
 
   const history = useHistory();
   const handleRowClick = useCallback(
@@ -201,7 +200,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
 
-  const client = useMemo(() => clients?.find(client => client.id === booking?.ForwAdrId), [clients, booking]);
+  const client = useClientById(booking?.ForwAdrId);
 
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
@@ -248,15 +247,9 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                 title="Carrier"
                 label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
                 label2={
-                  isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID']) ? (
-                    <Typography variant="body2">
-                      {booking['ERP-CarrierID'] && booking['ERP-CarrierID']}
-                      {booking['ERP-CarrierID'] && booking['ERP-ServiceID'] ? ' - ' : null}
-                      {booking['ERP-ServiceID'] && booking['ERP-ServiceID']}
-                    </Typography>
-                  ) : (
-                    ''
-                  )
+                  isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID'])
+                    ? booking['ERP-CarrierID'] + (booking['ERP-ServiceID'] && ` - ${booking['ERP-ServiceID']}`)
+                    : ''
                 }
                 gutterBottom
               />

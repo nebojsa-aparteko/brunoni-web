@@ -8,8 +8,8 @@ import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
 import UserRecords from '../../contexts/UserRecords';
-import useClients from '../../hooks/useClients';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import { useClientById } from '../../hooks/useClient';
 
 interface Props {
   quote: Quote;
@@ -70,14 +70,12 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content, className, show
 };
 
 const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) => {
-  const classes = useStyles();
   const users = useContext(UserRecords);
-  const clients = useClients();
   const requestedBy = useUserByAlphacomId(quote.userId);
 
-  const clientInfo = useMemo(() => {
-    const client = clients?.find(client => client.id === quote.clientId);
+  const client = useClientById(quote.clientId);
 
+  const clientInfo = useMemo(() => {
     return (
       <Fragment>
         {showCompanyInfo && (
@@ -101,7 +99,7 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
         <TableRowData label="" content="" />
       </Fragment>
     );
-  }, [showCompanyInfo, users, quote, clients]);
+  }, [showCompanyInfo, users, quote, client]);
 
   return (
     <Table size="small" aria-label="a dense table">

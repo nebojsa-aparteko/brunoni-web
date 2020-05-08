@@ -104,6 +104,18 @@ const DocumentListItem = ({
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
   const checklistItemFileDeletedHandler = useCallback(
     (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument, internal: boolean) => {
       firebase
@@ -136,22 +148,11 @@ const DocumentListItem = ({
           });
         });
     },
-    [],
+    [bookingId, checklistItem, enqueueSnackbar, getActivityLogUserData],
   );
 
   const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
 
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
   const handleMention = () =>
     activityLogContext.setState({ documentReference: item, checklistReference: checklistItem, internal: internal });
   const checklistCheckedRule = () => checklistItem.checked;

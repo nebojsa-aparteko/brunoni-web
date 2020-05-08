@@ -204,31 +204,37 @@ export const ContainerDates: React.FC<ContainerDatesProps> = ({ equipment, booki
 export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCategory }) => {
   const classes = useStyles();
 
+  const containersToDisplay = equipment.filter(
+    eqDetail => eqDetail.ContainerNumber && eqDetail.ContainerNumber !== 'NOT AVAILABLE',
+  );
+
   return (
-    <TableRow>
-      <TableCell className={classes.tableCellLabel}>Containers</TableCell>
-      <TableCell className={classes.tableCell}>
-        {equipment.map(equipmentDetail =>
-          equipmentDetail.ContainerNumber && equipmentDetail.ContainerNumber ? (
-            <span key={`ctdet-${equipmentDetail.ContainerNumber}`}>
-              {equipmentDetail.GateInDate ||
-              equipmentDetail.PickUpDate ||
-              equipmentDetail.DropOffDate ||
-              equipmentDetail.GateOutDate ? (
-                <HtmlTooltip
-                  title={<ContainerDates equipment={equipmentDetail} bookingCategory={bookingCategory} />}
-                  placement={'right'}
-                >
-                  <Box style={{ width: 'fit-content' }}>{equipmentDetail.ContainerNumber}</Box>
-                </HtmlTooltip>
-              ) : (
-                <Box style={{ width: 'fit-content' }}>{equipmentDetail.ContainerNumber}</Box>
-              )}
-            </span>
-          ) : null,
-        )}
-      </TableCell>
-    </TableRow>
+    <Fragment>
+      {containersToDisplay.length > 0 && (
+        <TableRow>
+          <TableCell className={classes.tableCellLabel}>Containers</TableCell>
+          <TableCell className={classes.tableCell}>
+            {containersToDisplay.map(equipmentDetail => (
+              <span key={`ctdet-${equipmentDetail.ContainerNumber}`}>
+                {equipmentDetail.GateInDate ||
+                equipmentDetail.PickUpDate ||
+                equipmentDetail.DropOffDate ||
+                equipmentDetail.GateOutDate ? (
+                  <HtmlTooltip
+                    title={<ContainerDates equipment={equipmentDetail} bookingCategory={bookingCategory} />}
+                    placement={'right'}
+                  >
+                    <span>{equipmentDetail.ContainerNumber}</span>
+                  </HtmlTooltip>
+                ) : (
+                  equipmentDetail.ContainerNumber
+                )}
+              </span>
+            ))}
+          </TableCell>
+        </TableRow>
+      )}
+    </Fragment>
   );
 };
 

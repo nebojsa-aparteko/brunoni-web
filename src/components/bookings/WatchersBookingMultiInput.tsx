@@ -1,4 +1,3 @@
-import { Team } from '../../model/Teams';
 import React from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
@@ -17,7 +16,8 @@ const WatchersBookingMultiInput: React.FC<Props> = ({ options, values, onChange 
       multiple
       options={options}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
-      defaultValue={values}
+      getOptionSelected={(option, value) => option.alphacomId === value.alphacomId}
+      value={values}
       onChange={onChange}
       renderTags={(value, getTagProps) =>
         value.map((option, index) => (
