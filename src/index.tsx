@@ -23,7 +23,7 @@ import StatisticsContext from './contexts/Statistics';
 import CarriersContext from './contexts/Carriers';
 import PortsContext from './contexts/Ports';
 import UserContext from './contexts/UserContext';
-import UserRecordsContext from './contexts/UserRecords';
+import UserRecordsContext from './contexts/UserRecordsContext';
 import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
@@ -34,6 +34,7 @@ import UserRecordContext from './contexts/UserRecordContext';
 import { BookingListFilterProvider } from './providers/BookingListFilterProvider';
 import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
+import ClientUsersProvider from './providers/ClientUsersProvider';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -110,17 +111,19 @@ const UserApp: React.FC = () => {
           // Company
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
-              <QuotesProvider>
-                <QuoteGroupsProvider>
-                  <QuoteListProvider>
-                    <BookingsProvider>
-                      <BookingListFilterProvider>
-                        <App />
-                      </BookingListFilterProvider>
-                    </BookingsProvider>
-                  </QuoteListProvider>
-                </QuoteGroupsProvider>
-              </QuotesProvider>
+              <ClientUsersProvider>
+                <QuotesProvider>
+                  <QuoteGroupsProvider>
+                    <QuoteListProvider>
+                      <BookingsProvider>
+                        <BookingListFilterProvider>
+                          <App />
+                        </BookingListFilterProvider>
+                      </BookingsProvider>
+                    </QuoteListProvider>
+                  </QuoteGroupsProvider>
+                </QuotesProvider>
+              </ClientUsersProvider>
             </FirestoreClientDocumentProvider>
           );
         default:
@@ -153,17 +156,19 @@ const UserApp: React.FC = () => {
       showCrispChat(true);
       return (
         <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
-          <QuotesProvider>
-            <QuoteGroupsProvider>
-              <QuoteListProvider>
-                <BookingsProvider>
-                  <BookingListFilterProvider>
-                    <App />
-                  </BookingListFilterProvider>
-                </BookingsProvider>
-              </QuoteListProvider>
-            </QuoteGroupsProvider>
-          </QuotesProvider>
+          <ClientUsersProvider>
+            <QuotesProvider>
+              <QuoteGroupsProvider>
+                <QuoteListProvider>
+                  <BookingsProvider>
+                    <BookingListFilterProvider>
+                      <App />
+                    </BookingListFilterProvider>
+                  </BookingsProvider>
+                </QuoteListProvider>
+              </QuoteGroupsProvider>
+            </QuotesProvider>
+          </ClientUsersProvider>
         </FirestoreClientDocumentProvider>
       );
   }

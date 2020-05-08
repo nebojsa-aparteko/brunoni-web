@@ -1,12 +1,12 @@
-import { useCallback } from 'react';
+import { useContext } from 'react';
 
-import UserRecord, { ADMIN_ROLES } from '../model/UserRecord';
-import useFirestoreCollection from './useFirestoreCollection';
+import { ADMIN_ROLES } from '../model/UserRecord';
+import UserRecordsContext from '../contexts/UserRecordsContext';
 
 export default function useAdminUsers(roles: string[] = ADMIN_ROLES) {
-  const query = useCallback(q => q.where('role', 'in', roles).orderBy('firstName', 'asc'), [roles]); //'isAdmin', '==', true), []);
+  const users = useContext(UserRecordsContext);
 
-  const usersCollection = useFirestoreCollection('users', query);
-
-  return usersCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserRecord)) as UserRecord[];
+  return users
+    ? users.filter(user => roles.indexOf(user.role) !== -1).sort((a, b) => (a.firstName >= b.firstName ? 1 : -1))
+    : [];
 }

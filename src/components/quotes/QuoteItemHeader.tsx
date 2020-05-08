@@ -7,7 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
-import UserRecords from '../../contexts/UserRecords';
+import UserRecords from '../../contexts/UserRecordsContext';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
 
