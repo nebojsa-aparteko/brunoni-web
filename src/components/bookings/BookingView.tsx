@@ -1,6 +1,6 @@
 import Avatar from 'react-avatar';
-import React, { Fragment, useCallback, useContext, useEffect, useMemo } from 'react';
-import { Box, Button, Divider, Grid, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -18,8 +18,11 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import WatchersBookingMultiInput from './WatchersBookingMultiInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
+import WatchersDialog from '../watchers/WatchersDialog';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import useUser from '../../hooks/useUser';
+import { isSuperAdmin } from '../../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -118,10 +121,14 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
+  const [_, userRecord] = useUser();
 
   const admins = useAdminUsers();
+
+  const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
+
+  const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -156,6 +163,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
+          <WatchersDialog isOpen={isOpenWatcherDialog} handleClose={handleCloseWatcherDialog} />
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
@@ -193,25 +201,34 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               </Box>
               <Box flex="1" />
               <Box>
-                <Avatar
-                  name={
-                    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt
-                  }
-                  title={
-                    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt
-                  }
-                  size="30"
-                  round={true}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    window.open(
-                      `mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}?subject=Booking - ${
-                        booking?.id
-                      } - question`,
-                      '_blank',
-                    )
-                  }
-                />
+                {/*<Avatar*/}
+                {/*  name={*/}
+                {/*    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt*/}
+                {/*  }*/}
+                {/*  title={*/}
+                {/*    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt*/}
+                {/*  }*/}
+                {/*  size="30"*/}
+                {/*  round={true}*/}
+                {/*  style={{ cursor: 'pointer' }}*/}
+                {/*  onClick={() =>*/}
+                {/*    window.open(*/}
+                {/*      `mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}?subject=Booking - ${*/}
+                {/*        booking?.id*/}
+                {/*      } - question`,*/}
+                {/*      '_blank',*/}
+                {/*    )*/}
+                {/*  }*/}
+                {/*/>*/}
+                {actingAs == null && isSuperAdmin(userRecord) ? (
+                  <Button variant="contained" onClick={() => setIsOpenWatcherDialog(true)}>
+                    Watchers
+                  </Button>
+                ) : (
+                  <IconButton color="primary" aria-label="Watch" component="span" onClick={() => {}}>
+                    <VisibilityIcon />
+                  </IconButton>
+                )}
               </Box>
               <Box className={classes.actions} displayPrint="none">
                 <Button
@@ -236,9 +253,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   </Button>
                 )}
               </Box>
-              {/*    <IconButton color="primary" aria-label="Watch" component="span" onClick={handleWatch}>
-                <VisibilityIcon />
-              </IconButton>*/}
             </Box>
 
             <Grid item xs={12}>
@@ -292,21 +306,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
-        {/*<UserAssignment*/}
-        {/*  onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}*/}
-        {/*  value={bookingAgent ? bookingAgent : undefined}*/}
-        {/*/>*/}
-        <WatchersBookingMultiInput
-          options={admins || []}
-          values={booking?.watchers || []}
-          onChange={(event, value) =>
-            firebase
-              .firestore()
-              .collection('bookings')
-              .doc(booking?.id)
-              .update('watchers', value)
-          }
-        />
         <CheckList booking={booking} />
       </Grid>
     </Grid>

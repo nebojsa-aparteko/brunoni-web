@@ -1,7 +1,8 @@
 import React from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
+import { Team } from '../../model/Teams';
 import UserRecord from '../../model/UserRecord';
 
 interface Props {
@@ -10,14 +11,13 @@ interface Props {
   onChange: (event: React.ChangeEvent<{}>, value: UserRecord | UserRecord[] | null) => void;
 }
 
-const WatchersBookingMultiInput: React.FC<Props> = ({ options, values, onChange }) => {
+const WatchersChipMultiInput: React.FC<Props> = ({ options, values, onChange }) => {
   return (
     <Autocomplete
       multiple
       options={options}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
-      getOptionSelected={(option, value) => option.alphacomId === value.alphacomId}
-      value={values}
+      defaultValue={values}
       onChange={onChange}
       renderTags={(value, getTagProps) =>
         value.map((option, index) => (
@@ -29,4 +29,4 @@ const WatchersBookingMultiInput: React.FC<Props> = ({ options, values, onChange 
   );
 };
 
-export default WatchersBookingMultiInput;
+export default WatchersChipMultiInput;

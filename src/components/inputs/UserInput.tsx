@@ -68,7 +68,7 @@ const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, o
           }}
         />
       )}
-      PopperComponent={Popup}
+      PopperComponent={Popper}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
         const matches = match(getOptionLabel(option), inputValue);

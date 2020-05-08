@@ -6,6 +6,8 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import UserRecord from '../../model/UserRecord';
 import { useClientById } from '../../hooks/useClient';
+import EditIcon from '@material-ui/icons/Edit';
+import UserAssignment from '../UserAssignment';
 
 interface Props {
   booking: Booking;

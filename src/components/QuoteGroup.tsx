@@ -56,6 +56,8 @@ import UserRecord from '../model/UserRecord';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import { useClientById } from '../hooks/useClient';
+import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
+import InternalStorage from './bookings/InternalStorage';
 
 interface Props {
   id: string;
@@ -451,7 +453,10 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
             );
           })}
         </Box>
-        <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />
+        <ActivityLogProvider>
+          {/*<InternalStorage id={quoteGroup?.id} collection={}/>*/}
+          <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />
+        </ActivityLogProvider>
       </Container>
     </Fragment>
   );
