@@ -264,22 +264,24 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const checklistItemFileAddedHandler = useCallback(
     (addedFiles: ChecklistItemValueDocument[], internal: boolean) => {
       const newDocuments = ((internal ? checklistItem.valuesAdmin : checklistItem.values) || []).concat(addedFiles);
-      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', newDocuments).then(_ =>
-        addActivityItem(
-          booking!.id,
-          checklistItem!.id,
-          createActivityObject(
-            ActivityChangeType.ADD_FILE,
-            getActivityLogUserData(),
-            checklistItem,
-            addedFiles,
-            undefined,
-            internal,
+      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', newDocuments)
+        .then(_ =>
+          addActivityItem(
+            booking!.id,
+            checklistItem!.id,
+            createActivityObject(
+              ActivityChangeType.ADD_FILE,
+              getActivityLogUserData(),
+              checklistItem,
+              addedFiles,
+              undefined,
+              internal,
+            ),
           ),
-        ),
-      );
+        )
+        .catch(error => console.error('Error saving new document list', error));
     },
-    [booking?.id, checklistItem.id],
+    [booking?.id, checklistItem, getActivityLogUserData],
   );
 
   const checklistItemStageChangeHandler = useCallback(
@@ -472,7 +474,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
         });
     },
-    [checklistItem, saveFiles, storeActivity],
+    [checklistItem, saveFiles, storeActivity, checklistItemFileAddedHandler, getActivityLogUserData],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
@@ -486,6 +488,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     open: openDraft,
     isDragActive: isDragActiveDraft,
   } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
+
+  const {
+    getRootProps: getRootPropsDraftNoClick,
+    getInputProps: getInputPropsDraftNoClick,
+    open: openDraftNoClick,
+    isDragActive: isDragActiveDraftNoClick,
+  } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true), noClick: true });
 
   return (
     <Box
@@ -586,8 +595,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       <Box>
         {isAdmin && checklistItem.valuesAdmin && checklistItem.valuesAdmin?.length > 0 && (
           <Box
-            {...getRootProps()}
-            className={isDragActiveDraft ? classes.dropZone : classes.root}
+            {...getRootPropsDraftNoClick()}
+            className={isDragActiveDraftNoClick ? classes.dropZone : classes.root}
             flexBasis="fit-content"
             display="flex"
             flexDirection="column"
@@ -595,11 +604,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             id={checklistItem.id}
             px={1}
           >
-            <input {...getInputProps()} />
+            <input {...getInputPropsDraftNoClick()} />
             <Divider />
             <Box display="flex" justifyContent="space-between">
-              <Typography variant="caption">Drafts</Typography>
-              <IconButton size="small" aria-label="Add Draft Files" onClick={openDraft}>
+              <Typography variant="subtitle2">Drafts</Typography>
+              <IconButton size="small" aria-label="Add Draft Files" onClick={openDraftNoClick}>
                 <AttachFileIcon />
               </IconButton>
             </Box>

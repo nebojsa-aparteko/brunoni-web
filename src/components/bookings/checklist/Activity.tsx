@@ -37,7 +37,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       {activity.documents &&
         activity.documents.map((doc, index) => {
           return [ActivityChangeType.ADD_FILE].includes(activity.changeType as ActivityChangeType) ? (
-            <Fragment>
+            <Fragment key={doc.url}>
               <Link href={doc.url} target="_blank">
                 {doc.name}
               </Link>

@@ -95,6 +95,7 @@ const DocumentListItem = ({
   changeStatus,
   storageBasePath,
   internal,
+  ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
@@ -204,7 +205,7 @@ const DocumentListItem = ({
   );
 
   return (
-    <div>
+    <div {...other}>
       <ListItem>
         <a
           href={item.url}

@@ -27,7 +27,7 @@ const DocumentList = ({
     <List className={classes.documentList}>
       {(orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[]).map((item, index) => (
         <DocumentListItem
-          key={`chklistitem-${item.storedName}`}
+          key={item.storedName}
           item={item}
           bookingId={bookingId}
           storageBasePath={storageBasePath}
