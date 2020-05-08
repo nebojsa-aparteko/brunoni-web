@@ -490,11 +490,13 @@ export const OverdimensionComponent: React.FC<Overdimension> = ({ detail }) => {
   return (
     <TableRow>
       <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
-      <TableCell className={classes.tableCell}>
-        {detail.Overwidth ? `OW: ${detail.Overwidth}` : ''}
-        {detail.Overheight ? `OH: ${detail.Overheight}` : ''}
-        {detail.Overlength ? `OL: ${detail.Overlength}` : ''}
-      </TableCell>
+      <Box display="flex" flexDirection="column">
+        <TableCell className={classes.tableCell}>
+          {detail.Overwidth ? `OW: ${detail.Overwidth}` : ''}
+          {detail.Overheight ? `OH: ${detail.Overheight}` : ''}
+          {detail.Overlength ? `OL: ${detail.Overlength}` : ''}
+        </TableCell>
+      </Box>
     </TableRow>
   );
 };
