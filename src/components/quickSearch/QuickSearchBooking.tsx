@@ -1,5 +1,14 @@
 import React, { useState, Fragment, useEffect, useRef } from 'react';
-import { Box, CircularProgress, createStyles, FormControl, IconButton, makeStyles, TextField } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  createStyles,
+  FormControl,
+  IconButton,
+  makeStyles,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
@@ -7,6 +16,7 @@ import { BookingRow } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import { useHistory } from 'react-router';
 import Mousetrap from 'mousetrap';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -21,27 +31,31 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const QuickSearchBooking: React.FC<Props> = ({ label, fieldPath, handleClose }) => {
+const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBookings }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Booking | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleBookingClick = () => {
     history.push(`/bookings/${searchResult?.id}`);
     handleClose();
   };
-  const handleBookingSearch = (fieldPath: string) => {
+  const handleBookingSearch = () => {
     setIsLoading(true);
-    firebase
-      .firestore()
-      .collection('bookings')
-      .where(fieldPath, '==', inputValue)
-      .get()
+    searchBookings(inputValue)
       .then(result => {
-        result.forEach(r => setSearchResult(normalizeBooking(r.data())));
+        setSearchResult(normalizeBooking(result));
         setIsLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+        setIsLoading(false);
+        enqueueSnackbar(<Typography color="inherit">{`There is no record with this criteria.`}</Typography>, {
+          variant: 'error',
+        });
       });
   };
 
@@ -49,13 +63,13 @@ const QuickSearchBooking: React.FC<Props> = ({ label, fieldPath, handleClose }) 
 
   useEffect(() => {
     if (inputRef) {
-      let moustrapInstance = new Mousetrap(inputRef.current);
-      moustrapInstance.stopCallback = function() {
+      let mousetrapInstance = new Mousetrap(inputRef.current);
+      mousetrapInstance.stopCallback = function() {
         return false;
       };
-      moustrapInstance.bind(['enter', 'enter'], () => handleBookingSearch(fieldPath));
+      mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
       return () => {
-        moustrapInstance?.unbind(['enter', 'enter']);
+        mousetrapInstance?.unbind(['enter', 'enter']);
       };
     }
   }, [inputRef, inputValue]);
@@ -72,7 +86,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, fieldPath, handleClose }) 
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch(fieldPath)}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
           <SearchIcon />
         </IconButton>
       </FormControl>
@@ -90,6 +104,6 @@ export default QuickSearchBooking;
 
 interface Props {
   label: string;
-  fieldPath: string;
   handleClose: () => void;
+  searchBookings: (inputValue: string) => Promise<Booking>;
 }

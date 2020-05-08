@@ -5,17 +5,17 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
   makeStyles,
-  TextField,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import SearchIcon from '@material-ui/icons/Search';
 import QuickSearchBooking from './QuickSearchBooking';
 import QuickSearchContainer from './QuickSearchContainer';
 import QuickSearchQuote from './QuickSearchQuote';
+import firebase from '../../firebase';
+import LoadListContainerModel from '../../model/LoadListContainerModel';
+import { Booking } from '../../model/Booking';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -51,6 +51,33 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
+const searchBookings = async (collection: string, fieldPath: string, inputValue: string) => {
+  const booking = await firebase
+    .firestore()
+    .collection('bookings')
+    .where(fieldPath, '==', inputValue)
+    .get();
+  return new Promise<Booking>(resolve => resolve(booking.docs[0].data() as Booking));
+};
+
+const nestedSearchBookings = async (collection: string, fieldPath: string, inputValue: string) =>
+  firebase
+    .firestore()
+    .collection(collection)
+    .where(fieldPath, '==', inputValue)
+    .get()
+    .then(
+      result => new Promise<string>(resolve => resolve(result.docs[0]?.data()?.bookingId)),
+    )
+    .then(async bookingId => {
+      const booking = await firebase
+        .firestore()
+        .collection('bookings')
+        .doc(bookingId)
+        .get();
+      return new Promise<Booking>(resolve => resolve(booking.data() as Booking));
+    });
+
 const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
 
@@ -67,12 +94,36 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <Typography>Find quote by:</Typography>
           <QuickSearchQuote label="Quote Id" fieldPath="id" handleClose={handleClose} />
           <Typography>Find booking by:</Typography>
-          <QuickSearchBooking label="File number" fieldPath="ERP-BkgRef" handleClose={handleClose} />
-          <QuickSearchBooking label="BL number" fieldPath="BL-No" handleClose={handleClose} />
-          <QuickSearchBooking label="Customer's reference" fieldPath="StatClientRef" handleClose={handleClose} />
-          <QuickSearchContainer label="Container number" fieldPath="container" handleClose={handleClose} />
-          <QuickSearchContainer label="Delivery reference" fieldPath="deliveryRef" handleClose={handleClose} />
-          <QuickSearchContainer label="Pickup reference" fieldPath="pickupRef" handleClose={handleClose} />
+          <QuickSearchBooking
+            label="File number"
+            handleClose={handleClose}
+            searchBookings={inputValue => searchBookings('bookings', 'ERP-BkgRef', inputValue)}
+          />
+          <QuickSearchBooking
+            label="BL number"
+            handleClose={handleClose}
+            searchBookings={inputValue => searchBookings('bookings', 'BL-No', inputValue)}
+          />
+          <QuickSearchBooking
+            label="Customer's reference"
+            handleClose={handleClose}
+            searchBookings={inputValue => searchBookings('bookings', 'StatClientRef', inputValue)}
+          />
+          <QuickSearchBooking
+            label="Container number"
+            handleClose={handleClose}
+            searchBookings={inputValue => nestedSearchBookings('containers', 'container', inputValue)}
+          />
+          <QuickSearchBooking
+            label="Delivery reference"
+            handleClose={handleClose}
+            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'deliveryRef', inputValue)}
+          />
+          <QuickSearchBooking
+            label="Pickup reference"
+            handleClose={handleClose}
+            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'pickupRef', inputValue)}
+          />
         </DialogContent>
       </Box>
     </Dialog>
