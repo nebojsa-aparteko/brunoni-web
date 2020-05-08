@@ -1,18 +1,11 @@
 import { Team } from './Teams';
+import Client from './Client';
 
 export default interface UserRecord {
   id: string;
   alphacomClientId: string;
   alphacomId: string;
-  company: {
-    id: string;
-    name: string;
-    nameSup?: string;
-    poBox?: string;
-    city: string;
-    zip?: string;
-    countryCode: string;
-  };
+  company: Client;
   isAdmin?: boolean;
   firstName: string;
   lastName: string;

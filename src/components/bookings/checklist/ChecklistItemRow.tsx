@@ -39,7 +39,6 @@ import { addActivityItem } from './ActivityLogContainer';
 import DocumentList from './DocumentList';
 import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
-import { useClientById } from '../../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -170,11 +169,10 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
-  const client = useClientById(booking.ForwAdrId);
 
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents', 'clients', client?.id, 'bookings', booking?.id, checklistItem.id].join('/');
-  }, [booking, client, checklistItem]);
+    return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, checklistItem.id].join('/');
+  }, [booking, checklistItem]);
 
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);

@@ -31,7 +31,7 @@ import { isImport } from './BookingView';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import { useClientById } from '../../hooks/useClient';
+import { useClientByIdFromCache, useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -200,7 +200,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
 
-  const client = useClientById(booking?.ForwAdrId);
+  const client = useClientByIdFromCache(booking?.ForwAdrId);
 
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({

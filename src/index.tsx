@@ -33,6 +33,7 @@ import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecordContext';
 import { BookingListFilterProvider } from './providers/BookingListFilterProvider';
 import { isDashboardUser } from './model/UserRecord';
+import ClientsContext from './contexts/ClientsContext';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -133,11 +134,13 @@ const UserApp: React.FC = () => {
               <QuoteGroupsProvider>
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
-                    <BookingsProvider>
-                      <BookingListFilterProvider>
-                        <App />
-                      </BookingListFilterProvider>
-                    </BookingsProvider>
+                    <FirestoreCollectionProvider name="clients" context={ClientsContext}>
+                      <BookingsProvider>
+                        <BookingListFilterProvider>
+                          <App />
+                        </BookingListFilterProvider>
+                      </BookingsProvider>
+                    </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>

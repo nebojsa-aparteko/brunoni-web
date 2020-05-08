@@ -125,7 +125,8 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const [user, userData, client] = useUser();
+  const [user, userData] = useUser();
+  const client = userData?.company;
 
   const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMoreAnchorEl(event.currentTarget);

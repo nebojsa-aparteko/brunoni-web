@@ -31,7 +31,9 @@ const UserWidget: React.FC = () => {
   const history = useHistory();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
-  const [user, userData, client] = useUser();
+  const [user, userData] = useUser();
+  const client = userData?.company;
+
   const [actingAs, setActingAs] = useContext(ActingAs);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
