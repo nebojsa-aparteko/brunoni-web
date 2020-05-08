@@ -46,29 +46,27 @@ const TeamManagementPage: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Team Management" />
-      <Container maxWidth="xl">
-        <Box className={classes.tabContainer}>
-          <Paper square>
-            <Tabs
-              value={selectedTab}
-              onChange={handleTabChange}
-              orientation="vertical"
-              aria-label="Team management tabs"
-              className={classes.tabs}
-            >
-              <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(1)} />
-              <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
-            </Tabs>
-          </Paper>
-          <TabPanel value={selectedTab} index={0}>
-            <TeamsTeamsContainer />
-          </TabPanel>
+      <Box className={classes.tabContainer}>
+        <Paper square>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+            orientation="vertical"
+            aria-label="Team management tabs"
+            className={classes.tabs}
+          >
+            <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(1)} />
+            <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
+          </Tabs>
+        </Paper>
+        <TabPanel value={selectedTab} index={0}>
+          <TeamsTeamsContainer />
+        </TabPanel>
 
-          <TabPanel value={selectedTab} index={1}>
-            <TeamsUsersContainer />
-          </TabPanel>
-        </Box>
-      </Container>
+        <TabPanel value={selectedTab} index={1}>
+          <TeamsUsersContainer />
+        </TabPanel>
+      </Box>
     </Fragment>
   );
 };

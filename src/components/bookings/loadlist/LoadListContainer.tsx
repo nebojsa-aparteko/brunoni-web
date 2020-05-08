@@ -31,6 +31,7 @@ const useStyles = makeStyles(() =>
       width: '100%',
       backgroundColor: 'white',
       border: '1px solid #ccc',
+      marginRight: '2px',
     },
     progressBar: {
       width: '0%',
@@ -157,7 +158,7 @@ const LoadListContainer = () => {
                                   }
                                   style={{ marginTop: '1em', marginLeft: '4em', cursor: 'pointer', width: '64px' }}
                                 >
-                                  <div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <div className={classes.progress}>
                                       <div
                                         className={classes.progressBar}
@@ -167,7 +168,7 @@ const LoadListContainer = () => {
                                         }}
                                       />
                                     </div>
-                                    {item.checklistCheckedCount && item.checklistItemCount && (
+                                    {item.checklistItemCount && (
                                       <Typography variant="subtitle2">
                                         {item.checklistCheckedCount}/{item.checklistItemCount}
                                       </Typography>

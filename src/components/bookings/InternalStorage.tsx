@@ -283,7 +283,9 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
           </CardContent>
         </Card>
       ) : (
-        <Typography>Drag 'n' Drop files or click here</Typography>
+        <Box display="flex" justifyContent="center">
+          <Typography>Drag 'n' Drop files or click here</Typography>
+        </Box>
       )}
     </Box>
   );

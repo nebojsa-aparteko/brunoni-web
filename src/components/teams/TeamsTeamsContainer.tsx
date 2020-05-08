@@ -37,7 +37,7 @@ const TeamsTeamsContainer: React.FC = () => {
       {!teams ? (
         <ChartsCircularProgress />
       ) : (
-        <Container maxWidth="xl">
+        <div>
           <Box display="flex" flexDirection="row-reverse">
             <Button onClick={onAdd} size="small" color="primary" variant="contained">
               Add
@@ -45,9 +45,9 @@ const TeamsTeamsContainer: React.FC = () => {
           </Box>
 
           <TableContainer component={Paper}>
-            <Table className={classes.table} size="small" aria-label="a dense table">
+            <Table className={classes.table} aria-label="a dense table">
               <colgroup>
-                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
                 <col style={{ width: '20%' }} />
                 <col style={{ width: '20%' }} />
                 <col style={{ width: '20%' }} />
@@ -57,11 +57,11 @@ const TeamsTeamsContainer: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Name</TableCell>
-                  <TableCell align="right">Members</TableCell>
-                  <TableCell align="right">Carriers</TableCell>
-                  <TableCell align="right">Categories</TableCell>
-                  <TableCell align="right">Checklist Items</TableCell>
-                  <TableCell align="right" />
+                  <TableCell align="center">Members</TableCell>
+                  <TableCell align="center">Carriers</TableCell>
+                  <TableCell align="center">Categories</TableCell>
+                  <TableCell align="center">Checklist Items</TableCell>
+                  <TableCell padding="none" align="right" />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -71,7 +71,7 @@ const TeamsTeamsContainer: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Container>
+        </div>
       )}
     </Fragment>
   );
