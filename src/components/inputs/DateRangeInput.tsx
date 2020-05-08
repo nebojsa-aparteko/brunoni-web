@@ -109,7 +109,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
             </InputAdornment>
           }
           margin="dense"
-          defaultValue={labelValue}
+          value={labelValue}
         />
       </FormControl>
 

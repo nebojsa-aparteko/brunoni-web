@@ -24,6 +24,7 @@ import formatDate from 'date-fns/format';
 import { BoookingProgressDialog } from '../BookingsTable';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
+import LoadListContainerModel from '../../../model/LoadListContainerModel';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -31,7 +32,6 @@ const useStyles = makeStyles(() =>
       width: '100%',
       backgroundColor: 'white',
       border: '1px solid #ccc',
-      marginRight: '2px',
     },
     progressBar: {
       width: '0%',
@@ -119,11 +119,11 @@ const LoadListContainer = () => {
             <CardContent>
               {Object.entries(items).map(([vesselWithVoyage, items]: any, index: number) => (
                 <Fragment key={`vesselWithVoyageItems-${index}`}>
-                  <Typography>{vesselWithVoyage}</Typography>
+                  <Typography variant="subtitle1">{vesselWithVoyage}</Typography>
                   {Object.entries(items).map(([carrierId, items]: any, index: number) => (
                     <Fragment key={`carrierIdItems-${index}`}>
-                      <Typography>{carrierId}</Typography>
-                      <Table>
+                      <Typography variant="subtitle2">{carrierId}</Typography>
+                      <Table size="small">
                         <TableHead>
                           <TableRow>
                             <TableCell align="right">Container</TableCell>
@@ -137,8 +137,8 @@ const LoadListContainer = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {items.map((item: any, index: number) => (
-                            <TableRow key={`index-${index}`}>
+                          {items.map((item: LoadListContainerModel) => (
+                            <TableRow key={item.container}>
                               <TableCell component="th" scope="row" align="right">
                                 {item.container}
                               </TableCell>
@@ -152,13 +152,14 @@ const LoadListContainer = () => {
                                 <Link to={`/bookings/${item.bookingId}`}>{item.bookingId || ''}</Link>
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
-                                <Box
-                                  onClick={(event: React.MouseEvent<unknown>) =>
-                                    handleProgressClick(event, item.bookingId)
-                                  }
-                                  style={{ marginTop: '1em', marginLeft: '4em', cursor: 'pointer', width: '64px' }}
-                                >
-                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                {item.checklistCheckedCount && item.checklistItemCount && item.checklistItemCount > 0 && (
+                                  <Box
+                                    onClick={(event: React.MouseEvent<unknown>) =>
+                                      handleProgressClick(event, item.bookingId)
+                                    }
+                                    display="flex"
+                                    style={{ cursor: 'pointer', width: 70 }}
+                                  >
                                     <div className={classes.progress}>
                                       <div
                                         className={classes.progressBar}
@@ -168,13 +169,12 @@ const LoadListContainer = () => {
                                         }}
                                       />
                                     </div>
-                                    {item.checklistItemCount && (
-                                      <Typography variant="subtitle2">
-                                        {item.checklistCheckedCount}/{item.checklistItemCount}
-                                      </Typography>
-                                    )}
-                                  </div>
-                                </Box>
+
+                                    <Typography variant="subtitle2" style={{ marginLeft: 4 }}>
+                                      {item.checklistCheckedCount}/{item.checklistItemCount}
+                                    </Typography>
+                                  </Box>
+                                )}
                               </TableCell>
                               <TableCell component="th" scope="row" align="right">
                                 {item.status || ''}
