@@ -22,7 +22,6 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
-import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -60,32 +59,32 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const saveFilesToFirestore = (bookingId: string, files: ChecklistItemValueDocument) =>
+const saveFilesToFirestore = (collection: string, id: string, files: ChecklistItemValueDocument) =>
   firebase
     .firestore()
-    .collection('bookings')
-    .doc(bookingId)
+    .collection(collection)
+    .doc(id)
     .collection('internal-documents')
     .doc()
     .set(files);
 
-const deleteFileFromFirebase = (deletedFile: ChecklistItemValueDocument, bookingId: string) =>
+const deleteFileFromFirebase = (collection: string, deletedFile: ChecklistItemValueDocument, id: string) =>
   firebase
     .firestore()
-    .collection('bookings')
-    .doc(bookingId)
+    .collection(collection)
+    .doc(id)
     .collection('internal-documents')
     .doc(deletedFile?.id)
     .delete();
 
-const InternalStorage: React.FC<Props> = ({ bookingId }) => {
+const InternalStorage: React.FC<Props> = ({ id, collection }) => {
   const classes = useStyles();
   const query = useCallback(q => q.orderBy('uploadedAt', 'desc'), []);
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
 
-  const filesCollection = useFirestoreCollection('bookings', query, bookingId, 'internal-documents');
+  const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
   const activityLogContext = useActivityLogState();
 
   const normalizedFiles =
@@ -96,8 +95,8 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents-internal', bookingId].join('/');
-  }, [bookingId]);
+    return [`${collection}-documents-internal`, id].join('/');
+  }, [id, collection]);
   const saveFiles = useCallback(
     async (files: File[]): Promise<any> => {
       const uploadFile = async (file: File): Promise<any> => {
@@ -165,9 +164,9 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
           .finally(() => {
             // remove item from the list in any case since if it is an error with the storage means file is alrady out
             setRemovalInProgress(false);
-            deleteFileFromFirebase(item, bookingId)
+            deleteFileFromFirebase(collection, item, id)
               .then(_ => {
-                console.log('File deleted', item, bookingId);
+                console.log('File deleted', collection, item, id);
               })
               .catch(error => {
                 console.error('failed to update deleted items', error);
@@ -185,7 +184,7 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
         });
       }
     },
-    [storageBasePath],
+    [storageBasePath, collection, id],
   );
 
   const getActivityLogUserData = useCallback(
@@ -213,13 +212,13 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
                 storedName: item.storedName,
               } as ChecklistItemValueDocument),
           );
-          return values.map(value => saveFilesToFirestore(bookingId, value));
+          return values.map(value => saveFilesToFirestore(collection, id, value));
         })
         .catch(err => {
-          console.error(`Error while storing files ${JSON.stringify(bookingId, null, 2)}`, err);
+          console.error(`Error while storing files ${JSON.stringify(id, null, 2)}`, err);
         });
     },
-    [saveFiles, bookingId],
+    [saveFiles, id, collection, getActivityLogUserData],
   );
   const onMentionFile = (item: ChecklistItemValueDocument) =>
     activityLogContext.setState({ documentReference: item, internal: true });
@@ -294,5 +293,6 @@ const InternalStorage: React.FC<Props> = ({ bookingId }) => {
 export default InternalStorage;
 
 interface Props {
-  bookingId: string;
+  id: string;
+  collection: string;
 }

@@ -68,7 +68,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
           </CardContent>
           <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
         </Card>
-        {!actingAs && <InternalStorage bookingId={booking!.id} />}
+        {!actingAs && <InternalStorage id={booking!.id} collection={'bookings'} />}
         <ActivityLogContainer bookingId={booking.id} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>

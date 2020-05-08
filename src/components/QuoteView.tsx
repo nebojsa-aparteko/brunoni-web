@@ -43,6 +43,8 @@ import UserRecord from '../model/UserRecord';
 import { addAssignee } from './QuoteGroup';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
+import InternalStorage from './bookings/InternalStorage';
+import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
 
 interface Props {
   quote?: Quote;
@@ -396,7 +398,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               </Select>
             </FormControl>
           </Box>
-          <QuoteActivityLogContainer quoteId={quote.id} />
+          <ActivityLogProvider>
+            {!actingAs && <InternalStorage id={quote!.id} collection={'quotes'} />}
+            <QuoteActivityLogContainer quoteId={quote.id} />
+          </ActivityLogProvider>
         </Grid>
       )}
     </Grid>
