@@ -21,6 +21,7 @@ import {
   ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
   CustomerAction,
+  CustomerChecklistActionType,
   ShortChecklistItem,
   Stage,
 } from './ChecklistItemModel';
@@ -547,6 +548,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             <Typography display="inline">{checklistItem.label}</Typography>
             {!isAdmin &&
               checklistItem.customerAction &&
+              checklistItem.customerAction.action === CustomerChecklistActionType.fillForm &&
               (checklistItem.customerAction.stageId
                 ? checkStageDependency(checklistItem.stages, checklistItem.customerAction.stageId || '')
                 : true) && (
