@@ -263,7 +263,11 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               </Box>
               <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
                 <QuoteNav
-                  backTo={quote.groupId !== quote.id ? `/quotes/groups/${quote.groupId}` : `/quotes/groups`}
+                  backTo={
+                    quote.id && quote?.groupId && quote.groupId !== quote.id
+                      ? `/quotes/groups/${quote.groupId}`
+                      : `/quotes/groups`
+                  }
                   title={`Quotation - ${quoteTitle}`}
                   subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
                 />

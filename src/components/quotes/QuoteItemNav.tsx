@@ -23,7 +23,6 @@ const useStyles = makeStyles(theme => ({
 
 const QuoteNav: React.FC<Props> = ({ backTo, title, subtitle }) => {
   const classes = useStyles();
-
   return (
     <Box display="flex">
       <Box flexShrink="0" displayPrint="none">

@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import uniq from 'lodash/fp/uniq';
 import {
@@ -95,20 +95,17 @@ const QuoteGroupRow: React.FC<RowProps> = ({
     );
   }, [showCompanyInfo, client, quotes[0].clientId, quotes[0].userNameString]);
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, pathToNavigate: string) => {
-    history.push(pathToNavigate);
-  };
+  const handleRowClick = useCallback(
+    (event: React.MouseEvent<unknown>) => {
+      console.log(history.location);
+
+      history.push(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
+    },
+    [history, quotes, id],
+  );
 
   return (
-    <TableRow
-      hover
-      tabIndex={-1}
-      className={classes.tableRow}
-      onClick={event =>
-        handleRowClick(event, quotes?.length !== 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`)
-      }
-      key={id}
-    >
+    <TableRow hover tabIndex={-1} className={classes.tableRow} onClick={handleRowClick} key={id}>
       {clientInfo}
       <TableCell>
         {quoteRouteLabelDisplay(quotes[0], true)}
