@@ -546,6 +546,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
 
             <Typography display="inline">{checklistItem.label}</Typography>
             {!isAdmin &&
+              !checklistItem.checked &&
               checklistItem.customerAction &&
               checklistItem.customerAction.action === CustomerChecklistActionType.fillForm &&
               (checklistItem.customerAction.stageId
@@ -572,6 +573,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
           </Box>
         </Box>
         {!isAdmin &&
+          !checklistItem.checked &&
           checklistItem.customerAction &&
           !checklistItem.customerAction?.at &&
           (checklistItem.customerAction.stageId
