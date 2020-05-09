@@ -25,6 +25,7 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
+import WatcherIconButton from '../watchers/WatcherIconButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -169,6 +170,29 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       .update('archived', !booking?.archived);
   }, [booking]);
 
+  const onWatch = useCallback(
+    (isWatching: boolean) => {
+      handleWatch(
+        booking.id,
+        isWatching
+          ? booking.watchers.filter(u => u.alphacomId !== userRecord.alphacomId)
+          : [...(booking.watchers || []), userRecord],
+      )
+        .then(_ =>
+          enqueueSnackbar(
+            <Typography color="inherit">
+              {isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!'}
+            </Typography>,
+            {
+              variant: 'success',
+              autoHideDuration: 1000,
+            },
+          ),
+        )
+        .catch(err => console.log(err));
+    },
+    [booking.id, booking.watchers, userRecord, userRecord.alphacomId],
+  );
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
@@ -240,46 +264,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   <Button variant="contained" onClick={() => setIsOpenWatcherDialog(true)}>
                     Watchers
                   </Button>
-                ) : booking.watchers.findIndex(val => val.alphacomId === userRecord.alphacomId) === -1 ? (
-                  <IconButton
-                    color="primary"
-                    aria-label="Watch"
-                    component="span"
-                    onClick={() =>
-                      handleWatch(booking.id, [...(booking.watchers || []), userRecord])
-                        .then(_ =>
-                          enqueueSnackbar(<Typography color="inherit">Successfully added to watchers!</Typography>, {
-                            variant: 'success',
-                          }),
-                        )
-                        .catch(err => console.log(err))
-                    }
-                  >
-                    <VisibilityIcon />
-                  </IconButton>
                 ) : (
-                  <IconButton
-                    color="primary"
-                    aria-label="Unwatch"
-                    component="span"
-                    onClick={() =>
-                      handleWatch(
-                        booking.id,
-                        booking.watchers.filter(u => u.alphacomId !== userRecord.alphacomId),
-                      )
-                        .then(_ =>
-                          enqueueSnackbar(
-                            <Typography color="inherit">Successfully removed from watchers!</Typography>,
-                            {
-                              variant: 'success',
-                            },
-                          ),
-                        )
-                        .catch(err => console.log(err))
-                    }
-                  >
-                    <VisibilityOffIcon />
-                  </IconButton>
+                  <WatcherIconButton
+                    isWatching={booking.watchers.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}
+                    handleWatch={onWatch}
+                  />
                 )}
               </Box>
               <Box className={classes.actions} displayPrint="none">
