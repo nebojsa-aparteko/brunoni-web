@@ -6,7 +6,7 @@ import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team } from '../../model/Teams';
 import { Button, IconButton, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { UserRecordMinProperties } from '../../model/UserRecord';
 import { firestore } from 'firebase';
 import asArray from '../../utilities/asArray';
 import Carriers from '../../contexts/Carriers';
@@ -18,6 +18,7 @@ import Chip from '@material-ui/core/Chip';
 import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
 import DeleteIcon from '@material-ui/icons/Delete';
+import pick from 'lodash/fp/pick';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -80,7 +81,12 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   };
 
   const onTeamsChanged = (event: React.ChangeEvent<{}>, value: UserRecord[] | UserRecord | null) => {
-    setActiveTeam(set('users', asArray(value))(activeTeam));
+    setActiveTeam(
+      set(
+        'users',
+        asArray(value).map(item => pick(UserRecordMinProperties)(item)),
+      )(activeTeam),
+    );
     setChanged(true);
   };
 

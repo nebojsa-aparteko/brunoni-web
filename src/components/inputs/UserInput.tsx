@@ -4,17 +4,17 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { UserRecordMin } from '../../model/UserRecord';
 
 const getOptionSelected = (option: UserRecord, value: UserRecord) => option?.alphacomId === value?.alphacomId;
-const getOptionLabel = (option: UserRecord) => `${option.firstName} ${option.lastName}`;
+const getOptionLabel = (option: UserRecord) => `${option.firstName || ''} ${option.lastName || ''}`;
 
 interface Props {
   label: string;
-  users: UserRecord[];
+  users: UserRecordMin[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: UserRecord;
-  onChange: (user: UserRecord | null) => void;
+  value?: UserRecordMin;
+  onChange: (user: UserRecordMin | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;

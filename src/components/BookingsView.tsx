@@ -26,8 +26,9 @@ import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
 import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
-import { BookingContextFilters, useBookingsFilterDispatch } from '../providers/BookingsProvider';
+import { BookingContextFilters, useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
 import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
+import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 
 interface Props {
   bookings?: Booking[];
@@ -102,6 +103,8 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
 
   const bookingFilterDispach = useBookingsFilterDispatch();
+
+  const { assignee } = useBookingsContext()[2];
 
   const resultChunks = useMemo(() => {
     const result = filter(
@@ -217,23 +220,37 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
           />
         </Card>
 
-        <CardContent className={classes.content}>
-          <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
-        </CardContent>
+        {bookings.length === 0 && (
+          <BookingsEmptyResults
+            message={
+              assignee
+                ? 'There are no bookings that might need your attention at the moment. ' +
+                  'You can use filters bar or quick search (ctrl+g on keyboard) to find what you might be looking for.'
+                : 'No bookings found for your filter criteria. Try chaning filters.'
+            }
+          />
+        )}
+        {bookings.length > 0 && (
+          <Fragment>
+            <CardContent className={classes.content}>
+              <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
+            </CardContent>
 
-        <CardActions className={classes.actions}>
-          {bookings && bookings.length > 0 && (
-            <TablePagination
-              component="div"
-              count={filteredResults ? filteredResults.length : 0}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25]}
-            />
-          )}
-        </CardActions>
+            <CardActions className={classes.actions}>
+              {bookings && bookings.length > 0 && (
+                <TablePagination
+                  component="div"
+                  count={filteredResults ? filteredResults.length : 0}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={[5, 10, 25]}
+                />
+              )}
+            </CardActions>
+          </Fragment>
+        )}
       </div>
     </Fragment>
   );

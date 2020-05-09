@@ -1,4 +1,4 @@
-import UserRecord from './UserRecord';
+import UserRecord, { UserRecordMin } from './UserRecord';
 
 export interface Booking {
   id: string;
@@ -24,7 +24,7 @@ export interface Booking {
   CtrTariffsDetails: CtrTariffDetail[];
   Agreement: string | null;
   StatClientRef: string | null;
-  BkgAgentContact: string | null;
+  BkgAgentContact?: string;
   ForwAdrId: string;
   ForwAdrCity: string;
   ForwAdrName: string;
@@ -55,7 +55,9 @@ export interface Booking {
   pendingPayment: boolean;
   checklistCheckedCount: number;
   checklistItemCount: number;
-  watchers: UserRecord[];
+  watchers: UserRecordMin[];
+  assignedUser: UserRecordMin;
+  assignedCustomerUser: UserRecordMin;
 }
 
 export interface CheckListData {

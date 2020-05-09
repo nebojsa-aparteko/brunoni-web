@@ -197,7 +197,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             isOpen={isOpenWatcherDialog}
             handleClose={handleCloseWatcherDialog}
             id={booking.id}
-            watchers={booking.watchers || []}
           />
           <ScrollToTopOnMount />
           <Paper className={classes.root}>

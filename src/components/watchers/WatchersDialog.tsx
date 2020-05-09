@@ -12,11 +12,14 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import UserRecord, { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
+import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import WatchersChipMultiInput from './WatchersChipMultiInput';
 import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
 import useClientUsers from '../../hooks/useClientUsers';
+import pick from 'lodash/fp/pick';
+import uniqBy from 'lodash/fp/uniqBy';
+import asArray from '../../utilities/asArray';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -53,7 +56,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const handleChangeAgent = (id: string, user: UserRecord | null) =>
+const handleChangeAgent = (id: string, user: UserRecordMin | null, watchers: UserRecordMin[] | null) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -63,11 +66,15 @@ const handleChangeAgent = (id: string, user: UserRecord | null) =>
         BkgAgentContactEml: user?.emailAddress || '',
         BkgAgentContactTxt: `${user?.firstName} ${user?.lastName}` || '',
         BkgAgentContact: user?.alphacomId || '',
+        assignedUser: user ? pick(UserRecordMinProperties)(user) : null,
+        watchers: uniqBy((item: UserRecordMin) => item.alphacomId)(
+          (watchers || []).concat(user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : []),
+        ),
       },
       { merge: true },
     );
 
-const handleChangeCustomer = (id: string, user: UserRecord | null) =>
+const handleChangeCustomer = (id: string, user: UserRecordMin | null, watchers: UserRecordMin[]) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -76,21 +83,43 @@ const handleChangeCustomer = (id: string, user: UserRecord | null) =>
       {
         ForwPersID: user?.alphacomId || '',
         ForwarderPersTxt: `${user?.firstName} ${user?.lastName}` || '',
+        assignedCustomerUser: user ? pick(UserRecordMinProperties)(user) : null,
+        watchers: uniqBy((item: UserRecordMin) => item.alphacomId)(
+          (watchers || []).concat(user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : []),
+        ),
       },
       { merge: true },
     );
 
-const handleChangeWatchers = (id: string, watchers: UserRecord | UserRecord[] | null) =>
+const handleChangeWatchers = (
+  id: string,
+  watchers: UserRecordMin | UserRecordMin[] | null,
+  assignedUser: UserRecordMin | null,
+  assignedCustomerUser: UserRecordMin | null,
+) =>
   firebase
     .firestore()
     .collection('bookings')
     .doc(id)
-    .update('watchers', watchers);
+    .update(
+      'watchers',
+      uniqBy((item: UserRecordMin) => item.alphacomId)(
+        asArray(watchers)
+          .concat(assignedUser || [])
+          .concat(assignedCustomerUser || []),
+      ).map(item => pick(UserRecordMinProperties)(item)),
+    );
 
-const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose, watchers }) => {
+const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
   const classes = useStyles();
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(booking.ForwAdrId);
+
+  const watchers = booking.watchers
+    ? booking.watchers.filter(
+        user => user.alphacomId !== booking.ForwAdrId && user.alphacomId !== booking.BkgAgentContact,
+      )
+    : [];
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">
@@ -104,32 +133,39 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose, watcher
         <DialogContent className={classes.dialogContent}>
           <Box my={1}>
             <UserInput
-              value={{
-                alphacomId: booking.BkgAgentContact || '',
-                firstName: booking.BkgAgentContactTxt || '',
-                lastName: '',
-              }}
+              value={
+                booking.assignedUser || {
+                  alphacomId: booking.BkgAgentContact || '',
+                  firstName: booking.BkgAgentContactTxt || '',
+                  lastName: '',
+                }
+              }
               label="Assigned Agent"
               users={assignableUsers || []}
-              onChange={user => handleChangeAgent(booking.id, user)}
+              onChange={user => handleChangeAgent(booking.id, user, booking.watchers)}
             />
           </Box>
           <Box my={1}>
             <UserInput
-              value={{
-                alphacomId: booking.ForwPersID || '',
-                firstName: booking.ForwarderPersTxt || '',
-                lastName: '',
-              }}
+              value={
+                booking.assignedCustomerUser || {
+                  alphacomId: booking.ForwPersID || '',
+                  alphacomClientId: booking.ForwAdrId,
+                  firstName: booking.ForwarderPersTxt || '',
+                  lastName: '',
+                }
+              }
               label="Assigned Client"
               users={assignableCustomers || []}
-              onChange={user => handleChangeCustomer(booking.id, user)}
+              onChange={user => handleChangeCustomer(booking.id, user, booking.watchers)}
             />
           </Box>
           <Box my={1}>
             <WatchersChipMultiInput
               options={assignableUsers || []}
-              onChange={(_, value) => handleChangeWatchers(booking.id, value)}
+              onChange={(_, value) =>
+                handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser)
+              }
               values={watchers}
             />
           </Box>
@@ -146,5 +182,4 @@ interface Props {
   isOpen: boolean;
   handleClose: () => void;
   id: string;
-  watchers: UserRecord[];
 }

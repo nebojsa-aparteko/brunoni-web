@@ -141,7 +141,7 @@ const LoadListContainer = () => {
                       </Typography>
                     </div>
                     {Object.entries(items).map(([carrierId, items]: any, index: number) => (
-                      <Card>
+                      <Card key={`${carrierId}${index}`}>
                         <Fragment key={`carrierIdItems-${index}`}>
                           <Typography className={classes.carrierTitle} variant="subtitle2">
                             {carrierId}

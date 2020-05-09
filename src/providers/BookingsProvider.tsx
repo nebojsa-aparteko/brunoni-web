@@ -1,4 +1,4 @@
-import React, { createContext, Reducer, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { createContext, Reducer, useContext, useMemo, useReducer, useState } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -6,8 +6,10 @@ import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
+import pick from 'lodash/fp/pick';
 import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
+import { UserRecordMinProperties } from '../model/UserRecord';
 
 interface Props {
   children: React.ReactNode;
@@ -63,7 +65,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     archived: false,
     category: BookingCategory.Export,
     pendingPayment: false,
-    // assignee: !actingAs && userRecord,
+    assignee: !actingAs && userRecord,
   } as BookingContextFilters);
 
   const query = useMemo(
@@ -96,9 +98,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.assignee) {
-        // const splituserId = filters.assignee.alphacomId.split('-');
-        // const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
-        query = query.where('BkgAgentContact', '==', filters.assignee.alphacomId);
+        query = query.where('watchers', 'array-contains', pick(UserRecordMinProperties)(filters.assignee));
       }
 
       if (filters.originPort) {
