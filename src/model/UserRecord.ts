@@ -2,17 +2,17 @@ import { Team } from './Teams';
 import Client from './Client';
 
 export default interface UserRecord {
-  id: string;
-  alphacomClientId: string;
+  id?: string;
+  alphacomClientId?: string;
   alphacomId: string;
-  company: Client;
+  company?: Client;
   isAdmin?: boolean;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  role: Role;
-  lastSession: Date;
-  teams: Team[];
+  firstName?: string;
+  lastName?: string;
+  emailAddress?: string;
+  role?: Role;
+  lastSession?: Date;
+  teams?: Team[];
 }
 
 export type Role = 'superadmin' | 'sales' | 'operations';

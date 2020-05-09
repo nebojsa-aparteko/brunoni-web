@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, makeStyles, Theme, createStyles, Link } from '@material-ui/core';
+import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
@@ -61,8 +61,8 @@ const Comment = ({ comment, ...other }: CommentProp) => {
     <Box className={classes.container} {...other}>
       <Box className={classes.rowContainer}>
         <Avatar
-          name={`${comment.by.firstName} ${comment.by.lastName}`}
-          title={`${comment.by.firstName} ${comment.by.lastName}`}
+          name={`${comment.by?.firstName} ${comment.by?.lastName}`}
+          title={`${comment.by?.firstName} ${comment.by?.lastName}`}
           size="30"
           round={true}
         />

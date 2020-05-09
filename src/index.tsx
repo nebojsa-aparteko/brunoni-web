@@ -71,12 +71,12 @@ const UserApp: React.FC = () => {
       $crisp.push([
         'set',
         'user:company',
-        [userRecord.company.name, { geolocation: [userRecord.company.countryCode, userRecord.company.city] }],
+        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
       ]);
       $crisp.push([
         'set',
         'user:name',
-        [userRecord.company.name, { geolocation: [userRecord.company.countryCode, userRecord.company.city] }],
+        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
       ]);
     } catch (e) {
       console.warn('Failed to push crisp command.');

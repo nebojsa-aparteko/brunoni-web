@@ -15,6 +15,8 @@ import useAdminUsers from '../../hooks/useAdminUsers';
 import UserRecord, { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import WatchersChipMultiInput from './WatchersChipMultiInput';
 import firebase from '../../firebase';
+import { Booking } from '../../model/Booking';
+import useClientUsers from '../../hooks/useClientUsers';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -51,7 +53,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const handleChangeAgent = (id: string, collection: string, user: UserRecord | null) =>
+const handleChangeAgent = (id: string, user: UserRecord | null) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -63,24 +65,39 @@ const handleChangeAgent = (id: string, collection: string, user: UserRecord | nu
         BkgAgentContact: user?.alphacomId || '',
       },
       { merge: true },
-    );
+    )
+    .then();
 
-const handleChangeWatchers = (id: string, collection: string, watchers: UserRecord | UserRecord[] | null) =>
+const handleChangeCustomer = (id: string, user: UserRecord | null) =>
   firebase
     .firestore()
-    .collection(collection)
+    .collection('bookings')
+    .doc(id)
+    .set(
+      {
+        ForwPersID: user?.alphacomId || '',
+        ForwarderPersTxt: `${user?.firstName} ${user?.lastName}` || '',
+      },
+      { merge: true },
+    );
+
+const handleChangeWatchers = (id: string, watchers: UserRecord | UserRecord[] | null) =>
+  firebase
+    .firestore()
+    .collection('bookings')
     .doc(id)
     .update('watchers', watchers);
 
-const WatchersDialog: React.FC<Props> = ({ id, collection, isOpen, handleClose, watchers }) => {
+const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose, watchers }) => {
   const classes = useStyles();
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const assignableCustomers = useClientUsers(booking.ForwAdrId);
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
-          <Typography variant="h4">Quick Search</Typography>
+          <Typography variant="h4">Watchers</Typography>
           <IconButton onClick={handleClose} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
@@ -88,18 +105,32 @@ const WatchersDialog: React.FC<Props> = ({ id, collection, isOpen, handleClose, 
         <DialogContent className={classes.dialogContent}>
           <Box my={1}>
             <UserInput
+              value={{
+                alphacomId: booking.BkgAgentContact || '',
+                firstName: booking.BkgAgentContactTxt || '',
+                lastName: '',
+              }}
               label="Assigned Agent"
               users={assignableUsers || []}
-              onChange={user => handleChangeAgent(id, collection, user)}
+              onChange={user => handleChangeAgent(booking.id, user)}
             />
           </Box>
           <Box my={1}>
-            <UserInput label="Assigned Client" users={assignableUsers || []} onChange={user => console.log(user)} />
+            <UserInput
+              value={{
+                alphacomId: booking.ForwPersID || '',
+                firstName: booking.ForwarderPersTxt || '',
+                lastName: '',
+              }}
+              label="Assigned Client"
+              users={assignableCustomers || []}
+              onChange={user => handleChangeCustomer(booking.id, user)}
+            />
           </Box>
           <Box my={1}>
             <WatchersChipMultiInput
               options={assignableUsers || []}
-              onChange={(_, value) => handleChangeWatchers(id, collection, value)}
+              onChange={(_, value) => handleChangeWatchers(booking.id, value)}
               values={watchers}
             />
           </Box>
@@ -112,9 +143,9 @@ const WatchersDialog: React.FC<Props> = ({ id, collection, isOpen, handleClose, 
 export default WatchersDialog;
 
 interface Props {
+  booking: Booking;
   isOpen: boolean;
   handleClose: () => void;
   id: string;
-  collection: string;
   watchers: UserRecord[];
 }

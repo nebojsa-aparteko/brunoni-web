@@ -1,4 +1,3 @@
-import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
@@ -18,10 +17,8 @@ import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import useAdminUsers from '../../hooks/useAdminUsers';
 import WatchersDialog from '../watchers/WatchersDialog';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
@@ -132,10 +129,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
-  const [_, userRecord] = useUser();
+  const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
-
-  const admins = useAdminUsers();
 
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
 
@@ -198,10 +193,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           <WatchersDialog
+            booking={booking}
             isOpen={isOpenWatcherDialog}
             handleClose={handleCloseWatcherDialog}
             id={booking.id}
-            collection="bookings"
             watchers={booking.watchers || []}
           />
           <ScrollToTopOnMount />
@@ -241,29 +236,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               </Box>
               <Box flex="1" />
               <Box>
-                {/*<Avatar*/}
-                {/*  name={*/}
-                {/*    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt*/}
-                {/*  }*/}
-                {/*  title={*/}
-                {/*    bookingAgent ? `${bookingAgent?.firstName} ${bookingAgent.lastName}` : booking?.BkgAgentContactTxt*/}
-                {/*  }*/}
-                {/*  size="30"*/}
-                {/*  round={true}*/}
-                {/*  style={{ cursor: 'pointer' }}*/}
-                {/*  onClick={() =>*/}
-                {/*    window.open(*/}
-                {/*      `mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}?subject=Booking - ${*/}
-                {/*        booking?.id*/}
-                {/*      } - question`,*/}
-                {/*      '_blank',*/}
-                {/*    )*/}
-                {/*  }*/}
-                {/*/>*/}
                 {actingAs == null && isSuperAdmin(userRecord) ? (
-                  <Button variant="contained" onClick={() => setIsOpenWatcherDialog(true)}>
-                    Watchers
-                  </Button>
+                  <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>
+                    <SupervisedUserCircleIcon />
+                  </IconButton>
                 ) : (
                   <WatcherIconButton
                     isWatching={booking.watchers.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}

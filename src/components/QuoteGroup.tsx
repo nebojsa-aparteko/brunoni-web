@@ -57,7 +57,6 @@ import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import { useClientById } from '../hooks/useClient';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
-import InternalStorage from './bookings/InternalStorage';
 
 interface Props {
   id: string;
@@ -128,7 +127,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const [user, userData] = useUser();
-  const client = userData?.company;
+  const client = userData?.company!;
 
   const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMoreAnchorEl(event.currentTarget);
