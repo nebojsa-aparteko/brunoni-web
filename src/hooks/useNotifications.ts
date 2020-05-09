@@ -3,7 +3,8 @@ import { useCallback } from 'react';
 import useFirestoreCollection from './useFirestoreCollection';
 
 import Notification from '../model/Notification';
-import { invoke, update } from 'lodash/fp';
+import { invoke, update, flow } from 'lodash/fp';
+import safeInvoke from '../utilities/safeInvoke';
 export default function useNotifications(userId?: string) {
   const query = useCallback(
     q =>
@@ -15,6 +16,9 @@ export default function useNotifications(userId?: string) {
   );
   const notificationsCollection = useFirestoreCollection('notifications', query);
   return notificationsCollection?.docs.map(doc => {
-    return update('at', invoke('toDate'))({ id: doc.id, ...doc.data() }) as Notification;
+    return flow(
+      update('at', invoke('toDate')),
+      update('activity', update('at', safeInvoke('toDate'))),
+    )({ id: doc.id, ...doc.data() }) as Notification;
   }) as Notification[];
 }

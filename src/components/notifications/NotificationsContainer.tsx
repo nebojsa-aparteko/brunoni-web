@@ -8,7 +8,7 @@ const NotificationsContainer: React.FC<Props> = ({ handleShow, notifications }) 
     const batch = firebase.firestore().batch();
 
     notifications
-      .filter(notification => !notification.seen)
+      ?.filter(notification => !notification.seen)
       .map(notification =>
         batch.update(
           firebase

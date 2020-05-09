@@ -2,10 +2,11 @@ import React, { Fragment } from 'react';
 import { Card, CardContent, CardHeader, createStyles, makeStyles } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
-import Notification from '../../model/Notification';
+import Notification, { NotificationType } from '../../model/Notification';
 import firebase from 'firebase';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { useHistory } from 'react-router';
+import Activity from '../bookings/checklist/Activity';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -21,7 +22,7 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
 
   return (
     <Fragment>
-      Comment left at{' '}
+      {notification.type === NotificationType.COMMENT ? 'Comment left at ' : 'Activity at '}
       <a
         style={{ cursor: 'pointer', textDecoration: 'underline' }}
         onClick={() =>
@@ -58,9 +59,11 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
         }*/
       />
       <CardContent>
-        <Comment
-          comment={{ at: notification.at, by: notification.by, comment: notification.comment } as ActivityLogItem}
-        />
+        {notification.type === NotificationType.COMMENT && notification.activity ? (
+          <Comment comment={notification.activity} />
+        ) : notification.activity ? (
+          <Activity activity={notification!.activity} />
+        ) : null}
       </CardContent>
     </Card>
   );

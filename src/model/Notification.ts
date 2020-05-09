@@ -11,10 +11,8 @@ export default interface Notification {
   userId: string;
   userEmail: string;
   at: Date;
-  by: ActivityLogUserData;
-  notification: NotificationType;
-  activityLogItem?: ActivityLogItem;
-  comment: string;
+  type: NotificationType;
+  activity?: ActivityLogItem;
   referenceObject?: string;
   referenceID?: string;
   seen?: boolean;
