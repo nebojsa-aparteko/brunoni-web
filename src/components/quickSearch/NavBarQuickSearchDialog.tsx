@@ -60,11 +60,16 @@ const searchBookings = async (collection: string, fieldPath: string, inputValue:
   return new Promise<Booking>(resolve => resolve(booking.docs[0].data() as Booking));
 };
 
-const nestedSearchBookings = async (collection: string, fieldPath: string, inputValue: string) =>
+const nestedSearchBookings = async (
+  collection: string,
+  fieldPath: string,
+  inputValue: string,
+  opStr: firebase.firestore.WhereFilterOp = '==',
+) =>
   firebase
     .firestore()
     .collection(collection)
-    .where(fieldPath, '==', inputValue)
+    .where(fieldPath, opStr, inputValue)
     .get()
     .then(
       result => new Promise<string>(resolve => resolve(result.docs[0]?.data()?.bookingId)),
@@ -117,12 +122,16 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <QuickSearchBooking
             label="Delivery reference"
             handleClose={handleClose}
-            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'deliveryRef', inputValue)}
+            searchBookings={inputValue =>
+              nestedSearchBookings('bookings-search', 'deliveryRef', inputValue, 'array-contains')
+            }
           />
           <QuickSearchBooking
             label="Pickup reference"
             handleClose={handleClose}
-            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'pickupRef', inputValue)}
+            searchBookings={inputValue =>
+              nestedSearchBookings('bookings-search', 'pickupRef', inputValue, 'array-contains')
+            }
           />
         </DialogContent>
       </Box>
