@@ -5,19 +5,16 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Grid,
   IconButton,
   makeStyles,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import QuickSearchQuote from '../quickSearch/QuickSearchQuote';
-import QuickSearchBooking from '../quickSearch/QuickSearchBooking';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
-import TeamsTeamsChipMultiInput from '../teams/TeamsTeamsChipMultiInput';
+import UserRecord, { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import WatchersChipMultiInput from './WatchersChipMultiInput';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -54,7 +51,28 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const WatchersDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
+const handleChangeAgent = (id: string, collection: string, user: UserRecord | null) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(id)
+    .set(
+      {
+        BkgAgentContactEml: user?.emailAddress || '',
+        BkgAgentContactTxt: `${user?.firstName} ${user?.lastName}` || '',
+        BkgAgentContact: user?.alphacomId || '',
+      },
+      { merge: true },
+    );
+
+const handleChangeWatchers = (id: string, collection: string, watchers: UserRecord | UserRecord[] | null) =>
+  firebase
+    .firestore()
+    .collection(collection)
+    .doc(id)
+    .update('watchers', watchers);
+
+const WatchersDialog: React.FC<Props> = ({ id, collection, isOpen, handleClose, watchers }) => {
   const classes = useStyles();
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
 
@@ -69,13 +87,21 @@ const WatchersDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Box my={1}>
-            <UserInput label="Assigned Agent" users={assignableUsers || []} onChange={user => console.log(user)} />
+            <UserInput
+              label="Assigned Agent"
+              users={assignableUsers || []}
+              onChange={user => handleChangeAgent(id, collection, user)}
+            />
           </Box>
           <Box my={1}>
             <UserInput label="Assigned Client" users={assignableUsers || []} onChange={user => console.log(user)} />
           </Box>
           <Box my={1}>
-            <WatchersChipMultiInput options={assignableUsers || []} onChange={event => console.log(event)} />
+            <WatchersChipMultiInput
+              options={assignableUsers || []}
+              onChange={(_, value) => handleChangeWatchers(id, collection, value)}
+              values={watchers}
+            />
           </Box>
         </DialogContent>
       </Box>
@@ -88,4 +114,7 @@ export default WatchersDialog;
 interface Props {
   isOpen: boolean;
   handleClose: () => void;
+  id: string;
+  collection: string;
+  watchers: UserRecord[];
 }

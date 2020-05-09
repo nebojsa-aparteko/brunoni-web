@@ -136,7 +136,6 @@ export const fileWithExt = (fileName: string): { name: string; ext: string } => 
 
 const checkStageDependency = (stages: Stage[], stageId: string) => {
   let index = stages.findIndex(el => el.id === stageId);
-  console.log('INDEX', stages[index - 1].checked);
   if (index === -1) return false;
   if (index === 0) {
     return true;

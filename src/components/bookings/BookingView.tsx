@@ -21,8 +21,10 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import WatchersDialog from '../watchers/WatchersDialog';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import useUser from '../../hooks/useUser';
-import { isSuperAdmin } from '../../model/UserRecord';
+import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -116,6 +118,13 @@ export const isImport = (category: BookingCategory) => {
   return category === BookingCategory.Import;
 };
 
+const handleWatch = (id: string, watchers: UserRecord[]) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(id)
+    .update('watchers', watchers);
+
 const BookingView: React.FC<Props> = ({ booking }) => {
   console.log('Booking object: ', booking);
 
@@ -123,6 +132,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
   const [_, userRecord] = useUser();
+  const { enqueueSnackbar } = useSnackbar();
 
   const admins = useAdminUsers();
 
@@ -163,7 +173,13 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
-          <WatchersDialog isOpen={isOpenWatcherDialog} handleClose={handleCloseWatcherDialog} />
+          <WatchersDialog
+            isOpen={isOpenWatcherDialog}
+            handleClose={handleCloseWatcherDialog}
+            id={booking.id}
+            collection="bookings"
+            watchers={booking.watchers || []}
+          />
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
@@ -224,9 +240,45 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   <Button variant="contained" onClick={() => setIsOpenWatcherDialog(true)}>
                     Watchers
                   </Button>
-                ) : (
-                  <IconButton color="primary" aria-label="Watch" component="span" onClick={() => {}}>
+                ) : booking.watchers.findIndex(val => val.alphacomId === userRecord.alphacomId) === -1 ? (
+                  <IconButton
+                    color="primary"
+                    aria-label="Watch"
+                    component="span"
+                    onClick={() =>
+                      handleWatch(booking.id, [...(booking.watchers || []), userRecord])
+                        .then(_ =>
+                          enqueueSnackbar(<Typography color="inherit">Successfully added to watchers!</Typography>, {
+                            variant: 'success',
+                          }),
+                        )
+                        .catch(err => console.log(err))
+                    }
+                  >
                     <VisibilityIcon />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    color="primary"
+                    aria-label="Unwatch"
+                    component="span"
+                    onClick={() =>
+                      handleWatch(
+                        booking.id,
+                        booking.watchers.filter(u => u.alphacomId !== userRecord.alphacomId),
+                      )
+                        .then(_ =>
+                          enqueueSnackbar(
+                            <Typography color="inherit">Successfully removed from watchers!</Typography>,
+                            {
+                              variant: 'success',
+                            },
+                          ),
+                        )
+                        .catch(err => console.log(err))
+                    }
+                  >
+                    <VisibilityOffIcon />
                   </IconButton>
                 )}
               </Box>
