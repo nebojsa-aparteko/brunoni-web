@@ -3,6 +3,7 @@ import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typog
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
+import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
 import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
@@ -20,7 +21,7 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
-import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
+import UserRecord, { isSuperAdmin, UserRecordMinProperties } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 
@@ -121,7 +122,10 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
     .firestore()
     .collection('bookings')
     .doc(id)
-    .update('watchers', watchers);
+    .update(
+      'watchers',
+      watchers.map(item => pick(UserRecordMinProperties)(item)),
+    );
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   console.log('Booking object: ', booking);
@@ -235,7 +239,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               </Box>
               <Box flex="1" />
               <Box>
-                {actingAs == null && isSuperAdmin(userRecord) ? (
+                {actingAs === null &&
+                (isSuperAdmin(userRecord) || booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
                   <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>
                     <SupervisedUserCircleIcon />
                   </IconButton>

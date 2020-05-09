@@ -5,7 +5,13 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 const WatcherIconButton: React.FC<Props> = ({ isWatching, handleWatch }) => {
   return (
-    <IconButton color="primary" aria-label="Watch" component="span" onClick={() => handleWatch(isWatching)}>
+    <IconButton
+      color="primary"
+      size="small"
+      aria-label="Watch"
+      component="span"
+      onClick={() => handleWatch(isWatching)}
+    >
       {isWatching ? <VisibilityOffIcon /> : <VisibilityIcon />}
     </IconButton>
   );
