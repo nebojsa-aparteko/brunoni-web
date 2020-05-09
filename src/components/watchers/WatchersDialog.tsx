@@ -65,8 +65,7 @@ const handleChangeAgent = (id: string, user: UserRecord | null) =>
         BkgAgentContact: user?.alphacomId || '',
       },
       { merge: true },
-    )
-    .then();
+    );
 
 const handleChangeCustomer = (id: string, user: UserRecord | null) =>
   firebase
