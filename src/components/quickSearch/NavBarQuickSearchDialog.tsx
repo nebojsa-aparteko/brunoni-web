@@ -11,10 +11,8 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import QuickSearchBooking from './QuickSearchBooking';
-import QuickSearchContainer from './QuickSearchContainer';
 import QuickSearchQuote from './QuickSearchQuote';
 import firebase from '../../firebase';
-import LoadListContainerModel from '../../model/LoadListContainerModel';
 import { Booking } from '../../model/Booking';
 
 const useStyles = makeStyles(theme =>
@@ -51,14 +49,22 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const searchBookings = async (collection: string, fieldPath: string, inputValue: string) => {
-  const booking = await firebase
+const searchBookings = async (collection: string, fieldPath: string, inputValue: string) =>
+  firebase
     .firestore()
     .collection('bookings')
     .where(fieldPath, '==', inputValue)
-    .get();
-  return new Promise<Booking>(resolve => resolve(booking.docs[0].data() as Booking));
-};
+    .get()
+    .then(result => {
+      if (result.docs.length > 0) {
+        return new Promise<Booking>(resolve => resolve(result.docs[0].data() as Booking));
+      } else {
+        return new Promise<Booking>((resolve, reject) => reject('No booking found'));
+      }
+    })
+    .catch(error => {
+      return new Promise<Booking>((resolve, reject) => reject(error));
+    });
 
 const nestedSearchBookings = async (
   collection: string,
@@ -71,16 +77,24 @@ const nestedSearchBookings = async (
     .collection(collection)
     .where(fieldPath, opStr, inputValue)
     .get()
-    .then(
-      result => new Promise<string>(resolve => resolve(result.docs[0]?.data()?.bookingId)),
-    )
-    .then(async bookingId => {
-      const booking = await firebase
-        .firestore()
-        .collection('bookings')
-        .doc(bookingId)
-        .get();
-      return new Promise<Booking>(resolve => resolve(booking.data() as Booking));
+    .then(result => {
+      if (result.docs.length > 0) {
+        const bookingId = result.docs[0].data().bookingId;
+        firebase
+          .firestore()
+          .collection('bookings')
+          .doc(bookingId)
+          .get()
+          .then(result => {
+            return new Promise<Booking>(resolve => resolve(result.data() as Booking));
+          })
+          .catch(error => {
+            return new Promise<Booking>((resolve, reject) => reject(error));
+          });
+      } else return new Promise<Booking>((resolve, reject) => reject('No booking found'));
+    })
+    .catch(error => {
+      return new Promise<Booking>((resolve, reject) => reject(error));
     });
 
 const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {

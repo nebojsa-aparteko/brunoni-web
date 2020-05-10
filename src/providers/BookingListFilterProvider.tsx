@@ -12,7 +12,7 @@ interface BookingListStateParams {
   destinationPort?: Port;
 }
 
-export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 10 };
+export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 25 };
 
 const BookingListFilterContext = React.createContext<[BookingListStateParams, any]>([
   BOOKING_FILTERS_INITIAL_STATE,

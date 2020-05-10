@@ -3,7 +3,7 @@ import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
-import { subWeeks } from 'date-fns';
+import { subMonths, subWeeks } from 'date-fns';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =
@@ -18,6 +18,11 @@ export type FilterFields =
 
 export const INITIAL_DATERANGE_FILTER = {
   startDate: subWeeks(new Date(), 2),
+  endDate: new Date(),
+};
+
+export const LAST_3_MONTHS = {
+  startDate: subMonths(new Date(), 3),
   endDate: new Date(),
 };
 

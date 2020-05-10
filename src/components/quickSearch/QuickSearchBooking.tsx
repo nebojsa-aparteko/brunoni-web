@@ -47,11 +47,12 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
     setIsLoading(true);
     searchBookings(inputValue)
       .then(result => {
+        console.log('Got Results ', result);
         setSearchResult(normalizeBooking(result));
         setIsLoading(false);
       })
       .catch(error => {
-        console.log(error);
+        console.log('got error ', error);
         setIsLoading(false);
         enqueueSnackbar(<Typography color="inherit">{`There is no record with this criteria.`}</Typography>, {
           variant: 'error',
@@ -105,5 +106,5 @@ export default QuickSearchBooking;
 interface Props {
   label: string;
   handleClose: () => void;
-  searchBookings: (inputValue: string) => Promise<Booking>;
+  searchBookings: (inputValue: string) => Promise<Booking | undefined>;
 }

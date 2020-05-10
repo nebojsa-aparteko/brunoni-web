@@ -9,7 +9,7 @@ import Meta from '../components/Meta';
 import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
-import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
+import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
 import { useLocalStorage } from 'react-use';
 
@@ -104,7 +104,9 @@ const BookingsPage: React.FC = () => {
   useEffect(() => {
     if (actingAs) {
       // we are acting as a customer set a date range:
-      bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+      if (!filters.dateRange) {
+        bookingFilterDispach({ type: 'set', field: 'dateRange', value: LAST_3_MONTHS });
+      }
       bookingFilterDispach({ type: 'clear', field: 'archived' });
       bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
     }

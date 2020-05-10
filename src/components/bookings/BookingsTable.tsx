@@ -261,12 +261,14 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
               />
             </Grid>
             <Grid item md={3} xs={12}>
-              <InfoBoxItem
-                title="Client"
-                label1={client ? client.name : ''}
-                label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
-                gutterBottom
-              />
+              {isAdmin && (
+                <InfoBoxItem
+                  title="Client"
+                  label1={client ? client.name : ''}
+                  label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
+                  gutterBottom
+                />
+              )}
             </Grid>
             <Grid item md={3} xs={12}>
               <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />

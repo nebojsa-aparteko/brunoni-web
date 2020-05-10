@@ -187,7 +187,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
     <Fragment>
       <Meta title={`Bookings`} />
 
-      <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter />
+      <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter={isAdmin} />
 
       <div>
         <Card>
@@ -237,7 +237,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
             </CardContent>
 
             <CardActions className={classes.actions}>
-              {bookings && bookings.length > 0 && (
+              {bookings && bookings.length > 0 && bookings.length > rowsPerPage && (
                 <TablePagination
                   component="div"
                   count={filteredResults ? filteredResults.length : 0}
@@ -245,7 +245,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
                   onChangeRowsPerPage={handleChangeRowsPerPage}
                   page={page}
                   rowsPerPage={rowsPerPage}
-                  rowsPerPageOptions={[5, 10, 25]}
+                  rowsPerPageOptions={[10, 25, 50]}
                 />
               )}
             </CardActions>
