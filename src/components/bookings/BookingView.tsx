@@ -24,6 +24,7 @@ import useUser from '../../hooks/useUser';
 import UserRecord, { isSuperAdmin, UserRecordMinProperties } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -167,6 +168,24 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       .collection('bookings')
       .doc(booking?.id)
       .update('archived', !booking?.archived);
+
+    // if the booking was in dispute and action is to archive it
+    // this is expected to be very rare so leave it as a separate call
+    if (booking.inDispute && !booking.archived) {
+      firebase
+        .firestore()
+        .collection('bookings')
+        .doc(booking?.id)
+        .update('inDispute', false);
+    }
+  }, [booking]);
+
+  const onDisputeClick = useCallback(() => {
+    firebase
+      .firestore()
+      .collection('bookings')
+      .doc(booking?.id)
+      .update('inDispute', !booking?.inDispute);
   }, [booking]);
 
   const onWatch = useCallback(
@@ -238,7 +257,33 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 </Typography>
               </Box>
               <Box flex="1" />
-              <Box>
+              <Box className={classes.actions} displayPrint="none">
+                {!actingAs && (
+                  <Fragment>
+                    <Button
+                      aria-label="archive"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ArchiveIcon />}
+                      onClick={onArchiveClick}
+                    >
+                      {booking.archived ? 'Restore' : 'Archive'}
+                    </Button>
+                    {booking.pendingPayment && !booking.archived && (
+                      <Button
+                        aria-label="dispute"
+                        variant="outlined"
+                        size="small"
+                        startIcon={<WarningIcon />}
+                        onClick={onDisputeClick}
+                        disabled={booking.inDispute}
+                      >
+                        {booking.inDispute ? 'in dispute' : 'Dispute'}
+                      </Button>
+                    )}
+                  </Fragment>
+                )}
+
                 {actingAs === null &&
                 (isSuperAdmin(userRecord) || booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
                   <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>
@@ -250,29 +295,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                     handleWatch={onWatch}
                   />
                 )}
-              </Box>
-              <Box className={classes.actions} displayPrint="none">
-                <Button
-                  aria-label="print"
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PrintIcon />}
-                  onClick={handlePrint}
-                >
-                  Print
-                </Button>
 
-                {!actingAs && (booking.pendingPayment || booking.archived) && (
-                  <Button
-                    aria-label="archive"
-                    variant="outlined"
-                    size="small"
-                    startIcon={<ArchiveIcon />}
-                    onClick={onArchiveClick}
-                  >
-                    {booking.archived ? 'Restore' : 'Archive'}
-                  </Button>
-                )}
+                <IconButton aria-label="print" size="small" onClick={handlePrint}>
+                  <PrintIcon />
+                </IconButton>
               </Box>
             </Box>
 

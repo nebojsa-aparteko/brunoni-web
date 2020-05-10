@@ -15,6 +15,7 @@ export default function useNotifications(userId?: string) {
     [userId],
   );
   const notificationsCollection = useFirestoreCollection('notifications', query);
+
   return notificationsCollection?.docs.map(doc => {
     return flow(
       update('at', invoke('toDate')),

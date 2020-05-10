@@ -53,6 +53,7 @@ export interface Booking {
   updatedAt: Date;
   archived: boolean;
   pendingPayment: boolean;
+  inDispute?: boolean;
   checklistCheckedCount: number;
   checklistItemCount: number;
   watchers: UserRecordMin[];

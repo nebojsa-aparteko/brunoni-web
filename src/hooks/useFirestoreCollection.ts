@@ -25,7 +25,7 @@ export default function useFirestoreCollection(
       return;
     }
 
-    (async () => {
+    const cleanup = (async () => {
       try {
         const collectionReference =
           documentPath && subCollection
@@ -58,9 +58,20 @@ export default function useFirestoreCollection(
         });
       } catch (error) {
         console.error('useFirestoreCollection', name, 'threw an error', error);
+        return null;
       }
     })();
-  }, [name, query, documentPath, subCollection]);
+
+    return () => {
+      if (cleanup) {
+        cleanup
+          .then(result => {
+            if (result) result();
+          })
+          .catch(error => console.error('cleanup error', error));
+      }
+    };
+  }, [name, query, documentPath, subCollection, setSnapshot]);
 
   return snapshot;
 }

@@ -13,14 +13,21 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   const userRecord = useContext(UserRecordContext);
   const notifications = useNotifications(userRecord?.alphacomId);
 
+  /*
+
   useEffect(() => {
-    if (notifications) {
-      setNotificationCount(
+    let didCancel = false;
+  /!*  if (!didCancel && notifications && notifications.length > 0 && setNotificationCount) {
+     /!* setNotificationCount(
         notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
           0,
-      );
-    }
+      );*!/
+    }*!/
+    return () => {
+      didCancel = true;
+    };
   }, [notifications, setNotificationCount]);
+*/
 
   return (
     <Fragment>

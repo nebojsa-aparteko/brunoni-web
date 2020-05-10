@@ -14,7 +14,7 @@ export default function useFirestoreDocument(
       return;
     }
 
-    (async () => {
+    const cleanup = (async () => {
       try {
         const document =
           (await documentPath) && subCollection
@@ -43,8 +43,19 @@ export default function useFirestoreDocument(
         });
       } catch (error) {
         console.error('useFirestoreDocument', `/${collection}/${id}`, 'threw an error', error);
+        return null;
       }
     })();
+
+    return () => {
+      if (cleanup) {
+        cleanup
+          .then(result => {
+            if (result) result();
+          })
+          .catch(error => console.error('cleanup error', error));
+      }
+    };
   }, [collection, id, documentPath, , subCollection]);
 
   return snapshot;

@@ -32,6 +32,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientByIdFromCache, useClientById } from '../../hooks/useClient';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -232,10 +233,15 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
               <span className={classes.tableRowHeader}>
                 <Typography variant="h5">File No. {booking['ERP-BkgRef']}</Typography>
                 {!isImport(booking.Category) ? (
-                  <Typography variant="body2" style={{ paddingLeft: '20px' }}>
+                  <Typography variant="body2" style={{ paddingLeft: 20 }}>
                     Refs: <LocRefs cargoDetails={booking.CargoDetails} />
                   </Typography>
                 ) : null}
+                {booking.pendingPayment && booking.inDispute && (
+                  <Typography variant="body1" style={{ paddingLeft: 20 }}>
+                    <WarningIcon fontSize="small" style={{ width: 14, height: 14 }} /> IN DISPUTE
+                  </Typography>
+                )}
               </span>
             </Fragment>
           ) : null}
