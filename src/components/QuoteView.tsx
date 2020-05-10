@@ -45,6 +45,7 @@ import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import InternalStorage from './bookings/InternalStorage';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
+import { formatDateSafe } from '../utilities/formattingHelpers';
 
 interface Props {
   quote?: Quote;
@@ -104,7 +105,7 @@ function ScrollToTopOnMount() {
 }
 
 const buildQuoteTile = (quote: QuoteModel) =>
-  `${quote.carrier.name || quote.carrier.id} - ${
+  `${quote.carrier?.name || quote.carrier?.id} - ${
     quote.placeOfDeliveryName ? quote.placeOfDeliveryName : portLongFormatLabel(quote.destination)
   }`;
 
@@ -271,7 +272,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                       : `/quotes/groups`
                   }
                   title={`Quotation - ${quoteTitle}`}
-                  subtitle={`${formatDate(quote.dateIssued, 'd. MMMM yyyy')}`}
+                  subtitle={`${formatDateSafe(quote.dateIssued, 'd. MMMM yyyy')}`}
                 />
 
                 <Box className={classes.actions} displayPrint="none">

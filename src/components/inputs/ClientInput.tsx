@@ -47,7 +47,7 @@ const ClientInput: React.FC<Props> = ({
     <Autocomplete
       {...rest}
       className={classes.root}
-      value={value}
+      value={value || null}
       onChange={(_: ChangeEvent<{}>, client: Client | null) => onChange(client)}
       autoSelect
       autoHighlight

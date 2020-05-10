@@ -6,7 +6,7 @@ export enum DateFormats {
   LONG = 'dd.MM.yyyy',
 }
 
-export const formatDateSafe = (date: Date, dateFormat: DateFormats) => {
+export const formatDateSafe = (date: Date, dateFormat: DateFormats | string) => {
   if (date) {
     try {
       return formatDate(date, dateFormat);

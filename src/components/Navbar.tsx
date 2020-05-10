@@ -261,10 +261,10 @@ const Navbar: React.FC = () => {
                         <Menu
                           id="simple-menu"
                           anchorEl={anchorEl}
-                          keepMounted
                           open={Boolean(anchorEl)}
                           onClose={handleMenuClose}
                           className={classes.menu}
+                          getContentAnchorEl={null}
                         >
                           <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="Equipment Situation" />
                           <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
@@ -331,7 +331,7 @@ const Navbar: React.FC = () => {
         </AppBar>
       </Hidden>
       <nav className={classes.drawer} aria-label="mailbox folders">
-        <Hidden mdUp implementation="css">
+        <Hidden mdUp>
           {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>

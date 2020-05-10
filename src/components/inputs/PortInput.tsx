@@ -31,7 +31,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
 
   return (
     <Autocomplete
-      value={value}
+      value={value || null}
       onChange={(_: ChangeEvent<{}>, port: Port | null) => onChange(port)}
       autoHighlight
       open={open}

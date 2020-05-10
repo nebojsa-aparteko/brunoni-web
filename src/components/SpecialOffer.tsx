@@ -120,7 +120,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
 
   return (
     <Card className={classes.card}>
-      <CardActionArea onClick={handleClick}>
+      <div onClick={handleClick} style={{ cursor: 'pointer' }}>
         <CardMedia className={classes.media} image={imageURL} title="Contemplative Reptile" />
         <CardContent className={classes.content}>
           <Typography variant="h5" className={classes.title}>
@@ -145,14 +145,14 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
                 Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
               </Fragment>
             ) : (
-              <Fragment>Book now</Fragment>
+              'Book now'
             )}
           </Button>
           <Typography variant="body2" color="textSecondary" component="p" className={classes.finePrint}>
             **subject to other charges
           </Typography>
         </CardContent>
-      </CardActionArea>
+      </div>
     </Card>
   );
 };
