@@ -56,7 +56,7 @@ export default function useFirestoreDocument(
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [collection, id, documentPath, , subCollection]);
+  }, [collection, id, documentPath, subCollection]);
 
   return snapshot;
 }
