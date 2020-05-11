@@ -56,7 +56,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Comment = ({ comment, ...other }: CommentProp) => {
   const classes = useStyles();
-
   return (
     <Box className={classes.container} {...other}>
       <Box className={classes.rowContainer}>

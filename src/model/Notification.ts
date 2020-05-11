@@ -1,5 +1,6 @@
 import { ActivityLogUserData } from '../components/bookings/checklist/ChecklistItemModel';
 import { ActivityLogItem } from '../components/bookings/checklist/ActivityModel';
+import { AlertType } from './Booking';
 
 export enum NotificationType {
   COMMENT,
@@ -17,4 +18,5 @@ export default interface Notification {
   referenceID?: string;
   seen?: boolean;
   id?: string;
+  alertType?: AlertType;
 }

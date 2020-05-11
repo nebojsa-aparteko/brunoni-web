@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import { Card, CardContent, CardHeader, createStyles, makeStyles } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
-import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import Notification, { NotificationType } from '../../model/Notification';
 import firebase from 'firebase';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { useHistory } from 'react-router';
 import Activity from '../bookings/checklist/Activity';
+import Alert from './Alert';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -22,7 +22,11 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
 
   return (
     <Fragment>
-      {notification.type === NotificationType.COMMENT ? 'Comment left at ' : 'Activity at '}
+      {notification.type === NotificationType.COMMENT
+        ? 'Comment left at '
+        : notification.type === NotificationType.ACTIVITY
+        ? 'Activity at '
+        : 'Alert at '}
       <a
         style={{ cursor: 'pointer', textDecoration: 'underline' }}
         onClick={() =>
@@ -46,6 +50,7 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
       .then(_ => console.log('Successfully saved'))
       .catch(err => console.log(err));
   };
+
   return (
     <Card className={classes.root} {...other}>
       <CardHeader
@@ -60,9 +65,14 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
       />
       <CardContent>
         {notification.type === NotificationType.COMMENT && notification.activity ? (
-          <Comment comment={notification.activity} />
-        ) : notification.activity ? (
+          <Fragment>
+            {console.log(notification.id)}
+            <Comment comment={notification.activity} />
+          </Fragment>
+        ) : notification.activity && notification.type === NotificationType.ACTIVITY ? (
           <Activity activity={notification!.activity} />
+        ) : notification.type === NotificationType.ALERT && notification.alertType ? (
+          <Alert alert={notification.alertType} />
         ) : null}
       </CardContent>
     </Card>
