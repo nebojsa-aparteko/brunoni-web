@@ -19,7 +19,11 @@ const QuotePageContainer: React.FC<Props> = ({ match }) => {
 
   const actingAs = useContext(ActingAs)[0];
 
-  const quoteDoc = quoteSnapshot ? ({ id: quoteSnapshot.id, ...quoteSnapshot.data() } as Booking) : undefined;
+  const quoteDoc = quoteSnapshot
+    ? quoteSnapshot.exists
+      ? ({ id: quoteSnapshot.id, ...quoteSnapshot.data() } as Booking)
+      : undefined
+    : undefined;
 
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
