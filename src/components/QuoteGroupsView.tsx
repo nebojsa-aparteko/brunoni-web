@@ -9,7 +9,6 @@ import {
   Paper,
   TablePagination,
   Typography,
-  Container as MUIContainer,
 } from '@material-ui/core';
 import GetQuotesButton from './GetQuotesButton';
 import QuoteGroupsContext from '../contexts/QuoteGroupsContext';
@@ -153,11 +152,9 @@ const QuoteGroupsView: React.FC<Props> = ({
 
   if (!quoteGroups) {
     return (
-      <MUIContainer maxWidth="lg">
-        <Paper className={classes.root}>
-          <ChartsCircularProgress />
-        </Paper>
-      </MUIContainer>
+      <Paper className={classes.root}>
+        <ChartsCircularProgress />
+      </Paper>
     );
   }
 

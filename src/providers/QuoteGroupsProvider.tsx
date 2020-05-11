@@ -217,7 +217,7 @@ const QuoteGroupsProvider: React.FC<Props> = ({ children }) => {
   const pickupLocations = useContext(PickupLocations);
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
-  const quotes = useQuotesContext()[0];
+  const [quotes, isLoading] = useQuotesContext();
 
   const normalize = useMemo(() => {
     const getContainerType = getEntity(containerTypes, containerType => containerType.id);
@@ -231,7 +231,7 @@ const QuoteGroupsProvider: React.FC<Props> = ({ children }) => {
 
   const quoteGroups = useMemo(() => (quotes === undefined ? undefined : normalize(quotes)), [quotes, normalize]);
 
-  return <Context.Provider value={quoteGroups}>{children}</Context.Provider>;
+  return <Context.Provider value={!isLoading ? quoteGroups : undefined}>{children}</Context.Provider>;
 };
 
 export default QuoteGroupsProvider;

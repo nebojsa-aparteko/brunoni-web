@@ -383,7 +383,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               <Select
                 labelId="quote-status-select-label"
                 id="quote-status-select"
-                value={quote!.status}
+                value={quote!.status || ''}
                 onChange={event => handleChange(event, quote.id)}
               >
                 <MenuItem value="">

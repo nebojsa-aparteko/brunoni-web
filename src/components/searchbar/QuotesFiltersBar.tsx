@@ -24,7 +24,7 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
 
   const quotesFilterDispatch = useQuotesFilterDispatch();
 
-  const filters = useQuotesContext()[1];
+  const filters = useQuotesContext()[2];
 
   const { clientFilter, originPort, destinationPort, dateRange } = filters;
 

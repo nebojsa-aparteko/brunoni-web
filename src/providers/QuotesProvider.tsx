@@ -1,4 +1,4 @@
-import React, { createContext, Reducer, useContext, useMemo, useReducer } from 'react';
+import React, { createContext, Reducer, useContext, useEffect, useMemo, useReducer, useState } from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
@@ -16,10 +16,9 @@ interface QuoteContextFilters extends ContextFilters {}
 
 const defaultFilters = {} as QuoteContextFilters;
 
-export const QuotesContext = createContext<[Quote[], QuoteContextFilters] | [undefined, QuoteContextFilters]>([
-  undefined,
-  defaultFilters,
-]);
+export const QuotesContext = createContext<
+  [Quote[], boolean, QuoteContextFilters] | [undefined, boolean, QuoteContextFilters]
+>([undefined, true, defaultFilters]);
 
 const QuotesFilterDispatchContext = createContext<QuoteDispatch | undefined>(undefined);
 
@@ -27,7 +26,11 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [filters, dispatch] = useReducer<Reducer<QuoteContextFilters, Action>>(reducer, defaultFilters);
+
+  const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(undefined);
 
   // in case of admins set assignee filter automatically
   // TODO activate this when it starts having sense :)
@@ -39,13 +42,17 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
-      let query = filters.dateRange
-        ? collection.orderBy('dateIssued', 'desc')
-        : // active quotes, filter the ones that are not archived and validity is still valid
-          collection.where('validityPeriod.to', '>=', subWeeks(new Date(), 1)).orderBy('validityPeriod.to', 'desc');
+      if (filtersPreviousVal?.archived !== filters.archived) {
+        // show loading only if there is a change in these filters
+        setIsLoading(true);
+      }
+
+      setFiltersPreviousVal(filters);
+
+      let query = null;
 
       if (actingAs && userRecord?.alphacomClientId) {
-        query = query.where('clientId', '==', userRecord!.alphacomClientId);
+        query = (query || collection).where('clientId', '==', userRecord!.alphacomClientId);
       }
 
       // admins have different filters, clients should default to seeing all
@@ -54,28 +61,31 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       //   query = query.where('archived', '==', filters.archived);
       // }
 
-      if (filters.dateRange?.startDate) {
-        query = query.where('dateIssued', '>=', filters.dateRange.startDate);
-      }
-      if (filters.dateRange?.endDate) {
-        query = query.where('dateIssued', '<=', filters.dateRange.endDate);
-      }
-
       if (filters.assignee) {
-        query = query.where('assignee', '==', filters.assignee.alphacomId);
+        query = (query || collection).where('assignee', '==', filters.assignee.alphacomId);
       }
 
       if (filters.originPort) {
-        query = query.where('origin', '==', filters.originPort.id);
+        query = (query || collection).where('origin', '==', filters.originPort.id);
       }
 
       if (filters.destinationPort) {
-        query = query.where('destination', '==', filters.destinationPort.id);
+        query = (query || collection).where('destination', '==', filters.destinationPort.id);
       }
 
       if (filters.clientFilter) {
-        query = query.where('clientId', '==', filters.clientFilter.id);
+        query = (query || collection).where('clientId', '==', filters.clientFilter.id);
       }
+
+      query = filters.dateRange
+        ? (query || collection)
+            .where('dateIssued', '>=', filters.dateRange.startDate)
+            .where('dateIssued', '<=', filters.dateRange.endDate)
+            .orderBy('dateIssued', 'desc')
+        : // active quotes, filter the ones that are not archived and validity is still valid
+          (query || collection)
+            .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
+            .orderBy('validityPeriod.to', 'desc');
 
       return query;
     },
@@ -85,6 +95,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   const quotesSnapshot = useFirestoreCollection('quotes', query);
 
   const quotesResult = useMemo(() => {
+    setIsLoading(false);
     const quotes = quotesSnapshot?.docs.map(doc => {
       return {
         id: doc.id,
@@ -96,7 +107,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   }, [quotesSnapshot]);
 
   return (
-    <QuotesContext.Provider value={[quotesResult, filters]}>
+    <QuotesContext.Provider value={[quotesResult, isLoading, filters]}>
       <QuotesFilterDispatchContext.Provider value={dispatch}>{children}</QuotesFilterDispatchContext.Provider>
     </QuotesContext.Provider>
   );

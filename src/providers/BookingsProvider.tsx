@@ -70,20 +70,22 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     assignee: !actingAs && userRecord,
   } as BookingContextFilters);
 
-  const [filtersPreviousVal, setFiltersPreviousVal] = useState<BookingContextFilters | undefined>(undefined);
+  // const [filtersPreviousVal, setFiltersPreviousVal] = useState<BookingContextFilters | undefined>(undefined);
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
-      if (
-        !isEqual(pick(['archived', 'category', 'pendingPayment'])(filtersPreviousVal))(
-          pick(['archived', 'category', 'pendingPayment'])(filters),
-        )
-      ) {
-        // show loading only if there is a change in these filters
-        setIsLoading(true);
-      }
+      // if (
+      //   !isEqual(pick(['archived', 'category', 'pendingPayment'])(filtersPreviousVal))(
+      //     pick(['archived', 'category', 'pendingPayment'])(filters),
+      //   )
+      // ) {
+      //   // show loading only if there is a change in these filters
+      //   setIsLoading(true);
+      // }
 
-      setFiltersPreviousVal(filters); // store previous value for future passes
+      setIsLoading(true);
+
+      // setFiltersPreviousVal(filters); // store previous value for future passes
 
       let query = collection.where('Category', '==', filters.category);
 
