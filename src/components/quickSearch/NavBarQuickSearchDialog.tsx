@@ -80,13 +80,13 @@ const nestedSearchBookings = async (
     .then(result => {
       if (result.docs.length > 0) {
         const bookingId = result.docs[0].data().bookingId;
-        firebase
+        return firebase
           .firestore()
           .collection('bookings')
           .doc(bookingId)
           .get()
-          .then(result => {
-            return new Promise<Booking>(resolve => resolve(result.data() as Booking));
+          .then(booking => {
+            return new Promise<Booking>(resolve => resolve(booking.data() as Booking));
           })
           .catch(error => {
             return new Promise<Booking>((resolve, reject) => reject(error));

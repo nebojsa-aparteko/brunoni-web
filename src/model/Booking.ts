@@ -53,6 +53,7 @@ export interface Booking {
   updatedAt: Date;
   archived: boolean;
   pendingPayment: boolean;
+  alerts: AlertType[];
   inDispute?: boolean;
   checklistCheckedCount: number;
   checklistItemCount: number;
@@ -280,4 +281,13 @@ export enum CarrierId {
   MACS = 'MACS',
   ZIM = 'ZIM Shipping Line',
   DEUTSCHE_AFRIKA = 'DAL DEUTSCHE AFRIKA-LINIEN',
+}
+
+export enum AlertType {
+  DEPOT_OUT_PICK_UP,
+  VGM,
+  INVOICED,
+  GATE_OUT,
+  FREIGHT,
+  S_I,
 }
