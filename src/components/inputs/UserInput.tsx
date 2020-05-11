@@ -37,7 +37,7 @@ const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, o
     <Autocomplete
       {...rest}
       className={classes.root}
-      value={value}
+      value={value || null}
       onChange={(_: ChangeEvent<{}>, user: UserRecord | null) => onChange(user)}
       autoSelect
       autoHighlight

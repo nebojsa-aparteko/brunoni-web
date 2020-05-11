@@ -62,9 +62,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.assignee) {
-        const splituserId = filters.assignee.alphacomId.split('-');
-        const normalizedUserId = splituserId[0] + '-' + Number(splituserId[1]);
-        query = query.where('assignee', '==', normalizedUserId);
+        query = query.where('assignee', '==', filters.assignee.alphacomId);
       }
 
       if (filters.originPort) {

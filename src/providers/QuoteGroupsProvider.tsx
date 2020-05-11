@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import update from 'lodash/fp/update';
 import orderBy from 'lodash/fp/orderBy';
 import flow from 'lodash/fp/flow';
-import compact from 'lodash/fp/flow';
+import padStart from 'lodash/fp/padStart';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import map from 'lodash/fp/map';
@@ -203,7 +203,7 @@ const normalizeQuoteGroups = (
     values,
     flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [set('groupId', item.id)(item)]))),
     map(normalizeQuoteGroup),
-    //orderBy([get('dateIssued'), flow(get('id'), padStart(10))], ['desc', 'desc']),
+    orderBy([get('dateIssued'), flow(get('id'), padStart(10))], ['desc', 'desc']),
   ) as (result: Quote[]) => QuoteGroup[];
 };
 

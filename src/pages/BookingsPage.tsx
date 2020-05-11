@@ -75,11 +75,16 @@ const BookingsPage: React.FC = () => {
 
   const [bookings, isLoading, filters] = useBookingsContext();
 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  useEffect(() => {
+    if (selectedTab) {
+      handleTabChange(selectedTab);
+    }
+  }, [selectedTab]);
+
+  const handleTabChange = (newValue: number) => {
     if (newValue !== selectedTab && setBookingsContextData) {
       setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
     }
-    setSelectedTab(newValue);
     switch (newValue) {
       case 0:
         bookingFilterDispach({ type: 'set', field: 'archived', value: false });
@@ -119,7 +124,7 @@ const BookingsPage: React.FC = () => {
         <Box className={classes.tabContainer}>
           <Tabs
             value={selectedTab}
-            onChange={handleTabChange}
+            onChange={(event: React.ChangeEvent<{}>, newValue: number) => setSelectedTab(newValue)}
             orientation="vertical"
             aria-label="Booking tabs"
             className={classes.tabs}
