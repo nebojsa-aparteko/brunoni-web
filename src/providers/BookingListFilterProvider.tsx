@@ -13,7 +13,7 @@ interface BookingListStateParams {
   activeTab: number;
 }
 
-export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 25, activeTab: 0 };
+export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 10, activeTab: 0 };
 
 const BookingListFilterContext = React.createContext<[BookingListStateParams, any]>([
   BOOKING_FILTERS_INITIAL_STATE,
