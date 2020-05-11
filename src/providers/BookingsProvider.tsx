@@ -79,12 +79,13 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
           pick(['archived', 'category', 'pendingPayment'])(filters),
         )
       ) {
+        // show loading only if there is a change in these filters
         setIsLoading(true);
       }
-      setFiltersPreviousVal(filters);
-      let query = filters.dateRange
-        ? collection.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
-        : collection.orderBy('updatedAt', 'desc');
+
+      setFiltersPreviousVal(filters); // store previous value for future passes
+
+      let query = collection.where('Category', '==', filters.category);
 
       if (actingAs && userRecord?.alphacomClientId) {
         query = query.where('ForwAdrId', '==', userRecord!.alphacomClientId);
@@ -94,8 +95,6 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       if (!actingAs) {
         query = query.where('archived', '==', filters.archived);
       }
-
-      query = query.where('Category', '==', filters.category);
 
       if (filters.pendingPayment !== undefined) {
         query = query.where('pendingPayment', '==', filters.pendingPayment);
@@ -123,6 +122,10 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       if (filters.clientFilter) {
         query = query.where('ForwAdrId', '==', filters.clientFilter.id);
       }
+
+      query = filters.dateRange
+        ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
+        : query.orderBy('updatedAt', 'desc');
 
       return query;
     },

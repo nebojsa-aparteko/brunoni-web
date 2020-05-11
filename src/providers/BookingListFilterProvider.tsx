@@ -10,9 +10,10 @@ interface BookingListStateParams {
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
+  activeTab: number;
 }
 
-export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 25 };
+export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 25, activeTab: 0 };
 
 const BookingListFilterContext = React.createContext<[BookingListStateParams, any]>([
   BOOKING_FILTERS_INITIAL_STATE,

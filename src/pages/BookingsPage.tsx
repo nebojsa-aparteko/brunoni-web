@@ -1,5 +1,5 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import BookingsView from '../components/BookingsView';
 import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -11,7 +11,7 @@ import ActingAs from '../contexts/ActingAs';
 import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
-import { useLocalStorage } from 'react-use';
+import set from 'lodash/fp/set';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -66,25 +66,31 @@ export function TabPanel(props: TabPanelProps) {
 
 const BookingsPage: React.FC = () => {
   const classes = useTabStyles();
-  const [selectedTab, setSelectedTab] = useLocalStorage('bookingsPageSelectedTab', 0);
   const actingAs = useContext(ActingAs)[0];
 
-  const setBookingsContextData = useContext(BookingListFilterContext)[1];
+  const [bookingsContextData, setBookingsContextData] = useContext(BookingListFilterContext);
+  const selectedTab = bookingsContextData.activeTab;
 
   const bookingFilterDispach = useBookingsFilterDispatch();
 
   const [bookings, isLoading, filters] = useBookingsContext();
 
   useEffect(() => {
-    if (selectedTab) {
-      handleTabChange(selectedTab);
+    if (bookingsContextData.activeTab) {
+      handleTabChange(bookingsContextData.activeTab);
     }
-  }, [selectedTab]);
+  }, [bookingsContextData.activeTab]);
+
+  const setSelectedTab = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setBookingsContextData(set('activeTab', newValue)(bookingsContextData));
+  };
 
   const handleTabChange = (newValue: number) => {
-    if (newValue !== selectedTab && setBookingsContextData) {
+    console.log('changing tab to ', newValue);
+    if (newValue !== bookingsContextData.activeTab && setBookingsContextData) {
       setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
     }
+
     switch (newValue) {
       case 0:
         bookingFilterDispach({ type: 'set', field: 'archived', value: false });
@@ -124,7 +130,7 @@ const BookingsPage: React.FC = () => {
         <Box className={classes.tabContainer}>
           <Tabs
             value={selectedTab}
-            onChange={(event: React.ChangeEvent<{}>, newValue: number) => setSelectedTab(newValue)}
+            onChange={setSelectedTab}
             orientation="vertical"
             aria-label="Booking tabs"
             className={classes.tabs}
