@@ -166,8 +166,8 @@ export const createActivityObject = (
   } as ActivityLogItem);
 
 const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: Booking, file: File) => {
-  if (['IMO', 'OGG'].includes(checklistItem.id)) {
-    const deliveryRef = booking.CargoDetails[0].LocRefs.find(f => f.LocType === BookingLocType.delivery);
+  if (['IMO', 'OOG'].includes(checklistItem.id)) {
+    const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
     if (deliveryRef) {
       return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
     }
