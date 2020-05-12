@@ -62,18 +62,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
-      // if (
-      //   !isEqual(pick(['archived', 'category', 'pendingPayment'])(filtersPreviousVal))(
-      //     pick(['archived', 'category', 'pendingPayment'])(filters),
-      //   )
-      // ) {
-      //   // show loading only if there is a change in these filters
-      //   setIsLoading(true);
-      // }
-
       setIsLoading(true);
-
-      // setFiltersPreviousVal(filters); // store previous value for future passes
 
       let query = collection.where('Category', '==', filters.category);
 
@@ -116,8 +105,6 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       query = filters.dateRange
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');
-
-      console.log('query rebuild', filters, query);
 
       return query;
     },

@@ -154,7 +154,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
       setBookingsContextData(set('page', page)(bookingsContextData));
     },
-    [setBookingsContextData, bookingsContextData],
+    [setBookingsContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
@@ -163,7 +163,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
         flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
       );
     },
-    [setBookingsContextData, bookingsContextData],
+    [setBookingsContextData],
   );
 
   const handleSearch = useCallback(
@@ -172,7 +172,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
         setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
       }
     },
-    [setBookingsContextData, bookingsContextData, searchString],
+    [setBookingsContextData, searchString],
   );
 
   // if (!bookings) {
@@ -183,7 +183,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   //   );
   // }
 
-  console.log('bookings ', chunk(10)(bookings?.map(item => [item['ERP-BkgRef'], item.pendingPayment])));
+  // console.log('bookings ', chunk(10)(bookings?.map(item => [item['ERP-BkgRef'], item.pendingPayment])));
 
   return (
     <Fragment>

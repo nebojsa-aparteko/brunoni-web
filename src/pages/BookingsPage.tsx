@@ -1,5 +1,5 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import BookingsView from '../components/BookingsView';
 import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -74,6 +74,20 @@ const BookingsPage: React.FC = () => {
 
   const [bookings, isLoading, filters, setFilters] = useBookingsContext();
 
+  // Remember scroll position
+  useEffect(() => {
+    if (bookingsContextData.scrollPosition && !isLoading) {
+      window.scroll(0, bookingsContextData.scrollPosition);
+    }
+
+    return () => {
+      // as it will be remounted a few times we do not want to store position if the scroll did not actually happen
+      if (window.scrollY > 200) {
+        setBookingsContextData(set('scrollPosition', window.scrollY)(bookingsContextData));
+      }
+    };
+  }, [isLoading, bookingsContextData.scrollPosition]);
+
   useEffect(() => {
     handleTabChange(bookingsContextData.activeTab);
   }, [bookingsContextData.activeTab]);
@@ -83,7 +97,7 @@ const BookingsPage: React.FC = () => {
   };
 
   const handleTabChange = (newValue: number) => {
-    console.log('changing tab to ', newValue);
+    setBookingsContextData(set('scrollPosition', 0)(bookingsContextData));
     if (newValue !== bookingsContextData.activeTab && setBookingsContextData) {
       setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
     }

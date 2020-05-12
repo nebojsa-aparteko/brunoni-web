@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { rangePredefinedValues } from '../components/inputs/DateRangeInput';
 import Client from '../model/Client';
 import Port from '../model/Port';
 
@@ -10,6 +9,7 @@ interface BookingListStateParams {
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
+  scrollPosition?: number;
   activeTab: number;
 }
 
