@@ -1,26 +1,33 @@
-import React, { createContext, Reducer, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  Reducer,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { Action, ContextFilters, reducer } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
 import { subWeeks } from 'date-fns';
+import { BookingContextFilters } from './BookingsProvider';
 
 interface Props {
   children: React.ReactNode;
 }
-
-export type QuoteDispatch = (action: Action) => void;
 
 interface QuoteContextFilters extends ContextFilters {}
 
 const defaultFilters = {} as QuoteContextFilters;
 
 export const QuotesContext = createContext<
-  [Quote[], boolean, QuoteContextFilters] | [undefined, boolean, QuoteContextFilters]
->([undefined, true, defaultFilters]);
-
-const QuotesFilterDispatchContext = createContext<QuoteDispatch | undefined>(undefined);
+  [Quote[] | undefined, boolean, QuoteContextFilters, Dispatch<SetStateAction<QuoteContextFilters>> | undefined]
+>([undefined, true, defaultFilters, undefined]);
 
 const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
@@ -28,7 +35,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [filters, dispatch] = useReducer<Reducer<QuoteContextFilters, Action>>(reducer, defaultFilters);
+  const [filters, setFilters] = useState<QuoteContextFilters>(defaultFilters);
 
   const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(undefined);
 
@@ -105,9 +112,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   }, [quotesSnapshot]);
 
   return (
-    <QuotesContext.Provider value={[quotesResult, isLoading, filters]}>
-      <QuotesFilterDispatchContext.Provider value={dispatch}>{children}</QuotesFilterDispatchContext.Provider>
-    </QuotesContext.Provider>
+    <QuotesContext.Provider value={[quotesResult, isLoading, filters, setFilters]}>{children}</QuotesContext.Provider>
   );
 };
 
@@ -117,14 +122,6 @@ export const useQuotesContext = () => {
   const context = React.useContext(QuotesContext);
   if (context === undefined) {
     throw new Error('useQuotesContext must be used within a QuotesProvider');
-  }
-  return context;
-};
-
-export const useQuotesFilterDispatch = () => {
-  const context = React.useContext(QuotesFilterDispatchContext);
-  if (context === undefined) {
-    throw new Error('useQuotesFilterDispatch must be used within a QuotesProvider');
   }
   return context;
 };

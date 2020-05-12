@@ -6,7 +6,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import TocIcon from '@material-ui/icons/Toc';
 import Meta from '../components/Meta';
-import { useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
+import { useBookingsContext } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
@@ -75,9 +75,7 @@ const BookingsPage: React.FC = () => {
   const [bookings, isLoading, filters, setFilters] = useBookingsContext();
 
   useEffect(() => {
-    if (bookingsContextData.activeTab) {
-      handleTabChange(bookingsContextData.activeTab);
-    }
+    handleTabChange(bookingsContextData.activeTab);
   }, [bookingsContextData.activeTab]);
 
   const setSelectedTab = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -105,7 +103,7 @@ const BookingsPage: React.FC = () => {
             flow(
               set('archived', true),
               set('pendingPayment', undefined),
-              set('dateRange', INITIAL_DATERANGE_FILTER),
+              set('dateRange', filters.dateRange || INITIAL_DATERANGE_FILTER),
             )(filters),
           );
         break;
@@ -122,7 +120,7 @@ const BookingsPage: React.FC = () => {
           flow(
             set('archived', undefined),
             set('pendingPayment', undefined),
-            set('dateRange', !filters.dateRange ? LAST_3_MONTHS : filters.dateRange),
+            set('dateRange', filters.dateRange || LAST_3_MONTHS),
           )(filters),
         );
     }

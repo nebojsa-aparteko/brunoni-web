@@ -7,8 +7,10 @@ import ActingAs from '../contexts/ActingAs';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import { TabPanel } from './BookingsPage';
-import { useQuotesFilterDispatch } from '../providers/QuotesProvider';
+import { useQuotesContext } from '../providers/QuotesProvider';
 import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
+import flow from 'lodash/fp/flow';
+import set from 'lodash/fp/set';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -38,18 +40,22 @@ const QuoteGroups: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const actingAs = useContext(ActingAs)[0];
 
-  const quoteFilterDispach = useQuotesFilterDispatch();
+  const [_, isLoading, quoteFilters, setQuoteFilters] = useQuotesContext();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
-        quoteFilterDispach({ type: 'set', field: 'archived', value: false });
-        quoteFilterDispach({ type: 'clear', field: 'dateRange' });
+        setQuoteFilters && setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
         break;
       case 1:
-        quoteFilterDispach({ type: 'set', field: 'archived', value: true });
-        quoteFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
+        setQuoteFilters &&
+          setQuoteFilters(
+            flow(
+              set('archived', true),
+              set('dateRange', quoteFilters.dateRange || INITIAL_DATERANGE_FILTER),
+            )(quoteFilters),
+          );
         break;
       default:
         break;
@@ -59,8 +65,13 @@ const QuoteGroups: React.FC = () => {
   useEffect(() => {
     if (actingAs) {
       // we are acting as a customer set a date range:
-      quoteFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
-      quoteFilterDispach({ type: 'clear', field: 'archived' });
+      setQuoteFilters &&
+        setQuoteFilters(
+          flow(
+            set('archived', undefined),
+            set('dateRange', quoteFilters.dateRange || INITIAL_DATERANGE_FILTER),
+          )(quoteFilters),
+        );
     }
   }, [actingAs]);
 

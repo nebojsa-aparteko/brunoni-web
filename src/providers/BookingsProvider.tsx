@@ -7,11 +7,9 @@ import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import pick from 'lodash/fp/pick';
-import orderBy from 'lodash/fp/orderBy';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
 import { UserRecordMinProperties } from '../model/UserRecord';
-import get from 'lodash/fp/get';
 
 interface Props {
   children: React.ReactNode;
@@ -41,20 +39,10 @@ const BookingsContext = createContext<
   [Booking[] | undefined, boolean, BookingContextFilters, Dispatch<SetStateAction<BookingContextFilters>> | undefined]
 >([undefined, true, defaultFilters, undefined]);
 
-const BookingsFilterDispatchContext = createContext<BookingsDispatch | undefined>(undefined);
-
 export const useBookingsContext = () => {
   const context = React.useContext(BookingsContext);
   if (context === undefined) {
     throw new Error('useBookingsContext must be used within a BookingsProvider');
-  }
-  return context;
-};
-
-export const useBookingsFilterDispatch = () => {
-  const context = React.useContext(BookingsFilterDispatchContext);
-  if (context === undefined) {
-    throw new Error('useBookingsFilterDispatch must be used within a BookingsProvider');
   }
   return context;
 };

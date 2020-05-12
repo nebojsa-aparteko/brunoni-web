@@ -9,8 +9,10 @@ import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
-import { useQuotesContext, useQuotesFilterDispatch } from '../../providers/QuotesProvider';
+import { useQuotesContext } from '../../providers/QuotesProvider';
 import UserRecord from '../../model/UserRecord';
+import flow from 'lodash/fp/flow';
+import set from 'lodash/fp/set';
 
 interface Props {
   showClientFilter?: boolean;
@@ -22,28 +24,23 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
   const clients = useClients();
   const ports = useContext(Ports);
 
-  const quotesFilterDispatch = useQuotesFilterDispatch();
-
-  const filters = useQuotesContext()[2];
+  const [_, isLoading, filters, setFilters] = useQuotesContext();
 
   const { clientFilter, originPort, destinationPort, dateRange } = filters;
 
-  const setOriginPort = (port: Port | null) =>
-    quotesFilterDispatch({
-      type: port ? 'set' : 'clear',
-      field: 'originPort',
-      value: port || undefined,
-    });
+  const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
+
   const setDestinationPort = (port: Port | null) =>
-    quotesFilterDispatch({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
+    setFilters && setFilters(set('destinationPort', port || undefined)(filters));
+
   const setClientFilter = (client: Client | null) =>
-    quotesFilterDispatch({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
+    setFilters && setFilters(set('clientFilter', client || undefined)(filters));
 
   const setUserFilter = (user: UserRecord | null) =>
-    quotesFilterDispatch({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
+    setFilters && setFilters(set('assignee', user || undefined)(filters));
 
   const setDateRange = (dateRange: DateRange) =>
-    quotesFilterDispatch({ type: 'set', field: 'dateRange', value: dateRange });
+    setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));
 
   return (
     <Box

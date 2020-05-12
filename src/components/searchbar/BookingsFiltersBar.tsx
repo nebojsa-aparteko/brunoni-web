@@ -9,7 +9,7 @@ import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
-import { useBookingsContext, useBookingsFilterDispatch } from '../../providers/BookingsProvider';
+import { useBookingsContext } from '../../providers/BookingsProvider';
 import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';

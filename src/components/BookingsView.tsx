@@ -26,7 +26,7 @@ import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
 import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
-import { BookingContextFilters, useBookingsContext, useBookingsFilterDispatch } from '../providers/BookingsProvider';
+import { BookingContextFilters, useBookingsContext } from '../providers/BookingsProvider';
 import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 
@@ -183,7 +183,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   //   );
   // }
 
-  console.log('bookings ', chunk(10)(bookings?.map(item => [item['ERP-BkgRef'], item.updatedAt])));
+  console.log('bookings ', chunk(10)(bookings?.map(item => [item['ERP-BkgRef'], item.pendingPayment])));
 
   return (
     <Fragment>
