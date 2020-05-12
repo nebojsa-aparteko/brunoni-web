@@ -6,6 +6,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
 import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
+import TeamsAssigneeContainer from '../components/teams/TeamsAssigneeContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -38,6 +39,8 @@ const TeamManagementPage: React.FC = () => {
         break;
       case 1:
         break;
+      case 2:
+        break;
       default:
         break;
     }
@@ -55,9 +58,9 @@ const TeamManagementPage: React.FC = () => {
             aria-label="Team management tabs"
             className={classes.tabs}
           >
-            <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(1)} />
-            <Tab icon={<PeopleIcon />} label="Assignee" {...a11yProps(2)} />
-            <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
+            <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(0)} />
+            <Tab icon={<PersonIcon />} label="Users" {...a11yProps(1)} />
+            <Tab icon={<PersonIcon />} label="Assignee" {...a11yProps(2)} />
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
@@ -67,8 +70,9 @@ const TeamManagementPage: React.FC = () => {
         <TabPanel value={selectedTab} index={1}>
           <TeamsUsersContainer />
         </TabPanel>
+
         <TabPanel value={selectedTab} index={2}>
-          <TeamsUsersContainer />
+          <TeamsAssigneeContainer />
         </TabPanel>
       </Box>
     </Fragment>
