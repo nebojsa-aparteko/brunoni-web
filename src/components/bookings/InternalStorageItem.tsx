@@ -45,13 +45,7 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
   const [removalInProgress, setRemovalInProgress] = useState(false);
   return (
     <ListItem>
-      <a
-        href={item.url}
-        download={item.name}
-        rel="noopener noreferrer"
-        className={classes.fileItemLink}
-        target="_blank"
-      >
+      <a href={item.url} download={item.name} rel="noopener noreferrer" className={classes.fileItemLink}>
         <ListItemAvatar>
           <Avatar color="primary">
             <DescriptionIcon />
