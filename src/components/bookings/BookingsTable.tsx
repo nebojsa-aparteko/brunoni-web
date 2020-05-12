@@ -3,6 +3,7 @@ import React, { Fragment, useCallback, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
   Box,
+  Card,
   Container as MUIContainer,
   createStyles,
   Dialog,
@@ -15,7 +16,6 @@ import {
   Paper,
   Theme,
   Typography,
-  Card,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import formatDate from 'date-fns/format';
@@ -28,10 +28,9 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import { DateFormats, formatDateSafe, formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import { useClientByIdFromCache, useClientById } from '../../hooks/useClient';
+import { useClientByIdFromCache } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
 
 const useStyles = makeStyles(() =>
@@ -374,7 +373,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
               <Grid item style={{ width: '55%' }}>
                 <InfoBoxItem
                   title="Last updated"
-                  label1={formatDistanceToNow(booking.updatedAt, { includeSeconds: true, addSuffix: true })}
+                  label1={formatDistanceToNowConfigured(booking.updatedAt)}
                   gutterBottom
                 />
               </Grid>

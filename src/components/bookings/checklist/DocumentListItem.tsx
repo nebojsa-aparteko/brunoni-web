@@ -15,7 +15,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import DescriptionIcon from '@material-ui/icons/Description';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
@@ -39,6 +38,7 @@ import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
 import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -225,12 +225,12 @@ const DocumentListItem = ({
             secondary={
               <span>
                 <Typography variant="caption">
-                  {`${formatDistanceToNow(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
+                  {`${formatDistanceToNowConfigured(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
                 </Typography>
                 <br />
                 {item.status?.at && (
                   <Typography variant="caption">
-                    {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNow(
+                    {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNowConfigured(
                       invoke('toDate')(item.status.at),
                     )} by ${item.status?.by?.firstName}`}
                   </Typography>

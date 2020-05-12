@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, createStyles, makeStyles } from '@materi
 import Comment from '../bookings/checklist/Comment';
 import Notification, { NotificationType } from '../../model/Notification';
 import firebase from 'firebase';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { useHistory } from 'react-router';
 import Activity from '../bookings/checklist/Activity';
 import Alert from './Alert';
+import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -55,7 +55,7 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
     <Card className={classes.root} {...other}>
       <CardHeader
         title={<NotificationTitle notification={notification} />}
-        subheader={formatDistanceToNow(notification.at)}
+        subheader={formatDistanceToNowConfigured(notification.at)}
         className={classes.header}
         /*action={
         <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>

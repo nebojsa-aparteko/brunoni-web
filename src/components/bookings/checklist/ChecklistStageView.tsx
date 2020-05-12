@@ -1,9 +1,9 @@
 import React from 'react';
 import { Stage } from './ChecklistItemModel';
-import { Box, FormControlLabel, Checkbox, Typography } from '@material-ui/core';
+import { Box, Checkbox, FormControlLabel, Typography } from '@material-ui/core';
 import { capitalCase } from 'change-case';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import safeInvoke from '../../../utilities/safeInvoke';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 
 const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
   return (
@@ -24,7 +24,7 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
       />
       {stage.checked && stage.by && stage.at && (
         <Typography color="textSecondary" variant="caption">
-          by {capitalCase(stage.by?.firstName)} {formatDistanceToNow(safeInvoke('toDate')(stage.at))} ago
+          by {capitalCase(stage.by?.firstName)} {formatDistanceToNowConfigured(safeInvoke('toDate')(stage.at))} ago
         </Typography>
       )}{' '}
     </Box>

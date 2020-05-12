@@ -1,11 +1,11 @@
 import React from 'react';
-import { Box, Typography, Paper, makeStyles, Theme, createStyles } from '@material-ui/core';
+import { Box, createStyles, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem } from './ActivityModel';
 import classNames from 'classnames';
 import asArray from '../../../utilities/asArray';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,7 +71,7 @@ const Comment = ({ comment, ...other }: CommentProp) => {
               <Typography className={classes.name} color="textPrimary">
                 {`${capitalCase(comment.by.firstName)} ${capitalCase(comment.by.lastName)}`}
               </Typography>
-              <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(
+              <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(
                 comment.at,
               )} ago`}</Typography>
             </Box>

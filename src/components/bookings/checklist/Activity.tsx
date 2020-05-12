@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -64,7 +64,9 @@ const Activity = ({ activity, ...other }: Props) => (
     <Box display="flex" flexDirection="column" ml={1}>
       {/*<Typography variant="body1">{activity.comment}</Typography>*/}
       {makeActivityRepresentation(activity)}
-      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNow(activity.at)} ago`}</Typography>
+      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(
+        activity.at,
+      )} ago`}</Typography>
     </Box>
   </Box>
 );

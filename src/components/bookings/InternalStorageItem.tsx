@@ -12,12 +12,12 @@ import {
   Typography,
 } from '@material-ui/core';
 import DescriptionIcon from '@material-ui/icons/Description';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import safeInvoke from '../../utilities/safeInvoke';
+import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -56,7 +56,9 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
           primary={item.name}
           secondary={
             <Typography variant="caption">
-              {`${formatDistanceToNow(safeInvoke('toDate')(item.uploadedAt))} by ${item.uploadedBy.firstName}`}
+              {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
+                item.uploadedBy.firstName
+              }`}
             </Typography>
           }
         />

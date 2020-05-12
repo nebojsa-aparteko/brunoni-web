@@ -1,4 +1,5 @@
 import formatDate from 'date-fns/format';
+import { formatDistanceToNow } from 'date-fns';
 
 export enum DateFormats {
   SHORT_HUMAN = 'd. MMMM',
@@ -17,3 +18,6 @@ export const formatDateSafe = (date: Date, dateFormat: DateFormats | string) => 
     return '???';
   }
 };
+
+export const formatDistanceToNowConfigured = (date: Date) =>
+  formatDistanceToNow(date, { includeSeconds: true, addSuffix: true });
