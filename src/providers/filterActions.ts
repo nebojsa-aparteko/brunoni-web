@@ -44,6 +44,8 @@ export type Action = {
   value?: DateRange | boolean | string | undefined | Port | Client | UserRecord;
 };
 
+export type ActionValues = {};
+
 export const reducer = <T extends ContextFilters>(state: T, action: Action): T => {
   switch (action.type) {
     case 'set':

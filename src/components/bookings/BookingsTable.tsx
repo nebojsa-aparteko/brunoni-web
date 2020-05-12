@@ -225,7 +225,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   )(Box);
 
   return (
-    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(booking.id)} key={booking.id}>
+    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(booking.id)}>
       <Grid container spacing={2} style={{ paddingTop: '10px' }}>
         <Grid item lg={12} xs={12}>
           {booking && booking['ERP-BkgRef'] ? (
@@ -374,7 +374,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
               <Grid item style={{ width: '55%' }}>
                 <InfoBoxItem
                   title="Last updated"
-                  label1={formatDistanceToNow(booking.updatedAt) + ' ago'}
+                  label1={formatDistanceToNow(booking.updatedAt, { includeSeconds: true, addSuffix: true })}
                   gutterBottom
                 />
               </Grid>

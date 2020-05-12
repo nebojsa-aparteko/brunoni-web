@@ -13,6 +13,7 @@ import { useBookingsContext, useBookingsFilterDispatch } from '../../providers/B
 import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
+import set from 'lodash/fp/set';
 
 interface Props {
   showClientFilter?: boolean;
@@ -31,28 +32,21 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const users = useAdminUsers();
   const ports = useContext(Ports);
 
-  const bookingFilterDispach = useBookingsFilterDispatch();
-
   const filters = useBookingsContext()[2];
+  const setFilters = useBookingsContext()[3]!;
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
 
-  const setOriginPort = (port: Port | null) =>
-    bookingFilterDispach({
-      type: port ? 'set' : 'clear',
-      field: 'originPort',
-      value: port || undefined,
-    });
-  const setDestinationPort = (port: Port | null) =>
-    bookingFilterDispach({ type: port ? 'set' : 'clear', field: 'destinationPort', value: port || undefined });
-  const setClientFilter = (client: Client | null) =>
-    bookingFilterDispach({ type: client ? 'set' : 'clear', field: 'clientFilter', value: client || undefined });
+  const setOriginPort = (port: Port | null) => setFilters(set('originPort', port || undefined)(filters));
 
-  const setUserFilter = (user: UserRecord | null) =>
-    bookingFilterDispach({ type: user ? 'set' : 'clear', field: 'assignee', value: user || undefined });
+  const setDestinationPort = (port: Port | null) => setFilters(set('destinationPort', port || undefined)(filters));
 
-  const setDateRange = (dateRange: DateRange) =>
-    bookingFilterDispach({ type: 'set', field: 'dateRange', value: dateRange });
+  const setClientFilter = (client: Client | null) => setFilters(set('clientFilter', client || undefined)(filters));
+
+  const setUserFilter = (user: UserRecord | null) => setFilters(set('assignee', user || undefined)(filters));
+
+  const setDateRange = (dateRange: DateRange) => setFilters(set('dateRange', dateRange || undefined)(filters));
+
   return (
     <Box
       display="flex"

@@ -1,4 +1,4 @@
-import React, { createContext, Reducer, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking, BookingCategory } from '../model/Booking';
@@ -7,10 +7,11 @@ import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import pick from 'lodash/fp/pick';
-import isEqual from 'lodash/fp/isEqual';
+import orderBy from 'lodash/fp/orderBy';
 import ActingAs from '../contexts/ActingAs';
-import { Action, ContextFilters, reducer } from './filterActions';
+import { ContextFilters } from './filterActions';
 import { UserRecordMinProperties } from '../model/UserRecord';
+import get from 'lodash/fp/get';
 
 interface Props {
   children: React.ReactNode;
@@ -28,7 +29,7 @@ export const normalizeBooking = flow(
 
 export const normalizeBookings = map(normalizeBooking);
 
-export type BookingsDispatch = (action: Action) => void;
+export type BookingsDispatch = Dispatch<SetStateAction<BookingContextFilters>>;
 
 export interface BookingContextFilters extends ContextFilters {
   category: string;
@@ -37,8 +38,9 @@ export interface BookingContextFilters extends ContextFilters {
 const defaultFilters = { archived: false, category: BookingCategory.Export } as BookingContextFilters;
 
 const BookingsContext = createContext<
-  [Booking[], boolean, BookingContextFilters] | [undefined, boolean, BookingContextFilters]
->([undefined, true, defaultFilters]);
+  [Booking[] | undefined, boolean, BookingContextFilters, Dispatch<SetStateAction<BookingContextFilters>> | undefined]
+>([undefined, true, defaultFilters, undefined]);
+
 const BookingsFilterDispatchContext = createContext<BookingsDispatch | undefined>(undefined);
 
 export const useBookingsContext = () => {
@@ -63,14 +65,12 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [filters, dispatch] = useReducer<Reducer<BookingContextFilters, Action>>(reducer, {
+  const [filters, setFilters] = useState<BookingContextFilters>({
     archived: false,
     category: BookingCategory.Export,
     pendingPayment: false,
     assignee: !actingAs && userRecord,
   } as BookingContextFilters);
-
-  // const [filtersPreviousVal, setFiltersPreviousVal] = useState<BookingContextFilters | undefined>(undefined);
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
@@ -129,6 +129,8 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');
 
+      console.log('query rebuild', filters, query);
+
       return query;
     },
     [userRecord, filters, actingAs],
@@ -149,8 +151,8 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
   }, [bookingsSnapshot]);
 
   return (
-    <BookingsContext.Provider value={[bookingsResult, isLoading, filters]}>
-      <BookingsFilterDispatchContext.Provider value={dispatch}>{children}</BookingsFilterDispatchContext.Provider>
+    <BookingsContext.Provider value={[bookingsResult, isLoading, filters, setFilters]}>
+      {children}
     </BookingsContext.Provider>
   );
 };

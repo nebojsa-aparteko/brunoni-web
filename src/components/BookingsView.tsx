@@ -102,9 +102,9 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
   const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
 
-  const bookingFilterDispach = useBookingsFilterDispatch();
+  const [_, isLoading, bookingFilters, setBookingFilters] = useBookingsContext();
 
-  const { assignee } = useBookingsContext()[2];
+  const { assignee } = bookingFilters;
 
   const resultChunks = useMemo(() => {
     const result = filter(
@@ -147,7 +147,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   }, [bookings, searchString, page, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    bookingFilterDispach({ type: 'set', field: 'category', value: (event.target as HTMLInputElement).value });
+    setBookingFilters && setBookingFilters(set('category', (event.target as HTMLInputElement).value)(bookingFilters));
   };
 
   const handleChangePage = useCallback(
@@ -182,6 +182,8 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   //     </Paper>
   //   );
   // }
+
+  console.log('bookings ', chunk(10)(bookings?.map(item => [item['ERP-BkgRef'], item.updatedAt])));
 
   return (
     <Fragment>

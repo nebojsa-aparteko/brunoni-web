@@ -12,6 +12,7 @@ import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../prov
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
 import set from 'lodash/fp/set';
+import flow from 'lodash/fp/flow';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -71,9 +72,7 @@ const BookingsPage: React.FC = () => {
   const [bookingsContextData, setBookingsContextData] = useContext(BookingListFilterContext);
   const selectedTab = bookingsContextData.activeTab;
 
-  const bookingFilterDispach = useBookingsFilterDispatch();
-
-  const [bookings, isLoading, filters] = useBookingsContext();
+  const [bookings, isLoading, filters, setFilters] = useBookingsContext();
 
   useEffect(() => {
     if (bookingsContextData.activeTab) {
@@ -93,19 +92,22 @@ const BookingsPage: React.FC = () => {
 
     switch (newValue) {
       case 0:
-        bookingFilterDispach({ type: 'set', field: 'archived', value: false });
-        bookingFilterDispach({ type: 'set', field: 'pendingPayment', value: false });
-        bookingFilterDispach({ type: 'clear', field: 'dateRange' });
+        setFilters &&
+          setFilters(flow(set('archived', false), set('pendingPayment', false), set('dateRange', undefined))(filters));
         break;
       case 1:
-        bookingFilterDispach({ type: 'set', field: 'archived', value: false });
-        bookingFilterDispach({ type: 'set', field: 'pendingPayment', value: true });
-        bookingFilterDispach({ type: 'clear', field: 'dateRange' });
+        setFilters &&
+          setFilters(flow(set('archived', false), set('pendingPayment', true), set('dateRange', undefined))(filters));
         break;
       case 2:
-        bookingFilterDispach({ type: 'set', field: 'archived', value: true });
-        bookingFilterDispach({ type: 'set', field: 'dateRange', value: INITIAL_DATERANGE_FILTER });
-        bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
+        setFilters &&
+          setFilters(
+            flow(
+              set('archived', true),
+              set('pendingPayment', undefined),
+              set('dateRange', INITIAL_DATERANGE_FILTER),
+            )(filters),
+          );
         break;
       default:
         break;
@@ -115,13 +117,16 @@ const BookingsPage: React.FC = () => {
   useEffect(() => {
     if (actingAs) {
       // we are acting as a customer set a date range:
-      if (!filters.dateRange) {
-        bookingFilterDispach({ type: 'set', field: 'dateRange', value: LAST_3_MONTHS });
-      }
-      bookingFilterDispach({ type: 'clear', field: 'archived' });
-      bookingFilterDispach({ type: 'clear', field: 'pendingPayment' });
+      setFilters &&
+        setFilters(
+          flow(
+            set('archived', undefined),
+            set('pendingPayment', undefined),
+            set('dateRange', !filters.dateRange ? LAST_3_MONTHS : filters.dateRange),
+          )(filters),
+        );
     }
-  }, [actingAs, bookingFilterDispach]);
+  }, [actingAs, setFilters]);
 
   return (
     <Fragment>
