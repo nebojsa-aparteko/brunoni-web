@@ -56,6 +56,7 @@ const TeamManagementPage: React.FC = () => {
             className={classes.tabs}
           >
             <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(1)} />
+            <Tab icon={<PeopleIcon />} label="Assignee" {...a11yProps(2)} />
             <Tab icon={<PersonIcon />} label="Users" {...a11yProps(0)} />
           </Tabs>
         </Paper>
@@ -64,6 +65,9 @@ const TeamManagementPage: React.FC = () => {
         </TabPanel>
 
         <TabPanel value={selectedTab} index={1}>
+          <TeamsUsersContainer />
+        </TabPanel>
+        <TabPanel value={selectedTab} index={2}>
           <TeamsUsersContainer />
         </TabPanel>
       </Box>
