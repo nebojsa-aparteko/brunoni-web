@@ -30,7 +30,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
 import { DateFormats, formatDateSafe, formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import { useClientByIdFromCache } from '../../hooks/useClient';
+import { useClientById, useClientByIdFromCache } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
 
 const useStyles = makeStyles(() =>
@@ -200,7 +200,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
 
-  const client = useClientByIdFromCache(booking?.ForwAdrId);
+  const client = useClientById(booking?.ForwAdrId);
 
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
@@ -263,8 +263,8 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
               {isAdmin && (
                 <InfoBoxItem
                   title="Client"
-                  label1={client ? client.name : ''}
-                  label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : ''}
+                  label1={client ? client.name : booking.ForwAdrName || ''}
+                  label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : booking.ForwAdrCity || ''}
                   gutterBottom
                 />
               )}
