@@ -417,7 +417,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
         </MUIContainer>
       ) : (
         bookings.map(booking => (
-          <Card className={classes.card} key={`booking-row-${booking.id}`}>
+          <Card className={classes.card} key={booking.id}>
             <BookingRow
               isAdmin={isAdmin}
               booking={booking}
