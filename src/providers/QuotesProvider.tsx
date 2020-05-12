@@ -55,11 +55,9 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
         query = (query || collection).where('clientId', '==', userRecord!.alphacomClientId);
       }
 
-      // admins have different filters, clients should default to seeing all
-      // TODO add archived when ready
-      // if (!actingAs) {
-      //   query = query.where('archived', '==', filters.archived);
-      // }
+      if (filters.archived) {
+        query = (query || collection).where('archived', '==', filters.archived);
+      }
 
       if (filters.assignee) {
         query = (query || collection).where('assignee', '==', filters.assignee.alphacomId);
