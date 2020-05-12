@@ -149,59 +149,66 @@ const QuoteGroupsView: React.FC<Props> = ({
       setQuoteListContextData(flow(set('searchString', searchStringNew), set('page', 0))(quoteListContextData));
     }
   };
-
-  if (!quoteGroups) {
-    return (
-      <Paper className={classes.root}>
-        <ChartsCircularProgress />
-      </Paper>
-    );
-  }
+  //
+  // if (!quoteGroups) {
+  //   return (
+  //     <Paper className={classes.root}>
+  //       <ChartsCircularProgress />
+  //     </Paper>
+  //   );
+  // }
 
   return (
     <Fragment>
       <QuotesFiltersBar showClientFilter={showCompanyInfo} showDateRange={showDateFilter} showRefreshButton />
-
-      <Card className={className} {...rest}>
-        <CardHeader
-          title={
-            <Box display="flex" alignItems="center">
-              <Typography variant="subtitle1" display="inline">
-                Quotes
-              </Typography>
-              {showGetQuoteButton && (
-                <Box ml={4}>
-                  <GetQuotesButton />
+      {quoteGroups ? (
+        <Fragment>
+          <Card className={className} {...rest}>
+            <CardHeader
+              title={
+                <Box display="flex" alignItems="center">
+                  <Typography variant="subtitle1" display="inline">
+                    Quotes
+                  </Typography>
+                  {showGetQuoteButton && (
+                    <Box ml={4}>
+                      <GetQuotesButton />
+                    </Box>
+                  )}
+                  <Box flex={1} />
+                  <Search
+                    onSearch={handleSearch}
+                    style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
+                  />
                 </Box>
-              )}
-              <Box flex={1} />
-              <Search
-                onSearch={handleSearch}
-                style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
-              />
-            </Box>
-          }
-        />
-        <CardContent className={classes.content}>
-          <QuoteGroupsTable
-            showCompanyInfo={showCompanyInfo}
-            quoteGroups={resultChunks && (get(page)(resultChunks) || [])}
-          />
-        </CardContent>
-        <CardActions className={classes.actions}>
-          {quoteGroups && quoteGroups.length > 0 && (
-            <TablePagination
-              component="div"
-              count={filteredResults ? filteredResults.length : 0}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              rowsPerPageOptions={[5, 10, 25]}
+              }
             />
-          )}
-        </CardActions>
-      </Card>
+            <CardContent className={classes.content}>
+              <QuoteGroupsTable
+                showCompanyInfo={showCompanyInfo}
+                quoteGroups={resultChunks && (get(page)(resultChunks) || [])}
+              />
+            </CardContent>
+            <CardActions className={classes.actions}>
+              {quoteGroups && quoteGroups.length > 0 && (
+                <TablePagination
+                  component="div"
+                  count={filteredResults ? filteredResults.length : 0}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={[5, 10, 25]}
+                />
+              )}
+            </CardActions>
+          </Card>
+        </Fragment>
+      ) : (
+        <Paper className={classes.root}>
+          <ChartsCircularProgress />
+        </Paper>
+      )}
     </Fragment>
   );
 };
