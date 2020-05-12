@@ -9,7 +9,6 @@ import { firestore } from 'firebase';
 import asArray from '../../utilities/asArray';
 import useTeams from '../../hooks/useTeams';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 
 interface Props {
   user: UserRecord;
@@ -49,7 +48,7 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
       <TableCell align="right">{user.role}</TableCell>
       <TableCell align="right">{teams && teams.map(team => team.name).join(',')}</TableCell>
       <TableCell align="right">
-        {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}
+        {user.lastSession ? formatDistanceToNow(invoke('toDate')(user.lastSession)) : 'never'}
       </TableCell>
     </TableRow>
   );
