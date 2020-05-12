@@ -175,13 +175,13 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
     [setBookingsContextData, bookingsContextData, searchString],
   );
 
-  if (!bookings) {
-    return (
-      <Paper className={classes.root}>
-        <ChartsCircularProgress />
-      </Paper>
-    );
-  }
+  // if (!bookings) {
+  //   return (
+  //     <Paper className={classes.root}>
+  //       <ChartsCircularProgress/>
+  //     </Paper>
+  //   );
+  // }
 
   return (
     <Fragment>
@@ -190,66 +190,74 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
       <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter={isAdmin} />
 
       <div>
-        <Card>
-          <CardHeader
-            title={
-              <Box display="flex" alignItems="center">
-                <Typography variant="subtitle1" display="inline">
-                  Bookings {archived && '- Archive'}
-                </Typography>
-                <Divider orientation="vertical" style={{ height: '100%' }} />
-                <RadioGroup
-                  aria-label="importexport"
-                  name="importexport"
-                  value={bookingContextFilters.category}
-                  onChange={handleImportOrExportChange}
-                  className={classes.importOrExport}
-                >
-                  <FormControlLabel value="Export" control={<Radio />} label="Export" />
-                  <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
-                </RadioGroup>
-
-                <Box flex={1} />
-
-                <Search
-                  onSearch={handleSearch}
-                  style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
-                />
-              </Box>
-            }
-          />
-        </Card>
-
-        {bookings.length === 0 && (
-          <BookingsEmptyResults
-            message={
-              assignee
-                ? 'There are no bookings that might need your attention at the moment. ' +
-                  'You can use filters bar or quick search (ctrl+g on keyboard) to find what you might be looking for.'
-                : 'No bookings found for your filter criteria. Try chaning filters.'
-            }
-          />
-        )}
-        {bookings.length > 0 && (
+        {bookings ? (
           <Fragment>
-            <CardContent className={classes.content}>
-              <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
-            </CardContent>
+            <Card>
+              <CardHeader
+                title={
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="subtitle1" display="inline">
+                      Bookings {archived && '- Archive'}
+                    </Typography>
+                    <Divider orientation="vertical" style={{ height: '100%' }} />
+                    <RadioGroup
+                      aria-label="importexport"
+                      name="importexport"
+                      value={bookingContextFilters.category}
+                      onChange={handleImportOrExportChange}
+                      className={classes.importOrExport}
+                    >
+                      <FormControlLabel value="Export" control={<Radio />} label="Export" />
+                      <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
+                    </RadioGroup>
 
-            <CardActions className={classes.actions}>
-              {bookings && bookings.length > 0 && bookings.length > rowsPerPage && (
-                <TablePagination
-                  component="div"
-                  count={filteredResults ? filteredResults.length : 0}
-                  onChangePage={handleChangePage}
-                  onChangeRowsPerPage={handleChangeRowsPerPage}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                  rowsPerPageOptions={[10, 25, 50]}
-                />
-              )}
-            </CardActions>
+                    <Box flex={1} />
+
+                    <Search
+                      onSearch={handleSearch}
+                      style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
+                    />
+                  </Box>
+                }
+              />
+            </Card>
+
+            {bookings.length === 0 && (
+              <BookingsEmptyResults
+                message={
+                  assignee
+                    ? 'There are no bookings that might need your attention at the moment. ' +
+                      'You can use filters bar or quick search (ctrl+g on keyboard) to find what you might be looking for.'
+                    : 'No bookings found for your filter criteria. Try chaning filters.'
+                }
+              />
+            )}
+            {bookings.length > 0 && (
+              <Fragment>
+                <CardContent className={classes.content}>
+                  <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
+                </CardContent>
+
+                <CardActions className={classes.actions}>
+                  {bookings && bookings.length > 0 && bookings.length > rowsPerPage && (
+                    <TablePagination
+                      component="div"
+                      count={filteredResults ? filteredResults.length : 0}
+                      onChangePage={handleChangePage}
+                      onChangeRowsPerPage={handleChangeRowsPerPage}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      rowsPerPageOptions={[10, 25, 50]}
+                    />
+                  )}
+                </CardActions>
+              </Fragment>
+            )}
           </Fragment>
+        ) : (
+          <Paper className={classes.root}>
+            <ChartsCircularProgress />
+          </Paper>
         )}
       </div>
     </Fragment>
