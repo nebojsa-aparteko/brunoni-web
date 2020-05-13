@@ -126,7 +126,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <QuickSearchBooking
             label="Customer's reference"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings', 'StatClientRef', inputValue)}
+            searchBookings={inputValue => searchBookings('bookings', 'Cust-BkgRef', inputValue)}
           />
           <QuickSearchBooking
             label="Container number"
