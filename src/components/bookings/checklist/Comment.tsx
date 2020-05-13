@@ -73,7 +73,7 @@ const Comment = ({ comment, ...other }: CommentProp) => {
               </Typography>
               <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(
                 comment.at,
-              )} ago`}</Typography>
+              )}`}</Typography>
             </Box>
             <Typography style={{ wordBreak: 'break-word' }}>
               {/*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*/}

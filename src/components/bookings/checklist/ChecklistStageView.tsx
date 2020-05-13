@@ -24,7 +24,7 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
       />
       {stage.checked && stage.by && stage.at && (
         <Typography color="textSecondary" variant="caption">
-          by {capitalCase(stage.by?.firstName)} {formatDistanceToNowConfigured(safeInvoke('toDate')(stage.at))} ago
+          by {capitalCase(stage.by?.firstName)} {formatDistanceToNowConfigured(safeInvoke('toDate')(stage.at))}
         </Typography>
       )}{' '}
     </Box>

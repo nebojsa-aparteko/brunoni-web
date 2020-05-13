@@ -39,8 +39,8 @@ const TeamManagementPage: React.FC = () => {
         break;
       case 1:
         break;
-      case 2:
-        break;
+      // case 2:
+      //   break;
       default:
         break;
     }
@@ -60,7 +60,7 @@ const TeamManagementPage: React.FC = () => {
           >
             <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(0)} />
             <Tab icon={<PersonIcon />} label="Users" {...a11yProps(1)} />
-            <Tab icon={<PersonIcon />} label="Assignee" {...a11yProps(2)} />
+            {/*<Tab icon={<PersonIcon />} label="Assignee" {...a11yProps(2)} />*/}
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
@@ -71,9 +71,9 @@ const TeamManagementPage: React.FC = () => {
           <TeamsUsersContainer />
         </TabPanel>
 
-        <TabPanel value={selectedTab} index={2}>
-          <TeamsAssigneeContainer />
-        </TabPanel>
+        {/*<TabPanel value={selectedTab} index={2}>*/}
+        {/*  <TeamsAssigneeContainer />*/}
+        {/*</TabPanel>*/}
       </Box>
     </Fragment>
   );

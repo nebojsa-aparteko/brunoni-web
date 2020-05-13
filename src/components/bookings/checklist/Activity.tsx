@@ -64,9 +64,7 @@ const Activity = ({ activity, ...other }: Props) => (
     <Box display="flex" flexDirection="column" ml={1}>
       {/*<Typography variant="body1">{activity.comment}</Typography>*/}
       {makeActivityRepresentation(activity)}
-      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(
-        activity.at,
-      )} ago`}</Typography>
+      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(activity.at)}`}</Typography>
     </Box>
   </Box>
 );
