@@ -46,6 +46,7 @@ import UserAssignment from './UserAssignment';
 import InternalStorage from './bookings/InternalStorage';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
 import { formatDateSafe } from '../utilities/formattingHelpers';
+import { useSnackbar } from 'notistack';
 
 interface Props {
   quote?: Quote;
@@ -139,6 +140,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   const [user, userData] = useUser();
   const clients = useClients();
+  const { enqueueSnackbar } = useSnackbar();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -236,11 +238,15 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
     // do something with this
     addAssignee(user, quoteId)
       .then(_ => {
-        {
-          console.log('Success assignee');
-        }
+        enqueueSnackbar(<Typography color="inherit">Saved user successfully!</Typography>, {
+          variant: 'success',
+        });
+        console.log('Success assignee');
       })
-      .catch(error => console.log(`Error while assignment in quote ${error}`));
+      .catch(error => {
+        console.log(`Error while assignment in quote ${error}`);
+        enqueueSnackbar(<Typography color="inherit">{`There was an error ${error}`}</Typography>, { variant: 'error' });
+      });
   };
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {

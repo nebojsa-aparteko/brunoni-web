@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Box,
   createStyles,
@@ -20,6 +20,7 @@ import useClientUsers from '../../hooks/useClientUsers';
 import pick from 'lodash/fp/pick';
 import uniqBy from 'lodash/fp/uniqBy';
 import asArray from '../../utilities/asArray';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -114,6 +115,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
   const classes = useStyles();
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(booking.ForwAdrId);
+  const { enqueueSnackbar } = useSnackbar();
 
   const watchers = booking.watchers
     ? booking.watchers.filter(
@@ -121,6 +123,18 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
       )
     : [];
 
+  const handleResponse = useCallback(
+    (fn: Promise<any>) => {
+      fn.then(_ =>
+        enqueueSnackbar(<Typography color="inherit">Saved user successfully!</Typography>, {
+          variant: 'success',
+        }),
+      ).catch(error =>
+        enqueueSnackbar(<Typography color="inherit">{`There was an error ${error}`}</Typography>, { variant: 'error' }),
+      );
+    },
+    [enqueueSnackbar],
+  );
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">
       <Box className={classes.dialogBody}>
@@ -142,7 +156,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Agent"
               users={assignableUsers || []}
-              onChange={user => handleChangeAgent(booking.id, user, booking.watchers)}
+              onChange={user => handleResponse(handleChangeAgent(booking.id, user, booking.watchers))}
             />
           </Box>
           <Box my={1}>
@@ -157,14 +171,16 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Client"
               users={assignableCustomers || []}
-              onChange={user => handleChangeCustomer(booking.id, user, booking.watchers)}
+              onChange={user => handleResponse(handleChangeCustomer(booking.id, user, booking.watchers))}
             />
           </Box>
           <Box my={1}>
             <WatchersChipMultiInput
               options={assignableUsers || []}
               onChange={(_, value) =>
-                handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser)
+                handleResponse(
+                  handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser),
+                )
               }
               values={watchers}
             />
