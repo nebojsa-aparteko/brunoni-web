@@ -10,6 +10,7 @@ export default interface LoadListContainerModel {
   vessel?: string;
   sealNum?: string;
   status?: string;
+  pol?: string;
   deliveryRef?: string;
   checklistCheckedCount?: number;
   checklistItemCount?: number;
