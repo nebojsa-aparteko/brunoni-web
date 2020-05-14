@@ -26,6 +26,7 @@ import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import LoadListContainerModel from '../../../model/LoadListContainerModel';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
+import VesselVoyageContainer from '../../vesselWithVoyage/VesselVoyageContainer';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -129,8 +130,7 @@ const LoadListContainer = () => {
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
         Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (
-          <Fragment>
-            {console.log(normalizedContainers)}
+          <Fragment key={`date-loadList-${date}`}>
             {Object.entries(items).map(([pol, items]: any, index: number) => (
               <Card key={`mapitemid-${index}`} style={{ marginBottom: '2em' }}>
                 <CardHeader title={`${date} ${pol}`} />

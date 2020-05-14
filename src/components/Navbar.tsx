@@ -243,6 +243,7 @@ const Navbar: React.FC = () => {
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
                     <ButtonMenuItem primary="Schedule" to="/schedule" />
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
+                    <ButtonMenuItem primary="Vessel" to="/vessel" />
 
                     {isDashboardUser(userRecord) && <ButtonMenuItem primary="Bookings" to="/bookings" />}
 
@@ -274,8 +275,31 @@ const Navbar: React.FC = () => {
 
                     {actingAs === null && (
                       <Fragment>
-                        <ButtonMenuItem primary="Side Charges" to="/charges" />
-                        {isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}
+                        <div className={classes.item}>
+                          <Button
+                            endIcon={<KeyboardArrowDownIcon />}
+                            aria-controls="configuration-menu"
+                            aria-haspopup="true"
+                            onClick={handleMenuClick}
+                          >
+                            <Typography variant="body1">Configuration</Typography>
+                          </Button>
+                        </div>
+                        <Menu
+                          id="configuration-menu"
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                          className={classes.menu}
+                          getContentAnchorEl={null}
+                        >
+                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
+                          {isSuperAdmin(userRecord) && (
+                            <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
+                          )}
+                        </Menu>
+                        {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
+                        {/*{isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}*/}
                       </Fragment>
                     )}
                   </Fragment>
@@ -369,7 +393,9 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
 
                   {isDashboardUser(userRecord) && (
-                    <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
+                    <Fragment>
+                      <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
+                    </Fragment>
                   )}
                   <ListItemLink primary="Equipment Situation" to="/equipment" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />

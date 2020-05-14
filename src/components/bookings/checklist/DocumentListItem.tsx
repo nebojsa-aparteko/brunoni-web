@@ -176,7 +176,8 @@ const DocumentListItem = ({
         const path = [storageBasePath, `${item.storedName}`].join('/');
         const storageRef = firebase.storage().ref();
         const documentRef = storageRef.child(encodeURI(path));
-
+        if (!internal && checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) === -1) {
+        }
         documentRef
           .delete()
           .then(() => {
