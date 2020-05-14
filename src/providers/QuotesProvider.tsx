@@ -63,7 +63,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.archived) {
-        query = (query || collection).where('archived', '==', filters.archived);
+        // query = (query || collection).where('archived', '==', filters.archived);
       }
 
       if (filters.assignee) {
@@ -91,10 +91,10 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
           (query || collection)
             .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
             .orderBy('validityPeriod.to', 'desc');
-
+      console.log(query);
       return query;
     },
-    [userRecord, filters, actingAs],
+    [userRecord, filters, actingAs, filtersPreviousVal],
   );
 
   const quotesSnapshot = useFirestoreCollection('quotes', query);
