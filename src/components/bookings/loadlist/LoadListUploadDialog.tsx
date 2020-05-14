@@ -46,17 +46,6 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const saveLoadListChanges = (containerId: string | undefined, item: LoadListContainerModel) => {
-  console.log(containerId);
-
-  if (!containerId) return;
-  return firebase
-    .firestore()
-    .collection('containers')
-    .doc(containerId)
-    .set(item, { merge: true });
-};
-
 const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const containers = useContainers();
