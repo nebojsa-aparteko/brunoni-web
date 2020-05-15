@@ -29,6 +29,7 @@ import containsString from '../utilities/containsString';
 import { BookingContextFilters, useBookingsContext } from '../providers/BookingsProvider';
 import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 import BookingsEmptyResults from './bookings/BookingsEmptyResults';
+import CategoryFilter from './CategoryFilter';
 
 interface Props {
   bookings?: Booking[];
@@ -202,17 +203,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
                       Bookings {archived && '- Archive'}
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
-                    <RadioGroup
-                      aria-label="importexport"
-                      name="importexport"
-                      value={bookingContextFilters.category}
-                      onChange={handleImportOrExportChange}
-                      className={classes.importOrExport}
-                    >
-                      <FormControlLabel value="Export" control={<Radio />} label="Export" />
-                      <FormControlLabel value="Import" control={<Radio />} label="Import/Crosstrade" />
-                    </RadioGroup>
-
+                    <CategoryFilter value={bookingContextFilters.category} onChange={handleImportOrExportChange} />
                     <Box flex={1} />
 
                     <Search

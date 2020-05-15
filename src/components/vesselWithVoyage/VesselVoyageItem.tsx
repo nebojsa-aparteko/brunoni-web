@@ -1,8 +1,17 @@
 import React, { Fragment } from 'react';
-import { Box, Paper, Typography } from '@material-ui/core';
+import {
+  Box,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Paper,
+  Typography,
+} from '@material-ui/core';
 import theme from '../../theme';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import firebase from '../../firebase';
 
 const SeparatorArrow = () => (
   <Box mx={4} display="flex" flexDirection="column" alignItems="center">
@@ -10,11 +19,19 @@ const SeparatorArrow = () => (
   </Box>
 );
 
+const getContainers = (bookings: string[]) =>
+  firebase
+    .firestore()
+    .collection('containers')
+    .where('bookingId', 'in', bookings);
+
 const VesselVoyageItem: React.FC<Props> = ({ vessel, items }) => {
   const entries = Object.entries(items);
 
   return (
+    // <ExpansionPanel style={{ padding: 4, marginBottom: 4 }}>
     <Paper style={{ padding: 4, marginBottom: 4 }}>
+      {/*<ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">*/}
       <Box display="flex" my={2}>
         <Box display="flex" alignItems="center">
           <DirectionsBoatIcon style={{ marginRight: theme.spacing(1) }} />
@@ -42,6 +59,8 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items }) => {
           </Fragment>
         )}
       </Box>
+      {/*</ExpansionPanelSummary>*/}
+      {/*<ExpansionPanelDetails></ExpansionPanelDetails>*/}
     </Paper>
   );
 };

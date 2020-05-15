@@ -4,7 +4,7 @@ import useFirestoreCollection from './useFirestoreCollection';
 import LoadListContainerModel from '../model/LoadListContainerModel';
 import subDays from 'date-fns/subDays';
 
-export default function useContainers() {
+export default function useContainers(q?: () => any) {
   const query = useCallback(
     q =>
       q
@@ -14,7 +14,7 @@ export default function useContainers() {
     [],
   );
 
-  const containersCollection = useFirestoreCollection('containers', query);
+  const containersCollection = useFirestoreCollection('containers', q || query);
 
   return containersCollection?.docs.map(doc => {
     return doc.data() as LoadListContainerModel;

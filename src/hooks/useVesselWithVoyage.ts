@@ -6,7 +6,7 @@ import safeInvoke from '../utilities/safeInvoke';
 import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
 
-export default function useVesselWithVoyage(query?: QueryFunction | null) {
+export default function useVesselWithVoyage(filter: string, query?: QueryFunction | null) {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
 
   useEffect(() => {
@@ -20,7 +20,8 @@ export default function useVesselWithVoyage(query?: QueryFunction | null) {
         const collectionReference = firebase
           .firestore()
           .collectionGroup('vesVoyCollection')
-          .where('ets', '>', new Date());
+          .where('ets', '>', new Date())
+          .where('category', '==', filter);
 
         // const collection = await ((query || identity)(collectionReference) as any).get();
         return collectionReference.onSnapshot({
@@ -51,7 +52,7 @@ export default function useVesselWithVoyage(query?: QueryFunction | null) {
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [query, setSnapshot]);
+  }, [query, setSnapshot, filter]);
 
   return snapshot;
 }
