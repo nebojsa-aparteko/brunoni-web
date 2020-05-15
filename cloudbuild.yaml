@@ -1,9 +1,12 @@
 steps:
-  - name: 'gcr.io/cloud-builders/yarn'
+  - name: 'node:12-alpine'
+    entrypoint: 'yarn'
     args: ['install']
-  - name: 'gcr.io/cloud-builders/yarn'
+  - name: 'node:12-alpine'
+    entrypoint: 'yarn'
     args: ['select:$_BRAND']
-  - name: 'gcr.io/cloud-builders/yarn'
+  - name: 'node:12-alpine'
+    entrypoint: 'yarn'
     args: ['build']
     env: ['REACT_APP_API_URL=$_API_URL', 'REACT_APP_ENV=$_REACT_APP_ENV']
   - name: 'eu.gcr.io/brunoni-allmarine/firebase-tools'
