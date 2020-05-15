@@ -53,45 +53,6 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [isHeaderValid, setIsHeaderValid] = useState(true);
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (!acceptedFiles.every(file => ['csv', 'xls'].includes(file.name.split('.').pop() || ''))) {
-        return enqueueSnackbar(<Typography color="inherit">File(s) must be csv type.</Typography>, {
-          variant: 'error',
-        });
-      }
-      // if (!isHeaderValid) {
-      //   setIsHeaderValid(true);
-      //   return enqueueSnackbar(
-      //     <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
-      //     {
-      //       variant: 'error',
-      //     },
-      //   );
-      // }
-      acceptedFiles.forEach(file => parseCSV(file));
-    },
-    [isHeaderValid],
-  );
-
-  useEffect(() => {
-    if (!isHeaderValid) {
-      enqueueSnackbar(
-        <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
-        {
-          variant: 'error',
-        },
-      );
-    }
-  }, [isHeaderValid]);
-  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
-    onDrop,
-    noClick: true,
-  });
-  const handleLoadListPaste = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoadListInput(event.target.value);
-    console.log(event.target.value);
-  };
   const parseCSV = (input: string | File) =>
     Papa.parse(input, {
       header: true,
@@ -139,9 +100,49 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       },
     } as ParseConfig);
 
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (!acceptedFiles.every(file => ['csv', 'xls'].includes(file.name.split('.').pop() || ''))) {
+        return enqueueSnackbar(<Typography color="inherit">File(s) must be csv type.</Typography>, {
+          variant: 'error',
+        });
+      }
+      // if (!isHeaderValid) {
+      //   setIsHeaderValid(true);
+      //   return enqueueSnackbar(
+      //     <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
+      //     {
+      //       variant: 'error',
+      //     },
+      //   );
+      // }
+      acceptedFiles.forEach(file => parseCSV(file));
+    },
+    [isHeaderValid, enqueueSnackbar, parseCSV],
+  );
+
+  useEffect(() => {
+    if (!isHeaderValid) {
+      enqueueSnackbar(
+        <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
+        {
+          variant: 'error',
+        },
+      );
+    }
+  }, [isHeaderValid, enqueueSnackbar]);
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
+    onDrop,
+    noClick: true,
+  });
+  const handleLoadListPaste = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoadListInput(event.target.value);
+    console.log(event.target.value);
+  };
+
   const handleLoadListSave = useCallback(() => {
     parseCSV(loadListInput);
-  }, [containers, loadListInput, setIsHeaderValid]);
+  }, [containers, loadListInput, setIsHeaderValid, parseCSV]);
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <Box className={classes.dialogBody}>

@@ -70,9 +70,12 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   const classes = useStyles();
   const history = useHistory();
 
-  const requestedBy = useUserByAlphacomId(quotes[0].userId);
+  const requestedById = quotes[0].userId;
+  const requestedBy = useUserByAlphacomId(requestedById);
 
-  const client = useClientById(quotes[0].clientId);
+  const clientId = quotes[0].clientId;
+  const clientUserNameString = quotes[0].userNameString;
+  const client = useClientById(clientId);
 
   const clientInfo = useMemo(() => {
     if (!showCompanyInfo) {
@@ -80,20 +83,16 @@ const QuoteGroupRow: React.FC<RowProps> = ({
     }
 
     if (!client) {
-      return <TableCell>{quotes[0].clientId}</TableCell>;
+      return <TableCell>{clientId}</TableCell>;
     }
 
     return (
       <TableCell>
         {client.name}
-        <ClientRequestedByLabel
-          userRecord={requestedBy}
-          userId={quotes[0].userId}
-          userNameString={quotes[0].userNameString}
-        />
+        <ClientRequestedByLabel userRecord={requestedBy} userId={requestedById} userNameString={clientUserNameString} />
       </TableCell>
     );
-  }, [showCompanyInfo, client, quotes[0].clientId, quotes[0].userNameString]);
+  }, [showCompanyInfo, client, requestedBy, requestedById, clientId, clientUserNameString]);
 
   const handleRowClick = useCallback(
     (event: React.MouseEvent<unknown>) => {

@@ -95,7 +95,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
         })
         .catch(err => console.log(err));
     },
-    [bookingId, userRecord, isAdmin, activityLogContext],
+    [bookingId, userRecord, activityLogContext],
   );
 
   const handleShowMore = () => {

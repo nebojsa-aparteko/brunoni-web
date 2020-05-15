@@ -6,8 +6,6 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import UserRecord from '../../model/UserRecord';
 import { useClientById } from '../../hooks/useClient';
-import EditIcon from '@material-ui/icons/Edit';
-import UserAssignment from '../UserAssignment';
 
 interface Props {
   booking: Booking;
@@ -137,7 +135,7 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
         <ClientDetails forwarder={forwarder} forwarderText={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
       </Fragment>
     );
-  }, [client, booking]);
+  }, [client, booking, forwarder]);
 
   return (
     <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
@@ -207,7 +205,11 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
             <TableRow>
               <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
               <TableCell className={classes.tableCell}>
-                <a href={`mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}`} target="_blank">
+                <a
+                  href={`mailto:${bookingAgent?.emailAddress || booking?.BkgAgentContactEml}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {bookingAgent ? `${bookingAgent.firstName} ${bookingAgent.lastName}` : booking.BkgAgentContactTxt}
                 </a>
               </TableCell>

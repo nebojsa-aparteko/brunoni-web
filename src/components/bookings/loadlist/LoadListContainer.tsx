@@ -85,16 +85,16 @@ const LoadListContainer = () => {
 
   const handleProgressClick = useCallback(
     async (event: React.MouseEvent<unknown>, bookingId: string) => {
-      const bookingRef = await firebase
+      firebase
         .firestore()
         .collection('bookings')
         .doc(bookingId)
-        .get();
-      const booking: Booking = { id: bookingId, ...(bookingRef.data() as Booking) };
-      if (booking.Category === 'Export' || booking.Category === 'Import') {
-        setIsProgressDialogOpen(true);
-        setDialogData(booking);
-      }
+        .get()
+        .then(result => {
+          setIsProgressDialogOpen(true);
+          setDialogData({ id: result.id, ...result.data() } as Booking);
+        })
+        .catch(error => console.error(`Booking id ${bookingId} does not exist `, error));
     },
     [setIsProgressDialogOpen, setDialogData],
   );

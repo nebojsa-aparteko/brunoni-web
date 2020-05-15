@@ -88,7 +88,7 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
           );
       }
     },
-    [inputValue],
+    [inputValue, normalize],
   );
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
         moustrapInstance?.unbind(['enter', 'enter']);
       };
     }
-  }, [inputRef, inputValue]);
+  }, [inputRef, inputValue, fieldPath, handleQuoteSearch]);
 
   return (
     <Fragment>
