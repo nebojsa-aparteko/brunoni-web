@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import VesselVoyageContainer from '../components/vesselWithVoyage/VesselVoyageContainer';
+import Meta from '../components/Meta';
 
 const VesselWithVoyagePage = () => {
-  return <VesselVoyageContainer />;
+  return (
+    <Fragment>
+      <Meta title="Vessel Overview" />
+      <VesselVoyageContainer />
+    </Fragment>
+  );
 };
 
 export default VesselWithVoyagePage;
