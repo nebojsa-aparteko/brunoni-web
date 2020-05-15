@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Card, CardContent, CardHeader, createStyles, makeStyles } from '@material-ui/core';
+import { Box, Card, CardContent, CardHeader, Chip, createStyles, makeStyles, Typography } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import Notification, { NotificationType } from '../../model/Notification';
 import firebase from 'firebase';
@@ -13,20 +13,46 @@ const useStyles = makeStyles(theme =>
     root: {
       margin: theme.spacing(2),
     },
-    header: {},
+    header: {
+      marginTop: theme.spacing(1),
+    },
   }),
 );
 
 const NotificationTitle: React.FC<Props> = ({ notification }) => {
   const history = useHistory();
-
+  const classes = useStyles();
   return (
     <Fragment>
-      {notification.type === NotificationType.COMMENT
-        ? 'Comment left at '
-        : notification.type === NotificationType.ACTIVITY
-        ? 'Activity at '
-        : 'Alert at '}
+      <Box>
+        <Chip
+          size="small"
+          label={`${
+            notification.type === NotificationType.COMMENT
+              ? 'Comment'
+              : notification.type === NotificationType.ACTIVITY
+              ? 'Activity'
+              : 'Alert'
+          }`}
+          style={{
+            backgroundColor:
+              notification.type === NotificationType.COMMENT
+                ? '#3cb371'
+                : notification.type === NotificationType.ACTIVITY
+                ? '#00a2f2'
+                : '#f4364c',
+            color: 'white',
+          }}
+        />
+      </Box>
+      <Typography className={classes.header}>
+        {notification.type === NotificationType.COMMENT
+          ? 'Comment left at '
+          : notification.type === NotificationType.ACTIVITY
+          ? 'Activity at '
+          : 'Alert at '}
+      </Typography>
+
       <a
         style={{ cursor: 'pointer', textDecoration: 'underline' }}
         onClick={() =>
@@ -52,7 +78,7 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
   };
 
   return (
-    <Card className={classes.root} {...other}>
+    <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
       <CardHeader
         title={<NotificationTitle notification={notification} />}
         subheader={formatDistanceToNowConfigured(notification.at)}

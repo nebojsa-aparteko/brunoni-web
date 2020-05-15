@@ -35,7 +35,6 @@ import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
 import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
-import { Route, MemoryRouter } from 'react-router';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 import { Omit } from '@material-ui/types';
 
