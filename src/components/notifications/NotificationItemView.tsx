@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme =>
       margin: theme.spacing(2),
     },
     header: {
-      marginTop: theme.spacing(1),
+      marginRight: theme.spacing(1),
     },
   }),
 );
@@ -24,43 +24,43 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
   const classes = useStyles();
   return (
     <Fragment>
-      <Box>
-        <Chip
-          size="small"
-          label={`${
+      <Chip
+        size="small"
+        label={`${
+          notification.type === NotificationType.COMMENT
+            ? 'Comment'
+            : notification.type === NotificationType.ACTIVITY
+            ? 'Activity'
+            : 'Alert'
+        }`}
+        style={{
+          backgroundColor:
             notification.type === NotificationType.COMMENT
-              ? 'Comment'
+              ? '#3cb371'
               : notification.type === NotificationType.ACTIVITY
-              ? 'Activity'
-              : 'Alert'
-          }`}
-          style={{
-            backgroundColor:
-              notification.type === NotificationType.COMMENT
-                ? '#3cb371'
-                : notification.type === NotificationType.ACTIVITY
-                ? '#00a2f2'
-                : '#f4364c',
-            color: 'white',
-          }}
-        />
-      </Box>
-      <Typography className={classes.header}>
-        {notification.type === NotificationType.COMMENT
-          ? 'Comment left at '
-          : notification.type === NotificationType.ACTIVITY
-          ? 'Activity at '
-          : 'Alert at '}
-      </Typography>
+              ? '#00a2f2'
+              : '#f4364c',
+          color: 'white',
+        }}
+      />
+      <Box display="flex" alignItems="center" my={1}>
+        <Typography className={classes.header}>
+          {notification.type === NotificationType.COMMENT
+            ? 'Comment left at '
+            : notification.type === NotificationType.ACTIVITY
+            ? 'Activity at '
+            : 'Alert at '}
+        </Typography>
 
-      <a
-        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-        onClick={() =>
-          notification.referenceObject && history.push(`/${notification.referenceObject}/${notification.referenceID}`)
-        }
-      >
-        {notification.referenceID}
-      </a>
+        <a
+          style={{ cursor: 'pointer', textDecoration: 'underline' }}
+          onClick={() =>
+            notification.referenceObject && history.push(`/${notification.referenceObject}/${notification.referenceID}`)
+          }
+        >
+          {notification.referenceID}
+        </a>
+      </Box>
     </Fragment>
   );
 };
