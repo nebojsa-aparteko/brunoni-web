@@ -7,10 +7,17 @@ import CloseIcon from '@material-ui/icons/Close';
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
-      minWidth: 500,
+      width: 500,
     },
     title: {
       margin: theme.spacing(1),
+      color: 'white',
+    },
+    titleRoot: {
+      backgroundColor: '#3c4858',
+    },
+    icon: {
+      color: 'white',
     },
   }),
 );
@@ -19,16 +26,16 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
   const classes = useStyles();
   return (
     <Box display="flex" flexDirection="column" justifyContent="center" className={classes.root}>
-      <Box display="flex" justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
         <Typography variant="subtitle1" className={classes.title} align="center">
           Notifications
         </Typography>
-        <IconButton aria-label="close-button-notification-center" onClick={handleShow}>
+        <IconButton aria-label="close-button-notification-center" onClick={handleShow} className={classes.icon}>
           <CloseIcon />
         </IconButton>
       </Box>
       <Divider />
-      {notifications.map(notification => (
+      {notifications?.map(notification => (
         <NotificationItemView notification={notification} key={notification.id} />
       ))}
     </Box>
