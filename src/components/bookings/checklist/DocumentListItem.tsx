@@ -176,24 +176,27 @@ const DocumentListItem = ({
         const path = [storageBasePath, `${item.storedName}`].join('/');
         const storageRef = firebase.storage().ref();
         const documentRef = storageRef.child(encodeURI(path));
-        if (!internal && checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) === -1) {
+        if (!internal && checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) !== -1) {
+          const newItemArray = checklistItem.values?.filter(chkItem => chkItem !== item);
+          checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+        } else {
+          documentRef
+            .delete()
+            .then(() => {
+              console.debug('file deleted from storage ', item);
+            })
+            .catch(error => {
+              console.error('Failed to remove item - {error.message}', error);
+            })
+            .finally(() => {
+              // remove item from the list in any case since if it is an error with the storage means file is alrady out
+              setRemovalInProgress(false);
+              const newItemArray = internal
+                ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
+                : checklistItem.values?.filter(chkItem => chkItem !== item);
+              checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+            });
         }
-        documentRef
-          .delete()
-          .then(() => {
-            console.debug('file deleted from storage ', item);
-          })
-          .catch(error => {
-            console.error('Failed to remove item - {error.message}', error);
-          })
-          .finally(() => {
-            // remove item from the list in any case since if it is an error with the storage means file is alrady out
-            setRemovalInProgress(false);
-            const newItemArray = internal
-              ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
-              : checklistItem.values?.filter(chkItem => chkItem !== item);
-            checklistItemFileDeletedHandler(newItemArray || [], item, internal);
-          });
       } catch (error) {
         setRemovalInProgress(false);
         enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
