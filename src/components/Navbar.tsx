@@ -242,7 +242,7 @@ const Navbar: React.FC = () => {
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
                     <ButtonMenuItem primary="Schedule" to="/schedule" />
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
-                    <ButtonMenuItem primary="Vessel" to="/vessel" />
+                    {isSuperAdmin(userRecord) && <ButtonMenuItem primary="Vessel" to="/vessel" />}
 
                     {isDashboardUser(userRecord) && <ButtonMenuItem primary="Bookings" to="/bookings" />}
 
