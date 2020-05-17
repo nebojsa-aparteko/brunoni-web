@@ -66,7 +66,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
 
       let query = collection.where('Category', '==', filters.category);
 
-      if (actingAs && userRecord?.alphacomClientId) {
+      if (actingAs && actingAs?.alphacomClientId) {
         query = query.where('ForwAdrId', '==', userRecord!.alphacomClientId);
       }
 

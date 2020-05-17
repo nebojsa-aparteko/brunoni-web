@@ -15,7 +15,7 @@ const ClientUsersProvider: React.FC<Props> = ({ children }) => {
     userRecord,
   ]);
 
-  const snapshot = useFirestoreCollection('users', userRecord ? query : undefined);
+  const snapshot = useFirestoreCollection('users', userRecord ? query : null);
 
   const userRecords = useMemo(() => {
     return snapshot?.docs.map(doc => {
