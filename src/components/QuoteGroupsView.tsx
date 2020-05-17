@@ -93,10 +93,8 @@ const QuoteGroupsView: React.FC<Props> = ({
   const [filteredResults, setFilteredResults] = useState<QuoteGroup[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    const dateFilteredQuoteGroups = filter((quoteGroup: QuoteGroup) => !quoteGroup.quotes[0].archived)(quoteGroups);
-
     const filteredResults =
-      searchString && searchString.length > 0 && dateFilteredQuoteGroups
+      searchString && searchString.length > 0 && quoteGroups
         ? filter(
             (quoteGroup: QuoteGroup) =>
               containsString(quoteGroup.id, searchString) ||
@@ -121,8 +119,8 @@ const QuoteGroupsView: React.FC<Props> = ({
                   (quote.carrier ? containsString(quote.carrier.id, searchString) : false) ||
                   containsString(quote.id, searchString),
               )(quoteGroup.quotes) !== undefined,
-          )(dateFilteredQuoteGroups)
-        : dateFilteredQuoteGroups;
+          )(quoteGroups)
+        : quoteGroups;
 
     const sortedFiltered = orderBy(
       [get('dateIssued'), flow(get('sortingId'), padStart(10))],

@@ -8,7 +8,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import { TabPanel } from './BookingsPage';
 import { useQuotesContext } from '../providers/QuotesProvider';
-import { INITIAL_DATERANGE_FILTER } from '../providers/filterActions';
+import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 
@@ -67,10 +67,7 @@ const QuoteGroups: React.FC = () => {
       // we are acting as a customer set a date range:
       setQuoteFilters &&
         setQuoteFilters(
-          flow(
-            set('archived', undefined),
-            set('dateRange', quoteFilters.dateRange || INITIAL_DATERANGE_FILTER),
-          )(quoteFilters),
+          flow(set('archived', undefined), set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS))(quoteFilters),
         );
     }
   }, [actingAs]);

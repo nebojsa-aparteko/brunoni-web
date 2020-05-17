@@ -58,8 +58,8 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       let query = null;
 
-      if (actingAs && userRecord?.alphacomClientId) {
-        query = (query || collection).where('clientId', '==', userRecord!.alphacomClientId);
+      if (actingAs && actingAs?.alphacomClientId) {
+        query = (query || collection).where('clientId', '==', actingAs!.alphacomClientId);
       }
 
       if (filters.archived) {
@@ -91,7 +91,6 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
           (query || collection)
             .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
             .orderBy('validityPeriod.to', 'desc');
-      console.log(query);
       return query;
     },
     [userRecord, filters, actingAs, filtersPreviousVal],
