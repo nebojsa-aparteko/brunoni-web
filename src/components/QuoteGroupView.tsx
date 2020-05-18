@@ -45,7 +45,6 @@ import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
-import QuoteGroups from '../contexts/QuoteGroupsContext';
 import { getEntity, normalizeQuoteGroups, Quote, QuoteDetail, QuoteGroup } from '../providers/QuoteGroupsProvider';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
@@ -55,14 +54,12 @@ import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogCo
 import UserRecord from '../model/UserRecord';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
-import { useClientById } from '../hooks/useClient';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import ContainerTypes from '../contexts/ContainerTypes';
 import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
-import { useQuotesContext } from '../providers/QuotesProvider';
 import { useHistory } from 'react-router';
 
 interface Props {
