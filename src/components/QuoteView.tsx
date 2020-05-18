@@ -40,7 +40,7 @@ import { Quote, Quote as QuoteModel, QuoteStatus, QuoteStatusText } from '../pro
 import ActingAs from '../contexts/ActingAs';
 import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
 import UserRecord from '../model/UserRecord';
-import { addAssignee } from './QuoteGroup';
+import { addAssignee } from './QuoteGroupView';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import InternalStorage from './bookings/InternalStorage';

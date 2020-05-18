@@ -166,7 +166,7 @@ export const normalizeQuote = (
   );
 };
 
-const normalizeQuoteGroups = (
+export const normalizeQuoteGroups = (
   getContainerType: (id: string) => ContainerType | null,
   getCommodityType: (id: string) => CommodityType | null,
   getPickupLocation: (id: string | null) => PickupLocation | null,

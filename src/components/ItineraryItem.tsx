@@ -48,8 +48,6 @@ const createMarkup = (port: SearchResultsPort) => ({
 const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
   const classes = useStyles();
 
-  console.log('it item ', itineraryItem);
-
   return (
     <Step {...rest} active={true}>
       <StepLabel>

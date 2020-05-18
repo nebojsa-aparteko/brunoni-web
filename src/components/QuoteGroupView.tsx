@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import formatDate from 'date-fns/format';
 import {
   Box,
@@ -46,7 +46,7 @@ import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
 import QuoteGroups from '../contexts/QuoteGroupsContext';
-import { Quote, QuoteDetail } from '../providers/QuoteGroupsProvider';
+import { getEntity, normalizeQuoteGroups, Quote, QuoteDetail, QuoteGroup } from '../providers/QuoteGroupsProvider';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
@@ -57,6 +57,13 @@ import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import { useClientById } from '../hooks/useClient';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
+import useFirestoreCollection from '../hooks/useFirestoreCollection';
+import ContainerTypes from '../contexts/ContainerTypes';
+import CommodityTypes from '../contexts/CommodityTypes';
+import PickupLocations from '../contexts/PickupLocations';
+import Ports from '../contexts/Ports';
+import { useQuotesContext } from '../providers/QuotesProvider';
+import { useHistory } from 'react-router';
 
 interface Props {
   id: string;
@@ -174,27 +181,71 @@ export const addAssignee = (user: UserRecord | null, quoteId: string) => {
     .update('assignedTo', user);
 };
 
-const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
+const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const classes = useStyles();
 
-  const carriers = useContext(Carriers);
-  const quoteGroups = useContext(QuoteGroups);
+  const [isLoading, setIsLoading] = useState(true);
+  const [quoteGroup, setQouteGroup] = useState<QuoteGroup | undefined>(undefined);
+
+  const [quotesByCarrier, setQuotesByCarrier] = useState<[string, Quote[]][] | undefined>(undefined);
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
-  const quoteGroup = useMemo(() => quoteGroups?.find(quoteGroup => quoteGroup.id === id), [quoteGroups, id]);
-  const client = useClientById(quoteGroup?.quotes[0].clientId);
+  const history = useHistory();
 
-  const quotesByCarrier = useMemo(
-    () =>
-      quoteGroup
-        ? (flow(get('quotes'), groupBy('carrier.id'), toPairs)(quoteGroup) as Array<[string, Quote[]]>)
-        : undefined,
-    [quoteGroup],
+  const containerTypes = useContext(ContainerTypes);
+  const commodityTypes = useContext(CommodityTypes);
+  const pickupLocations = useContext(PickupLocations);
+  const ports = useContext(Ports);
+  const carriers = useContext(Carriers);
+
+  const quotesSnapshot = useFirestoreCollection(
+    'quotes',
+    useCallback(
+      q => {
+        return q.where('groupId', '==', id);
+      },
+      [id],
+    ),
   );
 
   useEffect(() => {
-    if (quotesByCarrier && quotesByCarrier.length === 1) {
+    if (!(quotesSnapshot && containerTypes && commodityTypes && pickupLocations && ports && carriers)) {
+      return;
+    }
+
+    if (quotesSnapshot && quotesSnapshot.size > 0) {
+      const quotes = quotesSnapshot?.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        } as Quote;
+      }) as Quote[] | undefined;
+
+      const normalize = (quotes: Quote[]) => {
+        const getContainerType = getEntity(containerTypes, containerType => containerType.id);
+        const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
+        const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
+        const getPort = getEntity(ports, port => port.id);
+        const getCarrier = getEntity(carriers, carrier => carrier.name);
+
+        return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier)(quotes);
+      };
+
+      const normalizedQuoteGroup = quotes === undefined ? undefined : normalize(quotes).pop();
+
+      const quotesByCarrierNormalized = normalizedQuoteGroup
+        ? (flow(get('quotes'), groupBy('carrier.id'), toPairs)(normalizedQuoteGroup) as Array<[string, Quote[]]>)
+        : undefined;
+
+      setQouteGroup(normalizedQuoteGroup);
+      setQuotesByCarrier(quotesByCarrierNormalized);
+    }
+    setIsLoading(false);
+  }, [quotesSnapshot, containerTypes, commodityTypes, pickupLocations, ports, carriers]);
+
+  useEffect(() => {
+    if (quotesByCarrier && quotesByCarrier?.length === 1) {
       setSelectedPanel(quotesByCarrier[0][0]);
     }
   }, [quotesByCarrier]);
@@ -231,7 +282,9 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
       <Box mt={2} mb={2}>
         <Typography variant="body2">
           <span style={{ fontWeight: 700 }}>Quote for: </span>{' '}
-          {client ? client.name + ', ' + client.city : quoteGroup?.quotes[0].clientId}
+          {requestedBy?.company
+            ? requestedBy.company.name + ', ' + requestedBy.company.city
+            : quoteGroup?.quotes[0].clientId}
         </Typography>
         {quoteGroup?.quotes[0].userId && (
           <Typography variant="body2">
@@ -248,14 +301,18 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
         )}
       </Box>
     );
-  }, [showCompanyInfo, quoteGroup, client, requestedBy]);
+  }, [showCompanyInfo, quoteGroup, requestedBy]);
 
-  if (!quoteGroup) {
+  if (isLoading) {
     return (
       <Container maxWidth="lg">
         <ChartsCircularProgress />
       </Container>
     );
+  }
+
+  if (!isLoading && !quoteGroup) {
+    history.push('/not-found');
   }
 
   return !quotesByCarrier ? (
@@ -270,14 +327,14 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
           <QuoteNav
             backTo="/quotes/groups"
             title={`Quotations - ${quoteRouteLabelDisplay(quoteGroup)}`}
-            subtitle={`${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}`}
+            subtitle={quoteGroup ? `${formatDate(quoteGroup.dateIssued, 'd. MMMM yyyy')}` : ''}
           />
         </Box>
 
         <Box mx={2} mt={2} mb={6}>
           {clientInfo}
           <Grid container spacing={2}>
-            {quoteGroup.containers.map((container, i) => (
+            {quoteGroup?.containers?.map((container, i) => (
               <Grid item key={i}>
                 <Chip
                   label={
@@ -291,7 +348,7 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
           </Grid>
         </Box>
         <Box mb={6}>
-          {quotesByCarrier.map(([carrierId, quotes], index) => {
+          {quotesByCarrier?.map(([carrierId, quotes], index) => {
             // need to find all of the quoteDetail items across provided quotes
             const quoteDetailItemsMerged = flow(
               map(get('quoteDetails')),
@@ -454,11 +511,11 @@ const QuoteGroup: React.FC<Props> = ({ id, showCompanyInfo }) => {
         </Box>
         <ActivityLogProvider>
           {/*<InternalStorage id={quoteGroup?.id} collection={}/>*/}
-          <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />
+          {quoteGroup && <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />}
         </ActivityLogProvider>
       </Container>
     </Fragment>
   );
 };
 
-export default QuoteGroup;
+export default QuoteGroupView;
