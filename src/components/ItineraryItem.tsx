@@ -4,12 +4,13 @@ import { Theme, makeStyles, Box, Grid } from '@material-ui/core';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
-import { ItineraryItem as ItineraryItemModel } from '../model/route-search/RouteSearchResults';
+import { ItineraryItem as ItineraryItemModel, SearchResultsPort } from '../model/route-search/RouteSearchResults';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import InfoBoxItem from './InfoBoxItem';
 import { DateFormats } from '../utilities/formattingHelpers';
+import Port from '../model/Port';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {
@@ -40,10 +41,14 @@ const formatDateString = (date: string) => formatDate(new Date(date), DateFormat
 
 const isIntermediary = (itineraryItem: ItineraryItemModel) => itineraryItem.ArrivalDate && itineraryItem.DepartureDate;
 
-const createMarkup = (htmlMarkup: any) => ({ __html: htmlMarkup });
+const createMarkup = (port: SearchResultsPort) => ({
+  __html: port.PortName ? port.PortName : `${port.HarbourName}<br/>${port.Land}`,
+});
 
 const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
   const classes = useStyles();
+
+  console.log('it item ', itineraryItem);
 
   return (
     <Step {...rest} active={true}>
@@ -84,7 +89,7 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
               <InfoBoxItem
                 IconComponent={FlagIcon}
                 title={itineraryItem.DepartureDate ? 'Origin Terminal' : 'Destination Terminal'}
-                label1HTML={createMarkup(itineraryItem.Port.PortName)}
+                label1HTML={createMarkup(itineraryItem.Port)}
               />
               {/*<span dangerouslySetInnerHTML={createMarkup(itineraryItem.Port.PortName)}/>*/}
             </Grid>

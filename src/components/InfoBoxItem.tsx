@@ -49,7 +49,7 @@ const InfoBoxItem: React.FC<Props> = ({
         </Typography>
       )}
       {occupySpaceForTitle && <Box className={classes.titleBox} />}
-      {hasLabel1 && isString(label1) ? (
+      {hasLabel1 ? (
         <Typography variant="body1" display="block" className={classes.printText}>
           {label1HTML ? <span dangerouslySetInnerHTML={label1HTML} /> : <span>{label1}</span>}
         </Typography>

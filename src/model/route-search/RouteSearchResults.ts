@@ -22,7 +22,7 @@ export interface RouteSearchResult {
   Deadlines: RouteSearchResultDeadline[];
 }
 
-type Port = {
+export type SearchResultsPort = {
   ID: string;
   HarbourName: string;
   Land: string;
@@ -32,19 +32,19 @@ type Port = {
 export interface ItineraryItem {
   ArrivalDate?: string;
   DepartureDate?: string;
-  Port: Port;
+  Port: SearchResultsPort;
   VoyageInfo: RouteSearchResultVoyageInfo;
 }
 
 export interface RouteSearchResultOriginInfo extends ItineraryItem {
   DepartureDate: string;
-  Port: Port;
+  Port: SearchResultsPort;
   VoyageInfo: RouteSearchResultVoyageInfo;
 }
 
 export interface RouteSearchResultDestinationInfo extends ItineraryItem {
   ArrivalDate: string;
-  Port: Port;
+  Port: SearchResultsPort;
   VoyageInfo: RouteSearchResultVoyageInfo;
 }
 
@@ -57,7 +57,7 @@ export interface RouteSearchResultVoyageInfo {
 export interface RouteSearchResultIntermediatePortInfo extends ItineraryItem {
   ArrivalDate: string;
   DepartureDate: string;
-  Port: Port;
+  Port: SearchResultsPort;
   VoyageInfo: RouteSearchResultVoyageInfo;
 }
 

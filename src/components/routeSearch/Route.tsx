@@ -144,6 +144,7 @@ const Route: React.FC<Props> = ({ route }) => {
     setMoreAnchorEl(null);
   };
 
+  console.log('Route ', route);
   const buildMailToLink = (route: RouteSearchResult | undefined) => {
     if (route) {
       const mailtoAddress =
