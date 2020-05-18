@@ -3,7 +3,6 @@ import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
-import get from 'lodash/fp/get';
 import { subMonths, subWeeks } from 'date-fns';
 
 export type ActionType = 'set' | 'clear';
