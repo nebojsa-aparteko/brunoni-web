@@ -5,6 +5,7 @@ import Port from '../model/Port';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
 import { subMonths, subWeeks } from 'date-fns';
+import Carrier from '../model/Carrier';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =
@@ -36,6 +37,7 @@ export interface ContextFilters {
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
+  carrier?: Carrier;
 }
 
 export type Action = {

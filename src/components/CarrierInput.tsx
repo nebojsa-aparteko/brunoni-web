@@ -1,0 +1,106 @@
+import 'isomorphic-fetch';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
+import Carrier from '../model/Carrier';
+const getOptionLabel = (option: Carrier) => `${option.name}`;
+
+interface Props {
+  label: string;
+  carriers: Carrier[];
+  inputRef?: MutableRefObject<HTMLInputElement | undefined>;
+  value?: Carrier;
+  onChange: (carrier: Carrier | null) => void;
+  open?: boolean;
+  onOpen?: (event: React.ChangeEvent<{}>) => void;
+  onClose?: (event: React.ChangeEvent<{}>) => void;
+}
+
+const useStyles = makeStyles({
+  input: {
+    flexWrap: 'nowrap',
+  },
+});
+
+const CarrierInput: React.FC<Props> = ({ label, carriers, inputRef, value, onChange, open, onOpen, onClose }) => {
+  const classes = useStyles();
+  const loading = open && !carriers;
+
+  return (
+    <Autocomplete
+      value={value || null}
+      onChange={(_: ChangeEvent<{}>, carrier: Carrier | null) => onChange(carrier)}
+      autoHighlight
+      open={open}
+      onOpen={onOpen}
+      onClose={onClose}
+      getOptionLabel={getOptionLabel}
+      options={carriers}
+      loading={loading}
+      renderInput={params => (
+        <TextField
+          {...params}
+          inputRef={inputRef}
+          label={label}
+          fullWidth
+          variant="outlined"
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <React.Fragment>
+                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </React.Fragment>
+            ),
+            className: classes.input,
+          }}
+        />
+      )}
+      PopperComponent={Popup}
+      PaperComponent={Papyrus}
+      renderOption={(option, { inputValue }) => {
+        const matches = match(getOptionLabel(option), inputValue);
+        const parts = parse(getOptionLabel(option), matches);
+
+        return (
+          <div>
+            {parts.map((part: { highlight: boolean; text: string }, index: number) => (
+              <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                {part.text}
+              </span>
+            ))}
+          </div>
+        );
+      }}
+    />
+  );
+};
+
+const usePopupStyles = makeStyles((theme: Theme) => ({
+  popper: {
+    width: theme.breakpoints.values.md / 2,
+    zIndex: 100,
+  },
+}));
+
+function Popup(props: PopperProps) {
+  const { popperRef, anchorEl, open, children } = props;
+  const classes = usePopupStyles();
+
+  return (
+    <Popper
+      placement="bottom-start"
+      popperRef={popperRef as Ref<any>}
+      anchorEl={anchorEl}
+      open={open}
+      children={children}
+      className={classes.popper}
+    />
+  );
+}
+
+const Papyrus: React.FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => <Paper {...props} />;
+
+export default CarrierInput;
