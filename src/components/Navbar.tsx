@@ -242,9 +242,9 @@ const Navbar: React.FC = () => {
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
                     <ButtonMenuItem primary="Schedule" to="/schedule" />
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
-                    {isSuperAdmin(userRecord) && <ButtonMenuItem primary="Vessel" to="/vessel" />}
+                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
 
-                    {isDashboardUser(userRecord) && <ButtonMenuItem primary="Bookings" to="/bookings" />}
+                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Bookings" to="/bookings" />}
 
                     {actingAs !== null && (
                       <Fragment>
@@ -340,7 +340,7 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                {isDashboardUser(userRecord) && (
+                {isDashboardUser(userRecord) && !actingAs && (
                   <div className={classes.item}>
                     <NotificationsButton />
                   </div>
