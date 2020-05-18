@@ -5,6 +5,7 @@ import useFirestoreCollection from './useFirestoreCollection';
 import Notification from '../model/Notification';
 import { invoke, update, flow } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
+
 export default function useNotifications(userId?: string) {
   const query = useCallback(
     q =>
@@ -14,7 +15,7 @@ export default function useNotifications(userId?: string) {
         .limit(50),
     [userId],
   );
-  const notificationsCollection = useFirestoreCollection('notifications', query);
+  const notificationsCollection = useFirestoreCollection('notifications', userId ? query : null);
 
   return notificationsCollection?.docs.map(doc => {
     return flow(

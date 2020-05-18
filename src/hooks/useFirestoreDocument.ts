@@ -7,7 +7,7 @@ export default function useFirestoreDocument(
   documentPath?: string,
   subCollection?: string,
 ) {
-  const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined>();
+  const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined | null>();
 
   useEffect(() => {
     if (!id) {
@@ -43,7 +43,7 @@ export default function useFirestoreDocument(
         });
       } catch (error) {
         console.error('useFirestoreDocument', `/${collection}/${id}`, 'threw an error', error);
-        return null;
+        setSnapshot(null);
       }
     })();
 

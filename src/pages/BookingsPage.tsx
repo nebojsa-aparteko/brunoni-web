@@ -6,7 +6,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import TocIcon from '@material-ui/icons/Toc';
 import Meta from '../components/Meta';
-import { useBookingsContext } from '../providers/BookingsProvider';
+import BookingsProvider, { useBookingsContext } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
@@ -65,7 +65,7 @@ export function TabPanel(props: TabPanelProps) {
   );
 }
 
-const BookingsPage: React.FC = () => {
+const BookingsPageContainer: React.FC = () => {
   const classes = useTabStyles();
   const actingAs = useContext(ActingAs)[0];
 
@@ -190,6 +190,14 @@ const BookingsPage: React.FC = () => {
         </Container>
       )}
     </Fragment>
+  );
+};
+
+const BookingsPage = () => {
+  return (
+    <BookingsProvider>
+      <BookingsPageContainer />
+    </BookingsProvider>
   );
 };
 

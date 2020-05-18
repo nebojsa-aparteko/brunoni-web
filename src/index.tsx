@@ -14,7 +14,6 @@ import FirestoreClientDocumentProvider from './providers/FirestoreClientDocument
 import UserRecordProvider from './providers/UserRecord';
 import QuotesProvider from './providers/QuotesProvider';
 import QuoteGroupsProvider from './providers/QuoteGroupsProvider';
-import BookingsProvider from './providers/BookingsProvider';
 import SpecialOffersProvider from './providers/SpecialOffers';
 import ContainerTypesContext from './contexts/ContainerTypes';
 import CommodityTypesContext from './contexts/CommodityTypes';
@@ -117,11 +116,9 @@ const UserApp: React.FC = () => {
                 <QuotesProvider>
                   <QuoteGroupsProvider>
                     <QuoteListProvider>
-                      <BookingsProvider>
-                        <BookingListFilterProvider>
-                          <App />
-                        </BookingListFilterProvider>
-                      </BookingsProvider>
+                      <BookingListFilterProvider>
+                        <App />
+                      </BookingListFilterProvider>
                     </QuoteListProvider>
                   </QuoteGroupsProvider>
                 </QuotesProvider>
@@ -140,11 +137,9 @@ const UserApp: React.FC = () => {
                 <QuoteListProvider>
                   <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
                     <FirestoreCollectionProvider name="clients" context={ClientsContext}>
-                      <BookingsProvider>
-                        <BookingListFilterProvider>
-                          <App />
-                        </BookingListFilterProvider>
-                      </BookingsProvider>
+                      <BookingListFilterProvider>
+                        <App />
+                      </BookingListFilterProvider>
                     </FirestoreCollectionProvider>
                   </FirestoreCollectionProvider>
                 </QuoteListProvider>
@@ -162,11 +157,9 @@ const UserApp: React.FC = () => {
             <QuotesProvider>
               <QuoteGroupsProvider>
                 <QuoteListProvider>
-                  <BookingsProvider>
-                    <BookingListFilterProvider>
-                      <App />
-                    </BookingListFilterProvider>
-                  </BookingsProvider>
+                  <BookingListFilterProvider>
+                    <App />
+                  </BookingListFilterProvider>
                 </QuoteListProvider>
               </QuoteGroupsProvider>
             </QuotesProvider>

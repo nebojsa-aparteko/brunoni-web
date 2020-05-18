@@ -1,21 +1,10 @@
-import React, {
-  createContext,
-  Dispatch,
-  Reducer,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from 'react';
+import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
-import { Action, ContextFilters, reducer } from './filterActions';
+import { ContextFilters } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
 import { subWeeks } from 'date-fns';
-import { BookingContextFilters } from './BookingsProvider';
 
 interface Props {
   children: React.ReactNode;
@@ -58,8 +47,8 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       let query = null;
 
-      if (actingAs && actingAs?.alphacomClientId) {
-        query = (query || collection).where('clientId', '==', actingAs!.alphacomClientId);
+      if (actingAs && userRecord?.alphacomClientId) {
+        query = (query || collection).where('clientId', '==', userRecord!.alphacomClientId);
       }
 
       if (filters.archived) {
