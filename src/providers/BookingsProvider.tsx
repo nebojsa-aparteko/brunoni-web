@@ -102,10 +102,6 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         query = query.where('ForwAdrId', '==', filters.clientFilter.id);
       }
 
-      if (filters.carrier) {
-        query = query.where('CarrierID', '==', filters.carrier.name);
-      }
-
       query = filters.dateRange
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');

@@ -17,7 +17,7 @@ export default function useFirestoreCollection(
   documentPath?: string,
   subCollection?: string,
 ) {
-  const [snapshot, setSnapshot] = useState<firebase.firestore.QuerySnapshot | undefined | null>();
+  const [snapshot, setSnapshot] = useState<firebase.firestore.QuerySnapshot | undefined>();
 
   useEffect(() => {
     if (query === null) {
@@ -58,7 +58,7 @@ export default function useFirestoreCollection(
         });
       } catch (error) {
         console.error('useFirestoreCollection', name, 'threw an error', error);
-        setSnapshot(null);
+        return null;
       }
     })();
 
