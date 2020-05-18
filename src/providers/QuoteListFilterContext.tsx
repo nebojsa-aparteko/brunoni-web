@@ -17,7 +17,7 @@ const QuoteListFilterContext = React.createContext<[QuoteListStateParams, any]>(
   (state: QuoteListStateParams) => {},
 ]);
 
-const QuoteListProvider = (props: any) => {
+const QuoteFilterListProvider = (props: any) => {
   const [state, setState] = useState({
     searchString: '',
     page: 0,
@@ -32,4 +32,4 @@ const QuoteListProvider = (props: any) => {
   );
 };
 
-export { QuoteListFilterContext, QuoteListProvider };
+export { QuoteListFilterContext, QuoteFilterListProvider };

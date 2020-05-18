@@ -7,10 +7,11 @@ import ActingAs from '../contexts/ActingAs';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import { TabPanel } from './BookingsPage';
-import { useQuotesContext } from '../providers/QuotesProvider';
+import QuotesProvider, { useQuotesContext } from '../providers/QuotesProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
+import QuoteGroupsProvider from '../providers/QuoteGroupsProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -104,4 +105,12 @@ const QuoteGroups: React.FC = () => {
   );
 };
 
-export default QuoteGroups;
+const QuoteGroupsPage = () => (
+  <QuotesProvider>
+    <QuoteGroupsProvider>
+      <QuoteGroups />
+    </QuoteGroupsProvider>
+  </QuotesProvider>
+);
+
+export default QuoteGroupsPage;

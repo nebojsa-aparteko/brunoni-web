@@ -27,7 +27,7 @@ import * as serviceWorker from './serviceWorker';
 import theme from './theme';
 import firebase from './firebase';
 import { RouteSearchProvider } from './contexts/RouteSearchContext';
-import { QuoteListProvider } from './providers/QuoteListFilterContext';
+import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import ActingAs from './contexts/ActingAs';
 import UserRecordContext from './contexts/UserRecordContext';
 import { BookingListFilterProvider } from './providers/BookingListFilterProvider';
@@ -113,15 +113,11 @@ const UserApp: React.FC = () => {
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
               <ClientUsersProvider>
-                <QuotesProvider>
-                  <QuoteGroupsProvider>
-                    <QuoteListProvider>
-                      <BookingListFilterProvider>
-                        <App />
-                      </BookingListFilterProvider>
-                    </QuoteListProvider>
-                  </QuoteGroupsProvider>
-                </QuotesProvider>
+                <QuoteFilterListProvider>
+                  <BookingListFilterProvider>
+                    <App />
+                  </BookingListFilterProvider>
+                </QuoteFilterListProvider>
               </ClientUsersProvider>
             </FirestoreClientDocumentProvider>
           );
@@ -132,19 +128,15 @@ const UserApp: React.FC = () => {
             showCrispChat(true);
           }
           return isDashboardUser(userRecord) ? (
-            <QuotesProvider>
-              <QuoteGroupsProvider>
-                <QuoteListProvider>
-                  <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
-                    <FirestoreCollectionProvider name="clients" context={ClientsContext}>
-                      <BookingListFilterProvider>
-                        <App />
-                      </BookingListFilterProvider>
-                    </FirestoreCollectionProvider>
-                  </FirestoreCollectionProvider>
-                </QuoteListProvider>
-              </QuoteGroupsProvider>
-            </QuotesProvider>
+            <QuoteFilterListProvider>
+              <FirestoreCollectionProvider name="users" context={UserRecordsContext}>
+                <FirestoreCollectionProvider name="clients" context={ClientsContext}>
+                  <BookingListFilterProvider>
+                    <App />
+                  </BookingListFilterProvider>
+                </FirestoreCollectionProvider>
+              </FirestoreCollectionProvider>
+            </QuoteFilterListProvider>
           ) : (
             <App />
           );
@@ -154,15 +146,11 @@ const UserApp: React.FC = () => {
       return (
         <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
           <ClientUsersProvider>
-            <QuotesProvider>
-              <QuoteGroupsProvider>
-                <QuoteListProvider>
-                  <BookingListFilterProvider>
-                    <App />
-                  </BookingListFilterProvider>
-                </QuoteListProvider>
-              </QuoteGroupsProvider>
-            </QuotesProvider>
+            <QuoteFilterListProvider>
+              <BookingListFilterProvider>
+                <App />
+              </BookingListFilterProvider>
+            </QuoteFilterListProvider>
           </ClientUsersProvider>
         </FirestoreClientDocumentProvider>
       );
