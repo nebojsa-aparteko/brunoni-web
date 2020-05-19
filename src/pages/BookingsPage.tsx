@@ -4,13 +4,11 @@ import BookingsView from '../components/BookingsView';
 import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
-import TocIcon from '@material-ui/icons/Toc';
 import Meta from '../components/Meta';
 import BookingsProvider, { useBookingsContext } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
-import LoadListContainer from '../components/bookings/loadlist/LoadListContainer';
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
 
@@ -155,7 +153,6 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
             <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
-            <Tab icon={<TocIcon />} label="Loading List" {...a11yProps(3)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView
@@ -179,9 +176,6 @@ const BookingsPageContainer: React.FC = () => {
               archived
               showDateRangeFilter
             />
-          </TabPanel>
-          <TabPanel value={selectedTab} index={3}>
-            <LoadListContainer />
           </TabPanel>
         </Box>
       ) : (

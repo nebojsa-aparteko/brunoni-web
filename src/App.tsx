@@ -28,6 +28,7 @@ import ChartsCircularProgress from './components/dashboard/ChartsCircularProgres
 import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
 import VesselWithVoyagePage from './pages/VesselWithVoyagePage';
+import LoadListPage from './pages/LoadListPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -56,6 +57,7 @@ const adminRoutes = (
     <Route exact path="/teams" component={TeamManagementPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
+    <Route exact path="/loadList" component={LoadListPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>
