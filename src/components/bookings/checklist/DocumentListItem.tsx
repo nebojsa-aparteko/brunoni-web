@@ -84,7 +84,7 @@ const findTextForStatusType = (type: ChecklistItemValueDocumentStatusType) => {
     case ChecklistItemValueDocumentStatusType.DEFAULT:
       return '';
     case ChecklistItemValueDocumentStatusType.REJECTED:
-      return 'Rejected';
+      return 'Revision needed';
   }
 };
 

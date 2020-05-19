@@ -86,7 +86,7 @@ export enum ActivityText {
   DONE_BY_CUSTOMER = ' has marked done ',
   DEFAULTED_FILE = ' has undo changes on ',
   APPROVED_FILE = ' has approved ',
-  REJECTED_FILE = ' has rejected ',
+  REJECTED_FILE = ' has sent on revision ',
 }
 
 export enum ActivityChangeType {

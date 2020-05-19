@@ -108,7 +108,9 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
         <MentionsInput
           classNames={mentionsClassNames}
           className="mentions"
-          placeholder={activityLogContext.state?.rejected ? 'Please write reason of rejection' : 'Write a comment...'}
+          placeholder={
+            activityLogContext.state?.rejected ? 'Please write reason of revision need' : 'Write a comment...'
+          }
           inputRef={inputRef}
           onChange={(event, newValue, newPlainTextValue, mentions) => {
             updateMessageText(newValue, newPlainTextValue, mentions);
