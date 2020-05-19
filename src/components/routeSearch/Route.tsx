@@ -203,10 +203,7 @@ const Route: React.FC<Props> = ({ route }) => {
                     <Box display="flex" alignItems="center" lineHeight="normal">
                       {carrier ? (
                         <Fragment>
-                          <FiberManualRecordIcon
-                            className={classes.carrierAvatar}
-                            style={{ backgroundColor: carrier!.color }}
-                          />
+                          <FiberManualRecordIcon className={classes.carrierAvatar} style={{ color: carrier!.color }} />
                           <span>{carrier.name.toUpperCase()}</span>
                         </Fragment>
                       ) : route ? (
