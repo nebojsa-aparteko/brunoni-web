@@ -22,6 +22,7 @@ const groups = ['vesselWithVoyage', 'pol'];
 const VesselVoyageContainer: React.FC<Props> = () => {
   const [filter, setFilter] = useState('Export');
   const vessel = useVesselWithVoyage(filter);
+  const [expanded, setExpanded] = React.useState<string | false>(false);
 
   const normalizedVessel = useMemo(
     () =>
@@ -39,6 +40,9 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // setBookingFilters && setBookingFilters(set('category', (event.target as HTMLInputElement).value)(bookingFilters));
     setFilter((event.target as HTMLInputElement).value);
+  };
+  const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+    setExpanded(isExpanded ? panel : false);
   };
   return (
     <Card>
@@ -58,7 +62,13 @@ const VesselVoyageContainer: React.FC<Props> = () => {
 
         {normalizedVessel &&
           Object.entries(normalizedVessel).map(([vessel, items]: any, index: number) => (
-            <VesselVoyageItem vessel={vessel} items={items} key={vessel} />
+            <VesselVoyageItem
+              vessel={vessel}
+              items={items}
+              key={vessel}
+              expanded={expanded}
+              handleExpand={handleChange}
+            />
           ))}
       </CardContent>
     </Card>
