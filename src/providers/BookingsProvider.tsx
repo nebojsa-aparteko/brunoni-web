@@ -113,7 +113,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     [userRecord, filters, actingAs],
   );
 
-  const bookingsSnapshot = useFirestoreCollection('bookings', query);
+  const bookingsSnapshot = useFirestoreCollection('bookings', userRecord && actingAs ? query : null);
 
   const bookingsResult = useMemo(() => {
     setIsLoading(false);

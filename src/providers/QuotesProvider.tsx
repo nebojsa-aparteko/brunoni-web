@@ -85,7 +85,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
     [userRecord, filters, actingAs, filtersPreviousVal],
   );
 
-  const quotesSnapshot = useFirestoreCollection('quotes', query);
+  const quotesSnapshot = useFirestoreCollection('quotes', userRecord && actingAs ? query : null);
 
   const quotesResult = useMemo(() => {
     setIsLoading(false);
