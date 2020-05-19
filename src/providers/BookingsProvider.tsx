@@ -10,6 +10,7 @@ import pick from 'lodash/fp/pick';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
 import { UserRecordMinProperties } from '../model/UserRecord';
+import { useBookingListFilterContext } from './BookingListFilterProvider';
 
 interface Props {
   children: React.ReactNode;
@@ -33,7 +34,13 @@ export interface BookingContextFilters extends ContextFilters {
   category: string;
 }
 
-const defaultFilters = { archived: false, category: BookingCategory.Export } as BookingContextFilters;
+const defaultFilters = {
+  archived: false,
+  category: BookingCategory.Export,
+  page: 0,
+  rowsPerPage: 10,
+  activeTab: 0,
+} as BookingContextFilters;
 
 const BookingsContext = createContext<
   [Booking[] | undefined, boolean, BookingContextFilters, Dispatch<SetStateAction<BookingContextFilters>> | undefined]
@@ -53,12 +60,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [filters, setFilters] = useState<BookingContextFilters>({
-    archived: false,
-    category: BookingCategory.Export,
-    pendingPayment: false,
-    assignee: !actingAs && userRecord,
-  } as BookingContextFilters);
+  const [filters, setFilters] = useBookingListFilterContext();
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   Box,
   makeStyles,
@@ -10,9 +10,6 @@ import {
   CardActions,
   TablePagination,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -20,7 +17,7 @@ import set from 'lodash/fp/set';
 import chunk from 'lodash/fp/chunk';
 import filter from 'lodash/fp/filter';
 import Meta from './Meta';
-import { BookingListFilterContext } from '../providers/BookingListFilterProvider';
+import { useBookingListFilterContext } from '../providers/BookingListFilterProvider';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
@@ -97,7 +94,7 @@ export const getContainersString = (booking: Booking) => {
 const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilters, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
-  const [bookingsContextData, setBookingsContextData] = useContext(BookingListFilterContext);
+  const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
 
   const { searchString, page, rowsPerPage } = bookingsContextData;
 
@@ -153,23 +150,24 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-      setBookingsContextData(set('page', page)(bookingsContextData));
+      if (setBookingsContextData) setBookingsContextData(set('page', page)(bookingsContextData));
     },
     [setBookingsContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      setBookingsContextData(
-        flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
-      );
+      if (setBookingsContextData)
+        setBookingsContextData(
+          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
+        );
     },
     [setBookingsContextData],
   );
 
   const handleSearch = useCallback(
     (searchStringNew: string) => {
-      if (searchStringNew !== searchString) {
+      if (searchStringNew !== searchString && setBookingsContextData) {
         setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
       }
     },

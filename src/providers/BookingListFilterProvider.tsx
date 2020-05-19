@@ -1,33 +1,45 @@
-import React, { useState } from 'react';
-import Client from '../model/Client';
-import Port from '../model/Port';
+import React, { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
+import { ContextFilters } from './filterActions';
+import { BookingCategory } from '../model/Booking';
+import useUser from '../hooks/useUser';
+import ActingAs from '../contexts/ActingAs';
 
-interface BookingListStateParams {
-  searchString: string;
-  page: number;
-  rowsPerPage: number;
-  clientFilter?: Client;
-  originPort?: Port;
-  destinationPort?: Port;
-  scrollPosition?: number;
-  activeTab: number;
+export interface BookingContextFilters extends ContextFilters {
+  category: string;
 }
 
-export const BOOKING_FILTERS_INITIAL_STATE = { searchString: '', page: 0, rowsPerPage: 10, activeTab: 0 };
+export const BOOKING_FILTERS_INITIAL_STATE = {
+  archived: false,
+  category: BookingCategory.Export,
+  page: 0,
+  rowsPerPage: 10,
+  activeTab: 0,
+} as BookingContextFilters;
 
-const BookingListFilterContext = React.createContext<[BookingListStateParams, any]>([
-  BOOKING_FILTERS_INITIAL_STATE,
-  (state: BookingListStateParams) => {},
-]);
+const BookingListFilterContext = createContext<
+  [BookingContextFilters, Dispatch<SetStateAction<BookingContextFilters>> | undefined]
+>([BOOKING_FILTERS_INITIAL_STATE, undefined]);
 
 const BookingListFilterProvider = (props: any) => {
-  const [state, setState] = useState(BOOKING_FILTERS_INITIAL_STATE);
-  const setStateFn = (state: BookingListStateParams) => {
-    setState(state);
-  };
+  const userRecord = useUser()[1];
+  const actingAs = useContext(ActingAs)[0];
+
+  const [state, setState] = useState({
+    assignee: !actingAs && userRecord,
+    ...BOOKING_FILTERS_INITIAL_STATE,
+  } as BookingContextFilters);
+
   return (
-    <BookingListFilterContext.Provider value={[state, setStateFn]}>{props.children}</BookingListFilterContext.Provider>
+    <BookingListFilterContext.Provider value={[state, setState]}>{props.children}</BookingListFilterContext.Provider>
   );
 };
 
-export { BookingListFilterContext, BookingListFilterProvider };
+export const useBookingListFilterContext = () => {
+  const context = React.useContext(BookingListFilterContext);
+  if (context === undefined) {
+    throw new Error('useBookingListFilterContext must be used within a BookingListFilterProvider');
+  }
+  return context;
+};
+
+export default BookingListFilterProvider;

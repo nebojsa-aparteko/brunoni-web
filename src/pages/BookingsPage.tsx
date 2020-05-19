@@ -7,7 +7,7 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import Meta from '../components/Meta';
 import BookingsProvider, { useBookingsContext } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
-import { BOOKING_FILTERS_INITIAL_STATE, BookingListFilterContext } from '../providers/BookingListFilterProvider';
+import { BOOKING_FILTERS_INITIAL_STATE, useBookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
@@ -67,7 +67,7 @@ const BookingsPageContainer: React.FC = () => {
   const classes = useTabStyles();
   const actingAs = useContext(ActingAs)[0];
 
-  const [bookingsContextData, setBookingsContextData] = useContext(BookingListFilterContext);
+  const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
   const selectedTab = bookingsContextData.activeTab;
 
   const [bookings, isLoading, filters, setFilters] = useBookingsContext();
@@ -80,7 +80,7 @@ const BookingsPageContainer: React.FC = () => {
 
     return () => {
       // as it will be remounted a few times we do not want to store position if the scroll did not actually happen
-      if (window.scrollY > 200) {
+      if (window.scrollY > 200 && setBookingsContextData) {
         setBookingsContextData(set('scrollPosition', window.scrollY)(bookingsContextData));
       }
     };
@@ -91,11 +91,11 @@ const BookingsPageContainer: React.FC = () => {
   }, [bookingsContextData.activeTab]);
 
   const setSelectedTab = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setBookingsContextData(set('activeTab', newValue)(bookingsContextData));
+    if (setBookingsContextData) setBookingsContextData(set('activeTab', newValue)(bookingsContextData));
   };
 
   const handleTabChange = (newValue: number) => {
-    setBookingsContextData(set('scrollPosition', 0)(bookingsContextData));
+    if (setBookingsContextData) setBookingsContextData(set('scrollPosition', 0)(bookingsContextData));
     if (newValue !== bookingsContextData.activeTab && setBookingsContextData) {
       setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
     }
