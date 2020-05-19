@@ -16,6 +16,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import SideCharges from '../components/admin/SideCharges';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const GetStarted: React.FC = () => (
   <Box p={2}>
@@ -57,7 +58,7 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
                       onClick={() => (selected ? history.push('/charges') : history.push(path))}
                     >
                       <ListItemAvatar className={classes.avatarContainer}>
-                        <Avatar className={classes.avatar} style={{ backgroundColor: carrier.color }} />
+                        <FiberManualRecordIcon className={classes.avatar} style={{ color: carrier.color }} />
                       </ListItemAvatar>
                       <ListItemText primary={carrier.name.toUpperCase()} />
                     </ListItem>

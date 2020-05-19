@@ -47,6 +47,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import { DateFormats } from '../../utilities/formattingHelpers';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 interface Props {
   route?: RouteSearchResult;
@@ -202,7 +203,10 @@ const Route: React.FC<Props> = ({ route }) => {
                     <Box display="flex" alignItems="center" lineHeight="normal">
                       {carrier ? (
                         <Fragment>
-                          <Avatar className={classes.carrierAvatar} style={{ backgroundColor: carrier!.color }} />
+                          <FiberManualRecordIcon
+                            className={classes.carrierAvatar}
+                            style={{ backgroundColor: carrier!.color }}
+                          />
                           <span>{carrier.name.toUpperCase()}</span>
                         </Fragment>
                       ) : route ? (
