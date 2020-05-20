@@ -61,16 +61,17 @@ const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDat
 const normalizeContainerRecord = (item: any) => {
   return {
     id: item.id,
+    ...item,
     ets: safeDateFormat(item.ets),
     gateIn: safeDateFormat(item.gateIn),
     pickUp: safeDateFormat(item.pickUp),
     vesselWithVoyage: `${item.vessel} ${item.voyage}`,
-    pol: item.pol,
-    bookingId: item.bookingId,
-    container: item.container,
-    carrierId: item.carrierId,
-    checklistCheckedCount: item.checklistCheckedCount,
-    checklistItemCount: item.checklistItemCount,
+    // pol: item.pol,
+    // bookingId: item.bookingId,
+    // container: item.container,
+    // carrierId: item.carrierId,
+    // checklistCheckedCount: item.checklistCheckedCount,
+    // checklistItemCount: item.checklistItemCount,
   };
 };
 
@@ -210,10 +211,10 @@ const LoadListContainer = () => {
                                         {item.status || ''}
                                       </TableCell>
                                       <TableCell component="th" scope="row" align="right">
-                                        {item.pickUp || ''}
+                                        {item.pickUp || '-'}
                                       </TableCell>
                                       <TableCell component="th" scope="row" align="right">
-                                        {item.gateIn || ''}
+                                        {item.gateIn || '-'}
                                       </TableCell>
                                     </TableRow>
                                   ))}
