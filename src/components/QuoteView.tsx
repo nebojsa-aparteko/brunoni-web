@@ -4,17 +4,17 @@ import {
   Button,
   Container,
   Divider,
+  FormControl,
   Grid,
+  InputLabel,
   makeStyles,
+  MenuItem,
   Paper,
+  Select,
   Theme,
   Typography,
   useMediaQuery,
   useTheme,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@material-ui/core';
 import Page from './quotes/Page';
 import QuoteItemHeader from './quotes/QuoteItemHeader';
@@ -27,7 +27,6 @@ import QuoteItemRemarks from './quotes/QuoteItemRemarks';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import PrintIcon from '@material-ui/icons/Print';
-import formatDate from 'date-fns/format';
 import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';

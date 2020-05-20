@@ -55,7 +55,12 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
         <a
           style={{ cursor: 'pointer', textDecoration: 'underline' }}
           onClick={() =>
-            notification.referenceObject && history.push(`/${notification.referenceObject}/${notification.referenceID}`)
+            notification.referenceObject &&
+            history.push(
+              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+                notification.referenceID
+              }`,
+            )
           }
         >
           {notification.referenceID}
@@ -92,7 +97,6 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
       <CardContent>
         {notification.type === NotificationType.COMMENT && notification.activity ? (
           <Fragment>
-            {console.log(notification.id)}
             <Comment comment={notification.activity} />
           </Fragment>
         ) : notification.activity && notification.type === NotificationType.ACTIVITY ? (

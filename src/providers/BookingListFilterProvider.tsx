@@ -14,6 +14,7 @@ export const BOOKING_FILTERS_INITIAL_STATE = {
   page: 0,
   rowsPerPage: 10,
   activeTab: 0,
+  searchString: '',
 } as BookingContextFilters;
 
 const BookingListFilterContext = createContext<
