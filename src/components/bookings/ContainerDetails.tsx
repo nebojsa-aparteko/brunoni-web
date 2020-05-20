@@ -437,7 +437,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                       );
                     }
                   })}
-
+                  {detail['VGM-PIN'] && (
+                    <TableRowData label={'VGM Pin'} content={detail['VGM-PIN']} key={`booking-vgm-pin-type-${index}`} />
+                  )}
                   {detail.CargoDetailRermarks && (
                     <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
                   )}

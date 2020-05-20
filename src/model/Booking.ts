@@ -193,6 +193,7 @@ export interface CargoDetail {
   DemDetTariff: string;
   PluginTariff: string;
   StorageTariff: string;
+  'VGM-PIN': string;
 }
 
 export interface EquipmentDetail {
