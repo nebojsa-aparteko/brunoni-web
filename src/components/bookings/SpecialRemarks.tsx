@@ -61,7 +61,7 @@ const SpecialRemarks: React.FC<Props> = ({ remarks }) => {
           <TableCell className={classes.tableCellLabel}>Special Remarks</TableCell>
           <TableCell
             className={classes.tableCell}
-            dangerouslySetInnerHTML={{ __html: remarkTexts }}
+            dangerouslySetInnerHTML={{ __html: remarkTexts.replace(/\*/g, '') }}
             style={{ paddingBottom: '20px', textAlign: 'justify' }}
           />
         </TableRow>
