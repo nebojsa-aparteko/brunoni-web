@@ -313,6 +313,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                     version={booking.Version}
                     category={booking?.Category}
                     tariffDetails={booking?.CtrTariffsDetails}
+                    remarks={booking.Remarks}
                   />
                 </Box>
                 {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (

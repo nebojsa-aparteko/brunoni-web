@@ -23,6 +23,7 @@ import {
   CtrTariffDetail,
   EquipmentDetail,
   LocRefItem,
+  Remark,
 } from '../../model/Booking';
 import ContainerType from '../../model/ContainerType';
 import ContainerTypes from '../../contexts/ContainerTypes';
@@ -40,6 +41,7 @@ interface Props {
   version: BookingVersion;
   category: BookingCategory;
   tariffDetails: CtrTariffDetail[];
+  remarks: Remark[];
 }
 
 interface TableRowProps {
@@ -87,6 +89,7 @@ interface ContainerItemProps {
   version: BookingVersion;
   category: BookingCategory;
   tariffDetails: CtrTariffDetail[];
+  remarks: Remark[];
 }
 
 const useStyles = makeStyles(theme => ({
@@ -335,10 +338,11 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
   version,
   category,
   tariffDetails,
+  remarks,
 }) => {
   const cont = containerTypes?.find(type => type.id === detail.CtypID);
   const classes = useStyles();
-
+  const arrivalItemRemark = remarks.find(r => r.RemarkType === 'ARRIVAL INFO REMARKS');
   return (
     <Fragment>
       <Typography variant="h5">{index ? `ITEM ${index + 1}` : 'ITEM 1'}</Typography>
@@ -443,6 +447,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   {detail.CargoDetailRermarks && (
                     <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
                   )}
+                  {arrivalItemRemark && (
+                    <TableRowData label={'Arrival Items Remark'} content={arrivalItemRemark.RemarkTxt} />
+                  )}
                 </TableBody>
               </Table>
             </Grid>
@@ -457,7 +464,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
   );
 };
 
-const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tariffDetails }) => {
+const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tariffDetails, remarks }) => {
   const containerTypes = useContext(ContainerTypes);
 
   return (
@@ -476,6 +483,7 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tar
             version={version}
             category={category}
             tariffDetails={tariffDetails}
+            remarks={remarks}
           />
         ))}
     </Grid>
