@@ -39,6 +39,7 @@ import { useSnackbar } from 'notistack';
 import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import theme from '../../../theme';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -225,7 +226,10 @@ const DocumentListItem = ({
           </ListItemAvatar>
           <ListItemText
             id={`filelistitem-${item.storedName}`}
-            primary={item.name}
+            disableTypography
+            primary={
+              <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+            }
             secondary={
               <span>
                 <Typography variant="caption">

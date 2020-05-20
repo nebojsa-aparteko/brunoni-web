@@ -18,6 +18,7 @@ import { ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import safeInvoke from '../../utilities/safeInvoke';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
+import theme from '../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -59,7 +60,10 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
         </ListItemAvatar>
         <ListItemText
           id={`filelistitem-${item.storedName}`}
-          primary={item.name}
+          disableTypography
+          primary={
+            <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+          }
           secondary={
             <Typography variant="caption">
               {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
