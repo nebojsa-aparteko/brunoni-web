@@ -180,8 +180,9 @@ const LoadListContainer = () => {
                                         <Link to={`/bookings/${item.bookingId}`}>{item.bookingId || ''}</Link>
                                       </TableCell>
                                       <TableCell component="th" scope="row" align="right">
-                                        {item.checklistCheckedCount &&
-                                          item.checklistItemCount &&
+                                        {item.checklistCheckedCount !== undefined &&
+                                          item.checklistItemCount !== undefined &&
+                                          item.checklistCheckedCount >= 0 &&
                                           item.checklistItemCount > 0 && (
                                             <Box
                                               onClick={(event: React.MouseEvent<unknown>) =>
