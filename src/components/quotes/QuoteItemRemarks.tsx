@@ -36,7 +36,7 @@ const QuoteItemRemarks: React.FC<Props> = ({ remarks }) => {
             >
               <InfoBoxItem
                 label1HTML={{ __html: remark.RemarkText }}
-                occupySpaceForTitle={isXS ? false : remark.RemarkTitle !== null}
+                occupySpaceForTitle={isXS || remark.RemarkTitle !== undefined}
               />
             </Linkify>
           </Grid>
