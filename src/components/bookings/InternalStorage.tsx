@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
-import { ActivityLogUserData, ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
+import { ActivityChangeType, ActivityLogUserData, ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
 import { orderBy } from 'lodash/fp';
 import InternalStorageItem from './InternalStorageItem';
 import firebase from '../../firebase';
@@ -23,6 +23,7 @@ import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
+import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
 
 const useStyles = makeStyles((theme: Theme) => ({
   rootEmpty: {
@@ -77,6 +78,14 @@ const deleteFileFromFirebase = (collection: string, deletedFile: ChecklistItemVa
     .doc(deletedFile?.id)
     .delete();
 
+const addActivity = (activity: ActivityLogItem, collection: string, id: string) =>
+  firebase
+    .firestore()
+    .collection(collection)
+    .doc(id)
+    .collection('activity')
+    .doc()
+    .set(activity);
 const InternalStorage: React.FC<Props> = ({ id, collection }) => {
   const classes = useStyles();
   const query = useCallback(q => q.orderBy('uploadedAt', 'desc'), []);
@@ -170,7 +179,9 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
             deleteFileFromFirebase(collection, item, id)
               .then(_ => {
                 console.log('File deleted', collection, item, id);
+                return new Promise<ChecklistItemValueDocument>(resolve => resolve(item));
               })
+              .then(item => addActivity(createActivity([item], ActivityChangeType.DELETE_FILE), collection, id))
               .catch(error => {
                 console.error('failed to update deleted items', error);
                 enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
@@ -201,6 +212,19 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
       } as ActivityLogUserData),
     [userRecord],
   );
+
+  const createActivity = useCallback(
+    (documents: ChecklistItemValueDocument[], activityType: ActivityChangeType) =>
+      ({
+        at: new Date(),
+        by: getActivityLogUserData(),
+        type: ActivityType.ACTIVITY,
+        isInternal: true,
+        documents: documents,
+        changeType: activityType,
+      } as ActivityLogItem),
+    [getActivityLogUserData, userRecord],
+  );
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       saveFiles(acceptedFiles)
@@ -215,8 +239,10 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
                 storedName: item.storedName,
               } as ChecklistItemValueDocument),
           );
-          return values.map(value => saveFilesToFirestore(collection, id, value));
+          values.map(value => saveFilesToFirestore(collection, id, value));
+          return new Promise<ChecklistItemValueDocument[]>(resolve => resolve(documents));
         })
+        .then(documents => addActivity(createActivity(documents, ActivityChangeType.ADD_FILE), collection, id))
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(id, null, 2)}`, err);
         });

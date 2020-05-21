@@ -11,7 +11,7 @@ export interface ActivityLogItem {
   id?: string;
   comment?: string;
   documents?: ShortChecklistItemValueDocument[] | null;
-  checklistItem: ShortChecklistItem;
+  checklistItem?: ShortChecklistItem;
   stage?: Stage;
   by: ActivityLogUserData;
   at: Date;

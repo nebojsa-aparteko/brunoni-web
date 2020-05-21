@@ -12,7 +12,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const mapChangeTypeToText = (): ActivityText | undefined => {
     switch (activity.changeType) {
       case ActivityChangeType.CHECKED:
-        return activity.checklistItem.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
+        return activity?.checklistItem?.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
       case ActivityChangeType.ADD_FILE:
         return activity.documents!.length > 1 ? ActivityText.ADD_FILES : ActivityText.ADD_FILE;
       case ActivityChangeType.DELETE_FILE:
@@ -47,8 +47,14 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
             `${doc.name} `
           );
         })}
-      {activity.documents && 'from '}
-      <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+      {activity.documents && activity.changeType === ActivityChangeType.ADD_FILE ? ' into ' : 'from '}
+      {activity.checklistItem ? (
+        <Fragment>
+          <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+        </Fragment>
+      ) : (
+        'Internal storage.'
+      )}
     </Typography>
   );
 };
