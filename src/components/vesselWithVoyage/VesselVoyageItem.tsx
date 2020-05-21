@@ -34,6 +34,11 @@ const getBookings = (bookings: string[]) =>
     .where('ERP-BkgRef', 'in', bookings)
     .get();
 
+const findCarrierId = (items: any[]) => {
+  const obj = items.find(u => u.erpCarrierId && u.erpServiceId);
+  return obj ? `${obj.erpCarrierId} ${obj.erpServiceId}` : undefined;
+};
+
 const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpand }) => {
   const entries = useMemo(() => Object.entries(items), [items]);
   // const bookingsIds = useMemo(
@@ -133,10 +138,8 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpa
           <DirectionsBoatIcon style={{ marginRight: theme.spacing(1) }} />
           <Box display="flex" flexDirection="column">
             <Typography style={{ width: theme.spacing(30) }}>{vessel}</Typography>
-            {entries[0][1].erpCarrierId && entries[0][1].erpServiceId && (
-              <Typography
-                style={{ width: theme.spacing(30) }}
-              >{`${entries[0][1].erpCarrierId} ${entries[0][1].erpServiceId}`}</Typography>
+            {findCarrierId(entries[0][1]) && (
+              <Typography style={{ width: theme.spacing(30) }}>{findCarrierId(entries[0][1])}</Typography>
             )}
           </Box>
         </Box>
