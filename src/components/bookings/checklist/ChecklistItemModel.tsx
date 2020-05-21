@@ -6,6 +6,7 @@ export interface ChecklistItemValueDocument {
   storedName: string;
   status?: ChecklistItemValueDocumentStatus;
   id: string;
+  mentionCount?: number;
 }
 
 export enum ChecklistItemValueDocumentStatusType {
@@ -54,6 +55,7 @@ export interface ChecklistItem {
   values?: ChecklistItemValueDocument[];
   valuesAdmin?: ChecklistItemValueDocument[];
   stages: Stage[];
+  mentionCount?: number;
 }
 
 export enum CustomerChecklistActionType {

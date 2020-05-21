@@ -55,11 +55,11 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
     activityCollection,
   ]);
 
-  const filteredActivityLog = useMemo(() => {
-    return normalizedActivityLog?.filter((item: ActivityLogItem) =>
-      showMore ? true : item.type === ActivityType.COMMENT,
-    );
-  }, [showMore, normalizedActivityLog]);
+  const filteredActivityLog = useMemo(
+    () =>
+      normalizedActivityLog?.filter((item: ActivityLogItem) => (showMore ? true : item.type === ActivityType.COMMENT)),
+    [showMore, normalizedActivityLog],
+  );
 
   const userRecord = useContext(UserRecordContext);
 

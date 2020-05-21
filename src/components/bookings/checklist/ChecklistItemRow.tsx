@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import {
+  Badge,
   Box,
   Button,
   Checkbox,
@@ -565,7 +566,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
           <Box flex="1" />
           <Box display="flex">
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon />
+              <Badge badgeContent={checklistItem.mentionCount || 0} color="primary">
+                <AddCommentIcon />
+              </Badge>
             </IconButton>
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
