@@ -18,8 +18,7 @@ import { BookingRow } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { chunk } from 'lodash/fp';
-
-const CHUNK_SIZE = 10;
+import VesselWithVoyage from '../../model/VesselWithVoyage';
 
 const SeparatorArrow = () => (
   <Box mx={4} display="flex" flexDirection="column" alignItems="center">
@@ -39,18 +38,10 @@ const findCarrierId = (items: any[]) => {
   return obj ? `${obj.erpCarrierId} ${obj.erpServiceId}` : undefined;
 };
 
-const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpand }) => {
+const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpand, handleDialogOpen }) => {
   const entries = useMemo(() => Object.entries(items), [items]);
-  // const bookingsIds = useMemo(
-  //   () =>
-  //     chunk(CHUNK_SIZE)(
-  //       Object.entries(items).reduce(
-  //         (previousValue, currentValue) => previousValue.concat(currentValue[1].map((v: any) => v.bookingId)),
-  //         [] as string[],
-  //       ),
-  //     ),
-  //   [items],
-  // );
+  const vesselItems = useMemo(() => Object.entries(items).map(i => i[1])[0] as VesselWithVoyage[], [entries]);
+
   // const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
   // useEffect(() => {
   //   (async () => {
@@ -132,7 +123,7 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpa
     //     </Box>
     //   </ExpansionPanelDetails>
     // </ExpansionPanel>
-    <Paper style={{ padding: 4, marginBottom: 4 }}>
+    <Paper style={{ padding: 4, marginBottom: 4 }} onClick={() => handleDialogOpen(vesselItems)}>
       <Box display="flex" my={2}>
         <Box display="flex" alignItems="center">
           <DirectionsBoatIcon style={{ marginRight: theme.spacing(1) }} />
@@ -176,4 +167,5 @@ interface Props {
   items: any[];
   expanded: string | false;
   handleExpand: (name: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => void;
+  handleDialogOpen: (item: VesselWithVoyage[]) => void;
 }

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Card,
@@ -16,6 +16,8 @@ import VesselWithVoyage from '../../model/VesselWithVoyage';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import CategoryFilter from '../CategoryFilter';
 import set from 'lodash/fp/set';
+import VesselVoyageDialog from './VesselVoyageDialog';
+import { Booking } from '../../model/Booking';
 
 const groups = ['vesselWithVoyage', 'pol'];
 
@@ -23,7 +25,11 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const [filter, setFilter] = useState('Export');
   const vessel = useVesselWithVoyage(filter);
   const [expanded, setExpanded] = React.useState<string | false>(false);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
   const normalizedVessel = useMemo(
     () =>
       vessel?.reduce((r: any, o: any) => {
@@ -43,6 +49,10 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   };
   const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
+  };
+  const handleDialogOpen = (item: VesselWithVoyage[]) => {
+    setDialogData(item);
+    setIsDialogOpen(true);
   };
   return (
     <Card>
@@ -68,8 +78,10 @@ const VesselVoyageContainer: React.FC<Props> = () => {
               key={vessel}
               expanded={expanded}
               handleExpand={handleChange}
+              handleDialogOpen={handleDialogOpen}
             />
           ))}
+        <VesselVoyageDialog vesselItems={dialogData} isOpen={isDialogOpen} handleClose={handleDialogClose} />
       </CardContent>
     </Card>
   );
