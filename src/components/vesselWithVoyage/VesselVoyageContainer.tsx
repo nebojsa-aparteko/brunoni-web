@@ -26,6 +26,7 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const vessel = useVesselWithVoyage(filter);
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
@@ -50,7 +51,8 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
-  const handleDialogOpen = (item: VesselWithVoyage[]) => {
+  const handleDialogOpen = (item: VesselWithVoyage[], vessel: string) => {
+    setVesselName(vessel);
     setDialogData(item);
     setIsDialogOpen(true);
   };
@@ -81,7 +83,12 @@ const VesselVoyageContainer: React.FC<Props> = () => {
               handleDialogOpen={handleDialogOpen}
             />
           ))}
-        <VesselVoyageDialog vesselItems={dialogData} isOpen={isDialogOpen} handleClose={handleDialogClose} />
+        <VesselVoyageDialog
+          vesselItems={dialogData}
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          vessel={vesselName}
+        />
       </CardContent>
     </Card>
   );
