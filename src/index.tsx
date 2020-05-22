@@ -142,15 +142,15 @@ const UserApp: React.FC = () => {
     default:
       showCrispChat(true);
       return (
-        <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
-          <ClientUsersProvider>
-            <QuoteFilterListProvider>
-              <BookingListFilterProvider>
-                <App />
-              </BookingListFilterProvider>
-            </QuoteFilterListProvider>
-          </ClientUsersProvider>
-        </FirestoreClientDocumentProvider>
+        // <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
+        <ClientUsersProvider>
+          <QuoteFilterListProvider>
+            <BookingListFilterProvider>
+              <App />
+            </BookingListFilterProvider>
+          </QuoteFilterListProvider>
+        </ClientUsersProvider>
+        // </FirestoreClientDocumentProvider>
       );
   }
 };
