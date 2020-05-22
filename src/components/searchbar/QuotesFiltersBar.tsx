@@ -33,7 +33,7 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
   const setDestinationPort = (port: Port | null) =>
     setFilters && setFilters(set('destinationPort', port || undefined)(filters));
 
-  const setClientFilter = (client: Client | null) =>
+  const setClientFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('clientFilter', client || undefined)(filters));
 
   const setUserFilter = (user: UserRecord | null) =>

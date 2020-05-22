@@ -13,8 +13,8 @@ interface Props {
   label: string;
   clients: Client[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: Client;
-  onChange: (client: Client | null) => void;
+  value?: Client | null | undefined;
+  onChange: (client: Client | null | undefined) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -48,7 +48,7 @@ const ClientInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(_: ChangeEvent<{}>, client: Client | null) => onChange(client)}
+      onChange={(_: ChangeEvent<{}>, client: Client | null | undefined) => onChange(client)}
       autoSelect
       autoHighlight
       open={open}

@@ -41,7 +41,8 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const setDestinationPort = (port: Port | null) => setFilters(set('destinationPort', port || undefined)(filters));
 
-  const setClientFilter = (client: Client | null) => setFilters(set('clientFilter', client || undefined)(filters));
+  const setClientFilter = (client: Client | null | undefined) =>
+    setFilters(set('clientFilter', client || undefined)(filters));
 
   const setUserFilter = (user: UserRecord | null) => setFilters(set('assignee', user || undefined)(filters));
 
