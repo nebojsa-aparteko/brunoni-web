@@ -1,10 +1,11 @@
-import React from 'react';
-import { makeStyles, Theme } from '@material-ui/core';
+import React, { useState } from 'react';
+import { Box, FormControl, Grid, IconButton, makeStyles, MenuItem, Select, Theme } from '@material-ui/core';
 import Container from '../components/Container';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 import useUser from '../hooks/useUser';
-import useStatistics from '../hooks/useStatistics';
 import ChartsCircularProgress from '../components/dashboard/ChartsCircularProgress';
+import TodayIcon from '@material-ui/icons/Today';
+import DashboardYearSelect from '../components/DashboardYearSelect';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -23,10 +24,22 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Dashboard: React.FC = () => {
   const classes = useStyles();
   const userRecord = useUser()[1];
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(currentYear);
+  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setYear(event.target.value as number);
+  };
   return (
     <Container className={classes.root}>
+      <Box my={2}>
+        <Grid container justify="flex-end">
+          <Grid item xs={6} sm={5} md={4} lg={3}>
+            <DashboardYearSelect year={year} handleYearChange={handleYearChange} />
+          </Grid>
+        </Grid>
+      </Box>
       {userRecord?.alphacomClientId ? (
-        <DashboardCharts client={userRecord?.alphacomClientId} />
+        <DashboardCharts client={userRecord?.alphacomClientId} year={year} />
       ) : (
         <ChartsCircularProgress />
       )}
