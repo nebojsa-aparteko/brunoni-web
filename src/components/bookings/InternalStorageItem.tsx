@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Avatar,
+  Badge,
   CircularProgress,
   IconButton,
   ListItem,
@@ -83,7 +84,9 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
               handleMention(item);
             }}
           >
-            <AddCommentIcon />
+            <Badge badgeContent={item.mentionCount || 0} color="primary">
+              <AddCommentIcon />
+            </Badge>
           </IconButton>
 
           <IconButton

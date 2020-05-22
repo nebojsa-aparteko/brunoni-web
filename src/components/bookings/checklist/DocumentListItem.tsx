@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import {
   Avatar,
+  Badge,
   Box,
   CircularProgress,
   createStyles,
@@ -156,7 +157,11 @@ const DocumentListItem = ({
   const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
 
   const handleMention = () =>
-    activityLogContext.setState({ documentReference: item, checklistReference: checklistItem, internal: internal });
+    activityLogContext.setState({
+      documentReference: { ...item, isInternal: internal },
+      checklistReference: checklistItem,
+      internal: internal,
+    });
   const checklistCheckedRule = () => checklistItem.checked;
 
   const deleteFile = useCallback(
@@ -250,7 +255,9 @@ const DocumentListItem = ({
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon />
+              <Badge badgeContent={item.mentionCount || 0} color="primary">
+                <AddCommentIcon />
+              </Badge>
             </IconButton>
             {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
               editRestriction(item.uploadedAt) &&
