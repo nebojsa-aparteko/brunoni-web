@@ -175,7 +175,7 @@ export const normalizeQuoteGroups = (
 ) => {
   const normalizeQuotes = flow(
     map(normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier)),
-    orderBy(get('validityPeriod.from'), 'asc'),
+    orderBy(get('dateIssued'), 'asc'),
   );
 
   const normalizeQuoteGroup = flow(quotes => {
