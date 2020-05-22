@@ -1,21 +1,21 @@
-import React, { useContext, useState } from 'react';
-import { Box, FormControl, Grid, IconButton, MenuItem } from '@material-ui/core';
-import { Select } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { Box, FormControl, Grid, IconButton, MenuItem, Select } from '@material-ui/core';
 import TodayIcon from '@material-ui/icons/Today';
 import Page from '../quotes/Page';
 import TEUPerformance from './TEUPerformance';
 import CarrierPerformance from './CarrierPerformance';
 import ContainerTypePerformance from './ContainerTypePerformance';
 import Top5PortsPerformance from './Top5PortsPerformance';
-import StatisticsContext from '../../contexts/Statistics';
+import useStatistics from '../../hooks/useStatistics';
+import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 
-const DashboardCharts: React.FC = () => {
+const DashboardCharts: React.FC<Props> = ({ client }) => {
+  const clientPerformance = useStatistics(client);
+
   const currentYear = new Date().getFullYear();
 
   const [open, setOpen] = React.useState(false);
   const [year, setYear] = useState(currentYear);
-  const clientPerformance = useContext(StatisticsContext);
-
   const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setYear(event.target.value as number);
   };
@@ -70,7 +70,13 @@ const DashboardCharts: React.FC = () => {
         </Grid>
       </Grid>
     </Page>
-  ) : null;
+  ) : (
+    <BookingsEmptyResults message="There is no statistics for this client" />
+  );
 };
 
 export default DashboardCharts;
+
+interface Props {
+  client: string;
+}

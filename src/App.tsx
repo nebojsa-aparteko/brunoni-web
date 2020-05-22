@@ -29,6 +29,7 @@ import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
 import VesselWithVoyagePage from './pages/VesselWithVoyagePage';
 import LoadListPage from './pages/LoadListPage';
+import BookingsRedirect from './pages/BookingsRedirect';
 
 const anonymousRoutes = (
   <Switch>
@@ -46,7 +47,8 @@ const anonymousRoutes = (
 
 const adminRoutes = (
   <Switch>
-    <Route exact path="/" component={AdminDashboard} />
+    <Route exact path="/" component={BookingsRedirect} />
+    <Route exact path="/client-statistics" component={AdminDashboard} />
     <Route exact path="/schedule" component={Routes} />
     <Route exact path="/quotes/groups" component={QuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
