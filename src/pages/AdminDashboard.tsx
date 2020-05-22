@@ -38,9 +38,6 @@ const AdminDashboard = () => {
     <Container className={classes.root}>
       <Box my={2}>
         <Grid container justify="flex-end" spacing={3}>
-          <Grid item xs={6} sm={5} md={4} lg={3} alignItems="flex-end">
-            <DashboardYearSelect year={year} handleYearChange={handleYearChange} />
-          </Grid>
           {clients && (
             <Grid item xs={6} sm={5} md={4} lg={3}>
               <ClientInput
@@ -51,6 +48,9 @@ const AdminDashboard = () => {
               />
             </Grid>
           )}
+          <Grid item xs={6} sm={5} md={4} lg={3}>
+            <DashboardYearSelect year={year} handleYearChange={handleYearChange} />
+          </Grid>
         </Grid>
       </Box>
       {selectedClient ? <DashboardCharts client={selectedClient?.id} year={year} /> : <ChartsCircularProgress />}
