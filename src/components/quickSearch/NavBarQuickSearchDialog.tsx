@@ -131,7 +131,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <QuickSearchBooking
             label="Container number"
             handleClose={handleClose}
-            searchBookings={inputValue => nestedSearchBookings('containers', 'container', inputValue)}
+            searchBookings={inputValue => nestedSearchBookings('containers', 'container', inputValue.toUpperCase())}
           />
           <QuickSearchBooking
             label="Delivery reference"
