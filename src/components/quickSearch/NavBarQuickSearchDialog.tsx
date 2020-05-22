@@ -116,17 +116,17 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <QuickSearchBooking
             label="File number"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings', 'ERP-BkgRef', inputValue)}
+            searchBookings={inputValue => searchBookings('bookings-search', 'bookingId', inputValue.toLowerCase())}
           />
           <QuickSearchBooking
             label="BL number"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings', 'BL-No', inputValue)}
+            searchBookings={inputValue => searchBookings('bookings-search', 'BL-No', inputValue.toLowerCase())}
           />
           <QuickSearchBooking
             label="Customer's reference"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings', 'Cust-BkgRef', inputValue)}
+            searchBookings={inputValue => searchBookings('bookings-search', 'Cust-BkgRef', inputValue.toLowerCase())}
           />
           <QuickSearchBooking
             label="Container number"
@@ -137,14 +137,14 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             label="Delivery reference"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'deliveryRef', inputValue, 'array-contains')
+              nestedSearchBookings('bookings-search', 'deliveryRef', inputValue.toLowerCase(), 'array-contains')
             }
           />
           <QuickSearchBooking
             label="Pickup reference"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'pickupRef', inputValue, 'array-contains')
+              nestedSearchBookings('bookings-search', 'pickupRef', inputValue.toLowerCase(), 'array-contains')
             }
           />
         </DialogContent>
