@@ -356,7 +356,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                           {booking.FinalDestinationName}
                           <br />
                           <Typography variant={'body2'}>
-                            ETA. {formatDateSafe(booking.ETA, DateFormats.LONG)}
+                            ETA. {formatDateSafe(booking.FinalDestinationETA, DateFormats.LONG)}
                           </Typography>
                         </Fragment>
                       }
