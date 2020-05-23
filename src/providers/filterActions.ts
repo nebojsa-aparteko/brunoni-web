@@ -35,11 +35,6 @@ export interface ContextFilters {
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
-  searchString: string;
-  page: number;
-  rowsPerPage: number;
-  scrollPosition?: number;
-  activeTab: number;
 }
 
 export type Action = {

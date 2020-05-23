@@ -30,6 +30,9 @@ import { isDashboardUser } from './model/UserRecord';
 import VesselWithVoyagePage from './pages/VesselWithVoyagePage';
 import LoadListPage from './pages/LoadListPage';
 import BookingsRedirect from './pages/BookingsRedirect';
+import BookingListFilterProvider from './providers/BookingListFilterProvider';
+import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
+import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
 
 const anonymousRoutes = (
   <Switch>
@@ -122,16 +125,22 @@ const App: React.FC = () => {
 
   return (
     <Fragment>
-      <Navbar />
-      <div className={classes.deviceControl}>
-        {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
-      </div>
-      <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
-      {process.env.REACT_APP_BRAND === 'brunoni' ? (
-        <BrunoniFooter />
-      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-        <AllmarineFooter />
-      ) : null}
+      <QuoteFilterListProvider>
+        <BookingListPaginationProvider>
+          <BookingListFilterProvider>
+            <Navbar />
+            <div className={classes.deviceControl}>
+              {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+            </div>
+            <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
+            {process.env.REACT_APP_BRAND === 'brunoni' ? (
+              <BrunoniFooter />
+            ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+              <AllmarineFooter />
+            ) : null}
+          </BookingListFilterProvider>
+        </BookingListPaginationProvider>
+      </QuoteFilterListProvider>
     </Fragment>
   );
 };

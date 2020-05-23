@@ -23,14 +23,13 @@ import BookingsTable from './bookings/BookingsTable';
 import { Booking } from '../model/Booking';
 import Search from './searchbar/Search';
 import containsString from '../utilities/containsString';
-import { BookingContextFilters, useBookingsContext } from '../providers/BookingsProvider';
 import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 import CategoryFilter from './CategoryFilter';
+import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 
 interface Props {
   bookings?: Booking[];
-  bookingContextFilters: BookingContextFilters;
   isAdmin?: boolean;
   archived?: boolean;
   showDateRangeFilter?: boolean;
@@ -91,18 +90,17 @@ export const getContainersString = (booking: Booking) => {
     .split('/');
 };
 
-const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilters, archived, showDateRangeFilter }) => {
+const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
 
-  const { searchString, page, rowsPerPage } = bookingsContextData;
+  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+
+  const { assignee } = bookingsContextData;
+  const { searchString, page, rowsPerPage } = bookingPaginationContextData;
 
   const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
-
-  const [_, isLoading, bookingFilters, setBookingFilters] = useBookingsContext();
-
-  const { assignee } = bookingFilters;
 
   const resultChunks = useMemo(() => {
     const result = filter(
@@ -145,33 +143,37 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
   }, [bookings, searchString, page, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBookingFilters && setBookingFilters(set('category', (event.target as HTMLInputElement).value)(bookingFilters));
+    setBookingsContextData &&
+      setBookingsContextData(set('category', (event.target as HTMLInputElement).value)(bookingsContextData));
   };
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-      if (setBookingsContextData) setBookingsContextData(set('page', page)(bookingsContextData));
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
     },
-    [setBookingsContextData],
+    [setBookingPaginationContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      if (setBookingsContextData)
-        setBookingsContextData(
-          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingsContextData),
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(
+          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
         );
     },
-    [setBookingsContextData],
+    [setBookingPaginationContextData],
   );
 
   const handleSearch = useCallback(
     (searchStringNew: string) => {
-      if (searchStringNew !== searchString && setBookingsContextData) {
-        setBookingsContextData(flow(set('searchString', searchStringNew), set('page', 0))(bookingsContextData));
+      if (searchStringNew !== searchString && setBookingPaginationContextData) {
+        setBookingPaginationContextData(
+          flow(set('searchString', searchStringNew), set('page', 0))(bookingPaginationContextData),
+        );
       }
     },
-    [setBookingsContextData, searchString],
+    [setBookingPaginationContextData, searchString],
   );
 
   // if (!bookings) {
@@ -201,7 +203,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, bookingContextFilter
                       Bookings {archived && '- Archive'}
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
-                    <CategoryFilter value={bookingContextFilters.category} onChange={handleImportOrExportChange} />
+                    <CategoryFilter value={bookingsContextData.category} onChange={handleImportOrExportChange} />
                     <Box flex={1} />
 
                     <Search

@@ -1,7 +1,7 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
-import { Booking, BookingCategory } from '../model/Booking';
+import { Booking } from '../model/Booking';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
@@ -34,17 +34,7 @@ export interface BookingContextFilters extends ContextFilters {
   category: string;
 }
 
-const defaultFilters = {
-  archived: false,
-  category: BookingCategory.Export,
-  page: 0,
-  rowsPerPage: 10,
-  activeTab: 0,
-} as BookingContextFilters;
-
-const BookingsContext = createContext<
-  [Booking[] | undefined, boolean, BookingContextFilters, Dispatch<SetStateAction<BookingContextFilters>> | undefined]
->([undefined, true, defaultFilters, undefined]);
+const BookingsContext = createContext<[Booking[] | undefined, boolean]>([undefined, true]);
 
 export const useBookingsContext = () => {
   const context = React.useContext(BookingsContext);
@@ -60,7 +50,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [filters, setFilters] = useBookingListFilterContext();
+  const filters = useBookingListFilterContext()[0];
 
   const query = useMemo(
     () => (collection: firebase.firestore.CollectionReference) => {
@@ -128,11 +118,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     return normalizeBookings(bookings);
   }, [bookingsSnapshot]);
 
-  return (
-    <BookingsContext.Provider value={[bookingsResult, isLoading, filters, setFilters]}>
-      {children}
-    </BookingsContext.Provider>
-  );
+  return <BookingsContext.Provider value={[bookingsResult, isLoading]}>{children}</BookingsContext.Provider>;
 };
 
 export default BookingsProvider;

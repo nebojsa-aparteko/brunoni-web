@@ -6,15 +6,12 @@ import ActingAs from '../contexts/ActingAs';
 
 export interface BookingContextFilters extends ContextFilters {
   category: string;
+  activeTab?: number;
 }
 
 export const BOOKING_FILTERS_INITIAL_STATE = {
   archived: false,
   category: BookingCategory.Export,
-  page: 0,
-  rowsPerPage: 10,
-  activeTab: 0,
-  searchString: '',
 } as BookingContextFilters;
 
 const BookingListFilterContext = createContext<

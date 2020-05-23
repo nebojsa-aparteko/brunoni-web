@@ -1,5 +1,5 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect } from 'react';
 import BookingsView from '../components/BookingsView';
 import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -7,10 +7,11 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import Meta from '../components/Meta';
 import BookingsProvider, { useBookingsContext } from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
-import { BOOKING_FILTERS_INITIAL_STATE, useBookingListFilterContext } from '../providers/BookingListFilterProvider';
+import { useBookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
+import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -68,75 +69,87 @@ const BookingsPageContainer: React.FC = () => {
   const actingAs = useContext(ActingAs)[0];
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
-  const selectedTab = bookingsContextData.activeTab;
+  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const selectedTab = bookingPaginationContextData.activeTab;
 
-  const [bookings, isLoading, filters, setFilters] = useBookingsContext();
+  const [bookings, isLoading] = useBookingsContext();
 
   // Remember scroll position
   useEffect(() => {
-    if (bookingsContextData.scrollPosition && !isLoading) {
-      window.scroll(0, bookingsContextData.scrollPosition);
+    if (bookingPaginationContextData.scrollPosition && !isLoading) {
+      window.scroll(0, bookingPaginationContextData.scrollPosition);
     }
 
     return () => {
       // as it will be remounted a few times we do not want to store position if the scroll did not actually happen
-      if (window.scrollY > 200 && setBookingsContextData) {
-        setBookingsContextData(set('scrollPosition', window.scrollY)(bookingsContextData));
+      if (window.scrollY > 200 && setBookingPaginationContextData) {
+        setBookingPaginationContextData(set('scrollPosition', window.scrollY)(bookingPaginationContextData));
       }
     };
-  }, [isLoading, bookingsContextData.scrollPosition]);
+  }, [isLoading, bookingPaginationContextData.scrollPosition]);
 
   useEffect(() => {
-    handleTabChange(bookingsContextData.activeTab);
-  }, [bookingsContextData.activeTab]);
-
-  const setSelectedTab = (event: React.ChangeEvent<{}>, newValue: number) => {
-    if (setBookingsContextData) setBookingsContextData(set('activeTab', newValue)(bookingsContextData));
-  };
-
-  const handleTabChange = (newValue: number) => {
-    if (setBookingsContextData) setBookingsContextData(set('scrollPosition', 0)(bookingsContextData));
-    if (newValue !== bookingsContextData.activeTab && setBookingsContextData) {
-      setBookingsContextData(BOOKING_FILTERS_INITIAL_STATE);
+    if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
+      handleTabChange(bookingPaginationContextData.activeTab);
     }
+  }, [bookingPaginationContextData.activeTab]);
 
-    switch (newValue) {
-      case 0:
-        setFilters &&
-          setFilters(flow(set('archived', false), set('pendingPayment', false), set('dateRange', undefined))(filters));
-        break;
-      case 1:
-        setFilters &&
-          setFilters(flow(set('archived', false), set('pendingPayment', true), set('dateRange', undefined))(filters));
-        break;
-      case 2:
-        setFilters &&
-          setFilters(
-            flow(
+  const setSelectedTab = useCallback(
+    (event: React.ChangeEvent<{}>, newValue: number) => {
+      if (setBookingPaginationContextData) {
+        setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
+      }
+    },
+    [bookingPaginationContextData.activeTab],
+  );
+
+  const handleTabChange = useCallback(
+    (newValue: number) => {
+      const bookingsContextDataNew = () => {
+        switch (newValue) {
+          case 0:
+            return flow(
+              set('archived', false),
+              set('pendingPayment', false),
+              set('dateRange', undefined),
+            )(bookingsContextData);
+          case 1:
+            return flow(
+              set('archived', false),
+              set('pendingPayment', true),
+              set('dateRange', undefined),
+            )(bookingsContextData);
+          case 2:
+            return flow(
               set('archived', true),
               set('pendingPayment', undefined),
-              set('dateRange', filters.dateRange || INITIAL_DATERANGE_FILTER),
-            )(filters),
-          );
-        break;
-      default:
-        break;
-    }
-  };
+              set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
+            )(bookingsContextData);
+          default:
+            return bookingsContextData;
+        }
+      };
+
+      if (setBookingsContextData) {
+        setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
+      }
+    },
+    [setBookingsContextData],
+  );
 
   useEffect(() => {
     if (actingAs) {
       // we are acting as a customer set a date range:
-      setFilters &&
-        setFilters(
+      setBookingsContextData &&
+        setBookingsContextData(
           flow(
             set('archived', undefined),
             set('pendingPayment', undefined),
-            set('dateRange', filters.dateRange || LAST_3_MONTHS),
-          )(filters),
+            set('dateRange', bookingsContextData.dateRange || LAST_3_MONTHS),
+          )(bookingsContextData),
         );
     }
-  }, [actingAs, setFilters]);
+  }, [actingAs, setBookingsContextData]);
 
   return (
     <Fragment>
@@ -155,23 +168,14 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
-            <BookingsView
-              bookings={isLoading ? undefined : bookings}
-              bookingContextFilters={filters}
-              isAdmin={!actingAs}
-            />
+            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            <BookingsView
-              bookings={isLoading ? undefined : bookings}
-              bookingContextFilters={filters}
-              isAdmin={!actingAs}
-            />
+            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
           </TabPanel>
           <TabPanel value={selectedTab} index={2}>
             <BookingsView
               bookings={isLoading ? undefined : bookings}
-              bookingContextFilters={filters}
               isAdmin={!actingAs}
               archived
               showDateRangeFilter
@@ -180,7 +184,7 @@ const BookingsPageContainer: React.FC = () => {
         </Box>
       ) : (
         <Container maxWidth="lg">
-          <BookingsView bookings={bookings} bookingContextFilters={filters} showDateRangeFilter />
+          <BookingsView bookings={bookings} showDateRangeFilter />
         </Container>
       )}
     </Fragment>

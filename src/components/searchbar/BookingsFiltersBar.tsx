@@ -9,11 +9,11 @@ import useClients from '../../hooks/useClients';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
-import { useBookingsContext } from '../../providers/BookingsProvider';
 import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
+import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
 
 interface Props {
   showClientFilter?: boolean;
@@ -32,21 +32,23 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const users = useAdminUsers();
   const ports = useContext(Ports);
 
-  const filters = useBookingsContext()[2];
-  const setFilters = useBookingsContext()[3]!;
+  const [filters, setFilters] = useBookingListFilterContext();
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
 
-  const setOriginPort = (port: Port | null) => setFilters(set('originPort', port || undefined)(filters));
+  const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
 
-  const setDestinationPort = (port: Port | null) => setFilters(set('destinationPort', port || undefined)(filters));
+  const setDestinationPort = (port: Port | null) =>
+    setFilters && setFilters(set('destinationPort', port || undefined)(filters));
 
   const setClientFilter = (client: Client | null | undefined) =>
-    setFilters(set('clientFilter', client || undefined)(filters));
+    setFilters && setFilters(set('clientFilter', client || undefined)(filters));
 
-  const setUserFilter = (user: UserRecord | null) => setFilters(set('assignee', user || undefined)(filters));
+  const setUserFilter = (user: UserRecord | null) =>
+    setFilters && setFilters(set('assignee', user || undefined)(filters));
 
-  const setDateRange = (dateRange: DateRange) => setFilters(set('dateRange', dateRange || undefined)(filters));
+  const setDateRange = (dateRange: DateRange) =>
+    setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));
 
   return (
     <Box
