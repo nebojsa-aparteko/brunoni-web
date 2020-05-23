@@ -184,7 +184,7 @@ const BookingsPageContainer: React.FC = () => {
         </Box>
       ) : (
         <Container maxWidth="lg">
-          <BookingsView bookings={bookings} showDateRangeFilter />
+          <BookingsView bookings={isLoading ? undefined : bookings} showDateRangeFilter />
         </Container>
       )}
     </Fragment>
