@@ -44,8 +44,8 @@ const SpecialRemarks: React.FC<Props> = ({ remarks }) => {
 
   const remarkTexts = remarks
     .map(remark => {
-      return remark.RemarkTxt.split('<br/><br/>')
-        .map(remark => remark.split('<br/>').join(''))
+      return remark.RemarkTxt?.split('<br/><br/>')
+        .map(remark => remark?.split('<br/>').join(''))
         .join('<br/><br/>');
     })
     .join('<br />');
