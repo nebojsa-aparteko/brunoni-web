@@ -12,6 +12,7 @@ import { useVesselFilterContext } from '../../providers/VesselOverviewFilterProv
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import theme from '../../theme';
+import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 
 const groups = ['vesselWithVoyage', 'pol'];
 
@@ -73,10 +74,13 @@ const VesselVoyageContainer: React.FC<Props> = () => {
       <CardContent>
         {!normalizedVessel && <ChartsCircularProgress />}
 
-        {normalizedVessel &&
+        {normalizedVessel && Object.entries(normalizedVessel).length > 0 ? (
           Object.entries(normalizedVessel).map(([vessel, items]: any, index: number) => (
             <VesselVoyageItem vessel={vessel} items={items} key={vessel} handleDialogOpen={handleDialogOpen} />
-          ))}
+          ))
+        ) : (
+          <BookingsEmptyResults title="" message="No vessel with voyage item with this criteria." />
+        )}
         {isDialogOpen && (
           <VesselVoyageDialog
             vesselItems={dialogData}
