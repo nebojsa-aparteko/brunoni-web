@@ -31,8 +31,6 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const clients = useClients();
   const users = useAdminUsers();
   const ports = useContext(Ports);
-  console.log(users, 'Users');
-
   const [filters, setFilters] = useBookingListFilterContext();
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
