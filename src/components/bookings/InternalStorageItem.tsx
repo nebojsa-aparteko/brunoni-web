@@ -84,9 +84,9 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
               handleMention(item);
             }}
           >
-            <Badge badgeContent={item.mentionCount || 0} color="primary">
-              <AddCommentIcon />
-            </Badge>
+            {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
+            <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+            {/*</Badge>*/}
           </IconButton>
 
           <IconButton

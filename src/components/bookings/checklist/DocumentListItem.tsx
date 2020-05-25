@@ -255,9 +255,9 @@ const DocumentListItem = ({
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              <Badge badgeContent={item.mentionCount || 0} color="primary">
-                <AddCommentIcon />
-              </Badge>
+              {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
+              <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              {/*</Badge>*/}
             </IconButton>
             {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
               editRestriction(item.uploadedAt) &&
