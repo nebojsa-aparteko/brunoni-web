@@ -58,6 +58,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
     let didCancel = false;
     (async () => {
       if (!didCancel && vesselItems && bookingsIds) {
+        console.log(bookingsIds);
         setBookings(
           (await getBookings(bookingsIds[(bookings?.length || 0) / CHUNK_SIZE])).docs.map(bkg =>
             normalizeBooking(bkg.data()),

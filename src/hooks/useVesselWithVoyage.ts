@@ -6,7 +6,7 @@ import safeInvoke from '../utilities/safeInvoke';
 import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
 
-export default function useVesselWithVoyage(filter: string, query?: QueryFunction | null) {
+export default function useVesselWithVoyage(filter: string = 'Export', query?: QueryFunction | null) {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
 
   useEffect(() => {
