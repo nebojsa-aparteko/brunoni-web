@@ -31,6 +31,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const clients = useClients();
   const users = useAdminUsers();
   const ports = useContext(Ports);
+  console.log(users, 'Users');
 
   const [filters, setFilters] = useBookingListFilterContext();
 
@@ -90,7 +91,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
             </Box>
           </Grid>
         )}
-        {showAssigneeFilter && !showDateRange && (
+        {showAssigneeFilter && !showDateRange && users && (
           <Grid item sm={3} xs={12}>
             <UserInput label="Choose User" users={users || []} onChange={setUserFilter} value={assignee} />
           </Grid>

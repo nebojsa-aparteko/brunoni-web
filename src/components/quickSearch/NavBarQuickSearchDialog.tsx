@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme =>
 const searchBookings = async (collection: string, fieldPath: string, inputValue: string) =>
   firebase
     .firestore()
-    .collection('bookings')
+    .collection(collection)
     .where(fieldPath, '==', inputValue)
     .get()
     .then(result => {
@@ -116,17 +116,21 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <QuickSearchBooking
             label="File number"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings-search', 'bookingId', inputValue.toLowerCase())}
+            searchBookings={inputValue =>
+              nestedSearchBookings('bookings-search', 'bookingId', inputValue.toLowerCase())
+            }
           />
           <QuickSearchBooking
             label="BL number"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings-search', 'BL-No', inputValue.toLowerCase())}
+            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'BL-No', inputValue.toLowerCase())}
           />
           <QuickSearchBooking
             label="Customer's reference"
             handleClose={handleClose}
-            searchBookings={inputValue => searchBookings('bookings-search', 'Cust-BkgRef', inputValue.toLowerCase())}
+            searchBookings={inputValue =>
+              nestedSearchBookings('bookings-search', 'Cust-BkgRef', inputValue.toLowerCase())
+            }
           />
           <QuickSearchBooking
             label="Container number"
