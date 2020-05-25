@@ -9,27 +9,7 @@ import NotificationsView from './NotificationsView';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-  const handleShowNotifications = () =>
-    setIsNotificationDrawerOpen(prevState => {
-      (async () => {
-        if (prevState) {
-          const batch = firebase.firestore().batch();
-          notifications
-            ?.filter(notification => !notification.seen)
-            .map(notification =>
-              batch.update(
-                firebase
-                  .firestore()
-                  .collection('notifications')
-                  .doc(notification.id),
-                { seen: true },
-              ),
-            );
-          batch.commit().catch(err => console.log(err));
-        }
-      })();
-      return !prevState;
-    });
+  const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
   const userRecord = useContext(UserRecordContext);
   const notifications = useNotifications(userRecord?.alphacomId);
   const notificationCount = useMemo(
@@ -64,9 +44,11 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
-      <Drawer open={isNotificationDrawerOpen} anchor="right" onClose={handleShowNotifications}>
-        <NotificationsView handleShow={handleShowNotifications} notifications={notifications} />
-      </Drawer>
+      {isNotificationDrawerOpen && (
+        <Drawer open={isNotificationDrawerOpen} anchor="right" onClose={handleShowNotifications}>
+          <NotificationsView handleShow={handleShowNotifications} notifications={notifications} />
+        </Drawer>
+      )}
     </Fragment>
   );
 };

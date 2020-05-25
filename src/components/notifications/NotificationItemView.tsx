@@ -1,5 +1,15 @@
 import React, { Fragment } from 'react';
-import { Box, Card, CardContent, CardHeader, Chip, createStyles, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  createStyles,
+  IconButton,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import Notification, { NotificationType } from '../../model/Notification';
 import firebase from 'firebase';
@@ -7,7 +17,8 @@ import { useHistory } from 'react-router';
 import Activity from '../bookings/checklist/Activity';
 import Alert from './Alert';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
-
+import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
@@ -88,11 +99,11 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
         title={<NotificationTitle notification={notification} />}
         subheader={formatDistanceToNowConfigured(notification.at)}
         className={classes.header}
-        /*action={
-        <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
-          {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
-        </IconButton>
-        }*/
+        action={
+          <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
+            {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
+          </IconButton>
+        }
       />
       <CardContent>
         {notification.type === NotificationType.COMMENT && notification.activity ? (

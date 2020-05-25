@@ -1,8 +1,9 @@
-import React from 'react';
-import { Box, createStyles, Divider, IconButton, makeStyles, Typography } from '@material-ui/core';
+import React, { useCallback } from 'react';
+import { Box, Button, createStyles, Divider, IconButton, makeStyles, Typography } from '@material-ui/core';
 import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
+import firebase from 'firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -24,6 +25,23 @@ const useStyles = makeStyles(theme =>
 
 const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
   const classes = useStyles();
+  const markAllAsRead = useCallback(() => {
+    (async () => {
+      const batch = firebase.firestore().batch();
+      notifications
+        ?.filter(notification => !notification.seen)
+        .map(notification =>
+          batch.update(
+            firebase
+              .firestore()
+              .collection('notifications')
+              .doc(notification.id),
+            { seen: true },
+          ),
+        );
+      batch.commit().catch(err => console.log(err));
+    })();
+  }, [notifications]);
   return (
     <Box display="flex" flexDirection="column" justifyContent="center" className={classes.root}>
       <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
@@ -35,6 +53,9 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
         </IconButton>
       </Box>
       <Divider />
+      <Box display="flex" justifyContent="flex-end">
+        <Button onClick={markAllAsRead}>Mark all as read</Button>
+      </Box>
       {notifications?.map(notification => (
         <NotificationItemView notification={notification} key={notification.id} />
       ))}
