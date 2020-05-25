@@ -101,7 +101,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-navBar-quick-search" maxWidth="md">
+    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-navBar-quick-search" maxWidth="xl">
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Quick Search</Typography>
