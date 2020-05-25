@@ -8,6 +8,7 @@ import Client from '../model/Client';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 import ChartsCircularProgress from '../components/dashboard/ChartsCircularProgress';
 import DashboardYearSelect from '../components/DashboardYearSelect';
+import BookingsEmptyResults from '../components/bookings/BookingsEmptyResults';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -28,9 +29,7 @@ const AdminDashboard = () => {
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  useEffect(() => {
-    setSelectedClient(clients?.[0]);
-  }, [clients]);
+
   const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setYear(event.target.value as number);
   };
@@ -53,7 +52,14 @@ const AdminDashboard = () => {
           </Grid>
         </Grid>
       </Box>
-      {selectedClient ? <DashboardCharts client={selectedClient?.id} year={year} /> : <ChartsCircularProgress />}
+      {selectedClient && console.log(selectedClient)}
+      {selectedClient ? (
+        <DashboardCharts client={selectedClient?.id} year={year} />
+      ) : clients ? (
+        <BookingsEmptyResults title="" message="Please select client." />
+      ) : (
+        <ChartsCircularProgress />
+      )}
     </Container>
   );
 };

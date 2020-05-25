@@ -24,7 +24,6 @@ const groups = ['vesselWithVoyage', 'pol'];
 const VesselVoyageContainer: React.FC<Props> = () => {
   const [filter, setFilter] = useState('Export');
   const vessel = useVesselWithVoyage(filter);
-  const [expanded, setExpanded] = React.useState<string | false>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
@@ -47,9 +46,6 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // setBookingFilters && setBookingFilters(set('category', (event.target as HTMLInputElement).value)(bookingFilters));
     setFilter((event.target as HTMLInputElement).value);
-  };
-  const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
   };
   const handleDialogOpen = (item: VesselWithVoyage[], vessel: string) => {
     setVesselName(vessel);
@@ -74,21 +70,16 @@ const VesselVoyageContainer: React.FC<Props> = () => {
 
         {normalizedVessel &&
           Object.entries(normalizedVessel).map(([vessel, items]: any, index: number) => (
-            <VesselVoyageItem
-              vessel={vessel}
-              items={items}
-              key={vessel}
-              expanded={expanded}
-              handleExpand={handleChange}
-              handleDialogOpen={handleDialogOpen}
-            />
+            <VesselVoyageItem vessel={vessel} items={items} key={vessel} handleDialogOpen={handleDialogOpen} />
           ))}
-        <VesselVoyageDialog
-          vesselItems={dialogData}
-          isOpen={isDialogOpen}
-          handleClose={handleDialogClose}
-          vessel={vesselName}
-        />
+        {isDialogOpen && (
+          <VesselVoyageDialog
+            vesselItems={dialogData}
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            vessel={vesselName}
+          />
+        )}
       </CardContent>
     </Card>
   );

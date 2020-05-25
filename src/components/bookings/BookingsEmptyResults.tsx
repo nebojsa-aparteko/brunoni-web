@@ -6,9 +6,10 @@ import Typography from '@material-ui/core/Typography';
 
 interface Props {
   message?: string;
+  title?: string;
 }
 
-const BookingsEmptyResults: React.FC<Props> = ({ message }) => (
+const BookingsEmptyResults: React.FC<Props> = ({ message, title = 'No Results :(' }) => (
   <Container>
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
@@ -20,7 +21,7 @@ const BookingsEmptyResults: React.FC<Props> = ({ message }) => (
             disableSpinner
           />
           <Typography variant="h5" gutterBottom>
-            <Box fontWeight="fontWeightBold">No Results :(</Box>
+            <Box fontWeight="fontWeightBold">{title}</Box>
           </Typography>
           <Typography variant="subtitle1">{message}</Typography>
         </Box>

@@ -327,7 +327,9 @@ const Navbar: React.FC = () => {
                       >
                         <SearchIcon fontSize="small" />
                       </IconButton>
-                      <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                      {isSearchDialogOpen && (
+                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                      )}
                     </Fragment>
                   )
                 ) : process.env.REACT_APP_BRAND === 'brunoni' ? (

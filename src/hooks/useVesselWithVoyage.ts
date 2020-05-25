@@ -17,6 +17,7 @@ export default function useVesselWithVoyage(filter: string = 'Export', query?: Q
 
     const cleanup = (async () => {
       try {
+        console.log(filter, ' FILTER');
         const collectionReference = firebase
           .firestore()
           .collectionGroup('vesVoyCollection')

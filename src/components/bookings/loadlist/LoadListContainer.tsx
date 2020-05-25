@@ -127,7 +127,9 @@ const LoadListContainer = () => {
       <Button onClick={() => setIsDialogOpen(true)} color="primary">
         Add load list
       </Button>
-      <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
+      {isDialogOpen && (
+        <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
+      )}
       {!containers && <ChartsCircularProgress />}
       {normalizedContainers &&
         Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (

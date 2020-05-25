@@ -16,9 +16,15 @@ const findCarrierId = (items: any[]) => {
   return obj ? `${obj.erpCarrierId} ${obj.erpServiceId}` : undefined;
 };
 
-const VesselVoyageItem: React.FC<Props> = ({ vessel, items, expanded, handleExpand, handleDialogOpen }) => {
+const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) => {
   const entries = useMemo(() => Object.entries(items), [items]);
-  const vesselItems = useMemo(() => Object.entries(items).map(i => i[1])[0] as VesselWithVoyage[], [entries]);
+  const vesselItems = useMemo(
+    () =>
+      Object.entries(items)
+        .map(i => i[1])
+        .flat() as VesselWithVoyage[],
+    [entries],
+  );
 
   return (
     <Paper
@@ -66,7 +72,5 @@ export default VesselVoyageItem;
 interface Props {
   vessel: string;
   items: any[];
-  expanded: string | false;
-  handleExpand: (name: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => void;
   handleDialogOpen: (item: VesselWithVoyage[], vessel: string) => void;
 }

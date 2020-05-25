@@ -41,43 +41,37 @@ const useStyles = makeStyles(theme =>
 );
 const CHUNK_SIZE = 10;
 
-const getBookings = (bookings: string[]) =>
-  firebase
+const getBookings = (bookings: string[]) => {
+  console.log(bookings, 'BOOKINGS');
+  return firebase
     .firestore()
     .collection('bookings')
     .where('ERP-BkgRef', 'in', bookings)
     .get();
+};
 
 const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems, vessel }) => {
   const classes = useStyles();
-  const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems]);
+  const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems, CHUNK_SIZE]);
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
   const history = useHistory();
-
   useEffect(() => {
     let didCancel = false;
     (async () => {
-      if (!didCancel && vesselItems && bookingsIds) {
-        console.log(bookingsIds);
-        setBookings(
-          (await getBookings(bookingsIds[(bookings?.length || 0) / CHUNK_SIZE])).docs.map(bkg =>
-            normalizeBooking(bkg.data()),
-          ),
-        );
+      if (!didCancel && bookingsIds && isOpen) {
+        let bkgs: any[] = [];
+        for (const id of bookingsIds) {
+          bkgs = [...bkgs, ...(await getBookings(id)).docs.map(bkg => normalizeBooking(bkg.data()))];
+        }
+
+        setBookings(bkgs);
       }
     })();
 
     return () => {
       didCancel = true;
     };
-  }, [bookingsIds, normalizeBooking]);
-
-  const handleSeeMore = useCallback(async () => {
-    const bkgs = (await getBookings(bookingsIds[(bookings?.length || 0) / CHUNK_SIZE])).docs.map(bkg =>
-      normalizeBooking(bkg.data()),
-    );
-    setBookings(prevState => (prevState || []).concat(bkgs));
-  }, [bookingsIds]);
+  }, [bookingsIds, normalizeBooking, getBookings, isOpen]);
 
   const handleBookingClick = (bookingId: string) => {
     history.push(`/bookings/${bookingId}`);
@@ -97,15 +91,15 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
             {bookings ? (
               <Box display="flex" flexDirection="column">
                 {bookings.map((booking, index) => (
-                  <Box my={1} onClick={() => handleBookingClick(booking.id)} component={Paper}>
-                    <BookingRow booking={booking} key={`${booking['ERP-BkgRef']}-${index}`} />
+                  <Box
+                    my={1}
+                    onClick={() => handleBookingClick(booking.id)}
+                    component={Paper}
+                    key={`${booking['ERP-BkgRef']}-${index}`}
+                  >
+                    <BookingRow booking={booking} />
                   </Box>
                 ))}
-                {bookings && (bookingsIds?.length - 1) * CHUNK_SIZE > bookings.length && (
-                  <Button color="primary" onClick={handleSeeMore}>
-                    See more...
-                  </Button>
-                )}
               </Box>
             ) : (
               <ChartsCircularProgress />
