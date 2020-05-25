@@ -26,6 +26,7 @@ export interface ShortChecklistItemValueDocument {
   url: string;
   name: string;
   status?: ChecklistItemValueDocumentStatus;
+  isInternal?: boolean;
 }
 
 export interface ActivityLogUserData {
