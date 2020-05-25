@@ -1,32 +1,28 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  CircularProgress,
-  Divider,
-  ExpansionPanel,
-  Typography,
-} from '@material-ui/core';
-import useVesselWithVoyage, { normalizeVesselData } from '../../hooks/useVesselWithVoyage';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Box, Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
+import useVesselWithVoyage from '../../hooks/useVesselWithVoyage';
 import VesselVoyageItem from './VesselVoyageItem';
-import firebase from '../../firebase';
 import VesselWithVoyage from '../../model/VesselWithVoyage';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import CategoryFilter from '../CategoryFilter';
 import set from 'lodash/fp/set';
 import VesselVoyageDialog from './VesselVoyageDialog';
-import { Booking } from '../../model/Booking';
+import { BookingCategory } from '../../model/Booking';
+import { useVesselFilterContext } from '../../providers/VesselOverviewFilterProvider';
+import CarrierInput from '../inputs/CarrierInput';
+import Carriers from '../../contexts/Carriers';
+import theme from '../../theme';
 
 const groups = ['vesselWithVoyage', 'pol'];
 
 const VesselVoyageContainer: React.FC<Props> = () => {
-  const [filter, setFilter] = useState('Export');
-  const vessel = useVesselWithVoyage(filter);
+  const vessel = useVesselWithVoyage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
+  const [filters, setFilters] = useVesselFilterContext();
+  const { category, carrier } = filters;
+  const carriers = useContext(Carriers);
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
@@ -44,8 +40,7 @@ const VesselVoyageContainer: React.FC<Props> = () => {
     [vessel],
   );
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // setBookingFilters && setBookingFilters(set('category', (event.target as HTMLInputElement).value)(bookingFilters));
-    setFilter((event.target as HTMLInputElement).value);
+    if (setFilters) setFilters(set('category', (event.target as HTMLInputElement).value as BookingCategory)(filters));
   };
   const handleDialogOpen = (item: VesselWithVoyage[], vessel: string) => {
     setVesselName(vessel);
@@ -61,7 +56,17 @@ const VesselVoyageContainer: React.FC<Props> = () => {
               Vessel with voyage overview
             </Typography>
             <Divider orientation="vertical" style={{ height: '100%' }} />
-            <CategoryFilter value={filter} onChange={handleImportOrExportChange} />
+            <CategoryFilter value={category} onChange={handleImportOrExportChange} />
+            <Box display="flex" style={{ minWidth: theme.spacing(35) }}>
+              <CarrierInput
+                label={'Carriers'}
+                carriers={carriers}
+                onChange={carrier => {
+                  if (setFilters) setFilters(set('carrier', carrier)(filters));
+                }}
+                value={carrier}
+              />
+            </Box>
           </Box>
         }
       />

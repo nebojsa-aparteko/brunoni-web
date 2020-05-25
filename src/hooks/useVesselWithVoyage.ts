@@ -1,37 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import useFirestoreCollection, { QueryFunction } from './useFirestoreCollection';
-import { flow, update } from 'lodash/fp';
+import { flow, update, identity } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
+import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
+import pick from 'lodash/fp/pick';
+import { UserRecordMinProperties } from '../model/UserRecord';
 
-export default function useVesselWithVoyage(filter: string = 'Export', query?: QueryFunction | null) {
+export default function useVesselWithVoyage() {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
+  const [filters, _] = useVesselFilterContext();
+  const { category, carrier } = filters;
+  const query = useMemo(
+    () => (collection: firebase.firestore.Query) => {
+      // setIsLoading(true);
+
+      let query = collection.where('ets', '>', new Date());
+
+      if (category) {
+        query = query.where('category', '==', category);
+      }
+
+      if (carrier) {
+        query = query.where('carrier', '==', carrier.id);
+      }
+
+      return query;
+    },
+    [carrier, category, filters],
+  );
 
   useEffect(() => {
-    // if (query === null) {
-    //   setSnapshot(undefined);
-    //   return;
-    // }
-
     const cleanup = (async () => {
       try {
-        console.log(filter, ' FILTER');
-        const collectionReference = firebase
-          .firestore()
-          .collectionGroup('vesVoyCollection')
-          .where('ets', '>', new Date())
-          .where('category', '==', filter);
+        const collectionReference = firebase.firestore().collectionGroup('vesVoyCollection');
+        // .where('ets', '>', new Date())
+        // .where('category', '==', category);
 
-        // const collection = await ((query || identity)(collectionReference) as any).get();
-        return collectionReference.onSnapshot({
+        const collection = await ((query || identity)(collectionReference) as any);
+        return collection.onSnapshot({
           complete: () => console.log('Collection group for Voyage and Vessel completed'),
-          error: error => console.error('Collection group for Voyage and Vessel threw an error', error),
-          next: snapshot => {
+          error: (error: any) => console.error('Collection group for Voyage and Vessel threw an error', error),
+          next: (snapshot: any) => {
             console.debug('Collection group for Voyage and Vessel', 'updated with', snapshot);
             setSnapshot(
-              snapshot.docs.map(d => ({
+              snapshot.docs.map((d: any) => ({
                 ...normalizeVesselData(d.data()),
                 vesselWithVoyage: d.ref.parent.parent?.id,
               })) as VesselWithVoyage[],
@@ -53,7 +68,7 @@ export default function useVesselWithVoyage(filter: string = 'Export', query?: Q
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [query, setSnapshot, filter]);
+  }, [query, setSnapshot, filters]);
 
   return snapshot;
 }
