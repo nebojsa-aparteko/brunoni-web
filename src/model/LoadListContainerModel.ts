@@ -1,7 +1,6 @@
 export default interface LoadListContainerModel {
   container: string;
   bookingId: string;
-  sealNumber: string;
   pickUp?: Date;
   gateIn?: Date;
   carrierId: string;

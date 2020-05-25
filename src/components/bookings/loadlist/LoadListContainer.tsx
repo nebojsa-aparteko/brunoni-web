@@ -173,7 +173,7 @@ const LoadListContainer = () => {
                                         {item.container}
                                       </TableCell>
                                       <TableCell component="th" scope="row" align="right">
-                                        {item.sealNumber || ''}
+                                        {item.sealNum || ''}
                                       </TableCell>
                                       <TableCell component="th" scope="row" align="right">
                                         {item.deliveryRef || ''}
