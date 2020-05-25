@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Grid, makeStyles, Theme } from '@material-ui/core';
 import Container from '../components/Container';
 import useClients from '../hooks/useClients';
-import useStatistics from '../hooks/useStatistics';
 import ClientInput from '../components/inputs/ClientInput';
 import Client from '../model/Client';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
