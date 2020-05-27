@@ -73,7 +73,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
 
   const handleBookingClick = (bookingId: string) => {
     window.open(`/bookings/${bookingId}`);
-    handleClose();
+    // handleClose();
   };
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="xl">
