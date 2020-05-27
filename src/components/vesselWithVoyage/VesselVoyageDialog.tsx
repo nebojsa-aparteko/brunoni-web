@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
-  Button,
   createStyles,
   Dialog,
   DialogContent,
@@ -73,7 +72,8 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
   }, [bookingsIds, normalizeBooking, getBookings, isOpen]);
 
   const handleBookingClick = (bookingId: string) => {
-    history.push(`/bookings/${bookingId}`);
+    // history.push(`/bookings/${bookingId}`);
+    window.open(`/bookings/${bookingId}`);
     handleClose();
   };
   return (
