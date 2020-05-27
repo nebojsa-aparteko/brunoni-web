@@ -1,20 +1,42 @@
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 import useFirestoreCollection from './useFirestoreCollection';
 import LoadListContainerModel from '../model/LoadListContainerModel';
-import subDays from 'date-fns/subDays';
-import { BookingCategory } from '../model/Booking';
+import firebase from '../firebase';
+import { useLoadListFilterContext } from '../providers/LoadListFilterProvider';
 
 export default function useContainers(q?: () => any) {
-  const query = useCallback(
-    q =>
-      q
-        .where('category', '==', BookingCategory.Export)
-        .where('ets', '>=', subDays(new Date(), 1))
-        .orderBy('ets', 'asc')
-        .orderBy('bookingId', 'asc'),
-    [],
+  const [filters, _] = useLoadListFilterContext();
+  const { origin, carrier, dateRange } = filters;
+  const query = useMemo(
+    () => (collection: firebase.firestore.Query) => {
+      // setIsLoading(true);
+      let query = collection
+        .where('ets', '>=', dateRange?.startDate || new Date())
+        .where('ets', '<=', dateRange?.endDate || new Date());
+
+      if (origin) {
+        query = query.where('pod', '==', origin.id);
+      }
+
+      if (carrier) {
+        query = query.where('carrierId', '==', carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id);
+      }
+      query = query.orderBy('ets', 'asc').orderBy('bookingId', 'asc');
+      return query;
+    },
+    [carrier, filters],
   );
+
+  // const query = useCallback(
+  //   q =>
+  //     q
+  //       .where('category', '==', BookingCategory.Export)
+  //       .where('ets', '>=', subDays(new Date(), 1))
+  //       .orderBy('ets', 'asc')
+  //       .orderBy('bookingId', 'asc'),
+  //   [],
+  // );
 
   const containersCollection = useFirestoreCollection('containers', q || query);
 

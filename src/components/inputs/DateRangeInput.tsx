@@ -22,6 +22,7 @@ interface Props {
   open?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
+  isMaxDateSet?: boolean;
 }
 
 export const rangePredefinedValues: DefinedRange[] = [
@@ -67,7 +68,7 @@ const getLabelValue = (dateRange: DateRange | DefinedRange | undefined) => {
     : '';
 };
 
-const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
+const DateRangeInput: React.FC<Props> = ({ value, onChange, isMaxDateSet = true }) => {
   const [labelValue, setLabelValue] = useState();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -133,7 +134,7 @@ const DateRangeInput: React.FC<Props> = ({ value, onChange }) => {
             initialDateRange={value}
             onChange={range => onRangeChange(range)}
             definedRanges={rangePredefinedValues}
-            maxDate={new Date()}
+            maxDate={isMaxDateSet ? new Date() : undefined}
           />
         </ClickAwayListener>
       </Popover>

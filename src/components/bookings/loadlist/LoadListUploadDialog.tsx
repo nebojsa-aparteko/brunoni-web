@@ -48,7 +48,6 @@ const useStyles = makeStyles(theme =>
 
 const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
-  const containers = useContainers();
   const [loadListInput, setLoadListInput] = useState('');
   const { enqueueSnackbar } = useSnackbar();
   const [isHeaderValid, setIsHeaderValid] = useState(true);
@@ -142,7 +141,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
 
   const handleLoadListSave = useCallback(() => {
     parseCSV(loadListInput);
-  }, [containers, loadListInput, setIsHeaderValid, parseCSV]);
+  }, [loadListInput, setIsHeaderValid, parseCSV]);
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <Box className={classes.dialogBody}>
