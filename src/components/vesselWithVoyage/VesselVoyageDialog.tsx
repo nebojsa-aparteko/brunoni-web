@@ -42,7 +42,6 @@ const useStyles = makeStyles(theme =>
 const CHUNK_SIZE = 10;
 
 const getBookings = (bookings: string[]) => {
-  console.log(bookings, 'BOOKINGS');
   return firebase
     .firestore()
     .collection('bookings')

@@ -17,14 +17,14 @@ export default function useVesselWithVoyage() {
     () => (collection: firebase.firestore.Query) => {
       // setIsLoading(true);
 
-      let query = collection.where('ets', '>', new Date());
+      let query = collection.where('ets', '>=', new Date());
 
       if (category) {
         query = query.where('category', '==', category);
       }
 
       if (carrier) {
-        query = query.where('carrier', '==', carrier.id);
+        query = query.where('carrier', '==', carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id);
       }
 
       return query;
@@ -36,8 +36,6 @@ export default function useVesselWithVoyage() {
     const cleanup = (async () => {
       try {
         const collectionReference = firebase.firestore().collectionGroup('vesVoyCollection');
-        // .where('ets', '>', new Date())
-        // .where('category', '==', category);
 
         const collection = await ((query || identity)(collectionReference) as any);
         return collection.onSnapshot({
