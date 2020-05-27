@@ -16,7 +16,7 @@ export default function useContainers(q?: () => any) {
         .where('ets', '<=', dateRange?.endDate || new Date());
 
       if (origin) {
-        query = query.where('pod', '==', origin.id);
+        query = query.where('pol', '==', origin.id);
       }
 
       if (carrier) {
