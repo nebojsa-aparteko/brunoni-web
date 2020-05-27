@@ -72,7 +72,6 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
   }, [bookingsIds, normalizeBooking, getBookings, isOpen]);
 
   const handleBookingClick = (bookingId: string) => {
-    // history.push(`/bookings/${bookingId}`);
     window.open(`/bookings/${bookingId}`);
     handleClose();
   };
