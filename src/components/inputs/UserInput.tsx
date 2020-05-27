@@ -7,7 +7,7 @@ import match from 'autosuggest-highlight/match';
 import UserRecord, { UserRecordMin } from '../../model/UserRecord';
 
 const getOptionSelected = (option: UserRecord, value: UserRecord) => option?.alphacomId === value?.alphacomId;
-const getOptionLabel = (option: UserRecord) => `${option.firstName || ''} ${option.lastName || ''}`;
+const getOptionLabel = (option: UserRecord) => (option ? `${option.firstName || ''} ${option.lastName || ''}` : '');
 
 interface Props {
   label: string;

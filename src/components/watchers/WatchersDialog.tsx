@@ -83,7 +83,7 @@ const handleChangeCustomer = (id: string, user: UserRecordMin | null, watchers: 
     .set(
       {
         ForwPersID: user?.alphacomId || '',
-        ForwarderPersTxt: `${user?.firstName} ${user?.lastName}` || '',
+        ForwarderPersTxt: `${user?.firstName || ''} ${user?.lastName || ''}`,
         assignedCustomerUser: user ? pick(UserRecordMinProperties)(user) : null,
         watchers: uniqBy((item: UserRecordMin) => item.alphacomId)(
           (watchers || []).concat(user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : []),
