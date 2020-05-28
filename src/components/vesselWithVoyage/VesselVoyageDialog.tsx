@@ -52,7 +52,6 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
   const classes = useStyles();
   const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems, CHUNK_SIZE]);
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
-  const history = useHistory();
   useEffect(() => {
     let didCancel = false;
     (async () => {
@@ -72,8 +71,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
   }, [bookingsIds, normalizeBooking, getBookings, isOpen]);
 
   const handleBookingClick = (bookingId: string) => {
-    window.open(`/bookings/${bookingId}`);
-    // handleClose();
+    window.open(`/bookings/${bookingId}`, '_blank');
   };
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="xl">
@@ -95,7 +93,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
                     component={Paper}
                     key={`${booking['ERP-BkgRef']}-${index}`}
                   >
-                    <BookingRow booking={booking} />
+                    <BookingRow booking={booking} preventDefaultClick />
                   </Box>
                 ))}
               </Box>

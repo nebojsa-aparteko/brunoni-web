@@ -109,6 +109,7 @@ interface BookingRowProps {
   booking: Booking;
   onProgressClick?: any;
   isAdmin?: boolean;
+  preventDefaultClick?: boolean;
 }
 
 interface LocRefProps {
@@ -186,13 +187,15 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
   ) : null;
 };
 
-export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick }) => {
+export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick, preventDefaultClick }) => {
   const classes = useStyles();
 
   const history = useHistory();
   const handleRowClick = useCallback(
     (id: string) => {
-      history.push(`/bookings/${id}`);
+      if (!preventDefaultClick) {
+        history.push(`/bookings/${id}`);
+      }
     },
     [history],
   );
