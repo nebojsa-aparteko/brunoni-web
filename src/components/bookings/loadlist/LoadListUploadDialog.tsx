@@ -57,7 +57,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       header: true,
       skipEmptyLines: true,
       transformHeader: header => {
-        switch (header) {
+        switch (header.trim()) {
           case 'Container number':
           case 'container':
             return 'container';
