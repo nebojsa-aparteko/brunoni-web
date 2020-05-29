@@ -226,7 +226,9 @@ const LoadListContainer = () => {
                                           {item.deliveryRef || ''}
                                         </TableCell>
                                         <TableCell component="th" scope="row" align="right">
-                                          <Link to={`/bookings/${item.bookingId}`}>{item.bookingId || ''}</Link>
+                                          <Link to={`/bookings/${item.bookingId}`} target="_blank">
+                                            {item.bookingId || ''}
+                                          </Link>
                                         </TableCell>
                                         <TableCell component="th" scope="row" align="right">
                                           {item.checklistCheckedCount !== undefined &&
