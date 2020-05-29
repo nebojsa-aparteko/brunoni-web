@@ -155,6 +155,9 @@ export const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, 
       <span className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
+          {booking && booking['ERP-BkgRef'] ? (
+            <Typography variant="h6">File Number: {booking['ERP-BkgRef']}</Typography>
+          ) : null}
           {booking && booking['BL-No'] ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
           <IconButton onClick={handleClose} className={classes.closeModal}>
             <CloseIcon />
@@ -204,7 +207,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
 
   const client = useClientById(booking?.ForwAdrId);
-
+  const amsClosing = booking.PortTerms.Closings.find(closing => closing.ClosingType === 'AMS');
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
       root: {
@@ -239,6 +242,11 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                     Refs: <LocRefs cargoDetails={booking.CargoDetails} />
                   </Typography>
                 ) : null}
+                {amsClosing && (
+                  <Typography variant="body2" style={{ paddingLeft: 20 }}>
+                    AMS Closing: {amsClosing.ClosingDate}
+                  </Typography>
+                )}
                 {booking.pendingPayment && booking.inDispute && (
                   <Typography variant="body1" style={{ paddingLeft: 20 }}>
                     <WarningIcon fontSize="small" style={{ width: 14, height: 14 }} /> IN DISPUTE
