@@ -13,6 +13,7 @@ import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import theme from '../../theme';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
+import DateRangeInput from '../inputs/DateRangeInput';
 
 const groups = ['vesselWithVoyage', 'pol'];
 
@@ -22,7 +23,7 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
   const [filters, setFilters] = useVesselFilterContext();
-  const { category, carrier } = filters;
+  const { category, carrier, dateRange } = filters;
   const carriers = useContext(Carriers);
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
@@ -66,6 +67,15 @@ const VesselVoyageContainer: React.FC<Props> = () => {
                   if (setFilters) setFilters(set('carrier', carrier)(filters));
                 }}
                 value={carrier}
+              />
+            </Box>
+            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+              <DateRangeInput
+                onChange={dateRange => {
+                  if (setFilters) setFilters(set('dateRange', dateRange)(filters));
+                }}
+                value={dateRange}
+                isMaxDateSet={false}
               />
             </Box>
           </Box>

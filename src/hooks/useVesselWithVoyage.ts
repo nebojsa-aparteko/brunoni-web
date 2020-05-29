@@ -12,12 +12,12 @@ import { UserRecordMinProperties } from '../model/UserRecord';
 export default function useVesselWithVoyage() {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
   const [filters, _] = useVesselFilterContext();
-  const { category, carrier } = filters;
+  const { category, carrier, dateRange } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       // setIsLoading(true);
 
-      let query = collection.where('ets', '>=', new Date());
+      let query = collection.where('ets', '>=', dateRange.startDate).where('ets', '<=', dateRange.endDate);
 
       if (category) {
         query = query.where('category', '==', category);

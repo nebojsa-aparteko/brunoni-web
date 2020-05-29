@@ -158,7 +158,6 @@ const LoadListContainer = () => {
               <DateRangeInput
                 onChange={dateRange => {
                   if (setFilters) setFilters(set('dateRange', dateRange)(filters));
-                  containers = [];
                 }}
                 value={dateRange}
                 isMaxDateSet={false}
