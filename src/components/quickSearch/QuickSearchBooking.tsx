@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect, useRef } from 'react';
+import React, { useState, Fragment, useEffect, useRef, useContext } from 'react';
 import {
   Box,
   CircularProgress,
@@ -17,6 +17,7 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import { useHistory } from 'react-router';
 import Mousetrap from 'mousetrap';
 import { useSnackbar } from 'notistack';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -38,10 +39,11 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
+  const actingAs = useContext(ActingAs)[0];
 
   const handleBookingClick = () => {
-    history.push(`/bookings/${searchResult?.id}`);
-    handleClose();
+    window.open(`/bookings/${searchResult?.id}`);
+    // handleClose();
   };
   const handleBookingSearch = () => {
     setIsLoading(true);
@@ -94,7 +96,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
       {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
       {!isLoading && searchResult && (
         <Box onClick={handleBookingClick}>
-          <BookingRow booking={searchResult} />
+          <BookingRow booking={searchResult} isAdmin={!actingAs} preventDefaultClick />
         </Box>
       )}
     </Fragment>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   createStyles,
@@ -19,6 +19,7 @@ import { BookingRow } from '../bookings/BookingsTable';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import { useHistory } from 'react-router';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -50,6 +51,7 @@ const getBookings = (bookings: string[]) => {
 
 const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems, vessel }) => {
   const classes = useStyles();
+  const actingAs = useContext(ActingAs)[0];
   const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems, CHUNK_SIZE]);
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
   useEffect(() => {
@@ -93,7 +95,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
                     component={Paper}
                     key={`${booking['ERP-BkgRef']}-${index}`}
                   >
-                    <BookingRow booking={booking} preventDefaultClick />
+                    <BookingRow booking={booking} preventDefaultClick isAdmin={!actingAs} />
                   </Box>
                 ))}
               </Box>
