@@ -247,6 +247,9 @@ const Navbar: React.FC = () => {
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Bookings" to="/bookings" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem to="/client-statistics" primary="Client statistics" />
+                    )}
 
                     {actingAs !== null && (
                       <Fragment>
@@ -295,7 +298,6 @@ const Navbar: React.FC = () => {
                           getContentAnchorEl={null}
                         >
                           <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
-                          <MenuItemLink onClick={handleMenuClose} to="/client-statistics" primary="Client statistics" />
                           {isSuperAdmin(userRecord) && (
                             <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
                           )}
