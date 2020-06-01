@@ -5,6 +5,7 @@ import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
 import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
+import { Booking } from '../../../model/Booking';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -12,6 +13,7 @@ interface Props {
   onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
   showMore?: boolean;
   onChange?: () => void;
+  booking?: Booking;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -20,7 +22,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore, onChange, quoteActivityLog }) => {
+const ActivityLogView: React.FC<Props> = ({
+  activityLog,
+  onCommentSave,
+  showMore,
+  onChange,
+  quoteActivityLog,
+  booking,
+}) => {
   const classes = useStyles();
 
   return (
@@ -37,7 +46,7 @@ const ActivityLogView: React.FC<Props> = ({ activityLog, onCommentSave, showMore
             <WriteComment onCommentSave={onCommentSave} />
           </ActivityLogProvider>
         ) : (
-          <WriteComment onCommentSave={onCommentSave} />
+          <WriteComment onCommentSave={onCommentSave} booking={booking} />
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <ActivityLogItemView activityItem={activity} key={`act-${activity.id}`} />

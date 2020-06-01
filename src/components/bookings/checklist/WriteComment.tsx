@@ -11,6 +11,7 @@ import { Mention, MentionItem, MentionsInput } from 'react-mentions';
 import useAdminUsers from '../../../hooks/useAdminUsers';
 import mentionsClassNames from './mention.module.css';
 import useTeams from '../../../hooks/useTeams';
+import { Booking } from '../../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
+const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
@@ -53,10 +54,22 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave }) => {
 
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
+    if (booking?.assignedCustomerUser) {
+      return admins
+        ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)))
+        .concat([
+          {
+            id: booking?.assignedCustomerUser.alphacomId,
+            display: `${booking?.assignedCustomerUser.firstName} ${booking?.assignedCustomerUser.lastName}`,
+          } as MentionItem,
+        ]);
+    }
+
     return admins
       ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
       .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
-  }, [admins, teams]);
+  }, [admins, teams, booking]);
 
   useEffect(() => {
     if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {
@@ -182,4 +195,5 @@ export default WriteComment;
 
 interface WriteCommentProp {
   onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
+  booking?: Booking;
 }

@@ -12,9 +12,10 @@ import { useActivityLogState } from './ActivityLogContext';
 import { flow, omitBy, isNil } from 'lodash/fp';
 import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import { MentionItem } from 'react-mentions';
+import { Booking } from '../../../model/Booking';
 
 interface Props {
-  bookingId: string;
+  booking: Booking;
   isAdmin: boolean;
 }
 
@@ -28,7 +29,7 @@ export const addActivityItem = (bookingId: string, checklistId: string, activity
     .set(activityLog);
 };
 
-const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
+const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
   const [showMore, setShowMore] = useState(false);
   const activityLogContext = useActivityLogState();
 
@@ -42,7 +43,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
       },
       [isAdmin, showMore],
     ),
-    bookingId,
+    booking.id,
     'activity',
   );
 
@@ -75,7 +76,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
       firebase
         .firestore()
         .collection('bookings')
-        .doc(bookingId)
+        .doc(booking.id)
         .collection('activity')
         .add(
           flow(omitBy(isNil))({
@@ -95,7 +96,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
         })
         .catch(err => console.log(err));
     },
-    [bookingId, userRecord, activityLogContext],
+    [booking.id, userRecord, activityLogContext],
   );
 
   const handleShowMore = () => {
@@ -107,6 +108,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingId, isAdmin }) => {
       onCommentSave={handleCommentSave}
       showMore={showMore}
       onChange={handleShowMore}
+      booking={booking}
     />
   );
 };
