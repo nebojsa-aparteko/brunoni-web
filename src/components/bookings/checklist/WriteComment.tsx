@@ -54,21 +54,33 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
 
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
-    if (booking?.assignedCustomerUser) {
+    if (isAdmin) {
+      if (booking?.assignedCustomerUser) {
+        return admins
+          ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+          .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)))
+          .concat([
+            {
+              id: booking?.assignedCustomerUser.alphacomId,
+              display: `${booking?.assignedCustomerUser.firstName} ${booking?.assignedCustomerUser.lastName}`,
+            } as MentionItem,
+          ]);
+      }
+
       return admins
         ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
-        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)))
-        .concat([
-          {
-            id: booking?.assignedCustomerUser.alphacomId,
-            display: `${booking?.assignedCustomerUser.firstName} ${booking?.assignedCustomerUser.lastName}`,
-          } as MentionItem,
-        ]);
+        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
+    } else {
+      if (!booking?.assignedUser) {
+        return [];
+      }
+      return [
+        {
+          id: booking?.assignedUser.alphacomId,
+          display: `${booking?.assignedUser.firstName} ${booking?.assignedUser.lastName}`,
+        } as MentionItem,
+      ];
     }
-
-    return admins
-      ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
-      .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
   }, [admins, teams, booking]);
 
   useEffect(() => {
