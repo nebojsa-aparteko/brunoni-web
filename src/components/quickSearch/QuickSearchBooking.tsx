@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect, useRef, useContext } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import {
   Box,
   CircularProgress,
@@ -10,11 +10,9 @@ import {
   Typography,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
 import { BookingRow } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
-import { useHistory } from 'react-router';
 import Mousetrap from 'mousetrap';
 import { useSnackbar } from 'notistack';
 import ActingAs from '../../contexts/ActingAs';
@@ -37,13 +35,11 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Booking | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const actingAs = useContext(ActingAs)[0];
 
   const handleBookingClick = () => {
     window.open(`/bookings/${searchResult?.id}`);
-    // handleClose();
   };
   const handleBookingSearch = () => {
     setIsLoading(true);

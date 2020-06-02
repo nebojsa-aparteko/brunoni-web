@@ -384,12 +384,15 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               value={quote?.assignedTo}
             />
             <FormControl>
-              <InputLabel id="quote-status-select-label">Quote Status</InputLabel>
+              <InputLabel id="quote-status-select-label" shrink>
+                Quote Status
+              </InputLabel>
               <Select
                 labelId="quote-status-select-label"
                 id="quote-status-select"
                 value={quote!.status || ''}
                 onChange={event => handleChange(event, quote.id)}
+                displayEmpty
               >
                 <MenuItem value="">
                   <em>None</em>
@@ -397,7 +400,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 {Object.keys(QuoteStatus)
                   .filter(key => typeof QuoteStatus[key as any] !== 'number')
                   .map((status: string | QuoteStatus, index) => (
-                    <MenuItem value={Number(status)} key={`menuItem ${index}`}>
+                    <MenuItem value={Number(status)} key={`menuItem-${index}`}>
                       {Object.values(QuoteStatusText)[index]}
                     </MenuItem>
                   ))}

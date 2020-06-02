@@ -73,13 +73,15 @@ export interface Quote {
 }
 
 export enum QuoteStatus {
-  BOOKED,
-  LOST_COS_PRICE_DIFF,
-  LOST_COS_EQP_AVAIL,
-  LOST_COS_SPACE_AVAIL,
-  WAIT_FOR_BOOKING,
-  SPACE_CHECKING,
-  INDICATION,
+  BOOKED = 1,
+  LOST_COS_PRICE_DIFF = 2,
+  LOST_COS_EQP_AVAIL = 3,
+  LOST_COS_SPACE_AVAIL = 4,
+  WAIT_FOR_BOOKING = 5,
+  SPACE_CHECKING = 6,
+  INDICATION = 7,
+  WAIT_FOR_FEEDBACK = 8,
+  WAIT_FOR_SHIPPING_LINE = 9,
 }
 
 export enum QuoteStatusText {
@@ -90,6 +92,8 @@ export enum QuoteStatusText {
   WAIT_FOR_BOOKING = 'In negotiations - price ok - waiting for booking',
   SPACE_CHECKING = 'Checking space and/or equipment',
   INDICATION = 'Indication only',
+  WAIT_FOR_FEEDBACK = "Waiting for customer's feedback\n",
+  WAIT_FOR_SHIPPING_LINE = 'In negotiation with customer/shipping line',
 }
 
 export interface Term {
