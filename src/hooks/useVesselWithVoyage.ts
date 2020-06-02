@@ -24,7 +24,11 @@ export default function useVesselWithVoyage() {
       }
 
       if (carrier) {
-        query = query.where('carrier', '==', carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id);
+        query = query.where(
+          'carrier',
+          '==',
+          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+        );
       }
 
       return query;
