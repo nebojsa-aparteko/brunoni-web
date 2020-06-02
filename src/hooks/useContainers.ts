@@ -23,7 +23,11 @@ export default function useContainers(q?: () => any) {
       }
 
       if (carrier) {
-        query = query.where('carrierId', '==', carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id);
+        query = query.where(
+          'carrierId',
+          '==',
+          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+        );
       }
       query = query.orderBy('ets', 'asc').orderBy('bookingId', 'asc');
       return query;
