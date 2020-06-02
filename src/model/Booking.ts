@@ -204,6 +204,7 @@ export interface EquipmentDetail {
   GateOutDate: string | null;
   PickUpDate: string | null;
   CtrTariffs: CtrTariff[] | null;
+  PINNr: string;
 }
 
 export interface CtrTariff {

@@ -136,6 +136,29 @@ export const HtmlTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip);
 
+/*
+  This method is made because they changed representation of Pin number,
+   in last version they had only one Pin number on ContainerDetail field,
+   now they can have multiple pin numbers, and they moved pin number on
+   equipment level, so because of that we have to see if this booking has new or old presentation of that field
+   so we can display it properly
+ */
+const hasEquipmentPinNumber = (detail: CargoDetail) => {
+  const hasPinNrPerEquipment = detail.Equipment.some(e => e.PINNr !== undefined);
+  return hasPinNrPerEquipment ? (
+    <TableRowData
+      label={'Pin Number'}
+      content={detail.Equipment.reduce(
+        (previousValue, currentValue) =>
+          previousValue + currentValue.ContainerNumber + ' - ' + (currentValue.PINNr || '') + '<br>',
+        '',
+      )}
+    />
+  ) : detail.PINNr ? (
+    <TableRowData label={'Pin Number'} content={detail.PINNr} />
+  ) : null;
+};
+
 export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
@@ -320,8 +343,7 @@ export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) 
     <Fragment>
       {destinationTerminal ? <TableRowData label={'Destination Terminal'} content={destinationTerminal} /> : null}
 
-      {detail.PINNr ? <TableRowData label={'Pin Number'} content={detail.PINNr} /> : null}
-
+      {hasEquipmentPinNumber(detail)}
       {emptyReturnAddress ? <TableRowData label={'Empty Return Address'} content={emptyReturnAddress} /> : null}
 
       {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
