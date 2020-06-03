@@ -33,24 +33,24 @@ const TeamsTeamsContainer: React.FC = () => {
   };
 
   return (
-    <Fragment>
+    <div style={{ overflowY: 'hidden' }}>
       {!teams ? (
         <ChartsCircularProgress />
       ) : (
         <div>
-          <Box display="flex" flexDirection="row-reverse">
+          <Box display="flex" flexDirection="row">
             <Button onClick={onAdd} size="small" color="primary" variant="contained">
               Add
             </Button>
           </Box>
 
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} style={{ overflowY: 'auto' }}>
             <Table className={classes.table} aria-label="a dense table">
               <colgroup>
+                <col style={{ width: '25%' }} />
                 <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '15%' }} />
                 <col style={{ width: '20%' }} />
                 <col style={{ width: '5%' }} />
               </colgroup>
@@ -61,7 +61,7 @@ const TeamsTeamsContainer: React.FC = () => {
                   <TableCell align="center">Carriers</TableCell>
                   <TableCell align="center">Categories</TableCell>
                   <TableCell align="center">Checklist Items</TableCell>
-                  <TableCell padding="none" align="right" />
+                  <TableCell align="right" />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -73,7 +73,7 @@ const TeamsTeamsContainer: React.FC = () => {
           </TableContainer>
         </div>
       )}
-    </Fragment>
+    </div>
   );
 };
 

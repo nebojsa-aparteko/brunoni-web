@@ -113,7 +113,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
 
   return (
     <TableRow key={key} {...other}>
-      <TableCell component="th" scope="row">
+      <TableCell component="th" scope="row" style={{ minWidth: '150px' }}>
         <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
       <TableCell align="right">

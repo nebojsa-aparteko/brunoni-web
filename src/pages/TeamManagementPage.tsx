@@ -49,7 +49,7 @@ const TeamManagementPage: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Team Management" />
-      <Box className={classes.tabContainer}>
+      <Box className={classes.tabContainer} style={{ overflowY: 'hidden' }}>
         <Paper square>
           <Tabs
             value={selectedTab}

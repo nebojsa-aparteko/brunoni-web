@@ -248,7 +248,7 @@ const Navbar: React.FC = () => {
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Bookings" to="/bookings" />}
                     {isDashboardUser(userRecord) && !actingAs && (
-                      <ButtonMenuItem to="/client-statistics" primary="Client statistics" />
+                      <ButtonMenuItem to="/client-statistics" primary="Statistics" />
                     )}
 
                     {actingAs !== null && (
