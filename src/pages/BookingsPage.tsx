@@ -90,7 +90,11 @@ const BookingsPageContainer: React.FC = () => {
 
   useEffect(() => {
     if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
-      handleTabChange(bookingPaginationContextData.activeTab);
+      if (!actingAs) {
+        handleTabChange(bookingPaginationContextData.activeTab);
+      } else {
+        handleCustomerTabChange(bookingPaginationContextData.activeTab);
+      }
     }
   }, [bookingPaginationContextData.activeTab]);
 
@@ -137,14 +141,42 @@ const BookingsPageContainer: React.FC = () => {
     [setBookingsContextData],
   );
 
+  const handleCustomerTabChange = useCallback(
+    (newValue: number) => {
+      const bookingsContextDataNew = () => {
+        switch (newValue) {
+          case 0:
+            return flow(
+              set('archived', false),
+              set('pendingPayment', false),
+              set('dateRange', undefined),
+            )(bookingsContextData);
+          case 1:
+            return flow(
+              set('archived', true),
+              set('pendingPayment', undefined),
+              set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
+            )(bookingsContextData);
+          default:
+            return bookingsContextData;
+        }
+      };
+
+      if (setBookingsContextData) {
+        setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
+      }
+    },
+    [setBookingsContextData],
+  );
+
   useEffect(() => {
     if (actingAs) {
       // we are acting as a customer set a date range:
       setBookingsContextData &&
         setBookingsContextData(
           flow(
-            set('archived', undefined),
-            set('pendingPayment', undefined),
+            set('archived', false),
+            set('pendingPayment', false),
             set('dateRange', bookingsContextData.dateRange || LAST_3_MONTHS),
           )(bookingsContextData),
         );
@@ -183,9 +215,29 @@ const BookingsPageContainer: React.FC = () => {
           </TabPanel>
         </Box>
       ) : (
-        <Container maxWidth="lg">
-          <BookingsView bookings={isLoading ? undefined : bookings} showDateRangeFilter />
-        </Container>
+        <Box className={classes.tabContainer}>
+          <Tabs
+            value={selectedTab}
+            onChange={setSelectedTab}
+            orientation="vertical"
+            aria-label="Booking tabs"
+            className={classes.tabs}
+          >
+            <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
+            <Tab icon={<ArchiveIcon />} label="History" {...a11yProps(1)} />
+          </Tabs>
+          <TabPanel value={selectedTab} index={0}>
+            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={1}>
+            <BookingsView
+              bookings={isLoading ? undefined : bookings}
+              isAdmin={!actingAs}
+              archived
+              showDateRangeFilter
+            />
+          </TabPanel>
+        </Box>
       )}
     </Fragment>
   );
