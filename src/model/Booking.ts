@@ -281,8 +281,8 @@ export enum CarrierId {
   HAMBURG_SUD = 'Hamburg Süd',
   HYUNDAI_MERCHANT = 'HMM',
   MACS = 'MACS',
-  ZIM = 'ZIM Shipping Line',
-  DEUTSCHE_AFRIKA = 'DAL DEUTSCHE AFRIKA-LINIEN',
+  ZIM = 'ZIM',
+  DEUTSCHE_AFRIKA = 'DAL',
 }
 
 export enum AlertType {

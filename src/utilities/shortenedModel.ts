@@ -10,6 +10,6 @@ export const shortenedChecklist = (item: ChecklistItem | undefined) => {
 };
 export const shortenedDocumentValue = (item: ChecklistItemValueDocument | undefined) => {
   return item
-    ? ({ name: item.name, url: item.url, isInternal: item.isInternal } as ShortChecklistItemValueDocument)
+    ? ({ name: item.name, url: item.url, isInternal: item.isInternal || true } as ShortChecklistItemValueDocument)
     : undefined;
 };

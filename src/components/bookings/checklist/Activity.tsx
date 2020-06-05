@@ -25,6 +25,10 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
           : activity.documents![0].status?.type === ChecklistItemValueDocumentStatusType.APPROVED
           ? ActivityText.APPROVED_FILE
           : ActivityText.REJECTED_FILE;
+      case ActivityChangeType.DONE_BY_CUSTOMER:
+        return ActivityText.DONE_BY_CUSTOMER;
+      case ActivityChangeType.UNDO_COMPLETED_CUSTOMER:
+        return ActivityText.UNDO_COMPLETED_CUSTOMER;
     }
   };
   return (
@@ -47,7 +51,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
             `${doc.name} `
           );
         })}
-      {activity.documents && activity.changeType === ActivityChangeType.ADD_FILE ? ' into ' : 'from '}
+      {activity.documents ? (activity.changeType === ActivityChangeType.ADD_FILE ? ' into ' : 'from ') : null}
       {activity.checklistItem ? (
         <Fragment>
           <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.

@@ -1,6 +1,5 @@
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import {
-  Badge,
   Box,
   Button,
   Checkbox,
@@ -250,12 +249,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   );
 
   const checklistItemMarkCompletedHandler = useCallback(
-    (action: CustomerAction) => {
+    (action: CustomerAction, type?: ActivityChangeType) => {
       return saveChecklistChanges('customerAction', action).then(_ =>
         addActivityItem(
           booking!.id,
           checklistItem!.id,
-          createActivityObject(ActivityChangeType.DONE_BY_CUSTOMER, getActivityLogUserData(), checklistItem),
+          createActivityObject(
+            type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
+            getActivityLogUserData(),
+            checklistItem,
+          ),
         ),
       );
     },
@@ -338,7 +341,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
   const handleUncompleted = () => {
     const action = omit(['by', 'at'])(checklistItem.customerAction) as CustomerAction;
     console.log('ACtion', action);
-    storeActivity(() => checklistItemMarkCompletedHandler(action));
+    storeActivity(() => checklistItemMarkCompletedHandler(action, ActivityChangeType.UNDO_COMPLETED_CUSTOMER));
   };
 
   const handleCheckboxChange = useCallback(

@@ -88,6 +88,7 @@ export enum ActivityText {
   ADD_FILES = ' has added files ',
   DELETE_FILES = ' has deleted files ',
   DONE_BY_CUSTOMER = ' has marked done ',
+  UNDO_COMPLETED_CUSTOMER = ' has unmarked done ',
   DEFAULTED_FILE = ' has undo changes on ',
   APPROVED_FILE = ' has approved ',
   REJECTED_FILE = ' has sent on revision ',
@@ -100,6 +101,7 @@ export enum ActivityChangeType {
   STAGE_CHECKED,
   DOCUMENT_STATUS_CHANGED,
   DONE_BY_CUSTOMER,
+  UNDO_COMPLETED_CUSTOMER,
 }
 
 export enum ChecklistNames {
