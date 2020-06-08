@@ -163,7 +163,6 @@ const BookingsPageContainer: React.FC = () => {
       };
 
       if (setBookingsContextData) {
-        alert(JSON.stringify(bookingsContextDataNew(), null, 2));
         setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
