@@ -67,6 +67,10 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         query = query.where('archived', '==', filters.archived);
       }
 
+      if (filters.archived !== undefined && actingAs) {
+        query = query.where('archived', '==', filters.archived);
+      }
+
       if (filters.pendingPayment !== undefined) {
         query = query.where('pendingPayment', '==', filters.pendingPayment);
       }

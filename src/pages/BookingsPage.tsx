@@ -148,7 +148,7 @@ const BookingsPageContainer: React.FC = () => {
           case 0:
             return flow(
               set('archived', false),
-              set('pendingPayment', false),
+              set('pendingPayment', undefined),
               set('dateRange', undefined),
             )(bookingsContextData);
           case 1:
@@ -163,6 +163,7 @@ const BookingsPageContainer: React.FC = () => {
       };
 
       if (setBookingsContextData) {
+        alert(JSON.stringify(bookingsContextDataNew(), null, 2));
         setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
