@@ -246,7 +246,7 @@ const Navbar: React.FC = () => {
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
 
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Bookings" to="/bookings" />}
+                    <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
                     )}
@@ -347,11 +347,9 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                {isDashboardUser(userRecord) && !actingAs && (
-                  <div className={classes.item}>
-                    <NotificationsButton />
-                  </div>
-                )}
+                <div className={classes.item}>
+                  <NotificationsButton />
+                </div>
                 <div className={classes.item}>
                   <IdentityWidget />
                 </div>
@@ -398,11 +396,9 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
 
-                  {isDashboardUser(userRecord) && (
-                    <Fragment>
-                      <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
-                    </Fragment>
-                  )}
+                  <Fragment>
+                    <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
+                  </Fragment>
                   <ListItemLink primary="Equipment Situation" to="/equipment" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />
                 </Fragment>
