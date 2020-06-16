@@ -11,6 +11,7 @@ import update from 'lodash/fp/update';
 import keys from 'lodash/fp/keys';
 import flatten from 'lodash/fp/flatten';
 import uniq from 'lodash/fp/uniq';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
   Theme,
   makeStyles,
@@ -45,13 +46,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: 18,
   },
   good: {
-    backgroundColor: colors.green[300],
+    color: colors.green[300],
   },
   onRequest: {
-    backgroundColor: colors.yellow[500],
+    color: colors.yellow[500],
   },
   notAvailable: {
-    backgroundColor: colors.red[600],
+    color: colors.red[600],
   },
   enableHorizontalScroll: {
     overflowX: 'auto',
@@ -155,19 +156,19 @@ const EquipmentSituation: React.FC = () => {
 
         <Box display="flex" mt={3}>
           <Box display="flex">
-            <Avatar className={`${classes.avatar} ${classes.good}`} />
+            <FiberManualRecordIcon className={`${classes.avatar} ${classes.good}`} />
             <Box ml={1}>
               <Typography variant="body1">Good</Typography>
             </Box>
           </Box>
           <Box display="flex" ml={3}>
-            <Avatar className={`${classes.avatar} ${classes.onRequest}`} />
+            <FiberManualRecordIcon className={`${classes.avatar} ${classes.onRequest}`} />
             <Box ml={1}>
               <Typography variant="body1">On request</Typography>
             </Box>
           </Box>
           <Box display="flex" ml={3}>
-            <Avatar className={`${classes.avatar} ${classes.notAvailable}`} />
+            <FiberManualRecordIcon className={`${classes.avatar} ${classes.notAvailable}`} />
             <Box ml={1}>
               <Typography variant="body1">Not available</Typography>
             </Box>
@@ -216,7 +217,7 @@ const EquipmentSituation: React.FC = () => {
                           return (
                             <TableCell key={containerType.id}>
                               <Tooltip title={status}>
-                                <Avatar className={className} />
+                                <FiberManualRecordIcon className={className} />
                               </Tooltip>
                             </TableCell>
                           );
