@@ -19,6 +19,7 @@ import {
   BookingLocType,
   BookingVersion,
   CargoDetail,
+  CargoOverdimension,
   CtrTariff,
   CtrTariffDetail,
   EquipmentDetail,
@@ -415,7 +416,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
 
                 {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
 
-                {detail.Overdimension && <OverdimensionComponent detail={detail} />}
+                {detail.Overdimension && detail.Overdimension === CargoOverdimension.Trigger && (
+                  <OverdimensionComponent detail={detail} />
+                )}
 
                 {detail.Equipment && detail.Equipment[0] ? (
                   <EquipmentData equipment={detail.Equipment} bookingCategory={category} />
