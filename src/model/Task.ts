@@ -1,4 +1,20 @@
-export default interface Task {}
+import { UserRecordMin } from './UserRecord';
+
+export default interface Task {
+  id?: string;
+  type: TaskType;
+  dueDate?: Date;
+  assignedUser?: UserRecordMin;
+  resolved: boolean;
+  userRole: UserRole;
+  createdAt?: Date;
+  bookingId?: string;
+}
+
+export enum UserRole {
+  ADMIN,
+  CLIENT,
+}
 
 export enum TaskType {
   // EXPORT TASKS

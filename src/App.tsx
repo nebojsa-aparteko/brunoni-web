@@ -33,6 +33,7 @@ import BookingsRedirect from './pages/BookingsRedirect';
 import BookingListFilterProvider from './providers/BookingListFilterProvider';
 import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
+import MyDayPage from './pages/MyDayPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -63,6 +64,7 @@ const adminRoutes = (
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     <Route exact path="/loadList" component={LoadListPage} />
+    <Route exact path="/my-day" component={MyDayPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>
@@ -80,6 +82,7 @@ const userRoutes = (
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route path="/charges" component={SideCharges} />
+    <Route path="/my-day" component={MyDayPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>
