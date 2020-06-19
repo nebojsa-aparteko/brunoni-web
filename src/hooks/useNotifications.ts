@@ -12,7 +12,7 @@ export default function useNotifications(userId?: string) {
       q
         .where('userAlphacomId', '==', userId)
         .orderBy('at', 'desc')
-        .limit(50),
+        .limit(100),
     [userId],
   );
   const notificationsCollection = useFirestoreCollection('notifications', userId ? query : null);
