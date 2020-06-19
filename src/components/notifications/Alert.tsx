@@ -9,7 +9,7 @@ interface Props {
 enum AlertText {
   DEPOT_OUT_PICK_UP = 'Not empty picked up yet.',
   FREIGHT = 'Freight is not checked in checklist.',
-  GATE_OUT = 'Get out terminal is not checked in checklist.',
+  GATE_OUT = 'Gate out terminal is not checked in checklist.',
   INVOICED = 'Invoiced is not checked in checklist.',
   S_I = 'Closing for shipping instructions is soon, please check booking.',
   VGM = 'Closing for VGM is soon, please check booking.',
