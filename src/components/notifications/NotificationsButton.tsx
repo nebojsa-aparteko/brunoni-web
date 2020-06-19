@@ -1,10 +1,9 @@
-import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useMemo, useState } from 'react';
 import { Badge, Drawer, IconButtonProps } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import useNotifications from '../../hooks/useNotifications';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import firebase from '../../firebase';
 import NotificationsView from './NotificationsView';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {

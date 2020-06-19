@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-
-import useFirestoreCollection, { QueryFunction } from './useFirestoreCollection';
-import { flow, update, identity } from 'lodash/fp';
+import { flow, identity, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
-import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
-import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
-import pick from 'lodash/fp/pick';
-import { UserRecordMinProperties } from '../model/UserRecord';
 import Task from '../model/Task';
 
 export default function useTasks() {
@@ -15,7 +9,7 @@ export default function useTasks() {
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let query = collection.where('resolved', '==', false).orderBy('dueDate', 'asc');
+      let query = collection.where('resolved', '==', false);
 
       return query;
     },
