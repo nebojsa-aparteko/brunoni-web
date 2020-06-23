@@ -9,6 +9,7 @@ const MyDayTable: React.FC<Props> = ({ tasks, onResolve }) => {
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell align="center" />
             <TableCell align="center">Task</TableCell>
             <TableCell align="center">Booking</TableCell>
             <TableCell align="center">Assigned To</TableCell>
