@@ -3,9 +3,19 @@ import { Box, Card, CardContent, CardHeader, Typography } from '@material-ui/cor
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks from '../../hooks/useTasks';
 import MyDayTable from './MyDayTable';
+import firebase from '../../firebase';
+const resolveTask = (bookingId: string, taskId: string) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('tasks')
+    .doc(taskId)
+    .update('resolved', true);
 
 const MyDayContainer = () => {
   const tasks = useTasks();
+
   return (
     <Card>
       <CardHeader
@@ -17,7 +27,9 @@ const MyDayContainer = () => {
           </Box>
         }
       />
-      <CardContent>{tasks ? <MyDayTable tasks={tasks} /> : <ChartsCircularProgress />}</CardContent>
+      <CardContent>
+        {tasks ? <MyDayTable tasks={tasks} onResolve={resolveTask} /> : <ChartsCircularProgress />}
+      </CardContent>
     </Card>
   );
 };

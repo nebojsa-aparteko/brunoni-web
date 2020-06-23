@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link, TableCell, TableRow } from '@material-ui/core';
+import { Button, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
 
-const MyDayTableRow: React.FC<Props> = ({ task }) => {
+const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
   return (
     <TableRow key={task.id}>
-      <TableCell align="left">{Object.values(TaskDescription)[task.type - 1] || '-'}</TableCell>
+      <TableCell align="left">{Object.values(TaskDescription)[task.type] || '-'}</TableCell>
       <TableCell align="center">
         <Link target="_blank" href={`/bookings/${task.bookingId}`}>
           {task.bookingId}
@@ -14,6 +14,11 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
       </TableCell>
       <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
       <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
+      <TableCell align="center">
+        <Button variant="outlined" onClick={() => onResolve(task.bookingId, task.id)} disabled={task.resolved}>
+          Resolve
+        </Button>
+      </TableCell>
     </TableRow>
   );
 };
@@ -21,4 +26,5 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
 export default MyDayTableRow;
 interface Props {
   task: Task;
+  onResolve: (bookingId: string, taskId: string) => void;
 }

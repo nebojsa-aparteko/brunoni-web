@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import Task from '../../model/Task';
 import MyDayTableRow from './MyDayTableRow';
 
-const MyDayTable: React.FC<Props> = ({ tasks }) => {
+const MyDayTable: React.FC<Props> = ({ tasks, onResolve }) => {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -13,11 +13,12 @@ const MyDayTable: React.FC<Props> = ({ tasks }) => {
             <TableCell align="center">Booking</TableCell>
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>
+            <TableCell align="center" />
           </TableRow>
         </TableHead>
         <TableBody>
           {tasks.map(task => (
-            <MyDayTableRow task={task} />
+            <MyDayTableRow task={task} onResolve={onResolve} />
           ))}
         </TableBody>
       </Table>
@@ -29,4 +30,5 @@ export default MyDayTable;
 
 interface Props {
   tasks: Task[];
+  onResolve: (bookingId: string, taskId: string) => void;
 }

@@ -1,14 +1,14 @@
 import { UserRecordMin } from './UserRecord';
 
 export default interface Task {
-  id?: string;
+  id: string;
   type: TaskType;
   dueDate?: Date;
   assignedUser?: UserRecordMin;
   resolved: boolean;
   userRole: UserRole;
   createdAt?: Date;
-  bookingId?: string;
+  bookingId: string;
 }
 
 export enum UserRole {
@@ -18,12 +18,13 @@ export enum UserRole {
 
 export enum TaskType {
   // EXPORT TASKS
-  DEPOT_OUT_MOVE,
+  DEPOT_OUT_MOVE = 1,
   GATE_IN_CHECK_CONTAINER,
   B_BHT_ISSUANCE_GENERATED,
   VGM_SUBMISSION_ARRANGE,
   VGM_SUBMISSION_SUBMITTED,
   SHIPPING_INSTRUCTIONS_CHECK,
+  SHIPPING_INSTRUCTIONS_SUBMITTED,
   B_L_DRAFT_CREATE,
   B_L_DRAFT_SENT,
   B_L_DRAFT_APPROVE,
@@ -55,6 +56,7 @@ export enum TaskDescription {
   VGM_SUBMISSION_ARRANGE = 'Please arrange VGM submission.',
   VGM_SUBMISSION_SUBMITTED = 'Please check is VGM was submitted.',
   SHIPPING_INSTRUCTIONS_CHECK = 'Please check Shipping instruction.',
+  SHIPPING_INSTRUCTIONS_SUBMITTED = 'Please submit Shipping instruction.',
   B_L_DRAFT_CREATE = 'Please create B/L draft.',
   B_L_DRAFT_SENT = 'Please check if B/L draft has been sent.',
   B_L_DRAFT_APPROVE = 'Please find enclosed B/L draft of inspection and kindly approved on the checklist.',
