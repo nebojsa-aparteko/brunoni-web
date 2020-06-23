@@ -25,6 +25,8 @@ import UserRecord, { isSuperAdmin, UserRecordMinProperties } from '../../model/U
 import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
+import useTasksPerBooking from '../../hooks/useTasksPerBooking';
+import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -141,6 +143,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
+  const tasks = useTasksPerBooking(booking.id);
+
   const specialRemarks: Remark[] = useMemo(
     () =>
       booking
@@ -213,6 +217,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   );
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      {tasks && (
+        <Grid item xs={12} md={11}>
+          <BookingTaskExpansionPanel tasks={tasks} />
+        </Grid>
+      )}
       <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           <WatchersDialog
