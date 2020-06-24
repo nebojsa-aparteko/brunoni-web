@@ -16,7 +16,7 @@ function firestoreCollection<T>({ name, query, documentPath, subCollection, cont
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const value = useMemo(() => {
-    return snapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() } as any)) as T[] | undefined;
+    return snapshot?.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)) as T[] | undefined;
   }, [snapshot]);
 
   const { Provider } = context;

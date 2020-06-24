@@ -12,6 +12,8 @@ import useAdminUsers from '../../../hooks/useAdminUsers';
 import mentionsClassNames from './mention.module.css';
 import useTeams from '../../../hooks/useTeams';
 import { Booking } from '../../../model/Booking';
+import firebase from '../../../firebase';
+import UserRecord from '../../../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,7 +43,30 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
   const [messageText, setMessageText] = useState('');
   const [messageTextPlain, setMessageTextPlain] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
+  const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(undefined);
+  const [assignedUser, setAssignedUser] = useState<UserRecord | undefined>(undefined);
   const userRecord = useContext(UserRecordContext);
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection('users')
+      .where('alphacomId', '==', booking?.assignedCustomerUser?.alphacomId || '')
+      .where('emailAddress', '==', booking?.assignedCustomerUser.emailAddress)
+      .get()
+      .then(doc => {
+        if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+      });
+    firebase
+      .firestore()
+      .collection('users')
+      .where('alphacomId', '==', booking?.assignedUser?.alphacomId || '')
+      .where('emailAddress', '==', booking?.assignedUser.emailAddress)
+      .get()
+      .then(doc => {
+        if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+      });
+  }, [booking]);
+
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
     setIsAdmin(!actingAs);
@@ -55,14 +80,14 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
   const activityLogContext = useActivityLogState();
   const normalizedAdmins = useMemo(() => {
     if (isAdmin) {
-      if (booking?.assignedCustomerUser) {
+      if (assignedCustomerUser) {
         return admins
           ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
           .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)))
           .concat([
             {
-              id: booking?.assignedCustomerUser.alphacomId,
-              display: `${booking?.assignedCustomerUser.firstName} ${booking?.assignedCustomerUser.lastName}`,
+              id: assignedCustomerUser.id,
+              display: `${assignedCustomerUser?.firstName} ${assignedCustomerUser?.lastName}`,
             } as MentionItem,
           ]);
       }
@@ -71,17 +96,17 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
         ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
         .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
     } else {
-      if (!booking?.assignedUser) {
+      if (!assignedUser) {
         return [];
       }
       return [
         {
-          id: booking?.assignedUser.alphacomId,
-          display: `${booking?.assignedUser.firstName} ${booking?.assignedUser.lastName}`,
+          id: assignedUser.id,
+          display: `${assignedUser.firstName} ${assignedUser.lastName}`,
         } as MentionItem,
       ];
     }
-  }, [admins, teams, booking]);
+  }, [admins, teams, booking, assignedCustomerUser, assignedUser]);
 
   useEffect(() => {
     if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {

@@ -616,7 +616,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             <input {...getInputPropsDraftNoClick()} />
             <Divider />
             <Box display="flex" justifyContent="space-between">
-              <Typography variant="subtitle2">Drafts</Typography>
+              <Typography variant="subtitle2">Internals</Typography>
               <IconButton size="small" aria-label="Add Draft Files" onClick={openDraftNoClick}>
                 <AttachFileIcon />
               </IconButton>
