@@ -82,7 +82,7 @@ const userRoutes = (
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route path="/charges" component={SideCharges} />
-    <Route path="/my-day" component={MyDayPage} />
+    {/*<Route path="/my-day" component={MyDayPage} />*/}
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>
