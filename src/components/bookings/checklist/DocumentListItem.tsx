@@ -238,7 +238,9 @@ const DocumentListItem = ({
             secondary={
               <span>
                 <Typography variant="caption">
-                  {`${formatDistanceToNowConfigured(item.uploadedAt)} by ${item.uploadedBy.firstName}`}
+                  {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
+                    isAdmin ? ` by ${item.uploadedBy.firstName}` : ''
+                  }`}
                 </Typography>
                 <br />
                 {item.status?.at && (
