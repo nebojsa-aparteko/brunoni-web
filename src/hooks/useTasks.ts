@@ -16,7 +16,7 @@ export default function useTasks() {
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('resolved', '==', false);
       if (assignee) {
-        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
+        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee)).limit(100);
       }
       return query;
     },
