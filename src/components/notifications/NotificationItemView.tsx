@@ -83,7 +83,25 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
 
 const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
   const classes = useStyles();
-  const handleSeenStatusChange = () => {
+  const handleSeenStatusChange = async () => {
+    const sentNotifications = (
+      await firebase
+        .firestore()
+        .collection('email-notifications')
+        .doc(notification.userAlphacomId)
+        .get()
+    ).data() as {
+      lastSend: Date;
+      notifications: string[];
+    };
+    firebase
+      .firestore()
+      .collection('email-notifications')
+      .doc(notification.userAlphacomId)
+      .set({
+        lastSend: sentNotifications.lastSend,
+        notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+      });
     return firebase
       .firestore()
       .collection('notifications')

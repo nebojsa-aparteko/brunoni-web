@@ -1,13 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-
-import useFirestoreCollection, { QueryFunction } from './useFirestoreCollection';
-import { flow, update, identity } from 'lodash/fp';
+import { flow, identity, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
 import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
-import pick from 'lodash/fp/pick';
-import { UserRecordMinProperties } from '../model/UserRecord';
 
 export default function useVesselWithVoyage() {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();

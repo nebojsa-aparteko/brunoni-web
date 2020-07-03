@@ -8,7 +8,7 @@ export default function useAdminUsers(roles: string[] = ADMIN_ROLES) {
 
   return users
     ? users
-        .filter(user => roles.indexOf(user.role!) !== -1 && user.isAdmin && !user.archived)
+        .filter(user => roles.indexOf(user.role!) !== -1 && !user.archived)
         .sort((a, b) => (a.firstName! >= b.firstName! ? 1 : -1))
     : [];
 }

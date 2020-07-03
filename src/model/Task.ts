@@ -9,6 +9,7 @@ export default interface Task {
   userRole: UserRole;
   createdAt?: Date;
   bookingId: string;
+  selected?: boolean;
 }
 
 export enum UserRole {

@@ -28,7 +28,12 @@ const UserAssignment: React.FC<Props> = ({ value, onChange, ...other }) => {
         </div>
       ) : (
         <Box display="flex" style={{ minWidth: '300px' }}>
-          <UserInput label="Assigned To" users={assignableUsers || []} onChange={onChange} value={value} />
+          <UserInput
+            label="Assigned To"
+            users={assignableUsers || []}
+            onChange={(_, user) => onChange(user)}
+            value={value}
+          />
           <IconButton aria-label="cancel" onClick={() => setChangeInProgress(false)}>
             <ClearIcon />
           </IconButton>

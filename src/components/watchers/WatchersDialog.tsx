@@ -156,7 +156,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Agent"
               users={assignableUsers || []}
-              onChange={user => handleResponse(handleChangeAgent(booking.id, user, booking.watchers))}
+              onChange={(_, user) => handleResponse(handleChangeAgent(booking.id, user, booking.watchers))}
             />
           </Box>
           <Box my={1}>
@@ -171,7 +171,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Client"
               users={assignableCustomers || []}
-              onChange={user => handleResponse(handleChangeCustomer(booking.id, user, booking.watchers))}
+              onChange={(_, user) => handleResponse(handleChangeCustomer(booking.id, user, booking.watchers))}
             />
           </Box>
           <Box my={1}>

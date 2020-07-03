@@ -15,11 +15,12 @@ const MyDayTable: React.FC<Props> = ({ tasks, onResolve }) => {
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>
             <TableCell align="center" />
+            <TableCell align="center" />
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.map(task => (
-            <MyDayTableRow task={task} onResolve={onResolve} />
+          {tasks.map((task, index) => (
+            <MyDayTableRow task={task} onResolve={onResolve} key={task.id} />
           ))}
         </TableBody>
       </Table>

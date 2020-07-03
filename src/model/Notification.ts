@@ -9,7 +9,7 @@ export enum NotificationType {
 }
 
 export default interface Notification {
-  userId: string;
+  userAlphacomId: string;
   userEmail: string;
   at: Date;
   type: NotificationType;

@@ -1,5 +1,5 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Button, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
+import React, { ChangeEvent, Fragment, useContext, useEffect, useState } from 'react';
+import { Button, Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -24,13 +24,19 @@ const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
         setBooking(normalizeBooking(bkg.data()));
       });
   }, [task]);
+
   return (
     <Fragment>
       <TableRow key={task.id} onClick={() => setOpen(prevState => !prevState)} style={{ cursor: 'pointer' }}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small">
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+        <TableCell padding="checkbox">
+          <Checkbox
+            checked={task.selected}
+            onChange={event => {
+              task.selected = !task.selected;
+            }}
+            onFocus={event => event.stopPropagation()}
+            // inputProps={{ 'aria-label': 'select all desserts' }}
+          />
         </TableCell>
         <TableCell align="left">{Object.values(TaskDescription)[task.type] || '-'}</TableCell>
         <TableCell align="center">
@@ -52,6 +58,11 @@ const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
           >
             Resolve
           </Button>
+        </TableCell>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small">
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
         </TableCell>
       </TableRow>
       <TableRow>

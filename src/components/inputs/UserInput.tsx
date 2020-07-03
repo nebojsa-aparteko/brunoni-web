@@ -14,7 +14,7 @@ interface Props {
   users: UserRecordMin[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: UserRecordMin;
-  onChange: (user: UserRecordMin | null) => void;
+  onChange: (event: ChangeEvent<{}>, user: UserRecordMin | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -38,7 +38,7 @@ const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, o
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(_: ChangeEvent<{}>, user: UserRecord | null) => onChange(user)}
+      onChange={(event: ChangeEvent<{}>, user: UserRecord | null) => onChange(event, user)}
       autoSelect
       autoHighlight
       open={open}

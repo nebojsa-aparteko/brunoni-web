@@ -28,17 +28,37 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
   const markAllAsRead = useCallback(() => {
     (async () => {
       const batch = firebase.firestore().batch();
-      notifications
-        ?.filter(notification => !notification.seen)
-        .map(notification =>
-          batch.update(
-            firebase
+      await Promise.all(
+        notifications
+          ?.filter(notification => !notification.seen)
+          .map(async notification => {
+            const sentNotifications = (
+              await firebase
+                .firestore()
+                .collection('email-notifications')
+                .doc(notification.userAlphacomId)
+                .get()
+            ).data() as {
+              lastSend: Date;
+              notifications: string[];
+            };
+            await firebase
               .firestore()
-              .collection('notifications')
-              .doc(notification.id),
-            { seen: true },
-          ),
-        );
+              .collection('email-notifications')
+              .doc(notification.userAlphacomId)
+              .set({
+                lastSend: sentNotifications.lastSend,
+                notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+              });
+            return batch.update(
+              firebase
+                .firestore()
+                .collection('notifications')
+                .doc(notification.id),
+              { seen: true },
+            );
+          }),
+      );
       batch.commit().catch(err => console.log(err));
     })();
   }, [notifications]);

@@ -3,17 +3,24 @@ import { flow, identity, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import firebase from '../firebase';
 import Task from '../model/Task';
+import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
+import { useTaskFilterProviderContext } from '../providers/TaskFilterProvider';
+import pick from 'lodash/fp/pick';
+import { UserRecordMinProperties } from '../model/UserRecord';
 
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
-
+  const [filters, _] = useTaskFilterProviderContext();
+  const { assignee } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('resolved', '==', false);
-
+      if (assignee) {
+        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
+      }
       return query;
     },
-    [],
+    [filters],
   );
 
   useEffect(() => {
@@ -32,6 +39,7 @@ export default function useTasks() {
                 ...normalizeTaskData(d.data()),
                 bookingId: d.ref.parent.parent?.id,
                 id: d.id,
+                selected: false,
               })) as Task[],
             );
           },
