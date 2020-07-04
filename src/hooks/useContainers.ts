@@ -7,7 +7,7 @@ import { useLoadListFilterContext } from '../providers/LoadListFilterProvider';
 import { BookingCategory, BookingVersion } from '../model/Booking';
 
 export default function useContainers(q?: () => any) {
-  const [filters, _] = useLoadListFilterContext();
+  const [filters] = useLoadListFilterContext();
   const { origin, carrier, dateRange } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
@@ -32,7 +32,7 @@ export default function useContainers(q?: () => any) {
       query = query.orderBy('ets', 'asc').orderBy('bookingId', 'asc');
       return query;
     },
-    [carrier, filters],
+    [carrier, dateRange, origin],
   );
 
   // const query = useCallback(

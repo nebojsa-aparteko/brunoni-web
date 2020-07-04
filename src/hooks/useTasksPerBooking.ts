@@ -8,7 +8,7 @@ import safeInvoke from '../utilities/safeInvoke';
 export default function useTasksPerBooking(bookingId: string) {
   const tasksCollection = useFirestoreCollection(
     'bookings',
-    useCallback(query => query.orderBy('resolved', 'desc'), []),
+    useCallback(query => query.orderBy('resolved', 'asc'), []),
     bookingId,
     'tasks',
   );

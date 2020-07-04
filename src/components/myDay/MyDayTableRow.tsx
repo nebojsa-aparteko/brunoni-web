@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Fragment, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import { Button, Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
@@ -9,21 +9,13 @@ import { Booking } from '../../model/Booking';
 import firebase from '../../firebase';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
+import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 
 const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
   const [open, setOpen] = React.useState(false);
-  const [booking, setBooking] = useState<Booking | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
-  useEffect(() => {
-    firebase
-      .firestore()
-      .collection('bookings')
-      .doc(task.bookingId)
-      .get()
-      .then(bkg => {
-        setBooking(normalizeBooking(bkg.data()));
-      });
-  }, [task]);
+  const snapshot = useFirestoreDocument('bookings', task.bookingId);
+  const booking = useMemo(() => normalizeBooking(snapshot?.data()), [snapshot]);
 
   return (
     <Fragment>
@@ -31,14 +23,13 @@ const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
         <TableCell padding="checkbox">
           <Checkbox
             checked={task.selected}
-            onChange={event => {
+            onChange={_ => {
               task.selected = !task.selected;
             }}
             onFocus={event => event.stopPropagation()}
-            // inputProps={{ 'aria-label': 'select all desserts' }}
           />
         </TableCell>
-        <TableCell align="left">{Object.values(TaskDescription)[task.type] || '-'}</TableCell>
+        <TableCell align="left">{Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}</TableCell>
         <TableCell align="center">
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}

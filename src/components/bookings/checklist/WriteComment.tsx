@@ -106,7 +106,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
         } as MentionItem,
       ];
     }
-  }, [admins, teams, booking, assignedCustomerUser, assignedUser]);
+  }, [admins, teams, assignedCustomerUser, assignedUser, isAdmin]);
 
   useEffect(() => {
     if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {

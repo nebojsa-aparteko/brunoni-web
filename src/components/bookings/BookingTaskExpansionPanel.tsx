@@ -7,6 +7,7 @@ import {
   ExpansionPanelDetails,
   ExpansionPanelSummary,
   Link,
+  TableCell,
   TableRow,
   Typography,
 } from '@material-ui/core';
@@ -19,6 +20,7 @@ import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
 import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
+import { resolveTask } from '../myDay/MyDayContainer';
 
 const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
   const users = useAdminUsers();
@@ -85,7 +87,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
               marginBottom: theme.spacing(1),
             }}
           >
-            <Box textAlign="left" width={'10%'}>
+            <TableCell align="left" style={{ width: '10%' }}>
               <Checkbox
                 checked={task.selected}
                 onChange={event => {
@@ -95,33 +97,35 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
                 onFocus={event => event.stopPropagation()}
                 // inputProps={{ 'aria-label': 'select all desserts' }}
               />
-            </Box>
-            <Box textAlign="left" width={'30%'}>
-              <Typography variant="subtitle1">{Object.values(TaskDescription)[task.type] || '-'}</Typography>
-            </Box>
-            <Box textAlign="center" width={'15%'}>
+            </TableCell>
+            <TableCell align="left" style={{ width: '30%' }}>
+              <Typography variant="subtitle1">
+                {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
+              </Typography>
+            </TableCell>
+            <TableCell align="center" style={{ width: '15%' }}>
               <Link target="_blank" href={`/bookings/${task.bookingId}`}>
                 {task.bookingId}
               </Link>
-            </Box>
-            <Box textAlign="center" width={'20%'}>
+            </TableCell>
+            <TableCell align="center" style={{ width: '20%' }}>
               {task.assignedUser?.emailAddress || '-'}
-            </Box>
-            <Box textAlign="center" width={'15%'}>
+            </TableCell>
+            <TableCell align="center" style={{ width: '15%' }}>
               {task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}
-            </Box>
-            <Box textAlign="center" width={'10%'}>
+            </TableCell>
+            <TableCell align="center" style={{ width: '10%' }}>
               <Button
                 variant="outlined"
                 onClick={event => {
                   event.stopPropagation();
-                  // onResolve(task.bookingId, task.id);
+                  return resolveTask(task.bookingId, task.id);
                 }}
                 disabled={task.resolved}
               >
                 Resolve
               </Button>
-            </Box>
+            </TableCell>
           </TableRow>
         ))}
       </ExpansionPanelDetails>

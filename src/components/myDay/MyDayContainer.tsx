@@ -11,7 +11,7 @@ import useAdminUsers from '../../hooks/useAdminUsers';
 import theme from '../../theme';
 import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import pick from 'lodash/fp/pick';
-const resolveTask = (bookingId: string, taskId: string) =>
+export const resolveTask = (bookingId: string, taskId: string) =>
   firebase
     .firestore()
     .collection('bookings')

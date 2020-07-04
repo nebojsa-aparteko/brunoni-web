@@ -131,8 +131,6 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
     );
 
 const BookingView: React.FC<Props> = ({ booking }) => {
-  console.log('Booking object: ', booking);
-
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);

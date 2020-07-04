@@ -7,7 +7,7 @@ import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvide
 
 export default function useVesselWithVoyage() {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
-  const [filters, _] = useVesselFilterContext();
+  const [filters] = useVesselFilterContext();
   const { category, carrier, dateRange } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
@@ -29,7 +29,7 @@ export default function useVesselWithVoyage() {
 
       return query;
     },
-    [carrier, category, filters],
+    [carrier, category, dateRange],
   );
 
   useEffect(() => {
