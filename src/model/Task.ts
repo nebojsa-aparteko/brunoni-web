@@ -1,4 +1,5 @@
 import { UserRecordMin } from './UserRecord';
+import { BookingCategory } from './Booking';
 
 export default interface Task {
   id: string;
@@ -7,7 +8,11 @@ export default interface Task {
   assignedUser?: UserRecordMin;
   resolved: boolean;
   userRole: UserRole;
-  createdAt?: Date;
+  show: boolean;
+  createAt?: Date;
+  carrierId?: string;
+  category?: BookingCategory;
+  checklistId: string;
   bookingId: string;
   selected?: boolean;
 }

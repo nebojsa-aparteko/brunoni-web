@@ -95,7 +95,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
                   task.selected = !task.selected;
                 }}
                 onFocus={event => event.stopPropagation()}
-                // inputProps={{ 'aria-label': 'select all desserts' }}
+                disabled={task.resolved}
               />
             </TableCell>
             <TableCell align="left" style={{ width: '30%' }}>

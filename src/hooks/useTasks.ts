@@ -14,7 +14,7 @@ export default function useTasks() {
   const { assignee } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let query = collection.where('resolved', '==', false);
+      let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee)).limit(100);
       }
