@@ -1,5 +1,5 @@
 import React, { ChangeEvent, Fragment, useContext, useEffect, useMemo, useState } from 'react';
-import { Button, Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
+import { Button, Checkbox, Chip, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -38,17 +38,33 @@ const MyDayTableRow: React.FC<Props> = ({ task, onResolve }) => {
         <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
         <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
         <TableCell align="center">
-          <Button
-            variant="outlined"
-            onClick={event => {
-              event.stopPropagation();
-              onResolve(task.bookingId, task.id);
-              setOpen(false);
+          <Chip
+            size="small"
+            label={`${
+              task.dueDate && task.dueDate < new Date() && !task.resolved
+                ? 'Overdue'
+                : task.resolved
+                ? 'Resolved'
+                : task.show
+                ? 'Pending'
+                : !task.show && task.dueDate
+                ? 'Future'
+                : 'Not Created yet'
+            }`}
+            style={{
+              backgroundColor:
+                task.dueDate && task.dueDate < new Date() && !task.resolved
+                  ? '#f4364c'
+                  : task.resolved
+                  ? '#999999'
+                  : task.show
+                  ? '#00a2f2'
+                  : !task.show && task.dueDate
+                  ? '#3cb371'
+                  : '#999999',
+              color: 'white',
             }}
-            disabled={task.resolved}
-          >
-            Resolve
-          </Button>
+          />
         </TableCell>
         <TableCell>
           <IconButton aria-label="expand row" size="small">

@@ -9,6 +9,7 @@ import {
   ExpansionPanelSummary,
   Link,
   TableCell,
+  TableHead,
   TableRow,
   Typography,
 } from '@material-ui/core';
@@ -79,6 +80,27 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
         </Box>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+        <TableHead style={{ width: '100%' }}>
+          <TableRow style={{ width: '100%' }}>
+            <TableCell align="center" style={{ width: '10%' }} />
+            <TableCell align="center" style={{ width: '30%' }}>
+              Task
+            </TableCell>
+            <TableCell align="center" style={{ width: '15%' }}>
+              File No.
+            </TableCell>
+            <TableCell align="center" style={{ width: '20%' }}>
+              Assigned To
+            </TableCell>
+            <TableCell align="center" style={{ width: '15%' }}>
+              Due Date
+            </TableCell>
+            <TableCell align="center" style={{ width: '10%' }}>
+              Task status
+            </TableCell>
+            <TableCell align="center" />
+          </TableRow>
+        </TableHead>
         {tasks.map(task => (
           <TableRow
             key={task.id}

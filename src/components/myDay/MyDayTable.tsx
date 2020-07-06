@@ -14,7 +14,7 @@ const MyDayTable: React.FC<Props> = ({ tasks, onResolve }) => {
             <TableCell align="center">File No.</TableCell>
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>
-            <TableCell align="center" />
+            <TableCell align="center">Task status</TableCell>
             <TableCell align="center" />
           </TableRow>
         </TableHead>
