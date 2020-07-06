@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, Fragment } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks from '../../hooks/useTasks';
@@ -32,10 +32,52 @@ const MyDayContainer = () => {
       <CardHeader
         title={
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="subtitle1" display="inline">
+            <Typography variant="h3" display="inline">
               My Day
             </Typography>
-            <Box display="flex" style={{ minWidth: theme.spacing(35) }}>
+          </Box>
+        }
+      />
+      <CardContent>
+        <Box display="flex" flexDirection="row" mb={2} justifyContent="space-between">
+          <Box display="flex">
+            <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
+              <UserInput
+                label="Assign task to"
+                users={users}
+                onChange={(_, user) => {
+                  console.log(user);
+                  setAssignTo(user || undefined);
+                }}
+                value={assignTo}
+              />
+            </Box>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={event => {
+                // console.log(tasks?.filter(task => task.selected));
+                tasks
+                  ?.filter(task => task.selected)
+                  .forEach(task =>
+                    firebase
+                      .firestore()
+                      .collection('bookings')
+                      .doc(task.bookingId)
+                      .collection('tasks')
+                      .doc(task.id)
+                      .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
+                  );
+              }}
+            >
+              Assign user
+            </Button>
+          </Box>
+          <Box display="flex" alignItems="center">
+            <Typography variant="h4" display="inline">
+              Filter by:
+            </Typography>
+            <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
               <UserInput
                 label="Assigned user"
                 users={users}
@@ -47,41 +89,6 @@ const MyDayContainer = () => {
               />
             </Box>
           </Box>
-        }
-      />
-      <CardContent>
-        <Box display="flex" flexDirection="row">
-          <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
-            <UserInput
-              label="Assign task to"
-              users={users}
-              onChange={(_, user) => {
-                console.log(user);
-                setAssignTo(user || undefined);
-              }}
-              value={assignTo}
-            />
-          </Box>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={event => {
-              // console.log(tasks?.filter(task => task.selected));
-              tasks
-                ?.filter(task => task.selected)
-                .forEach(task =>
-                  firebase
-                    .firestore()
-                    .collection('bookings')
-                    .doc(task.bookingId)
-                    .collection('tasks')
-                    .doc(task.id)
-                    .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
-                );
-            }}
-          >
-            Assign user
-          </Button>
         </Box>
         {tasks ? <MyDayTable tasks={tasks} onResolve={resolveTask} /> : <ChartsCircularProgress />}
       </CardContent>

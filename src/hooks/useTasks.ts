@@ -16,12 +16,12 @@ export default function useTasks() {
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (assignee) {
-        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee)).limit(100);
+        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
       }
       query.limit(100);
       return query;
     },
-    [filters],
+    [filters, assignee, UserRecordMinProperties, pick],
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function useTasks() {
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [query, setSnapshot]);
+  }, [query, setSnapshot, normalizeTaskData]);
 
   return snapshot;
 }

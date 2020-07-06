@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
@@ -21,6 +22,7 @@ import pick from 'lodash/fp/pick';
 import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import { resolveTask } from '../myDay/MyDayContainer';
+import { NotificationType } from '../../model/Notification';
 
 const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
   const users = useAdminUsers();
@@ -115,16 +117,43 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
               {task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}
             </TableCell>
             <TableCell align="center" style={{ width: '10%' }}>
-              <Button
-                variant="outlined"
-                onClick={event => {
-                  event.stopPropagation();
-                  return resolveTask(task.bookingId, task.id);
+              {/*<Button*/}
+              {/*  variant="outlined"*/}
+              {/*  onClick={event => {*/}
+              {/*    event.stopPropagation();*/}
+              {/*    return resolveTask(task.bookingId, task.id);*/}
+              {/*  }}*/}
+              {/*  disabled={task.resolved}*/}
+              {/*>*/}
+              {/*  Resolve*/}
+              {/*</Button>*/}
+              <Chip
+                size="small"
+                label={`${
+                  task.dueDate && task.dueDate < new Date() && !task.resolved
+                    ? 'Overdue'
+                    : task.resolved
+                    ? 'Resolved'
+                    : task.show
+                    ? 'Pending'
+                    : !task.show && task.dueDate
+                    ? 'Future'
+                    : 'Not Created yet'
+                }`}
+                style={{
+                  backgroundColor:
+                    task.dueDate && task.dueDate < new Date() && !task.resolved
+                      ? '#f4364c'
+                      : task.resolved
+                      ? '#999999'
+                      : task.show
+                      ? '#00a2f2'
+                      : !task.show && task.dueDate
+                      ? '#3cb371'
+                      : '#999999',
+                  color: 'white',
                 }}
-                disabled={task.resolved}
-              >
-                Resolve
-              </Button>
+              />
             </TableCell>
           </TableRow>
         ))}
