@@ -23,7 +23,7 @@ export default function useTasks() {
       query.limit(100);
       return query;
     },
-    [filters, assignee, UserRecordMinProperties, pick, showClientTasks],
+    [filters, assignee, UserRecordMinProperties, pick, showClientTasks, UserRole],
   );
 
   useEffect(() => {

@@ -19,8 +19,8 @@ const MyDayTable: React.FC<Props> = ({ tasks }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.map((task, index) => (
-            <MyDayTableRow task={task} key={task.id} />
+          {tasks.map(task => (
+            <MyDayTableRow task={task} key={`${task.id}${task.bookingId}`} />
           ))}
         </TableBody>
       </Table>

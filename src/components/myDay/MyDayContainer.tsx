@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks from '../../hooks/useTasks';
@@ -21,7 +21,25 @@ const MyDayContainer = () => {
   const { assignee } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
-
+  const onAssignedFilter = useCallback(
+    (_, user) => {
+      if (setFilters) setFilters(set('assignee', user || undefined)(filters));
+    },
+    [filters],
+  );
+  const onAssignUser = useCallback(() => {
+    tasks
+      ?.filter(task => task.selected)
+      .forEach(task =>
+        firebase
+          .firestore()
+          .collection('bookings')
+          .doc(task.bookingId)
+          .collection('tasks')
+          .doc(task.id)
+          .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
+      );
+  }, [tasks, assignTo, pick, UserRecordMinProperties]);
   return (
     <Card>
       <CardHeader
@@ -41,30 +59,12 @@ const MyDayContainer = () => {
                 label="Assign task to"
                 users={users}
                 onChange={(_, user) => {
-                  console.log(user);
                   setAssignTo(user || undefined);
                 }}
                 value={assignTo}
               />
             </Box>
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={event => {
-                // console.log(tasks?.filter(task => task.selected));
-                tasks
-                  ?.filter(task => task.selected)
-                  .forEach(task =>
-                    firebase
-                      .firestore()
-                      .collection('bookings')
-                      .doc(task.bookingId)
-                      .collection('tasks')
-                      .doc(task.id)
-                      .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
-                  );
-              }}
-            >
+            <Button color="primary" variant="contained" onClick={onAssignUser}>
               Assign user
             </Button>
           </Box>
@@ -75,15 +75,7 @@ const MyDayContainer = () => {
               Filter by:
             </Typography>
             <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
-              <UserInput
-                label="Assigned user"
-                users={users}
-                onChange={(_, user) => {
-                  console.log(user);
-                  if (setFilters) setFilters(set('assignee', user || undefined)(filters));
-                }}
-                value={assignee}
-              />
+              <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
             </Box>
           </Box>
         </Box>
