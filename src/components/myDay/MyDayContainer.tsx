@@ -1,4 +1,4 @@
-import React, { useMemo, useState, Fragment } from 'react';
+import React, { useContext, useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks from '../../hooks/useTasks';
@@ -6,19 +6,13 @@ import MyDayTable from './MyDayTable';
 import firebase from '../../firebase';
 import UserInput from '../inputs/UserInput';
 import set from 'lodash/fp/set';
-import TaskFilterProvider, { useTaskFilterProviderContext } from '../../providers/TaskFilterProvider';
+import { useTaskFilterProviderContext } from '../../providers/TaskFilterProvider';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import theme from '../../theme';
 import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import pick from 'lodash/fp/pick';
-export const resolveTask = (bookingId: string, taskId: string) =>
-  firebase
-    .firestore()
-    .collection('bookings')
-    .doc(bookingId)
-    .collection('tasks')
-    .doc(taskId)
-    .update('resolved', true);
+import ActingAs from '../../contexts/ActingAs';
+import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -26,6 +20,7 @@ const MyDayContainer = () => {
   const users = useAdminUsers();
   const { assignee } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+  const actingAs = useContext(ActingAs)[0];
 
   return (
     <Card>
@@ -73,7 +68,9 @@ const MyDayContainer = () => {
               Assign user
             </Button>
           </Box>
+
           <Box display="flex" alignItems="center">
+            {!actingAs && <TaskClientFilterSwitch />}
             <Typography variant="h4" display="inline">
               Filter by:
             </Typography>
@@ -90,7 +87,7 @@ const MyDayContainer = () => {
             </Box>
           </Box>
         </Box>
-        {tasks ? <MyDayTable tasks={tasks} onResolve={resolveTask} /> : <ChartsCircularProgress />}
+        {tasks ? <MyDayTable tasks={tasks} /> : <ChartsCircularProgress />}
       </CardContent>
     </Card>
   );

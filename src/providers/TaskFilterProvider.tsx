@@ -4,9 +4,10 @@ import { UserRecordMin } from '../model/UserRecord';
 
 export interface TaskFilterProviderContextFilters {
   assignee?: UserRecordMin | undefined;
+  showClientTasks: boolean;
 }
 
-export const TASK_FILTERS_INITIAL_STATE = {} as TaskFilterProviderContextFilters;
+export const TASK_FILTERS_INITIAL_STATE = { showClientTasks: false } as TaskFilterProviderContextFilters;
 
 const TaskFilterProviderContext = createContext<
   [TaskFilterProviderContextFilters, Dispatch<SetStateAction<TaskFilterProviderContextFilters>> | undefined]

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import Task from '../../model/Task';
-import MyDayTableRow from './MyDayTableRow';
+import BookingTaskTableRow from './BookingTaskTableRow';
 
-const MyDayTable: React.FC<Props> = ({ tasks }) => {
+const BookingTaskTable: React.FC<Props> = ({ tasks }) => {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -15,12 +15,11 @@ const MyDayTable: React.FC<Props> = ({ tasks }) => {
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>
             <TableCell align="center">Task status</TableCell>
-            <TableCell align="center" />
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.map((task, index) => (
-            <MyDayTableRow task={task} key={task.id} />
+          {tasks.map(task => (
+            <BookingTaskTableRow task={task} key={task.id} />
           ))}
         </TableBody>
       </Table>
@@ -28,7 +27,7 @@ const MyDayTable: React.FC<Props> = ({ tasks }) => {
   );
 };
 
-export default MyDayTable;
+export default BookingTaskTable;
 
 interface Props {
   tasks: Task[];

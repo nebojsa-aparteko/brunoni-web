@@ -1,0 +1,49 @@
+import React from 'react';
+import Task, { TaskDescription, UserRole } from '../../model/Task';
+import { Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/core';
+import formatDate from 'date-fns/format';
+import TaskStatusChip from '../TaskStatusChip';
+
+const BookingTaskTableRow: React.FC<Props> = ({ task }) => {
+  return (
+    <TableRow
+      key={task.id}
+      style={{
+        backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff',
+      }}
+    >
+      <TableCell align="left">
+        <Checkbox
+          checked={task.selected}
+          onChange={event => {
+            event.stopPropagation();
+            task.selected = !task.selected;
+          }}
+          onFocus={event => event.stopPropagation()}
+          disabled={task.resolved}
+        />
+      </TableCell>
+      <TableCell align="left">
+        <Typography variant="subtitle1">
+          {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
+        </Typography>
+      </TableCell>
+      <TableCell align="center">
+        <Link target="_blank" href={`/bookings/${task.bookingId}`}>
+          {task.bookingId}
+        </Link>
+      </TableCell>
+      <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
+      <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
+      <TableCell align="center">
+        <TaskStatusChip task={task} />
+      </TableCell>
+    </TableRow>
+  );
+};
+
+export default BookingTaskTableRow;
+
+interface Props {
+  task: Task;
+}

@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { flow, identity, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import firebase from '../firebase';
-import Task from '../model/Task';
-import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
+import Task, { UserRole } from '../model/Task';
 import { useTaskFilterProviderContext } from '../providers/TaskFilterProvider';
 import pick from 'lodash/fp/pick';
 import { UserRecordMinProperties } from '../model/UserRecord';
@@ -11,17 +10,20 @@ import { UserRecordMinProperties } from '../model/UserRecord';
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
   const [filters, _] = useTaskFilterProviderContext();
-  const { assignee } = filters;
+  const { assignee, showClientTasks } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
       }
+      if (!showClientTasks) {
+        query = query.where('userRole', '==', UserRole.ADMIN);
+      }
       query.limit(100);
       return query;
     },
-    [filters, assignee, UserRecordMinProperties, pick],
+    [filters, assignee, UserRecordMinProperties, pick, showClientTasks],
   );
 
   useEffect(() => {
