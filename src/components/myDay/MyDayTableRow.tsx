@@ -1,10 +1,10 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import { Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { TaskDescription, UserRole } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { BookingRow } from '../bookings/BookingsTable';
+import { BookingRow, BoookingProgressDialog } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import useFirestoreDocument from '../../hooks/useFirestoreDocument';
@@ -15,6 +15,22 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
   const actingAs = useContext(ActingAs)[0];
   const snapshot = useFirestoreDocument('bookings', task.bookingId);
   const booking = useMemo(() => normalizeBooking(snapshot?.data()), [snapshot]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleProgressClick = useCallback(
+    (event: React.MouseEvent<unknown>) => {
+      event.stopPropagation();
+
+      if (booking.Category === 'Export' || booking.Category === 'Import') {
+        setIsDialogOpen(true);
+      }
+    },
+    [setIsDialogOpen, booking],
+  );
+
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
 
   return (
     <Fragment>
@@ -52,10 +68,13 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            {booking && <BookingRow booking={booking} isAdmin={!actingAs} />}
+            {booking && <BookingRow booking={booking} isAdmin={!actingAs} onProgressClick={handleProgressClick} />}
           </Collapse>
         </TableCell>
       </TableRow>
+      {isDialogOpen && booking && (
+        <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={booking} />
+      )}
     </Fragment>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Box,
   Button,
@@ -21,6 +21,24 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
   const users = useAdminUsers();
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
 
+  const assignUser = useCallback(
+    event => {
+      // console.log(tasks?.filter(task => task.selected));
+      event.stopPropagation();
+      tasks
+        ?.filter(task => task.selected)
+        .forEach(task => {
+          firebase
+            .firestore()
+            .collection('bookings')
+            .doc(task.bookingId)
+            .collection('tasks')
+            .doc(task.id)
+            .update('assignedUser', pick(UserRecordMinProperties)(assignTo));
+        });
+    },
+    [tasks],
+  );
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
@@ -47,25 +65,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
                 value={assignTo}
               />
             </Box>
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={event => {
-                // console.log(tasks?.filter(task => task.selected));
-                event.stopPropagation();
-                tasks
-                  ?.filter(task => task.selected)
-                  .forEach(task =>
-                    firebase
-                      .firestore()
-                      .collection('bookings')
-                      .doc(task.bookingId)
-                      .collection('tasks')
-                      .doc(task.id)
-                      .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
-                  );
-              }}
-            >
+            <Button color="primary" variant="contained" onClick={assignUser}>
               Assign user
             </Button>
           </Box>

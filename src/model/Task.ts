@@ -83,5 +83,5 @@ export enum TaskDescription {
   PIN_NUMBER_ARRANGE = 'Please arrange PIN number and provide it to customer.',
   GATE_OUT_TERMINAL_CHECK = 'Please check if container is GATED OUT.',
   DEPOT_IN_CHECK = 'Please check DEPOT IN move.',
-  FREIGHT_COLLECTION_CHECK = 'Please check if payment received and inform agent at  destination.',
+  FREIGHT_COLLECTION_CHECK = 'Please check if payment received and inform agent at destination.',
 }
