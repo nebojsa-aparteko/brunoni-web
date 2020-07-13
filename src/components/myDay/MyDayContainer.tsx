@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks from '../../hooks/useTasks';
@@ -27,6 +27,9 @@ const MyDayContainer = () => {
     },
     [filters],
   );
+
+  const filtered = useMemo(() => tasks, [tasks]);
+
   const onAssignUser = useCallback(() => {
     tasks
       ?.filter(task => task.selected)

@@ -1,6 +1,7 @@
 import { ActivityLogUserData } from '../components/bookings/checklist/ChecklistItemModel';
 import { ActivityLogItem } from '../components/bookings/checklist/ActivityModel';
 import { AlertType } from './Booking';
+import { TaskType } from './Task';
 
 export enum NotificationType {
   COMMENT,
@@ -19,4 +20,5 @@ export default interface Notification {
   seen?: boolean;
   id?: string;
   alertType?: AlertType;
+  taskType?: TaskType;
 }
