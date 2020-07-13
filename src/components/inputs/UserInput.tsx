@@ -39,7 +39,6 @@ const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, o
       className={classes.root}
       value={value || null}
       onChange={(event: ChangeEvent<{}>, user: UserRecord | null) => onChange(event, user)}
-      autoSelect
       autoHighlight
       open={open}
       onOpen={onOpen}
