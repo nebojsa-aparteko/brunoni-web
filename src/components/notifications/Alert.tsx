@@ -18,7 +18,6 @@ enum AlertText {
 }
 
 const makeAlertText = (alert: AlertType) => {
-  console.log('Alert');
   switch (alert) {
     case AlertType.DEPOT_OUT_PICK_UP:
       return AlertText.DEPOT_OUT_PICK_UP;
@@ -38,14 +37,12 @@ const makeAlertText = (alert: AlertType) => {
 };
 
 const makeTaskAlertText = (type: TaskType) => {
-  console.log('Task');
   return Object.entries(TaskDescription).find(t => t[0] === type)?.[1] || '-';
 };
 
 const Alert: React.FC<Props> = ({ alert }) => (
   <Box>
     <Typography>
-      {console.log('Alert', alert)}
       {alert.alertType ? makeAlertText(alert.alertType) : alert.taskType ? makeTaskAlertText(alert.taskType) : null}
     </Typography>
   </Box>

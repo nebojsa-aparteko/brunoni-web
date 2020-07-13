@@ -6,7 +6,6 @@ import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
 import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
-import TeamsAssigneeContainer from '../components/teams/TeamsAssigneeContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {

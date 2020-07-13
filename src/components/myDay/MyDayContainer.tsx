@@ -13,12 +13,14 @@ import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import pick from 'lodash/fp/pick';
 import ActingAs from '../../contexts/ActingAs';
 import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
+import TaskStatusInput from '../tasks/TaskStatusInput';
+import { getTaskFilter } from '../TaskStatusChip';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
   const [filters, setFilters] = useTaskFilterProviderContext();
   const users = useAdminUsers();
-  const { assignee } = filters;
+  const { assignee, taskStatus } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
   const onAssignedFilter = useCallback(
@@ -27,8 +29,22 @@ const MyDayContainer = () => {
     },
     [filters],
   );
-
-  const filtered = useMemo(() => tasks, [tasks]);
+  const onStatusFilter = useCallback(
+    (_, status) => {
+      if (setFilters) setFilters(set('taskStatus', status || undefined)(filters));
+    },
+    [filters],
+  );
+  /*
+    Overdue / Future, make array of filter functions, and add that function into filter function of an array
+   */
+  const filteredTasks = useMemo(() => {
+    console.log('Counting status');
+    if (taskStatus) {
+      console.log(tasks?.filter(getTaskFilter(taskStatus)));
+    }
+    return taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks;
+  }, [taskStatus, tasks, getTaskFilter]);
 
   const onAssignUser = useCallback(() => {
     tasks
@@ -80,9 +96,17 @@ const MyDayContainer = () => {
             <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
               <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
             </Box>
+            <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
+              <TaskStatusInput
+                label="Task status"
+                onChange={onStatusFilter}
+                tasksStatus={['Overdue', 'Pending']}
+                value={taskStatus}
+              />
+            </Box>
           </Box>
         </Box>
-        {tasks ? <MyDayTable tasks={tasks} /> : <ChartsCircularProgress />}
+        {filteredTasks ? <MyDayTable tasks={filteredTasks} /> : <ChartsCircularProgress />}
       </CardContent>
     </Card>
   );

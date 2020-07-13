@@ -84,13 +84,7 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
 const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
   const classes = useStyles();
   const handleSeenStatusChange = async () => {
-    const sentNotifications = (
-      await firebase
-        .firestore()
-        .collection('email-notifications')
-        .doc(notification.userAlphacomId)
-        .get()
-    ).data() as {
+    const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
       lastSend: Date;
       notifications: string[];
     };
@@ -143,3 +137,10 @@ export default NotificationItemView;
 interface Props {
   notification: Notification;
 }
+
+const getEmailNotifications = (userId: string) =>
+  firebase
+    .firestore()
+    .collection('email-notifications')
+    .doc(userId)
+    .get();

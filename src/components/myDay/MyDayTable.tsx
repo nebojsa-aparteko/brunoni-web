@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
 import Task from '../../model/Task';
 import MyDayTableRow from './MyDayTableRow';
 
@@ -22,6 +22,15 @@ const MyDayTable: React.FC<Props> = ({ tasks }) => {
           {tasks.map(task => (
             <MyDayTableRow task={task} key={`${task.id}${task.bookingId}`} />
           ))}
+          {/*<TableRow>*/}
+          {/*  <TableCell align="center" />*/}
+          {/*  <TableCell>*/}
+          {/*    <Typography variant="h3">Header 1</Typography>*/}
+          {/*  </TableCell>*/}
+          {/*</TableRow>*/}
+          {/*{tasks.map(task => (*/}
+          {/*  <MyDayTableRow task={task} key={`${task.id}${task.bookingId}`} />*/}
+          {/*))}*/}
         </TableBody>
       </Table>
     </TableContainer>

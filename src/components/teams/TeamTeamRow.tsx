@@ -97,6 +97,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       .doc(activeTeam.id)
       .update(activeTeam)
       .then(_ => {
+        setChanged(false);
         enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
           variant: 'success',
           autoHideDuration: 1000,
