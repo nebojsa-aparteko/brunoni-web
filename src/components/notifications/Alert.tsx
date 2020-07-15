@@ -43,7 +43,11 @@ const makeTaskAlertText = (type: TaskType) => {
 const Alert: React.FC<Props> = ({ alert }) => (
   <Box>
     <Typography>
-      {alert.alertType ? makeAlertText(alert.alertType) : alert.taskType ? makeTaskAlertText(alert.taskType) : null}
+      {alert.alertType !== undefined
+        ? makeAlertText(alert.alertType)
+        : alert.taskType
+        ? makeTaskAlertText(alert.taskType)
+        : alert.alertType}
     </Typography>
   </Box>
 );

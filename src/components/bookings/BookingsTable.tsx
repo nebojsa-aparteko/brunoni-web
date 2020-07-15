@@ -207,7 +207,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const bookingAgent = useUserByAlphacomId(checkedBkgAgentContactID);
 
   const client = useClientById(booking?.ForwAdrId);
-  const amsClosing = booking.PortTerms.Closings.find(closing => closing.ClosingType === 'AMS');
+  const amsClosing = booking?.PortTerms?.Closings.find(closing => closing.ClosingType === 'AMS');
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
       root: {

@@ -124,7 +124,8 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
           </Fragment>
         ) : notification.activity && notification.type === NotificationType.ACTIVITY ? (
           <Activity activity={notification!.activity} />
-        ) : notification.type === NotificationType.ALERT && (notification.alertType || notification.taskType) ? (
+        ) : notification.type === NotificationType.ALERT &&
+          (notification.alertType !== undefined || notification.taskType) ? (
           <Alert alert={notification} />
         ) : null}
       </CardContent>
