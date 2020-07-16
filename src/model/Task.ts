@@ -66,7 +66,7 @@ export enum TaskDescription {
   SHIPPING_INSTRUCTIONS_SUBMITTED = 'Kindly submit Shipping Instruction.',
   B_L_DRAFT_CREATE = 'Please create a B/L draft and upload it in the checklist once done.',
   B_L_DRAFT_SENT = 'Please check if B/L draft has been sent.',
-  B_L_DRAFT_APPROVE = 'Please find enclose B/L draft for inspection. Kindly check and approve it on the checklist.',
+  B_L_DRAFT_APPROVE = 'Please find enclosed B/L draft for inspection. Kindly check and approve it on the checklist.',
   B_L_FINAL_UPLOAD = 'Please upload final B/L copy.',
   OOG_OBTAIN_APPROVAL = 'Please obtain OOG approval.',
   OOG_CHECK_APPROVED = 'Please check if OOG approval is in place.',
