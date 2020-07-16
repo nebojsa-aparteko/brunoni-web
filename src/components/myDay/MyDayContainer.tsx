@@ -28,6 +28,7 @@ const MyDayContainer = () => {
   const users = useAdminUsers();
   const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [assignedUserTrigger, setAssignedUserTrigger] = useState(false);
   const { assignee, taskStatus } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
@@ -81,7 +82,7 @@ const MyDayContainer = () => {
         }, Promise.resolve([] as [string, Task[]][]))
         .then(n => setNormalizedTasks(n || []));
     }
-  }, [teams, setNormalizedTasks]);
+  }, [teams, setNormalizedTasks, assignedUserTrigger]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -102,7 +103,7 @@ const MyDayContainer = () => {
   }, [taskStatus, tasks, getTaskFilter]);
 
   const onAssignUser = useCallback(() => {
-    tasks
+    [...(tasks || []), ...(normalizedTasks?.flatMap(nt => nt[1]) || [])]
       ?.filter(task => task.selected)
       .forEach(task =>
         firebase
@@ -111,7 +112,8 @@ const MyDayContainer = () => {
           .doc(task.bookingId)
           .collection('tasks')
           .doc(task.id)
-          .update('assignedUser', pick(UserRecordMinProperties)(assignTo)),
+          .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
+          .then(() => setAssignedUserTrigger(prevState => !prevState)),
       );
   }, [tasks, assignTo, pick, UserRecordMinProperties]);
   return (
