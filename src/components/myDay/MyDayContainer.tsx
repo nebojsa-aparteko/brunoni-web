@@ -73,7 +73,8 @@ const MyDayContainer = () => {
                   currentValue.carriers
                     ?.map(carrier => carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
-                  currentValue.categories?.findIndex(category => category === task.category) !== -1,
+                  currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
+                  (!task.assignedUser || !task.assignedUser.alphacomId),
               ),
           ] as [string, Task[]];
           return [...p, newTuple];
