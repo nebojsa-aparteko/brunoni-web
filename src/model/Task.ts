@@ -76,6 +76,7 @@ export enum TaskDescription {
   SOC_CERTIFICATE_CHECK_UPLOAD = 'Please check and upload SOC Certificate in the system.',
   LASHING_CERTIFICATE_UPLOAD = 'Please upload Lashing Certificate  in the checklist.',
   LASHING_CERTIFICATE_CHECK_UPLOAD = 'Please check or upload Lashing Certificate  in the system.',
+  CHECK_INVOICED = 'Please check why shipment is not invoiced.',
 
   // IMPORT TASKS
   B_L_SURRENDERED_UPLOAD = 'Please upload B/L Copy.',
