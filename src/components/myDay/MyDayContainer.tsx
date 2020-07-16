@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import useTasks from '../../hooks/useTasks';
+import useTasks, { normalizeTaskData } from '../../hooks/useTasks';
 import MyDayTable from './MyDayTable';
 import firebase from '../../firebase';
 import UserInput from '../inputs/UserInput';
@@ -9,17 +9,25 @@ import set from 'lodash/fp/set';
 import { useTaskFilterProviderContext } from '../../providers/TaskFilterProvider';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import theme from '../../theme';
-import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import pick from 'lodash/fp/pick';
 import ActingAs from '../../contexts/ActingAs';
 import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 import TaskStatusInput from '../tasks/TaskStatusInput';
 import { getTaskFilter } from '../TaskStatusChip';
+import Task, { UserRole } from '../../model/Task';
+import { BookingCategory } from '../../model/Booking';
+import useTeams from '../../hooks/useTeams';
+import { cloneDeep } from 'lodash/fp';
+import { Team } from '../../model/Teams';
+import safeInvoke from '../../utilities/safeInvoke';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
   const [filters, setFilters] = useTaskFilterProviderContext();
   const users = useAdminUsers();
+  const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
+  const [teams, setTeams] = useState<Team[]>([]);
   const { assignee, taskStatus } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
@@ -29,12 +37,58 @@ const MyDayContainer = () => {
     },
     [filters],
   );
+
+  useEffect(() => {
+    if (assignee)
+      getTeamsPerUser(assignee).then(fbTeams => {
+        setTeams(
+          fbTeams.docs.map(doc => {
+            return { id: doc.id, ...doc.data() } as Team;
+          }) as Team[],
+        );
+      });
+  }, [assignee]);
+
+  useEffect(() => {
+    if (teams) {
+      teams
+        ?.reduce(async (previousValue, currentValue) => {
+          const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
+
+          const p = await previousValue;
+          const newTuple = [
+            currentValue.name as string,
+            tasksPerTeam.docs
+              .map(
+                task =>
+                  ({
+                    ...normalizeTaskData(task.data()),
+                    bookingId: task.ref.parent.parent?.id,
+                    id: task.id,
+                    selected: false,
+                  } as Task),
+              )
+              .filter(
+                task =>
+                  currentValue.carriers
+                    ?.map(carrier => carrier.name)
+                    .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
+                  currentValue.categories?.findIndex(category => category === task.category) !== -1,
+              ),
+          ] as [string, Task[]];
+          return [...p, newTuple];
+        }, Promise.resolve([] as [string, Task[]][]))
+        .then(n => setNormalizedTasks(n || []));
+    }
+  }, [teams, setNormalizedTasks]);
+
   const onStatusFilter = useCallback(
     (_, status) => {
       if (setFilters) setFilters(set('taskStatus', status || undefined)(filters));
     },
     [filters],
   );
+
   /*
     Overdue / Future, make array of filter functions, and add that function into filter function of an array
    */
@@ -106,10 +160,36 @@ const MyDayContainer = () => {
             </Box>
           </Box>
         </Box>
-        {filteredTasks ? <MyDayTable tasks={filteredTasks} /> : <ChartsCircularProgress />}
+        {filteredTasks ? (
+          <MyDayTable
+            tasks={filteredTasks}
+            normalizedTasks={normalizedTasks}
+            shouldShowTeamTasks={!!(assignee && assignee.alphacomId)}
+          />
+        ) : (
+          <ChartsCircularProgress />
+        )}
       </CardContent>
     </Card>
   );
 };
 
 export default MyDayContainer;
+
+const getTeamTasks = (checklistItems: string[]) =>
+  firebase
+    .firestore()
+    .collectionGroup('tasks')
+    .where('checklistId', 'in', checklistItems)
+    .where('resolved', '==', false)
+    .where('show', '==', true)
+    .where('userRole', '==', UserRole.ADMIN)
+    .orderBy('assignedUser')
+    .get();
+
+const getTeamsPerUser = (assignee: UserRecord) =>
+  firebase
+    .firestore()
+    .collection('teams')
+    .where('users', 'array-contains', pick(UserRecordMinProperties)(assignee))
+    .get();
