@@ -187,7 +187,6 @@ const getTeamTasks = (checklistItems: string[]) =>
     .where('resolved', '==', false)
     .where('show', '==', true)
     .where('userRole', '==', UserRole.ADMIN)
-    .orderBy('assignedUser')
     .get();
 
 const getTeamsPerUser = (assignee: UserRecord) =>
