@@ -652,7 +652,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             px={1}
           >
             <input {...getInputPropsDraft()} />
-            Drafts
+            Internals
           </Box>
         </Fragment>
       )}
