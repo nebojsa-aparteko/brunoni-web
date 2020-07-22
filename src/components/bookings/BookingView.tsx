@@ -21,7 +21,7 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
-import UserRecord, { isSuperAdmin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { isDashboardUser, isSuperAdmin, UserRecordMinProperties } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -292,7 +292,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 )}
 
                 {actingAs === null &&
-                (isSuperAdmin(userRecord) || booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
+                (isDashboardUser(userRecord) || booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
                   <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>
                     <SupervisedUserCircleIcon />
                   </IconButton>
