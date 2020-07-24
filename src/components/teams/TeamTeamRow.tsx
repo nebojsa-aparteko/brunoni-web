@@ -61,7 +61,8 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
 
   const carriers = useContext(Carriers);
   const categories = Object.keys(BookingCategory);
-  const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]) || '-';
+  const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]);
+  const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
@@ -72,9 +73,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
     setChanged(true);
   };
   const handleChecklistItemChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
-    console.log(Object.entries(ChecklistNamesPreview));
     const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
-    console.log(asArray(value).map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0]));
     setActiveTeam(
       set(
         'checklistItems',
@@ -167,7 +166,9 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
           multiple
           autoHighlight
           options={checklistItems || []}
-          defaultValue={team.checklistItems}
+          defaultValue={team.checklistItems?.map(
+            val => checklistNamesPreview.find(([id, name]) => id === val)?.[1] || '',
+          )}
           getOptionSelected={(option, value) => option === value}
           onChange={handleChecklistItemChange}
           renderTags={(value, getTagProps) =>
