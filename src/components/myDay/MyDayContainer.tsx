@@ -16,11 +16,8 @@ import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 import TaskStatusInput from '../tasks/TaskStatusInput';
 import { getTaskFilter } from '../TaskStatusChip';
 import Task, { UserRole } from '../../model/Task';
-import { BookingCategory } from '../../model/Booking';
-import useTeams from '../../hooks/useTeams';
-import { cloneDeep } from 'lodash/fp';
 import { Team } from '../../model/Teams';
-import safeInvoke from '../../utilities/safeInvoke';
+import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -179,15 +176,34 @@ const MyDayContainer = () => {
 
 export default MyDayContainer;
 
-const getTeamTasks = (checklistItems: string[]) =>
-  firebase
-    .firestore()
-    .collectionGroup('tasks')
-    .where('checklistId', 'in', checklistItems)
-    .where('resolved', '==', false)
-    .where('show', '==', true)
-    .where('userRole', '==', UserRole.ADMIN)
-    .get();
+const getTeamTasks = (checklistItems: string[]) => {
+  const stages: ChecklistNames[] = [];
+  const checklists: ChecklistNames[] = [];
+  checklistItems.forEach(c => {
+    const ch = getChecklistItem(c as ChecklistNames);
+    if (ch.checklistStageId) {
+      stages.push(ch.checklistStageId);
+    }
+    checklists.push(ch.checklistId);
+  });
+  return stages.length > 0
+    ? firebase
+        .firestore()
+        .collectionGroup('tasks')
+        .where('checklistStageId', 'in', stages)
+        .where('resolved', '==', false)
+        .where('show', '==', true)
+        .where('userRole', '==', UserRole.ADMIN)
+        .get()
+    : firebase
+        .firestore()
+        .collectionGroup('tasks')
+        .where('checklistId', 'in', checklistItems)
+        .where('resolved', '==', false)
+        .where('show', '==', true)
+        .where('userRole', '==', UserRole.ADMIN)
+        .get();
+};
 
 const getTeamsPerUser = (assignee: UserRecord) =>
   firebase
@@ -195,3 +211,29 @@ const getTeamsPerUser = (assignee: UserRecord) =>
     .collection('teams')
     .where('users', 'array-contains', pick(UserRecordMinProperties)(assignee))
     .get();
+
+const getChecklistItem = (item: ChecklistNames): ChecklistItemType => {
+  const chkitem = checklistItemsWithStages.find(checklistItem => {
+    console.log(checklistItem, item);
+    return checklistItem.checklistStageId === item;
+  });
+  console.log('Chkitem', chkitem);
+  return chkitem ? chkitem : { checklistId: item };
+};
+
+const checklistItemsWithStages: ChecklistItemType[] = [
+  { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['BL_DRAFT_APPROVED '] },
+  { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['BL_DRAFT_SENT '] },
+  { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['FINAL_BL_COPY '] },
+  { checklistId: ChecklistNames.OOG, checklistStageId: ChecklistNames.OOG_APPROVED },
+  { checklistId: ChecklistNames.OOG, checklistStageId: ChecklistNames.OOG_REQUESTED },
+  { checklistId: ChecklistNames.IMO, checklistStageId: ChecklistNames.IMO_REQUESTED },
+  { checklistId: ChecklistNames.IMO, checklistStageId: ChecklistNames.IMO_APPROVED },
+  { checklistId: ChecklistNames.IMO, checklistStageId: ChecklistNames.FINAL_DGD_SHEET },
+  { checklistId: ChecklistNames.IMO, checklistStageId: ChecklistNames.INFORMED_PORT },
+];
+
+interface ChecklistItemType {
+  checklistId: ChecklistNames;
+  checklistStageId?: ChecklistNames;
+}

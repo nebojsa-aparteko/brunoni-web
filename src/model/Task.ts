@@ -13,6 +13,7 @@ export default interface Task {
   carrierId?: string;
   category?: BookingCategory;
   checklistId: string;
+  checklistStageId?: string;
   bookingId: string;
   selected?: boolean;
 }
