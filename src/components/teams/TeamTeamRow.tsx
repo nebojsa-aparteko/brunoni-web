@@ -12,7 +12,7 @@ import asArray from '../../utilities/asArray';
 import Carriers from '../../contexts/Carriers';
 import firebase from '../../firebase';
 import { BookingCategory } from '../../model/Booking';
-import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistNamesPreview } from '../bookings/checklist/ChecklistItemModel';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
 import Carrier from '../../model/Carrier';
@@ -61,7 +61,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
 
   const carriers = useContext(Carriers);
   const categories = Object.keys(BookingCategory);
-  const checklistItems = Object.keys(ChecklistNames);
+  const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]) || '-';
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
@@ -72,7 +72,15 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
     setChanged(true);
   };
   const handleChecklistItemChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
-    setActiveTeam(set('checklistItems', asArray(value))(activeTeam));
+    console.log(Object.entries(ChecklistNamesPreview));
+    const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
+    console.log(asArray(value).map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0]));
+    setActiveTeam(
+      set(
+        'checklistItems',
+        asArray(value).map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0]),
+      )(activeTeam),
+    );
     setChanged(true);
   };
   const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {

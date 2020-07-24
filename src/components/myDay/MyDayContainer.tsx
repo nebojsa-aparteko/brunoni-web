@@ -52,8 +52,8 @@ const MyDayContainer = () => {
       teams
         ?.reduce(async (previousValue, currentValue) => {
           const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
-
           const p = await previousValue;
+
           const newTuple = [
             currentValue.name as string,
             tasksPerTeam.docs
