@@ -53,6 +53,16 @@ const MyDayContainer = () => {
         ?.reduce(async (previousValue, currentValue) => {
           const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
           const p = await previousValue;
+          tasksPerTeam.docs.forEach(e =>
+            console.log(
+              e.id,
+              currentValue.carriers
+                ?.map(carrier => getId(carrier.name) || carrier.name)
+                .findIndex(carrier => carrier === e.data().carrierId?.toUpperCase()) !== -1,
+            ),
+          );
+
+          console.log(currentValue.carriers?.map(carrier => getId(carrier.name) || carrier.name));
 
           const newTuple = [
             currentValue.name as string,
@@ -69,7 +79,7 @@ const MyDayContainer = () => {
               .filter(
                 task =>
                   currentValue.carriers
-                    ?.map(carrier => carrier.name)
+                    ?.map(carrier => getId(carrier.name) || carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
                   currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
                   (!task.assignedUser || !task.assignedUser.alphacomId),
@@ -213,11 +223,7 @@ const getTeamsPerUser = (assignee: UserRecord) =>
     .get();
 
 const getChecklistItem = (item: ChecklistNames): ChecklistItemType => {
-  const chkitem = checklistItemsWithStages.find(checklistItem => {
-    console.log(checklistItem, item);
-    return checklistItem.checklistStageId === item;
-  });
-  console.log('Chkitem', chkitem);
+  const chkitem = checklistItemsWithStages.find(checklistItem => checklistItem.checklistStageId === item);
   return chkitem ? chkitem : { checklistId: item };
 };
 
@@ -238,3 +244,23 @@ interface ChecklistItemType {
   checklistId: ChecklistNames;
   checklistStageId?: ChecklistNames;
 }
+const getId = (carrierName: string) => {
+  return carrierIds[carrierName.toLowerCase()];
+};
+const carrierIds = {
+  ['Hamburg Süd'.toLowerCase()]: 'Hamburg Süd'.toUpperCase(),
+  ['HMM'.toLowerCase()]: 'HMM',
+  ['Hugo Stinnes'.toLowerCase()]: 'STNN',
+  ['MACS'.toLowerCase()]: 'MACS',
+  ['Sloman Neptun'.toLowerCase()]: 'SLOM',
+  ['UAL'.toLowerCase()]: 'UAL',
+  ['DAL'.toLowerCase()]: 'DAL',
+  ['ZIM LINE'.toLowerCase()]: 'ZIM',
+  ['SETH SHIPPING'.toLowerCase()]: 'SETH SHIPPING',
+  ['Gold Star Line'.toLowerCase()]: 'GSL',
+  ['UAFL'.toLowerCase()]: 'UAFL',
+  ['VAN UDEN'.toLowerCase()]: 'VAN UDEN',
+  ['WAIVER SERVICE'.toLowerCase()]: 'WAIVER SERVICE',
+  ['DAL DEUTSCHE AFRIKA-LINIEN'.toLowerCase()]: 'DAL',
+  ['UAFL UNITED AFRICA FEEDER LINE'.toLowerCase()]: 'UAFL',
+};
