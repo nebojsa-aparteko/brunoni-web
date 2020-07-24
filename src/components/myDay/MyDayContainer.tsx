@@ -222,6 +222,7 @@ const getChecklistItem = (item: ChecklistNames): ChecklistItemType => {
 };
 
 const checklistItemsWithStages: ChecklistItemType[] = [
+  { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames.BL_DRAFT_CREATE },
   { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['BL_DRAFT_APPROVED '] },
   { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['BL_DRAFT_SENT '] },
   { checklistId: ChecklistNames.B_L, checklistStageId: ChecklistNames['FINAL_BL_COPY '] },
