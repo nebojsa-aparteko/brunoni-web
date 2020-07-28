@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const DocumentList = ({
   checklistItem,
   checklistItemValues,
-  bookingId,
+  booking,
   storageBasePath,
   changeStatus,
   internal,
@@ -29,7 +29,7 @@ const DocumentList = ({
         <DocumentListItem
           key={item.storedName}
           item={item}
-          bookingId={bookingId}
+          booking={booking}
           storageBasePath={storageBasePath}
           checklistItem={checklistItem}
           changeStatus={changeStatus}

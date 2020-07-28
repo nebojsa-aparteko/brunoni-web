@@ -240,12 +240,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       return saveChecklistChanges('checked', checked).then(_ =>
         addActivityItem(
           booking!.id,
-          checklistItem!.id,
           createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), { ...checklistItem, checked }),
         ),
       );
     },
-    [booking?.id, checklistItem.id],
+    [booking?.id, checklistItem],
   );
 
   const checklistItemMarkCompletedHandler = useCallback(
@@ -253,7 +252,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       return saveChecklistChanges('customerAction', action).then(_ =>
         addActivityItem(
           booking!.id,
-          checklistItem!.id,
           createActivityObject(
             type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
             getActivityLogUserData(),
@@ -262,7 +260,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         ),
       );
     },
-    [booking?.id, checklistItem.id],
+    [booking?.id, checklistItem],
   );
 
   const checklistItemFileAddedHandler = useCallback(
@@ -272,7 +270,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         .then(_ =>
           addActivityItem(
             booking!.id,
-            checklistItem!.id,
             createActivityObject(
               ActivityChangeType.ADD_FILE,
               getActivityLogUserData(),
@@ -294,7 +291,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       return saveChecklistChanges('stages', stages).then(_ =>
         addActivityItem(
           booking!.id,
-          checklistItem!.id,
           createActivityObject(
             ActivityChangeType.STAGE_CHECKED,
             getActivityLogUserData(),
@@ -305,7 +301,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         ),
       );
     },
-    [booking?.id, checklistItem.id],
+    [booking?.id, checklistItem],
   );
 
   const checklistItemDocumentStatusChangeHandler = useCallback(
@@ -313,14 +309,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
       return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
         addActivityItem(
           booking!.id,
-          checklistItem!.id,
           createActivityObject(ActivityChangeType.DOCUMENT_STATUS_CHANGED, getActivityLogUserData(), checklistItem, [
             document,
           ]),
         ),
       );
     },
-    [booking?.id, checklistItem.id],
+    [booking?.id, checklistItem],
   );
   const handleMention = () => {
     activityLogContext.setState({ checklistReference: checklistItem });
@@ -593,7 +588,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
         <DocumentList
           storageBasePath={storageBasePath}
           checklistItemValues={checklistItem.values || []}
-          bookingId={booking!.id}
+          booking={booking}
           checklistItem={checklistItem}
           changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
             handleDocumentStatusChange(item, status, false)
@@ -625,7 +620,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             <DocumentList
               storageBasePath={storageBasePath}
               checklistItemValues={checklistItem.valuesAdmin || []}
-              bookingId={booking!.id}
+              booking={booking}
               checklistItem={checklistItem}
               changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
                 handleDocumentStatusChange(item, status, true)

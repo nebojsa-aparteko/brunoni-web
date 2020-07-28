@@ -19,7 +19,7 @@ interface Props {
   isAdmin: boolean;
 }
 
-export const addActivityItem = (bookingId: string, checklistId: string, activityLog: ActivityLogItem) => {
+export const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
   return firebase
     .firestore()
     .collection('bookings')

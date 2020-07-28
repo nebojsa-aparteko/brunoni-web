@@ -41,6 +41,8 @@ import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import theme from '../../../theme';
+import RejectionDialog from '../RejectionDialog';
+import { Booking } from '../../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -93,7 +95,7 @@ const findTextForStatusType = (type: ChecklistItemValueDocumentStatusType) => {
 const DocumentListItem = ({
   item,
   checklistItem,
-  bookingId,
+  booking,
   changeStatus,
   storageBasePath,
   internal,
@@ -104,7 +106,15 @@ const DocumentListItem = ({
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(() => {
+    setIsDialogOpen(true);
+  }, [setIsDialogOpen]);
   const { enqueueSnackbar } = useSnackbar();
 
   const getActivityLogUserData = useCallback(
@@ -124,15 +134,14 @@ const DocumentListItem = ({
       firebase
         .firestore()
         .collection('bookings')
-        .doc(bookingId)
+        .doc(booking.id!)
         .collection('checklist')
         .doc(checklistItem?.id)
         .update(internal ? 'valuesAdmin' : 'values', documents)
         .then(_ => {
           console.log('File deleted', deletedFile, documents, internal, checklistItem);
           return addActivityItem(
-            bookingId,
-            checklistItem!.id,
+            booking.id!,
             createActivityObject(
               ActivityChangeType.DELETE_FILE,
               getActivityLogUserData(),
@@ -151,18 +160,21 @@ const DocumentListItem = ({
           });
         });
     },
-    [bookingId, checklistItem, enqueueSnackbar, getActivityLogUserData],
+    [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
   );
 
   const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
 
-  const handleMention = () =>
-    activityLogContext.setState({
-      documentReference: { ...item, isInternal: internal },
-      checklistReference: checklistItem,
-      internal: internal,
-    });
-  const checklistCheckedRule = () => checklistItem.checked;
+  const handleMention = useCallback(
+    () =>
+      activityLogContext.setState({
+        documentReference: { ...item, isInternal: internal },
+        checklistReference: checklistItem,
+        internal: internal,
+      }),
+    [checklistItem, internal, item],
+  );
+  const checklistCheckedRule = useCallback(() => checklistItem.checked, [checklistItem]);
 
   const deleteFile = useCallback(
     (item: ChecklistItemValueDocument, internal: boolean) => {
@@ -330,24 +342,35 @@ const DocumentListItem = ({
                   component="button"
                   variant="body2"
                   onClick={() => {
-                    changeStatus(item, {
-                      type: ChecklistItemValueDocumentStatusType.REJECTED,
-                      by: getActivityLogUserData(),
-                      at: new Date(),
-                    });
-                    activityLogContext.setState({
-                      rejected: true,
-                      documentReference: item,
-                      checklistReference: checklistItem,
-                    });
+                    // changeStatus(item, {
+                    //   type: ChecklistItemValueDocumentStatusType.REJECTED,
+                    //   by: getActivityLogUserData(),
+                    //   at: new Date(),
+                    // });
+                    // activityLogContext.setState({
+                    //   rejected: true,
+                    //   documentReference: item,
+                    //   checklistReference: checklistItem,
+                    // });
+                    handleDialogOpen();
                   }}
                 >
-                  Reject
+                  Request amendment
                 </Link>
               </Box>
             )}
           </Box>
         )}
+      {isDialogOpen && (
+        <RejectionDialog
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          booking={booking}
+          checklistItem={checklistItem}
+          document={item}
+          changeStatus={changeStatus}
+        />
+      )}
     </div>
   );
 };
@@ -356,7 +379,7 @@ export default DocumentListItem;
 
 export interface DocumentListItemPropsBase {
   checklistItem: ChecklistItem;
-  bookingId: string;
+  booking: Booking;
   storageBasePath: string;
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
