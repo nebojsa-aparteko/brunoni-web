@@ -296,7 +296,8 @@ const DocumentListItem = ({
       {((internal && isAdmin) || (!internal && !isAdmin)) &&
         (item.status?.at ? editRestriction(item.status.at) : true) &&
         (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
-        !checklistCheckedRule() && (
+        !checklistCheckedRule() &&
+        checkIfShouldShowStatusAction(checklistItem.id) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
             {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
               <Box display="flex" ml={2} mb={2}>
@@ -388,3 +389,6 @@ export interface DocumentListItemPropsBase {
 interface DocumentListItemProps extends DocumentListItemPropsBase {
   item: ChecklistItemValueDocument;
 }
+
+const dontShowStatusActionForSomeChecklist = ['IMO', 'SOC_CERTIFICATE', 'SHIPPING_INSTRUCTIONS'];
+const checkIfShouldShowStatusAction = (id: string) => !dontShowStatusActionForSomeChecklist.includes(id);

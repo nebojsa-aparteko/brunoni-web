@@ -397,6 +397,9 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
+                  {isDashboardUser(userRecord) && !actingAs && (
+                    <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
+                  )}
 
                   <Fragment>
                     <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
