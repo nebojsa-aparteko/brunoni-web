@@ -383,12 +383,16 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
             </Grid>
             <Grid item md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
               <Grid item style={{ width: '45%' }}>
-                <InfoBoxItem title="Created On" label1={formatDate(booking.createdAt, 'dd.MM.yyyy')} gutterBottom />
+                <InfoBoxItem
+                  title="Created On"
+                  label1={booking.createdAt ? formatDate(booking.createdAt, 'dd.MM.yyyy') : ''}
+                  gutterBottom
+                />
               </Grid>
               <Grid item style={{ width: '55%' }}>
                 <InfoBoxItem
                   title="Last updated"
-                  label1={formatDistanceToNowConfigured(booking.updatedAt)}
+                  label1={booking.updatedAt ? formatDistanceToNowConfigured(booking.updatedAt) : ''}
                   gutterBottom
                 />
               </Grid>

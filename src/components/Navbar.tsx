@@ -314,13 +314,26 @@ const Navbar: React.FC = () => {
                 <div className={classes.spacer} />
                 {user !== undefined && user !== null ? (
                   actingAs ? (
-                    <ButtonMenuItem
-                      primary="Get Quote"
-                      to="/quotes/get"
-                      variant="contained"
-                      color="primary"
-                      typographyStyle={{ color: 'white' }}
-                    />
+                    <Fragment>
+                      <ButtonMenuItem
+                        primary="Get Quote"
+                        to="/quotes/get"
+                        variant="contained"
+                        color="primary"
+                        typographyStyle={{ color: 'white' }}
+                      />
+                      <IconButton
+                        buttonRef={quickSearchButtonRef}
+                        onClick={() => setIsSearchDialogOpen(true)}
+                        style={{ padding: 8 }}
+                        title={'Hey hey you can use your keyboard as well. Try it out >> ctrl+g <<'}
+                      >
+                        <SearchIcon fontSize="small" />
+                      </IconButton>
+                      {isSearchDialogOpen && (
+                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                      )}
+                    </Fragment>
                   ) : (
                     <Fragment>
                       <IconButton

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Box,
   createStyles,
@@ -14,6 +14,8 @@ import QuickSearchBooking from './QuickSearchBooking';
 import QuickSearchQuote from './QuickSearchQuote';
 import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
+import ActingAs from '../../contexts/ActingAs';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -71,10 +73,17 @@ const nestedSearchBookings = async (
   fieldPath: string,
   inputValue: string,
   opStr: firebase.firestore.WhereFilterOp = '==',
-) =>
-  firebase
-    .firestore()
-    .collection(collection)
+  isAdmin: boolean,
+  clientId?: string,
+) => {
+  if (isAdmin && !clientId) return new Promise<Booking>((resolve, reject) => reject('No booking found'));
+  const searchRef = isAdmin
+    ? firebase.firestore().collection(collection)
+    : firebase
+        .firestore()
+        .collection(collection)
+        .where('clientId', '==', clientId);
+  return searchRef
     .where(fieldPath, opStr, inputValue)
     .get()
     .then(result => {
@@ -96,9 +105,11 @@ const nestedSearchBookings = async (
     .catch(error => {
       return new Promise<Booking>((resolve, reject) => reject(error));
     });
-
+};
 const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
+  const actingAs = useContext(ActingAs)[0];
+  const userRecord = useContext(UserRecordContext);
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-navBar-quick-search" maxWidth="xl">
@@ -117,38 +128,84 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             label="File number"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'bookingId', inputValue.toLowerCase())
+              nestedSearchBookings(
+                'bookings-search',
+                'bookingId',
+                inputValue.toLowerCase(),
+                '==',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
             }
           />
           <QuickSearchBooking
             label="BL number"
             handleClose={handleClose}
-            searchBookings={inputValue => nestedSearchBookings('bookings-search', 'BL-No', inputValue.toLowerCase())}
+            searchBookings={inputValue =>
+              nestedSearchBookings(
+                'bookings-search',
+                'BL-No',
+                inputValue.toLowerCase(),
+                '==',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
+            }
           />
           <QuickSearchBooking
             label="Customer's reference"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'Cust-BkgRef', inputValue.toLowerCase())
+              nestedSearchBookings(
+                'bookings-search',
+                'Cust-BkgRef',
+                inputValue.toLowerCase(),
+                '==',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
             }
           />
           <QuickSearchBooking
             label="Container number"
             handleClose={handleClose}
-            searchBookings={inputValue => nestedSearchBookings('containers', 'container', inputValue.toUpperCase())}
+            searchBookings={inputValue =>
+              nestedSearchBookings(
+                'containers',
+                'container',
+                inputValue.toUpperCase(),
+                '==',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
+            }
           />
           <QuickSearchBooking
             label="Delivery reference"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'deliveryRef', inputValue.toLowerCase(), 'array-contains')
+              nestedSearchBookings(
+                'bookings-search',
+                'deliveryRef',
+                inputValue.toLowerCase(),
+                'array-contains',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
             }
           />
           <QuickSearchBooking
             label="Pickup reference"
             handleClose={handleClose}
             searchBookings={inputValue =>
-              nestedSearchBookings('bookings-search', 'pickupRef', inputValue.toLowerCase(), 'array-contains')
+              nestedSearchBookings(
+                'bookings-search',
+                'pickupRef',
+                inputValue.toLowerCase(),
+                'array-contains',
+                !actingAs,
+                userRecord?.alphacomClientId,
+              )
             }
           />
         </DialogContent>
