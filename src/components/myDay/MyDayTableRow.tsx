@@ -10,7 +10,7 @@ import ActingAs from '../../contexts/ActingAs';
 import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import TaskStatusChip from '../TaskStatusChip';
 
-const MyDayTableRow: React.FC<Props> = ({ task }) => {
+const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow }) => {
   const [open, setOpen] = React.useState(false);
   const actingAs = useContext(ActingAs)[0];
   const snapshot = useFirestoreDocument('bookings', task.bookingId);
@@ -36,30 +36,29 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
     <Fragment>
       <TableRow
         key={task.id}
-        onClick={() => setOpen(prevState => !prevState)}
         style={{ cursor: 'pointer', backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff' }}
       >
         <TableCell padding="checkbox">
-          <Checkbox
-            checked={task.selected}
-            onChange={_ => {
-              task.selected = !task.selected;
-            }}
-            onFocus={event => event.stopPropagation()}
-          />
+          <Checkbox checked={selected} onChange={onSelectRow} onFocus={event => event.stopPropagation()} />
         </TableCell>
-        <TableCell align="left">{Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}</TableCell>
+        <TableCell align="left" onClick={() => setOpen(prevState => !prevState)}>
+          {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
+        </TableCell>
         <TableCell align="center">
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
           </Link>
         </TableCell>
-        <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
-        <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
-        <TableCell align="center">
+        <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
+          {task.assignedUser?.emailAddress || '-'}
+        </TableCell>
+        <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
+          {task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}
+        </TableCell>
+        <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
           <TaskStatusChip task={task} />
         </TableCell>
-        <TableCell>
+        <TableCell onClick={() => setOpen(prevState => !prevState)}>
           <IconButton aria-label="expand row" size="small">
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
@@ -82,4 +81,6 @@ const MyDayTableRow: React.FC<Props> = ({ task }) => {
 export default MyDayTableRow;
 interface Props {
   task: Task;
+  selected: boolean;
+  onSelectRow: () => void;
 }

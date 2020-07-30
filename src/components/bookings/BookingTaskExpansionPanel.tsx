@@ -20,24 +20,35 @@ import BookingTaskTable from '../tasks/BookingTaskTable';
 const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
   const users = useAdminUsers();
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
 
   const assignUser = useCallback(
     event => {
       // console.log(tasks?.filter(task => task.selected));
       event.stopPropagation();
-      tasks
-        ?.filter(task => task.selected)
-        .forEach(task => {
-          firebase
-            .firestore()
-            .collection('bookings')
-            .doc(task.bookingId)
-            .collection('tasks')
-            .doc(task.id)
-            .update('assignedUser', pick(UserRecordMinProperties)(assignTo));
-        });
+      selectedTasks.forEach(id => {
+        const [bookingId, taskId] = id.split('/');
+
+        firebase
+          .firestore()
+          .collection('bookings')
+          .doc(bookingId)
+          .collection('tasks')
+          .doc(taskId)
+          .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
+          .then(() => {
+            setSelectedTasks([]);
+          });
+      });
     },
-    [tasks],
+    [selectedTasks, assignTo],
+  );
+  const onSelectTask = useCallback(
+    (id: string) =>
+      setSelectedTasks(prevState =>
+        selectedTasks.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+      ),
+    [selectedTasks],
   );
   return (
     <ExpansionPanel>
@@ -72,7 +83,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
         </Box>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <BookingTaskTable tasks={tasks} />
+        <BookingTaskTable tasks={tasks} selectedTasks={selectedTasks} onSelectTask={onSelectTask} />
       </ExpansionPanelDetails>
     </ExpansionPanel>
   );

@@ -4,7 +4,7 @@ import { Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/co
 import formatDate from 'date-fns/format';
 import TaskStatusChip from '../TaskStatusChip';
 
-const BookingTaskTableRow: React.FC<Props> = ({ task }) => {
+const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
   return (
     <TableRow
       key={task.id}
@@ -14,10 +14,10 @@ const BookingTaskTableRow: React.FC<Props> = ({ task }) => {
     >
       <TableCell align="left">
         <Checkbox
-          checked={task.selected}
+          checked={selected}
           onChange={event => {
             event.stopPropagation();
-            task.selected = !task.selected;
+            onSelectTask(`${task.bookingId}/${task.id}`);
           }}
           onFocus={event => event.stopPropagation()}
           disabled={task.resolved}
@@ -46,4 +46,6 @@ export default BookingTaskTableRow;
 
 interface Props {
   task: Task;
+  selected: boolean;
+  onSelectTask: (id: string) => void;
 }

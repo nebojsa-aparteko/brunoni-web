@@ -25,7 +25,17 @@ const MyDayContainer = () => {
   const users = useAdminUsers();
   const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
   const [teams, setTeams] = useState<Team[]>([]);
+  //we use this only to render again after assigning users, because we dont work with live data
   const [assignedUserTrigger, setAssignedUserTrigger] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const onSelectRow = useCallback(
+    (id: string) =>
+      setSelectedTasks(prevState =>
+        selectedTasks.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+      ),
+    [selectedTasks],
+  );
+
   const { assignee, taskStatus } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
@@ -53,16 +63,6 @@ const MyDayContainer = () => {
         ?.reduce(async (previousValue, currentValue) => {
           const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
           const p = await previousValue;
-          tasksPerTeam.docs.forEach(e =>
-            console.log(
-              e.id,
-              currentValue.carriers
-                ?.map(carrier => getId(carrier.name) || carrier.name)
-                .findIndex(carrier => carrier === e.data().carrierId?.toUpperCase()) !== -1,
-            ),
-          );
-
-          console.log(currentValue.carriers?.map(carrier => getId(carrier.name) || carrier.name));
 
           const newTuple = [
             currentValue.name as string,
@@ -101,28 +101,42 @@ const MyDayContainer = () => {
   /*
     Overdue / Future, make array of filter functions, and add that function into filter function of an array
    */
-  const filteredTasks = useMemo(() => {
-    console.log('Counting status');
-    if (taskStatus) {
-      console.log(tasks?.filter(getTaskFilter(taskStatus)));
-    }
-    return taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks;
-  }, [taskStatus, tasks, getTaskFilter]);
+  const filteredTasks = useMemo(() => (taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks), [
+    taskStatus,
+    tasks,
+    getTaskFilter,
+  ]);
 
   const onAssignUser = useCallback(() => {
-    [...(tasks || []), ...(normalizedTasks?.flatMap(nt => nt[1]) || [])]
-      ?.filter(task => task.selected)
-      .forEach(task =>
-        firebase
-          .firestore()
-          .collection('bookings')
-          .doc(task.bookingId)
-          .collection('tasks')
-          .doc(task.id)
-          .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
-          .then(() => setAssignedUserTrigger(prevState => !prevState)),
-      );
-  }, [tasks, assignTo, pick, UserRecordMinProperties]);
+    // [...(tasks || []), ...(normalizedTasks?.flatMap(nt => nt[1]) || [])]
+    //   ?.filter(task => task.selected)
+    //   .forEach(task =>
+    //     firebase
+    //       .firestore()
+    //       .collection('bookings')
+    //       .doc(task.bookingId)
+    //       .collection('tasks')
+    //       .doc(task.id)
+    //       .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
+    //       .then(() => setAssignedUserTrigger(prevState => !prevState)),
+    //   );
+    selectedTasks.forEach(id => {
+      const teamTasks = id.split('-');
+      const [bookingId, taskId] = teamTasks[0].split('/');
+
+      firebase
+        .firestore()
+        .collection('bookings')
+        .doc(bookingId)
+        .collection('tasks')
+        .doc(taskId)
+        .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
+        .then(() => {
+          setSelectedTasks([]);
+          setAssignedUserTrigger(prevState => !prevState);
+        });
+    });
+  }, [selectedTasks, assignTo, pick, UserRecordMinProperties]);
   return (
     <Card>
       <CardHeader
@@ -175,6 +189,8 @@ const MyDayContainer = () => {
             tasks={filteredTasks}
             normalizedTasks={normalizedTasks}
             shouldShowTeamTasks={!!(assignee && assignee.alphacomId)}
+            selectedTasks={selectedTasks}
+            onSelectRow={onSelectRow}
           />
         ) : (
           <ChartsCircularProgress />

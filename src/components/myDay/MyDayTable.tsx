@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
 import Task from '../../model/Task';
 import MyDayTableRow from './MyDayTableRow';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
-const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTasks }) => {
+const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTasks, selectedTasks, onSelectRow }) => {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -21,7 +21,12 @@ const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTas
         </TableHead>
         <TableBody>
           {tasks.map(task => (
-            <MyDayTableRow task={task} key={`${task.id}${task.bookingId}`} />
+            <MyDayTableRow
+              task={task}
+              key={`${task.bookingId}/${task.id}`}
+              selected={selectedTasks.includes(`${task.bookingId}/${task.id}`)}
+              onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}`)}
+            />
           ))}
           {normalizedTasks ? (
             normalizedTasks.map(normalizedTask =>
@@ -34,7 +39,12 @@ const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTas
                     </TableCell>
                   </TableRow>
                   {normalizedTask[1].map(task => (
-                    <MyDayTableRow task={task} key={`${task.id}${task.bookingId}teams`} />
+                    <MyDayTableRow
+                      task={task}
+                      key={`${task.bookingId}/${task.id}-${normalizedTask[0]}`}
+                      selected={selectedTasks.includes(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
+                      onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
+                    />
                   ))}
                 </Fragment>
               ) : null,
@@ -54,4 +64,6 @@ interface Props {
   tasks: Task[];
   normalizedTasks: [string, Task[]][] | undefined;
   shouldShowTeamTasks: boolean;
+  onSelectRow: (id: string) => void;
+  selectedTasks: string[];
 }

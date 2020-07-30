@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import Task from '../../model/Task';
 import BookingTaskTableRow from './BookingTaskTableRow';
 
-const BookingTaskTable: React.FC<Props> = ({ tasks }) => {
+const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask }) => {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -19,7 +19,12 @@ const BookingTaskTable: React.FC<Props> = ({ tasks }) => {
         </TableHead>
         <TableBody>
           {tasks.map(task => (
-            <BookingTaskTableRow task={task} key={task.id} />
+            <BookingTaskTableRow
+              task={task}
+              key={task.id}
+              selected={selectedTasks.includes(`${task.bookingId}/${task.id}`)}
+              onSelectTask={onSelectTask}
+            />
           ))}
         </TableBody>
       </Table>
@@ -31,4 +36,6 @@ export default BookingTaskTable;
 
 interface Props {
   tasks: Task[];
+  selectedTasks: string[];
+  onSelectTask: (bookingId: string) => void;
 }
