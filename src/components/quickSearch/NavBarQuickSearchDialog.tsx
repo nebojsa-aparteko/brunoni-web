@@ -153,7 +153,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             }
           />
           <QuickSearchBooking
-            label="Customer's reference"
+            label={`${!actingAs ? "Customer's" : 'Your'} reference`}
             handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
