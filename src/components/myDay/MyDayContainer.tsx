@@ -184,7 +184,7 @@ const MyDayContainer = () => {
             </Box>
           </Box>
         </Box>
-        {filteredTasks ? (
+        {filteredTasks && normalizedTasks ? (
           <MyDayTable
             tasks={filteredTasks}
             normalizedTasks={normalizedTasks}

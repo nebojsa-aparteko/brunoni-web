@@ -221,7 +221,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
                   assignee
                     ? 'There are no bookings that might need your attention at the moment. ' +
                       'You can use filters bar or quick search (ctrl+g on keyboard) to find what you might be looking for.'
-                    : 'No bookings found for your filter criteria. Try chaning filters.'
+                    : 'No bookings found for your filter criteria. Try changing filters.'
                 }
               />
             )}
