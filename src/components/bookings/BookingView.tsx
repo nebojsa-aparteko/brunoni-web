@@ -215,7 +215,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   );
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {!actingAs && tasks && (
+      {tasks && (
         <Grid item xs={12} md={11}>
           <BookingTaskExpansionPanel tasks={tasks} />
         </Grid>

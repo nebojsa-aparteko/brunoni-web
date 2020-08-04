@@ -29,7 +29,7 @@ import TeamManagementPage from './pages/TeamManagementPage';
 import { isDashboardUser } from './model/UserRecord';
 import VesselWithVoyagePage from './pages/VesselWithVoyagePage';
 import LoadListPage from './pages/LoadListPage';
-import BookingsRedirect from './pages/BookingsRedirect';
+import AdminRedirect from './pages/AdminRedirect';
 import BookingListFilterProvider from './providers/BookingListFilterProvider';
 import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
@@ -51,7 +51,7 @@ const anonymousRoutes = (
 
 const adminRoutes = (
   <Switch>
-    <Route exact path="/" component={BookingsRedirect} />
+    <Route exact path="/" component={AdminRedirect} />
     <Route exact path="/client-statistics" component={AdminDashboard} />
     <Route exact path="/schedule" component={Routes} />
     <Route exact path="/quotes/groups" component={QuoteGroups} />
@@ -81,8 +81,8 @@ const userRoutes = (
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />
+    <Route exact path="/my-day" component={MyDayPage} />
     <Route path="/charges" component={SideCharges} />
-    {/*<Route path="/my-day" component={MyDayPage} />*/}
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>

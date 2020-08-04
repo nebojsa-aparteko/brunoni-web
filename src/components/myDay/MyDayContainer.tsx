@@ -47,7 +47,7 @@ const MyDayContainer = () => {
   );
 
   useEffect(() => {
-    if (assignee)
+    if (assignee && !actingAs)
       getTeamsPerUser(assignee).then(fbTeams => {
         setTeams(
           fbTeams.docs.map(doc => {
@@ -149,41 +149,43 @@ const MyDayContainer = () => {
         }
       />
       <CardContent>
-        <Box display="flex" flexDirection="row" mb={2} justifyContent="space-between">
-          <Box display="flex">
-            <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
-              <UserInput
-                label="Assign task to"
-                users={users}
-                onChange={(_, user) => {
-                  setAssignTo(user || undefined);
-                }}
-                value={assignTo}
-              />
+        {!actingAs && (
+          <Box display="flex" flexDirection="row" mb={2} justifyContent="space-between">
+            <Box display="flex">
+              <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
+                <UserInput
+                  label="Assign task to"
+                  users={users}
+                  onChange={(_, user) => {
+                    setAssignTo(user || undefined);
+                  }}
+                  value={assignTo}
+                />
+              </Box>
+              <Button color="primary" variant="contained" onClick={onAssignUser}>
+                Assign user
+              </Button>
             </Box>
-            <Button color="primary" variant="contained" onClick={onAssignUser}>
-              Assign user
-            </Button>
-          </Box>
 
-          <Box display="flex" alignItems="center">
-            {!actingAs && <TaskClientFilterSwitch />}
-            <Typography variant="h4" display="inline">
-              Filter by:
-            </Typography>
-            <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
-              <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
-            </Box>
-            <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
-              <TaskStatusInput
-                label="Task status"
-                onChange={onStatusFilter}
-                tasksStatus={['Overdue', 'Pending']}
-                value={taskStatus}
-              />
+            <Box display="flex" alignItems="center">
+              {!actingAs && <TaskClientFilterSwitch />}
+              <Typography variant="h4" display="inline">
+                Filter by:
+              </Typography>
+              <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
+                <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
+              </Box>
+              <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
+                <TaskStatusInput
+                  label="Task status"
+                  onChange={onStatusFilter}
+                  tasksStatus={['Overdue', 'Pending']}
+                  value={taskStatus}
+                />
+              </Box>
             </Box>
           </Box>
-        </Box>
+        )}
         {filteredTasks && normalizedTasks ? (
           <MyDayTable
             tasks={filteredTasks}

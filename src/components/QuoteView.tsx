@@ -254,7 +254,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start">
-      <Grid item md={isAdmin ? 7 : 12} xs={12}>
+      <Grid item md={7} xs={12}>
         <Page title={quoteTitle}>
           <Container maxWidth="lg">
             <ScrollToTopOnMount />
@@ -376,43 +376,45 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           </Container>
         </Page>
       </Grid>
-      {isAdmin && (
+      {
         <Grid item md={4} xs={12} style={{ marginTop: theme.spacing(2) }}>
-          <Box display="flex" justifyContent="center" flexDirection="column">
-            <UserAssignment
-              onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
-              value={quote?.assignedTo}
-            />
-            <FormControl>
-              <InputLabel id="quote-status-select-label" shrink>
-                Quote Status
-              </InputLabel>
-              <Select
-                labelId="quote-status-select-label"
-                id="quote-status-select"
-                value={quote!.status || ''}
-                onChange={event => handleChange(event, quote.id)}
-                displayEmpty
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {Object.keys(QuoteStatus)
-                  .filter(key => typeof QuoteStatus[key as any] !== 'number')
-                  .map((status: string | QuoteStatus, index) => (
-                    <MenuItem value={Number(status)} key={`menuItem-${index}`}>
-                      {Object.values(QuoteStatusText)[index]}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          </Box>
+          {isAdmin && (
+            <Box display="flex" justifyContent="center" flexDirection="column">
+              <UserAssignment
+                onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
+                value={quote?.assignedTo}
+              />
+              <FormControl>
+                <InputLabel id="quote-status-select-label" shrink>
+                  Quote Status
+                </InputLabel>
+                <Select
+                  labelId="quote-status-select-label"
+                  id="quote-status-select"
+                  value={quote!.status || ''}
+                  onChange={event => handleChange(event, quote.id)}
+                  displayEmpty
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {Object.keys(QuoteStatus)
+                    .filter(key => typeof QuoteStatus[key as any] !== 'number')
+                    .map((status: string | QuoteStatus, index) => (
+                      <MenuItem value={Number(status)} key={`menuItem-${index}`}>
+                        {Object.values(QuoteStatusText)[index]}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
           <ActivityLogProvider>
             {!actingAs && <InternalStorage id={quote!.id} collection={'quotes'} />}
             <QuoteActivityLogContainer quoteId={quote.id} />
           </ActivityLogProvider>
         </Grid>
-      )}
+      }
     </Grid>
   );
 };

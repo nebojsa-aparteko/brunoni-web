@@ -1,14 +1,26 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 
 import useFirestoreCollection from './useFirestoreCollection';
-import Task from '../model/Task';
+import Task, { UserRole } from '../model/Task';
 import { flow, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
+import ActingAs from '../contexts/ActingAs';
 
 export default function useTasksPerBooking(bookingId: string) {
+  const [actingAs] = useContext(ActingAs);
+
   const tasksCollection = useFirestoreCollection(
     'bookings',
-    useCallback(query => query.orderBy('resolved', 'asc'), []),
+    useCallback(
+      query => {
+        let q = query;
+        if (actingAs) {
+          q = q.where('userRole', '==', UserRole.CLIENT);
+        }
+        return q.orderBy('resolved', 'asc');
+      },
+      [actingAs],
+    ),
     bookingId,
     'tasks',
   );

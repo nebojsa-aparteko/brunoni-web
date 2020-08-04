@@ -10,17 +10,27 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import ActingAs from '../../contexts/ActingAs';
 
 interface Props {
   quoteId: string;
 }
 
 const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
+  const [actingAs, setActingAs] = useContext(ActingAs);
+
   const quoteActivityLogCollection = useFirestoreCollection(
     'quotes',
-    useCallback(query => {
-      return query.orderBy('at', 'desc');
-    }, []),
+    useCallback(
+      q => {
+        let query = q;
+        if (actingAs) {
+          query = query.where('isInternal', '==', false);
+        }
+        return query.orderBy('at', 'desc');
+      },
+      [actingAs],
+    ),
     quoteId,
     'activity',
   );
@@ -37,7 +47,7 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
   const userRecord = useContext(UserRecordContext);
 
   const handleCommentSave = useCallback(
-    (messageBody: string, mentions: MentionItem[]) => {
+    (messageBody: string, mentions: MentionItem[], customerMessage: boolean) => {
       const userActivityLogData = {
         firstName: userRecord?.firstName,
         lastName: userRecord?.lastName,
@@ -56,7 +66,7 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
             comment: messageBody,
             at: new Date(),
             by: userActivityLogData,
-            isInternal: true,
+            isInternal: customerMessage,
             mentions: mentions,
           } as QuoteActivityModel),
         )

@@ -243,7 +243,7 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="Schedule" to="/schedule" />
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
 
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="My day" to="/my-day" />}
+                    <ButtonMenuItem primary="My day" to="/my-day" />
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
@@ -410,9 +410,8 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
-                  {isDashboardUser(userRecord) && !actingAs && (
-                    <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
-                  )}
+
+                  <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
 
                   <Fragment>
                     <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
