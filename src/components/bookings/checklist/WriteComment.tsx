@@ -14,6 +14,7 @@ import useTeams from '../../../hooks/useTeams';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import UserRecord from '../../../model/UserRecord';
+import { Quote } from '../../../providers/QuoteGroupsProvider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) => {
+const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quote }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
@@ -66,6 +67,27 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking }) =>
         if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
   }, [booking]);
+
+  useEffect(() => {
+    if (quote) {
+      firebase
+        .firestore()
+        .collection('users')
+        .where('alphacomId', '==', quote?.userId || '')
+        .get()
+        .then(doc => {
+          if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        });
+      firebase
+        .firestore()
+        .collection('users')
+        .where('alphacomId', '==', quote?.assignedTo?.alphacomId || '')
+        .get()
+        .then(doc => {
+          if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        });
+    }
+  }, [quote]);
 
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
@@ -233,4 +255,5 @@ export default WriteComment;
 interface WriteCommentProp {
   onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
   booking?: Booking;
+  quote?: Quote;
 }

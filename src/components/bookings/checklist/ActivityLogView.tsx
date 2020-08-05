@@ -6,6 +6,7 @@ import { MentionItem } from 'react-mentions';
 import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
 import { Booking } from '../../../model/Booking';
+import { Quote } from '../../../providers/QuoteGroupsProvider';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -14,6 +15,7 @@ interface Props {
   showMore?: boolean;
   onChange?: () => void;
   booking?: Booking;
+  quote?: Quote;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -29,6 +31,7 @@ const ActivityLogView: React.FC<Props> = ({
   onChange,
   quoteActivityLog,
   booking,
+  quote,
 }) => {
   const classes = useStyles();
 
@@ -43,7 +46,7 @@ const ActivityLogView: React.FC<Props> = ({
       <CardContent>
         {quoteActivityLog ? (
           <ActivityLogProvider>
-            <WriteComment onCommentSave={onCommentSave} />
+            <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
         ) : (
           <WriteComment onCommentSave={onCommentSave} booking={booking} />

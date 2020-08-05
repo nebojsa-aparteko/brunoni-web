@@ -11,12 +11,14 @@ import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import ActingAs from '../../contexts/ActingAs';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 
 interface Props {
   quoteId: string;
+  quote: Quote;
 }
 
-const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
+const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId, quote }) => {
   const [actingAs, setActingAs] = useContext(ActingAs);
 
   const quoteActivityLogCollection = useFirestoreCollection(
@@ -79,7 +81,12 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId }) => {
   );
 
   return (
-    <ActivityLogView activityLog={normalizedActivityLog} onCommentSave={handleCommentSave} quoteActivityLog={true} />
+    <ActivityLogView
+      activityLog={normalizedActivityLog}
+      onCommentSave={handleCommentSave}
+      quoteActivityLog={true}
+      quote={quote}
+    />
   );
 };
 

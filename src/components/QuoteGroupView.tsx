@@ -509,7 +509,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
         <ActivityLogProvider>
           {/*<InternalStorage id={quoteGroup?.id} collection={}/>*/}
           {/*TODO This should be visible only for admins*/}
-          {quoteGroup && <QuoteGroupActivityLogContainer groupId={quoteGroup.id} />}
+          {quoteGroup && <QuoteGroupActivityLogContainer groupId={quoteGroup.id} quote={quoteGroup?.quotes?.[0]} />}
         </ActivityLogProvider>
       </Container>
     </Fragment>

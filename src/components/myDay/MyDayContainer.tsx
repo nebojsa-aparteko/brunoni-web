@@ -55,7 +55,7 @@ const MyDayContainer = () => {
           }) as Team[],
         );
       });
-  }, [assignee]);
+  }, [assignee, actingAs]);
 
   useEffect(() => {
     if (teams) {
@@ -108,18 +108,6 @@ const MyDayContainer = () => {
   ]);
 
   const onAssignUser = useCallback(() => {
-    // [...(tasks || []), ...(normalizedTasks?.flatMap(nt => nt[1]) || [])]
-    //   ?.filter(task => task.selected)
-    //   .forEach(task =>
-    //     firebase
-    //       .firestore()
-    //       .collection('bookings')
-    //       .doc(task.bookingId)
-    //       .collection('tasks')
-    //       .doc(task.id)
-    //       .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
-    //       .then(() => setAssignedUserTrigger(prevState => !prevState)),
-    //   );
     selectedTasks.forEach(id => {
       const teamTasks = id.split('-');
       const [bookingId, taskId] = teamTasks[0].split('/');

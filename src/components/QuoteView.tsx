@@ -411,7 +411,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           )}
           <ActivityLogProvider>
             {!actingAs && <InternalStorage id={quote!.id} collection={'quotes'} />}
-            <QuoteActivityLogContainer quoteId={quote.id} />
+            <QuoteActivityLogContainer quoteId={quote.id} quote={quote} />
           </ActivityLogProvider>
         </Grid>
       }

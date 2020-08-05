@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -11,14 +11,15 @@ import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import ActingAs from '../../contexts/ActingAs';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 
 interface Props {
   groupId: string;
+  quote: Quote;
 }
 
-const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId }) => {
+const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId, quote }) => {
   const [actingAs, setActingAs] = useContext(ActingAs);
-
   const quoteActivityLogCollection = useFirestoreCollection(
     'quotes-group-comments',
     useCallback(
@@ -76,7 +77,12 @@ const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId }) => {
   );
 
   return (
-    <ActivityLogView activityLog={normalizedActivityLog} onCommentSave={handleCommentSave} quoteActivityLog={true} />
+    <ActivityLogView
+      activityLog={normalizedActivityLog}
+      onCommentSave={handleCommentSave}
+      quoteActivityLog={true}
+      quote={quote}
+    />
   );
 };
 
