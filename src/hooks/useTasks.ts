@@ -28,7 +28,6 @@ export default function useTasks() {
       if (actingAs) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
       }
-      query.limit(100);
       return query;
     },
     [filters, assignee, UserRecordMinProperties, pick, showClientTasks, UserRole, actingAs, userRecord],
