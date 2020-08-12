@@ -18,7 +18,6 @@ import { Booking } from '../../model/Booking';
 import { BookingRow } from '../bookings/BookingsTable';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { normalizeBooking } from '../../providers/BookingsProvider';
-import { useHistory } from 'react-router';
 import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(theme =>

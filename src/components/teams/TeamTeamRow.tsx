@@ -12,7 +12,7 @@ import asArray from '../../utilities/asArray';
 import Carriers from '../../contexts/Carriers';
 import firebase from '../../firebase';
 import { BookingCategory } from '../../model/Booking';
-import { ChecklistNamesPreview } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistNames, ChecklistNamesPreview } from '../bookings/checklist/ChecklistItemModel';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
 import Carrier from '../../model/Carrier';
@@ -74,10 +74,13 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   };
   const handleChecklistItemChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
     const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
+
     setActiveTeam(
       set(
         'checklistItems',
-        asArray(value).map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0]),
+        asArray(value)
+          .map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0])
+          .map(val => ChecklistNames[val as keyof typeof ChecklistNames]),
       )(activeTeam),
     );
     setChanged(true);
@@ -166,9 +169,9 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
           multiple
           autoHighlight
           options={checklistItems || []}
-          defaultValue={team.checklistItems?.map(
-            val => checklistNamesPreview.find(([id, name]) => id === val)?.[1] || '',
-          )}
+          defaultValue={team.checklistItems
+            ?.map(value => Object.entries(ChecklistNames).find(([id, name]) => value === name)?.[0] || '')
+            ?.map(val => checklistNamesPreview.find(([id, name]) => id === val)?.[1] || '')}
           getOptionSelected={(option, value) => option === value}
           onChange={handleChecklistItemChange}
           renderTags={(value, getTagProps) =>
