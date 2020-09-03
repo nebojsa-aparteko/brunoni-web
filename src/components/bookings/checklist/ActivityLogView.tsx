@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
+import React, { useLayoutEffect } from 'react';
+import { Box, Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
 import WriteComment from './WriteComment';
 import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
@@ -34,7 +34,17 @@ const ActivityLogView: React.FC<Props> = ({
   quote,
 }) => {
   const classes = useStyles();
-
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      const id = window.location.hash.split('#').pop();
+      console.log(id);
+      if (!window.location.hash || window.location.hash === '' || !id) return;
+      const element = window.document.getElementById(id);
+      if (!element) return;
+      element.scrollIntoView();
+      console.log('Scrolled');
+    }, 1000);
+  }, [window.location.hash]);
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
@@ -52,7 +62,9 @@ const ActivityLogView: React.FC<Props> = ({
           <WriteComment onCommentSave={onCommentSave} booking={booking} />
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
-          <ActivityLogItemView activityItem={activity} key={`act-${activity.id}`} />
+          <Box id={activity.id} key={`act-${activity.id}`}>
+            <ActivityLogItemView activityItem={activity} />
+          </Box>
         ))}
       </CardContent>
     </Card>

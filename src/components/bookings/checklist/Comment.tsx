@@ -54,10 +54,15 @@ const useStyles = makeStyles((theme: Theme) =>
   });
 };*/
 
-const Comment = ({ comment, ...other }: CommentProp) => {
+const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
   const classes = useStyles();
   return (
-    <Box className={classes.container} {...other}>
+    <Box
+      className={classes.container}
+      style={{ cursor: handleCommentClick ? 'pointer' : 'initial' }}
+      {...other}
+      onClick={handleCommentClick}
+    >
       <Box className={classes.rowContainer}>
         <Avatar
           name={`${comment.by?.firstName} ${comment.by?.lastName}`}
@@ -105,6 +110,7 @@ export default Comment;
 
 interface CommentProp {
   comment: ActivityLogItem;
+  handleCommentClick?: () => void;
   handleEdit?: () => void;
   handleDelete?: () => void;
 }

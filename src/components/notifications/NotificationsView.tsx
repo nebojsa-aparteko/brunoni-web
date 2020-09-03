@@ -77,7 +77,7 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
         <Button onClick={markAllAsRead}>Mark all as read</Button>
       </Box>
       {notifications?.map(notification => (
-        <NotificationItemView notification={notification} key={notification.id} />
+        <NotificationItemView notification={notification} key={notification.id} handleShowDrawer={handleShow} />
       ))}
     </Box>
   );

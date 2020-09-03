@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -81,14 +82,15 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
   );
 };
 
-const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
+const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
+  const history = useHistory();
   const handleSeenStatusChange = async () => {
     const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
       lastSend: Date;
       notifications: string[];
     };
-    firebase
+    await firebase
       .firestore()
       .collection('email-notifications')
       .doc(notification.userAlphacomId)
@@ -112,15 +114,29 @@ const NotificationItemView: React.FC<Props> = ({ notification, ...other }) => {
         subheader={formatDistanceToNowConfigured(notification.at)}
         className={classes.header}
         action={
-          <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
-            {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
-          </IconButton>
+          <Fragment>
+            {/*<Button>Mark read for all</Button>*/}
+            <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
+              {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
+            </IconButton>
+          </Fragment>
         }
       />
       <CardContent>
         {notification.type === NotificationType.COMMENT && notification.activity ? (
           <Fragment>
-            <Comment comment={notification.activity} />
+            <Comment
+              comment={notification.activity}
+              handleCommentClick={() => {
+                handleShowDrawer();
+                notification.referenceObject &&
+                  history.push(
+                    `/${
+                      notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject
+                    }/${notification.referenceID}#${notification.activity?.id}`,
+                  );
+              }}
+            />
           </Fragment>
         ) : notification.activity && notification.type === NotificationType.ACTIVITY ? (
           <Activity activity={notification!.activity} />
@@ -137,6 +153,10 @@ export default NotificationItemView;
 
 interface Props {
   notification: Notification;
+}
+
+interface NotificationItemProps extends Props {
+  handleShowDrawer: () => void;
 }
 
 const getEmailNotifications = (userId: string) =>
