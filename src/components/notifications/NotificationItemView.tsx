@@ -21,6 +21,9 @@ import Alert from './Alert';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import TaskNotification from './TaskNotification';
+import HelpIcon from '@material-ui/icons/Help';
+
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
@@ -49,7 +52,9 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
             ? 'Comment'
             : notification.type === NotificationType.ACTIVITY
             ? 'Activity'
-            : 'Alert'
+            : notification.type === NotificationType.ALERT
+            ? 'Alert'
+            : 'Task'
         }`}
         style={{
           backgroundColor:
@@ -57,7 +62,9 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
               ? '#3cb371'
               : notification.type === NotificationType.ACTIVITY
               ? '#00a2f2'
-              : '#f4364c',
+              : notification.type === NotificationType.ALERT
+              ? '#f4364c'
+              : '#2bbbad',
           color: 'white',
         }}
       />
@@ -67,7 +74,9 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
             ? 'Comment left at '
             : notification.type === NotificationType.ACTIVITY
             ? 'Activity at '
-            : 'Alert at '}
+            : notification.type === NotificationType.ALERT
+            ? 'Alert at '
+            : 'New Task at '}
           {notification.referenceObject ? `${getReferenceLabel(notification.referenceObject)}` : null}
         </Typography>
 
@@ -152,9 +161,14 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         ) : notification.type === NotificationType.ALERT &&
           (notification.alertType !== undefined || notification.taskType) ? (
           <Alert alert={notification} />
+        ) : notification.type === NotificationType.TASK && notification.createdTaskType ? (
+          <TaskNotification task={notification.createdTaskType} />
         ) : null}
       </CardContent>
       <CardActions>
+        {/*<IconButton>*/}
+        {/*  <HelpIcon />*/}
+        {/*</IconButton>*/}
         <Button
           size="small"
           style={{ marginLeft: 'auto' }}
