@@ -169,7 +169,11 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
             );
           }}
         >
-          Learn More
+          {notification.referenceObject === 'quoteGroup'
+            ? 'View Quote Group'
+            : notification.referenceObject === 'bookings'
+            ? 'View Booking'
+            : 'View Quote'}
         </Button>
       </CardActions>
     </Card>
