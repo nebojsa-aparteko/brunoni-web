@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme =>
       marginRight: theme.spacing(1),
     },
     titleAnchor: {
-      color: theme.palette.secondary.main,
+      color: theme.palette.primary.main,
       cursor: 'pointer',
       textDecoration: 'underline',
     },
@@ -159,7 +159,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           size="small"
           style={{ marginLeft: 'auto' }}
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={() => {
             handleShowDrawer();
             history.push(
