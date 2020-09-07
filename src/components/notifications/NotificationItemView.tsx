@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Chip,
@@ -27,6 +28,11 @@ const useStyles = makeStyles(theme =>
     },
     header: {
       marginRight: theme.spacing(1),
+    },
+    titleAnchor: {
+      color: theme.palette.secondary.main,
+      cursor: 'pointer',
+      textDecoration: 'underline',
     },
   }),
 );
@@ -62,10 +68,11 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
             : notification.type === NotificationType.ACTIVITY
             ? 'Activity at '
             : 'Alert at '}
+          {notification.referenceObject ? `${getReferenceLabel(notification.referenceObject)}` : null}
         </Typography>
 
         <a
-          style={{ cursor: 'pointer', textDecoration: 'underline' }}
+          className={classes.titleAnchor}
           onClick={() =>
             notification.referenceObject &&
             history.push(
@@ -90,14 +97,16 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       lastSend: Date;
       notifications: string[];
     };
-    await firebase
-      .firestore()
-      .collection('email-notifications')
-      .doc(notification.userAlphacomId)
-      .set({
-        lastSend: sentNotifications.lastSend,
-        notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-      });
+    if (sentNotifications) {
+      await firebase
+        .firestore()
+        .collection('email-notifications')
+        .doc(notification.userAlphacomId)
+        .set({
+          lastSend: sentNotifications.lastSend,
+          notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+        });
+    }
     return firebase
       .firestore()
       .collection('notifications')
@@ -145,6 +154,24 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           <Alert alert={notification} />
         ) : null}
       </CardContent>
+      <CardActions>
+        <Button
+          size="small"
+          style={{ marginLeft: 'auto' }}
+          variant="contained"
+          color="secondary"
+          onClick={() => {
+            handleShowDrawer();
+            history.push(
+              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+                notification.referenceID
+              }`,
+            );
+          }}
+        >
+          Learn More
+        </Button>
+      </CardActions>
     </Card>
   );
 };
@@ -165,3 +192,6 @@ const getEmailNotifications = (userId: string) =>
     .collection('email-notifications')
     .doc(userId)
     .get();
+
+const getReferenceLabel = (referenceObject: string) =>
+  referenceObject === 'bookings' ? 'Booking File No.' : 'Quote number';

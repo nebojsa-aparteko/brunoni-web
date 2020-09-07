@@ -42,14 +42,16 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
               lastSend: Date;
               notifications: string[];
             };
-            await firebase
-              .firestore()
-              .collection('email-notifications')
-              .doc(notification.userAlphacomId)
-              .set({
-                lastSend: sentNotifications.lastSend,
-                notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-              });
+            if (sentNotifications) {
+              await firebase
+                .firestore()
+                .collection('email-notifications')
+                .doc(notification.userAlphacomId)
+                .set({
+                  lastSend: sentNotifications.lastSend,
+                  notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+                });
+            }
             return batch.update(
               firebase
                 .firestore()
