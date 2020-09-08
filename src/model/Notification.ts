@@ -1,12 +1,13 @@
-import { ActivityLogUserData } from '../components/bookings/checklist/ChecklistItemModel';
 import { ActivityLogItem } from '../components/bookings/checklist/ActivityModel';
 import { AlertType } from './Booking';
 import { TaskType } from './Task';
+import { UserRecordMin } from './UserRecord';
 
 export enum NotificationType {
   COMMENT,
   ACTIVITY,
   ALERT,
+  TASK,
 }
 
 export default interface Notification {
@@ -21,4 +22,6 @@ export default interface Notification {
   id?: string;
   alertType?: AlertType;
   taskType?: TaskType;
+  createdTaskType?: TaskType;
+  readForAllBy: UserRecordMin;
 }
