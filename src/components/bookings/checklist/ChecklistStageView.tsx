@@ -12,7 +12,6 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
         disabled={disabled}
         control={
           <Checkbox
-            // defaultChecked={stage.checked}
             onChange={event => {
               handleChange(stage, event.target.checked);
             }}

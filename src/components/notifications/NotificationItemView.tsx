@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -18,12 +18,11 @@ import firebase from 'firebase';
 import { useHistory } from 'react-router';
 import Activity from '../bookings/checklist/Activity';
 import Alert from './Alert';
-import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import TaskNotification from './TaskNotification';
-import HelpIcon from '@material-ui/icons/Help';
 import DateFormattedText from '../DateFormattedText';
+import InfoNotification from './InfoNotification';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -41,8 +40,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const NotificationTitle: React.FC<Props> = ({ notification }) => {
-  const history = useHistory();
+const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, handleClick }) => {
   const classes = useStyles();
   return (
     <Fragment>
@@ -55,7 +53,9 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
             ? 'Activity'
             : notification.type === NotificationType.ALERT
             ? 'Alert'
-            : 'Task'
+            : notification.type === NotificationType.TASK
+            ? 'Task'
+            : 'Info'
         }`}
         style={{
           backgroundColor:
@@ -65,7 +65,9 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
               ? '#00a2f2'
               : notification.type === NotificationType.ALERT
               ? '#f4364c'
-              : '#2bbbad',
+              : notification.type === NotificationType.TASK
+              ? '#2bbbad'
+              : '#9b59b6',
           color: 'white',
         }}
       />
@@ -77,21 +79,13 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
             ? 'Activity at '
             : notification.type === NotificationType.ALERT
             ? 'Alert at '
-            : 'New Task at '}
+            : notification.type === NotificationType.TASK
+            ? 'New Task at '
+            : 'New Info about '}
           {notification.referenceObject ? `${getReferenceLabel(notification.referenceObject)}` : null}
         </Typography>
 
-        <a
-          className={classes.titleAnchor}
-          onClick={() =>
-            notification.referenceObject &&
-            history.push(
-              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
-                notification.referenceID
-              }`,
-            )
-          }
-        >
+        <a className={classes.titleAnchor} onClick={handleClick}>
           {notification.referenceID}
         </a>
       </Box>
@@ -102,6 +96,22 @@ const NotificationTitle: React.FC<Props> = ({ notification }) => {
 const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
   const history = useHistory();
+  const handleClick = useCallback(() => {
+    firebase
+      .firestore()
+      .collection('notifications')
+      .doc(notification.id)
+      .set({ seen: true } as Notification, { merge: true })
+      .then(() => {
+        handleShowDrawer();
+        notification.referenceObject &&
+          history.push(
+            `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+              notification.referenceID
+            }`,
+          );
+      });
+  }, [notification, handleShowDrawer]);
   const handleSeenStatusChange = async () => {
     const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
       lastSend: Date;
@@ -129,7 +139,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   return (
     <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
       <CardHeader
-        title={<NotificationTitle notification={notification} />}
+        title={<NotificationTitle notification={notification} handleClick={handleClick} />}
         subheader={<DateFormattedText date={notification.at} />}
         className={classes.header}
         action={
@@ -147,13 +157,20 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
             <Comment
               comment={notification.activity}
               handleCommentClick={() => {
-                handleShowDrawer();
-                notification.referenceObject &&
-                  history.push(
-                    `/${
-                      notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject
-                    }/${notification.referenceID}#${notification.activity?.id}`,
-                  );
+                firebase
+                  .firestore()
+                  .collection('notifications')
+                  .doc(notification.id)
+                  .set({ seen: true } as Notification, { merge: true })
+                  .then(() => {
+                    handleShowDrawer();
+                    notification.referenceObject &&
+                      history.push(
+                        `/${
+                          notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject
+                        }/${notification.referenceID}#${notification.activity?.id}`,
+                      );
+                  });
               }}
             />
           </Fragment>
@@ -164,26 +181,15 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           <Alert alert={notification} />
         ) : notification.type === NotificationType.TASK && notification.createdTaskType ? (
           <TaskNotification task={notification.createdTaskType} />
+        ) : notification.type === NotificationType.INFO && notification.infoType ? (
+          <InfoNotification infoType={notification.infoType} />
         ) : null}
       </CardContent>
       <CardActions>
         {/*<IconButton>*/}
         {/*  <HelpIcon />*/}
         {/*</IconButton>*/}
-        <Button
-          size="small"
-          style={{ marginLeft: 'auto' }}
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            handleShowDrawer();
-            history.push(
-              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
-                notification.referenceID
-              }`,
-            );
-          }}
-        >
+        <Button size="small" style={{ marginLeft: 'auto' }} variant="contained" color="primary" onClick={handleClick}>
           {notification.referenceObject === 'quoteGroup'
             ? 'View Quote Group'
             : notification.referenceObject === 'bookings'
@@ -199,6 +205,10 @@ export default NotificationItemView;
 
 interface Props {
   notification: Notification;
+}
+
+interface NotificationTitleProps extends Props {
+  handleClick: () => void;
 }
 
 interface NotificationItemProps extends Props {

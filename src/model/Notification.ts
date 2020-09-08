@@ -8,8 +8,8 @@ export enum NotificationType {
   ACTIVITY,
   ALERT,
   TASK,
+  INFO,
 }
-
 export default interface Notification {
   userAlphacomId: string;
   userEmail: string;
@@ -24,4 +24,13 @@ export default interface Notification {
   taskType?: TaskType;
   createdTaskType?: TaskType;
   readForAllBy: UserRecordMin;
+  infoType?: InfoType;
+}
+
+export enum InfoType {
+  PIN_NUMBER_RECEIVED = 'PIN_NUMBER_RECEIVED',
+}
+
+export enum InfoTypeDescription {
+  PIN_NUMBER_RECEIVED = 'Please note the PIN number and relevant empty return information are available now.',
 }
