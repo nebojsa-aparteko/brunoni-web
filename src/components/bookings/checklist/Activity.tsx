@@ -1,10 +1,11 @@
-import React, { Fragment } from 'react';
-import { Box, Link, Typography } from '@material-ui/core';
+import React, { Fragment, useState } from 'react';
+import { Box, Link, Tooltip, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
-import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import { formatDateSafe, formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import formatDate from 'date-fns/format';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -63,21 +64,34 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
   );
 };
 
-const Activity = ({ activity, ...other }: Props) => (
-  <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
-    <Avatar
-      name={`${activity.by.firstName} ${activity.by.lastName}`}
-      title={`${activity.by.firstName} ${activity.by.lastName}`}
-      size="40"
-      round={true}
-    />
-    <Box display="flex" flexDirection="column" ml={1}>
-      {/*<Typography variant="body1">{activity.comment}</Typography>*/}
-      {makeActivityRepresentation(activity)}
-      <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(activity.at)}`}</Typography>
+const Activity = ({ activity, ...other }: Props) => {
+  const [isFullDateFormat, setIsFullDateFormat] = useState(false);
+  return (
+    <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
+      <Avatar
+        name={`${activity.by.firstName} ${activity.by.lastName}`}
+        title={`${activity.by.firstName} ${activity.by.lastName}`}
+        size="40"
+        round={true}
+      />
+      <Box display="flex" flexDirection="column" ml={1}>
+        {makeActivityRepresentation(activity)}
+        <Tooltip title="Click here to change date format" placement="left">
+          <Typography
+            color="textSecondary"
+            variant="caption"
+            onClick={() => setIsFullDateFormat(prevState => !prevState)}
+            style={{ cursor: 'pointer' }}
+          >
+            {isFullDateFormat
+              ? `${formatDate(activity.at, 'dd.MM.yyyy HH:mm:ss')}`
+              : `${formatDistanceToNowConfigured(activity.at)}`}
+          </Typography>
+        </Tooltip>
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export default Activity;
 
