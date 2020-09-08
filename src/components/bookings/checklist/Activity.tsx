@@ -20,9 +20,9 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       case ActivityChangeType.STAGE_CHECKED:
         return activity.stage!.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
       case ActivityChangeType.DOCUMENT_STATUS_CHANGED:
-        return activity.documents?.[0].status?.type === ChecklistItemValueDocumentStatusType.DEFAULT
+        return activity.documents?.[0]?.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT
           ? ActivityText.DEFAULTED_FILE
-          : activity.documents?.[0].status?.type === ChecklistItemValueDocumentStatusType.APPROVED
+          : activity.documents?.[0]?.status?.type === ChecklistItemValueDocumentStatusType.APPROVED
           ? ActivityText.APPROVED_FILE
           : ActivityText.REJECTED_FILE;
       case ActivityChangeType.DONE_BY_CUSTOMER:
