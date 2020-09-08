@@ -4,7 +4,7 @@ import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
-import { formatDateSafe, formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import formatDate from 'date-fns/format';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
