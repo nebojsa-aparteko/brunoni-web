@@ -10,7 +10,7 @@ const ChecklistStagesView = ({ stages, handleChange }: Props) => {
         <ChecklistStageView
           stage={stage}
           handleChange={handleChange}
-          key={`chklist-${index}`}
+          key={stage.id}
           disabled={
             (index > 0 && !stages[index - 1].checked) || (index < stages.length - 1 && stages[index + 1].checked)
           }

@@ -6,6 +6,7 @@ import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import formatDate from 'date-fns/format';
+import DateFormattedText from '../../DateFormattedText';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -76,18 +77,7 @@ const Activity = ({ activity, ...other }: Props) => {
       />
       <Box display="flex" flexDirection="column" ml={1}>
         {makeActivityRepresentation(activity)}
-        <Tooltip title="Click here to change date format" placement="left">
-          <Typography
-            color="textSecondary"
-            variant="caption"
-            onClick={() => setIsFullDateFormat(prevState => !prevState)}
-            style={{ cursor: 'pointer' }}
-          >
-            {isFullDateFormat
-              ? `${formatDate(activity.at, 'dd.MM.yyyy HH:mm:ss')}`
-              : `${formatDistanceToNowConfigured(activity.at)}`}
-          </Typography>
-        </Tooltip>
+        <DateFormattedText date={activity.at} />
       </Box>
     </Box>
   );

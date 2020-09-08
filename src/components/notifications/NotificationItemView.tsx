@@ -23,6 +23,7 @@ import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import TaskNotification from './TaskNotification';
 import HelpIcon from '@material-ui/icons/Help';
+import DateFormattedText from '../DateFormattedText';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -129,7 +130,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
     <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
       <CardHeader
         title={<NotificationTitle notification={notification} />}
-        subheader={formatDistanceToNowConfigured(notification.at)}
+        subheader={<DateFormattedText date={notification.at} />}
         className={classes.header}
         action={
           <Fragment>

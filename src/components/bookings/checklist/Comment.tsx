@@ -1,11 +1,13 @@
-import React from 'react';
-import { Box, createStyles, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import React, { useState } from 'react';
+import { Box, createStyles, makeStyles, Paper, Theme, Tooltip, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem } from './ActivityModel';
 import classNames from 'classnames';
 import asArray from '../../../utilities/asArray';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import formatDate from 'date-fns/format';
+import DateFormattedText from '../../DateFormattedText';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
   const classes = useStyles();
+
   return (
     <Box
       className={classes.container}
@@ -76,9 +79,7 @@ const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
               <Typography className={classes.name} color="textPrimary">
                 {`${capitalCase(comment.by.firstName)} ${capitalCase(comment.by.lastName)}`}
               </Typography>
-              <Typography color="textSecondary" variant="caption">{`${formatDistanceToNowConfigured(
-                comment.at,
-              )}`}</Typography>
+              <DateFormattedText date={comment.at} />
             </Box>
             <Typography style={{ wordBreak: 'break-word' }}>
               {/*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*/}
