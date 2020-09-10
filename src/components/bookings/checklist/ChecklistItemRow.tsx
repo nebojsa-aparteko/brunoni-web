@@ -287,7 +287,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
 
   const checklistItemStageChangeHandler = useCallback(
     (stages: Stage[], stage: Stage) => {
-      console.log(stage, 'STAGE');
       return saveChecklistChanges('stages', stages).then(_ =>
         addActivityItem(
           booking!.id,

@@ -1,10 +1,12 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Box,
   Button,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  FormControlLabel,
+  Switch,
   Typography,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -23,7 +25,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const actingAs = useContext(ActingAs)[0];
-
+  const [showResolved, setShowResolved] = useState(false);
   const assignUser = useCallback(
     event => {
       // console.log(tasks?.filter(task => task.selected));
@@ -52,6 +54,10 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
       ),
     [selectedTasks],
   );
+  const filteredTasks = useMemo(() => (showResolved ? tasks : tasks.filter(task => !task.resolved)), [
+    showResolved,
+    tasks,
+  ]);
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
@@ -64,7 +70,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
             flex: 1,
           }}
         >
-          <Typography>{tasks.length} Tasks</Typography>
+          <Typography>{filteredTasks.length} Tasks</Typography>
           {!actingAs && (
             <Box display="flex" flexDirection="row">
               <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
@@ -87,7 +93,23 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks }) => {
         </Box>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <BookingTaskTable tasks={tasks} selectedTasks={selectedTasks} onSelectTask={onSelectTask} />
+        <FormControlLabel
+          style={{ marginTop: '8px', marginBottom: '8px' }}
+          control={
+            <Switch
+              checked={showResolved}
+              onChange={(event, checked) => {
+                event.stopPropagation();
+                setShowResolved(checked);
+              }}
+              color="primary"
+              name="showResolvedTasks"
+            />
+          }
+          label="Show resolved tasks"
+          labelPlacement="start"
+        />
+        <BookingTaskTable tasks={filteredTasks} selectedTasks={selectedTasks} onSelectTask={onSelectTask} />
       </ExpansionPanelDetails>
     </ExpansionPanel>
   );
