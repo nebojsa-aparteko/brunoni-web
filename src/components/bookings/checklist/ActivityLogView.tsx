@@ -53,7 +53,7 @@ const ActivityLogView: React.FC<Props> = ({
         history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
       }
     }, 1000);
-  }, [window.location.search]);
+  }, []);
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
