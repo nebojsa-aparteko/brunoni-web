@@ -37,12 +37,10 @@ const ActivityLogView: React.FC<Props> = ({
   useLayoutEffect(() => {
     setTimeout(() => {
       const id = window.location.hash.split('#').pop();
-      console.log(id);
       if (!window.location.hash || window.location.hash === '' || !id) return;
       const element = window.document.getElementById(id);
       if (!element) return;
       element.scrollIntoView();
-      console.log('Scrolled');
     }, 1000);
   }, [window.location.hash]);
   return (

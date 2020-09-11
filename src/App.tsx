@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import { Route, Switch } from 'react-router';
 import { makeStyles, Theme } from '@material-ui/core';
 
@@ -34,6 +34,9 @@ import BookingListFilterProvider from './providers/BookingListFilterProvider';
 import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
 import MyDayPage from './pages/MyDayPage';
+import * as QueryString from 'querystring';
+import firebase from 'firebase';
+import { useHistory } from 'react-router-dom';
 
 const anonymousRoutes = (
   <Switch>
@@ -125,7 +128,24 @@ const useStyles = makeStyles((theme: Theme) => ({
 const App: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
+  const history = useHistory();
 
+  // If we come from email notification, we want to read that notification and delete it from url
+  useEffect(() => {
+    const params = QueryString.parse(window.location.search.replace('?', ''));
+    if (params.readNotification) {
+      const notificationId = params.readNotification as string;
+      //read that notification
+      firebase
+        .firestore()
+        .collection('notifications')
+        .doc(notificationId)
+        .set({ seen: true }, { merge: true })
+        .then(() => {
+          history.replace(window.location.pathname);
+        });
+    }
+  }, []);
   return (
     <Fragment>
       <QuoteFilterListProvider>
