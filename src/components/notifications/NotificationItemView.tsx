@@ -168,7 +168,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
                       history.push(
                         `/${
                           notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject
-                        }/${notification.referenceID}#${notification.activity?.id}`,
+                        }/${notification.referenceID}?focusComment=${notification.activity?.id}`,
                       );
                   });
               }}
