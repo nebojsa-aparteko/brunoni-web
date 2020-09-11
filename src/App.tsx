@@ -142,7 +142,8 @@ const App: React.FC = () => {
         .doc(notificationId)
         .set({ seen: true }, { merge: true })
         .then(() => {
-          history.replace(window.location.pathname);
+          delete params.readNotification;
+          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
         });
     }
   }, []);

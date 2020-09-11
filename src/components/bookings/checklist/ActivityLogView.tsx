@@ -7,6 +7,9 @@ import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
 import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
+import { useHistory } from 'react-router-dom';
+import QueryString from 'querystring';
+import firebase from 'firebase';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -34,15 +37,23 @@ const ActivityLogView: React.FC<Props> = ({
   quote,
 }) => {
   const classes = useStyles();
+  const history = useHistory();
+
   useLayoutEffect(() => {
     setTimeout(() => {
-      const id = window.location.hash.split('#').pop();
-      if (!window.location.hash || window.location.hash === '' || !id) return;
-      const element = window.document.getElementById(id);
-      if (!element) return;
-      element.scrollIntoView();
+      const params = QueryString.parse(window.location.search.replace('?', ''));
+      if (params.focusComment) {
+        const activityId = params.focusComment as string;
+        //read that notification
+        if (!window.location.search || window.location.search === '' || !activityId) return;
+        const element = window.document.getElementById(activityId);
+        if (!element) return;
+        element.scrollIntoView();
+        delete params.focusComment;
+        history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+      }
     }, 1000);
-  }, [window.location.hash]);
+  }, [window.location.search]);
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
