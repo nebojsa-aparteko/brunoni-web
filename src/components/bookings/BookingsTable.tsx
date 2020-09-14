@@ -30,7 +30,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
 import { DateFormats, formatDateSafe, formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import { useClientById, useClientByIdFromCache } from '../../hooks/useClient';
+import { useClientById } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
 
 const useStyles = makeStyles(() =>
@@ -351,7 +351,10 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                           {booking.PlaceOfRecieptName}
                           <br />
                           <Typography variant={'body2'}>
-                            ETS. {formatDateSafe(booking.ETS, DateFormats.LONG)}
+                            ETS.{' '}
+                            {booking.PlaceOfReceiptETS
+                              ? formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG)
+                              : formatDateSafe(booking.ETS, DateFormats.LONG)}
                           </Typography>
                         </Fragment>
                       }
