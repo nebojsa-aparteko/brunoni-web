@@ -8,6 +8,7 @@ export interface ChecklistItemValueDocument {
   id: string;
   mentionCount?: number;
   isInternal?: boolean;
+  final?: boolean;
 }
 
 export enum ChecklistItemValueDocumentStatusType {

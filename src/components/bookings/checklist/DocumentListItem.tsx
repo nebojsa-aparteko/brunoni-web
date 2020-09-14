@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useState } from 'react';
 import {
   Avatar,
-  Badge,
   Box,
   CircularProgress,
   createStyles,
@@ -43,6 +42,7 @@ import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelp
 import theme from '../../../theme';
 import RejectionDialog from '../RejectionDialog';
 import { Booking } from '../../../model/Booking';
+import FlagIcon from '@material-ui/icons/Flag';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -68,6 +68,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     reject: {
       backgroundColor: 'rgba(255,68,68, 0.7)',
+    },
+    final: {
+      '&:hover': {
+        color: '#F7BC06',
+      },
     },
   }),
 );
@@ -99,6 +104,7 @@ const DocumentListItem = ({
   changeStatus,
   storageBasePath,
   internal,
+  markAsFinal,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
@@ -290,10 +296,16 @@ const DocumentListItem = ({
                 </IconButton>
               )}
             {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+            {checklistItem.id === 'B_L' && (
+              <IconButton size="small" aria-label="Mark as final" onClick={() => markAsFinal(item)} disabled={!isAdmin}>
+                <FlagIcon className={classes.final} style={{ color: item.final ? '#F7BC06' : 'inherit' }} />
+              </IconButton>
+            )}
           </div>
         </ListItemSecondaryAction>
       </ListItem>
-      {((internal && isAdmin) || (!internal && !isAdmin)) &&
+      {(isAdmin ? true : !item.final) &&
+        ((internal && isAdmin) || (!internal && !isAdmin)) &&
         (item.status?.at ? editRestriction(item.status.at) : true) &&
         (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
         !checklistCheckedRule() &&
@@ -384,6 +396,7 @@ export interface DocumentListItemPropsBase {
   storageBasePath: string;
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
+  markAsFinal: (item: ChecklistItemValueDocument) => void;
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {

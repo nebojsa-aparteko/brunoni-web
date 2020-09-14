@@ -399,7 +399,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
     },
     [storageBasePath],
   );
-
+  const handleMarkAsFinal = (item: ChecklistItemValueDocument, internal: boolean) => {
+    saveChecklistChanges(
+      internal ? 'valuesAdmin' : 'values',
+      (internal ? checklistItem.valuesAdmin : checklistItem.values)?.map(value =>
+        value.url === item.url ? { ...value, final: !item.final } : value,
+      ),
+    ).then(() => console.log('done'));
+  };
   const handleDocumentStatusChange = (
     item: ChecklistItemValueDocument,
     status: ChecklistItemValueDocumentStatus,
@@ -593,6 +600,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
             handleDocumentStatusChange(item, status, false)
           }
           internal={false}
+          markAsFinal={item => handleMarkAsFinal(item, false)}
         />
       </Box>
       <Box>
@@ -625,6 +633,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
                 handleDocumentStatusChange(item, status, true)
               }
               internal={true}
+              markAsFinal={item => handleMarkAsFinal(item, true)}
             />
           </Box>
         )}

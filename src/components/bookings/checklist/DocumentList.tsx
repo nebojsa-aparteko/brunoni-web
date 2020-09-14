@@ -13,14 +13,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DocumentList = ({
+const DocumentList: React.FC<Props> = ({
   checklistItem,
   checklistItemValues,
   booking,
   storageBasePath,
   changeStatus,
   internal,
-}: Props) => {
+  markAsFinal,
+}) => {
   const classes = useStyles();
   const [shouldShowPrevious, setShouldShowPrevious] = useState<boolean>(false);
   const sortedList = useMemo(() => orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[], [
@@ -29,7 +30,7 @@ const DocumentList = ({
   return (
     <List className={classes.documentList}>
       {internal || shouldShowPrevious ? (
-        sortedList.map((item, index) => (
+        sortedList.map(item => (
           <DocumentListItem
             key={item.storedName}
             item={item}
@@ -38,6 +39,7 @@ const DocumentList = ({
             checklistItem={checklistItem}
             changeStatus={changeStatus}
             internal={internal}
+            markAsFinal={markAsFinal}
           />
         ))
       ) : sortedList[0] ? (
@@ -50,6 +52,7 @@ const DocumentList = ({
             checklistItem={checklistItem}
             changeStatus={changeStatus}
             internal={internal}
+            markAsFinal={markAsFinal}
           />
         </Fragment>
       ) : null}

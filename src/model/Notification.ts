@@ -29,8 +29,14 @@ export default interface Notification {
 
 export enum InfoType {
   PIN_NUMBER_RECEIVED = 'PIN_NUMBER_RECEIVED',
+  SHIPPED_ON_BOARD = 'SHIPPED_ON_BOARD',
+  FINAL_BL = 'FINAL_BL',
+  BL_DRAFT_FOR_INSPECTION = 'BL_DRAFT_FOR_INSPECTION',
 }
 
 export enum InfoTypeDescription {
   PIN_NUMBER_RECEIVED = 'Please note the PIN number and relevant empty return information are available now.',
+  SHIPPED_ON_BOARD = ' Your shipment has been successfully loaded on board.',
+  FINAL_BL = 'Please find enclosed the final B/L copy or copies if multiple involved.',
+  BL_DRAFT_FOR_INSPECTION = 'Please find enclosed BL draft for inspection. Kindly check and approve it on the checklist.',
 }
