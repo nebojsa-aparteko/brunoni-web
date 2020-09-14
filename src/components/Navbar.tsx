@@ -386,6 +386,7 @@ const Navbar: React.FC = () => {
                 />
               </Link>
               <Box displayPrint="none">
+                <NotificationsButton />
                 <IconButton aria-label="open drawer" edge="end" onClick={handleDrawerToggle}>
                   <MenuIcon />
                 </IconButton>

@@ -8,7 +8,7 @@ import firebase from 'firebase';
 const useStyles = makeStyles(theme =>
   createStyles({
     root: {
-      width: 500,
+      width: 400,
     },
     title: {
       margin: theme.spacing(1),
