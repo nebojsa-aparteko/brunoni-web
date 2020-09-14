@@ -131,7 +131,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'bookings-search',
                 'bookingId',
-                inputValue.toLowerCase(),
+                inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
@@ -145,7 +145,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'bookings-search',
                 'BL-No',
-                inputValue.toLowerCase(),
+                inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
@@ -159,7 +159,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'bookings-search',
                 'Cust-BkgRef',
-                inputValue.toLowerCase(),
+                inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
@@ -173,7 +173,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'containers',
                 'container',
-                inputValue.toUpperCase(),
+                inputValue.toUpperCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
@@ -187,7 +187,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'bookings-search',
                 'deliveryRef',
-                inputValue.toLowerCase(),
+                inputValue.toLowerCase().trim(),
                 'array-contains',
                 !actingAs,
                 userRecord?.alphacomClientId,
@@ -201,7 +201,7 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               nestedSearchBookings(
                 'bookings-search',
                 'pickupRef',
-                inputValue.toLowerCase(),
+                inputValue.toLowerCase().trim(),
                 'array-contains',
                 !actingAs,
                 userRecord?.alphacomClientId,
