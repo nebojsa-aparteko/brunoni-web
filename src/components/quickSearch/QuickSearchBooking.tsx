@@ -17,7 +17,7 @@ import Mousetrap from 'mousetrap';
 import { useSnackbar } from 'notistack';
 import ActingAs from '../../contexts/ActingAs';
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(() =>
   createStyles({
     formControl: {
       display: 'flex',
@@ -33,20 +33,20 @@ const useStyles = makeStyles(theme =>
 const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBookings }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
-  const [searchResult, setSearchResult] = useState<Booking | undefined>(undefined);
+  const [searchResult, setSearchResult] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const actingAs = useContext(ActingAs)[0];
 
-  const handleBookingClick = () => {
-    window.open(`/bookings/${searchResult?.id}`);
+  const handleBookingClick = (index: number) => {
+    window.open(`/bookings/${searchResult[index].id}`);
   };
   const handleBookingSearch = () => {
     setIsLoading(true);
     searchBookings(inputValue)
       .then(result => {
         console.log('Got Results ', result);
-        setSearchResult(normalizeBooking(result));
+        setSearchResult([...searchResult].concat(normalizeBooking(result)));
         setIsLoading(false);
       })
       .catch(error => {
@@ -90,11 +90,13 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
         </IconButton>
       </FormControl>
       {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-      {!isLoading && searchResult && (
-        <Box onClick={handleBookingClick}>
-          <BookingRow booking={searchResult} isAdmin={!actingAs} preventDefaultClick />
-        </Box>
-      )}
+      {!isLoading &&
+        searchResult &&
+        searchResult.map((result, index) => (
+          <Box key={index} onClick={() => handleBookingClick(index)}>
+            <BookingRow booking={searchResult[index]} isAdmin={!actingAs} preventDefaultClick />
+          </Box>
+        ))}
     </Fragment>
   );
 };
@@ -104,5 +106,5 @@ export default QuickSearchBooking;
 interface Props {
   label: string;
   handleClose: () => void;
-  searchBookings: (inputValue: string) => Promise<Booking | undefined>;
+  searchBookings: (inputValue: string) => Promise<Booking[] | undefined>;
 }

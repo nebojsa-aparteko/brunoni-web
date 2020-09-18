@@ -16,6 +16,7 @@ import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
 import ActingAs from '../../contexts/ActingAs';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import { normalizeBooking } from '../../providers/BookingsProvider';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -51,23 +52,6 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const searchBookings = async (collection: string, fieldPath: string, inputValue: string) =>
-  firebase
-    .firestore()
-    .collection(collection)
-    .where(fieldPath, '==', inputValue)
-    .get()
-    .then(result => {
-      if (result.docs.length > 0) {
-        return new Promise<Booking>(resolve => resolve(result.docs[0].data() as Booking));
-      } else {
-        return new Promise<Booking>((resolve, reject) => reject('No booking found'));
-      }
-    })
-    .catch(error => {
-      return new Promise<Booking>((resolve, reject) => reject(error));
-    });
-
 const nestedSearchBookings = async (
   collection: string,
   fieldPath: string,
@@ -76,7 +60,7 @@ const nestedSearchBookings = async (
   isAdmin: boolean,
   clientId?: string,
 ) => {
-  if (isAdmin && !clientId) return new Promise<Booking>((resolve, reject) => reject('No booking found'));
+  if (isAdmin && !clientId) return new Promise<Booking[]>((resolve, reject) => reject('No booking found'));
   const searchRef = isAdmin
     ? firebase.firestore().collection(collection)
     : firebase
@@ -88,22 +72,27 @@ const nestedSearchBookings = async (
     .get()
     .then(result => {
       if (result.docs.length > 0) {
-        const bookingId = result.docs[0].data().bookingId;
-        return firebase
-          .firestore()
-          .collection('bookings')
-          .doc(bookingId)
-          .get()
-          .then(booking => {
-            return new Promise<Booking>(resolve => resolve(booking.data() as Booking));
-          })
-          .catch(error => {
-            return new Promise<Booking>((resolve, reject) => reject(error));
-          });
-      } else return new Promise<Booking>((resolve, reject) => reject('No booking found'));
+        const bookingIds = result.docs.map(_ => _.data().bookingId);
+        return (
+          firebase
+            .firestore()
+            .collection('bookings')
+            // .doc(bookingId)
+            .where('id', 'in', bookingIds)
+            .get()
+            .then(bookings => {
+              return new Promise<Booking[]>(resolve =>
+                resolve(bookings.docs.map(_ => normalizeBooking(_.data() as Booking))),
+              );
+            })
+            .catch(error => {
+              return new Promise<Booking[]>((resolve, reject) => reject(error));
+            })
+        );
+      } else return new Promise<Booking[]>((resolve, reject) => reject('No booking found'));
     })
     .catch(error => {
-      return new Promise<Booking>((resolve, reject) => reject(error));
+      return new Promise<Booking[]>((resolve, reject) => reject(error));
     });
 };
 const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
