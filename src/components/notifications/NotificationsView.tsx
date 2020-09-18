@@ -72,7 +72,7 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
     })();
   }, [notifications]);
   return (
-    <Grid sm={12} xs={12}>
+    <Grid xs={12}>
       <Box flexDirection="column" justifyContent="center">
         <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
           <Typography variant="subtitle1" className={classes.title} align="center">
