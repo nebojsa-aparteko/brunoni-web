@@ -1,5 +1,15 @@
 import React, { useCallback } from 'react';
-import { Box, Button, createStyles, Divider, IconButton, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  createStyles,
+  Divider,
+  Grid,
+  IconButton,
+  ListItem,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
@@ -7,9 +17,6 @@ import firebase from 'firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
-    root: {
-      width: 400,
-    },
     title: {
       margin: theme.spacing(1),
       color: 'white',
@@ -65,23 +72,27 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
     })();
   }, [notifications]);
   return (
-    <Box display="flex" flexDirection="column" justifyContent="center" className={classes.root}>
-      <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
-        <Typography variant="subtitle1" className={classes.title} align="center">
-          Notifications
-        </Typography>
-        <IconButton aria-label="close-button-notification-center" onClick={handleShow} className={classes.icon}>
-          <CloseIcon />
-        </IconButton>
+    <Grid sm={12} xs={12}>
+      <Box flexDirection="column" justifyContent="center">
+        <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
+          <Typography variant="subtitle1" className={classes.title} align="center">
+            Notifications
+          </Typography>
+          <IconButton aria-label="close-button-notification-center" onClick={handleShow} className={classes.icon}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        <Box display="flex" justifyContent="flex-end">
+          <Button onClick={markAllAsRead}>Mark all as read</Button>
+        </Box>
+        {notifications?.map(notification => (
+          <ListItem key={notification.id}>
+            <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
+          </ListItem>
+        ))}
       </Box>
-      <Divider />
-      <Box display="flex" justifyContent="flex-end">
-        <Button onClick={markAllAsRead}>Mark all as read</Button>
-      </Box>
-      {notifications?.map(notification => (
-        <NotificationItemView notification={notification} key={notification.id} handleShowDrawer={handleShow} />
-      ))}
-    </Box>
+    </Grid>
   );
 };
 
