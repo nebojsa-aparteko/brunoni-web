@@ -362,9 +362,7 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                <div className={classes.item}>
-                  <NotificationsButton />
-                </div>
+                <div className={classes.item}>{user !== undefined && user !== null && <NotificationsButton />}</div>
                 <div className={classes.item}>
                   <IdentityWidget />
                 </div>
@@ -386,7 +384,7 @@ const Navbar: React.FC = () => {
                 />
               </Link>
               <Box displayPrint="none">
-                <NotificationsButton />
+                {user !== undefined && user !== null && <NotificationsButton />}
                 <IconButton aria-label="open drawer" edge="end" onClick={handleDrawerToggle}>
                   <MenuIcon />
                 </IconButton>
