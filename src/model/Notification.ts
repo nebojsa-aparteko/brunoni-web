@@ -37,6 +37,6 @@ export enum InfoType {
 export enum InfoTypeDescription {
   PIN_NUMBER_RECEIVED = 'Please note the PIN number and relevant empty return information are available now.',
   SHIPPED_ON_BOARD = ' Your shipment has been successfully loaded on board.',
-  FINAL_BL = 'Please find enclosed the final B/L copy or copies if multiple involved.',
+  FINAL_BL = 'Please find enclosed the final B/L copy for above mentioned shipment.',
   BL_DRAFT_FOR_INSPECTION = 'Please find enclosed BL draft for inspection. Kindly check and approve it on the checklist.',
 }
