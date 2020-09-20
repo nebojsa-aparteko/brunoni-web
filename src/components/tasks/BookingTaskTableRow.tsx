@@ -1,8 +1,12 @@
 import React from 'react';
 import Task, { TaskDescription, UserRole } from '../../model/Task';
-import { Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/core';
+import { Checkbox, IconButton, Link, TableCell, TableRow, Typography } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import TaskStatusChip from '../TaskStatusChip';
+import InfoIcon from '@material-ui/icons/Info';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import firebase from '../../firebase';
 
 const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
   return (
@@ -37,6 +41,49 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
       <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
       <TableCell align="center">
         <TaskStatusChip task={task} />
+      </TableCell>
+
+      <TableCell align="center">
+        {task.additionalInfo && (
+          <IconButton aria-label="additional-info" size="small">
+            <InfoIcon />
+          </IconButton>
+        )}
+        {task.manualResolve ? (
+          task.resolved ? (
+            <IconButton
+              aria-label="mark-as-resolved"
+              size="small"
+              onClick={() =>
+                firebase
+                  .firestore()
+                  .collection('bookings')
+                  .doc(task.bookingId)
+                  .collection('tasks')
+                  .doc(task.id)
+                  .set({ resolved: false }, { merge: true })
+              }
+            >
+              <CheckCircleIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              aria-label="mark-as-unresolved"
+              size="small"
+              onClick={() =>
+                firebase
+                  .firestore()
+                  .collection('bookings')
+                  .doc(task.bookingId)
+                  .collection('tasks')
+                  .doc(task.id)
+                  .set({ resolved: true }, { merge: true })
+              }
+            >
+              <CheckCircleOutlineIcon />
+            </IconButton>
+          )
+        ) : null}
       </TableCell>
     </TableRow>
   );
