@@ -28,6 +28,7 @@ const useStyles = makeStyles(theme =>
   createStyles({
     root: {
       margin: theme.spacing(2),
+      width: '100%',
     },
     header: {
       marginRight: theme.spacing(1),
