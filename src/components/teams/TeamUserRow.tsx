@@ -47,7 +47,6 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
       </TableCell>
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
-      <TableCell align="right">{teams && teams.map(team => team.name).join(',')}</TableCell>
       <TableCell align="right">
         {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}
       </TableCell>

@@ -1,12 +1,13 @@
 import React from 'react';
-import Task, { TaskDescription, UserRole } from '../../model/Task';
-import { Checkbox, IconButton, Link, TableCell, TableRow, Typography } from '@material-ui/core';
+import Task, { TaskAdditionalInfoTypeDescription, TaskDescription, UserRole } from '../../model/Task';
+import { Checkbox, IconButton, Link, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import TaskStatusChip from '../TaskStatusChip';
 import InfoIcon from '@material-ui/icons/Info';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import firebase from '../../firebase';
+import safeInvoke from '../../utilities/safeInvoke';
 
 const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
   return (
@@ -45,9 +46,16 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
 
       <TableCell align="center">
         {task.additionalInfo && (
-          <IconButton aria-label="additional-info" size="small">
-            <InfoIcon />
-          </IconButton>
+          <Tooltip
+            title={`${Object.entries(TaskAdditionalInfoTypeDescription).find(
+              t => t[0] === task.additionalInfo?.type,
+            )?.[1] || '-'} ${formatDate(safeInvoke('toDate')(task.additionalInfo.amsClosingDate), 'd. MMMM yyyy')}`}
+            aria-label="additionalInfo"
+          >
+            <IconButton aria-label="additional-info" size="small">
+              <InfoIcon style={{ color: '#F7BC06' }} />
+            </IconButton>
+          </Tooltip>
         )}
         {task.manualResolve ? (
           task.resolved ? (

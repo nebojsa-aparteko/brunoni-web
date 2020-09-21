@@ -33,7 +33,6 @@ const TeamsUsersContainer: React.FC = () => {
                 <TableCell>Name</TableCell>
                 <TableCell align="right">email</TableCell>
                 <TableCell align="right">Role</TableCell>
-                <TableCell align="right">Assigned Teams</TableCell>
                 <TableCell align="right">Last Login</TableCell>
               </TableRow>
             </TableHead>
