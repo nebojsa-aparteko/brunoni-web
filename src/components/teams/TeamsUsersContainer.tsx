@@ -39,8 +39,8 @@ const TeamsUsersContainer: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {adminUsers?.map(user => (
-                <TeamUserRow user={user} key={`adminuser-${user.alphacomId}`} />
+              {adminUsers?.map((user, index) => (
+                <TeamUserRow user={user} key={`adminuser-${user.alphacomId}-${index}`} />
               ))}
             </TableBody>
           </Table>
