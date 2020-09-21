@@ -115,7 +115,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <Typography>Find booking by:</Typography>
           <QuickSearchBooking
             label="File number"
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'bookings-search',
@@ -129,7 +128,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           />
           <QuickSearchBooking
             label="BL number"
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'bookings-search',
@@ -143,7 +141,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           />
           <QuickSearchBooking
             label={`${!actingAs ? "Customer's" : 'Your'} reference`}
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'bookings-search',
@@ -157,7 +154,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           />
           <QuickSearchBooking
             label="Container number"
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'containers',
@@ -171,7 +167,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           />
           <QuickSearchBooking
             label="Delivery reference"
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'bookings-search',
@@ -185,7 +180,6 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           />
           <QuickSearchBooking
             label="Pickup reference"
-            handleClose={handleClose}
             searchBookings={inputValue =>
               nestedSearchBookings(
                 'bookings-search',

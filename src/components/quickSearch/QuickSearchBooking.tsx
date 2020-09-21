@@ -1,11 +1,15 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
+  CardActions,
+  CardContent,
   CircularProgress,
   createStyles,
+  Divider,
   FormControl,
   IconButton,
   makeStyles,
+  TablePagination,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -16,8 +20,13 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import Mousetrap from 'mousetrap';
 import { useSnackbar } from 'notistack';
 import ActingAs from '../../contexts/ActingAs';
+import chunk from 'lodash/fp/chunk';
+import { useBookingListPaginationContext } from '../../providers/BookingListPaginationProvider';
+import get from 'lodash/fp/get';
+import set from 'lodash/fp/set';
+import flow from 'lodash/fp/flow';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles(theme =>
   createStyles({
     formControl: {
       display: 'flex',
@@ -27,16 +36,44 @@ const useStyles = makeStyles(() =>
     searchInput: {
       flex: 1,
     },
+    content: {
+      padding: 0,
+      overflowX: 'auto',
+    },
+    actions: {
+      padding: theme.spacing(1),
+      justifyContent: 'flex-end',
+    },
   }),
 );
 
-const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBookings }) => {
+const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const actingAs = useContext(ActingAs)[0];
+  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const { page, rowsPerPage } = bookingPaginationContextData;
+
+  const handleChangePage = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
+    },
+    [setBookingPaginationContextData, rowsPerPage],
+  );
+
+  const handleChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(
+          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
+        );
+    },
+    [setBookingPaginationContextData],
+  );
 
   const handleBookingClick = (index: number) => {
     window.open(`/bookings/${searchResult[index].id}`);
@@ -57,6 +94,9 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
         });
       });
   };
+  const resultChunks = useMemo(() => {
+    return chunk(rowsPerPage)(searchResult);
+  }, [searchResult, rowsPerPage]);
 
   const inputRef = useRef();
 
@@ -90,13 +130,33 @@ const QuickSearchBooking: React.FC<Props> = ({ label, handleClose, searchBooking
         </IconButton>
       </FormControl>
       {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-      {!isLoading &&
-        searchResult &&
-        searchResult.map((result, index) => (
-          <Box key={index} onClick={() => handleBookingClick(index)}>
-            <BookingRow booking={searchResult[index]} isAdmin={!actingAs} preventDefaultClick />
-          </Box>
-        ))}
+      {!isLoading && searchResult && (
+        <Box>
+          <CardContent className={classes.content}>
+            {resultChunks &&
+              (get(page)(resultChunks) || []).map((result, index) => (
+                <Box key={index} onClick={() => handleBookingClick(index)}>
+                  <BookingRow booking={searchResult[index]} isAdmin={!actingAs} preventDefaultClick />
+                  <Divider />
+                </Box>
+              ))}
+          </CardContent>
+
+          <CardActions className={classes.actions}>
+            {searchResult && searchResult.length > 0 && (
+              <TablePagination
+                component="div"
+                count={searchResult ? searchResult.length : 0}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[3, 5, 10, 25]}
+              />
+            )}
+          </CardActions>
+        </Box>
+      )}
     </Fragment>
   );
 };
@@ -105,6 +165,5 @@ export default QuickSearchBooking;
 
 interface Props {
   label: string;
-  handleClose: () => void;
   searchBookings: (inputValue: string) => Promise<Booking[] | undefined>;
 }
