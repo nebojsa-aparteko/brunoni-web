@@ -17,6 +17,17 @@ import firebase from 'firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
+    root: {
+      [theme.breakpoints.up('sm')]: {
+        maxWidth: theme.spacing(50),
+      },
+      [theme.breakpoints.up('md')]: {
+        maxWidth: theme.spacing(65),
+      },
+      [theme.breakpoints.up('lg')]: {
+        maxWidth: theme.spacing(70),
+      },
+    },
     title: {
       margin: theme.spacing(1),
       color: 'white',
@@ -72,7 +83,7 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
     })();
   }, [notifications]);
   return (
-    <Grid xs={12}>
+    <Grid xs={12} className={classes.root}>
       <Box flexDirection="column" justifyContent="center">
         <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
           <Typography variant="subtitle1" className={classes.title} align="center">
