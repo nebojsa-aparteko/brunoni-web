@@ -105,12 +105,21 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       .set({ seen: true } as Notification, { merge: true })
       .then(() => {
         handleShowDrawer();
-        notification.referenceObject &&
-          history.push(
-            `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
-              notification.referenceID
-            }`,
-          );
+        if (notification.type === NotificationType.COMMENT) {
+          notification.referenceObject &&
+            history.push(
+              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+                notification.referenceID
+              }?focusComment=${notification.activity?.id}`,
+            );
+        } else {
+          notification.referenceObject &&
+            history.push(
+              `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+                notification.referenceID
+              }`,
+            );
+        }
       });
   }, [notification, handleShowDrawer]);
   const handleSeenStatusChange = async () => {
