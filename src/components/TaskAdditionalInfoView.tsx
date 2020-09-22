@@ -8,7 +8,7 @@ import InfoIcon from '@material-ui/icons/Info';
 const TaskAdditionalInfoView: React.FC<Props> = ({ additionalInfo }) => (
   <Tooltip
     title={`${Object.entries(TaskAdditionalInfoTypeDescription).find(t => t[0] === additionalInfo?.type)?.[1] ||
-      '-'} ${formatDate(safeInvoke('toDate')(additionalInfo.amsClosingDate), 'd. MMMM yyyy')}`}
+      '-'} ${formatDate(safeInvoke('toDate')(additionalInfo.amsClosingDate), 'd. MMMM yyyy HH:mm')}`}
     aria-label="additionalInfo"
   >
     <IconButton aria-label="additional-info" size="small">

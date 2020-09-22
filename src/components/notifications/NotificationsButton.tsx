@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
-import { Badge, Drawer, IconButtonProps } from '@material-ui/core';
+import { Badge, createStyles, Drawer, IconButtonProps, makeStyles } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import useNotifications from '../../hooks/useNotifications';
@@ -17,19 +17,6 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
       0,
     [notifications],
   );
-
-  // useEffect(() => {
-  //   let didCancel = false;
-  //   if (!didCancel && notifications && notifications.length > 0 && setNotificationCount) {
-  //     setNotificationCount(
-  //       notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
-  //         0,
-  //     );
-  //   }
-  //   return () => {
-  //     didCancel = true;
-  //   };
-  // }, [notifications, setNotificationCount]);
 
   return (
     <Fragment>
