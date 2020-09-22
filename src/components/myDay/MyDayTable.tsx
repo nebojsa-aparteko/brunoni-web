@@ -5,7 +5,14 @@ import MyDayTableRow from './MyDayTableRow';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 
-const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTasks, selectedTasks, onSelectRow }) => {
+const MyDayTable: React.FC<Props> = ({
+  tasks,
+  normalizedTasks,
+  shouldShowTeamTasks,
+  selectedTasks,
+  onSelectRow,
+  updateComponent,
+}) => {
   return (
     <Fragment>
       {tasks.length === 0 && normalizedTasks?.reduce((prev, current) => prev + current[1].length, 0) === 0 ? (
@@ -22,6 +29,7 @@ const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTas
                 <TableCell align="center">Due Date</TableCell>
                 <TableCell align="center">Task status</TableCell>
                 <TableCell align="center" />
+                <TableCell align="center" />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -31,6 +39,7 @@ const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTas
                   key={`${task.bookingId}/${task.id}`}
                   selected={selectedTasks.includes(`${task.bookingId}/${task.id}`)}
                   onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}`)}
+                  updateComponent={updateComponent}
                 />
               ))}
               {normalizedTasks ? (
@@ -49,6 +58,7 @@ const MyDayTable: React.FC<Props> = ({ tasks, normalizedTasks, shouldShowTeamTas
                           key={`${task.bookingId}/${task.id}-${normalizedTask[0]}`}
                           selected={selectedTasks.includes(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
                           onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
+                          updateComponent={updateComponent}
                         />
                       ))}
                     </Fragment>
@@ -73,4 +83,5 @@ interface Props {
   shouldShowTeamTasks: boolean;
   onSelectRow: (id: string) => void;
   selectedTasks: string[];
+  updateComponent: () => void;
 }

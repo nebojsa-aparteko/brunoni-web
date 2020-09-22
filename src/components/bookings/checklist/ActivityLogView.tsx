@@ -9,7 +9,6 @@ import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router-dom';
 import QueryString from 'querystring';
-import firebase from 'firebase';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -54,6 +53,7 @@ const ActivityLogView: React.FC<Props> = ({
       }
     }, 1000);
   }, []);
+
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader

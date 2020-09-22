@@ -297,7 +297,12 @@ const DocumentListItem = ({
               )}
             {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
             {checklistItem.id === 'B_L' && (
-              <IconButton size="small" aria-label="Mark as final" onClick={() => markAsFinal(item)} disabled={!isAdmin}>
+              <IconButton
+                size="small"
+                aria-label="Mark as final"
+                onClick={() => markAsFinal(item)}
+                disabled={!isAdmin || checklistCheckedRule()}
+              >
                 <FlagIcon className={classes.final} style={{ color: item.final ? '#F7BC06' : 'inherit' }} />
               </IconButton>
             )}

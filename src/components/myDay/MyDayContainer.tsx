@@ -181,6 +181,7 @@ const MyDayContainer = () => {
             shouldShowTeamTasks={!!(assignee && assignee.alphacomId)}
             selectedTasks={selectedTasks}
             onSelectRow={onSelectRow}
+            updateComponent={() => setAssignedUserTrigger(prevState => !prevState)}
           />
         ) : (
           <ChartsCircularProgress />

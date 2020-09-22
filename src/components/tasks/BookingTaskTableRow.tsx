@@ -1,13 +1,11 @@
 import React from 'react';
-import Task, { TaskAdditionalInfoTypeDescription, TaskDescription, UserRole } from '../../model/Task';
-import { Checkbox, IconButton, Link, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
+import Task from '../../model/Task';
+import { TaskDescription, UserRole } from '../../model/Task';
+import { Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import TaskStatusChip from '../TaskStatusChip';
-import InfoIcon from '@material-ui/icons/Info';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import firebase from '../../firebase';
-import safeInvoke from '../../utilities/safeInvoke';
+import TaskManualResolveButton from '../TaskManualResolveButton';
+import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 
 const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
   return (
@@ -45,53 +43,8 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
       </TableCell>
 
       <TableCell align="center">
-        {task.additionalInfo && (
-          <Tooltip
-            title={`${Object.entries(TaskAdditionalInfoTypeDescription).find(
-              t => t[0] === task.additionalInfo?.type,
-            )?.[1] || '-'} ${formatDate(safeInvoke('toDate')(task.additionalInfo.amsClosingDate), 'd. MMMM yyyy')}`}
-            aria-label="additionalInfo"
-          >
-            <IconButton aria-label="additional-info" size="small">
-              <InfoIcon style={{ color: '#F7BC06' }} />
-            </IconButton>
-          </Tooltip>
-        )}
-        {task.manualResolve ? (
-          task.resolved ? (
-            <IconButton
-              aria-label="mark-as-resolved"
-              size="small"
-              onClick={() =>
-                firebase
-                  .firestore()
-                  .collection('bookings')
-                  .doc(task.bookingId)
-                  .collection('tasks')
-                  .doc(task.id)
-                  .set({ resolved: false }, { merge: true })
-              }
-            >
-              <CheckCircleIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              aria-label="mark-as-unresolved"
-              size="small"
-              onClick={() =>
-                firebase
-                  .firestore()
-                  .collection('bookings')
-                  .doc(task.bookingId)
-                  .collection('tasks')
-                  .doc(task.id)
-                  .set({ resolved: true }, { merge: true })
-              }
-            >
-              <CheckCircleOutlineIcon />
-            </IconButton>
-          )
-        ) : null}
+        {task.additionalInfo && <TaskAdditionalInfoView additionalInfo={task.additionalInfo} />}
+        {task.manualResolve && <TaskManualResolveButton task={task} />}
       </TableCell>
     </TableRow>
   );
