@@ -33,6 +33,10 @@ export interface TaskAdditionalInfo {
 export enum TaskAdditionalInfoType {
   AMS_CLOSING = 'AMS_CLOSING',
 }
+
+export enum TaskAdditionalInfoTypeDescription {
+  AMS_CLOSING = 'AMS Closing:',
+}
 export enum TaskType {
   // EXPORT TASKS
   DEPOT_OUT_MOVE = 'DEPOT_OUT_MOVE',

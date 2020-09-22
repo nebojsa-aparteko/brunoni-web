@@ -9,8 +9,10 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import TaskStatusChip from '../TaskStatusChip';
+import TaskManualResolveButton from '../TaskManualResolveButton';
+import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 
-const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow }) => {
+const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateComponent }) => {
   const [open, setOpen] = React.useState(false);
   const actingAs = useContext(ActingAs)[0];
   const snapshot = useFirestoreDocument('bookings', task.bookingId);
@@ -63,6 +65,10 @@ const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow }) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        <TableCell align="center">
+          {task.additionalInfo && <TaskAdditionalInfoView additionalInfo={task.additionalInfo} />}
+          {task.manualResolve && <TaskManualResolveButton task={task} updateComponent={updateComponent} />}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -83,4 +89,5 @@ interface Props {
   task: Task;
   selected: boolean;
   onSelectRow: () => void;
+  updateComponent: () => void;
 }

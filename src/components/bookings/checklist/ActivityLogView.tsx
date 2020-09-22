@@ -65,6 +65,7 @@ const ActivityLogView: React.FC<Props> = ({
       }
     }, 1000);
   }, []);
+
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader

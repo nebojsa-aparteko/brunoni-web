@@ -19,6 +19,7 @@ export default interface UserRecord extends UserRecordMin {
   lastSession?: Date;
   teams?: Team[];
   archived?: boolean;
+  redirectedAdmin?: UserRecordMin;
 }
 
 export type Role = 'superadmin' | 'sales' | 'operations';
