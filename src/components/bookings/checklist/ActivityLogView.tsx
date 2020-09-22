@@ -9,7 +9,6 @@ import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router-dom';
 import QueryString from 'querystring';
-import firebase from 'firebase';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -49,6 +48,18 @@ const ActivityLogView: React.FC<Props> = ({
         const element = window.document.getElementById(activityId);
         if (!element) return;
         element.scrollIntoView();
+        element.animate(
+          [
+            { backgroundColor: '#ffffff' },
+            { backgroundColor: 'rgba(255,198,30,0.77)' },
+            { backgroundColor: '#ffffff' },
+          ],
+          {
+            duration: 1500,
+            fill: 'backwards',
+            iterations: 6,
+          },
+        );
         delete params.focusComment;
         history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
       }
