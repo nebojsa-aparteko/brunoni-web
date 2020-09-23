@@ -97,6 +97,18 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
 const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
   const history = useHistory();
+  const onReadForAll = useCallback(() => {
+    firebase
+      .firestore()
+      .collection('notifications')
+      .where('readId', '==', notification.readId)
+      .get()
+      .then(notifications => {
+        console.log(notifications.docs.map(not => not.data().userEmail));
+        return Promise.all(notifications.docs.map(notificationRef => notificationRef.ref.update('seen', true)));
+      })
+      .then(() => console.log('Read for all'));
+  }, [notification]);
   const handleClick = useCallback(() => {
     firebase
       .firestore()
@@ -154,7 +166,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         className={classes.header}
         action={
           <Fragment>
-            {/*<Button>Mark read for all</Button>*/}
+            <Button onClick={onReadForAll}>Read for all</Button>
             <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
               {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
             </IconButton>

@@ -25,6 +25,7 @@ export default interface Notification {
   createdTaskType?: TaskType;
   readForAllBy: UserRecordMin;
   infoType?: InfoType;
+  readId?: string;
 }
 
 export enum InfoType {
