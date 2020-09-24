@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
@@ -6,7 +6,7 @@ import get from 'lodash/fp/get';
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
-import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
+import { Booking, BookingCategory, BookingVersion, FreightDetailGroup, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
@@ -21,7 +21,7 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
-import UserRecord, { isDashboardUser, isSuperAdmin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
 import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -337,7 +337,13 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
                 {booking.FreightDetails && (
                   <Box marginTop="0em" marginBottom="0em">
-                    <BookingFreight freightDetails={booking.FreightDetails} />
+                    <BookingFreight
+                      freightDetails={
+                        booking.FreightDetails.some(f => f.Group)
+                          ? booking.FreightDetails.filter(f => f.Group === FreightDetailGroup.EXTERNAL)
+                          : booking.FreightDetails
+                      }
+                    />
                   </Box>
                 )}
                 <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>

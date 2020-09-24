@@ -123,7 +123,6 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
   const classes = useStyles();
   const client = useClientById(booking.ForwAdrId);
   const forwarder = useUserByAlphacomId(booking.ForwPersID);
-
   const clientInfo = useMemo(() => {
     if (!client) {
       return `${booking.ForwAdrName || ''} ${booking.ForwAdrCity} (${booking.ForwAdrId})`;

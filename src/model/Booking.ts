@@ -250,6 +250,13 @@ export interface FreightDetail {
   Total: string;
   Currency: string;
   Unit: string;
+  Group: FreightDetailGroup;
+}
+
+export enum FreightDetailGroup {
+  EXTERNAL = 'external',
+  INTERNAL1 = 'internal1',
+  INTERNAL2 = 'internal2',
 }
 
 export enum ShipperOwnedContainer {
