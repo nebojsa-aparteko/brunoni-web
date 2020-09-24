@@ -112,16 +112,17 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
     setAnchorEl(null);
   };
   const onReadForAll = useCallback(() => {
+    if (!notification.readId) return;
     firebase
       .firestore()
       .collection('notifications')
       .where('readId', '==', notification.readId)
       .get()
       .then(notifications => {
-        console.log(notifications.docs.map(not => not.data().userEmail));
         return Promise.all(notifications.docs.map(notificationRef => notificationRef.ref.update('seen', true)));
       })
-      .then(() => handleClose());
+      .then(() => handleClose())
+      .catch(() => handleClose());
   }, [notification, handleClose]);
   const handleClick = useCallback(() => {
     firebase
