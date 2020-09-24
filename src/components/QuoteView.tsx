@@ -379,7 +379,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
       {
         <Grid item md={4} xs={12} style={{ marginTop: theme.spacing(2) }}>
           {isAdmin && (
-            <Box display="flex" justifyContent="center" flexDirection="column">
+            <Box display="flex" justifyContent="center" flexDirection="column" displayPrint="none">
               <UserAssignment
                 onChange={(user: UserRecord | null) => setAssignedUser(user, quote!.id)}
                 value={quote?.assignedTo}
@@ -409,10 +409,12 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               </FormControl>
             </Box>
           )}
-          <ActivityLogProvider>
-            {!actingAs && <InternalStorage id={quote!.id} collection={'quotes'} />}
-            <QuoteActivityLogContainer quoteId={quote.id} quote={quote} />
-          </ActivityLogProvider>
+          <Box displayPrint="none">
+            <ActivityLogProvider>
+              {!actingAs && <InternalStorage id={quote!.id} collection={'quotes'} />}
+              <QuoteActivityLogContainer quoteId={quote.id} quote={quote} />
+            </ActivityLogProvider>
+          </Box>
         </Grid>
       }
     </Grid>

@@ -218,7 +218,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {tasks && (
         <Grid item xs={12} md={11}>
-          <BookingTaskExpansionPanel tasks={tasks} />
+          <Box displayPrint="none">
+            <BookingTaskExpansionPanel tasks={tasks} />
+          </Box>
         </Grid>
       )}
       <Grid item md={7} xs={12}>
@@ -368,7 +370,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
-        <CheckList booking={booking} />
+        <Box displayPrint="none">
+          <CheckList booking={booking} />
+        </Box>
       </Grid>
     </Grid>
   );
