@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback } from 'react';
+import React, { Fragment, useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
@@ -10,6 +10,8 @@ import {
   createStyles,
   IconButton,
   makeStyles,
+  Menu,
+  MenuItem,
   Typography,
 } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
@@ -23,6 +25,8 @@ import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import TaskNotification from './TaskNotification';
 import DateFormattedText from '../DateFormattedText';
 import InfoNotification from './InfoNotification';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -97,6 +101,16 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
 const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
   const history = useHistory();
+  const [actingAs] = useContext(ActingAs);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const onReadForAll = useCallback(() => {
     firebase
       .firestore()
@@ -107,8 +121,8 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         console.log(notifications.docs.map(not => not.data().userEmail));
         return Promise.all(notifications.docs.map(notificationRef => notificationRef.ref.update('seen', true)));
       })
-      .then(() => console.log('Read for all'));
-  }, [notification]);
+      .then(() => handleClose());
+  }, [notification, handleClose]);
   const handleClick = useCallback(() => {
     firebase
       .firestore()
@@ -166,10 +180,21 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         className={classes.header}
         action={
           <Fragment>
-            <Button onClick={onReadForAll}>Read for all</Button>
+            {/*<Button onClick={onReadForAll}>Read for all</Button>*/}
+
             <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
               {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
             </IconButton>
+            {!actingAs && (
+              <IconButton aria-label="close-button-notification-center" onClick={handleClickMenu}>
+                <MoreVertIcon />
+              </IconButton>
+            )}
+            {!actingAs && (
+              <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+                <MenuItem onClick={onReadForAll}>Read for all</MenuItem>
+              </Menu>
+            )}
           </Fragment>
         }
       />
