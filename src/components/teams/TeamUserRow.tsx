@@ -1,6 +1,6 @@
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import invoke from 'lodash/fp/invoke';
 import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
@@ -16,6 +16,10 @@ interface Props {
 
 const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const assignableUsersWithoutCurrent = useMemo(
+    () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
+    [assignableUsers, user],
+  );
   const onChange = useCallback(
     (selectedUser: UserRecordMin | null) => {
       firebase
@@ -51,7 +55,7 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
       <TableCell align="right">
         <UserInput
           label="Redirect To"
-          users={assignableUsers || []}
+          users={assignableUsersWithoutCurrent || []}
           onChange={(_, user) => onChange(user)}
           value={user.redirectedAdmin}
         />
