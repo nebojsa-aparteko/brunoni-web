@@ -2,17 +2,7 @@ import React, { useContext, useEffect, useState, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import addDays from 'date-fns/addDays';
 import subDays from 'date-fns/subDays';
-import {
-  makeStyles,
-  Box,
-  Typography,
-  Theme,
-  Button,
-  Card,
-  CardActionArea,
-  CardMedia,
-  CardContent,
-} from '@material-ui/core';
+import { makeStyles, Box, Typography, Theme, Button, Card, CardMedia, CardContent } from '@material-ui/core';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Carrier from '../model/Carrier';
 import ContainerType from '../model/ContainerType';
@@ -123,9 +113,6 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
       <div onClick={handleClick} style={{ cursor: 'pointer' }}>
         <CardMedia className={classes.media} image={imageURL} title="Contemplative Reptile" />
         <CardContent className={classes.content}>
-          <Typography variant="h5" className={classes.title}>
-            <strong>{carrier.name}</strong>
-          </Typography>
           <Box display="flex" alignContent="center" className={classes.subtitle}>
             <Typography>{origin.city}</Typography>
             <ArrowForwardIcon fontSize="small" className={classes.routeIcon} />
