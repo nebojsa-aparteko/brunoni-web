@@ -380,13 +380,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
                 {booking.FreightDetails && (
                   <Box marginTop="0em" marginBottom="0em" displayPrint="none">
-                    <BookingFreight
-                      freightDetails={
-                        booking.FreightDetails.some(f => f.Group)
-                          ? booking.FreightDetails.filter(f => f.Group === FreightDetailGroup.EXTERNAL)
-                          : booking.FreightDetails
-                      }
-                    />
+                    <BookingFreight freightDetails={booking.FreightDetails} />
                   </Box>
                 )}
                 <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
