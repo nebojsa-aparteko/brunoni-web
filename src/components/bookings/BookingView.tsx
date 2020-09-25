@@ -1,5 +1,17 @@
 import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Menu,
+  MenuItem,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -27,6 +39,8 @@ import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
 import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
+import brunoniLogo from '../../assets/logo.brunoni.png';
+import allmarineLogo from '../../assets/logo.allmarine.png';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -136,7 +150,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
-
+  const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
@@ -213,7 +227,15 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     },
     [booking.id, booking.watchers, userRecord, userRecord.alphacomId],
   );
-
+  // const [anchorEl, setAnchorEl] = React.useState(null);
+  //
+  // const handleClickMenu = (event: any) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
+  //
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {tasks && (
@@ -235,11 +257,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
-                {/* <img
-                  src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
-                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                <img
+                  src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
                   style={{ width: '5em' }}
-                /> */}
+                />
               </Box>
               <Divider />
             </Box>
@@ -301,7 +322,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   </IconButton>
                 ) : (
                   <WatcherIconButton
-                    isWatching={booking.watchers.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}
+                    isWatching={booking.watchers?.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}
                     handleWatch={onWatch}
                   />
                 )}
@@ -309,6 +330,26 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 <IconButton aria-label="print" size="small" onClick={handlePrint}>
                   <PrintIcon />
                 </IconButton>
+                {/*<Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>*/}
+                {/*  <MenuItem*/}
+                {/*    onClick={() => {*/}
+                {/*      setPrintWithCost(false);*/}
+                {/*      handlePrint();*/}
+                {/*      handleClose();*/}
+                {/*    }}*/}
+                {/*  >*/}
+                {/*    Print without costs*/}
+                {/*  </MenuItem>*/}
+                {/*  <MenuItem*/}
+                {/*    onClick={() => {*/}
+                {/*      setPrintWithCost(true);*/}
+                {/*      handlePrint();*/}
+                {/*      handleClose();*/}
+                {/*    }}*/}
+                {/*  >*/}
+                {/*    Print with cost*/}
+                {/*  </MenuItem>*/}
+                {/*</Menu>*/}
               </Box>
             </Box>
 
@@ -338,7 +379,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 ) : null}
 
                 {booking.FreightDetails && (
-                  <Box marginTop="0em" marginBottom="0em">
+                  <Box marginTop="0em" marginBottom="0em" displayPrint="none">
                     <BookingFreight
                       freightDetails={
                         booking.FreightDetails.some(f => f.Group)
