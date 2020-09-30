@@ -83,7 +83,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
     searchBookings(inputValue)
       .then(result => {
         console.log('Got Results ', result);
-        setSearchResult([...searchResult].concat(normalizeBooking(result)));
+        setSearchResult([].concat(normalizeBooking(result)));
         setIsLoading(false);
       })
       .catch(error => {
