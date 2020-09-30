@@ -169,10 +169,10 @@ const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: B
   if (['IMO', 'OOG'].includes(checklistItem.id)) {
     const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
     if (deliveryRef) {
-      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
+      return `filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
     }
   }
-  return `attachment; filename=${file.name}`;
+  return `filename=${file.name}`;
 };
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
