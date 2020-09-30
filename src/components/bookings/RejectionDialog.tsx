@@ -146,24 +146,18 @@ const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checkl
             <Grid item xs={12}>
               <Grid container direction="row" spacing={1}>
                 <Grid item xs={12} md={6}>
-                  <object
-                    data="http://www.africau.edu/images/default/sample.pdf"
-                    type="application/pdf"
-                    width="100%"
-                    height="420"
-                  >
-                    <embed src="http://www.africau.edu/images/default/sample.pdf" type="application/pdf" />
-                  </object>
+                  <embed
+                    src={'https://www.ets.org/Media/Tests/GRE/pdf/gre_research_validity_data.pdf'}
+                    width={'100%'}
+                    height={420}
+                  />
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <object
-                    data="http://www.africau.edu/images/default/sample.pdf"
-                    type="application/pdf"
-                    width="100%"
-                    height="420"
-                  >
-                    <embed src="http://www.africau.edu/images/default/sample.pdf" type="application/pdf" />
-                  </object>
+                  <embed
+                    src={'https://www.ets.org/Media/Tests/GRE/pdf/gre_research_validity_data.pdf'}
+                    width={'100%'}
+                    height={420}
+                  />
                 </Grid>
               </Grid>
             </Grid>
