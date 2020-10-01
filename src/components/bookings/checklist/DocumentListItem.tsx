@@ -334,7 +334,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+            {isAdmin && item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
               <Box display="flex" ml={2} mb={2}>
                 <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -373,7 +373,7 @@ const DocumentListItem = ({
                     handleDialogOpen();
                   }}
                 >
-                  Request amendment
+                  {isAdmin ? 'Request amendment' : 'Compare and approve or request amendment'}
                 </Link>
               </Box>
             )}

@@ -36,6 +36,13 @@ import invoke from 'lodash/fp/invoke';
 
 const useStyles = makeStyles(theme =>
   createStyles({
+    dialogPaper: {
+      minHeight: '100vh',
+      maxHeight: '100vh',
+    },
+    dialogTitleBar: {
+      height: '48px',
+    },
     closeModal: {
       position: 'absolute',
       top: '5px',
@@ -45,7 +52,6 @@ const useStyles = makeStyles(theme =>
     },
     dialogContent: {
       paddingBottom: theme.spacing(3),
-      maxHeight: 600,
     },
   }),
 );
@@ -132,8 +138,8 @@ const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checkl
     },
     [booking.id, userRecord, checklistItem, document],
   );
-  return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="lg" fullWidth>
+  return !actingAs ? (
+    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md" fullWidth>
       <Box>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{`Please enter needed correction on ${checklistItem.label} document`}</Typography>
@@ -142,64 +148,95 @@ const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checkl
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
-          <Grid container direction="column" spacing={1}>
-            <Grid item xs={12}>
-              <Grid container direction="row" spacing={1}>
-                <Grid item xs={12} md={6}>
-                  <object data={document.url} type="application/pdf" width="100%" height="420">
-                    <embed src={document.url} type="application/pdf" />
-                  </object>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <object data={document.url} type="application/pdf" width="100%" height="420">
-                    <embed src={document.url} type="application/pdf" />
-                  </object>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12} md={12}>
-              {amendmentRequested ? (
-                <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
-              ) : (
-                filteredActivities?.map((activity: ActivityLogItem) => (
-                  <Box id={activity.id} key={`act-${activity.id}`}>
-                    <ActivityLogItemView activityItem={normalizeActivity(activity)} />
-                  </Box>
-                ))
-              )}
-            </Grid>
-          </Grid>
+          <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
         </DialogContent>
         <DialogActions>
-          {amendmentRequested ? (
-            <React.Fragment>
-              <Button onClick={() => setAmendmentRequested(false)} color="primary" variant="outlined" autoFocus>
-                Cancel amendment
-              </Button>
-              <Button
-                onClick={onReject}
-                variant="contained"
-                color="primary"
-                disabled={!rejectionInput || rejectionInput?.messagePlain.length < 1}
-              >
-                Send request
-              </Button>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <Button onClick={handleClose} color="primary" variant="outlined" autoFocus>
-                Cancel
-              </Button>
-              <Button onClick={() => setAmendmentRequested(true)} variant="contained" color="primary">
-                Request amendment
-              </Button>
-              <Button onClick={handleApproveDocument} color="primary" variant="contained" autoFocus>
-                Approve
-              </Button>
-            </React.Fragment>
-          )}
+          <Button onClick={handleClose} color="primary" variant="outlined" autoFocus>
+            Cancel
+          </Button>
+          <Button
+            onClick={onReject}
+            variant="contained"
+            color="primary"
+            disabled={!rejectionInput || rejectionInput?.messagePlain.length < 1}
+          >
+            Request amendment
+          </Button>
         </DialogActions>
       </Box>
+    </Dialog>
+  ) : (
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="xl"
+      fullWidth
+      className={classes.dialogPaper}
+    >
+      <DialogTitle disableTypography id="dialog-title-check-list" className={classes.dialogTitleBar}>
+        <IconButton onClick={handleClose} className={classes.closeModal}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent className={classes.dialogContent}>
+        <Grid container direction="column" spacing={1}>
+          <Grid item xs={12}>
+            <Grid container direction="row" spacing={1}>
+              <Grid item xs={12} md={6}>
+                <object data={document.url} type="application/pdf" width="100%" height="420">
+                  <embed src={document.url} type="application/pdf" />
+                </object>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <object data={document.url} type="application/pdf" width="100%" height="420">
+                  <embed src={document.url} type="application/pdf" />
+                </object>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            {amendmentRequested ? (
+              <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+            ) : (
+              filteredActivities?.map((activity: ActivityLogItem) => (
+                <Box id={activity.id} key={`act-${activity.id}`}>
+                  <ActivityLogItemView activityItem={normalizeActivity(activity)} />
+                </Box>
+              ))
+            )}
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        {amendmentRequested ? (
+          <React.Fragment>
+            <Button onClick={() => setAmendmentRequested(false)} color="primary" variant="outlined" autoFocus>
+              Cancel amendment
+            </Button>
+            <Button
+              onClick={onReject}
+              variant="contained"
+              color="primary"
+              disabled={!rejectionInput || rejectionInput?.messagePlain.length < 1}
+            >
+              Send request
+            </Button>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Button onClick={handleClose} color="primary" variant="outlined" autoFocus>
+              Cancel
+            </Button>
+            <Button onClick={() => setAmendmentRequested(true)} variant="contained" color="primary">
+              Request amendment
+            </Button>
+            <Button onClick={handleApproveDocument} color="primary" variant="contained" autoFocus>
+              Approve
+            </Button>
+          </React.Fragment>
+        )}
+      </DialogActions>
     </Dialog>
   );
 };
