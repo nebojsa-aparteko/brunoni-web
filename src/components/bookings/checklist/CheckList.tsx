@@ -32,8 +32,11 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
 
   const checklistItems = useChecklist(booking.id);
+
   const checklistDocuments: ChecklistItemValueDocument[] = actingAs
-    ? checklistItems?.flatMap(item => item.values as ChecklistItemValueDocument[]) || []
+    ? checklistItems
+        ?.filter(checklistItem => checklistItem.id === 'SHIPPING_INSTRUCTIONS' || checklistItem.id === 'B_L')
+        .flatMap(item => item.values as ChecklistItemValueDocument[]) || []
     : [];
 
   if (!checklistItems) {

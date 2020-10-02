@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -101,6 +101,10 @@ const MenuProps = {
   },
 };
 
+const sortByDate = (a: ChecklistItemValueDocument, b: ChecklistItemValueDocument) => {
+  return b.uploadedAt.getTime() - a.uploadedAt.getTime();
+};
+
 const RejectionDialog: React.FC<Props> = ({
   isOpen,
   booking,
@@ -116,11 +120,23 @@ const RejectionDialog: React.FC<Props> = ({
   const [rejectionInput, setRejectionInput] = useState<RejectionInput | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
   const userRecord = useContext(UserRecordContext);
+  const [sortedDocuments, setSortedDocuments] = useState<ChecklistItemValueDocument[]>(
+    allDocuments && allDocuments.length > 0 ? allDocuments.sort(sortByDate) : [],
+  );
+
+  useEffect(() => {
+    setSortedDocuments(allDocuments && allDocuments.length > 0 ? allDocuments?.sort(sortByDate) : []);
+  }, [allDocuments]);
+
   const [leftDocument, serLeftDocument] = useState<ChecklistItemValueDocument | undefined>(
-    allDocuments && allDocuments.length > 0 ? allDocuments[0] : undefined,
+    sortedDocuments && sortedDocuments.length > 0 ? sortedDocuments[0] : undefined,
   );
   const [rightDocument, serRightDocument] = useState<ChecklistItemValueDocument | undefined>(
-    allDocuments && allDocuments.length > 0 ? (allDocuments.length > 1 ? allDocuments[1] : allDocuments[0]) : undefined,
+    sortedDocuments && sortedDocuments.length > 0
+      ? sortedDocuments.length > 1
+        ? sortedDocuments[1]
+        : sortedDocuments[0]
+      : undefined,
   );
 
   const userActivityLogData = {
@@ -293,16 +309,40 @@ const RejectionDialog: React.FC<Props> = ({
         <Grid container direction="row" spacing={1} style={{ flex: 1, width: '100%' }}>
           {leftDocument ? (
             <Grid item xs={12} md={6}>
-              <object data={leftDocument.url} type="application/pdf" width="100%" height="100%">
-                <embed src={leftDocument.url} type="application/pdf" />
-              </object>
+              {leftDocument?.name
+                .split('.')
+                .pop()
+                ?.toLowerCase() === 'pdf' ? (
+                <object data={leftDocument.url} type="application/pdf" width="100%" height="100%">
+                  <embed src={leftDocument.url} type="application/pdf" />
+                </object>
+              ) : (
+                <Box style={{ height: '100%' }}>
+                  <Typography style={{ marginTop: '45%' }}>
+                    The comparing option is currently only available for PDF files. The same functionality for other
+                    document types will be available soon.
+                  </Typography>
+                </Box>
+              )}
             </Grid>
           ) : null}
           {rightDocument ? (
             <Grid item xs={12} md={6}>
-              <object data={rightDocument.url} type="application/pdf" width="100%" height="100%">
-                <embed src={rightDocument.url} type="application/pdf" />
-              </object>
+              {rightDocument?.name
+                .split('.')
+                .pop()
+                ?.toLowerCase() === 'pdf' ? (
+                <object data={rightDocument.url} type="application/pdf" width="100%" height="100%">
+                  <embed src={rightDocument.url} type="application/pdf" />
+                </object>
+              ) : (
+                <Box style={{ height: '100%' }}>
+                  <Typography style={{ marginTop: '45%' }}>
+                    The comparing option is currently only available for PDF files. The same functionality for other
+                    document types will be available soon.
+                  </Typography>
+                </Box>
+              )}
             </Grid>
           ) : null}
         </Grid>
