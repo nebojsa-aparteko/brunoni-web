@@ -51,7 +51,7 @@ const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
 
-const showCrispChat = (show: Boolean) => {
+export const showCrispChat = (show: Boolean) => {
   try {
     $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
   } catch (e) {

@@ -43,6 +43,7 @@ import theme from '../../../theme';
 import RejectionDialog from '../RejectionDialog';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
+import { showCrispChat } from '../../../index';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,12 +117,15 @@ const DocumentListItem = ({
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isComparisonDialog, setIsComparisonDialog] = useState<boolean>(false);
 
   const handleDialogClose = useCallback(() => {
+    showCrispChat(true);
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
 
   const handleDialogOpen = useCallback(() => {
+    showCrispChat(false);
     setIsDialogOpen(true);
   }, [setIsDialogOpen]);
   const { enqueueSnackbar } = useSnackbar();
@@ -339,8 +343,8 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {isAdmin && item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
-              <Box display="flex" ml={2} mb={2}>
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
                   component="button"
@@ -359,26 +363,32 @@ const DocumentListItem = ({
               </Box>
             )}
             {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-              <Box display="flex" ml={2} mb={2}>
-                {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5' }} /> : null}
+              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
                   component="button"
                   variant="body2"
                   onClick={() => {
-                    // changeStatus(item, {
-                    //   type: ChecklistItemValueDocumentStatusType.REJECTED,
-                    //   by: getActivityLogUserData(),
-                    //   at: new Date(),
-                    // });
-                    // activityLogContext.setState({
-                    //   rejected: true,
-                    //   documentReference: item,
-                    //   checklistReference: checklistItem,
-                    // });
+                    setIsComparisonDialog(false);
                     handleDialogOpen();
                   }}
                 >
-                  {isAdmin ? 'Request amendment' : 'Compare and approve or request amendment'}
+                  Request amendment
+                </Link>
+              </Box>
+            )}
+            {!isAdmin && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5', margin: 'auto' }} /> : null}
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    setIsComparisonDialog(true);
+                    handleDialogOpen();
+                  }}
+                >
+                  Compare Shipping Instruction with B/L Draft
                 </Link>
               </Box>
             )}
@@ -393,6 +403,7 @@ const DocumentListItem = ({
           document={item}
           changeStatus={changeStatus}
           allDocuments={allDocuments}
+          isComparisonDialog={isComparisonDialog}
         />
       )}
     </div>

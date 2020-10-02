@@ -43,12 +43,15 @@ import ActivityLogItemView from './checklist/ActivityLogItemView';
 import CommentInput from '../CommentInput';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
+import { formatDateSafe } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles(theme =>
   createStyles({
     dialogPaper: {
-      minHeight: '90vh',
-      maxHeight: '90vh',
+      minHeight: '100vh',
+      maxHeight: '100vh',
+      minWidth: '100vw',
+      maxWidth: '100vw',
     },
     dialogTitleBar: {
       height: '48px',
@@ -81,7 +84,7 @@ const useStyles = makeStyles(theme =>
     formControl: {
       marginTop: -4,
       marginRight: theme.spacing(4),
-      minWidth: 200,
+      minWidth: 400,
       height: 40,
     },
   }),
@@ -106,6 +109,7 @@ const RejectionDialog: React.FC<Props> = ({
   document,
   changeStatus,
   allDocuments,
+  isComparisonDialog,
 }) => {
   const classes = useStyles();
   const [amendmentRequested, setAmendmentRequested] = useState<boolean>(false);
@@ -203,7 +207,8 @@ const RejectionDialog: React.FC<Props> = ({
     serRightDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
   };
 
-  return !actingAs ? (
+  //TODO separate this into two components, one for each dialog
+  return !isComparisonDialog ? (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md" fullWidth>
       <Box>
         <DialogTitle disableTypography id="dialog-title-check-list">
@@ -248,7 +253,10 @@ const RejectionDialog: React.FC<Props> = ({
                 .filter(document => document.url !== rightDocument?.url)
                 .map(document => (
                   <MenuItem key={document.url} value={document.url}>
-                    {document.name || document.storedName || ''}
+                    {(document.name || document.storedName) +
+                      ' (' +
+                      formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
+                      ')'}
                   </MenuItem>
                 ))}
             </Select>
@@ -262,7 +270,10 @@ const RejectionDialog: React.FC<Props> = ({
                 .filter(document => document.url !== leftDocument?.url)
                 .map(document => (
                   <MenuItem key={document.url} value={document.url}>
-                    {document.name || document.storedName || ''}
+                    {(document.name || document.storedName) +
+                      ' (' +
+                      formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
+                      ')'}
                   </MenuItem>
                 ))}
             </Select>
@@ -361,6 +372,7 @@ interface Props {
   checklistItem: ChecklistItem;
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   allDocuments?: ChecklistItemValueDocument[];
+  isComparisonDialog: boolean;
 }
 
 export interface RejectionInput {
