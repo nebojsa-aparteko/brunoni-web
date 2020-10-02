@@ -175,7 +175,7 @@ const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: B
   return `filename=${file.name}`;
 };
 
-const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowProp) => {
+const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -601,6 +601,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
           }
           internal={false}
           markAsFinal={item => handleMarkAsFinal(item, false)}
+          allDocuments={allDocuments}
         />
       </Box>
       <Box>
@@ -634,6 +635,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin }: ChecklistItemRowP
               }
               internal={true}
               markAsFinal={item => handleMarkAsFinal(item, true)}
+              allDocuments={allDocuments}
             />
           </Box>
         )}
@@ -667,6 +669,7 @@ interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking;
+  allDocuments: ChecklistItemValueDocument[];
 }
 
 interface ConfirmedByCustomer {

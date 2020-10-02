@@ -7,11 +7,21 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  List,
+  ListItem,
   makeStyles,
+  MenuItem,
+  Select,
   Typography,
 } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CloseIcon from '@material-ui/icons/Close';
 import { Booking } from '../../model/Booking';
 import { MentionItem } from 'react-mentions';
@@ -37,8 +47,8 @@ import invoke from 'lodash/fp/invoke';
 const useStyles = makeStyles(theme =>
   createStyles({
     dialogPaper: {
-      minHeight: '100vh',
-      maxHeight: '100vh',
+      minHeight: '90vh',
+      maxHeight: '90vh',
     },
     dialogTitleBar: {
       height: '48px',
@@ -51,17 +61,63 @@ const useStyles = makeStyles(theme =>
       height: '47px',
     },
     dialogContent: {
-      paddingBottom: theme.spacing(3),
+      flex: 1,
+      alignContent: 'stretch',
+    },
+    dialogActions: {
+      height: '48px',
+    },
+    expansionPanelHeading: {
+      fontSize: theme.typography.pxToRem(15),
+      fontWeight: theme.typography.fontWeightRegular,
+    },
+    expansionPanelContent: {
+      flexDirection: 'column',
+    },
+    activityList: {
+      maxHeight: '15vh',
+      overflow: 'auto',
+    },
+    formControl: {
+      marginTop: -4,
+      marginRight: theme.spacing(4),
+      minWidth: 200,
+      height: 40,
     },
   }),
 );
 
-const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checklistItem, document, changeStatus }) => {
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const RejectionDialog: React.FC<Props> = ({
+  isOpen,
+  booking,
+  handleClose,
+  checklistItem,
+  document,
+  changeStatus,
+  allDocuments,
+}) => {
   const classes = useStyles();
   const [amendmentRequested, setAmendmentRequested] = useState<boolean>(false);
   const [rejectionInput, setRejectionInput] = useState<RejectionInput | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
   const userRecord = useContext(UserRecordContext);
+  const [leftDocument, serLeftDocument] = useState<ChecklistItemValueDocument | undefined>(
+    allDocuments && allDocuments.length > 0 ? allDocuments[0] : undefined,
+  );
+  const [rightDocument, serRightDocument] = useState<ChecklistItemValueDocument | undefined>(
+    allDocuments && allDocuments.length > 0 ? (allDocuments.length > 1 ? allDocuments[1] : allDocuments[0]) : undefined,
+  );
 
   const userActivityLogData = {
     firstName: userRecord?.firstName,
@@ -138,6 +194,15 @@ const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checkl
     },
     [booking.id, userRecord, checklistItem, document],
   );
+
+  const handleChangeLeftDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
+    serLeftDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument);
+  };
+
+  const handleChangeRightDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
+    serRightDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
+  };
+
   return !actingAs ? (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md" fullWidth>
       <Box>
@@ -172,43 +237,88 @@ const RejectionDialog: React.FC<Props> = ({ isOpen, booking, handleClose, checkl
       aria-labelledby="dialog-title-check-list"
       maxWidth="xl"
       fullWidth
-      className={classes.dialogPaper}
+      classes={{ paper: classes.dialogPaper }}
     >
       <DialogTitle disableTypography id="dialog-title-check-list" className={classes.dialogTitleBar}>
+        {leftDocument && allDocuments ? (
+          <FormControl className={classes.formControl}>
+            <InputLabel>Left Document</InputLabel>
+            <Select value={leftDocument?.url} onChange={handleChangeLeftDocument} MenuProps={MenuProps}>
+              {allDocuments
+                .filter(document => document.url !== rightDocument?.url)
+                .map(document => (
+                  <MenuItem key={document.url} value={document.url}>
+                    {document.name || document.storedName || ''}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        ) : null}
+        {rightDocument && allDocuments ? (
+          <FormControl className={classes.formControl}>
+            <InputLabel>Right Document</InputLabel>
+            <Select value={rightDocument?.url} onChange={handleChangeRightDocument} MenuProps={MenuProps}>
+              {allDocuments
+                .filter(document => document.url !== leftDocument?.url)
+                .map(document => (
+                  <MenuItem key={document.url} value={document.url}>
+                    {document.name || document.storedName || ''}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        ) : null}
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent className={classes.dialogContent}>
-        <Grid container direction="column" spacing={1}>
-          <Grid item xs={12}>
-            <Grid container direction="row" spacing={1}>
-              <Grid item xs={12} md={6}>
-                <object data={document.url} type="application/pdf" width="100%" height="420">
-                  <embed src={document.url} type="application/pdf" />
-                </object>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <object data={document.url} type="application/pdf" width="100%" height="420">
-                  <embed src={document.url} type="application/pdf" />
-                </object>
-              </Grid>
+      <Grid
+        container
+        direction="column"
+        spacing={1}
+        className={classes.dialogContent}
+        style={{ padding: 16, paddingLeft: 22 }}
+      >
+        <Grid container direction="row" spacing={1} style={{ flex: 1, width: '100%' }}>
+          {leftDocument ? (
+            <Grid item xs={12} md={6}>
+              <object data={leftDocument.url} type="application/pdf" width="100%" height="100%">
+                <embed src={leftDocument.url} type="application/pdf" />
+              </object>
             </Grid>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            {amendmentRequested ? (
-              <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
-            ) : (
-              filteredActivities?.map((activity: ActivityLogItem) => (
-                <Box id={activity.id} key={`act-${activity.id}`}>
-                  <ActivityLogItemView activityItem={normalizeActivity(activity)} />
-                </Box>
-              ))
-            )}
-          </Grid>
+          ) : null}
+          {rightDocument ? (
+            <Grid item xs={12} md={6}>
+              <object data={rightDocument.url} type="application/pdf" width="100%" height="100%">
+                <embed src={rightDocument.url} type="application/pdf" />
+              </object>
+            </Grid>
+          ) : null}
         </Grid>
-      </DialogContent>
-      <DialogActions>
+        <Grid item xs={12} md={12}>
+          {amendmentRequested ? (
+            <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+          ) : filteredActivities && filteredActivities.length > 0 ? (
+            <ExpansionPanel>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography className={classes.expansionPanelHeading}>
+                  {'Amendment comments (' + filteredActivities.length + ')'}
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails className={classes.expansionPanelContent}>
+                <List className={classes.activityList}>
+                  {filteredActivities?.map((activity: ActivityLogItem) => (
+                    <ListItem key={`act-${activity.id}`} id={activity.id}>
+                      <ActivityLogItemView activityItem={normalizeActivity(activity)} />
+                    </ListItem>
+                  ))}
+                </List>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          ) : null}
+        </Grid>
+      </Grid>
+      <DialogActions className={classes.dialogActions}>
         {amendmentRequested ? (
           <React.Fragment>
             <Button onClick={() => setAmendmentRequested(false)} color="primary" variant="outlined" autoFocus>
@@ -250,6 +360,7 @@ interface Props {
   document: ChecklistItemValueDocument;
   checklistItem: ChecklistItem;
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
+  allDocuments?: ChecklistItemValueDocument[];
 }
 
 export interface RejectionInput {

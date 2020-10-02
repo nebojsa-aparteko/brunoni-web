@@ -77,6 +77,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const { NODE_ENV } = process.env;
+
 const findClassName = (item: ChecklistItemValueDocumentStatus | undefined, classes: any) => {
   if (!item) {
     return '';
@@ -105,6 +107,7 @@ const DocumentListItem = ({
   storageBasePath,
   internal,
   markAsFinal,
+  allDocuments,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
@@ -312,7 +315,9 @@ const DocumentListItem = ({
       {(isAdmin ? true : !item.final) &&
         ((internal && isAdmin) || (!internal && !isAdmin)) &&
         (item.status?.at ? editRestriction(item.status.at) : true) &&
-        (!internal && !isAdmin ? userRecord?.emailAddress !== item.uploadedBy.emailAddress : true) &&
+        (!internal && !isAdmin && NODE_ENV === 'production'
+          ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
+          : true) &&
         !checklistCheckedRule() &&
         checkIfShouldShowStatusAction(checklistItem.id) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
@@ -355,7 +360,7 @@ const DocumentListItem = ({
             )}
             {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
               <Box display="flex" ml={2} mb={2}>
-                <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
+                {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5' }} /> : null}
                 <Link
                   component="button"
                   variant="body2"
@@ -387,6 +392,7 @@ const DocumentListItem = ({
           checklistItem={checklistItem}
           document={item}
           changeStatus={changeStatus}
+          allDocuments={allDocuments}
         />
       )}
     </div>
@@ -402,6 +408,7 @@ export interface DocumentListItemPropsBase {
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;
+  allDocuments: ChecklistItemValueDocument[];
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {

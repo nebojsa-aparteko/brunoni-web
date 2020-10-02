@@ -19,6 +19,7 @@ import ActingAs from '../../../contexts/ActingAs';
 import { ActivityLogProvider } from './ActivityLogContext';
 import useChecklist from '../../../hooks/useChecklist';
 import InternalStorage from '../InternalStorage';
+import { ChecklistItemValueDocument } from './ChecklistItemModel';
 
 interface CheckListProps {
   booking: Booking;
@@ -31,6 +32,9 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
 
   const checklistItems = useChecklist(booking.id);
+  const checklistDocuments: ChecklistItemValueDocument[] = actingAs
+    ? checklistItems?.flatMap(item => item.values as ChecklistItemValueDocument[]) || []
+    : [];
 
   if (!checklistItems) {
     return (
@@ -62,6 +66,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
                   checklistItem={item}
                   isAdmin={!actingAs}
                   booking={booking}
+                  allDocuments={checklistDocuments}
                 />
               ))}
             </Box>

@@ -21,6 +21,7 @@ const DocumentList: React.FC<Props> = ({
   changeStatus,
   internal,
   markAsFinal,
+  allDocuments,
 }) => {
   const classes = useStyles();
   const [shouldShowPrevious, setShouldShowPrevious] = useState<boolean>(false);
@@ -40,6 +41,7 @@ const DocumentList: React.FC<Props> = ({
             changeStatus={changeStatus}
             internal={internal}
             markAsFinal={markAsFinal}
+            allDocuments={allDocuments}
           />
         ))
       ) : sortedList[0] ? (
@@ -53,6 +55,7 @@ const DocumentList: React.FC<Props> = ({
             changeStatus={changeStatus}
             internal={internal}
             markAsFinal={markAsFinal}
+            allDocuments={allDocuments}
           />
         </Fragment>
       ) : null}
