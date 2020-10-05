@@ -9,7 +9,7 @@ export interface ChecklistItemValueDocument {
   mentionCount?: number;
   isInternal?: boolean;
   final?: boolean;
-  isSelected?: boolean;
+  isSelectedForComparison?: boolean;
 }
 
 export enum ChecklistItemValueDocumentStatusType {
@@ -123,7 +123,7 @@ export enum ChecklistNames {
   BHT_NUMBER_ISSUANCE = 'BHT_NUMBER_ISSUANCE',
   VGM_SUBMISSION = 'VGM_SUBMISSION',
   SHIPPING_INSTRUCTIONS = 'SHIPPING_INSTRUCTIONS',
-  B_L = 'B/L',
+  B_L = 'B_L',
   BL_DRAFT_CREATE = 'BL_DRAFT_CREATE',
   'BL_DRAFT_SENT ' = 'BL_DRAFT_SENT ',
   'BL_DRAFT_APPROVED ' = 'BL_DRAFT_APPROVED ',

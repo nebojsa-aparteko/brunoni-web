@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -19,7 +19,7 @@ import ActingAs from '../../../contexts/ActingAs';
 import { ActivityLogProvider } from './ActivityLogContext';
 import useChecklist from '../../../hooks/useChecklist';
 import InternalStorage from '../InternalStorage';
-import { ChecklistItemValueDocument } from './ChecklistItemModel';
+import { ChecklistItemValueDocument, ChecklistNames } from './ChecklistItemModel';
 
 interface CheckListProps {
   booking: Booking;
@@ -33,11 +33,17 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
 
   const checklistItems = useChecklist(booking.id);
 
-  const checklistDocuments: ChecklistItemValueDocument[] = actingAs
-    ? checklistItems
-        ?.filter(checklistItem => checklistItem.id === 'SHIPPING_INSTRUCTIONS' || checklistItem.id === 'B_L')
-        .flatMap(item => item.values as ChecklistItemValueDocument[]) || []
-    : [];
+  const comparableDocuments = useMemo(
+    () =>
+      checklistItems
+        ?.filter(
+          checklistItem =>
+            checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS || checklistItem.id === ChecklistNames.B_L,
+        )
+        .flatMap(item => item.values as ChecklistItemValueDocument[])
+        .filter(document => document.isSelectedForComparison) || [],
+    [checklistItems],
+  );
 
   if (!checklistItems) {
     return (
@@ -69,7 +75,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
                   checklistItem={item}
                   isAdmin={!actingAs}
                   booking={booking}
-                  allDocuments={checklistDocuments}
+                  comparableDocuments={comparableDocuments}
                 />
               ))}
             </Box>

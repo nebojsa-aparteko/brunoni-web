@@ -175,7 +175,7 @@ const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: B
   return `filename=${file.name}`;
 };
 
-const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: ChecklistItemRowProp) => {
+const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -399,6 +399,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: Che
     },
     [storageBasePath],
   );
+
+  const handleSelectForComparison = (item: ChecklistItemValueDocument) => {
+    saveChecklistChanges(
+      'values',
+      checklistItem.values?.map(value =>
+        value.url === item.url ? { ...value, isSelectedForComparison: !item.isSelectedForComparison } : value,
+      ),
+    ).then(() => console.log('done'));
+  };
+
   const handleMarkAsFinal = (item: ChecklistItemValueDocument, internal: boolean) => {
     saveChecklistChanges(
       internal ? 'valuesAdmin' : 'values',
@@ -407,6 +417,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: Che
       ),
     ).then(() => console.log('done'));
   };
+
   const handleDocumentStatusChange = (
     item: ChecklistItemValueDocument,
     status: ChecklistItemValueDocumentStatus,
@@ -601,7 +612,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: Che
           }
           internal={false}
           markAsFinal={item => handleMarkAsFinal(item, false)}
-          allDocuments={allDocuments}
+          comparableDocuments={comparableDocuments}
+          selectForComparison={item => handleSelectForComparison(item)}
         />
       </Box>
       <Box>
@@ -635,7 +647,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, allDocuments }: Che
               }
               internal={true}
               markAsFinal={item => handleMarkAsFinal(item, true)}
-              allDocuments={allDocuments}
+              comparableDocuments={comparableDocuments}
+              selectForComparison={item => handleSelectForComparison(item)}
             />
           </Box>
         )}
@@ -669,7 +682,7 @@ interface ChecklistItemRowProp {
   checklistItem: ChecklistItem;
   isAdmin: boolean | undefined;
   booking: Booking;
-  allDocuments: ChecklistItemValueDocument[];
+  comparableDocuments: ChecklistItemValueDocument[];
 }
 
 interface ConfirmedByCustomer {

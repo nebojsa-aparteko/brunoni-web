@@ -20,6 +20,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
+import CompareIcon from '@material-ui/icons/Compare';
 import {
   ActivityChangeType,
   ActivityLogUserData,
@@ -27,6 +28,7 @@ import {
   ChecklistItemValueDocument,
   ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
+  ChecklistNames,
 } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
@@ -108,7 +110,8 @@ const DocumentListItem = ({
   storageBasePath,
   internal,
   markAsFinal,
-  allDocuments,
+  comparableDocuments,
+  selectForComparison,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
@@ -281,10 +284,15 @@ const DocumentListItem = ({
         </a>
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
+            {isAdmin &&
+            !internal &&
+            (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
+              <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
+                <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
+              </IconButton>
+            ) : null}
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
               <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-              {/*</Badge>*/}
             </IconButton>
             {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
               editRestriction(item.uploadedAt) &&
@@ -303,7 +311,7 @@ const DocumentListItem = ({
                 </IconButton>
               )}
             {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
-            {checklistItem.id === 'B_L' && (
+            {checklistItem.id === ChecklistNames.B_L && (
               <IconButton
                 size="small"
                 aria-label="Mark as final"
@@ -343,7 +351,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+            {item.isSelectedForComparison && item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -362,7 +370,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+            {item.isSelectedForComparison && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -377,21 +385,23 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {!isAdmin && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5', margin: 'auto' }} /> : null}
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    setIsComparisonDialog(true);
-                    handleDialogOpen();
-                  }}
-                >
-                  Compare Shipping Instruction with B/L Draft
-                </Link>
-              </Box>
-            )}
+            {!isAdmin &&
+              item.isSelectedForComparison &&
+              item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+                <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                  {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5', margin: 'auto' }} /> : null}
+                  <Link
+                    component="button"
+                    variant="body2"
+                    onClick={() => {
+                      setIsComparisonDialog(true);
+                      handleDialogOpen();
+                    }}
+                  >
+                    Compare Shipping Instruction with B/L Draft
+                  </Link>
+                </Box>
+              )}
           </Box>
         )}
       {isDialogOpen && (
@@ -402,7 +412,7 @@ const DocumentListItem = ({
           checklistItem={checklistItem}
           document={item}
           changeStatus={changeStatus}
-          allDocuments={allDocuments}
+          allDocuments={comparableDocuments}
           isComparisonDialog={isComparisonDialog}
         />
       )}
@@ -419,7 +429,8 @@ export interface DocumentListItemPropsBase {
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   internal: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;
-  allDocuments: ChecklistItemValueDocument[];
+  comparableDocuments: ChecklistItemValueDocument[];
+  selectForComparison: (item: ChecklistItemValueDocument) => void;
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {
