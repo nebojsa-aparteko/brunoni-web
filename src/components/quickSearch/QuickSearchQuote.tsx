@@ -65,7 +65,7 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
         firebase
           .firestore()
           .collection('quotes')
-          .doc(inputValue)
+          .doc(inputValue.trim().toLowerCase())
           .get()
           .then(result => {
             if (result) {
