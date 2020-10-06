@@ -19,6 +19,7 @@ import {
   ListItem,
   makeStyles,
   MenuItem,
+  Paper,
   Select,
   Typography,
 } from '@material-ui/core';
@@ -46,6 +47,8 @@ import CommentInput from '../CommentInput';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { formatDateSafe } from '../../utilities/formattingHelpers';
+import { Document, Page, pdfjs } from 'react-pdf';
+import PDFViewer from '../PDFViewer';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -91,6 +94,10 @@ const useStyles = makeStyles(theme =>
       marginRight: theme.spacing(4),
       minWidth: 400,
       height: 40,
+    },
+    page: {
+      width: '100%',
+      padding: 4,
     },
   }),
 );
@@ -307,49 +314,87 @@ const RejectionDialog: React.FC<Props> = ({
         className={classes.dialogContent}
         style={{ padding: 16, paddingLeft: 22 }}
       >
-        <Grid container direction="row" spacing={1} style={{ flex: 1, width: '100%' }}>
-          {leftDocument ? (
-            <Grid item xs={12} md={6}>
-              {leftDocument?.name
-                .split('.')
-                .pop()
-                ?.toLowerCase() === 'pdf' ? (
-                <object data={leftDocument.url} type="application/pdf" width="100%" height="100%">
-                  <embed src={leftDocument.url} type="application/pdf" />
-                </object>
-              ) : (
-                <Box style={{ height: '100%' }}>
+        <Grid item>
+          <Grid container direction="row" spacing={1} style={{ flex: 1, width: '100%' }}>
+            {leftDocument ? (
+              <Grid item xs={12} md={6}>
+                {leftDocument?.name
+                  .split('.')
+                  .pop()
+                  ?.toLowerCase() === 'pdf' ? (
+                  <Box width="100%" padding={2} bgcolor="grey" position="relative">
+                    <Paper style={{ padding: 8 }}>
+                      <Typography style={{ fontWeight: 'bolder' }}>{leftDocument?.name}</Typography>
+                    </Paper>
+                    <Box
+                      width="100%"
+                      minHeight="40vh"
+                      maxHeight="70vh"
+                      overflow="scroll"
+                      style={{ backgroundColor: 'grey' }}
+                    >
+                      <PDFViewer file={leftDocument} />
+                      {/*  <Document*/}
+                      {/*    file={leftDocument.url}*/}
+                      {/*    onLoadSuccess={onDocumentLoadSuccess}*/}
+                      {/*  >*/}
+                      {/*    /!*{Array.from(new Array(numPages), (el, index) => (*!/*/}
+                      {/*    /!*  <Page key={`page_${index + 1}`} pageNumber={index + 1} className={classes.page}/>*!/*/}
+                      {/*    /!*))}*!/*/}
+                      {/*    <Page pageNumber={pageNumber} />*/}
+                      {/*  </Document>*/}
+                      {/*</Box>*/}
+                      {/*<Box flex={1} flexDirection="row" justifyContent="center">*/}
+                      {/*  <Button disabled={pageNumber <= 1} onClick={previousPage}>*/}
+                      {/*    Previous*/}
+                      {/*  </Button>*/}
+                      {/*  <Typography>{`${pageNumber} / ${numPages}`}</Typography>*/}
+                      {/*  <Button*/}
+                      {/*    disabled={pageNumber >= numPages}*/}
+                      {/*    onClick={nextPage}*/}
+                      {/*  >*/}
+                      {/*    Next*/}
+                      {/*  </Button>*/}
+                    </Box>
+                  </Box>
+                ) : (
+                  // <object data={leftDocument.url} type="application/pdf" width="100%" height="100%">
+                  //   <embed src={leftDocument.url} type="application/pdf" />
+                  // </object>
+                  <Typography style={{ paddingTop: '45%' }}>
+                    The comparing option is currently only available for PDF files. The same functionality for other
+                    document types will be available soon.
+                  </Typography>
+                )}
+              </Grid>
+            ) : null}
+            {rightDocument ? (
+              <Grid item xs={12} md={6}>
+                {rightDocument?.name
+                  .split('.')
+                  .pop()
+                  ?.toLowerCase() === 'pdf' ? (
+                  <object data={rightDocument.url} type="application/pdf" width="100%" height="100%">
+                    <embed src={rightDocument.url} type="application/pdf" />
+                  </object>
+                ) : (
                   <Typography style={{ marginTop: '45%' }}>
                     The comparing option is currently only available for PDF files. The same functionality for other
                     document types will be available soon.
                   </Typography>
-                </Box>
-              )}
-            </Grid>
-          ) : null}
-          {rightDocument ? (
-            <Grid item xs={12} md={6}>
-              {rightDocument?.name
-                .split('.')
-                .pop()
-                ?.toLowerCase() === 'pdf' ? (
-                <object data={rightDocument.url} type="application/pdf" width="100%" height="100%">
-                  <embed src={rightDocument.url} type="application/pdf" />
-                </object>
-              ) : (
-                <Box style={{ height: '100%' }}>
-                  <Typography style={{ marginTop: '45%' }}>
-                    The comparing option is currently only available for PDF files. The same functionality for other
-                    document types will be available soon.
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
-          ) : null}
+                )}
+              </Grid>
+            ) : null}
+          </Grid>
         </Grid>
         <Grid item xs={12} md={12}>
           {amendmentRequested ? (
-            <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+            <React.Fragment>
+              <Typography style={{ marginTop: 8 }}>
+                Please enter the description of what needs to be changed:
+              </Typography>
+              <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+            </React.Fragment>
           ) : filteredActivities && filteredActivities.length > 0 ? (
             <ExpansionPanel>
               <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
