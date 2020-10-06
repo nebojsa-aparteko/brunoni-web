@@ -81,6 +81,9 @@ const PDFViewer: React.FC<Props> = ({ file }) => {
             >
               <AddIcon />
             </Fab>
+            <a href={file.url} download={file.name} target="_blank">
+              Download
+            </a>
           </Grid>
         </Grid>
         {/*<Button variant="contained" disabled={scale <= 0.1} onClick={() => changeScale(-0.1)}>*/}
