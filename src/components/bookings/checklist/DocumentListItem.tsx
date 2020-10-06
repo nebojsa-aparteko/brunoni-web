@@ -351,7 +351,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.isSelectedForComparison && item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -370,7 +370,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.isSelectedForComparison && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+            {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -386,7 +386,7 @@ const DocumentListItem = ({
               </Box>
             )}
             {!isAdmin &&
-              item.isSelectedForComparison &&
+              (internal ? true : item.isSelectedForComparison) &&
               item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
                 <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                   {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5', margin: 'auto' }} /> : null}
@@ -398,7 +398,7 @@ const DocumentListItem = ({
                       handleDialogOpen();
                     }}
                   >
-                    Compare Shipping Instruction with B/L Draft
+                    Compare Documents
                   </Link>
                 </Box>
               )}

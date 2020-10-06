@@ -130,11 +130,11 @@ const RejectionDialog: React.FC<Props> = ({
     [allDocuments],
   );
 
-  const [leftDocument, setLeftDocument] = useState<ChecklistItemValueDocument | undefined>(
-    sortedDocuments && sortedDocuments.length > 0 ? sortedDocuments[0] : undefined,
-  );
+  const [leftDocument, setLeftDocument] = useState<ChecklistItemValueDocument | undefined>();
   const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>(document);
-
+  useEffect(() => {
+    setLeftDocument(sortedDocuments?.filter(doc => doc.checklistId === ChecklistNames.SHIPPING_INSTRUCTIONS)?.[0]);
+  }, [sortedDocuments]);
   const userActivityLogData = {
     firstName: userRecord?.firstName,
     lastName: userRecord?.lastName,
@@ -262,11 +262,11 @@ const RejectionDialog: React.FC<Props> = ({
         className={classes.dialogTitleBar}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}
       >
-        {leftDocument && allDocuments ? (
+        {leftDocument && sortedDocuments ? (
           <FormControl className={classes.formControl}>
             <InputLabel>Left Document</InputLabel>
             <Select value={leftDocument?.url} onChange={handleChangeLeftDocument} MenuProps={MenuProps}>
-              {allDocuments
+              {sortedDocuments
                 .filter(document => document.url !== rightDocument?.url)
                 .map(document => (
                   <MenuItem key={document.url} value={document.url}>
@@ -279,11 +279,11 @@ const RejectionDialog: React.FC<Props> = ({
             </Select>
           </FormControl>
         ) : null}
-        {rightDocument && allDocuments ? (
+        {rightDocument && sortedDocuments ? (
           <FormControl className={classes.formControl}>
             <InputLabel>Right Document</InputLabel>
             <Select value={rightDocument?.url} onChange={handleChangeRightDocument} MenuProps={MenuProps}>
-              {allDocuments
+              {sortedDocuments
                 .filter(document => document.url !== leftDocument?.url)
                 .map(document => (
                   <MenuItem key={document.url} value={document.url}>
