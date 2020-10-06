@@ -1,14 +1,40 @@
 import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Document as DocumentForDownload, Page as PageForDownload, PDFDownloadLink } from '@react-pdf/renderer';
 
-import { Box, Button, Fab, Grid, IconButton, Typography } from '@material-ui/core';
+import { Box, Fab, Grid } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 import { ChecklistItemValueDocument } from './bookings/checklist/ChecklistItemModel';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+const DocumentView: React.FC<{
+  file: ChecklistItemValueDocument;
+  scale: number;
+  onDocumentLoadSuccess: (value: any) => void;
+  numPages: number;
+}> = ({ file, scale, numPages, onDocumentLoadSuccess }) => (
+  <Document file={file.url} onLoadSuccess={onDocumentLoadSuccess} options={''}>
+    {Array.from(new Array(numPages), (el, index) => (
+      <Box key={index} paddingY={1}>
+        <Page key={`page_${index + 1}`} pageNumber={index + 1} scale={scale} />
+      </Box>
+    ))}
+    {/*<Page pageNumber={pageNumber} />*/}
+  </Document>
+  // {/*<Box flex={1} flexDirection="row" justifyContent="center" style={{position: "absolute", bottom: "64px"}}>*/}
+  // {/*  <Button disabled={pageNumber <= 1} onClick={previousPage}>*/}
+  // {/*    Previous*/}
+  // {/*  </Button>*/}
+  // {/*  <Typography>{`${pageNumber} / ${numPages}`}</Typography>*/}
+  // {/*  <Button*/}
+  // {/*    disabled={pageNumber >= numPages}*/}
+  // {/*    onClick={nextPage}*/}
+  // {/*  >*/}
+  // {/*    Next*/}
+  // {/*  </Button>*/}
+  // {/*</Box>*/}
+);
 
 const PDFViewer: React.FC<Props> = ({ file }) => {
   const [numPages, setNumPages] = useState<number>(0);
@@ -22,37 +48,14 @@ const PDFViewer: React.FC<Props> = ({ file }) => {
     setScale(scale + offset);
   };
 
-  const DownloadableDocument = () => (
-    <DocumentForDownload ref={file.url}>
-      {Array.from(new Array(numPages), (el, index) => (
-        <PageForDownload key={`page_${index + 1}`} />
-      ))}
-      {/*<Page pageNumber={pageNumber} />*/}
-    </DocumentForDownload>
-  );
-
-  const DocumentView = () => (
-    <Document file={file.url} onLoadSuccess={onDocumentLoadSuccess} options={''}>
-      {Array.from(new Array(numPages), (el, index) => (
-        <Box key={index} paddingY={1}>
-          <Page key={`page_${index + 1}`} pageNumber={index + 1} scale={scale} />
-        </Box>
-      ))}
-      {/*<Page pageNumber={pageNumber} />*/}
-    </Document>
-    // {/*<Box flex={1} flexDirection="row" justifyContent="center" style={{position: "absolute", bottom: "64px"}}>*/}
-    // {/*  <Button disabled={pageNumber <= 1} onClick={previousPage}>*/}
-    // {/*    Previous*/}
-    // {/*  </Button>*/}
-    // {/*  <Typography>{`${pageNumber} / ${numPages}`}</Typography>*/}
-    // {/*  <Button*/}
-    // {/*    disabled={pageNumber >= numPages}*/}
-    // {/*    onClick={nextPage}*/}
-    // {/*  >*/}
-    // {/*    Next*/}
-    // {/*  </Button>*/}
-    // {/*</Box>*/}
-  );
+  // const DownloadableDocument = () => (
+  //   <DocumentForDownload ref={file.url}>
+  //     {Array.from(new Array(numPages), (el, index) => (
+  //       <PageForDownload key={`page_${index + 1}`} />
+  //     ))}
+  //     {/*<Page pageNumber={pageNumber} />*/}
+  //   </DocumentForDownload>
+  // );
 
   return (
     // <MyDocument/>
@@ -96,7 +99,7 @@ const PDFViewer: React.FC<Props> = ({ file }) => {
         {/*  {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}*/}
         {/*</PDFDownloadLink>*/}
       </div>
-      <DocumentView />
+      <DocumentView scale={scale} file={file} onDocumentLoadSuccess={onDocumentLoadSuccess} numPages={numPages} />
     </Box>
   );
 };
