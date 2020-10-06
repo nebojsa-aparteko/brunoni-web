@@ -1,7 +1,8 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
+  colors,
   createStyles,
   Dialog,
   DialogActions,
@@ -31,6 +32,7 @@ import {
   ChecklistItemValueDocument,
   ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
+  ChecklistNames,
 } from './checklist/ChecklistItemModel';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
@@ -69,6 +71,9 @@ const useStyles = makeStyles(theme =>
     },
     dialogActions: {
       height: '48px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     expansionPanelHeading: {
       fontSize: theme.typography.pxToRem(15),
@@ -120,24 +125,15 @@ const RejectionDialog: React.FC<Props> = ({
   const [rejectionInput, setRejectionInput] = useState<RejectionInput | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
   const userRecord = useContext(UserRecordContext);
-  const [sortedDocuments, setSortedDocuments] = useState<ChecklistItemValueDocument[]>(
-    allDocuments && allDocuments.length > 0 ? allDocuments.sort(sortByDate) : [],
+  const sortedDocuments = useMemo<ChecklistItemValueDocument[]>(
+    () => (allDocuments && allDocuments.length > 0 ? allDocuments.sort(sortByDate) : []),
+    [allDocuments],
   );
 
-  useEffect(() => {
-    setSortedDocuments(allDocuments && allDocuments.length > 0 ? allDocuments?.sort(sortByDate) : []);
-  }, [allDocuments]);
-
-  const [leftDocument, serLeftDocument] = useState<ChecklistItemValueDocument | undefined>(
+  const [leftDocument, setLeftDocument] = useState<ChecklistItemValueDocument | undefined>(
     sortedDocuments && sortedDocuments.length > 0 ? sortedDocuments[0] : undefined,
   );
-  const [rightDocument, serRightDocument] = useState<ChecklistItemValueDocument | undefined>(
-    sortedDocuments && sortedDocuments.length > 0
-      ? sortedDocuments.length > 1
-        ? sortedDocuments[1]
-        : sortedDocuments[0]
-      : undefined,
-  );
+  const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>(document);
 
   const userActivityLogData = {
     firstName: userRecord?.firstName,
@@ -216,11 +212,11 @@ const RejectionDialog: React.FC<Props> = ({
   );
 
   const handleChangeLeftDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
-    serLeftDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument);
+    setLeftDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument);
   };
 
   const handleChangeRightDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
-    serRightDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
+    setRightDocument(allDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
   };
 
   //TODO separate this into two components, one for each dialog
@@ -260,7 +256,12 @@ const RejectionDialog: React.FC<Props> = ({
       fullWidth
       classes={{ paper: classes.dialogPaper }}
     >
-      <DialogTitle disableTypography id="dialog-title-check-list" className={classes.dialogTitleBar}>
+      <DialogTitle
+        disableTypography
+        id="dialog-title-check-list"
+        className={classes.dialogTitleBar}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}
+      >
         {leftDocument && allDocuments ? (
           <FormControl className={classes.formControl}>
             <InputLabel>Left Document</InputLabel>
@@ -392,7 +393,12 @@ const RejectionDialog: React.FC<Props> = ({
             <Button onClick={() => setAmendmentRequested(true)} variant="contained" color="primary">
               Request amendment
             </Button>
-            <Button onClick={handleApproveDocument} color="primary" variant="contained" autoFocus>
+            <Button
+              onClick={handleApproveDocument}
+              style={{ backgroundColor: 'rgba(0,200,81, 1)' }}
+              variant="contained"
+              autoFocus
+            >
               Approve
             </Button>
           </React.Fragment>
@@ -413,6 +419,7 @@ interface Props {
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   allDocuments?: ChecklistItemValueDocument[];
   isComparisonDialog: boolean;
+  rightDocumentInitially?: ChecklistItemValueDocument;
 }
 
 export interface RejectionInput {

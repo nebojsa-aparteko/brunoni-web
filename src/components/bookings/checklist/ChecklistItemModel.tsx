@@ -10,6 +10,7 @@ export interface ChecklistItemValueDocument {
   isInternal?: boolean;
   final?: boolean;
   isSelectedForComparison?: boolean;
+  checklistId?: string;
 }
 
 export enum ChecklistItemValueDocumentStatusType {
