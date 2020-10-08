@@ -12,6 +12,7 @@ import {
   TableRow,
   Tabs,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
@@ -40,6 +41,10 @@ const useStyles = makeStyles((theme: Theme) =>
     table: {
       minWidth: 650,
       overflowX: 'auto',
+    },
+    emptyState: {
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
     // tableHead: {
     //   fontWeight: theme.typography.fontWeightBold,
@@ -85,13 +90,13 @@ const AdminBookingFreight: React.FC<Props> = ({ freightDetails }) => {
           <Tab label="Internal 2" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
+      <TabPanel value={value} index={0} style={{ margin: 0 }}>
         <BookingFreightTable freightDetails={externalFreight} />
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={value} index={1} style={{ margin: 0 }}>
         <BookingFreightTable freightDetails={internal1Freight} />
       </TabPanel>
-      <TabPanel value={value} index={2}>
+      <TabPanel value={value} index={2} style={{ margin: 0 }}>
         <BookingFreightTable freightDetails={internal2Freight} />
       </TabPanel>
     </Fragment>
@@ -117,26 +122,30 @@ const BookingFreightTable: React.FC<Props> = ({ freightDetails }) => {
             <TableBody>
               {freightDetails.map((freight, index) => {
                 return (
-                  <TableRow
-                    selected={(index + 1) % 2 === 0}
-                    key={`booking-freight-${index}`}
-                    className={classes.tableRow}
-                  >
-                    <TableCell component="th" scope="row">
-                      {freight.Txt}
-                    </TableCell>
-                    <TableCell align="right">{freight.Anz}</TableCell>
-                    <TableCell align="right">{freight.Unit}</TableCell>
-                    <TableCell align="right">{freight.UnitValue}</TableCell>
-                    <TableCell align="right">{freight.Currency}</TableCell>
-                    <TableCell align="right">{freight.Total}</TableCell>
-                  </TableRow>
+                  <Tooltip title={freight.Invoice ? `Invoice no. ${freight.Invoice}` : ''} placement="left">
+                    <TableRow
+                      selected={(index + 1) % 2 === 0}
+                      key={`booking-freight-${index}`}
+                      className={classes.tableRow}
+                    >
+                      <TableCell component="th" scope="row">
+                        {freight.Txt}
+                      </TableCell>
+                      <TableCell align="right">{freight.Anz}</TableCell>
+                      <TableCell align="right">{freight.Unit}</TableCell>
+                      <TableCell align="right">{freight.UnitValue}</TableCell>
+                      <TableCell align="right">{freight.Currency}</TableCell>
+                      <TableCell align="right">{freight.Total}</TableCell>
+                    </TableRow>
+                  </Tooltip>
                 );
               })}
             </TableBody>
           </Table>
         ) : (
-          <Typography variant="h3">No Freight Detail to show</Typography>
+          <Typography variant="h3" className={classes.emptyState}>
+            No Freight Detail to show
+          </Typography>
         )}
       </Box>
     </Grid>

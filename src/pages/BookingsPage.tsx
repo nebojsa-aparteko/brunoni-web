@@ -1,7 +1,7 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { Fragment, useCallback, useContext, useEffect } from 'react';
+import React, { CSSProperties, Fragment, useCallback, useContext, useEffect } from 'react';
 import BookingsView from '../components/BookingsView';
-import { Box, Container, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
+import { Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import Meta from '../components/Meta';
@@ -37,6 +37,7 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: any;
   value: any;
+  style?: CSSProperties;
 }
 
 export function a11yProps(index: any) {
@@ -48,7 +49,7 @@ export function a11yProps(index: any) {
 
 export function TabPanel(props: TabPanelProps) {
   const classes = useStyles();
-  const { children, value, index, ...other } = props;
+  const { children, value, index, style, ...other } = props;
 
   return (
     <Box
@@ -57,6 +58,7 @@ export function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`scrollable-prevent-tabpanel-${index}`}
       aria-labelledby={`scrollable-prevent-tab-${index}`}
+      style={style}
       {...other}
     >
       {value === index && children}
