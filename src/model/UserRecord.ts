@@ -1,9 +1,17 @@
 import { Team } from './Teams';
 import Client from './Client';
 
-export const UserRecordMinProperties = ['alphacomClientId', 'alphacomId', 'firstName', 'lastName', 'emailAddress'];
+export const UserRecordMinProperties = [
+  'alphacomClientId',
+  'alphacomId',
+  'firstName',
+  'lastName',
+  'emailAddress',
+  'id',
+];
 
 export interface UserRecordMin {
+  id?: string;
   alphacomClientId?: string;
   alphacomId: string;
   firstName: string;
@@ -12,7 +20,6 @@ export interface UserRecordMin {
 }
 
 export default interface UserRecord extends UserRecordMin {
-  id?: string;
   company?: Client;
   isAdmin?: boolean;
   role?: Role;

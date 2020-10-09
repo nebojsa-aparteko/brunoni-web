@@ -81,10 +81,12 @@ const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
               </Typography>
               <DateFormattedText date={comment.at} />
             </Box>
-            <Typography style={{ wordBreak: 'break-word' }}>
-              {/*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*/}
-              {comment?.comment} {/*&& wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)*/}
-            </Typography>
+            <div dangerouslySetInnerHTML={{ __html: comment?.comment!.replaceAll('\n', '<br/>') }} />
+            {/*<Typography style={{ wordBreak: 'break-word' }}>*/}
+            {/*  /!*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*!/*/}
+            {/*  {comment?.comment}/!*&& wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)*!/*/}
+            {/*  {console.log(comment.comment)}*/}
+            {/*</Typography>*/}
             {comment.checklistItem && (
               <Box>
                 Ref - <a href={`#${comment.checklistItem?.id}`}>{comment.checklistItem?.label}</a>
