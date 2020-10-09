@@ -42,7 +42,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import theme from '../../../theme';
-import RejectionDialog from '../RejectionDialog';
+import RejectionModal from '../documentApproval/RejectionModal';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
 import { showCrispChat } from '../../../index';
@@ -284,9 +284,7 @@ const DocumentListItem = ({
         </a>
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
-            {isAdmin &&
-            !internal &&
-            (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
+            {isAdmin && !internal && checklistItem.id === ChecklistNames.B_L ? (
               <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
                 <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
               </IconButton>
@@ -405,7 +403,7 @@ const DocumentListItem = ({
           </Box>
         )}
       {isDialogOpen && (
-        <RejectionDialog
+        <RejectionModal
           isOpen={isDialogOpen}
           handleClose={handleDialogClose}
           booking={booking}

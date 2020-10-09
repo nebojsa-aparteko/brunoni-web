@@ -136,7 +136,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
               setUploadProgress(0);
               // success
               storageRef.updateMetadata({
-                contentDisposition: `filename=${file.name}`,
+                contentDisposition: `attachment; filename=${file.name}`,
               });
               uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
                 resolve({ url: downloadURL, name: file.name, storedName: storedFileName });

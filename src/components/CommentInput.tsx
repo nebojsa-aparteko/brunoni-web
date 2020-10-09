@@ -7,7 +7,7 @@ import firebase from '../firebase';
 import UserRecord from '../model/UserRecord';
 import useAdminUsers from '../hooks/useAdminUsers';
 import useTeams from '../hooks/useTeams';
-import { RejectionInput } from './bookings/RejectionDialog';
+import { RejectionInput } from './bookings/documentApproval/RejectionModal';
 
 const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
   const [messageText, setMessageText] = useState('');
