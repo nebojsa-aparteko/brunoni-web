@@ -1,14 +1,7 @@
 import { Team } from './Teams';
 import Client from './Client';
 
-export const UserRecordMinProperties = [
-  'alphacomClientId',
-  'alphacomId',
-  'firstName',
-  'lastName',
-  'emailAddress',
-  'id',
-];
+export const UserRecordMinProperties = ['alphacomClientId', 'alphacomId', 'firstName', 'lastName', 'emailAddress'];
 
 export interface UserRecordMin {
   id?: string;
