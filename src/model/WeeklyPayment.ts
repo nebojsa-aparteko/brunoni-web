@@ -1,8 +1,11 @@
+import { BookingCategory } from './Booking';
+
 export default interface WeeklyPayment {
+  id?: string;
   Recid: string;
   Ref: string;
   File: string;
-  Transport: 'Import';
+  Transport: BookingCategory;
   BL: string;
   Vessel: string;
   Carrier: string;

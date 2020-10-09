@@ -2,9 +2,9 @@ import React, { Fragment } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
+import WeeklyPayment from '../../model/WeeklyPayment';
 
-const PaymentOverviewTable = () => {
-  const overviewData = [] as string[];
+const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
   return (
     <Fragment>
       {overviewData.length === 0 ? (
@@ -22,8 +22,8 @@ const PaymentOverviewTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {overviewData.map(() => (
-                <PaymentOverviewTableRow />
+              {overviewData.map(payment => (
+                <PaymentOverviewTableRow paymentData={payment} />
               ))}
             </TableBody>
           </Table>
@@ -34,3 +34,7 @@ const PaymentOverviewTable = () => {
 };
 
 export default PaymentOverviewTable;
+
+interface Props {
+  overviewData: WeeklyPayment[];
+}
