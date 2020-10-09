@@ -102,6 +102,7 @@ const MenuProps = {
 };
 
 const ComparisonDialog: React.FC<Props> = ({
+  document,
   isOpen,
   booking,
   handleClose,
@@ -116,11 +117,10 @@ const ComparisonDialog: React.FC<Props> = ({
   const actingAs = useContext(ActingAs)[0];
 
   const [leftDocument, setLeftDocument] = useState<ChecklistItemValueDocument | undefined>();
-  const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>();
+  const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>(document);
 
   useEffect(() => {
     setLeftDocument(sortedDocuments?.filter(doc => doc.checklistId === ChecklistNames.SHIPPING_INSTRUCTIONS)?.[0]);
-    setRightDocument(sortedDocuments?.filter(doc => doc.checklistId === ChecklistNames.B_L)?.[0]);
   }, [sortedDocuments]);
 
   const handleChangeLeftDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -342,6 +342,7 @@ const ComparisonDialog: React.FC<Props> = ({
 export default ComparisonDialog;
 
 interface Props {
+  document: ChecklistItemValueDocument;
   isOpen: boolean;
   handleClose: () => void;
   booking: Booking;

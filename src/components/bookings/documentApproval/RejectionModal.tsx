@@ -100,6 +100,7 @@ const RejectionModal: React.FC<Props> = ({
     />
   ) : (
     <ComparisonDialog
+      document={document}
       isOpen={isOpen}
       handleClose={handleClose}
       booking={booking}

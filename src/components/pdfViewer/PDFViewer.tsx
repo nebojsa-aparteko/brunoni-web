@@ -25,12 +25,12 @@ const PDFViewer: React.FC<Props> = ({ file }) => {
       <Box style={{ position: 'absolute', bottom: 64, right: 32, zIndex: 200 }}>
         <Grid container direction="column-reverse" spacing={1}>
           <Grid item>
-            <Fab size="medium" disabled={scale <= 0.4} onClick={() => changeScale(scale <= 1.5 ? -0.1 : -0.5)}>
+            <Fab size="medium" disabled={scale <= 0.4} onClick={() => changeScale(-0.1)}>
               <RemoveIcon />
             </Fab>
           </Grid>
           <Grid item>
-            <Fab size="medium" disabled={scale >= 5} onClick={() => changeScale(scale < 1.5 ? 0.1 : 0.5)}>
+            <Fab size="medium" disabled={scale >= 1.35} onClick={() => changeScale(0.1)}>
               <AddIcon />
             </Fab>
           </Grid>
