@@ -122,12 +122,12 @@ const BookingFreightTable: React.FC<Props> = ({ freightDetails }) => {
             <TableBody>
               {freightDetails.map((freight, index) => {
                 return (
-                  <Tooltip title={freight.Invoice ? `Invoice no. ${freight.Invoice}` : ''} placement="left">
-                    <TableRow
-                      selected={(index + 1) % 2 === 0}
-                      key={`booking-freight-${index}`}
-                      className={classes.tableRow}
-                    >
+                  <Tooltip
+                    title={freight.Invoice ? `Invoice no. ${freight.Invoice}` : ''}
+                    placement="left"
+                    key={`booking-freight-${index}`}
+                  >
+                    <TableRow selected={(index + 1) % 2 === 0} className={classes.tableRow}>
                       <TableCell component="th" scope="row">
                         {freight.Txt}
                       </TableCell>
