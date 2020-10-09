@@ -40,6 +40,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import DocumentList from './DocumentList';
 import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
+import ActionModal from './ActionModel';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -184,6 +185,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, checklistItem.id].join('/');
   }, [booking, checklistItem]);
 
+  const [isActionDialogOpen, setActionDialogOpen] = useState(false);
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
@@ -339,8 +341,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   };
 
   const handleCheckboxChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      storeActivity(() => checklistItemCheckedHandler(event.target.checked));
+    (value: boolean) => {
+      storeActivity(() => checklistItemCheckedHandler(value));
     },
     [checklistItemCheckedHandler],
   );
@@ -554,7 +556,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               <Checkbox
                 checked={checklistItem.checked}
                 disabled={!isAdmin}
-                onChange={event => handleCheckboxChange(event)}
+                onChange={event =>
+                  event.target.checked ? handleCheckboxChange(event.target.checked) : setActionDialogOpen(true)
+                }
               />
             ) : (
               checklistItem.checked && <DoneIcon />
@@ -673,6 +677,18 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             Internals
           </Box>
         </Fragment>
+      )}
+      {isActionDialogOpen && (
+        <ActionModal
+          isOpen={isActionDialogOpen}
+          handleClose={() => setActionDialogOpen(false)}
+          onSuccess={() => handleCheckboxChange(false)}
+        >
+          <Typography>
+            Are you sure you want to uncheck an item? If you uncheck item, that can generate new notification to the
+            customer?
+          </Typography>
+        </ActionModal>
       )}
     </Box>
   );

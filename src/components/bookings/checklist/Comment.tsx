@@ -81,7 +81,10 @@ const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
               </Typography>
               <DateFormattedText date={comment.at} />
             </Box>
-            <div dangerouslySetInnerHTML={{ __html: comment?.comment!.replaceAll('\n', '<br/>') }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: comment?.comment!.replaceAll('\n', '<br/>') }}
+              style={{ fontSize: 14 }}
+            />
             {/*<Typography style={{ wordBreak: 'break-word' }}>*/}
             {/*  /!*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*!/*/}
             {/*  {comment?.comment}/!*&& wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)*!/*/}
