@@ -1,4 +1,4 @@
-import UserRecord, { UserRecordMin } from './UserRecord';
+import { UserRecordMin } from './UserRecord';
 
 export interface Booking {
   id: string;
@@ -251,6 +251,7 @@ export interface FreightDetail {
   Currency: string;
   Unit: string;
   Group: FreightDetailGroup;
+  Invoice: string;
 }
 
 export enum FreightDetailGroup {

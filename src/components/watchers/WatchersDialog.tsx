@@ -177,11 +177,11 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
           <Box my={1}>
             <WatchersChipMultiInput
               options={assignableUsers || []}
-              onChange={(_, value) =>
+              onChange={(_, value) => {
                 handleResponse(
                   handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser),
-                )
-              }
+                );
+              }}
               values={watchers}
             />
           </Box>
