@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { Box, createStyles, makeStyles, Paper, Theme, Tooltip, Typography } from '@material-ui/core';
+import React, { useMemo } from 'react';
+import { Box, createStyles, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { capitalCase } from 'change-case';
 import { ActivityLogItem } from './ActivityModel';
 import classNames from 'classnames';
 import asArray from '../../../utilities/asArray';
-import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
-import formatDate from 'date-fns/format';
 import DateFormattedText from '../../DateFormattedText';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -58,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
   const classes = useStyles();
-
+  const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);
   return (
     <Box
       className={classes.container}
@@ -81,10 +79,7 @@ const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
               </Typography>
               <DateFormattedText date={comment.at} />
             </Box>
-            <div
-              dangerouslySetInnerHTML={{ __html: comment?.comment!.replaceAll('\n', '<br/>') }}
-              style={{ fontSize: 14 }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: htmlComment || comment?.comment! }} style={{ fontSize: 14 }} />
             {/*<Typography style={{ wordBreak: 'break-word' }}>*/}
             {/*  /!*{comment?.comment && wrapTags(comment!.comment, /(@\[.*\]\([a-zA-Z.0-9 ]*@[a-zA-Z ]*.\w*\))/)}*!/*/}
             {/*  {comment?.comment}/!*&& wrapTags(comment!.comment, /(@\[.*\]\(.*\))/)*!/*/}
