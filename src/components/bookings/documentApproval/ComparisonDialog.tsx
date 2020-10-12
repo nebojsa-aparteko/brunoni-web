@@ -41,6 +41,7 @@ import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import ActingAs from '../../../contexts/ActingAs';
+import HTMLViewer from '../../HTMLViewer';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -158,6 +159,42 @@ const ComparisonDialog: React.FC<Props> = ({
     updateDocumentStatus(ChecklistItemValueDocumentStatusType.APPROVED);
   };
 
+  const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => {
+    switch (fileType) {
+      case 'pdf':
+        return (
+          <Box width="100%" position="relative" display="flex" flexDirection="column">
+            <Paper style={{ padding: 8, maxWidth: '48vw' }}>
+              <Typography style={{ fontWeight: 'bolder' }}>{document?.name}</Typography>
+            </Paper>
+            <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
+              <PDFViewer file={document} />
+            </Box>
+          </Box>
+        );
+      case 'html':
+        return (
+          <Box width="100%" position="relative" display="flex" flexDirection="column">
+            <Paper style={{ padding: 8, maxWidth: '48vw' }}>
+              <Typography style={{ fontWeight: 'bolder' }}>{document?.name}</Typography>
+            </Paper>
+            <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
+              <div>
+                <HTMLViewer file={{ url: document.url }} />
+              </div>
+            </Box>
+          </Box>
+        );
+      default:
+        return (
+          <Typography style={{ flex: 1, margin: 'auto' }}>
+            The comparing option is currently only available for PDF files. The same functionality for other document
+            types will be available soon.
+          </Typography>
+        );
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -228,45 +265,23 @@ const ComparisonDialog: React.FC<Props> = ({
             >
               {leftDocument ? (
                 <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
-                  {leftDocument?.name
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase() === 'pdf' ? (
-                    <Box width="100%" position="relative" display="flex" flexDirection="column">
-                      <Paper style={{ padding: 8, maxWidth: '48vw' }}>
-                        <Typography style={{ fontWeight: 'bolder' }}>{leftDocument?.name}</Typography>
-                      </Paper>
-                      <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
-                        <PDFViewer file={leftDocument} />
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Typography style={{ flex: 1, margin: 'auto' }}>
-                      The comparing option is currently only available for PDF files. The same functionality for other
-                      document types will be available soon.
-                    </Typography>
+                  {renderDocument(
+                    leftDocument,
+                    leftDocument?.name
+                      .split('.')
+                      .pop()
+                      ?.toLowerCase(),
                   )}
                 </Grid>
               ) : null}
               {rightDocument ? (
                 <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
-                  {rightDocument?.name
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase() === 'pdf' ? (
-                    <Box width="100%" position="relative" display="flex" flexDirection="column">
-                      <Paper style={{ padding: 8 }}>
-                        <Typography style={{ fontWeight: 'bolder' }}>{rightDocument?.name}</Typography>
-                      </Paper>
-                      <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
-                        <PDFViewer file={rightDocument} />
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Typography style={{ flex: 1, margin: 'auto' }}>
-                      The comparing option is currently only available for PDF files. The same functionality for other
-                      document types will be available soon.
-                    </Typography>
+                  {renderDocument(
+                    rightDocument,
+                    rightDocument?.name
+                      .split('.')
+                      .pop()
+                      ?.toLowerCase(),
                   )}
                 </Grid>
               ) : null}
