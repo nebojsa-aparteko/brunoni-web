@@ -143,7 +143,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           </CardContent>
 
           <CardActions className={classes.actions}>
-            {searchResult && searchResult.length > 0 && (
+            {searchResult && searchResult.length > rowsPerPage && (
               <TablePagination
                 component="div"
                 count={searchResult ? searchResult.length : 0}
