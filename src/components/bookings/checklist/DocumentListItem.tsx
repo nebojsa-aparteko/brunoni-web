@@ -284,7 +284,9 @@ const DocumentListItem = ({
         </a>
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
-            {isAdmin && !internal && checklistItem.id === ChecklistNames.B_L ? (
+            {isAdmin &&
+            !internal &&
+            (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
               <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
                 <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
               </IconButton>

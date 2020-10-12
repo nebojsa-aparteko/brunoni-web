@@ -47,9 +47,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
               checklistId: item.id,
             })) as ChecklistItemValueDocument[],
         )
-        .filter(document =>
-          document.checklistId === ChecklistNames.SHIPPING_INSTRUCTIONS ? true : document.isSelectedForComparison,
-        ) || [],
+        .filter(document => document.isSelectedForComparison) || [],
     [checklistItems],
   );
 
