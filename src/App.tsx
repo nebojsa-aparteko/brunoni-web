@@ -37,6 +37,7 @@ import MyDayPage from './pages/MyDayPage';
 import * as QueryString from 'querystring';
 import firebase from 'firebase';
 import { useHistory } from 'react-router-dom';
+import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -68,6 +69,7 @@ const adminRoutes = (
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/my-day" component={MyDayPage} />
+    <Route exact path="/weekly-payment" component={WeeklyPaymentPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>

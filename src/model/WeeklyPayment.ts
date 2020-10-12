@@ -2,17 +2,17 @@ import { BookingCategory } from './Booking';
 
 export default interface WeeklyPayment {
   id?: string;
-  Recid: string;
-  Ref: string;
-  File: string;
-  Transport: BookingCategory;
-  BL: string;
-  Vessel: string;
-  Carrier: string;
-  PayDate: Date;
-  Currency: Currency;
-  Amount: number;
-  DebitCredit: DebitCredit;
+  bookingId: string;
+  recId: string;
+  reference: string;
+  blNumber: string;
+  category: BookingCategory;
+  vessel: string;
+  carrier: string;
+  currency: Currency;
+  amount: number;
+  debitCredit: DebitCredit;
+  payDate: Date;
 }
 
 export enum Currency {

@@ -7,7 +7,7 @@ import WeeklyPayment from '../../model/WeeklyPayment';
 const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
   return (
     <Fragment>
-      {overviewData.length === 0 ? (
+      {!overviewData || overviewData.length === 0 ? (
         <BookingsEmptyResults message={'No Payment overview found for your filter criteria. Try changing filters.'} />
       ) : (
         <TableContainer component={Paper}>

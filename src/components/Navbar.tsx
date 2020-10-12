@@ -300,6 +300,7 @@ const Navbar: React.FC = () => {
                           getContentAnchorEl={null}
                         >
                           <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
+                          <MenuItemLink onClick={handleMenuClose} to="/weekly-payment" primary="Weekly Payment" />
                           {isSuperAdmin(userRecord) && (
                             <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
                           )}

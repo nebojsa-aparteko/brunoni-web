@@ -7,32 +7,36 @@ import pick from 'lodash/fp/pick';
 import { UserRecordMinProperties } from '../model/UserRecord';
 import WeeklyPayment from '../model/WeeklyPayment';
 import useFirestoreCollection from './useFirestoreCollection';
-import { Team } from '../model/Teams';
 import { useWeeklyPaymentFilterProviderContext } from '../providers/WeeklyPaymentFilterProvider';
+import { update } from 'lodash/fp';
+import safeInvoke from '../utilities/safeInvoke';
 
 export default () => {
-  const [filters, _] = useWeeklyPaymentFilterProviderContext();
+  const [filters] = useWeeklyPaymentFilterProviderContext();
   const { carrier, paymentDate } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let query = collection.where('resolved', '==', false).where('show', '==', true);
+      let query = collection.limit(100);
+      // let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (paymentDate) {
         // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
       }
       if (actingAs) {
-        query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
+        // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
       }
       return query;
     },
     [filters, paymentDate, UserRecordMinProperties, pick, carrier, UserRole, actingAs, userRecord],
   );
 
-  const teamsCollection = useFirestoreCollection('teams', query);
+  const paymentCollection = useFirestoreCollection('weeklyPayment', query);
 
-  return teamsCollection?.docs.map(doc => {
-    return { id: doc.id, ...doc.data() } as Team;
+  return paymentCollection?.docs.map(doc => {
+    return { id: doc.id, ...doc.data() } as WeeklyPayment;
   }) as WeeklyPayment[];
 };
+
+export const normalizePaymentOverview = (item: any) => update('payDate', safeInvoke('toDate'))(item);
