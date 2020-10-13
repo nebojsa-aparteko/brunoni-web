@@ -19,7 +19,7 @@ export default () => {
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let query = collection.orderBy('bookingId', 'asc').limit(20);
+      let query = collection.orderBy('bookingId', 'asc').limit(100);
       // let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (paymentDate) {
         // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
