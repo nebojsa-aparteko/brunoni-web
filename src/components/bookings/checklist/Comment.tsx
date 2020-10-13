@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
   const classes = useStyles();
-  const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);
+  // const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);
   return (
     <Box
       className={classes.container}
