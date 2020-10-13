@@ -34,26 +34,6 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-/*const wrapTags = (text: string, regex: RegExp) => {
-  const textArray = text.split(regex);
-  let identifier;
-  let name;
-  return textArray.map((str, index) => {
-    if (regex.test(str)) {
-      identifier = str.match(/\((.*)\)/i);
-      name = str.match(/\[(.*)\]/i);
-
-      console.log('IDENTIFIER', name);
-      return identifier && identifier[0]?.indexOf('@') === -1 ? (
-        <Typography key={`typ-${index}`} style={{ fontWeight: 'bold' }}>{`@${name && name[1]}`}</Typography>
-      ) : (
-        <Link key={`commentid-${index}`} href={`mailto:${identifier && identifier[1]}`}>{`@${name && name[1]}`}</Link>
-      );
-    }
-    return str;
-  });
-};*/
-
 const Comment = ({ comment, handleCommentClick, ...other }: CommentProp) => {
   const classes = useStyles();
   // const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);

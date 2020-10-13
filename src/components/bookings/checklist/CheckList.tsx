@@ -40,13 +40,16 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
           checklistItem =>
             checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS || checklistItem.id === ChecklistNames.B_L,
         )
-        .flatMap(
-          item =>
-            (item.values || [])?.map(i => ({
-              ...i,
-              checklistId: item.id,
-            })) as ChecklistItemValueDocument[],
+        .map(item =>
+          (item.values || []).map(
+            i =>
+              ({
+                ...i,
+                checklistId: item.id,
+              } as ChecklistItemValueDocument),
+          ),
         )
+        .reduce((acc, val) => acc.concat(val), [])
         .filter(document => document.isSelectedForComparison) || [],
     [checklistItems],
   );
