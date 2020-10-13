@@ -20,21 +20,14 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
     [assignableUsers, user],
   );
+  console.log(user);
   const onChange = useCallback(
     (selectedUser: UserRecordMin | null) => {
       firebase
         .firestore()
         .collection('users')
-        .where('alphacomId', '==', user?.alphacomId)
-        .get()
-        .then(users =>
-          users.docs
-            .pop()
-            ?.ref.set(
-              { redirectedAdmin: selectedUser ? pick(UserRecordMinProperties)(selectedUser) : null },
-              { merge: true },
-            ),
-        )
+        .doc(user.id)
+        .set({ redirectedAdmin: selectedUser ? pick(UserRecordMinProperties)(selectedUser) : null }, { merge: true })
         .then(_ => console.log('Saved'));
     },
     [user],
