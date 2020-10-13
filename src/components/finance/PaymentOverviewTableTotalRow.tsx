@@ -1,0 +1,20 @@
+import React from 'react';
+import { TableCell, TableRow } from '@material-ui/core';
+import { Currency } from '../../model/WeeklyPayment';
+import currencyFormatter from '../../utilities/currencyFormatter';
+
+const PaymentOverviewTableTotalRow: React.FC<Props> = ({ total }) => (
+  <TableRow style={{ backgroundColor: '#eee' }}>
+    <TableCell align="left" />
+    <TableCell align="center" />
+    <TableCell align="center" />
+    <TableCell align="center">{`Total ${total.currency}`}</TableCell>
+    <TableCell align="center">{currencyFormatter(total.currency)(total.amount)}</TableCell>
+  </TableRow>
+);
+
+export default PaymentOverviewTableTotalRow;
+
+interface Props {
+  total: { currency: Currency; amount: number };
+}

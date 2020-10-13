@@ -4,7 +4,7 @@ import { Link, TableCell, TableRow, Typography } from '@material-ui/core';
 
 const PaymentOverviewTableRow: React.FC<Props> = ({ paymentData }) => {
   return (
-    <TableRow key={paymentData.id}>
+    <TableRow>
       <TableCell align="left">
         <Link target="_blank" href={`/bookings/${paymentData.bookingId}`}>
           {paymentData.bookingId}

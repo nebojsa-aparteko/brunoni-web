@@ -1,24 +1,12 @@
 import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Menu,
-  MenuItem,
-  Paper,
-  Theme,
-  Typography,
-} from '@material-ui/core';
+import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
-import { Booking, BookingCategory, BookingVersion, FreightDetailGroup, Remark } from '../../model/Booking';
+import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
@@ -225,7 +213,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         )
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord, userRecord.alphacomId],
+    [booking.id, booking.watchers, userRecord],
   );
   // const [anchorEl, setAnchorEl] = React.useState(null);
   //

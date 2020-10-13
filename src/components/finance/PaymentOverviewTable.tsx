@@ -1,10 +1,23 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
-import WeeklyPayment from '../../model/WeeklyPayment';
+import WeeklyPayment, { Currency } from '../../model/WeeklyPayment';
+import { groupBy } from 'lodash/fp';
+import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
 
 const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
+  const total = useMemo(() => {
+    return overviewData
+      ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(([key, value]) => ({
+          currency: key as Currency,
+          amount: value.reduce((previousValue, currentValue) => currentValue.amount + previousValue, 0),
+        }))
+      : [];
+  }, [overviewData]);
+  useEffect(() => {
+    console.log('Total', total);
+  }, [total]);
   return (
     <Fragment>
       {!overviewData || overviewData.length === 0 ? (
@@ -23,7 +36,10 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
             </TableHead>
             <TableBody>
               {overviewData.map(payment => (
-                <PaymentOverviewTableRow paymentData={payment} />
+                <PaymentOverviewTableRow paymentData={payment} key={payment.id} />
+              ))}
+              {total.map((value, index) => (
+                <PaymentOverviewTableTotalRow total={value} key={index} />
               ))}
             </TableBody>
           </Table>
