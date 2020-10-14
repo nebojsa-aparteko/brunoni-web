@@ -22,7 +22,7 @@ export default () => {
       let query = collection.orderBy('bookingId', 'asc').limit(100);
       // let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (paymentDate) {
-        // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
+        query = query.where('payDate', '==', paymentDate);
       }
       if (actingAs) {
         // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));

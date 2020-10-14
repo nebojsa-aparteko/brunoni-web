@@ -1,14 +1,18 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react';
 import Carrier from '../model/Carrier';
 import { Currency } from '../model/WeeklyPayment';
+import { startOfDay } from 'date-fns/fp';
 
 export interface WeeklyPaymentFilterContext {
-  carrier?: Carrier;
-  paymentDate?: Date;
-  currency: Currency;
+  carrier: Carrier;
+  paymentDate: Date;
+  currency: Currency[];
 }
 
-export const TASK_FILTERS_INITIAL_STATE = { currency: Currency.USD } as WeeklyPaymentFilterContext;
+export const TASK_FILTERS_INITIAL_STATE = {
+  currency: [Currency.USD],
+  paymentDate: startOfDay(new Date()),
+} as WeeklyPaymentFilterContext;
 
 const WeeklyPaymentFilterProviderContext = createContext<
   [WeeklyPaymentFilterContext, Dispatch<SetStateAction<WeeklyPaymentFilterContext>> | undefined]

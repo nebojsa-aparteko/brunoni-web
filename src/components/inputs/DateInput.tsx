@@ -5,6 +5,7 @@ import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { useTheme } from '@material-ui/core';
 
 interface Props {
+  label?: string;
   value?: Date;
   onChange: (date: Date) => void;
   open: boolean;
@@ -12,7 +13,7 @@ interface Props {
   onClose?: () => void;
 }
 
-const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose }) => {
+const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, label = 'Earliest Date' }) => {
   const theme = useTheme();
 
   return (
@@ -21,7 +22,7 @@ const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose }) 
         disableToolbar
         inputVariant="outlined"
         variant="inline"
-        label="Earliest Date"
+        label={label}
         open={open}
         onOpen={onOpen}
         onClose={onClose}
