@@ -222,7 +222,7 @@ const getTeamTasks = (checklistItems: string[]) => {
         .get();
 };
 
-const getTeamsPerUser = (assignee: UserRecord) =>
+export const getTeamsPerUser = (assignee: UserRecord) =>
   firebase
     .firestore()
     .collection('teams')

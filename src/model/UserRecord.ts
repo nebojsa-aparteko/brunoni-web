@@ -20,6 +20,7 @@ export default interface UserRecord extends UserRecordMin {
   teams?: Team[];
   archived?: boolean;
   redirectedAdmin?: UserRecordMin;
+  isRedirectionActive?: boolean;
 }
 
 export type Role = 'superadmin' | 'sales' | 'operations';

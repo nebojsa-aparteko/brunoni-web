@@ -4,7 +4,7 @@ import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 
 import { useSnackbar } from 'notistack';
-import { Box, Chip, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core';
+import { Box, Chip, Link, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 
@@ -121,6 +121,9 @@ const UserWidget: React.FC = () => {
             {client && <MenuItem onClick={handleSwitch}>Switch to {client.name}</MenuItem>}
           </div>
         )}
+        <MenuItem component={Link} href={'/my-profile'}>
+          My profile
+        </MenuItem>
         <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
       </Menu>
     </Fragment>

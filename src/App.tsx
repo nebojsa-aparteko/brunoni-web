@@ -37,6 +37,7 @@ import MyDayPage from './pages/MyDayPage';
 import * as QueryString from 'querystring';
 import firebase from 'firebase';
 import { useHistory } from 'react-router-dom';
+import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 
 const anonymousRoutes = (
@@ -69,6 +70,7 @@ const adminRoutes = (
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/my-day" component={MyDayPage} />
+    <Route exact path="/my-profile" component={MyProfilePage} />
     <Route exact path="/weekly-payment" component={WeeklyPaymentPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
@@ -87,6 +89,7 @@ const userRoutes = (
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route exact path="/my-day" component={MyDayPage} />
+    <Route exact path="/my-profile" component={MyProfilePage} />
     <Route path="/charges" component={SideCharges} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />

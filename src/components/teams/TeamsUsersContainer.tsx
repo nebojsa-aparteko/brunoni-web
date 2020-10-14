@@ -35,6 +35,7 @@ const TeamsUsersContainer: React.FC = () => {
                 <TableCell align="right">Role</TableCell>
                 <TableCell align="right">Last Login</TableCell>
                 <TableCell align="center">Vacation</TableCell>
+                <TableCell align="center">Redirect To</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
