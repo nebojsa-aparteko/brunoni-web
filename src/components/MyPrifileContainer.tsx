@@ -11,8 +11,7 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
-import ActingAs from '../contexts/ActingAs';
+import React, { useEffect, useState } from 'react';
 import useUser from '../hooks/useUser';
 import { getTeamsPerUser } from './myDay/MyDayContainer';
 import { Team } from '../model/Teams';
@@ -42,7 +41,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const MyProfileContainer = () => {
-  const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
   const [user, userData] = useUser();
   const [userTeams, setUserTeams] = useState<Team[]>([]);
@@ -67,11 +65,13 @@ const MyProfileContainer = () => {
                 <Typography variant="h3" display="inline">
                   My Profile
                 </Typography>
-                {!actingAs &&
-                  userData &&
+                {userData &&
                   userData.redirectedAdmin &&
                   (userData.redirectedAdmin.firstName || userData.redirectedAdmin.lastName) && (
-                    <UserNotificationRedirectionSwitch userUid={user.uid} user={userData} />
+                    <Box display="flex" flexWrap="nowrap" alignItems="center" justifyContent="center">
+                      <Typography>Notification redirection</Typography>
+                      <UserNotificationRedirectionSwitch userUid={user.uid} user={userData} />
+                    </Box>
                   )}
               </Box>
             }
@@ -107,8 +107,7 @@ const MyProfileContainer = () => {
                       <ListItemText primary="Teams:" secondary={userTeams?.map(team => team.name).join(', ')} />
                     </ListItem>
                   )}
-                  {!actingAs &&
-                    userData.redirectedAdmin &&
+                  {userData.redirectedAdmin &&
                     (userData.redirectedAdmin.firstName || userData.redirectedAdmin.lastName) && (
                       <ListItem>
                         <ListItemText

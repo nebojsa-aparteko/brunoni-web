@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useCallback } from 'react';
 import UserRecord from '../model/UserRecord';
-import { FormControlLabel, Switch } from '@material-ui/core';
+import { FormControl, Switch } from '@material-ui/core';
 import firebase from '../firebase';
 
 const UserNotificationRedirectionSwitch = ({ userUid, user }: Props) => {
@@ -18,10 +18,9 @@ const UserNotificationRedirectionSwitch = ({ userUid, user }: Props) => {
   );
 
   return (
-    <FormControlLabel
-      control={<Switch checked={user.isRedirectionActive} onChange={saveUserChanges} name="checkedB" color="primary" />}
-      label="Notification redirection"
-    />
+    <FormControl>
+      <Switch checked={user.isRedirectionActive} onChange={saveUserChanges} name="checkedB" color="primary" />
+    </FormControl>
   );
 };
 
