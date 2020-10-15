@@ -1,23 +1,14 @@
-import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
 import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
-import filter from 'lodash/fp/filter';
-import flow from 'lodash/fp/flow';
-import get from 'lodash/fp/get';
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
-import { Booking, BookingCategory, BookingVersion, Remark } from '../../model/Booking';
+import { Booking, BookingCategory, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
-import BookingSummary from './BookingSummary';
-import ContainerDetails from './ContainerDetails';
-import BookingFreight from './BookingFreight';
-import PortTerms from './PortTerms';
-import SpecialRemarks from './SpecialRemarks';
 import CheckList from './checklist/CheckList';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
-import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
@@ -29,6 +20,7 @@ import useTasksPerBooking from '../../hooks/useTasksPerBooking';
 import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
+import BookingViewMainContent from './BookingViewMainContent';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -93,7 +85,7 @@ interface Props {
   booking: Booking;
 }
 
-const getBookingTitle = (booking?: Booking) => {
+export const getBookingTitle = (booking?: Booking) => {
   return booking?.CarrierID?.toUpperCase() || '';
 };
 
@@ -107,11 +99,6 @@ function ScrollToTopOnMount() {
 
 const handlePrint = () => {
   window.print();
-};
-
-const remark = {
-  special: 'SPECIAL REMARKS',
-  final: 'FINAL REMARKS',
 };
 
 export const isLongVersion = (version: BookingVersion) => {
@@ -135,36 +122,14 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
 const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-  const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
-  const [isPrintWithCost, setPrintWithCost] = useState(false);
+  // const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
   const tasks = useTasksPerBooking(booking.id);
-
-  const specialRemarks: Remark[] = useMemo(
-    () =>
-      booking
-        ? flow(
-            get('Remarks'),
-            filter((item: Remark) => item.RemarkType === remark.special),
-          )(booking)
-        : [],
-    [booking],
-  );
-  const finalRemarks: Remark[] = useMemo(
-    () =>
-      booking
-        ? flow(
-            get('Remarks'),
-            filter((item: Remark) => item.RemarkType === remark.final),
-          )(booking)
-        : [],
-    [booking],
-  );
 
   const onArchiveClick = useCallback(() => {
     firebase
@@ -247,6 +212,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               <Box mb={2}>
                 <img
                   src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
+                  alt=""
                   style={{ width: '5em' }}
                 />
               </Box>
@@ -342,52 +308,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             </Box>
 
             <Grid item xs={12}>
-              <Page title={getBookingTitle(booking)}>
-                <Box marginTop="1em" marginBottom="0em">
-                  <BookingSummary booking={booking} bookingAgent={bookingAgent} />
-                </Box>
-                <Box marginTop="0em" marginBottom="0em">
-                  <ContainerDetails
-                    cargoDetail={booking.CargoDetails}
-                    version={booking.Version}
-                    category={booking?.Category}
-                    tariffDetails={booking?.CtrTariffsDetails}
-                    remarks={booking.Remarks}
-                  />
-                </Box>
-                {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
-                  <Fragment>
-                    <Box marginTop="0em" marginBottom="0em">
-                      <PortTerms portTerms={booking.PortTerms} />
-                    </Box>
-                    <Box marginTop="0em" marginBottom="0em">
-                      <SpecialRemarks remarks={specialRemarks} />
-                    </Box>
-                  </Fragment>
-                ) : null}
-
-                {booking.FreightDetails && (
-                  <Box marginTop="0em" marginBottom="0em" displayPrint="none">
-                    <BookingFreight freightDetails={booking.FreightDetails} />
-                  </Box>
-                )}
-                <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
-                  {finalRemarks.map((item, index) => {
-                    const text = item.RemarkTxt.split('<br/><br/>'); // split the string into an array for each new paragraph
-
-                    return item.RemarkTxt ? (
-                      <Typography variant="body2" key={`final-remark-${index}`}>
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: text.map(remark => remark.split('<br/>').join('')).join('<br/><br/>'),
-                          }}
-                        />
-                        {/* remove all <br/> from the elements of the string array to get rid of manual new rows and join the elements, aka paragraphs with <br/><br/> as they were initially */}
-                      </Typography>
-                    ) : null;
-                  })}
-                </Box>
-              </Page>
+              <BookingViewMainContent booking={booking} />
             </Grid>
           </Paper>
         </Page>

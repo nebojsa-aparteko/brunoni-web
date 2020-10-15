@@ -121,6 +121,7 @@ const DocumentListItem = ({
   const isAdmin = !actingAs;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComparisonDialog, setIsComparisonDialog] = useState<boolean>(false);
+  const [isAccountingDialog, setIsAccountingDialog] = useState<boolean>(false);
 
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
@@ -378,6 +379,7 @@ const DocumentListItem = ({
                   variant="body2"
                   onClick={() => {
                     setIsComparisonDialog(false);
+                    setIsAccountingDialog(false);
                     handleDialogOpen();
                   }}
                 >
@@ -389,16 +391,34 @@ const DocumentListItem = ({
               (internal ? true : item.isSelectedForComparison) &&
               item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
                 <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                  {isAdmin ? <CancelOutlinedIcon style={{ color: '#5f91c5', margin: 'auto' }} /> : null}
                   <Link
                     component="button"
                     variant="body2"
                     onClick={() => {
                       setIsComparisonDialog(true);
+                      setIsAccountingDialog(false);
                       handleDialogOpen();
                     }}
                   >
                     Compare Documents
+                  </Link>
+                </Box>
+              )}
+            {!isAdmin &&
+              (internal ? true : item.isSelectedForComparison) &&
+              item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+                <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                  <Link
+                    component="button"
+                    variant="body2"
+                    onClick={() => {
+                      setIsComparisonDialog(true);
+                      setIsAccountingDialog(true);
+
+                      handleDialogOpen();
+                    }}
+                  >
+                    Check Accounting Document
                   </Link>
                 </Box>
               )}
@@ -414,6 +434,7 @@ const DocumentListItem = ({
           changeStatus={changeStatus}
           allDocuments={comparableDocuments}
           isComparisonDialog={isComparisonDialog}
+          isAccountingDialog={isAccountingDialog}
         />
       )}
     </div>

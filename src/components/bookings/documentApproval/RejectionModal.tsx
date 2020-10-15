@@ -30,6 +30,7 @@ const RejectionModal: React.FC<Props> = ({
   changeStatus,
   allDocuments,
   isComparisonDialog,
+  isAccountingDialog,
 }) => {
   const [rejectionInput, setRejectionInput] = useState<RejectionInput | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
@@ -109,6 +110,7 @@ const RejectionModal: React.FC<Props> = ({
       onReject={onReject}
       rejectionInput={rejectionInput}
       onRejectionInputChange={onRejectionInputChange}
+      isAccountingDialog={isAccountingDialog}
     />
   );
 };
@@ -124,7 +126,7 @@ interface Props {
   changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
   allDocuments?: ChecklistItemValueDocument[];
   isComparisonDialog: boolean;
-  rightDocumentInitially?: ChecklistItemValueDocument;
+  isAccountingDialog?: boolean;
 }
 
 export interface RejectionInput {
