@@ -4,15 +4,16 @@ import * as changeCase from 'change-case';
 import identity from 'lodash/fp/identity';
 
 import { useSnackbar } from 'notistack';
-import { Box, Chip, Link, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core';
+import { Avatar, Box, Chip, Link, makeStyles, Menu, MenuItem, Typography } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import Forward from '@material-ui/icons/Forward';
 import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { useHistory } from 'react-router';
-import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
+import { isDashboardUser } from '../model/UserRecord';
 
 const useStyles = makeStyles(() => ({
   chip: {
@@ -23,6 +24,9 @@ const useStyles = makeStyles(() => ({
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
     },
+  },
+  avatarWarning: {
+    backgroundColor: 'rgba(255,16,0,0.25)',
   },
 }));
 
@@ -70,7 +74,21 @@ const UserWidget: React.FC = () => {
   return (
     <Fragment>
       <Chip
-        avatar={isDashboardUser(userData) ? <SupervisedUserCircle /> : <AccountCircle />}
+        avatar={
+          <Avatar className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}>
+            {isDashboardUser(userData) ? (
+              userData && userData.isRedirectionActive ? (
+                <Forward color="error" />
+              ) : (
+                <SupervisedUserCircle />
+              )
+            ) : userData && userData.isRedirectionActive ? (
+              <Forward color="error" />
+            ) : (
+              <AccountCircle />
+            )}
+          </Avatar>
+        }
         aria-label="User menu"
         aria-controls={menuId}
         aria-haspopup="true"
