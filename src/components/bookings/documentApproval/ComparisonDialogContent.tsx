@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import BookingViewMainContent from '../BookingViewMainContent';
-import React, { useCallback, useContext } from 'react';
+import React, { ReactChild, useCallback, useContext } from 'react';
 import CommentInput from '../../CommentInput';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
@@ -53,6 +53,33 @@ const useStyles = makeStyles(theme =>
     },
   }),
 );
+const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name, children }) => {
+  return (
+    <Box width="100%" position="relative" display="flex" flexDirection="column">
+      <Paper style={{ padding: 8, maxWidth: '48vw' }}>
+        <Typography style={{ fontWeight: 'bolder' }}>{name}</Typography>
+      </Paper>
+      <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>{children}</Box>
+    </Box>
+  );
+};
+
+const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => (
+  <DocumentLayout name={document.name}>
+    {fileType === 'pdf' ? (
+      <PDFViewer file={document} />
+    ) : fileType === 'html' ? (
+      <div>
+        <HTMLViewer file={{ url: document.url }} />
+      </div>
+    ) : (
+      <Typography style={{ flex: 1, margin: 'auto' }}>
+        The comparing option is currently only available for PDF files. The same functionality for other document types
+        will be available soon.
+      </Typography>
+    )}
+  </DocumentLayout>
+);
 
 const ComparisonDialogContent = ({
   booking,
@@ -88,42 +115,6 @@ const ComparisonDialogContent = ({
   })) as ActivityLogItem[];
 
   const filteredActivities = activityCollection?.filter(activity => activity.documents && activity.documents);
-
-  const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => {
-    switch (fileType) {
-      case 'pdf':
-        return (
-          <Box width="100%" position="relative" display="flex" flexDirection="column">
-            <Paper style={{ padding: 8, maxWidth: '48vw' }}>
-              <Typography style={{ fontWeight: 'bolder' }}>{document?.name}</Typography>
-            </Paper>
-            <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
-              <PDFViewer file={document} />
-            </Box>
-          </Box>
-        );
-      case 'html':
-        return (
-          <Box width="100%" position="relative" display="flex" flexDirection="column">
-            <Paper style={{ padding: 8, maxWidth: '48vw' }}>
-              <Typography style={{ fontWeight: 'bolder' }}>{document?.name}</Typography>
-            </Paper>
-            <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>
-              <div>
-                <HTMLViewer file={{ url: document.url }} />
-              </div>
-            </Box>
-          </Box>
-        );
-      default:
-        return (
-          <Typography style={{ flex: 1, margin: 'auto' }}>
-            The comparing option is currently only available for PDF files. The same functionality for other document
-            types will be available soon.
-          </Typography>
-        );
-    }
-  };
 
   return (
     <Grid
