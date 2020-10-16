@@ -21,6 +21,7 @@ import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
+import TourButton from './BookingTour';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -198,7 +199,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Box>
         </Grid>
       )}
-      <Grid item md={7} xs={12}>
+      <Grid className="bookingHeader" item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           <WatchersDialog
             booking={booking}
@@ -284,6 +285,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 <IconButton aria-label="print" size="small" onClick={handlePrint}>
                   <PrintIcon />
                 </IconButton>
+                <TourButton />
                 {/*<Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>*/}
                 {/*  <MenuItem*/}
                 {/*    onClick={() => {*/}

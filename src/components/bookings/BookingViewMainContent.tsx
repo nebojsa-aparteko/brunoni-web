@@ -44,10 +44,10 @@ const BookingViewMainContent = ({ booking }: Props) => {
 
   return (
     <Page title={getBookingTitle(booking)}>
-      <Box marginTop="1em" marginBottom="0em">
+      <Box className="bookingSummary" marginTop="1em" marginBottom="0em">
         <BookingSummary booking={booking} bookingAgent={bookingAgent} />
       </Box>
-      <Box marginTop="0em" marginBottom="0em">
+      <Box className="bookingContainerDetails" marginTop="0em" marginBottom="0em">
         <ContainerDetails
           cargoDetail={booking.CargoDetails}
           version={booking.Version}
