@@ -494,10 +494,6 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tar
 
   return (
     <Grid item xs={12}>
-      <Box marginTop="2em" marginBottom="2em">
-        <Divider />
-      </Box>
-
       {cargoDetail &&
         cargoDetail.map((cargoDetailItem, index) => (
           <ContainerItem

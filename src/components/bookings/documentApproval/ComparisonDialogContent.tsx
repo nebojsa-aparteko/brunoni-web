@@ -12,7 +12,6 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
-import BookingViewMainContent from '../BookingViewMainContent';
 import React, { ReactChild, useCallback, useContext } from 'react';
 import CommentInput from '../../CommentInput';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -27,6 +26,7 @@ import PDFViewer from '../../pdfViewer/PDFViewer';
 import HTMLViewer from '../../HTMLViewer';
 import ActingAs from '../../../contexts/ActingAs';
 import { RejectionInput } from './RejectionModal';
+import ExpandingBookingContent from './ExpandingBookingContent';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -47,12 +47,17 @@ const useStyles = makeStyles(theme =>
     },
     bookingViewContainer: {
       display: 'flex',
+      flexDirection: 'column',
       minHeight: 0,
       height: '100%',
       overflow: 'scroll',
     },
+    elevatedComponent: {
+      boxShadow: '0 0 0 1px rgba(63,63,68,0.05), 0 1px 3px 0 rgba(63,63,68,0.15)',
+    },
   }),
 );
+
 const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name, children }) => {
   return (
     <Box width="100%" position="relative" display="flex" flexDirection="column">
@@ -145,7 +150,7 @@ const ComparisonDialogContent = ({
             ) : null
           ) : (
             <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
-              <BookingViewMainContent booking={booking} />
+              <ExpandingBookingContent booking={booking} />
             </Grid>
           )}
           {!isAccountingDialog ? (
