@@ -2,7 +2,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import React, { useCallback, useMemo } from 'react';
 import invoke from 'lodash/fp/invoke';
-import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { ADMIN_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import UserInput from '../inputs/UserInput';
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
-  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const assignableUsers = useAdminUsers(ADMIN_ROLES);
   const assignableUsersWithoutCurrent = useMemo(
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
     [assignableUsers, user],

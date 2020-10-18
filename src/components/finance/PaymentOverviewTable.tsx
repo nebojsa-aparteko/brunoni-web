@@ -31,7 +31,7 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
                 <TableCell align="center">B/L No.</TableCell>
                 <TableCell align="center">Vessel</TableCell>
                 <TableCell align="center">Currency</TableCell>
-                <TableCell align="center">Amount</TableCell>
+                <TableCell align="right">Amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

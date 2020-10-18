@@ -1,6 +1,7 @@
 import React from 'react';
 import WeeklyPayment from '../../model/WeeklyPayment';
 import { Link, TableCell, TableRow, Typography } from '@material-ui/core';
+import currencyFormatter from '../../utilities/currencyFormatter';
 
 const PaymentOverviewTableRow: React.FC<Props> = ({ paymentData }) => {
   return (
@@ -15,7 +16,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({ paymentData }) => {
       </TableCell>
       <TableCell align="center">{paymentData.vessel || '-'}</TableCell>
       <TableCell align="center">{paymentData.currency}</TableCell>
-      <TableCell align="center">{paymentData.amount}</TableCell>
+      <TableCell align="right">{currencyFormatter(paymentData.currency)(paymentData.amount)}</TableCell>
     </TableRow>
   );
 };
