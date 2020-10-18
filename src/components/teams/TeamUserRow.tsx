@@ -20,7 +20,6 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
     [assignableUsers, user],
   );
-  console.log(user);
   const onChange = useCallback(
     (selectedUser: UserRecordMin | null) => {
       firebase
