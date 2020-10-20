@@ -5,7 +5,7 @@ import {
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  ChecklistItemValueDocumentStatus,
+  DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
 } from '../checklist/ChecklistItemModel';
 import { flow, isNil, omitBy } from 'lodash/fp';
@@ -90,15 +90,17 @@ const RejectionModal: React.FC<Props> = ({
   );
 
   return !isComparisonDialog ? (
-    <RejectionDialog
-      booking={booking}
-      checklistItem={checklistItem}
-      isOpen={isOpen}
-      handleClose={handleClose}
-      onReject={onReject}
-      rejectionInput={rejectionInput}
-      onRejectionInputChange={onRejectionInputChange}
-    />
+    checklistItem ? (
+      <RejectionDialog
+        booking={booking}
+        checklistItem={checklistItem}
+        isOpen={isOpen}
+        handleClose={handleClose}
+        onReject={onReject}
+        rejectionInput={rejectionInput}
+        onRejectionInputChange={onRejectionInputChange}
+      />
+    ) : null
   ) : (
     <ComparisonDialog
       document={document}
@@ -122,8 +124,8 @@ interface Props {
   handleClose: () => void;
   booking: Booking;
   document: ChecklistItemValueDocument;
-  checklistItem: ChecklistItem;
-  changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
+  checklistItem?: ChecklistItem;
+  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
   allDocuments?: ChecklistItemValueDocument[];
   isComparisonDialog: boolean;
   isAccountingDialog?: boolean;

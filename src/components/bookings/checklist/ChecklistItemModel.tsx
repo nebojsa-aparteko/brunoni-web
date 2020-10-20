@@ -1,11 +1,14 @@
-export interface ChecklistItemValueDocument {
+export interface DocumentValue {
   uploadedBy: ActivityLogUserData;
   uploadedAt: Date;
   url: string;
   name: string;
   storedName: string;
-  status?: ChecklistItemValueDocumentStatus;
+  status?: DocumentValueStatus;
   id: string;
+}
+
+export interface ChecklistItemValueDocument extends DocumentValue {
   mentionCount?: number;
   isInternal?: boolean;
   final?: boolean;
@@ -19,7 +22,7 @@ export enum ChecklistItemValueDocumentStatusType {
   REJECTED,
 }
 
-export interface ChecklistItemValueDocumentStatus {
+export interface DocumentValueStatus {
   type: ChecklistItemValueDocumentStatusType;
   at?: Date;
   by?: ActivityLogUserData;
@@ -28,7 +31,7 @@ export interface ChecklistItemValueDocumentStatus {
 export interface ShortChecklistItemValueDocument {
   url: string;
   name: string;
-  status?: ChecklistItemValueDocumentStatus;
+  status?: DocumentValueStatus;
   isInternal?: boolean;
 }
 

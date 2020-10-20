@@ -1,25 +1,14 @@
-import React, { Fragment, useContext, useMemo } from 'react';
-import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  Divider,
-  Paper,
-  Typography,
-} from '@material-ui/core';
+import React, { Fragment, useContext } from 'react';
+import { Card, CardActions, CardContent, CardHeader, Divider, Tab, Tabs } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
-import ChecklistItemRow from './ChecklistItemRow';
-import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import { differenceInMilliseconds } from 'date-fns';
 import ActivityLogContainer from './ActivityLogContainer';
 import ActingAs from '../../../contexts/ActingAs';
 import { ActivityLogProvider } from './ActivityLogContext';
-import useChecklist from '../../../hooks/useChecklist';
 import InternalStorage from '../InternalStorage';
-import { ChecklistItemValueDocument, ChecklistNames } from './ChecklistItemModel';
+import TabPanel from '../../TabPanel';
+import ChecklistContent from './ChecklistContent';
+import AccountingTabContent from '../accountingTab/AccountingTabContent';
 
 interface CheckListProps {
   booking: Booking;
@@ -28,41 +17,21 @@ interface CheckListProps {
 export const editRestriction = (date: Date) =>
   differenceInMilliseconds(new Date(), date) <= Number(process.env.EDIT_RESTRICTION_TIME) || 600000;
 
+function a11yProps(index: any) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
 
-  const checklistItems = useChecklist(booking.id);
+  const [tabValue, setTabValue] = React.useState(0);
 
-  const comparableDocuments = useMemo(
-    () =>
-      checklistItems
-        ?.filter(
-          checklistItem =>
-            checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS || checklistItem.id === ChecklistNames.B_L,
-        )
-        .map(item =>
-          (item.values || []).map(
-            i =>
-              ({
-                ...i,
-                checklistId: item.id,
-              } as ChecklistItemValueDocument),
-          ),
-        )
-        .reduce((acc, val) => acc.concat(val), [])
-        .filter(document => document.isSelectedForComparison) || [],
-    [checklistItems],
-  );
-
-  if (!checklistItems) {
-    return (
-      <Container>
-        <Paper>
-          <ChartsCircularProgress />
-        </Paper>
-      </Container>
-    );
-  }
+  const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   return (
     <Fragment>
@@ -70,28 +39,26 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
         <Card>
           <CardHeader
             title={
-              <Typography component="h2" variant="h2">
-                Checklist
-              </Typography>
+              <Tabs value={tabValue} onChange={handleChangeTab}>
+                <Tab label="Checklist" {...a11yProps(0)} />
+                <Tab label="Accounting" {...a11yProps(1)} />
+              </Tabs>
             }
           />
           <Divider />
           <CardContent>
-            <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
-              {checklistItems.map(item => (
-                <ChecklistItemRow
-                  key={`chkitem-${booking.id}-${item.id}`}
-                  checklistItem={item}
-                  isAdmin={!actingAs}
-                  booking={booking}
-                  comparableDocuments={comparableDocuments}
-                />
-              ))}
-            </Box>
+            <TabPanel index={0} value={tabValue}>
+              <ChecklistContent booking={booking} />
+            </TabPanel>
+            <TabPanel index={1} value={tabValue}>
+              <AccountingTabContent booking={booking} />
+            </TabPanel>
           </CardContent>
-          <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
+          {tabValue === 0 && (
+            <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
+          )}
         </Card>
-        {!actingAs && <InternalStorage id={booking!.id} collection={'bookings'} />}
+        {!actingAs && tabValue === 0 && <InternalStorage id={booking!.id} collection={'bookings'} />}
         <ActivityLogContainer booking={booking} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>

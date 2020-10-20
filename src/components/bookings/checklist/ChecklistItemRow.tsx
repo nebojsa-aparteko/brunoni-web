@@ -18,7 +18,7 @@ import {
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  ChecklistItemValueDocumentStatus,
+  DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
   CustomerAction,
   CustomerChecklistActionType,
@@ -422,7 +422,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   const handleDocumentStatusChange = (
     item: ChecklistItemValueDocument,
-    status: ChecklistItemValueDocumentStatus,
+    status: DocumentValueStatus,
     internal: boolean,
   ) => {
     let newItemArray: ChecklistItemValueDocument[];
@@ -611,7 +611,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           checklistItemValues={checklistItem.values || []}
           booking={booking}
           checklistItem={checklistItem}
-          changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
             handleDocumentStatusChange(item, status, false)
           }
           internal={false}
@@ -646,7 +646,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               checklistItemValues={checklistItem.valuesAdmin || []}
               booking={booking}
               checklistItem={checklistItem}
-              changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+              changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
                 handleDocumentStatusChange(item, status, true)
               }
               internal={true}
