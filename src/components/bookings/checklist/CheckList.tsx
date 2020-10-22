@@ -39,9 +39,9 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
         <Card>
           <CardHeader
             title={
-              <Tabs value={tabValue} onChange={handleChangeTab}>
+              <Tabs value={tabValue} onChange={!actingAs ? handleChangeTab : () => {}}>
                 <Tab label="Checklist" {...a11yProps(0)} />
-                <Tab label="Accounting" {...a11yProps(1)} />
+                {!actingAs && <Tab label="Accounting" {...a11yProps(1)} />}
               </Tabs>
             }
           />
@@ -50,9 +50,11 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
             <TabPanel index={0} value={tabValue}>
               <ChecklistContent booking={booking} />
             </TabPanel>
-            <TabPanel index={1} value={tabValue}>
-              <AccountingTabContent booking={booking} />
-            </TabPanel>
+            {!actingAs && (
+              <TabPanel index={1} value={tabValue}>
+                <AccountingTabContent booking={booking} />
+              </TabPanel>
+            )}
           </CardContent>
           {tabValue === 0 && (
             <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
