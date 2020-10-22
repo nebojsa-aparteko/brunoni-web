@@ -110,6 +110,7 @@ const DocumentListItem = ({
   changeStatus,
   storageBasePath,
   internal,
+  isAccountingDocument,
   markAsFinal,
   comparableDocuments,
   selectForComparison,
@@ -382,13 +383,14 @@ const DocumentListItem = ({
       </ListItem>
       {(isAdmin ? true : !item.final) &&
         ((internal && isAdmin) || (!internal && !isAdmin)) &&
-        (item.status?.at ? editRestriction(item.status.at) : true) &&
-        (!internal && !isAdmin && NODE_ENV === 'production'
-          ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
-          : true) &&
-        !checklistCheckedRule() &&
-        checklistItem &&
-        checkIfShouldShowStatusAction(checklistItem.id) && (
+        (((item.status?.at ? editRestriction(item.status.at) : true) &&
+          (!internal && !isAdmin && NODE_ENV === 'production'
+            ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
+            : true) &&
+          !checklistCheckedRule() &&
+          checklistItem &&
+          checkIfShouldShowStatusAction(checklistItem.id)) ||
+          isAccountingDocument) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
             {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
               <Box display="flex" ml={2} mb={2}>
@@ -427,7 +429,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+            {!isAccountingDocument && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -444,6 +446,7 @@ const DocumentListItem = ({
               </Box>
             )}
             {!isAdmin &&
+              !isAccountingDocument &&
               (internal ? true : item.isSelectedForComparison) &&
               item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
                 <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
@@ -460,24 +463,22 @@ const DocumentListItem = ({
                   </Link>
                 </Box>
               )}
-            {!isAdmin &&
-              (internal ? true : item.isSelectedForComparison) &&
-              item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-                <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                      setIsComparisonDialog(true);
-                      setIsAccountingDialog(true);
+            {isAdmin && internal && isAccountingDocument && (
+              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    setIsComparisonDialog(true);
+                    setIsAccountingDialog(true);
 
-                      handleDialogOpen();
-                    }}
-                  >
-                    Check Accounting Document
-                  </Link>
-                </Box>
-              )}
+                    handleDialogOpen();
+                  }}
+                >
+                  Check Accounting Document
+                </Link>
+              </Box>
+            )}
           </Box>
         )}
       {isDialogOpen && (
@@ -505,6 +506,7 @@ export interface DocumentListItemPropsBase {
   storageBasePath: string;
   changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
   internal: boolean;
+  isAccountingDocument?: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;
   comparableDocuments: ChecklistItemValueDocument[];
   selectForComparison: (item: ChecklistItemValueDocument) => void;

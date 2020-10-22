@@ -18,6 +18,7 @@ import firebase from '../../../firebase';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import useAccountingDocuments from '../../../hooks/useAccountingDocuments';
+import { editRestriction } from '../checklist/CheckList';
 
 const addAccountingDocument = (file: DocumentValue, bookingId: string) => {
   return firebase
@@ -27,6 +28,16 @@ const addAccountingDocument = (file: DocumentValue, bookingId: string) => {
     .collection('accounting-documents')
     .doc()
     .set(file);
+};
+
+const changeAccountingDocument = (file: DocumentValue, bookingId: string) => {
+  return firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('accounting-documents')
+    .doc(file.id)
+    .update(file);
 };
 
 const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
@@ -68,6 +79,55 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
     [booking, getActivityLogUserData],
   );
 
+  const storeAccountingActivity = (accountingActivityHandler: () => Promise<void>) => {
+    accountingActivityHandler()
+      .then(_ => {
+        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+          variant: 'success',
+          autoHideDuration: 1500,
+        });
+      })
+      .catch(error => {
+        console.error('error storing activity', error);
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      });
+  };
+
+  const handleDocumentStatusChange = (item: DocumentValue, status: DocumentValueStatus) => {
+    if (item.status && !editRestriction(item.status!.at as Date)) {
+      return enqueueSnackbar(
+        <Typography color="inherit">
+          {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
+        </Typography>,
+        {
+          variant: 'error',
+          autoHideDuration: 1000,
+        },
+      );
+    }
+    const newItem: DocumentValue = { ...item, status: status };
+
+    storeAccountingActivity(() =>
+      changeAccountingDocument(newItem, booking.id).then(_ =>
+        addActivityItem(
+          booking!.id,
+          createActivityObject(
+            ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+            getActivityLogUserData(),
+            undefined,
+            [newItem],
+            undefined,
+            true,
+            true,
+          ),
+        ),
+      ),
+    );
+  };
+
   const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, 'accounting-documents'].join(
       '/',
@@ -90,32 +150,20 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
           item={item}
           booking={booking}
           storageBasePath={storageBasePath}
-          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) => {}}
+          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
+            handleDocumentStatusChange(item, status)
+          }
           internal={true}
-          markAsFinal={item => {}}
+          isAccountingDocument={true}
+          markAsFinal={() => {}}
           comparableDocuments={[]}
-          selectForComparison={item => {}}
+          selectForComparison={() => {}}
         />
       ))}
       <DropZone
         storageBasePath={storageBasePath}
         internal={false}
-        onUpload={values =>
-          accountingFileAddedHandler(values)
-            .then(_ => {
-              enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-                variant: 'success',
-                autoHideDuration: 1500,
-              });
-            })
-            .catch(error => {
-              console.error('error storing activity', error);
-              enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 3000,
-              });
-            })
-        }
+        onUpload={values => storeAccountingActivity(() => accountingFileAddedHandler(values))}
         onDelete={() => {}}
       />
     </Box>
