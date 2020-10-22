@@ -29,7 +29,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import { flow, isNil, omit, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
-import { Booking, BookingLocType, CheckListDocument } from '../../../model/Booking';
+import { Booking, StoredDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';
@@ -41,6 +41,8 @@ import DocumentList from './DocumentList';
 import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
+import DropZone, { makeContentDispositionFileName } from '../../DropZone';
+import omitEmptyDeep from '../../../utilities/omitEmptyDeep';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -146,10 +148,11 @@ const checkStageDependency = (stages: Stage[], stageId: string) => {
 export const createActivityObject = (
   changeType: ActivityChangeType,
   by: ActivityLogUserData,
-  checklistItem: ChecklistItem,
+  checklistItem?: ChecklistItem,
   documents?: ChecklistItemValueDocument[],
   stage?: Stage,
   internal?: boolean,
+  isAccountingActivity?: boolean,
 ): ActivityLogItem =>
   flow(omitBy(isNil))({
     changeType: changeType,
@@ -157,24 +160,15 @@ export const createActivityObject = (
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: internal,
-    checklistItem: {
-      id: checklistItem.id,
-      label: checklistItem.label,
-      checked: !!checklistItem.checked,
-    } as ShortChecklistItem,
+    checklistItem: omitEmptyDeep({
+      id: checklistItem?.id,
+      label: checklistItem?.label,
+      checked: checklistItem?.checked,
+    } as ShortChecklistItem),
     documents: documents,
     stage: stage,
+    isAccountingActivity: !!isAccountingActivity,
   } as ActivityLogItem);
-
-const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: Booking, file: File) => {
-  if (['IMO', 'OOG'].includes(checklistItem.id)) {
-    const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
-    if (deliveryRef) {
-      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
-    }
-  }
-  return `attachment; filename=${file.name}`;
-};
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
   const classes = useStyles();
@@ -475,7 +469,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   const onDrop = useCallback(
     (acceptedFiles: File[], internal: boolean) => {
       saveFiles(acceptedFiles)
-        .then((documents: CheckListDocument[]) => {
+        .then((documents: StoredDocument[]) => {
           console.log(documents, 'DOCUMENTS');
           const values = documents.map(item => {
             return {
@@ -499,13 +493,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, false),
     noClick: true,
   });
-
-  const {
-    getRootProps: getRootPropsDraft,
-    getInputProps: getInputPropsDraft,
-    open: openDraft,
-    isDragActive: isDragActiveDraft,
-  } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 
   const {
     getRootProps: getRootPropsDraftNoClick,
@@ -660,22 +647,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       {isAdmin && checklistItem.valuesAdmin?.length === 0 && (
         <Fragment>
           <Divider orientation="vertical" flexItem={true} />
-          <Box
-            {...getRootPropsDraft()}
-            className={
-              isDragActiveDraft ? classes.draftDragZone : isDragActive ? classes.draftEmpty : classes.draftRoot
-            }
-            flexBasis="fit-content"
-            display="flex"
-            flexDirection="column"
-            id={checklistItem.id}
-            justifyContent="center"
-            alignItems="center"
-            px={1}
-          >
-            <input {...getInputPropsDraft()} />
-            Internals
-          </Box>
+          <DropZone
+            label={'Internals'}
+            storageBasePath={storageBasePath}
+            booking={booking}
+            checklistItem={checklistItem}
+            internal={true}
+            onUpload={(values, internal) => storeActivity(() => checklistItemFileAddedHandler(values, internal))}
+          />
         </Fragment>
       )}
       {isActionDialogOpen && (

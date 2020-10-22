@@ -5,11 +5,11 @@ export interface DocumentValue {
   name: string;
   storedName: string;
   status?: DocumentValueStatus;
+  mentionCount?: number;
   id: string;
 }
 
 export interface ChecklistItemValueDocument extends DocumentValue {
-  mentionCount?: number;
   isInternal?: boolean;
   final?: boolean;
   isSelectedForComparison?: boolean;

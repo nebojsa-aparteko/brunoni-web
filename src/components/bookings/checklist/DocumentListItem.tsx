@@ -29,6 +29,7 @@ import {
   DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
   ChecklistNames,
+  DocumentValue,
 } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
@@ -146,15 +147,19 @@ const DocumentListItem = ({
     [userRecord],
   );
 
-  const checklistItemFileDeletedHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument, internal: boolean) => {
+  const checklistFileDeletedHandler = useCallback(
+    (
+      documents: ChecklistItemValueDocument[] | DocumentValue[],
+      deletedFile: ChecklistItemValueDocument | DocumentValue,
+      internal: boolean,
+    ) => {
       checklistItem
         ? firebase
             .firestore()
             .collection('bookings')
             .doc(booking.id!)
             .collection('checklist')
-            .doc(checklistItem?.id)
+            .doc(checklistItem.id)
             .update(internal ? 'valuesAdmin' : 'values', documents)
             .then(_ => {
               console.log('File deleted', deletedFile, documents, internal, checklistItem);
@@ -177,7 +182,45 @@ const DocumentListItem = ({
                 autoHideDuration: 1000,
               });
             })
-        : console.log('Update document to be implemented');
+        : console.log('Error: Checklist item not defined');
+    },
+    [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
+  );
+
+  const accountingFileDeletedHandler = useCallback(
+    (
+      documents: ChecklistItemValueDocument[] | DocumentValue[],
+      deletedFile: ChecklistItemValueDocument | DocumentValue,
+    ) => {
+      firebase
+        .firestore()
+        .collection('bookings')
+        .doc(booking.id!)
+        .collection('accounting-documents')
+        .doc(deletedFile.id)
+        .delete()
+        .then(_ => {
+          console.log('File deleted', deletedFile);
+          return addActivityItem(
+            booking.id!,
+            createActivityObject(
+              ActivityChangeType.DELETE_FILE,
+              getActivityLogUserData(),
+              undefined,
+              [deletedFile],
+              undefined,
+              undefined,
+              true,
+            ),
+          );
+        })
+        .catch(error => {
+          console.error('Failed to delete item', error);
+          enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
+            variant: 'error',
+            autoHideDuration: 1000,
+          });
+        });
     },
     [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
   );
@@ -196,7 +239,7 @@ const DocumentListItem = ({
   const checklistCheckedRule = useCallback(() => checklistItem?.checked, [checklistItem]);
 
   const deleteFile = useCallback(
-    (item: ChecklistItemValueDocument, internal: boolean) => {
+    (item: ChecklistItemValueDocument | DocumentValue, internal: boolean) => {
       setRemovalInProgress(true);
       try {
         if (!editRestriction(item.uploadedAt as Date)) {
@@ -219,26 +262,29 @@ const DocumentListItem = ({
           checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) !== -1
         ) {
           const newItemArray = checklistItem.values?.filter(chkItem => chkItem !== item);
-          checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+          checklistFileDeletedHandler(newItemArray || [], item, internal);
         } else {
-          if (checklistItem) {
-            documentRef
-              .delete()
-              .then(() => {
-                console.debug('file deleted from storage ', item);
-              })
-              .catch(error => {
-                console.error('Failed to remove item - {error.message}', error);
-              })
-              .finally(() => {
-                // remove item from the list in any case since if it is an error with the storage means file is alrady out
-                setRemovalInProgress(false);
-                const newItemArray = internal
+          documentRef
+            .delete()
+            .then(() => {
+              console.debug('file deleted from storage ', item);
+            })
+            .catch(error => {
+              console.error('Failed to remove item - {error.message}', error);
+            })
+            .finally(() => {
+              // remove item from the list in any case since if it is an error with the storage means file is alrady out
+              setRemovalInProgress(false);
+              let newItemArray: ChecklistItemValueDocument[] | DocumentValue[] | undefined = [];
+              if (checklistItem) {
+                newItemArray = internal
                   ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
                   : checklistItem.values?.filter(chkItem => chkItem !== item);
-                checklistItemFileDeletedHandler(newItemArray || [], item, internal);
-              });
-          }
+                checklistFileDeletedHandler(newItemArray || [], item, internal);
+              } else {
+                accountingFileDeletedHandler(newItemArray || [], item);
+              }
+            });
         }
       } catch (error) {
         setRemovalInProgress(false);
@@ -296,7 +342,7 @@ const DocumentListItem = ({
             {isAdmin &&
             !internal &&
             checklistItem &&
-              (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
+            (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
               <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
                 <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
               </IconButton>

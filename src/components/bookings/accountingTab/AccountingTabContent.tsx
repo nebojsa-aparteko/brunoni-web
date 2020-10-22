@@ -1,75 +1,78 @@
-import { Box, Container, createStyles, makeStyles } from '@material-ui/core';
-import React, { useMemo } from 'react';
+import { Box, Container, Typography } from '@material-ui/core';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { Booking } from '../../../model/Booking';
-import { ChecklistItemValueDocument, DocumentValue, DocumentValueStatus } from '../checklist/ChecklistItemModel';
+import {
+  ActivityChangeType,
+  ActivityLogUserData,
+  ChecklistItemValueDocument,
+  DocumentValue,
+  DocumentValueStatus,
+} from '../checklist/ChecklistItemModel';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 
 import DocumentListItem from '../checklist/DocumentListItem';
-import { useDropzone } from 'react-dropzone';
+import DropZone from '../../DropZone';
+import { addActivityItem } from '../checklist/ActivityLogContainer';
+import { createActivityObject } from '../checklist/ChecklistItemRow';
+import firebase from '../../../firebase';
+import UserRecordContext from '../../../contexts/UserRecordContext';
+import { useSnackbar } from 'notistack';
+import useAccountingDocuments from '../../../hooks/useAccountingDocuments';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    draftRoot: {
-      height: '50px',
-      border: '1px dashed #ccc',
-      cursor: 'pointer',
-      borderColor: '#999',
-      '&:focus': {
-        outline: 'none',
-      },
-    },
-    draftEmpty: {
-      height: '50px',
-      border: 'none',
-    },
-  }),
-);
-
-const testDate = new Date();
-const accountingDocuments: DocumentValue[] = [
-  {
-    id: 'doc1',
-    name: 'Test file 1',
-    storedName: 'Test_file_1',
-    url: '',
-    uploadedBy: {
-      alphacomId: '006184-006',
-      alphacomClientId: '006184',
-      emailAddress: 'marko.nenadovic@spicefactory.co',
-      firstName: 'Marko',
-      lastName: 'Nenadovic',
-    },
-    uploadedAt: testDate,
-  },
-  {
-    id: 'doc2',
-    name: 'Test file 2',
-    storedName: 'Test_file_2',
-    url: '',
-    uploadedBy: {
-      alphacomId: '006184-006',
-      alphacomClientId: '006184',
-      emailAddress: 'marko.nenadovic@spicefactory.co',
-      firstName: 'Marko',
-      lastName: 'Nenadovic',
-    },
-    uploadedAt: testDate,
-  },
-];
+const addAccountingDocument = (file: DocumentValue, bookingId: string) => {
+  return firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .collection('accounting-documents')
+    .doc()
+    .set(file);
+};
 
 const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
-  const classes = useStyles();
+  const userRecord = useContext(UserRecordContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const accountingDocuments = useAccountingDocuments(booking.id);
+
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const accountingFileAddedHandler = useCallback(
+    (addedFiles: DocumentValue[]) => {
+      return Promise.all(addedFiles.map(file => addAccountingDocument(file, booking.id)))
+        .then(_ =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject(
+              ActivityChangeType.ADD_FILE,
+              getActivityLogUserData(),
+              undefined,
+              addedFiles,
+              undefined,
+              undefined,
+              true,
+            ),
+          ),
+        )
+        .catch(error => console.error('Error saving new document list', error));
+    },
+    [booking, getActivityLogUserData],
+  );
+
   const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, 'accounting-documents'].join(
       '/',
     );
   }, [booking]);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles: File[]) => () => {
-      console.log(acceptedFiles);
-    },
-  });
 
   if (!accountingDocuments) {
     return (
@@ -94,21 +97,27 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
           selectForComparison={item => {}}
         />
       ))}
-      <Box
-        {...getRootProps()}
-        className={isDragActive ? classes.draftEmpty : classes.draftRoot}
-        flexBasis="stretch"
-        width={'100%'}
-        display="flex"
-        flexDirection="column"
-        id={'accounting_document'}
-        justifyContent="center"
-        alignItems="center"
-        px={1}
-      >
-        <input {...getInputProps()} />
-        Drag and drop files here
-      </Box>
+      <DropZone
+        storageBasePath={storageBasePath}
+        internal={false}
+        onUpload={values =>
+          accountingFileAddedHandler(values)
+            .then(_ => {
+              enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+                variant: 'success',
+                autoHideDuration: 1500,
+              });
+            })
+            .catch(error => {
+              console.error('error storing activity', error);
+              enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+                variant: 'error',
+                autoHideDuration: 3000,
+              });
+            })
+        }
+        onDelete={() => {}}
+      />
     </Box>
   );
 };

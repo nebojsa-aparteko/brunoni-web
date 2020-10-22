@@ -58,8 +58,10 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         <Fragment>
           <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
         </Fragment>
-      ) : (
+      ) : !activity.isAccountingActivity ? (
         'Internal storage.'
+      ) : (
+        'Accounting.'
       )}
     </Typography>
   );
