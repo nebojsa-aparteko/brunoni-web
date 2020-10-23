@@ -18,6 +18,7 @@ interface Props {
   onChange?: () => void;
   booking?: Booking;
   quote?: Quote;
+  isAccounting?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -34,6 +35,7 @@ const ActivityLogView: React.FC<Props> = ({
   quoteActivityLog,
   booking,
   quote,
+  isAccounting,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -80,7 +82,7 @@ const ActivityLogView: React.FC<Props> = ({
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
         ) : (
-          <WriteComment onCommentSave={onCommentSave} booking={booking} />
+          <WriteComment onCommentSave={onCommentSave} booking={booking} isAccounting={isAccounting} />
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <Box id={activity.id} key={`act-${activity.id}`}>

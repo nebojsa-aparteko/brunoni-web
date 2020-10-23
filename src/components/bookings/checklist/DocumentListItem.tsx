@@ -233,7 +233,8 @@ const DocumentListItem = ({
       activityLogContext.setState({
         documentReference: { ...item, isInternal: internal },
         checklistReference: checklistItem,
-        internal: internal,
+        internal: isAccountingDocument ? true : internal,
+        isAccountingActivity: isAccountingDialog,
       }),
     [checklistItem, internal, item],
   );

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quote }) => {
+const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quote, isAccounting }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
@@ -201,7 +201,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
           <SendIcon />
         </IconButton>
       </Box>
-      {isAdmin && (
+      {isAdmin && !isAccounting && (
         <FormControlLabel
           control={
             <Checkbox
@@ -256,4 +256,5 @@ interface WriteCommentProp {
   onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
   booking?: Booking;
   quote?: Quote;
+  isAccounting?: boolean;
 }

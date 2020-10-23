@@ -61,7 +61,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
           )}
         </Card>
         {!actingAs && tabValue === 0 && <InternalStorage id={booking!.id} collection={'bookings'} />}
-        <ActivityLogContainer booking={booking} isAdmin={!actingAs} />
+        <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={tabValue === 1} />
       </ActivityLogProvider>
     </Fragment>
   );

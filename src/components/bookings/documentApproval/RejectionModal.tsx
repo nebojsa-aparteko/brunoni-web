@@ -75,6 +75,7 @@ const RejectionModal: React.FC<Props> = ({
           at: new Date(),
           by: userActivityLogData,
           isInternal: internal,
+          isAccountingActivity: isAccountingDialog,
           checklistItem: shortenedChecklist(checklistItem),
           documents: shortenedDocumentValue(document),
           mentions: mentions,
