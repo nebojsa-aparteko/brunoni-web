@@ -24,8 +24,13 @@ export default () => {
       if (paymentDate) {
         query = query.where('payDate', '==', paymentDate);
       }
-      if (actingAs) {
-        // query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
+      if (carrier) {
+        console.log(carrier.name, carrier.id);
+        query = query.where(
+          'carrier',
+          '==',
+          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+        );
       }
       return query;
     },

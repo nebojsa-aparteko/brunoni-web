@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import PaymentOverviewTable from './PaymentOverviewTable';
 import usePaymentOverview from '../../hooks/usePaymentOverview';
 import {
@@ -21,11 +21,21 @@ import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
 import { startOfDay } from 'date-fns/fp';
+import CarrierInput from '../inputs/CarrierInput';
+import theme from '../../theme';
+import Carriers from '../../contexts/Carriers';
+
 const useStyles = makeStyles(theme => ({
   formControl: {
     margin: theme.spacing(1),
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
     minWidth: 120,
     // maxWidth: 300,
+  },
+  spacer: {
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
   },
 }));
 const ITEM_HEIGHT = 48;
@@ -42,8 +52,9 @@ const PaymentOverviewContainer = () => {
   const overviewData = usePaymentOverview();
   const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
+  const carriers = useContext(Carriers);
 
-  const { currency, paymentDate } = filters;
+  const { currency, paymentDate, carrier } = filters;
 
   const classes = useStyles();
 
@@ -81,33 +92,47 @@ const PaymentOverviewContainer = () => {
         }
       />
       <CardContent>
-        <FormControl className={classes.formControl}>
-          <InputLabel id="currency-select">Currency</InputLabel>
-          <Select
-            labelId="currency-select"
-            id="currency-select-checkbox"
-            multiple
-            value={currency}
-            onChange={onCurrencyChange}
-            input={<Input />}
-            renderValue={selected => (selected as any[]).join(', ')}
-            MenuProps={MenuProps}
-          >
-            {Object.entries(Currency).map(([key, value]) => (
-              <MenuItem key={key} value={value}>
-                <Checkbox checked={currency.indexOf(value) > -1} />
-                <ListItemText primary={value} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <DateInput
-          value={paymentDate}
-          onChange={handleDateChange}
-          open={dateOpen}
-          onOpen={() => setDateOpen(true)}
-          label="Payment Date"
-        />
+        <Box display="flex" flexDirection="row">
+          <FormControl className={classes.formControl}>
+            <InputLabel id="currency-select">Currency</InputLabel>
+            <Select
+              labelId="currency-select"
+              id="currency-select-checkbox"
+              multiple
+              value={currency}
+              onChange={onCurrencyChange}
+              input={<Input />}
+              renderValue={selected => (selected as any[]).join(', ')}
+              MenuProps={MenuProps}
+            >
+              {Object.entries(Currency).map(([key, value]) => (
+                <MenuItem key={key} value={value}>
+                  <Checkbox checked={currency.indexOf(value) > -1} />
+                  <ListItemText primary={value} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box className={classes.spacer}>
+            <DateInput
+              value={paymentDate}
+              onChange={handleDateChange}
+              open={dateOpen}
+              onOpen={() => setDateOpen(true)}
+              label="Payment Date"
+            />
+          </Box>
+          <Box display="flex" style={{ minWidth: theme.spacing(35) }} className={classes.spacer}>
+            <CarrierInput
+              label={'Carriers'}
+              carriers={carriers}
+              onChange={carrier => {
+                if (setFilters) setFilters(set('carrier', carrier)(filters));
+              }}
+              value={carrier}
+            />
+          </Box>
+        </Box>
         <PaymentOverviewTable overviewData={filteredOverviewData} />
       </CardContent>
     </Card>
