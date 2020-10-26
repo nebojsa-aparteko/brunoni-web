@@ -1,5 +1,16 @@
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
@@ -191,7 +202,16 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   // };
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {tasks && (
+      {tasks === undefined && (
+        <Grid item xs={12} md={11}>
+          <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
+            <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CircularProgress style={{ margin: 'auto' }} />
+            </Paper>
+          </Box>
+        </Grid>
+      )}
+      {tasks && tasks.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
             <BookingTaskExpansionPanel tasks={tasks} />
