@@ -48,7 +48,13 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       {activity.stage && ` '${activity.stage?.label}' stage in `}
       {activity.documents &&
         activity.documents.map((doc, index) => {
-          return [ActivityChangeType.ADD_FILE].includes(activity.changeType as ActivityChangeType) ? (
+          return [
+            ActivityChangeType.ADD_FILE,
+            ActivityChangeType.SELECT_FOR_COMPARISON,
+            ActivityChangeType.UNSELECT_FOR_COMPARISON,
+            ActivityChangeType.MARK_AS_FINAL,
+            ActivityChangeType.UNMARK_AS_FINAL,
+          ].includes(activity.changeType as ActivityChangeType) ? (
             <Fragment key={doc.url}>
               <Link href={doc.url} target="_blank">
                 {doc.name}
@@ -64,9 +70,9 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         ' for comparison.'}
       {activity.documents &&
       activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
-        activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
-        activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
-        activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL
+      activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
+      activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
+      activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL
         ? activity.changeType === ActivityChangeType.ADD_FILE
           ? ' into '
           : ' from '
