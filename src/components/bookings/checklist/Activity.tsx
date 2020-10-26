@@ -1,11 +1,9 @@
-import React, { Fragment, useState } from 'react';
-import { Box, Link, Tooltip, Typography } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
-import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
-import formatDate from 'date-fns/format';
 import DateFormattedText from '../../DateFormattedText';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
@@ -31,6 +29,14 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.DONE_BY_CUSTOMER;
       case ActivityChangeType.UNDO_COMPLETED_CUSTOMER:
         return ActivityText.UNDO_COMPLETED_CUSTOMER;
+      case ActivityChangeType.SELECT_FOR_COMPARISON:
+        return ActivityText.SELECT_FOR_COMPARISON;
+      case ActivityChangeType.UNSELECT_FOR_COMPARISON:
+        return ActivityText.UNSELECT_FOR_COMPARISON;
+      case ActivityChangeType.MARK_AS_FINAL:
+        return ActivityText.MARK_AS_FINAL;
+      case ActivityChangeType.UNMARK_AS_FINAL:
+        return ActivityText.UNMARK_AS_FINAL;
     }
   };
   return (
@@ -53,22 +59,37 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
             `${doc.name} `
           );
         })}
-      {activity.documents ? (activity.changeType === ActivityChangeType.ADD_FILE ? ' into ' : 'from ') : null}
-      {activity.checklistItem ? (
-        <Fragment>
-          <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
-        </Fragment>
-      ) : !activity.isAccountingActivity ? (
-        'Internal storage.'
-      ) : (
-        'Accounting.'
-      )}
+      {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
+        activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
+        ' for comparison.'}
+      {activity.documents &&
+      activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
+        activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
+        activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
+        activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL
+        ? activity.changeType === ActivityChangeType.ADD_FILE
+          ? ' into '
+          : ' from '
+        : null}
+      {activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
+      activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
+      activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
+      activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL ? (
+        activity.checklistItem ? (
+          <Fragment>
+            <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+          </Fragment>
+        ) : !activity.isAccountingActivity ? (
+          'Internal storage.'
+        ) : (
+          'Accounting.'
+        )
+      ) : null}
     </Typography>
   );
 };
 
 const Activity = ({ activity, ...other }: Props) => {
-  const [isFullDateFormat, setIsFullDateFormat] = useState(false);
   return (
     <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
       <Avatar

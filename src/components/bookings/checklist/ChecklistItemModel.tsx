@@ -98,6 +98,10 @@ export enum ActivityText {
   DEFAULTED_FILE = ' has undo changes on ',
   APPROVED_FILE = ' has approved ',
   REJECTED_FILE = ' has sent on revision ',
+  SELECT_FOR_COMPARISON = ' has selected ',
+  UNSELECT_FOR_COMPARISON = ' has unselected ',
+  MARK_AS_FINAL = ' has marked as final ',
+  UNMARK_AS_FINAL = ' has marked as not final ',
 }
 
 export enum ActivityChangeType {
@@ -108,6 +112,10 @@ export enum ActivityChangeType {
   DOCUMENT_STATUS_CHANGED,
   DONE_BY_CUSTOMER,
   UNDO_COMPLETED_CUSTOMER,
+  SELECT_FOR_COMPARISON,
+  UNSELECT_FOR_COMPARISON,
+  MARK_AS_FINAL,
+  UNMARK_AS_FINAL,
 }
 
 export enum ChecklistNames {

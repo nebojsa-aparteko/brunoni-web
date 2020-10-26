@@ -18,10 +18,10 @@ import {
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
   CustomerAction,
   CustomerChecklistActionType,
+  DocumentValueStatus,
   ShortChecklistItem,
   Stage,
 } from './ChecklistItemModel';
@@ -312,6 +312,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     },
     [booking?.id, checklistItem],
   );
+
   const handleMention = () => {
     activityLogContext.setState({ checklistReference: checklistItem });
   };
@@ -402,7 +403,20 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       checklistItem.values?.map(value =>
         value.url === item.url ? { ...value, isSelectedForComparison: !item.isSelectedForComparison } : value,
       ),
-    ).then(() => console.log('done'));
+    ).then(() => {
+      console.log('done');
+      return addActivityItem(
+        booking!.id,
+        createActivityObject(
+          !item.isSelectedForComparison
+            ? ActivityChangeType.SELECT_FOR_COMPARISON
+            : ActivityChangeType.UNSELECT_FOR_COMPARISON,
+          getActivityLogUserData(),
+          checklistItem,
+          [item],
+        ),
+      );
+    });
   };
 
   const handleMarkAsFinal = (item: ChecklistItemValueDocument, internal: boolean) => {
@@ -411,7 +425,18 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       (internal ? checklistItem.valuesAdmin : checklistItem.values)?.map(value =>
         value.url === item.url ? { ...value, final: !item.final } : value,
       ),
-    ).then(() => console.log('done'));
+    ).then(() => {
+      console.log('done');
+      return addActivityItem(
+        booking!.id,
+        createActivityObject(
+          !item.final ? ActivityChangeType.MARK_AS_FINAL : ActivityChangeType.UNMARK_AS_FINAL,
+          getActivityLogUserData(),
+          checklistItem,
+          [item],
+        ),
+      );
+    });
   };
 
   const handleDocumentStatusChange = (
