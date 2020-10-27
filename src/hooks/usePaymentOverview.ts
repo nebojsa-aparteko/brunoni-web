@@ -11,7 +11,7 @@ import { useWeeklyPaymentFilterProviderContext } from '../providers/WeeklyPaymen
 import { update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 
-export default () => {
+export default (bookingId?: string) => {
   const [filters] = useWeeklyPaymentFilterProviderContext();
   const { carrier, paymentDate } = filters;
   const [actingAs] = useContext(ActingAs);
@@ -21,11 +21,13 @@ export default () => {
     () => (collection: firebase.firestore.Query) => {
       let query = collection.orderBy('bookingId', 'asc').limit(100);
       // let query = collection.where('resolved', '==', false).where('show', '==', true);
+      if (bookingId) {
+        return query.where('bookingId', '==', bookingId);
+      }
       if (paymentDate) {
         query = query.where('payDate', '==', paymentDate);
       }
       if (carrier) {
-        console.log(carrier.name, carrier.id);
         query = query.where(
           'carrier',
           '==',
@@ -34,7 +36,7 @@ export default () => {
       }
       return query;
     },
-    [filters, paymentDate, UserRecordMinProperties, pick, carrier, UserRole, actingAs, userRecord],
+    [filters, paymentDate, UserRecordMinProperties, pick, carrier, UserRole, actingAs, userRecord, bookingId],
   );
 
   const paymentCollection = useFirestoreCollection('weeklyPayment', query);
