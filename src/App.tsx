@@ -64,13 +64,13 @@ const adminRoutes = (
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
-    <Route exact path="/equipment" component={Unauthorized} />
     <Route exact path="/teams" component={TeamManagementPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/my-day" component={MyDayPage} />
     <Route exact path="/my-profile" component={MyProfilePage} />
+    <Route exact path="/equipment" component={EquipmentSituation} />
     <Route exact path="/weekly-payment" component={WeeklyPaymentPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
