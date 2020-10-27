@@ -35,10 +35,10 @@ import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
 import MyDayPage from './pages/MyDayPage';
 import * as QueryString from 'querystring';
-import firebase from 'firebase';
 import { useHistory } from 'react-router-dom';
 import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
+import firebase from './firebase';
 
 const anonymousRoutes = (
   <Switch>

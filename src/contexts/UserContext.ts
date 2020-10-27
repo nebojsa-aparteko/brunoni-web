@@ -1,4 +1,4 @@
 import React from 'react';
-import { User } from 'firebase';
+import firebase from '../firebase';
 
-export default React.createContext<User | null | undefined>(undefined);
+export default React.createContext<firebase.User | null | undefined>(undefined);

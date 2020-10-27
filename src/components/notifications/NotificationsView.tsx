@@ -13,7 +13,7 @@ import {
 import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
-import firebase from 'firebase';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({

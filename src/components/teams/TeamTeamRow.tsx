@@ -7,7 +7,6 @@ import { Team, TeamType } from '../../model/Teams';
 import { Button, IconButton, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord, { UserRecordMinProperties } from '../../model/UserRecord';
-import { firestore } from 'firebase';
 import asArray from '../../utilities/asArray';
 import Carriers from '../../contexts/Carriers';
 import firebase from '../../firebase';
@@ -24,25 +23,6 @@ import { TaskType } from '../../model/Task';
 interface Props extends React.Attributes {
   team: Team;
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const saveChanges = (field: string, value: any, teamId: string) => {
-  return firebase
-    .firestore()
-    .collection('teams')
-    .doc(teamId)
-    .update(field, value);
-};
 
 const deleteTeam = (teamId: string) =>
   firebase
@@ -82,7 +62,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       set(
         'checklistItems',
         asArray(value)
-          .map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0])
+          .map(val => checklistNamesPreview.find(([, name]) => name === val)?.[0])
           .map(val => ChecklistNames[val as keyof typeof ChecklistNames]),
       )(activeTeam),
     );
@@ -93,7 +73,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       set(
         'taskTypes',
         asArray(value)
-          .map(val => taskTypeNamesPreview.find(([id, name]) => name === val)?.[0])
+          .map(val => taskTypeNamesPreview.find(([, name]) => name === val)?.[0])
           .map(val => TaskType[val as keyof typeof TaskType]),
       )(activeTeam),
     );
@@ -115,7 +95,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   };
 
   const onSave = useCallback(() => {
-    const teamsCollection = firestore().collection('teams');
+    const teamsCollection = firebase.firestore().collection('teams');
 
     teamsCollection
       .doc(activeTeam.id)
@@ -185,8 +165,8 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
             autoHighlight
             options={checklistItems || []}
             defaultValue={team.checklistItems
-              ?.map(value => Object.entries(ChecklistNames).find(([id, name]) => value === name)?.[0] || '')
-              ?.map(val => checklistNamesPreview.find(([id, name]) => id === val)?.[1] || '')}
+              ?.map(value => Object.entries(ChecklistNames).find(([, name]) => value === name)?.[0] || '')
+              ?.map(val => checklistNamesPreview.find(([id]) => id === val)?.[1] || '')}
             getOptionSelected={(option, value) => option === value}
             onChange={handleChecklistItemChange}
             renderTags={(value, getTagProps) =>
@@ -202,8 +182,8 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
             autoHighlight
             options={taskTypes || []}
             defaultValue={team.taskTypes
-              ?.map(value => Object.entries(TaskType).find(([id, name]) => value === name)?.[0] || '')
-              ?.map(val => taskTypeNamesPreview.find(([id, name]) => id === val)?.[1] || '')}
+              ?.map(value => Object.entries(TaskType).find(([, name]) => value === name)?.[0] || '')
+              ?.map(val => taskTypeNamesPreview.find(([id]) => id === val)?.[1] || '')}
             getOptionSelected={(option, value) => option === value}
             onChange={handleTaskTypeChange}
             renderTags={(value, getTagProps) =>

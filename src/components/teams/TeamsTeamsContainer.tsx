@@ -9,12 +9,12 @@ import {
   ExpansionPanelSummary,
   Typography,
 } from '@material-ui/core';
-import { firestore } from 'firebase';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import OperationsTeamsTable from './OperationsTeamsTable';
 import AccountingTeamsTable from './AccountingTeamsTable';
 import { TeamType } from '../../model/Teams';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles({
   expansionPanel: {
@@ -47,7 +47,8 @@ const TeamsTeamsContainer: React.FC = () => {
 
   const onAdd = (isAccounting: boolean, event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    firestore()
+    firebase
+      .firestore()
       .collection('teams')
       .add({ name: '', teamType: isAccounting ? TeamType.ACCOUNTING : TeamType.OPERATIONS })
       .then(docRef => {
