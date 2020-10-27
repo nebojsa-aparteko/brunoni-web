@@ -43,7 +43,7 @@ const MyDayContainer = () => {
     (_, user) => {
       if (setFilters) setFilters(set('assignee', user || undefined)(filters));
     },
-    [filters],
+    [filters, setFilters],
   );
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const MyDayContainer = () => {
     (_, status) => {
       if (setFilters) setFilters(set('taskStatus', status || undefined)(filters));
     },
-    [filters],
+    [filters, setFilters],
   );
 
   /*
@@ -104,7 +104,6 @@ const MyDayContainer = () => {
   const filteredTasks = useMemo(() => (taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks), [
     taskStatus,
     tasks,
-    getTaskFilter,
   ]);
 
   const onAssignUser = useCallback(() => {
@@ -124,7 +123,7 @@ const MyDayContainer = () => {
           setAssignedUserTrigger(prevState => !prevState);
         });
     });
-  }, [selectedTasks, assignTo, pick, UserRecordMinProperties]);
+  }, [selectedTasks, assignTo]);
   return (
     <Card>
       <CardHeader
@@ -195,13 +194,11 @@ export default MyDayContainer;
 
 const getTeamTasks = (checklistItems: string[]) => {
   const stages: ChecklistNames[] = [];
-  const checklists: ChecklistNames[] = [];
   checklistItems.forEach(c => {
     const ch = getChecklistItem(c as ChecklistNames);
     if (ch.checklistStageId) {
       stages.push(ch.checklistStageId);
     }
-    checklists.push(ch.checklistId);
   });
   return stages.length > 0
     ? firebase

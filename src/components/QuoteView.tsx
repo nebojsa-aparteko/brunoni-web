@@ -143,7 +143,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const [actingAs] = useContext(ActingAs);
 
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {

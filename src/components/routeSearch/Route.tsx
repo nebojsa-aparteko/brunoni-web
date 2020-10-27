@@ -1,7 +1,6 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import {
-  Avatar,
   Box,
   Button,
   Chip,
@@ -12,12 +11,12 @@ import {
   ExpansionPanelSummary,
   Grid,
   IconButton,
+  ListItemText,
   makeStyles,
   Popover,
   Theme,
   Typography,
   useTheme,
-  ListItemText,
 } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import ItineraryItem from '../ItineraryItem';

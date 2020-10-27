@@ -62,7 +62,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
       if (setBookingPaginationContextData)
         setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
     },
-    [setBookingPaginationContextData, rowsPerPage],
+    [setBookingPaginationContextData, bookingPaginationContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
@@ -72,13 +72,13 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
         );
     },
-    [setBookingPaginationContextData],
+    [setBookingPaginationContextData, bookingPaginationContextData],
   );
 
   const handleBookingClick = (index: number) => {
     window.open(`/bookings/${searchResult[index].id}`);
   };
-  const handleBookingSearch = () => {
+  const handleBookingSearch = useCallback(() => {
     setIsLoading(true);
     searchBookings(inputValue)
       .then(result => {
@@ -93,7 +93,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           variant: 'error',
         });
       });
-  };
+  }, [inputValue, enqueueSnackbar, searchBookings]);
   const resultChunks = useMemo(() => {
     return chunk(rowsPerPage)(searchResult);
   }, [searchResult, rowsPerPage]);
@@ -111,7 +111,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
         mousetrapInstance?.unbind(['enter', 'enter']);
       };
     }
-  }, [inputRef, inputValue]);
+  }, [inputRef, inputValue, handleBookingSearch]);
 
   return (
     <Fragment>

@@ -151,7 +151,7 @@ const App: React.FC = () => {
           history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
         });
     }
-  }, []);
+  }, [history]);
   return (
     <Fragment>
       <QuoteFilterListProvider>

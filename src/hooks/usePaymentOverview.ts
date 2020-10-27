@@ -1,10 +1,5 @@
-import { useContext, useMemo } from 'react';
-import { UserRole } from '../model/Task';
-import ActingAs from '../contexts/ActingAs';
-import UserRecordContext from '../contexts/UserRecordContext';
+import { useMemo } from 'react';
 import firebase from '../firebase';
-import pick from 'lodash/fp/pick';
-import { UserRecordMinProperties } from '../model/UserRecord';
 import WeeklyPayment from '../model/WeeklyPayment';
 import useFirestoreCollection from './useFirestoreCollection';
 import { useWeeklyPaymentFilterProviderContext } from '../providers/WeeklyPaymentFilterProvider';
@@ -14,16 +9,15 @@ import safeInvoke from '../utilities/safeInvoke';
 export default (bookingId?: string) => {
   const [filters] = useWeeklyPaymentFilterProviderContext();
   const { carrier, paymentDate } = filters;
-  const [actingAs] = useContext(ActingAs);
-  const userRecord = useContext(UserRecordContext);
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
+      if (bookingId) {
+        return collection.where('bookingId', '==', bookingId);
+      }
       let query = collection.orderBy('bookingId', 'asc').limit(100);
       // let query = collection.where('resolved', '==', false).where('show', '==', true);
-      if (bookingId) {
-        return query.where('bookingId', '==', bookingId);
-      }
+
       if (paymentDate) {
         query = query.where('payDate', '==', paymentDate);
       }
@@ -36,7 +30,7 @@ export default (bookingId?: string) => {
       }
       return query;
     },
-    [filters, paymentDate, UserRecordMinProperties, pick, carrier, UserRole, actingAs, userRecord, bookingId],
+    [paymentDate, carrier, bookingId],
   );
 
   const paymentCollection = useFirestoreCollection('weeklyPayment', query);

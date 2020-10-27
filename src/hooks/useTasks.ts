@@ -11,7 +11,7 @@ import UserRecordContext from '../contexts/UserRecordContext';
 
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
-  const [filters, _] = useTaskFilterProviderContext();
+  const [filters] = useTaskFilterProviderContext();
   const { assignee, showClientTasks } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
@@ -30,7 +30,7 @@ export default function useTasks() {
       }
       return query;
     },
-    [filters, assignee, UserRecordMinProperties, pick, showClientTasks, UserRole, actingAs, userRecord],
+    [assignee, showClientTasks, actingAs, userRecord],
   );
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function useTasks() {
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [query, setSnapshot, normalizeTaskData]);
+  }, [query, setSnapshot]);
 
   return snapshot;
 }

@@ -38,8 +38,6 @@ const useStyles = makeStyles(theme =>
       marginRight: theme.spacing(1),
     },
     titleAnchor: {
-      color: theme.palette.primary.main,
-      cursor: 'pointer',
       textDecoration: 'underline',
     },
   }),
@@ -90,9 +88,9 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
           {notification.referenceObject ? `${getReferenceLabel(notification.referenceObject)}` : null}
         </Typography>
 
-        <a className={classes.titleAnchor} onClick={handleClick}>
+        <Button className={classes.titleAnchor} onClick={handleClick} color="primary">
           {notification.referenceID}
-        </a>
+        </Button>
       </Box>
     </Fragment>
   );
@@ -108,9 +106,9 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
   const onReadForAll = useCallback(() => {
     if (!notification.readId) return;
     firebase
@@ -148,7 +146,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
             );
         }
       });
-  }, [notification, handleShowDrawer]);
+  }, [notification, handleShowDrawer, history]);
   const handleSeenStatusChange = async () => {
     const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
       lastSend: Date;

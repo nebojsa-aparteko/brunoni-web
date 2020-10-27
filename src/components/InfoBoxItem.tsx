@@ -1,4 +1,4 @@
-import { Box, makeStyles, Theme, Typography } from '@material-ui/core';
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { Fragment } from 'react';
 import { SvgIconProps } from '@material-ui/core/SvgIcon';
 
@@ -12,7 +12,7 @@ interface Props {
   occupySpaceForTitle?: boolean;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   printText: {
     ['@media print']: {
       fontSize: '10px',
@@ -22,10 +22,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: '29px', // theme.typography.subtitle2.lineHeight + '8',
   },
 }));
-
-function isString(x: React.ReactNode | string): boolean {
-  return typeof x === 'string';
-}
 
 const InfoBoxItem: React.FC<Props> = ({
   IconComponent,

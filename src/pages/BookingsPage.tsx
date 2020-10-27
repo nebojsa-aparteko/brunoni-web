@@ -88,17 +88,7 @@ const BookingsPageContainer: React.FC = () => {
         setBookingPaginationContextData(set('scrollPosition', window.scrollY)(bookingPaginationContextData));
       }
     };
-  }, [isLoading, bookingPaginationContextData.scrollPosition]);
-
-  useEffect(() => {
-    if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
-      if (!actingAs) {
-        handleTabChange(bookingPaginationContextData.activeTab);
-      } else {
-        handleCustomerTabChange(bookingPaginationContextData.activeTab);
-      }
-    }
-  }, [bookingPaginationContextData.activeTab]);
+  }, [isLoading, bookingPaginationContextData, setBookingPaginationContextData]);
 
   const setSelectedTab = useCallback(
     (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -106,7 +96,7 @@ const BookingsPageContainer: React.FC = () => {
         setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
       }
     },
-    [bookingPaginationContextData.activeTab],
+    [bookingPaginationContextData, setBookingPaginationContextData],
   );
 
   const handleTabChange = useCallback(
@@ -140,7 +130,7 @@ const BookingsPageContainer: React.FC = () => {
         setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
-    [setBookingsContextData],
+    [setBookingsContextData, bookingsContextData],
   );
 
   const handleCustomerTabChange = useCallback(
@@ -168,8 +158,24 @@ const BookingsPageContainer: React.FC = () => {
         setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
-    [setBookingsContextData],
+    [setBookingsContextData, bookingsContextData],
   );
+
+  useEffect(() => {
+    if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
+      if (!actingAs) {
+        handleTabChange(bookingPaginationContextData.activeTab);
+      } else {
+        handleCustomerTabChange(bookingPaginationContextData.activeTab);
+      }
+    }
+  }, [
+    bookingPaginationContextData.activeTab,
+    actingAs,
+    bookingsContextData.activeTab,
+    handleCustomerTabChange,
+    handleTabChange,
+  ]);
 
   useEffect(() => {
     if (actingAs) {
@@ -183,7 +189,7 @@ const BookingsPageContainer: React.FC = () => {
           )(bookingsContextData),
         );
     }
-  }, [actingAs, setBookingsContextData]);
+  }, [actingAs, setBookingsContextData, bookingsContextData]);
 
   return (
     <Fragment>

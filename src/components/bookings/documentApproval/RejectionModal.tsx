@@ -52,10 +52,6 @@ const RejectionModal: React.FC<Props> = ({
     setRejectionInput(input);
   }, []);
 
-  const onReject = useCallback(() => {
-    handleCommentSave(rejectionInput!.message, rejectionInput!.mentions, !actingAs);
-  }, [rejectionInput, actingAs]);
-
   const updateDocumentStatus = (newStatus: ChecklistItemValueDocumentStatusType) => {
     changeStatus(document, {
       type: newStatus,
@@ -87,8 +83,12 @@ const RejectionModal: React.FC<Props> = ({
         })
         .catch(err => console.log(err));
     },
-    [booking.id, userRecord, checklistItem, document],
+    [booking.id, checklistItem, document, isAccountingDialog, updateDocumentStatus, userActivityLogData],
   );
+
+  const onReject = useCallback(() => {
+    handleCommentSave(rejectionInput!.message, rejectionInput!.mentions, !actingAs);
+  }, [rejectionInput, actingAs, handleCommentSave]);
 
   return !isComparisonDialog ? (
     checklistItem ? (

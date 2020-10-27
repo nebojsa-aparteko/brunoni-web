@@ -41,7 +41,7 @@ const QuoteGroups: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const actingAs = useContext(ActingAs)[0];
 
-  const [_, isLoading, quoteFilters, setQuoteFilters] = useQuotesContext();
+  const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
@@ -71,7 +71,7 @@ const QuoteGroups: React.FC = () => {
           flow(set('archived', undefined), set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS))(quoteFilters),
         );
     }
-  }, [actingAs]);
+  }, [actingAs, setQuoteFilters, quoteFilters]);
 
   return (
     <Fragment>

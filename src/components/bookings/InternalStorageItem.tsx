@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Avatar,
-  Badge,
   CircularProgress,
   IconButton,
   ListItem,

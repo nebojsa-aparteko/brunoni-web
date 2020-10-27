@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
-import { Box, CircularProgress, IconButton, makeStyles, Theme, Tooltip, Typography } from '@material-ui/core';
+import { CircularProgress, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import useUser from '../hooks/useUser';
 
@@ -9,7 +9,7 @@ interface Props {
   alphacomClientId: string;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   button: {
     position: 'relative',
   },
@@ -79,7 +79,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
     return () => {
       controller.abort();
     };
-  }, [busy]);
+  }, [busy, alphacomClientId, collection, user, enqueueSnackbar]);
 
   return (
     <Tooltip title="Refresh" enterDelay={500} leaveDelay={200}>

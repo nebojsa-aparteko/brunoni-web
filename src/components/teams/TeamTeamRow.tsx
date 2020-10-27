@@ -114,7 +114,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
           autoHideDuration: 3000,
         });
       });
-  }, [activeTeam]);
+  }, [activeTeam, enqueueSnackbar]);
 
   return (
     <TableRow key={key} {...other}>

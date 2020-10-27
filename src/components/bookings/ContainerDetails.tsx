@@ -104,7 +104,7 @@ const useStyles = makeStyles(theme => ({
   },
   tableRow: {
     verticalAlign: 'top',
-    ['@media not print']: {
+    '@media not print': {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
         marginTop: theme.spacing(1),

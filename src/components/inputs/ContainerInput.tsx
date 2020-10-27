@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, Fragment, ForwardRefRenderFunction } from 'react';
+import React, { forwardRef, ForwardRefRenderFunction, Fragment, useImperativeHandle, useRef } from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';

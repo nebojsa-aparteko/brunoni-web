@@ -154,7 +154,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
 
       return Promise.all(requests);
     },
-    [storageBasePath],
+    [storageBasePath, enqueueSnackbar],
   );
 
   const onDeleteFile = useCallback(

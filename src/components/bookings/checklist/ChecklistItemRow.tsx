@@ -198,22 +198,25 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   const activityLogContext = useActivityLogState();
 
-  const storeActivity = (checklistItemActivityHandler: () => Promise<void>) => {
-    checklistItemActivityHandler()
-      .then(_ => {
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1000,
+  const storeActivity = useCallback(
+    (checklistItemActivityHandler: () => Promise<void>) => {
+      checklistItemActivityHandler()
+        .then(_ => {
+          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+            variant: 'success',
+            autoHideDuration: 1000,
+          });
+        })
+        .catch(error => {
+          console.error('error storing activity', error);
+          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
         });
-      })
-      .catch(error => {
-        console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      });
-  };
+    },
+    [enqueueSnackbar],
+  );
 
   const saveChecklistChanges = useCallback(
     (
@@ -228,7 +231,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         .doc(checklistItem?.id)
         .update(field, value);
     },
-    [booking?.id, checklistItem.id],
+    [booking, checklistItem],
   );
 
   const checklistItemCheckedHandler = useCallback(
@@ -240,7 +243,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemMarkCompletedHandler = useCallback(
@@ -256,7 +259,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemFileAddedHandler = useCallback(
@@ -278,7 +281,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         )
         .catch(error => console.error('Error saving new document list', error));
     },
-    [booking?.id, checklistItem, getActivityLogUserData],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemStageChangeHandler = useCallback(
@@ -296,7 +299,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemDocumentStatusChangeHandler = useCallback(
@@ -310,7 +313,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, saveChecklistChanges, getActivityLogUserData],
   );
 
   const handleMention = () => {
@@ -339,7 +342,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     (value: boolean) => {
       storeActivity(() => checklistItemCheckedHandler(value));
     },
-    [checklistItemCheckedHandler],
+    [checklistItemCheckedHandler, storeActivity],
   );
 
   const saveFiles = useCallback(
@@ -394,7 +397,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
       return Promise.all(requests);
     },
-    [storageBasePath],
+    [storageBasePath, booking, checklistItem, enqueueSnackbar],
   );
 
   const handleSelectForComparison = (item: ChecklistItemValueDocument) => {

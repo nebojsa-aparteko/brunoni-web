@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Box, FormControl, Grid, IconButton, makeStyles, MenuItem, Select, Theme } from '@material-ui/core';
+import { Box, Grid, makeStyles, Theme } from '@material-ui/core';
 import Container from '../components/Container';
 import DashboardCharts from '../components/dashboard/DashboardCharts';
 import useUser from '../hooks/useUser';
 import ChartsCircularProgress from '../components/dashboard/ChartsCircularProgress';
-import TodayIcon from '@material-ui/icons/Today';
 import DashboardYearSelect from '../components/DashboardYearSelect';
 
 const useStyles = makeStyles((theme: Theme) => ({

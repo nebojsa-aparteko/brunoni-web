@@ -1,6 +1,6 @@
 import React from 'react';
 import formatDate from 'date-fns/format';
-import { Theme, makeStyles, Box, Grid } from '@material-ui/core';
+import { Box, Grid, makeStyles, Theme } from '@material-ui/core';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
@@ -10,7 +10,6 @@ import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import InfoBoxItem from './InfoBoxItem';
 import { DateFormats } from '../utilities/formattingHelpers';
-import Port from '../model/Port';
 
 const useStyles = makeStyles((theme: Theme) => ({
   routePoint: {

@@ -10,8 +10,6 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
 import { useQuotesContext } from '../../providers/QuotesProvider';
-import UserRecord from '../../model/UserRecord';
-import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 
 interface Props {
@@ -24,7 +22,7 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
   const clients = useClients();
   const ports = useContext(Ports);
 
-  const [_, isLoading, filters, setFilters] = useQuotesContext();
+  const [, , filters, setFilters] = useQuotesContext();
 
   const { clientFilter, originPort, destinationPort, dateRange } = filters;
 
@@ -35,9 +33,6 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
 
   const setClientFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('clientFilter', client || undefined)(filters));
-
-  const setUserFilter = (user: UserRecord | null) =>
-    setFilters && setFilters(set('assignee', user || undefined)(filters));
 
   const setDateRange = (dateRange: DateRange) =>
     setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));

@@ -1,4 +1,3 @@
-import UserRecord from '../model/UserRecord';
 import useFirestoreDocument from './useFirestoreDocument';
 
 export default function useStatistics(userId: string | undefined = undefined) {

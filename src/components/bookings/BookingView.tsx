@@ -189,7 +189,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         )
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord],
+    [booking.id, booking.watchers, userRecord, enqueueSnackbar],
   );
   // const [anchorEl, setAnchorEl] = React.useState(null);
   //

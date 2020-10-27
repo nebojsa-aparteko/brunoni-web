@@ -140,7 +140,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, searchString, page, rowsPerPage]);
+  }, [bookings, searchString, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBookingsContextData &&
@@ -152,7 +152,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
       if (setBookingPaginationContextData)
         setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
     },
-    [setBookingPaginationContextData],
+    [setBookingPaginationContextData, bookingPaginationContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
@@ -162,7 +162,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
           flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
         );
     },
-    [setBookingPaginationContextData],
+    [setBookingPaginationContextData, bookingPaginationContextData],
   );
 
   const handleSearch = useCallback(
@@ -173,7 +173,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
         );
       }
     },
-    [setBookingPaginationContextData, searchString],
+    [setBookingPaginationContextData, searchString, bookingPaginationContextData],
   );
 
   // if (!bookings) {

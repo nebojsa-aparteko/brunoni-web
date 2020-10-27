@@ -130,7 +130,7 @@ const QuoteGroupsView: React.FC<Props> = ({
     setFilteredResults(sortedFiltered);
 
     return chunk(rowsPerPage)(sortedFiltered);
-  }, [quoteGroups, searchString, page, rowsPerPage]);
+  }, [quoteGroups, searchString, rowsPerPage]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     setQuoteListContextData(set('page', page)(quoteListContextData));

@@ -70,7 +70,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
           ? true
           : item.type === ActivityType.COMMENT,
       ),
-    [showMore, normalizedActivityLog],
+    [showMore, normalizedActivityLog, isAccounting],
   );
 
   const userRecord = useContext(UserRecordContext);
@@ -108,7 +108,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
         })
         .catch(err => console.log(err));
     },
-    [booking.id, userRecord, activityLogContext],
+    [booking.id, userRecord, activityLogContext, isAccounting],
   );
 
   const handleShowMore = () => {

@@ -12,7 +12,7 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
-import React, { ReactChild, useCallback, useContext } from 'react';
+import React, { ReactChild, useCallback } from 'react';
 import CommentInput from '../../CommentInput';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
@@ -24,7 +24,6 @@ import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import PDFViewer from '../../pdfViewer/PDFViewer';
 import HTMLViewer from '../../HTMLViewer';
-import ActingAs from '../../../contexts/ActingAs';
 import { RejectionInput } from './RejectionModal';
 import ExpandingBookingContent from './ExpandingBookingContent';
 
@@ -95,19 +94,15 @@ const ComparisonDialogContent = ({
   amendmentRequested,
   isAccountingDialog,
 }: Props) => {
-  const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
 
   const activityLogCollection = useFirestoreCollection(
     'bookings',
-    useCallback(
-      query => {
-        const queryByItemFilter = query.where('type', '==', ActivityType.COMMENT);
-        const queryByAdminRole = queryByItemFilter.where('isInternal', '==', false);
-        return queryByAdminRole.orderBy('at', 'desc');
-      },
-      [actingAs],
-    ),
+    useCallback(query => {
+      const queryByItemFilter = query.where('type', '==', ActivityType.COMMENT);
+      const queryByAdminRole = queryByItemFilter.where('isInternal', '==', false);
+      return queryByAdminRole.orderBy('at', 'desc');
+    }, []),
     booking.id,
     'activity',
   );

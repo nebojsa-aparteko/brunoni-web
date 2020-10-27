@@ -41,7 +41,7 @@ const QuotePageContainer: React.FC<Props> = ({ match }) => {
     return normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const quote = useMemo(() => (quoteDoc ? normalize(quoteDoc) : undefined), [quoteDoc]);
+  const quote = useMemo(() => (quoteDoc ? normalize(quoteDoc) : undefined), [quoteDoc, normalize]);
 
   return <QuoteView quote={quote} loading={!quoteSnapshot} showCompanyInfo={!actingAs} />;
 };
