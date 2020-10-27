@@ -36,6 +36,7 @@ import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
 import invoke from 'lodash/fp/invoke';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import { detectAndInsertLink } from '../../utilities/detectAndInsertLink';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -473,7 +474,10 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                     <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
                   )}
                   {arrivalItemRemark && (
-                    <TableRowData label={'Arrival Items Remark'} content={arrivalItemRemark.RemarkTxt} />
+                    <TableRowData
+                      label={'Arrival Items Remark'}
+                      content={detectAndInsertLink(arrivalItemRemark.RemarkTxt)}
+                    />
                   )}
                 </TableBody>
               </Table>
