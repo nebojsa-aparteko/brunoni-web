@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -7,6 +7,8 @@ import {
   Grid,
   IconButton,
   makeStyles,
+  Menu,
+  MenuItem,
   Paper,
   Theme,
   Typography,
@@ -108,10 +110,6 @@ function ScrollToTopOnMount() {
   return null;
 }
 
-const handlePrint = () => {
-  window.print();
-};
-
 export const isLongVersion = (version: BookingVersion) => {
   return version === 'Long';
 };
@@ -135,7 +133,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
-  // const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [printRequested, setPrintRequested] = useState(false);
+  const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
@@ -191,15 +190,21 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     },
     [booking.id, booking.watchers, userRecord, enqueueSnackbar],
   );
-  // const [anchorEl, setAnchorEl] = React.useState(null);
-  //
-  // const handleClickMenu = (event: any) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-  //
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  useLayoutEffect(() => {
+    if (printRequested) {
+      window.print();
+      setPrintRequested(false);
+    }
+  }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {tasks === undefined && (
@@ -301,34 +306,34 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   />
                 )}
 
-                <IconButton aria-label="print" size="small" onClick={handlePrint}>
+                <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
                   <PrintIcon />
                 </IconButton>
-                {/*<Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>*/}
-                {/*  <MenuItem*/}
-                {/*    onClick={() => {*/}
-                {/*      setPrintWithCost(false);*/}
-                {/*      handlePrint();*/}
-                {/*      handleClose();*/}
-                {/*    }}*/}
-                {/*  >*/}
-                {/*    Print without costs*/}
-                {/*  </MenuItem>*/}
-                {/*  <MenuItem*/}
-                {/*    onClick={() => {*/}
-                {/*      setPrintWithCost(true);*/}
-                {/*      handlePrint();*/}
-                {/*      handleClose();*/}
-                {/*    }}*/}
-                {/*  >*/}
-                {/*    Print with cost*/}
-                {/*  </MenuItem>*/}
-                {/*</Menu>*/}
+                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+                  <MenuItem
+                    onClick={() => {
+                      setPrintWithCost(false);
+                      setPrintRequested(true);
+                      handleClose();
+                    }}
+                  >
+                    Print without costs
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setPrintWithCost(true);
+                      setPrintRequested(true);
+                      handleClose();
+                    }}
+                  >
+                    Print with cost
+                  </MenuItem>
+                </Menu>
               </Box>
             </Box>
 
             <Grid item xs={12}>
-              <BookingViewMainContent booking={booking} />
+              <BookingViewMainContent booking={booking} isPrintWithCost={isPrintWithCost} />
             </Grid>
           </Paper>
         </Page>

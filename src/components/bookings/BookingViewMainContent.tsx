@@ -1,4 +1,4 @@
-import { Box, Divider } from '@material-ui/core';
+import { Box, Divider, makeStyles } from '@material-ui/core';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
 import React, { Fragment, useMemo } from 'react';
@@ -19,8 +19,21 @@ export const remark = {
   final: 'FINAL REMARKS',
 };
 
-const BookingViewMainContent = ({ booking }: Props) => {
+const useStyles = makeStyles(() => ({
+  hidePrint: {
+    ['@media print']: {
+      display: 'none',
+    },
+  },
+  showPrint: {
+    ['@media print']: {
+      display: 'initial',
+    },
+  },
+}));
+const BookingViewMainContent = ({ booking, isPrintWithCost }: Props) => {
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
+  const classes = useStyles();
 
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -62,7 +75,7 @@ const BookingViewMainContent = ({ booking }: Props) => {
       ) : null}
 
       {booking.FreightDetails && (
-        <Box marginTop="0em" marginBottom="0em" displayPrint="none">
+        <Box marginTop="0em" marginBottom="0em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
           <BookingFreight freightDetails={booking.FreightDetails} />
         </Box>
       )}
@@ -75,6 +88,7 @@ const BookingViewMainContent = ({ booking }: Props) => {
 
 interface Props {
   booking: Booking;
+  isPrintWithCost: boolean;
 }
 
 export default BookingViewMainContent;
