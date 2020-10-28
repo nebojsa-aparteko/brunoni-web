@@ -1,4 +1,13 @@
-import { Box, Container, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Container,
+  ExpansionPanel,
+  ExpansionPanelActions,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
+} from '@material-ui/core';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { Booking } from '../../../model/Booking';
 import {
@@ -19,6 +28,11 @@ import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import useAccountingDocuments from '../../../hooks/useAccountingDocuments';
 import { editRestriction } from '../checklist/CheckList';
+import usePaymentOverview from '../../../hooks/usePaymentOverview';
+import { formatDateSafe } from '../../../utilities/formattingHelpers';
+import safeInvoke from '../../../utilities/safeInvoke';
+import currencyFormatter from '../../../utilities/currencyFormatter';
+import { Status } from '../../../model/WeeklyPayment';
 
 const addAccountingDocument = (file: DocumentValue, bookingId: string) => {
   return firebase
@@ -42,6 +56,8 @@ const changeAccountingDocument = (file: DocumentValue, bookingId: string) => {
 
 const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
   const userRecord = useContext(UserRecordContext);
+  const weeklyPayments = usePaymentOverview(booking.id);
+  console.log(weeklyPayments);
   const { enqueueSnackbar } = useSnackbar();
   const accountingDocuments = useAccountingDocuments(booking.id);
 
@@ -143,29 +159,64 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" style={{ flex: 1, listStyle: 'none' }}>
-      {accountingDocuments.map(item => (
-        <DocumentListItem
-          key={item.id}
-          item={item}
-          booking={booking}
-          storageBasePath={storageBasePath}
-          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
-            handleDocumentStatusChange(item, status)
-          }
-          internal={true}
-          isAccountingDocument={true}
-          markAsFinal={() => {}}
-          comparableDocuments={[]}
-          selectForComparison={() => {}}
-        />
+    <Box display="flex" flex={1} flexDirection="column" px={0} style={{ listStyle: 'none' }}>
+      {weeklyPayments.map(payment => (
+        <ExpansionPanel key={payment.reference} defaultExpanded style={{ margin: 4 }}>
+          <ExpansionPanelSummary style={{ backgroundColor: 'rgba(198,238,241,0.24)', display: 'flex' }}>
+            <Box flex={1} display="flex" flexDirection="row" justifyContent="space-between">
+              <Typography variant={'h5'}>
+                {formatDateSafe(safeInvoke('toDate')(payment.payDate), 'd. MMMM yyyy.')}
+              </Typography>
+              <Typography variant={'h5'}>{'Amount: ' + currencyFormatter(payment.currency)(payment.amount)}</Typography>
+              <Typography
+                variant={'h5'}
+                color={payment.status === Status.PAID ? 'primary' : 'textPrimary'}
+                style={{ fontWeight: 700 }}
+              >
+                {payment.status}
+              </Typography>
+            </Box>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Box display="flex" flex={1} flexDirection="column" px={0} style={{ listStyle: 'none' }}>
+              <Box p={2}>
+                <Typography variant={'h5'}>{'Reference Id: ' + payment.reference}</Typography>
+                <Typography variant={'h5'}>{'Type: ' + payment.debitCredit}</Typography>
+              </Box>
+              {accountingDocuments.map(item => (
+                <DocumentListItem
+                  key={item.id}
+                  item={item}
+                  booking={booking}
+                  storageBasePath={storageBasePath}
+                  changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
+                    handleDocumentStatusChange(item, status)
+                  }
+                  internal={true}
+                  isAccountingDocument={true}
+                  markAsFinal={() => {}}
+                  comparableDocuments={[]}
+                  selectForComparison={() => {}}
+                />
+              ))}
+              <DropZone
+                storageBasePath={storageBasePath}
+                internal={false}
+                onUpload={values => storeAccountingActivity(() => accountingFileAddedHandler(values))}
+                onDelete={() => {}}
+              />
+            </Box>
+          </ExpansionPanelDetails>
+          <ExpansionPanelActions>
+            <Button color="primary" variant="contained">
+              Approve Payment
+            </Button>
+            <Button color="primary" variant="outlined">
+              Postpone Payment
+            </Button>
+          </ExpansionPanelActions>
+        </ExpansionPanel>
       ))}
-      <DropZone
-        storageBasePath={storageBasePath}
-        internal={false}
-        onUpload={values => storeAccountingActivity(() => accountingFileAddedHandler(values))}
-        onDelete={() => {}}
-      />
     </Box>
   );
 };

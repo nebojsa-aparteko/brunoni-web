@@ -46,7 +46,13 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
             }
           />
           <Divider />
-          <CardContent>
+          <CardContent
+            style={{
+              padding: tabValue === 1 ? 0 : 24,
+              paddingTop: tabValue === 1 ? 4 : 24,
+              paddingBottom: tabValue === 1 ? 4 : 24,
+            }}
+          >
             <TabPanel index={0} value={tabValue}>
               <ChecklistContent booking={booking} />
             </TabPanel>
