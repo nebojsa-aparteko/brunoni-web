@@ -161,7 +161,7 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
   return (
     <Box display="flex" flex={1} flexDirection="column" px={0} style={{ listStyle: 'none' }}>
       {weeklyPayments.map(payment => (
-        <ExpansionPanel key={payment.reference} defaultExpanded style={{ margin: 4 }}>
+        <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
           <ExpansionPanelSummary style={{ backgroundColor: 'rgba(198,238,241,0.24)', display: 'flex' }}>
             <Box flex={1} display="flex" flexDirection="row" justifyContent="space-between">
               <Typography variant={'h5'}>
@@ -170,8 +170,7 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
               <Typography variant={'h5'}>{'Amount: ' + currencyFormatter(payment.currency)(payment.amount)}</Typography>
               <Typography
                 variant={'h5'}
-                color={payment.status === Status.PAID ? 'primary' : 'textPrimary'}
-                style={{ fontWeight: 700 }}
+                style={{ fontWeight: 700, color: payment.status === Status.PAID ? 'rgba(0,200,81)' : '#000' }}
               >
                 {payment.status}
               </Typography>
