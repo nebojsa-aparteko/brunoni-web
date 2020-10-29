@@ -9,7 +9,9 @@ export default interface Task {
   resolved: boolean;
   userRole: UserRole;
   show: boolean;
-  manualResolve: boolean;
+  manualResolve: ManualResolveType;
+  taskCategory: TaskCategory;
+  declineManualResolveAction?: TaskType;
   additionalInfo?: TaskAdditionalInfo;
   createAt?: Date;
   carrierId?: string;
@@ -18,6 +20,16 @@ export default interface Task {
   checklistStageId?: string;
   bookingId: string;
   selected?: boolean;
+}
+
+export enum ManualResolveType {
+  RESOLVE = 'RESOLVE',
+  NO_MANUAL_RESOLVE = 'NO_MANUAL_RESOLVE',
+  RESOLVE_OR_DECLINE = 'RESOLVE_OR_DECLINE',
+}
+export enum TaskCategory {
+  OPERATIONS = 'OPERATIONS',
+  ACCOUNTING = 'ACCOUNTING',
 }
 
 export enum UserRole {
@@ -71,6 +83,12 @@ export enum TaskType {
   GATE_OUT_TERMINAL_CHECK = 'GATE_OUT_TERMINAL_CHECK',
   DEPOT_IN_CHECK = 'DEPOT_IN_CHECK',
   FREIGHT_COLLECTION_CHECK = 'FREIGHT_COLLECTION_CHECK',
+
+  // ACCOUNTING TASKS
+  UPLOAD_INVOICE = 'UPLOAD_INVOICE',
+  COMPARE_COSTS = 'COMPARE_COSTS',
+  COMPARE_SYSTEMS = 'COMPARE_SYSTEMS',
+  CORRECT_COMMISSION = 'CORRECT_COMMISSION',
 }
 
 export enum TaskDescription {
@@ -109,4 +127,10 @@ export enum TaskDescription {
   DEPOT_IN_CHECK = 'Please check DEPOT IN move.',
   DEPOT_IN_CHECK_CONTAINER = 'Please check container on Demurrage and Detention.',
   FREIGHT_COLLECTION_CHECK = 'Please check if payment received and inform agent at destination.',
+
+  // ACCOUNTING TASKS
+  UPLOAD_INVOICE = 'Please upload invoice from Shipping Line.',
+  COMPARE_COSTS = 'Please compare and approve costs.',
+  COMPARE_SYSTEMS = 'Please compare Systems, upload documentation and approve correctness.',
+  CORRECT_COMMISSION = 'Please correct commissioned amount.',
 }
