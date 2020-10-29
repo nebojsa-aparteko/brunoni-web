@@ -22,14 +22,13 @@ import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlin
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import CompareIcon from '@material-ui/icons/Compare';
 import {
-  ActivityChangeType,
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
   ChecklistNames,
   DocumentValue,
+  DocumentValueStatus,
 } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
@@ -39,8 +38,6 @@ import UserRecordContext from '../../../contexts/UserRecordContext';
 import { invoke } from 'lodash/fp';
 import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
-import { addActivityItem } from './ActivityLogContainer';
-import { createActivityObject } from './ChecklistItemRow';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import theme from '../../../theme';
 import RejectionModal from '../documentApproval/RejectionModal';
@@ -108,6 +105,7 @@ const DocumentListItem = ({
   checklistItem,
   booking,
   changeStatus,
+  deleteFile,
   storageBasePath,
   internal,
   isAccountingDocument,
@@ -148,84 +146,6 @@ const DocumentListItem = ({
     [userRecord],
   );
 
-  const checklistFileDeletedHandler = useCallback(
-    (
-      documents: ChecklistItemValueDocument[] | DocumentValue[],
-      deletedFile: ChecklistItemValueDocument | DocumentValue,
-      internal: boolean,
-    ) => {
-      checklistItem
-        ? firebase
-            .firestore()
-            .collection('bookings')
-            .doc(booking.id!)
-            .collection('checklist')
-            .doc(checklistItem.id)
-            .update(internal ? 'valuesAdmin' : 'values', documents)
-            .then(_ => {
-              console.log('File deleted', deletedFile, documents, internal, checklistItem);
-              return addActivityItem(
-                booking.id!,
-                createActivityObject(
-                  ActivityChangeType.DELETE_FILE,
-                  getActivityLogUserData(),
-                  checklistItem,
-                  [deletedFile],
-                  undefined,
-                  internal,
-                ),
-              );
-            })
-            .catch(error => {
-              console.error('failed to update deleted items', error);
-              enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
-            })
-        : console.log('Error: Checklist item not defined');
-    },
-    [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
-  );
-
-  const accountingFileDeletedHandler = useCallback(
-    (
-      documents: ChecklistItemValueDocument[] | DocumentValue[],
-      deletedFile: ChecklistItemValueDocument | DocumentValue,
-    ) => {
-      firebase
-        .firestore()
-        .collection('bookings')
-        .doc(booking.id!)
-        .collection('accounting-documents')
-        .doc(deletedFile.id)
-        .delete()
-        .then(_ => {
-          console.log('File deleted', deletedFile);
-          return addActivityItem(
-            booking.id!,
-            createActivityObject(
-              ActivityChangeType.DELETE_FILE,
-              getActivityLogUserData(),
-              undefined,
-              [deletedFile],
-              undefined,
-              undefined,
-              true,
-            ),
-          );
-        })
-        .catch(error => {
-          console.error('Failed to delete item', error);
-          enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
-            variant: 'error',
-            autoHideDuration: 1000,
-          });
-        });
-    },
-    [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
-  );
-
   const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
 
   const handleMention = useCallback(
@@ -236,11 +156,11 @@ const DocumentListItem = ({
         internal: isAccountingDocument ? true : internal,
         isAccountingActivity: isAccountingDialog,
       }),
-    [checklistItem, internal, item],
+    [checklistItem, internal, item, activityLogContext, isAccountingDialog, isAccountingDocument],
   );
   const checklistCheckedRule = useCallback(() => checklistItem?.checked, [checklistItem]);
 
-  const deleteFile = useCallback(
+  const handleDeleteFile = useCallback(
     (item: ChecklistItemValueDocument | DocumentValue, internal: boolean) => {
       setRemovalInProgress(true);
       try {
@@ -264,7 +184,7 @@ const DocumentListItem = ({
           checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) !== -1
         ) {
           const newItemArray = checklistItem.values?.filter(chkItem => chkItem !== item);
-          checklistFileDeletedHandler(newItemArray || [], item, internal);
+          deleteFile && deleteFile(item, newItemArray || [], internal);
         } else {
           documentRef
             .delete()
@@ -282,9 +202,9 @@ const DocumentListItem = ({
                 newItemArray = internal
                   ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
                   : checklistItem.values?.filter(chkItem => chkItem !== item);
-                checklistFileDeletedHandler(newItemArray || [], item, internal);
+                deleteFile && deleteFile(item, newItemArray || [], internal);
               } else {
-                accountingFileDeletedHandler(newItemArray || [], item);
+                deleteFile && deleteFile(item);
               }
             });
         }
@@ -296,7 +216,7 @@ const DocumentListItem = ({
         });
       }
     },
-    [storageBasePath, checklistItem, removalInProgress],
+    [storageBasePath, checklistItem, removalInProgress, deleteFile, enqueueSnackbar],
   );
 
   return (
@@ -361,7 +281,7 @@ const DocumentListItem = ({
                   aria-label="Remove File"
                   onClick={event => {
                     event.stopPropagation();
-                    deleteFile(item, internal);
+                    handleDeleteFile(item, internal);
                   }}
                   aria-labelledby={`filelistitem-${item.storedName}`}
                 >
@@ -506,6 +426,11 @@ export interface DocumentListItemPropsBase {
   booking: Booking;
   storageBasePath: string;
   changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
+  deleteFile?: (
+    item: ChecklistItemValueDocument | DocumentValue,
+    documents?: ChecklistItemValueDocument[] | DocumentValue[],
+    internal?: boolean,
+  ) => void;
   internal: boolean;
   isAccountingDocument?: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;

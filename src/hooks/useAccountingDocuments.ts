@@ -5,10 +5,15 @@ import { DocumentValue } from '../components/bookings/checklist/ChecklistItemMod
 import safeInvoke from '../utilities/safeInvoke';
 import { update } from 'lodash/fp';
 
-export default function useAccountingDocuments(bookingId: string) {
+export default function useAccountingDocuments(paymentReference: string) {
   let query = useCallback(q => q.orderBy('uploadedAt', 'asc'), []);
 
-  const accountingDocumentsCollection = useFirestoreCollection('bookings', query, bookingId, 'accounting-documents');
+  const accountingDocumentsCollection = useFirestoreCollection(
+    'weeklyPayment',
+    query,
+    paymentReference,
+    'accounting-documents',
+  );
 
   return accountingDocumentsCollection?.docs.map(doc => {
     return update('uploadedAt', safeInvoke('toDate'))({ id: doc.id, ...doc.data() } as DocumentValue);
