@@ -37,6 +37,12 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.MARK_AS_FINAL;
       case ActivityChangeType.UNMARK_AS_FINAL:
         return ActivityText.UNMARK_AS_FINAL;
+      case ActivityChangeType.POSTPONE_PAYMENT:
+        return ActivityText.POSTPONE_PAYMENT;
+      case ActivityChangeType.APPROVE_PAYMENT:
+        return ActivityText.APPROVE_PAYMENT;
+      case ActivityChangeType.REVERT_PAYMENT_APPROVAL:
+        return ActivityText.REVERT_PAYMENT_APPROVAL;
     }
   };
   return (
@@ -54,6 +60,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
             ActivityChangeType.UNSELECT_FOR_COMPARISON,
             ActivityChangeType.MARK_AS_FINAL,
             ActivityChangeType.UNMARK_AS_FINAL,
+            ActivityChangeType.DOCUMENT_STATUS_CHANGED,
           ].includes(activity.changeType as ActivityChangeType) ? (
             <Fragment key={doc.url}>
               <Link href={doc.url} target="_blank">
@@ -68,8 +75,12 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
         activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
         ' for comparison.'}
-      {activity.documents &&
-      activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
+      {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
+      activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
+      activity.changeType === ActivityChangeType.POSTPONE_PAYMENT
+        ? activity.paymentReference
+        : null}
+      {activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
       activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
       activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
       activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL
@@ -77,6 +88,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
           ? ' into '
           : ' from '
         : null}
+
       {activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
       activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
       activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&

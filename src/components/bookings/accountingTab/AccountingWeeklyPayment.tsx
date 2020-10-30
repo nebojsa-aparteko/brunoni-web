@@ -1,4 +1,4 @@
-import WeeklyPayment, { Status } from '../../../model/WeeklyPayment';
+import WeeklyPayment, { DebitCredit, Status } from '../../../model/WeeklyPayment';
 import {
   Box,
   Button,
@@ -7,6 +7,8 @@ import {
   ExpansionPanelActions,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Menu,
+  MenuItem,
   Typography,
 } from '@material-ui/core';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
@@ -16,11 +18,11 @@ import DocumentListItem from '../checklist/DocumentListItem';
 import {
   ActivityChangeType,
   ActivityLogUserData,
+  ChecklistItemValueDocumentStatusType,
   DocumentValue,
   DocumentValueStatus,
 } from '../checklist/ChecklistItemModel';
-import DropZone from '../../DropZone';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Booking } from '../../../model/Booking';
 import { editRestriction } from '../checklist/CheckList';
 import { addActivityItem } from '../checklist/ActivityLogContainer';
@@ -30,6 +32,9 @@ import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import useAccountingDocuments from '../../../hooks/useAccountingDocuments';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
+import { showCrispChat } from '../../../index';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import DropZone from '../../DropZone';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -51,20 +56,63 @@ const deleteAccountingDocument = (file: DocumentValue, paymentReference: string)
     .delete();
 };
 
-const changeAccountingDocument = (file: DocumentValue, bookingId: string) => {
+const changeAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
     .firestore()
-    .collection('booking-documents')
-    .doc(bookingId)
+    .collection('weeklyPayment')
+    .doc(paymentReference)
     .collection('accounting-documents')
     .doc(file.id)
     .update(file);
+};
+
+const changeWeeklyPayment = (updatedPayment: WeeklyPayment) => {
+  return firebase
+    .firestore()
+    .collection('weeklyPayment')
+    .doc(updatedPayment.reference)
+    .update(updatedPayment);
+};
+
+interface PostponeMenuProps {
+  anchorEl: any;
+  handleClose: () => void;
+  changePayment: (offset: number) => void;
+}
+
+const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
+  return (
+    <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+      <MenuItem onClick={() => changePayment(-7)}>1 Week Earlier</MenuItem>
+      <MenuItem onClick={() => changePayment(7)}>1 Week Later</MenuItem>
+    </Menu>
+  );
 };
 
 const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDialogClose = useCallback(() => {
+    showCrispChat(true);
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(() => {
+    showCrispChat(false);
+    setIsDialogOpen(true);
+  }, [setIsDialogOpen]);
 
   const storageBasePath = useMemo((): string => {
     return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, 'accounting-documents'].join(
@@ -103,7 +151,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         )
         .catch(error => console.error('Error saving new document list', error));
     },
-    [booking, getActivityLogUserData],
+    [booking, getActivityLogUserData, payment.reference],
   );
 
   const handleDeleteFile = useCallback(
@@ -125,57 +173,117 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         )
         .catch(error => console.error('Error during document deletion', error));
     },
-    [booking, getActivityLogUserData],
+    [booking, getActivityLogUserData, payment.reference],
   );
 
-  const storeAccountingActivity = (accountingActivityHandler: () => Promise<void>) => {
-    accountingActivityHandler()
-      .then(_ => {
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1500,
+  const storeAccountingActivity = useCallback(
+    (accountingActivityHandler: () => Promise<void>) => {
+      accountingActivityHandler()
+        .then(_ => {
+          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+            variant: 'success',
+            autoHideDuration: 1500,
+          });
+        })
+        .catch(error => {
+          console.error('error storing activity', error);
+          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
         });
-      })
-      .catch(error => {
-        console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      });
-  };
+    },
+    [enqueueSnackbar],
+  );
 
-  const handleDocumentStatusChange = (item: DocumentValue, status: DocumentValueStatus) => {
-    if (item.status && !editRestriction(item.status!.at as Date)) {
-      return enqueueSnackbar(
-        <Typography color="inherit">
-          {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
-        </Typography>,
-        {
-          variant: 'error',
-          autoHideDuration: 1000,
-        },
-      );
-    }
-    const newItem: DocumentValue = { ...item, status: status };
+  const handleDocumentStatusChange = useCallback(
+    (item: DocumentValue, status: DocumentValueStatus) => {
+      if (item.status && !editRestriction(item.status!.at as Date)) {
+        return enqueueSnackbar(
+          <Typography color="inherit">
+            {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
+          </Typography>,
+          {
+            variant: 'error',
+            autoHideDuration: 1000,
+          },
+        );
+      }
+      const newItem: DocumentValue = { ...item, status: status };
 
-    storeAccountingActivity(() =>
-      changeAccountingDocument(newItem, booking.id).then(_ =>
-        addActivityItem(
-          booking!.id,
-          createActivityObject(
-            ActivityChangeType.DOCUMENT_STATUS_CHANGED,
-            getActivityLogUserData(),
-            undefined,
-            [newItem],
-            undefined,
-            true,
-            true,
+      storeAccountingActivity(() =>
+        changeAccountingDocument(newItem, payment.reference).then(_ =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject(
+              ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+              getActivityLogUserData(),
+              undefined,
+              [newItem],
+              undefined,
+              true,
+              true,
+            ),
           ),
         ),
-      ),
-    );
-  };
+      );
+    },
+    [payment.reference, booking, enqueueSnackbar, getActivityLogUserData, storeAccountingActivity],
+  );
+
+  const handleChangePayDate = useCallback(
+    (offset: number) => {
+      const newDate = safeInvoke('toDate')(payment.payDate).getDate() + offset;
+      const updatedPayment = { ...payment, payDate: new Date(safeInvoke('toDate')(payment.payDate).setDate(newDate)) };
+
+      return Promise.resolve(changeWeeklyPayment(updatedPayment)).then(_ => {
+        handleClose();
+        storeAccountingActivity(() =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject(
+              ActivityChangeType.POSTPONE_PAYMENT,
+              getActivityLogUserData(),
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              true,
+              payment.reference,
+            ),
+          ),
+        );
+      });
+    },
+    [payment, booking, getActivityLogUserData, storeAccountingActivity],
+  );
+
+  const handleChangePaymentStatus = useCallback(
+    (newStatus: Status) => {
+      const updatedPayment: WeeklyPayment = { ...payment, status: newStatus };
+      const activityType: ActivityChangeType =
+        newStatus === Status.APPROVED ? ActivityChangeType.APPROVE_PAYMENT : ActivityChangeType.REVERT_PAYMENT_APPROVAL;
+      return Promise.resolve(changeWeeklyPayment(updatedPayment)).then(_ => {
+        handleDialogClose();
+        storeAccountingActivity(() =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject(
+              activityType,
+              getActivityLogUserData(),
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              true,
+              payment.reference,
+            ),
+          ),
+        );
+      });
+    },
+    [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose],
+  );
 
   return (
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
@@ -184,7 +292,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
           <Typography variant={'h5'}>
             {formatDateSafe(safeInvoke('toDate')(payment.payDate), 'd. MMMM yyyy.')}
           </Typography>
-          <Typography variant={'h5'}>{'Amount: ' + currencyFormatter(payment.currency)(payment.amount)}</Typography>
+          <Typography variant={'h5'}>
+            {'Amount: ' +
+              (payment.debitCredit === DebitCredit.CREDIT
+                ? currencyFormatter(payment.currency)(-payment.amount)
+                : currencyFormatter(payment.currency)(payment.amount))}
+          </Typography>
           <Typography
             variant={'h5'}
             style={{ fontWeight: 700, color: payment.status === Status.PAID ? 'rgba(0,200,81)' : '#000' }}
@@ -219,26 +332,64 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
                 markAsFinal={() => {}}
                 comparableDocuments={[]}
                 selectForComparison={() => {}}
+                paymentStatus={payment.status}
               />
             ))
           )}
-
-          <DropZone
-            storageBasePath={storageBasePath}
-            internal={false}
-            onUpload={values => storeAccountingActivity(() => handleAddFile(values))}
-            onDelete={() => {}}
-          />
+          {payment.status === Status.IN_PROGRESS && (
+            <DropZone
+              storageBasePath={storageBasePath}
+              internal={false}
+              onUpload={values => storeAccountingActivity(() => handleAddFile(values))}
+              onDelete={() => {}}
+            />
+          )}
         </Box>
       </ExpansionPanelDetails>
       <ExpansionPanelActions>
-        <Button color="primary" variant="contained">
-          Approve Payment
-        </Button>
-        <Button color="primary" variant="outlined">
-          Postpone Payment
-        </Button>
+        {payment.status === Status.IN_PROGRESS && (
+          <React.Fragment>
+            <Button onClick={handleClickMenu} color="primary" variant="outlined">
+              Postpone Payment
+            </Button>
+            <Button
+              onClick={handleDialogOpen}
+              color="primary"
+              variant="contained"
+              disabled={
+                payment.status !== Status.IN_PROGRESS ||
+                !(accountingDocuments && accountingDocuments.length > 0
+                  ? accountingDocuments.every(
+                      document => document.status?.type === ChecklistItemValueDocumentStatusType.APPROVED,
+                    )
+                  : false)
+              }
+            >
+              Approve Payment
+            </Button>
+          </React.Fragment>
+        )}
+        {payment.status === Status.APPROVED && (
+          <Button onClick={handleDialogOpen} color="primary" variant="outlined">
+            Revert Approval
+          </Button>
+        )}
       </ExpansionPanelActions>
+      <PostponeMenu anchorEl={anchorEl} handleClose={handleClose} changePayment={handleChangePayDate} />
+      {isDialogOpen && (
+        <ConfirmationDialog
+          isOpen={isDialogOpen}
+          label={
+            payment.status === Status.IN_PROGRESS
+              ? 'Please confirm payment approval'
+              : 'Please confirm approvement reversal'
+          }
+          handleConfirm={() =>
+            handleChangePaymentStatus(payment.status === Status.IN_PROGRESS ? Status.APPROVED : Status.IN_PROGRESS)
+          }
+          handleClose={handleDialogClose}
+        />
+      )}
     </ExpansionPanel>
   );
 };

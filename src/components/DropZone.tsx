@@ -277,14 +277,13 @@ const DropZone: React.FC<DropZoneProps> = ({
 
       return Promise.all(requests);
     },
-    [storageBasePath],
+    [storageBasePath, booking, checklistItem, enqueueSnackbar],
   );
 
   const onDrop = useCallback(
     (acceptedFiles: File[], internal: boolean) => {
       saveFiles(acceptedFiles)
         .then((documents: StoredDocument[]) => {
-          console.log(documents, 'DOCUMENTS');
           const values = documents.map(item => {
             return {
               uploadedBy: getActivityLogUserData(),

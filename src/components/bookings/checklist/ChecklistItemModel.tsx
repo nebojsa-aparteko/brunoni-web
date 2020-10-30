@@ -102,6 +102,9 @@ export enum ActivityText {
   UNSELECT_FOR_COMPARISON = ' has unselected ',
   MARK_AS_FINAL = ' has marked as final ',
   UNMARK_AS_FINAL = ' has marked as not final ',
+  POSTPONE_PAYMENT = ' has postponed payment ',
+  APPROVE_PAYMENT = ' has approved payment ',
+  REVERT_PAYMENT_APPROVAL = ' has reverted the approval of payment ',
 }
 
 export enum ActivityChangeType {
@@ -116,6 +119,9 @@ export enum ActivityChangeType {
   UNSELECT_FOR_COMPARISON,
   MARK_AS_FINAL,
   UNMARK_AS_FINAL,
+  POSTPONE_PAYMENT,
+  APPROVE_PAYMENT,
+  REVERT_PAYMENT_APPROVAL,
 }
 
 export enum ChecklistNames {

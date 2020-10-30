@@ -44,6 +44,7 @@ import RejectionModal from '../documentApproval/RejectionModal';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
 import { showCrispChat } from '../../../index';
+import { Status } from '../../../model/WeeklyPayment';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -112,12 +113,14 @@ const DocumentListItem = ({
   markAsFinal,
   comparableDocuments,
   selectForComparison,
+  paymentStatus,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
+  const { enqueueSnackbar } = useSnackbar();
   const isAdmin = !actingAs;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComparisonDialog, setIsComparisonDialog] = useState<boolean>(false);
@@ -132,7 +135,6 @@ const DocumentListItem = ({
     showCrispChat(false);
     setIsDialogOpen(true);
   }, [setIsDialogOpen]);
-  const { enqueueSnackbar } = useSnackbar();
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -216,7 +218,7 @@ const DocumentListItem = ({
         });
       }
     },
-    [storageBasePath, checklistItem, removalInProgress, deleteFile, enqueueSnackbar],
+    [storageBasePath, checklistItem, deleteFile, enqueueSnackbar],
   );
 
   return (
@@ -311,7 +313,7 @@ const DocumentListItem = ({
           !checklistCheckedRule() &&
           checklistItem &&
           checkIfShouldShowStatusAction(checklistItem.id)) ||
-          isAccountingDocument) && (
+          (isAccountingDocument && paymentStatus && paymentStatus === Status.IN_PROGRESS)) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
             {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
               <Box display="flex" ml={2} mb={2}>
@@ -436,6 +438,7 @@ export interface DocumentListItemPropsBase {
   markAsFinal: (item: ChecklistItemValueDocument) => void;
   comparableDocuments: ChecklistItemValueDocument[];
   selectForComparison: (item: ChecklistItemValueDocument) => void;
+  paymentStatus?: Status;
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {

@@ -153,6 +153,7 @@ export const createActivityObject = (
   stage?: Stage,
   internal?: boolean,
   isAccountingActivity?: boolean,
+  paymentReference?: string,
 ): ActivityLogItem =>
   flow(omitBy(isNil))({
     changeType: changeType,
@@ -168,6 +169,7 @@ export const createActivityObject = (
     documents: documents,
     stage: stage,
     isAccountingActivity: !!isAccountingActivity,
+    paymentReference: paymentReference,
   } as ActivityLogItem);
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {

@@ -12,6 +12,7 @@ export interface ActivityLogItem {
   comment?: string;
   documents?: ShortChecklistItemValueDocument[] | null;
   checklistItem?: ShortChecklistItem;
+  paymentReference?: string;
   stage?: Stage;
   by: ActivityLogUserData;
   at: Date;

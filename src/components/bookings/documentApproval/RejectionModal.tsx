@@ -52,14 +52,17 @@ const RejectionModal: React.FC<Props> = ({
     setRejectionInput(input);
   }, []);
 
-  const updateDocumentStatus = (newStatus: ChecklistItemValueDocumentStatusType) => {
-    changeStatus(document, {
-      type: newStatus,
-      by: userActivityLogData,
-      at: new Date(),
-    });
-    handleClose();
-  };
+  const updateDocumentStatus = useCallback(
+    (newStatus: ChecklistItemValueDocumentStatusType) => {
+      changeStatus(document, {
+        type: newStatus,
+        by: userActivityLogData,
+        at: new Date(),
+      });
+      handleClose();
+    },
+    [document, changeStatus, handleClose, userActivityLogData],
+  );
 
   const handleCommentSave = useCallback(
     (messageBody: string, mentions: MentionItem[], internal: boolean) => {

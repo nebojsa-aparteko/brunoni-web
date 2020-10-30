@@ -29,5 +29,6 @@ export enum DebitCredit {
 
 export enum Status {
   IN_PROGRESS = 'In Progress',
+  APPROVED = 'Approved',
   PAID = 'Paid',
 }
