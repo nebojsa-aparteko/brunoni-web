@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect } from 'react';
 import { Card, CardActions, CardContent, CardHeader, Divider, Tab, Tabs } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
 import { differenceInMilliseconds } from 'date-fns';
@@ -28,7 +28,13 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
 
   const [tabValue, setTabValue] = React.useState(0);
-
+  useEffect(() => {
+    const value = localStorage.getItem('checklistTab');
+    setTabValue(value ? +value : 0);
+  }, []);
+  useEffect(() => {
+    localStorage.setItem('checklistTab', `${tabValue}`);
+  }, [tabValue]);
   const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabValue(newValue);
   };
