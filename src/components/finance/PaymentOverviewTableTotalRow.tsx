@@ -8,6 +8,8 @@ const PaymentOverviewTableTotalRow: React.FC<Props> = ({ total }) => (
     <TableCell align="left" />
     <TableCell align="center" />
     <TableCell align="center" />
+    <TableCell align="center" />
+    <TableCell align="center" />
     <TableCell align="center">{`Total ${total.currency}`}</TableCell>
     <TableCell align="right">{currencyFormatter(total.currency)(total.amount)}</TableCell>
   </TableRow>

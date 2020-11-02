@@ -36,7 +36,7 @@ export default (bookingId?: string) => {
   const paymentCollection = useFirestoreCollection('weeklyPayment', query);
 
   return paymentCollection?.docs.map(doc => {
-    return { id: doc.id, ...doc.data() } as WeeklyPayment;
+    return { id: doc.id, ...normalizePaymentOverview(doc.data()) } as WeeklyPayment;
   }) as WeeklyPayment[];
 };
 

@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
-import safeInvoke from '../../../utilities/safeInvoke';
 import currencyFormatter from '../../../utilities/currencyFormatter';
 import DocumentListItem from '../checklist/DocumentListItem';
 import {
@@ -35,6 +34,7 @@ import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import { showCrispChat } from '../../../index';
 import ConfirmationDialog from '../../ConfirmationDialog';
 import DropZone from '../../DropZone';
+import { addDays } from 'date-fns';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -66,7 +66,7 @@ const changeAccountingDocument = (file: DocumentValue, paymentReference: string)
     .update(file);
 };
 
-const changeWeeklyPayment = (updatedPayment: WeeklyPayment) => {
+export const changeWeeklyPayment = (updatedPayment: WeeklyPayment) => {
   return firebase
     .firestore()
     .collection('weeklyPayment')
@@ -233,8 +233,8 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 
   const handleChangePayDate = useCallback(
     (offset: number) => {
-      const newDate = safeInvoke('toDate')(payment.payDate).getDate() + offset;
-      const updatedPayment = { ...payment, payDate: new Date(safeInvoke('toDate')(payment.payDate).setDate(newDate)) };
+      const newDate = addDays(payment.payDate, offset);
+      const updatedPayment = { ...payment, payDate: newDate };
 
       return Promise.resolve(changeWeeklyPayment(updatedPayment)).then(_ => {
         handleClose();
@@ -289,9 +289,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
       <ExpansionPanelSummary style={{ backgroundColor: 'rgba(198,238,241,0.24)', display: 'flex' }}>
         <Box flex={1} display="flex" flexDirection="row" justifyContent="space-between">
-          <Typography variant={'h5'}>
-            {formatDateSafe(safeInvoke('toDate')(payment.payDate), 'd. MMMM yyyy.')}
-          </Typography>
+          <Typography variant={'h5'}>{formatDateSafe(payment.payDate, 'd. MMMM yyyy.')}</Typography>
           <Typography variant={'h5'}>
             {'Amount: ' +
               (payment.debitCredit === DebitCredit.CREDIT
