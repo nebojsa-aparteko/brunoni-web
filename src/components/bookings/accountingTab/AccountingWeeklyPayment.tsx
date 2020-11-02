@@ -66,12 +66,12 @@ const changeAccountingDocument = (file: DocumentValue, paymentReference: string)
     .update(file);
 };
 
-export const changeWeeklyPayment = (updatedPayment: WeeklyPayment) => {
+export const changeWeeklyPayment = (referenceId: string, updatedPayment: any) => {
   return firebase
     .firestore()
     .collection('weeklyPayment')
-    .doc(updatedPayment.reference)
-    .update(updatedPayment);
+    .doc(referenceId)
+    .set(updatedPayment, { merge: true });
 };
 
 interface PostponeMenuProps {
@@ -82,7 +82,7 @@ interface PostponeMenuProps {
 
 const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
   return (
-    <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+    <Menu id="accounting-postpone-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
       <MenuItem onClick={() => changePayment(-7)}>1 Week Earlier</MenuItem>
       <MenuItem onClick={() => changePayment(7)}>1 Week Later</MenuItem>
     </Menu>
@@ -233,10 +233,9 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 
   const handleChangePayDate = useCallback(
     (offset: number) => {
-      const newDate = addDays(payment.payDate, offset);
-      const updatedPayment = { ...payment, payDate: newDate };
-
-      return Promise.resolve(changeWeeklyPayment(updatedPayment)).then(_ => {
+      return Promise.resolve(
+        changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }),
+      ).then(_ => {
         handleClose();
         storeAccountingActivity(() =>
           addActivityItem(
@@ -260,10 +259,9 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 
   const handleChangePaymentStatus = useCallback(
     (newStatus: Status) => {
-      const updatedPayment: WeeklyPayment = { ...payment, status: newStatus };
       const activityType: ActivityChangeType =
         newStatus === Status.APPROVED ? ActivityChangeType.APPROVE_PAYMENT : ActivityChangeType.REVERT_PAYMENT_APPROVAL;
-      return Promise.resolve(changeWeeklyPayment(updatedPayment)).then(_ => {
+      return Promise.resolve(changeWeeklyPayment(payment.reference, { status: newStatus })).then(_ => {
         handleDialogClose();
         storeAccountingActivity(() =>
           addActivityItem(
@@ -292,9 +290,9 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
           <Typography variant={'h5'}>{formatDateSafe(payment.payDate, 'd. MMMM yyyy.')}</Typography>
           <Typography variant={'h5'}>
             {'Amount: ' +
-              (payment.debitCredit === DebitCredit.CREDIT
-                ? currencyFormatter(payment.currency)(-payment.amount)
-                : currencyFormatter(payment.currency)(payment.amount))}
+              currencyFormatter(payment.currency)(
+                payment.debitCredit === DebitCredit.CREDIT ? -payment.amount : payment.amount,
+              )}
           </Typography>
           <Typography
             variant={'h5'}
@@ -373,7 +371,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
           </Button>
         )}
       </ExpansionPanelActions>
-      <PostponeMenu anchorEl={anchorEl} handleClose={handleClose} changePayment={handleChangePayDate} />
+      {anchorEl && <PostponeMenu anchorEl={anchorEl} handleClose={handleClose} changePayment={handleChangePayDate} />}
       {isDialogOpen && (
         <ConfirmationDialog
           isOpen={isDialogOpen}

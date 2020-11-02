@@ -67,7 +67,7 @@ interface PostponeMenuProps {
 const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
   return (
     <Menu
-      id="simple-menu"
+      id="payment-overview-postpone-menu"
       anchorEl={anchorEl}
       anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       transformOrigin={{ horizontal: 'left', vertical: 'top' }}
@@ -150,10 +150,8 @@ const PaymentOverviewContainer = () => {
         filteredOverviewData
           .filter(payment => payment.id && selectedPayments && selectedPayments.indexOf(payment.id) > -1)
           .map(payment => {
-            const newDate = addDays(payment.payDate, offset);
-            const updatedPayment = { ...payment, payDate: newDate };
-            handleSelect(updatedPayment.id);
-            return changeWeeklyPayment(updatedPayment).then(_ =>
+            handleSelect(payment.id);
+            return changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }).then(_ =>
               addActivityItem(
                 payment.bookingId,
                 createActivityObject(
