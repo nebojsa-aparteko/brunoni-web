@@ -16,7 +16,7 @@ import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 import TaskStatusInput from '../tasks/TaskStatusInput';
 import { getTaskFilter } from '../TaskStatusChip';
 import Task, { UserRole } from '../../model/Task';
-import { Team } from '../../model/Teams';
+import { Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
 
 const MyDayContainer = () => {
@@ -61,7 +61,10 @@ const MyDayContainer = () => {
     if (teams) {
       teams
         ?.reduce(async (previousValue, currentValue) => {
-          const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
+          const tasksPerTeam =
+            (await currentValue.teamType) === TeamType.OPERATIONS
+              ? await getOperationsTeamTasks(currentValue.checklistItems || [])
+              : await getAccountingTeamTasks(currentValue.taskTypes || []);
           const p = await previousValue;
 
           const newTuple = [
@@ -192,7 +195,7 @@ const MyDayContainer = () => {
 
 export default MyDayContainer;
 
-const getTeamTasks = (checklistItems: string[]) => {
+const getOperationsTeamTasks = (checklistItems: string[]) => {
   const stages: ChecklistNames[] = [];
   checklistItems.forEach(c => {
     const ch = getChecklistItem(c as ChecklistNames);
@@ -218,6 +221,16 @@ const getTeamTasks = (checklistItems: string[]) => {
         .where('userRole', '==', UserRole.ADMIN)
         .get();
 };
+
+const getAccountingTeamTasks = (taskTypes: string[]) =>
+  firebase
+    .firestore()
+    .collectionGroup('tasks')
+    .where('id', 'in', taskTypes)
+    .where('resolved', '==', false)
+    .where('show', '==', true)
+    .where('userRole', '==', UserRole.ADMIN)
+    .get();
 
 export const getTeamsPerUser = (assignee: UserRecord) =>
   firebase
