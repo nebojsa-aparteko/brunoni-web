@@ -12,6 +12,7 @@ import AccountingTabContent from '../accountingTab/AccountingTabContent';
 
 interface CheckListProps {
   booking: Booking;
+  onTabChange?: (newValue: string) => void;
 }
 
 export const editRestriction = (date: Date) =>
@@ -24,7 +25,7 @@ function a11yProps(index: any) {
   };
 }
 
-const CheckList: React.FC<CheckListProps> = ({ booking }) => {
+const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
   const actingAs = useContext(ActingAs)[0];
 
   const [tabValue, setTabValue] = React.useState(0);
@@ -36,6 +37,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking }) => {
     localStorage.setItem('checklistTab', `${tabValue}`);
   }, [tabValue]);
   const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
+    onTabChange && onTabChange(newValue.toString());
     setTabValue(newValue);
   };
 

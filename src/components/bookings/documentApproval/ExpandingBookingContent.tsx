@@ -5,7 +5,7 @@ import BookingSummary from '../BookingSummary';
 import ContainerDetails from '../ContainerDetails';
 import PortTerms from '../../../components/bookings/PortTerms';
 import { isImport, isLongVersion } from '../BookingView';
-import { Box } from '@material-ui/core';
+import { Box, makeStyles } from '@material-ui/core';
 import SpecialRemarks from '../SpecialRemarks';
 import BookingFreight from '../BookingFreight';
 import BookingRemarks from '../BookingRemarks';
@@ -15,8 +15,22 @@ import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
 import { remark } from '../BookingViewMainContent';
 
-const ExpandingBookingContent = ({ booking }: Props) => {
+const useStyles = makeStyles(() => ({
+  hidePrint: {
+    ['@media print']: {
+      display: 'none',
+    },
+  },
+  showPrint: {
+    ['@media print']: {
+      display: 'initial',
+    },
+  },
+}));
+
+const ExpandingBookingContent = ({ booking, isPrintWithCost }: Props) => {
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
+  const classes = useStyles();
 
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -56,7 +70,7 @@ const ExpandingBookingContent = ({ booking }: Props) => {
         </SimpleExpansionPanel>
       ) : null}
       {booking.FreightDetails && (
-        <Box marginTop="1em" marginBottom="1em" displayPrint="none">
+        <Box marginTop="1em" marginBottom="1em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
           <BookingFreight freightDetails={booking.FreightDetails} />
         </Box>
       )}
@@ -67,6 +81,7 @@ const ExpandingBookingContent = ({ booking }: Props) => {
 
 interface Props {
   booking: Booking;
+  isPrintWithCost?: boolean;
 }
 
 export default ExpandingBookingContent;

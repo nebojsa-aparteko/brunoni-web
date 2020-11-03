@@ -34,6 +34,7 @@ import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
+import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -136,6 +137,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(localStorage.getItem('checklistTab'));
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
@@ -333,14 +335,18 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             </Box>
 
             <Grid item xs={12}>
-              <BookingViewMainContent booking={booking} isPrintWithCost={isPrintWithCost} />
+              {selectedTab === '1' ? (
+                <ExpandingBookingContent booking={booking} isPrintWithCost={isPrintWithCost} />
+              ) : (
+                <BookingViewMainContent booking={booking} isPrintWithCost={isPrintWithCost} />
+              )}
             </Grid>
           </Paper>
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
         <Box displayPrint="none">
-          <CheckList booking={booking} />
+          <CheckList booking={booking} onTabChange={setSelectedTab} />
         </Box>
       </Grid>
     </Grid>

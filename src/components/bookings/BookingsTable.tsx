@@ -200,7 +200,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
         history.push(`/bookings/${id}`);
       }
     },
-    [history],
+    [history, preventDefaultClick],
   );
 
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
