@@ -13,7 +13,7 @@ export default interface WeeklyPayment {
   amount: number;
   debitCredit: DebitCredit;
   payDate: Date;
-  status?: Status;
+  status: Status;
 }
 
 export enum Currency {

@@ -81,6 +81,7 @@ export enum TaskType {
   RELEASE_DONE_ARRANGE = 'RELEASE_DONE_ARRANGE',
   PIN_NUMBER_ARRANGE = 'PIN_NUMBER_ARRANGE',
   GATE_OUT_TERMINAL_CHECK = 'GATE_OUT_TERMINAL_CHECK',
+  DEM_DET_CHECK_CONTAINER = 'DEM_DET_CHECK_CONTAINER',
   DEPOT_IN_CHECK = 'DEPOT_IN_CHECK',
   FREIGHT_COLLECTION_CHECK = 'FREIGHT_COLLECTION_CHECK',
 
@@ -124,6 +125,7 @@ export enum TaskDescription {
   RELEASE_DONE_ARRANGE = 'Please arrange release.',
   PIN_NUMBER_ARRANGE = 'Please arrange PIN number and provide it to customer.',
   GATE_OUT_TERMINAL_CHECK = 'Please check if container is GATED OUT.',
+  DEM_DET_CHECK_CONTAINER = 'Please check container on Demurrage and Storage.',
   DEPOT_IN_CHECK = 'Please check DEPOT IN move.',
   DEPOT_IN_CHECK_CONTAINER = 'Please check container on Demurrage and Detention.',
   FREIGHT_COLLECTION_CHECK = 'Please check if payment received and inform agent at destination.',

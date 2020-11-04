@@ -289,10 +289,10 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         <Box flex={1} display="flex" flexDirection="row" justifyContent="space-between">
           <Typography variant={'h5'}>{formatDateSafe(payment.payDate, 'd. MMMM yyyy.')}</Typography>
           <Typography variant={'h5'}>
-            {'Amount: ' +
-              currencyFormatter(payment.currency)(
-                payment.debitCredit === DebitCredit.CREDIT ? -payment.amount : payment.amount,
-              )}
+            {'Amount: '.concat(
+              currencyFormatter(payment.currency)(payment.amount),
+              payment.debitCredit === DebitCredit.CREDIT ? '-' : '',
+            )}
           </Typography>
           <Typography
             variant={'h5'}
@@ -353,12 +353,14 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
               color="primary"
               variant="contained"
               disabled={
-                payment.status !== Status.IN_PROGRESS ||
-                !(accountingDocuments && accountingDocuments.length > 0
-                  ? accountingDocuments.every(
-                      document => document.status?.type === ChecklistItemValueDocumentStatusType.APPROVED,
-                    )
-                  : false)
+                !(
+                  payment.status === Status.IN_PROGRESS &&
+                  (accountingDocuments && accountingDocuments.length > 0
+                    ? accountingDocuments.every(
+                        document => document.status?.type === ChecklistItemValueDocumentStatusType.APPROVED,
+                      )
+                    : payment.carrier !== 'Hamburg Süd')
+                )
               }
             >
               Approve Payment
