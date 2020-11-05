@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import { Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
-import Task, { TaskDescription, UserRole } from '../../model/Task';
+import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
@@ -67,7 +67,9 @@ const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateCom
         </TableCell>
         <TableCell align="center">
           {task.additionalInfo && <TaskAdditionalInfoView additionalInfo={task.additionalInfo} />}
-          {task.manualResolve && <TaskManualResolveButton task={task} updateComponent={updateComponent} />}
+          {task.manualResolve && task.manualResolve !== ManualResolveType.NO_MANUAL_RESOLVE && (
+            <TaskManualResolveButton task={task} updateComponent={updateComponent} />
+          )}
         </TableCell>
       </TableRow>
       <TableRow>
