@@ -142,38 +142,40 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
     return chunk(rowsPerPage)(result);
   }, [bookings, searchString, rowsPerPage]);
 
-  const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBookingsContextData &&
-      setBookingsContextData(set('category', (event.target as HTMLInputElement).value)(bookingsContextData));
-  };
+  const handleImportOrExportChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setBookingsContextData &&
+        setBookingsContextData(set('category', (event.target as HTMLInputElement).value)(bookingsContextData));
+    },
+    [setBookingsContextData],
+  );
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-      if (setBookingPaginationContextData)
-        setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
+      if (setBookingPaginationContextData) setBookingPaginationContextData(prevState => set('page', page)(prevState));
     },
-    [setBookingPaginationContextData, bookingPaginationContextData],
+    [setBookingPaginationContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (setBookingPaginationContextData)
-        setBookingPaginationContextData(
-          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
+        setBookingPaginationContextData(prevState =>
+          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(prevState),
         );
     },
-    [setBookingPaginationContextData, bookingPaginationContextData],
+    [setBookingPaginationContextData],
   );
 
   const handleSearch = useCallback(
     (searchStringNew: string) => {
       if (searchStringNew !== searchString && setBookingPaginationContextData) {
-        setBookingPaginationContextData(
-          flow(set('searchString', searchStringNew), set('page', 0))(bookingPaginationContextData),
+        setBookingPaginationContextData(prevState =>
+          flow(set('searchString', searchStringNew), set('page', 0))(prevState),
         );
       }
     },
-    [setBookingPaginationContextData, searchString, bookingPaginationContextData],
+    [setBookingPaginationContextData, searchString],
   );
 
   // if (!bookings) {

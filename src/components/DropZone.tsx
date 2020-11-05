@@ -100,7 +100,7 @@ export const makeContentDispositionFilePrefix = (
   if (checklistItem && booking && ['IMO', 'OOG'].includes(checklistItem.id)) {
     const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
     if (deliveryRef) {
-      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.`;
+      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}_`;
     }
   }
   return `attachment; filename=`;
@@ -111,7 +111,7 @@ export const makeContentDispositionFileName = (
   booking: Booking | undefined,
   file: File,
 ) => {
-  return `${makeContentDispositionFilePrefix(checklistItem, booking)}${file.name.split('.').pop()}`;
+  return `${makeContentDispositionFilePrefix(checklistItem, booking)}${file.name}`;
 };
 
 export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelete }) => {
