@@ -33,6 +33,8 @@ import { changeWeeklyPayment } from '../bookings/accountingTab/AccountingWeeklyP
 import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { addDays } from 'date-fns';
+import PaymentOverviewDialog from './PaymentOverviewDialog';
+import { showCrispChat } from '../../index';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -89,6 +91,23 @@ const PaymentOverviewContainer = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const carriers = useContext(Carriers);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
+
+  const handleDialogClose = useCallback(() => {
+    showCrispChat(true);
+    setIsDialogOpen(false);
+    setOpenBooking(undefined);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(
+    (bookingId: string) => {
+      showCrispChat(false);
+      setIsDialogOpen(true);
+      setOpenBooking(bookingId);
+    },
+    [setIsDialogOpen],
+  );
 
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -123,14 +142,17 @@ const PaymentOverviewContainer = () => {
     return (overviewData || []).filter(data => currency.includes(data.currency));
   }, [overviewData, currency]);
 
-  const handleSelect = (paymentId: string | undefined) => {
-    const updatedSelectedPayments = paymentId
-      ? selectedPayments.findIndex(pid => pid === paymentId) > -1
-        ? selectedPayments.filter(pid => pid !== paymentId)
-        : [...selectedPayments, paymentId]
-      : undefined;
-    if (updatedSelectedPayments) setSelectedPayments(updatedSelectedPayments);
-  };
+  const handleSelect = useCallback(
+    (paymentId: string | undefined) => {
+      const updatedSelectedPayments = paymentId
+        ? selectedPayments.findIndex(pid => pid === paymentId) > -1
+          ? selectedPayments.filter(pid => pid !== paymentId)
+          : [...selectedPayments, paymentId]
+        : undefined;
+      if (updatedSelectedPayments) setSelectedPayments(updatedSelectedPayments);
+    },
+    [selectedPayments],
+  );
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -182,7 +204,7 @@ const PaymentOverviewContainer = () => {
           });
         });
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments],
+    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect],
   );
 
   return (
@@ -256,7 +278,9 @@ const PaymentOverviewContainer = () => {
           overviewData={filteredOverviewData}
           selectedPayments={selectedPayments || []}
           handleSelect={handleSelect}
+          handleOpenPreviewDialog={handleDialogOpen}
         />
+        <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
       </CardContent>
     </Card>
   );

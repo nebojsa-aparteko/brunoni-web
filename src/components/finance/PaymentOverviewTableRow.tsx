@@ -3,25 +3,31 @@ import WeeklyPayment, { Status } from '../../model/WeeklyPayment';
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
-import { useHistory } from 'react-router-dom';
 
-const PaymentOverviewTableRow: React.FC<Props> = ({ paymentData, selectedPayments, handleSelect }) => {
-  const history = useHistory();
-
-  const goToBookingAccountingTab = () => {
-    localStorage.setItem('checklistTab', `1`);
-    return history.push(`/bookings/${paymentData.bookingId}`);
+const PaymentOverviewTableRow: React.FC<Props> = ({
+  paymentData,
+  selectedPayments,
+  handleSelect,
+  handleOpenPreviewDialog,
+}) => {
+  const handleRowClick = () => {
+    handleOpenPreviewDialog(paymentData.bookingId);
   };
   const handleLinkClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
   };
 
+  const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    handleSelect();
+  };
+
   return (
-    <TableRow hover onClick={goToBookingAccountingTab}>
+    <TableRow hover onClick={handleRowClick}>
       <TableCell align="left">
         <Checkbox
           checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
-          onChange={handleSelect}
+          onClick={e => onClick(e)}
           disabled={paymentData.status !== Status.IN_PROGRESS}
         />
       </TableCell>
@@ -61,4 +67,5 @@ interface Props {
   paymentData: WeeklyPayment;
   selectedPayments: string[];
   handleSelect: () => void;
+  handleOpenPreviewDialog: (bookingId: string) => void;
 }

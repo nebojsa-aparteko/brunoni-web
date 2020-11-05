@@ -6,7 +6,12 @@ import WeeklyPayment, { Currency } from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
 
-const PaymentOverviewTable: React.FC<Props> = ({ overviewData, selectedPayments, handleSelect }) => {
+const PaymentOverviewTable: React.FC<Props> = ({
+  overviewData,
+  selectedPayments,
+  handleSelect,
+  handleOpenPreviewDialog,
+}) => {
   const total = useMemo(() => {
     return overviewData
       ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(([key, value]) => ({
@@ -41,6 +46,7 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData, selectedPayments,
                   key={payment.id}
                   selectedPayments={selectedPayments}
                   handleSelect={() => handleSelect(payment.id)}
+                  handleOpenPreviewDialog={handleOpenPreviewDialog}
                 />
               ))}
               {total.map((value, index) => (
@@ -60,4 +66,5 @@ interface Props {
   overviewData: WeeklyPayment[];
   selectedPayments: string[];
   handleSelect: (selectedId: string | undefined) => void;
+  handleOpenPreviewDialog: (bookingId: string) => void;
 }
