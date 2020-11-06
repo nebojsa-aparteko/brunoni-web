@@ -45,6 +45,7 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.REVERT_PAYMENT_APPROVAL;
     }
   };
+
   return (
     <Typography>
       <Link href={`mailto:${activity.by.emailAddress}`}>
@@ -74,31 +75,28 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         })}
       {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
         activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
-        ' for comparison.'}
+        ' for comparison'}
       {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
       activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
       activity.changeType === ActivityChangeType.POSTPONE_PAYMENT
         ? activity.paymentReference
         : null}
-      {activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
-      activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
-      activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
-      activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL
+      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
+      (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
         ? activity.changeType === ActivityChangeType.ADD_FILE
           ? ' into '
           : ' from '
         : null}
 
-      {activity.changeType !== ActivityChangeType.SELECT_FOR_COMPARISON &&
-      activity.changeType !== ActivityChangeType.UNSELECT_FOR_COMPARISON &&
-      activity.changeType !== ActivityChangeType.MARK_AS_FINAL &&
-      activity.changeType !== ActivityChangeType.UNMARK_AS_FINAL ? (
+      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER ? (
         activity.checklistItem ? (
           <Fragment>
             <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
           </Fragment>
         ) : !activity.isAccountingActivity ? (
-          'Internal storage.'
+          activity.isInternal ? (
+            'Internal storage.'
+          ) : null
         ) : (
           'Accounting.'
         )

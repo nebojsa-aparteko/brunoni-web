@@ -121,6 +121,7 @@ const DocumentList: React.FC<Props> = ({
             storageBasePath={storageBasePath}
             checklistItem={checklistItem}
             changeStatus={changeStatus}
+            deleteFile={checklistFileDeletedHandler}
             internal={internal}
             markAsFinal={markAsFinal}
             comparableDocuments={comparableDocuments}

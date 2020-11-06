@@ -18,7 +18,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import { Currency } from '../../model/WeeklyPayment';
+import { Currency, Status } from '../../model/WeeklyPayment';
 import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
@@ -112,7 +112,7 @@ const PaymentOverviewContainer = () => {
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { currency, paymentDate, carrier } = filters;
+  const { currency, paymentDate, carrier, status } = filters;
 
   const classes = useStyles();
 
@@ -130,6 +130,12 @@ const PaymentOverviewContainer = () => {
     },
     [setFilters],
   );
+  const onStatusChange = useCallback(
+    (event: ChangeEvent<{ name?: string; value: unknown }>) => {
+      if (setFilters) setFilters(prevState => set('status', event.target.value as Status[])(prevState));
+    },
+    [setFilters],
+  );
   const handleDateChange = useCallback(
     (date: Date) => {
       if (setFilters) setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
@@ -139,7 +145,9 @@ const PaymentOverviewContainer = () => {
   );
 
   const filteredOverviewData = useMemo(() => {
-    return (overviewData || []).filter(data => currency.includes(data.currency));
+    return (overviewData || []).filter(
+      data => currency.includes(data.currency) && (data.status ? status.includes(data.status) : true),
+    );
   }, [overviewData, currency]);
 
   const handleSelect = useCallback(
@@ -235,6 +243,26 @@ const PaymentOverviewContainer = () => {
               {Object.entries(Currency).map(([key, value]) => (
                 <MenuItem key={key} value={value}>
                   <Checkbox checked={currency.indexOf(value) > -1} />
+                  <ListItemText primary={value} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="status-select">Status</InputLabel>
+            <Select
+              labelId="status-select"
+              id="status-select-checkbox"
+              multiple
+              value={status}
+              onChange={onStatusChange}
+              input={<Input />}
+              renderValue={selected => (selected as any[]).join(', ')}
+              MenuProps={MenuProps}
+            >
+              {Object.entries(Status).map(([key, value]) => (
+                <MenuItem key={key} value={value}>
+                  <Checkbox checked={status.indexOf(value) > -1} />
                   <ListItemText primary={value} />
                 </MenuItem>
               ))}

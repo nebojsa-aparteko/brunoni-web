@@ -42,7 +42,6 @@ import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
-import omitEmptyDeep from '../../../utilities/omitEmptyDeep';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -161,7 +160,7 @@ export const createActivityObject = (
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: internal,
-    checklistItem: omitEmptyDeep({
+    checklistItem: omitBy(isNil)({
       id: checklistItem?.id,
       label: checklistItem?.label,
       checked: checklistItem?.checked,
