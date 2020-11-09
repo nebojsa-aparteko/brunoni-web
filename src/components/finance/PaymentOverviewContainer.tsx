@@ -148,7 +148,7 @@ const PaymentOverviewContainer = () => {
     return (overviewData || []).filter(
       data => currency.includes(data.currency) && (data.status ? status.includes(data.status) : true),
     );
-  }, [overviewData, currency]);
+  }, [overviewData, status, currency]);
 
   const handleSelect = useCallback(
     (paymentId: string | undefined) => {
