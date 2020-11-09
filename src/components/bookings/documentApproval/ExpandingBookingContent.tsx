@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const ExpandingBookingContent = ({ booking, isPrintWithCost }: Props) => {
+const ExpandingBookingContent = ({ booking, isPrintWithCost, initialFreightTab }: Props) => {
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
   const classes = useStyles();
 
@@ -71,7 +71,7 @@ const ExpandingBookingContent = ({ booking, isPrintWithCost }: Props) => {
       ) : null}
       {booking.FreightDetails && (
         <Box marginTop="1em" marginBottom="1em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
-          <BookingFreight freightDetails={booking.FreightDetails} />
+          <BookingFreight freightDetails={booking.FreightDetails} initiallySelectedTab={initialFreightTab} />
         </Box>
       )}
       <BookingRemarks booking={booking} />
@@ -82,6 +82,7 @@ const ExpandingBookingContent = ({ booking, isPrintWithCost }: Props) => {
 interface Props {
   booking: Booking;
   isPrintWithCost?: boolean;
+  initialFreightTab?: number;
 }
 
 export default ExpandingBookingContent;

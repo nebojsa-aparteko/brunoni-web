@@ -88,7 +88,7 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
               style={{ flex: 1, overflow: 'hidden', width: '100%', minHeight: 0 }}
             >
               <Grid item xs={12} md={8} className={classes.bookingViewContainer} style={{ paddingTop: 8 }}>
-                {booking && <ExpandingBookingContent booking={booking} />}
+                {booking && <ExpandingBookingContent booking={booking} initialFreightTab={1} />}
               </Grid>
               <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
                 {booking && <AccountingTabContent booking={booking} />}
