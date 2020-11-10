@@ -72,14 +72,13 @@ const DocumentList: React.FC<Props> = ({
               console.log('File deleted', deletedFile, documents, internal, checklistItem);
               return addActivityItem(
                 booking.id!,
-                createActivityObject(
-                  ActivityChangeType.DELETE_FILE,
-                  getActivityLogUserData(),
-                  checklistItem,
-                  [deletedFile],
-                  undefined,
-                  internal,
-                ),
+                createActivityObject({
+                  changeType: ActivityChangeType.DELETE_FILE,
+                  by: getActivityLogUserData(),
+                  checklistItem: checklistItem,
+                  documents: [deletedFile],
+                  internal: internal,
+                }),
               );
             })
             .catch(error => {

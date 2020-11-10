@@ -184,16 +184,12 @@ const PaymentOverviewContainer = () => {
             return changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }).then(_ =>
               addActivityItem(
                 payment.bookingId,
-                createActivityObject(
-                  ActivityChangeType.POSTPONE_PAYMENT,
-                  getActivityLogUserData(),
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
-                  true,
-                  payment.reference,
-                ),
+                createActivityObject({
+                  changeType: ActivityChangeType.POSTPONE_PAYMENT,
+                  by: getActivityLogUserData(),
+                  isAccountingActivity: true,
+                  paymentReference: payment.reference,
+                }),
               ),
             );
           }),

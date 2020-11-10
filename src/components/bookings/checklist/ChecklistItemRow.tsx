@@ -144,32 +144,36 @@ const checkStageDependency = (stages: Stage[], stageId: string) => {
   } else return stages[index - 1].checked;
 };
 
-export const createActivityObject = (
-  changeType: ActivityChangeType,
-  by: ActivityLogUserData,
-  checklistItem?: ChecklistItem,
-  documents?: ChecklistItemValueDocument[],
-  stage?: Stage,
-  internal?: boolean,
-  isAccountingActivity?: boolean,
-  paymentReference?: string,
-): ActivityLogItem =>
-  flow(omitBy(isNil))({
+export const createActivityObject = (data: {
+  changeType: ActivityChangeType;
+  by: ActivityLogUserData;
+  checklistItem?: ChecklistItem;
+  documents?: ChecklistItemValueDocument[];
+  stage?: Stage;
+  internal?: boolean;
+  isAccountingActivity?: boolean;
+  paymentReference?: string;
+}): ActivityLogItem => {
+  const { by, changeType, internal, checklistItem, paymentReference, documents, stage, isAccountingActivity } = data;
+  return flow(omitBy(isNil))({
     changeType: changeType,
     by: by,
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: internal,
-    checklistItem: omitBy(isNil)({
-      id: checklistItem?.id,
-      label: checklistItem?.label,
-      checked: checklistItem?.checked,
-    } as ShortChecklistItem),
+    checklistItem: checklistItem
+      ? omitBy(isNil)({
+          id: checklistItem?.id,
+          label: checklistItem?.label,
+          checked: checklistItem?.checked,
+        } as ShortChecklistItem)
+      : undefined,
     documents: documents,
     stage: stage,
     isAccountingActivity: !!isAccountingActivity,
     paymentReference: paymentReference,
   } as ActivityLogItem);
+};
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
   const classes = useStyles();
@@ -240,7 +244,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('checked', checked).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), { ...checklistItem, checked }),
+          createActivityObject({
+            changeType: ActivityChangeType.CHECKED,
+            by: getActivityLogUserData(),
+            checklistItem: { ...checklistItem, checked },
+          }),
         ),
       );
     },
@@ -252,11 +260,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('customerAction', action).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(
-            type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
-            getActivityLogUserData(),
-            checklistItem,
-          ),
+          createActivityObject({
+            changeType: type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+          }),
         ),
       );
     },
@@ -270,14 +278,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         .then(_ =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.ADD_FILE,
-              getActivityLogUserData(),
-              checklistItem,
-              addedFiles,
-              undefined,
-              internal,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.ADD_FILE,
+              by: getActivityLogUserData(),
+              checklistItem: checklistItem,
+              documents: addedFiles,
+              internal: internal,
+            }),
           ),
         )
         .catch(error => console.error('Error saving new document list', error));
@@ -290,13 +297,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('stages', stages).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(
-            ActivityChangeType.STAGE_CHECKED,
-            getActivityLogUserData(),
-            checklistItem,
-            undefined,
-            stage,
-          ),
+          createActivityObject({
+            changeType: ActivityChangeType.STAGE_CHECKED,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+            stage: stage,
+          }),
         ),
       );
     },
@@ -308,9 +314,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(ActivityChangeType.DOCUMENT_STATUS_CHANGED, getActivityLogUserData(), checklistItem, [
-            document,
-          ]),
+          createActivityObject({
+            changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+            documents: [document],
+          }),
         ),
       );
     },
@@ -411,14 +420,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       console.log('done');
       return addActivityItem(
         booking!.id,
-        createActivityObject(
-          !item.isSelectedForComparison
+        createActivityObject({
+          changeType: !item.isSelectedForComparison
             ? ActivityChangeType.SELECT_FOR_COMPARISON
             : ActivityChangeType.UNSELECT_FOR_COMPARISON,
-          getActivityLogUserData(),
-          checklistItem,
-          [item],
-        ),
+          by: getActivityLogUserData(),
+          checklistItem: checklistItem,
+          documents: [item],
+        }),
       );
     });
   };
@@ -433,12 +442,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       console.log('done');
       return addActivityItem(
         booking!.id,
-        createActivityObject(
-          !item.final ? ActivityChangeType.MARK_AS_FINAL : ActivityChangeType.UNMARK_AS_FINAL,
-          getActivityLogUserData(),
-          checklistItem,
-          [item],
-        ),
+        createActivityObject({
+          changeType: !item.final ? ActivityChangeType.MARK_AS_FINAL : ActivityChangeType.UNMARK_AS_FINAL,
+          by: getActivityLogUserData(),
+          checklistItem: checklistItem,
+          documents: [item],
+        }),
       );
     });
   };

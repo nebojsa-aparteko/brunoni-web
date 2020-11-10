@@ -138,15 +138,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         .then(_ =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.ADD_FILE,
-              getActivityLogUserData(),
-              undefined,
-              addedFiles,
-              undefined,
-              undefined,
-              true,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.ADD_FILE,
+              by: getActivityLogUserData(),
+              documents: addedFiles,
+              isAccountingActivity: true,
+            }),
           ),
         )
         .catch(error => console.error('Error saving new document list', error));
@@ -160,15 +157,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         .then(_ =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.DELETE_FILE,
-              getActivityLogUserData(),
-              undefined,
-              [deletedFile],
-              undefined,
-              undefined,
-              true,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.DELETE_FILE,
+              by: getActivityLogUserData(),
+              documents: [deletedFile],
+              isAccountingActivity: true,
+            }),
           ),
         )
         .catch(error => console.error('Error during document deletion', error));
@@ -215,15 +209,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         changeAccountingDocument(newItem, payment.reference).then(_ =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.DOCUMENT_STATUS_CHANGED,
-              getActivityLogUserData(),
-              undefined,
-              [newItem],
-              undefined,
-              true,
-              true,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+              by: getActivityLogUserData(),
+              documents: [newItem],
+              isAccountingActivity: true,
+            }),
           ),
         ),
       );
@@ -240,16 +231,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         storeAccountingActivity(() =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.POSTPONE_PAYMENT,
-              getActivityLogUserData(),
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              true,
-              payment.reference,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.POSTPONE_PAYMENT,
+              by: getActivityLogUserData(),
+              isAccountingActivity: true,
+              paymentReference: payment.reference,
+            }),
           ),
         );
       });
@@ -266,16 +253,12 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         storeAccountingActivity(() =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              activityType,
-              getActivityLogUserData(),
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              true,
-              payment.reference,
-            ),
+            createActivityObject({
+              changeType: activityType,
+              by: getActivityLogUserData(),
+              isAccountingActivity: true,
+              paymentReference: payment.reference,
+            }),
           ),
         );
       });
