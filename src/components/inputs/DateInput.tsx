@@ -1,8 +1,11 @@
 import 'date-fns';
 import React from 'react';
 import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import { DatePicker, Day, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { useTheme } from '@material-ui/core';
+import moment from 'moment';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import { getISOWeek } from 'date-fns';
 
 interface Props {
   label?: string;
@@ -13,6 +16,37 @@ interface Props {
   onClose?: () => void;
 }
 
+const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersDate, dayInCurrentMonth: boolean) => {
+  return (
+    <div>
+      {date && date.getDay() === 0 ? (
+        <div style={{ position: 'absolute', left: 6, marginTop: 9, fontSize: '0.8em', color: 'grey' }}>
+          {getISOWeek(date)}
+        </div>
+      ) : null}
+      <Day
+        current={
+          date
+            ? moment()
+                .date(date.getDate())
+                .isSame(moment().date(new Date().getDate()), 'day')
+            : undefined
+        }
+        hidden={!dayInCurrentMonth}
+        selected={
+          date && selectedDate
+            ? moment()
+                .date(date.getDate())
+                .isSame(moment().date(selectedDate.getDate()), 'day')
+            : undefined
+        }
+      >
+        {date ? date.getDate().toString() : null}
+      </Day>
+    </div>
+  );
+};
+
 const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, label = 'Earliest Date' }) => {
   const theme = useTheme();
 
@@ -20,6 +54,7 @@ const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, la
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <DatePicker
         disableToolbar
+        renderDay={renderDay}
         inputVariant="outlined"
         variant="inline"
         label={label}
