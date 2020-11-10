@@ -1,0 +1,38 @@
+export const START_GLOBAL_LOADING = 'START_GLOBAL_LOADING';
+export const STOP_GLOBAL_LOADING = 'STOP_GLOBAL_LOADING';
+export const SHOW_SUCCESS_SNACKBAR = 'SHOW_SUCCESS_SNACKBAR';
+export const SHOW_ERROR_SNACKBAR = 'SHOW_ERROR_SNACKBAR';
+export const SHOW_INFO_SNACKBAR = 'SHOW_INFO_SNACKBAR';
+
+export interface StartGlobalLoadingAction {
+  type: typeof START_GLOBAL_LOADING;
+}
+
+export interface StopGlobalLoadingAction {
+  type: typeof STOP_GLOBAL_LOADING;
+}
+export interface ShowSuccessSnackbarAction {
+  type: typeof SHOW_SUCCESS_SNACKBAR;
+  message: string;
+}
+export interface ShowErrorSnackbarAction {
+  type: typeof SHOW_ERROR_SNACKBAR;
+  message: string;
+}
+export interface ShowInfoSnackbarAction {
+  type: typeof SHOW_INFO_SNACKBAR;
+  message: string;
+}
+
+export interface GlobalAppState {
+  isGlobalLoadingInProgress: boolean;
+  snackbarMessage?: string;
+  snackbarType?: 'error' | 'success' | 'info';
+}
+
+export type globalActions =
+  | StartGlobalLoadingAction
+  | StopGlobalLoadingAction
+  | ShowErrorSnackbarAction
+  | ShowSuccessSnackbarAction
+  | ShowInfoSnackbarAction;

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useSnackbar } from 'notistack';
-import { CircularProgress, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
+import React, { useContext, useEffect, useState } from 'react';
+import { CircularProgress, IconButton, makeStyles, Tooltip } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import useUser from '../hooks/useUser';
+import { GlobalContext } from '../store/GlobalStore';
+import { SHOW_ERROR_SNACKBAR, SHOW_INFO_SNACKBAR } from '../store/types/globalAppState';
 
 interface Props {
   collection: 'quotes' | 'clientPerformance';
@@ -21,7 +22,7 @@ const useStyles = makeStyles(() => ({
 const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) => {
   const classes = useStyles();
 
-  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
 
   const [busy, setBusy] = useState(false);
 
@@ -55,20 +56,20 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
         );
 
         if (response.ok) {
-          enqueueSnackbar(<Typography color="inherit">Contents are now up to date.</Typography>, { variant: 'info' });
+          dispatch({ type: SHOW_INFO_SNACKBAR, message: 'Contents are now up to date.' });
         } else {
           console.error(`Failed to request to refresh ${collection}`, response);
-          enqueueSnackbar(
-            <Typography color="inherit">Failed to refresh the contents. Please try again later.</Typography>,
-            { variant: 'error' },
-          );
+          dispatch({
+            type: SHOW_ERROR_SNACKBAR,
+            message: 'Failed to refresh the contents. Please try again later.',
+          });
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
-          enqueueSnackbar(
-            <Typography color="inherit">Failed to refresh the contents. Please try again later.</Typography>,
-            { variant: 'error' },
-          );
+          dispatch({
+            type: SHOW_ERROR_SNACKBAR,
+            message: 'Failed to refresh the contents. Please try again later',
+          });
           console.error('Failed to request the login email', e);
         }
       } finally {
@@ -79,7 +80,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
     return () => {
       controller.abort();
     };
-  }, [busy, alphacomClientId, collection, user, enqueueSnackbar]);
+  }, [busy, alphacomClientId, collection, user, dispatch]);
 
   return (
     <Tooltip title="Refresh" enterDelay={500} leaveDelay={200}>

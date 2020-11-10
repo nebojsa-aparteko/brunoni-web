@@ -11,20 +11,20 @@ import {
   makeStyles,
   TablePagination,
   TextField,
-  Typography,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import { Booking } from '../../model/Booking';
 import { BookingRow } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import Mousetrap from 'mousetrap';
-import { useSnackbar } from 'notistack';
 import ActingAs from '../../contexts/ActingAs';
 import chunk from 'lodash/fp/chunk';
 import { useBookingListPaginationContext } from '../../providers/BookingListPaginationProvider';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
+import { GlobalContext } from '../../store/GlobalStore';
+import { SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -52,7 +52,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
   const actingAs = useContext(ActingAs)[0];
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
@@ -89,11 +89,12 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
       .catch(error => {
         console.log('got error ', error);
         setIsLoading(false);
-        enqueueSnackbar(<Typography color="inherit">{`There is no record with this criteria.`}</Typography>, {
-          variant: 'error',
+        dispatch({
+          type: SHOW_ERROR_SNACKBAR,
+          message: `There is no record with this criteria.`,
         });
       });
-  }, [inputValue, enqueueSnackbar, searchBookings]);
+  }, [inputValue, dispatch, searchBookings]);
   const resultChunks = useMemo(() => {
     return chunk(rowsPerPage)(searchResult);
   }, [searchResult, rowsPerPage]);

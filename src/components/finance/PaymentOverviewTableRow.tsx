@@ -1,5 +1,5 @@
 import React from 'react';
-import WeeklyPayment, { Status } from '../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
@@ -28,7 +28,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         <Checkbox
           checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
           onClick={e => onClick(e)}
-          disabled={paymentData.status !== Status.IN_PROGRESS}
+          disabled={paymentData.status !== WeeklyPaymentStatus.IN_PROGRESS}
         />
       </TableCell>
       <TableCell align="left">
@@ -45,9 +45,9 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
             label={paymentData.status}
             style={{
               backgroundColor:
-                paymentData.status === Status.APPROVED
+                paymentData.status === WeeklyPaymentStatus.APPROVED
                   ? theme.palette.primary.main
-                  : paymentData.status === Status.PAID
+                  : paymentData.status === WeeklyPaymentStatus.PAID
                   ? '#10881a'
                   : '#999',
               color: 'white',

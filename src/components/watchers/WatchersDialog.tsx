@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import {
   Box,
   createStyles,
@@ -20,7 +20,8 @@ import useClientUsers from '../../hooks/useClientUsers';
 import pick from 'lodash/fp/pick';
 import uniqBy from 'lodash/fp/uniqBy';
 import asArray from '../../utilities/asArray';
-import { useSnackbar } from 'notistack';
+import { GlobalContext } from '../../store/GlobalStore';
+import { SHOW_ERROR_SNACKBAR, SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -115,7 +116,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
   const classes = useStyles();
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(booking.ForwAdrId);
-  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
 
   const watchers = booking.watchers
     ? booking.watchers.filter(
@@ -125,15 +126,11 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
 
   const handleResponse = useCallback(
     (fn: Promise<any>) => {
-      fn.then(_ =>
-        enqueueSnackbar(<Typography color="inherit">Saved user successfully!</Typography>, {
-          variant: 'success',
-        }),
-      ).catch(error =>
-        enqueueSnackbar(<Typography color="inherit">{`There was an error ${error}`}</Typography>, { variant: 'error' }),
+      fn.then(_ => dispatch({ message: 'Saved user successfully!', type: SHOW_SUCCESS_SNACKBAR })).catch(error =>
+        dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }),
       );
     },
-    [enqueueSnackbar],
+    [dispatch],
   );
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">

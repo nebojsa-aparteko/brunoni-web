@@ -30,6 +30,7 @@ import UserRecordContext from './contexts/UserRecordContext';
 import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
+import GlobalStore from './store/GlobalStore';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -198,48 +199,50 @@ const render = (user: firebase.User | null) => {
       <CrispChatRouteUpdater />
       <ThemeProvider theme={theme}>
         <SnackbarProvider>
-          <LoginDialogProvider>
-            <ScrollToTop />
-            <CssBaseline />
-            <CookiesNotification />
-            <RouteSearchProvider>
-              {user ? (
-                <UserContext.Provider value={user}>
-                  <UserRecordProvider>
+          <GlobalStore>
+            <LoginDialogProvider>
+              <ScrollToTop />
+              <CssBaseline />
+              <CookiesNotification />
+              <RouteSearchProvider>
+                {user ? (
+                  <UserContext.Provider value={user}>
+                    <UserRecordProvider>
+                      <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
+                        <FirestoreCollectionProvider name="ports" context={PortsContext}>
+                          <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                            <SpecialOffersProvider>
+                              <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                                <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                                  <ActingAsProvider>
+                                    <UserApp />
+                                  </ActingAsProvider>
+                                </FirestoreCollectionProvider>
+                              </FirestoreCollectionProvider>
+                            </SpecialOffersProvider>
+                          </FirestoreCollectionProvider>
+                        </FirestoreCollectionProvider>
+                      </FirestoreCollectionProvider>
+                    </UserRecordProvider>
+                  </UserContext.Provider>
+                ) : (
+                  <UserContext.Provider value={null}>
                     <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                       <FirestoreCollectionProvider name="ports" context={PortsContext}>
                         <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
                           <SpecialOffersProvider>
-                            <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                              <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                                <ActingAsProvider>
-                                  <UserApp />
-                                </ActingAsProvider>
-                              </FirestoreCollectionProvider>
-                            </FirestoreCollectionProvider>
+                            <ActingAsProvider anonymous>
+                              <App />
+                            </ActingAsProvider>
                           </SpecialOffersProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>
                     </FirestoreCollectionProvider>
-                  </UserRecordProvider>
-                </UserContext.Provider>
-              ) : (
-                <UserContext.Provider value={null}>
-                  <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
-                    <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                      <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                        <SpecialOffersProvider>
-                          <ActingAsProvider anonymous>
-                            <App />
-                          </ActingAsProvider>
-                        </SpecialOffersProvider>
-                      </FirestoreCollectionProvider>
-                    </FirestoreCollectionProvider>
-                  </FirestoreCollectionProvider>
-                </UserContext.Provider>
-              )}
-            </RouteSearchProvider>
-          </LoginDialogProvider>
+                  </UserContext.Provider>
+                )}
+              </RouteSearchProvider>
+            </LoginDialogProvider>
+          </GlobalStore>
         </SnackbarProvider>
       </ThemeProvider>
     </Router>

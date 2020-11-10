@@ -18,7 +18,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import { Currency, Status } from '../../model/WeeklyPayment';
+import { Currency, WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
@@ -132,7 +132,7 @@ const PaymentOverviewContainer = () => {
   );
   const onStatusChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters) setFilters(prevState => set('status', event.target.value as Status[])(prevState));
+      if (setFilters) setFilters(prevState => set('status', event.target.value as WeeklyPaymentStatus[])(prevState));
     },
     [setFilters],
   );
@@ -256,7 +256,7 @@ const PaymentOverviewContainer = () => {
               renderValue={selected => (selected as any[]).join(', ')}
               MenuProps={MenuProps}
             >
-              {Object.entries(Status).map(([key, value]) => (
+              {Object.entries(WeeklyPaymentStatus).map(([key, value]) => (
                 <MenuItem key={key} value={value}>
                   <Checkbox checked={status.indexOf(value) > -1} />
                   <ListItemText primary={value} />

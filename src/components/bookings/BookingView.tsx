@@ -35,6 +35,8 @@ import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
 import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
+import { GlobalContext } from '../../store/GlobalStore';
+import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -134,6 +136,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
@@ -178,15 +181,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           : [...(booking.watchers || []), userRecord],
       )
         .then(_ =>
-          enqueueSnackbar(
-            <Typography color="inherit">
-              {isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!'}
-            </Typography>,
-            {
-              variant: 'success',
-              autoHideDuration: 1000,
-            },
-          ),
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
+          }),
         )
         .catch(err => console.log(err));
     },
