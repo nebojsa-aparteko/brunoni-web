@@ -1,4 +1,4 @@
-import WeeklyPayment, { DebitCredit, Status } from '../../../model/WeeklyPayment';
+import WeeklyPayment, { DebitCredit, WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import {
   Box,
   Button,
@@ -245,9 +245,11 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
   );
 
   const handleChangePaymentStatus = useCallback(
-    (newStatus: Status) => {
+    (newStatus: WeeklyPaymentStatus) => {
       const activityType: ActivityChangeType =
-        newStatus === Status.APPROVED ? ActivityChangeType.APPROVE_PAYMENT : ActivityChangeType.REVERT_PAYMENT_APPROVAL;
+        newStatus === WeeklyPaymentStatus.APPROVED
+          ? ActivityChangeType.APPROVE_PAYMENT
+          : ActivityChangeType.REVERT_PAYMENT_APPROVAL;
       return Promise.resolve(changeWeeklyPayment(payment.reference, { status: newStatus })).then(_ => {
         handleDialogClose();
         storeAccountingActivity(() =>
@@ -279,7 +281,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
           </Typography>
           <Typography
             variant={'h5'}
-            style={{ fontWeight: 700, color: payment.status === Status.PAID ? 'rgba(0,200,81)' : '#000' }}
+            style={{ fontWeight: 700, color: payment.status === WeeklyPaymentStatus.PAID ? 'rgba(0,200,81)' : '#000' }}
           >
             {payment.status}
           </Typography>
@@ -315,7 +317,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
               />
             ))
           )}
-          {payment.status === Status.IN_PROGRESS && (
+          {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
             <DropZone
               storageBasePath={storageBasePath}
               internal={false}
@@ -326,7 +328,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         </Box>
       </ExpansionPanelDetails>
       <ExpansionPanelActions>
-        {payment.status === Status.IN_PROGRESS && (
+        {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
           <React.Fragment>
             <Button onClick={handleClickMenu} color="primary" variant="outlined">
               Postpone Payment
@@ -337,7 +339,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
               variant="contained"
               disabled={
                 !(
-                  payment.status === Status.IN_PROGRESS &&
+                  payment.status === WeeklyPaymentStatus.IN_PROGRESS &&
                   (accountingDocuments && accountingDocuments.length > 0
                     ? accountingDocuments.every(
                         document => document.status?.type === ChecklistItemValueDocumentStatusType.APPROVED,
@@ -350,7 +352,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
             </Button>
           </React.Fragment>
         )}
-        {payment.status === Status.APPROVED && (
+        {payment.status === WeeklyPaymentStatus.APPROVED && (
           <Button onClick={handleDialogOpen} color="primary" variant="outlined">
             Revert Approval
           </Button>
@@ -361,12 +363,16 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         <ConfirmationDialog
           isOpen={isDialogOpen}
           label={
-            payment.status === Status.IN_PROGRESS
+            payment.status === WeeklyPaymentStatus.IN_PROGRESS
               ? 'Please confirm payment approval'
-              : 'Please confirm approvement reversal'
+              : 'Please confirm approved reversal'
           }
           handleConfirm={() =>
-            handleChangePaymentStatus(payment.status === Status.IN_PROGRESS ? Status.APPROVED : Status.IN_PROGRESS)
+            handleChangePaymentStatus(
+              payment.status === WeeklyPaymentStatus.IN_PROGRESS
+                ? WeeklyPaymentStatus.APPROVED
+                : WeeklyPaymentStatus.IN_PROGRESS,
+            )
           }
           handleClose={handleDialogClose}
         />
