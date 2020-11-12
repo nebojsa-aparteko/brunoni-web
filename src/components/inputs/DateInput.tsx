@@ -1,11 +1,12 @@
 import 'date-fns';
 import React from 'react';
 import DateFnsUtils from '@date-io/date-fns';
+import enLocale from 'date-fns/locale/en-GB';
 import { DatePicker, Day, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { useTheme } from '@material-ui/core';
 import moment from 'moment';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
-import { getISOWeek } from 'date-fns';
+import { getWeek } from 'date-fns';
 
 interface Props {
   label?: string;
@@ -21,7 +22,7 @@ const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersD
     <div>
       {date && date.getDay() === 0 ? (
         <div style={{ position: 'absolute', left: 6, marginTop: 9, fontSize: '0.8em', color: 'grey' }}>
-          {getISOWeek(date)}
+          {getWeek(date, { weekStartsOn: 1, firstWeekContainsDate: 4 })}
         </div>
       ) : null}
       <Day
@@ -49,9 +50,8 @@ const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersD
 
 const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, label = 'Earliest Date' }) => {
   const theme = useTheme();
-
   return (
-    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enLocale}>
       <DatePicker
         disableToolbar
         renderDay={renderDay}
