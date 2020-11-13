@@ -32,7 +32,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell align="center" />
+                {selectedPayments && <TableCell align="center" />}
                 <TableCell align="left">File No.</TableCell>
                 <TableCell align="center">B/L No.</TableCell>
                 <TableCell align="center">Vessel</TableCell>
@@ -48,12 +48,12 @@ const PaymentOverviewTable: React.FC<Props> = ({
                   status={overviewData[index].status}
                   key={payment.id}
                   selectedPayments={selectedPayments}
-                  handleSelect={() => handleSelect(payment.id)}
+                  handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}
                   handleOpenPreviewDialog={handleOpenPreviewDialog}
                 />
               ))}
               {total.map((value, index) => (
-                <PaymentOverviewTableTotalRow total={value} key={index} />
+                <PaymentOverviewTableTotalRow total={value} key={index} hasSelection={!!selectedPayments} />
               ))}
             </TableBody>
           </Table>
@@ -67,7 +67,7 @@ export default PaymentOverviewTable;
 
 interface Props {
   overviewData: WeeklyPayment[] | Commission[];
-  selectedPayments: string[];
-  handleSelect: (selectedId: string | undefined) => void;
+  selectedPayments?: string[];
+  handleSelect?: (selectedId: string | undefined) => void;
   handleOpenPreviewDialog: (bookingId: string) => void;
 }

@@ -3,7 +3,6 @@ import PaymentOverviewTable from './PaymentOverviewTable';
 import usePaymentOverview from '../../hooks/usePaymentOverview';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -13,7 +12,6 @@ import {
   InputLabel,
   ListItemText,
   makeStyles,
-  Menu,
   MenuItem,
   Select,
   Typography,
@@ -25,13 +23,6 @@ import { startOfDay } from 'date-fns/fp';
 import CarrierInput from '../inputs/CarrierInput';
 import theme from '../../theme';
 import Carriers from '../../contexts/Carriers';
-import UserRecordContext from '../../contexts/UserRecordContext';
-import { useSnackbar } from 'notistack';
-import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
-import { changeWeeklyPayment } from '../bookings/accountingTab/AccountingWeeklyPayment';
-import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
-import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
-import { addDays } from 'date-fns';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
 import { showCrispChat } from '../../index';
 import { Currency, DebitCredit } from '../../model/Payment';
@@ -61,37 +52,12 @@ const MenuProps = {
   },
 };
 
-interface PostponeMenuProps {
-  anchorEl: any;
-  handleClose: () => void;
-  changePayment: (offset: number) => void;
-}
-
-const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
-  return (
-    <Menu
-      id="commission-overview-postpone-menu"
-      anchorEl={anchorEl}
-      anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-      transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-      keepMounted
-      open={Boolean(anchorEl)}
-      onClose={handleClose}
-    >
-      <MenuItem onClick={() => changePayment(-7)}>1 Week Earlier</MenuItem>
-      <MenuItem onClick={() => changePayment(7)}>1 Week Later</MenuItem>
-    </Menu>
-  );
-};
-
 const CommissionOverviewContainer = () => {
   const overviewData = usePaymentOverview(DebitCredit.CREDIT) as Commission[];
 
   const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const carriers = useContext(Carriers);
-  const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
 
@@ -110,20 +76,9 @@ const CommissionOverviewContainer = () => {
     [setIsDialogOpen],
   );
 
-  const userRecord = useContext(UserRecordContext);
-  const { enqueueSnackbar } = useSnackbar();
-
   const { currency, paymentDate, carrier, commissionStatus } = filters;
 
   const classes = useStyles();
-
-  const handleClickMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const onCurrencyChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
@@ -151,67 +106,6 @@ const CommissionOverviewContainer = () => {
       data => currency.includes(data.currency) && (data.status ? commissionStatus.includes(data.status) : true),
     );
   }, [overviewData, commissionStatus, currency]);
-
-  const handleSelect = useCallback(
-    (paymentId: string | undefined) => {
-      const updatedSelectedPayments = paymentId
-        ? selectedPayments.findIndex(pid => pid === paymentId) > -1
-          ? selectedPayments.filter(pid => pid !== paymentId)
-          : [...selectedPayments, paymentId]
-        : undefined;
-      if (updatedSelectedPayments) setSelectedPayments(updatedSelectedPayments);
-    },
-    [selectedPayments],
-  );
-
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
-
-  const handleChangePayDates = useCallback(
-    (offset: number) => {
-      return Promise.all(
-        filteredOverviewData
-          .filter(payment => payment.id && selectedPayments && selectedPayments.indexOf(payment.id) > -1)
-          .map(payment => {
-            handleSelect(payment.id);
-            return changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }).then(_ =>
-              addActivityItem(
-                payment.bookingId,
-                createActivityObject({
-                  changeType: ActivityChangeType.POSTPONE_PAYMENT,
-                  by: getActivityLogUserData(),
-                  isAccountingActivity: true,
-                  paymentReference: payment.reference,
-                }),
-              ),
-            );
-          }),
-      )
-        .then(_ => {
-          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-            variant: 'success',
-            autoHideDuration: 1500,
-          });
-        })
-        .catch(error => {
-          console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-            variant: 'error',
-            autoHideDuration: 3000,
-          });
-        });
-    },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect],
-  );
 
   return (
     <Card>
@@ -285,27 +179,8 @@ const CommissionOverviewContainer = () => {
               value={carrier}
             />
           </Box>
-          <Button
-            onClick={handleClickMenu}
-            color="primary"
-            variant="outlined"
-            disabled={!(filteredOverviewData && filteredOverviewData.length > 0) || selectedPayments.length === 0}
-            style={{ marginBottom: theme.spacing(1) }}
-          >
-            Postpone Selected Commissions
-          </Button>
-          <PostponeMenu
-            anchorEl={anchorEl}
-            handleClose={handleClose}
-            changePayment={offset => handleChangePayDates(offset)}
-          />
         </Box>
-        <PaymentOverviewTable
-          overviewData={filteredOverviewData}
-          selectedPayments={selectedPayments || []}
-          handleSelect={handleSelect}
-          handleOpenPreviewDialog={handleDialogOpen}
-        />
+        <PaymentOverviewTable overviewData={filteredOverviewData} handleOpenPreviewDialog={handleDialogOpen} />
         <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
       </CardContent>
     </Card>

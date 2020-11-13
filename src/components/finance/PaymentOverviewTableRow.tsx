@@ -22,18 +22,20 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
 
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    handleSelect();
+    handleSelect && handleSelect();
   };
 
   return (
     <TableRow hover onClick={handleRowClick}>
-      <TableCell align="left">
-        <Checkbox
-          checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
-          onClick={e => onClick(e)}
-          disabled={status !== WeeklyPaymentStatus.IN_PROGRESS && status !== CommissionStatus.INVOICED}
-        />
-      </TableCell>
+      {selectedPayments && (
+        <TableCell align="left">
+          <Checkbox
+            checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
+            onClick={e => onClick(e)}
+            disabled={status !== WeeklyPaymentStatus.IN_PROGRESS && status !== CommissionStatus.INVOICED}
+          />
+        </TableCell>
+      )}
       <TableCell align="left">
         <Link target="_blank" href={`/bookings/${paymentData.bookingId}`} onClick={handleLinkClick}>
           {paymentData.bookingId}
@@ -69,7 +71,7 @@ export default PaymentOverviewTableRow;
 interface Props {
   paymentData: Payment;
   status: WeeklyPaymentStatus | CommissionStatus;
-  selectedPayments: string[];
-  handleSelect: () => void;
+  selectedPayments: string[] | undefined;
+  handleSelect?: () => void;
   handleOpenPreviewDialog: (bookingId: string) => void;
 }

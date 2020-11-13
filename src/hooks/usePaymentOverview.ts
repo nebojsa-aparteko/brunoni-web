@@ -42,12 +42,6 @@ export default (debitCredit?: DebitCredit, bookingId?: string) => {
   );
 
   const paymentCollection = useFirestoreCollection('weeklyPayment', query);
-  console.log(
-    paymentCollection &&
-      (paymentCollection?.docs.map(doc => {
-        return { id: doc.id, ...normalizePaymentOverview(doc.data()) } as WeeklyPayment;
-      }) as WeeklyPayment[]),
-  );
   if (debitCredit === DebitCredit.CREDIT)
     return paymentCollection?.docs.map(doc => {
       return { id: doc.id, ...normalizePaymentOverview(doc.data()) } as Commission;
