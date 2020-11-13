@@ -12,13 +12,16 @@ import UserRecordContext from '../contexts/UserRecordContext';
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
   const [filters] = useTaskFilterProviderContext();
-  const { assignee, showClientTasks } = filters;
+  const { assignee, showClientTasks, taskCategory } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('resolved', '==', false).where('show', '==', true);
+      if (taskCategory) {
+        query = query.where('taskCategory', '==', taskCategory);
+      }
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
       }
@@ -30,7 +33,7 @@ export default function useTasks() {
       }
       return query;
     },
-    [assignee, showClientTasks, actingAs, userRecord],
+    [assignee, showClientTasks, actingAs, userRecord, taskCategory],
   );
 
   useEffect(() => {
