@@ -18,7 +18,6 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import WeeklyPayment, { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
@@ -36,6 +35,7 @@ import { addDays } from 'date-fns';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
 import { showCrispChat } from '../../index';
 import { Currency, DebitCredit } from '../../model/Payment';
+import Commission, { CommissionStatus } from '../../model/Commission';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -70,7 +70,7 @@ interface PostponeMenuProps {
 const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
   return (
     <Menu
-      id="payment-overview-postpone-menu"
+      id="commission-overview-postpone-menu"
       anchorEl={anchorEl}
       anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       transformOrigin={{ horizontal: 'left', vertical: 'top' }}
@@ -84,8 +84,8 @@ const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, chan
   );
 };
 
-const PaymentOverviewContainer = () => {
-  const overviewData = usePaymentOverview(DebitCredit.DEBIT) as WeeklyPayment[];
+const CommissionOverviewContainer = () => {
+  const overviewData = usePaymentOverview(DebitCredit.CREDIT) as Commission[];
 
   const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
@@ -113,7 +113,7 @@ const PaymentOverviewContainer = () => {
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { currency, paymentDate, carrier, status } = filters;
+  const { currency, paymentDate, carrier, commissionStatus } = filters;
 
   const classes = useStyles();
 
@@ -133,7 +133,8 @@ const PaymentOverviewContainer = () => {
   );
   const onStatusChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters) setFilters(prevState => set('status', event.target.value as WeeklyPaymentStatus[])(prevState));
+      if (setFilters)
+        setFilters(prevState => set('commissionStatus', event.target.value as CommissionStatus[])(prevState));
     },
     [setFilters],
   );
@@ -147,9 +148,9 @@ const PaymentOverviewContainer = () => {
 
   const filteredOverviewData = useMemo(() => {
     return (overviewData || []).filter(
-      data => currency.includes(data.currency) && (data.status ? status.includes(data.status) : true),
+      data => currency.includes(data.currency) && (data.status ? commissionStatus.includes(data.status) : true),
     );
-  }, [overviewData, status, currency]);
+  }, [overviewData, commissionStatus, currency]);
 
   const handleSelect = useCallback(
     (paymentId: string | undefined) => {
@@ -218,7 +219,7 @@ const PaymentOverviewContainer = () => {
         title={
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Typography variant="h3" display="inline">
-              Weekly Payment
+              Commissions
             </Typography>
           </Box>
         }
@@ -251,15 +252,15 @@ const PaymentOverviewContainer = () => {
               labelId="status-select"
               id="status-select-checkbox"
               multiple
-              value={status}
+              value={commissionStatus}
               onChange={onStatusChange}
               input={<Input />}
               renderValue={selected => (selected as any[]).join(', ')}
               MenuProps={MenuProps}
             >
-              {Object.entries(WeeklyPaymentStatus).map(([key, value]) => (
+              {Object.entries(CommissionStatus).map(([key, value]) => (
                 <MenuItem key={key} value={value}>
-                  <Checkbox checked={status.indexOf(value) > -1} />
+                  <Checkbox checked={commissionStatus.indexOf(value) > -1} />
                   <ListItemText primary={value} />
                 </MenuItem>
               ))}
@@ -271,7 +272,7 @@ const PaymentOverviewContainer = () => {
               onChange={handleDateChange}
               open={dateOpen}
               onOpen={() => setDateOpen(true)}
-              label="Payment Date"
+              label="Commission Date"
             />
           </Box>
           <Box display="flex" style={{ minWidth: theme.spacing(35) }} className={classes.spacer}>
@@ -291,7 +292,7 @@ const PaymentOverviewContainer = () => {
             disabled={!(filteredOverviewData && filteredOverviewData.length > 0) || selectedPayments.length === 0}
             style={{ marginBottom: theme.spacing(1) }}
           >
-            Postpone Selected Payments
+            Postpone Selected Commissions
           </Button>
           <PostponeMenu
             anchorEl={anchorEl}
@@ -311,4 +312,4 @@ const PaymentOverviewContainer = () => {
   );
 };
 
-export default PaymentOverviewContainer;
+export default CommissionOverviewContainer;

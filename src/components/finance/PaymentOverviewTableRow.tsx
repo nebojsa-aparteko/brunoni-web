@@ -1,11 +1,14 @@
 import React from 'react';
-import WeeklyPayment, { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
+import { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
+import Payment from '../../model/Payment';
+import { CommissionStatus } from '../../model/Commission';
 
 const PaymentOverviewTableRow: React.FC<Props> = ({
   paymentData,
+  status,
   selectedPayments,
   handleSelect,
   handleOpenPreviewDialog,
@@ -28,7 +31,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         <Checkbox
           checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
           onClick={e => onClick(e)}
-          disabled={paymentData.status !== WeeklyPaymentStatus.IN_PROGRESS}
+          disabled={status !== WeeklyPaymentStatus.IN_PROGRESS && status !== CommissionStatus.INVOICED}
         />
       </TableCell>
       <TableCell align="left">
@@ -39,15 +42,15 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
       <TableCell align="center">{paymentData.blNumber}</TableCell>
       <TableCell align="center">{paymentData.vessel || '-'}</TableCell>
       <TableCell align="center">
-        {paymentData.status && (
+        {status && (
           <Chip
             size="small"
-            label={paymentData.status}
+            label={status}
             style={{
               backgroundColor:
-                paymentData.status === WeeklyPaymentStatus.APPROVED
+                status === WeeklyPaymentStatus.APPROVED
                   ? theme.palette.primary.main
-                  : paymentData.status === WeeklyPaymentStatus.PAID
+                  : status === WeeklyPaymentStatus.PAID
                   ? '#10881a'
                   : '#999',
               color: 'white',
@@ -64,7 +67,8 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
 export default PaymentOverviewTableRow;
 
 interface Props {
-  paymentData: WeeklyPayment;
+  paymentData: Payment;
+  status: WeeklyPaymentStatus | CommissionStatus;
   selectedPayments: string[];
   handleSelect: () => void;
   handleOpenPreviewDialog: (bookingId: string) => void;

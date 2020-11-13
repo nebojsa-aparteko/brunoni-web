@@ -39,6 +39,7 @@ import { useHistory } from 'react-router-dom';
 import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 import firebase from './firebase';
+import CommissionsPage from './pages/CommissionsPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -72,6 +73,7 @@ const adminRoutes = (
     <Route exact path="/my-profile" component={MyProfilePage} />
     <Route exact path="/equipment" component={EquipmentSituation} />
     <Route exact path="/weekly-payment" component={WeeklyPaymentPage} />
+    <Route exact path="/commissions" component={CommissionsPage} />
     <Route path="/not-found" component={NotFound} />
     <Route component={NotFound} />
   </Switch>

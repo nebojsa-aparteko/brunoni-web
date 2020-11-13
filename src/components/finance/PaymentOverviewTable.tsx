@@ -2,9 +2,11 @@ import React, { Fragment, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
-import WeeklyPayment, { Currency } from '../../model/WeeklyPayment';
+import WeeklyPayment from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
+import Commission from '../../model/Commission';
+import Payment, { Currency } from '../../model/Payment';
 
 const PaymentOverviewTable: React.FC<Props> = ({
   overviewData,
@@ -40,9 +42,10 @@ const PaymentOverviewTable: React.FC<Props> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {overviewData.map(payment => (
+              {(overviewData as Payment[]).map((payment, index) => (
                 <PaymentOverviewTableRow
                   paymentData={payment}
+                  status={overviewData[index].status}
                   key={payment.id}
                   selectedPayments={selectedPayments}
                   handleSelect={() => handleSelect(payment.id)}
@@ -63,7 +66,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
 export default PaymentOverviewTable;
 
 interface Props {
-  overviewData: WeeklyPayment[];
+  overviewData: WeeklyPayment[] | Commission[];
   selectedPayments: string[];
   handleSelect: (selectedId: string | undefined) => void;
   handleOpenPreviewDialog: (bookingId: string) => void;

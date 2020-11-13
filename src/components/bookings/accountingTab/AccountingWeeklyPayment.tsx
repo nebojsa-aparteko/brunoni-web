@@ -1,4 +1,4 @@
-import WeeklyPayment, { DebitCredit, WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import {
   Box,
   Button,
@@ -35,6 +35,7 @@ import { showCrispChat } from '../../../index';
 import ConfirmationDialog from '../../ConfirmationDialog';
 import DropZone from '../../DropZone';
 import { addDays } from 'date-fns';
+import { DebitCredit } from '../../../model/Payment';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase

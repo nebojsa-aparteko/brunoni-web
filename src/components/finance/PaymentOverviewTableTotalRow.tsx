@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableCell, TableRow } from '@material-ui/core';
-import { Currency } from '../../model/WeeklyPayment';
 import currencyFormatter from '../../utilities/currencyFormatter';
+import { Currency } from '../../model/Payment';
 
 const PaymentOverviewTableTotalRow: React.FC<Props> = ({ total }) => (
   <TableRow style={{ backgroundColor: '#eee' }}>

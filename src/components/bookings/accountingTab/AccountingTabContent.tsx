@@ -4,9 +4,11 @@ import { Booking } from '../../../model/Booking';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import usePaymentOverview from '../../../hooks/usePaymentOverview';
 import AccountingWeeklyPayment from './AccountingWeeklyPayment';
+import { DebitCredit } from '../../../model/Payment';
+import WeeklyPayment from '../../../model/WeeklyPayment';
 
 const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
-  const weeklyPayments = usePaymentOverview(booking.id);
+  const weeklyPayments = usePaymentOverview(DebitCredit.DEBIT, booking.id) as WeeklyPayment[];
 
   if (!weeklyPayments) {
     return (

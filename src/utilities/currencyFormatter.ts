@@ -1,4 +1,4 @@
-import { Currency } from '../model/WeeklyPayment';
+import { Currency } from '../model/Payment';
 
 const formatUSDCurrency = (amount: number) =>
   new Intl.NumberFormat('de-CH', {
