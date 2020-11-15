@@ -1,5 +1,15 @@
 import React, { useLayoutEffect } from 'react';
-import { Box, Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControlLabel,
+  makeStyles,
+  Switch,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import WriteComment from './WriteComment';
 import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
@@ -72,7 +82,13 @@ const ActivityLogView: React.FC<Props> = ({
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
         action={
-          !quoteActivityLog ? <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" /> : null
+          !quoteActivityLog ? (
+            <FormControlLabel
+              control={<Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />}
+              label="Show Activity"
+              labelPlacement="start"
+            />
+          ) : null
         }
         title={<Typography variant="subtitle1">Activity</Typography>}
       />

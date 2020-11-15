@@ -41,7 +41,9 @@ const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateCom
         style={{ cursor: 'pointer', backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff' }}
       >
         <TableCell padding="checkbox">
-          <Checkbox checked={selected} onChange={onSelectRow} onFocus={event => event.stopPropagation()} />
+          {!actingAs && (
+            <Checkbox checked={selected} onChange={onSelectRow} onFocus={event => event.stopPropagation()} />
+          )}
         </TableCell>
         <TableCell align="left" onClick={() => setOpen(prevState => !prevState)}>
           {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
