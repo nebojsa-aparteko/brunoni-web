@@ -23,9 +23,9 @@ export default (debitCredit?: DebitCredit, bookingId?: string) => {
       }
       let query = collection.orderBy('bookingId', 'asc').limit(100);
       // let query = collection.where('resolved', '==', false).where('show', '==', true);
-      if (debitCredit) {
-        query = query.where('debitCredit', '==', debitCredit);
-      }
+      // if (debitCredit) {
+      //   query = query.where('debitCredit', '==', debitCredit);
+      // }
       if (paymentDate) {
         query = query.where('payDate', '==', paymentDate);
       }

@@ -50,7 +50,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
             label={status}
             style={{
               backgroundColor:
-                status === WeeklyPaymentStatus.APPROVED
+                status === WeeklyPaymentStatus.BLOCKED
                   ? theme.palette.primary.main
                   : status === WeeklyPaymentStatus.PAID
                   ? '#10881a'

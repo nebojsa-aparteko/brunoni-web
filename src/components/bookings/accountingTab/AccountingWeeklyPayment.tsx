@@ -1,4 +1,4 @@
-import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentApiAction, WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import {
   Box,
   Button,
@@ -36,6 +36,7 @@ import ConfirmationDialog from '../../ConfirmationDialog';
 import DropZone from '../../DropZone';
 import { addDays } from 'date-fns';
 import { DebitCredit } from '../../../model/Payment';
+import useUser from '../../../hooks/useUser';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -90,12 +91,84 @@ const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, chan
   );
 };
 
+const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyPayment) => {
+  try {
+    const token = await user.getIdToken();
+    console.log('Postponing');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        action: WeeklyPaymentApiAction.MOVE,
+        recId: weeklyPayment.recId,
+        reference: weeklyPayment.reference,
+        payDate: addDays(weeklyPayment.payDate, offset),
+      }),
+    });
+
+    if (response.ok) {
+      const body = await response.json();
+      console.log('Body', body);
+    } else {
+      const body = await response.json();
+      console.error(`Failed to request`, response, body);
+    }
+  } catch (e) {
+    console.error('Failed to perform request', e);
+  } finally {
+  }
+};
+
+const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => {
+  try {
+    const token = await user.getIdToken();
+
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        action:
+          weeklyPayment.status === WeeklyPaymentStatus.BLOCKED
+            ? WeeklyPaymentApiAction.UNBLOCK
+            : WeeklyPaymentApiAction.BLOCK,
+        recId: weeklyPayment.recId,
+        reference: weeklyPayment.reference,
+      }),
+    });
+
+    if (response.ok) {
+      const body = await response.json();
+      console.log('Body', body);
+    } else {
+      const body = await response.json();
+      console.error(`Failed to request`, response, body);
+    }
+  } catch (e) {
+    console.error('Failed to perform request', e);
+  }
+};
+
 const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [user] = useUser();
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -225,9 +298,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 
   const handleChangePayDate = useCallback(
     (offset: number) => {
-      return Promise.resolve(
-        changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }),
-      ).then(_ => {
+      return Promise.resolve(postponePayment(offset, user, payment)).then(_ => {
         handleClose();
         storeAccountingActivity(() =>
           addActivityItem(
@@ -242,32 +313,29 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         );
       });
     },
-    [payment, booking, getActivityLogUserData, storeAccountingActivity],
+    [payment, booking, getActivityLogUserData, storeAccountingActivity, user],
   );
 
-  const handleChangePaymentStatus = useCallback(
-    (newStatus: WeeklyPaymentStatus) => {
-      const activityType: ActivityChangeType =
-        newStatus === WeeklyPaymentStatus.APPROVED
-          ? ActivityChangeType.APPROVE_PAYMENT
-          : ActivityChangeType.REVERT_PAYMENT_APPROVAL;
-      return Promise.resolve(changeWeeklyPayment(payment.reference, { status: newStatus })).then(_ => {
-        handleDialogClose();
-        storeAccountingActivity(() =>
-          addActivityItem(
-            booking!.id,
-            createActivityObject({
-              changeType: activityType,
-              by: getActivityLogUserData(),
-              isAccountingActivity: true,
-              paymentReference: payment.reference,
-            }),
-          ),
-        );
-      });
-    },
-    [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose],
-  );
+  const handleChangePaymentStatus = useCallback(() => {
+    const activityType: ActivityChangeType =
+      payment.status === WeeklyPaymentStatus.BLOCKED
+        ? ActivityChangeType.REVERT_PAYMENT_APPROVAL
+        : ActivityChangeType.APPROVE_PAYMENT;
+    return approveWeeklyPayment(user, payment).then(_ => {
+      handleDialogClose();
+      storeAccountingActivity(() =>
+        addActivityItem(
+          booking!.id,
+          createActivityObject({
+            changeType: activityType,
+            by: getActivityLogUserData(),
+            isAccountingActivity: true,
+            paymentReference: payment.reference,
+          }),
+        ),
+      );
+    });
+  }, [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose, user]);
 
   return (
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
@@ -353,7 +421,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
             </Button>
           </React.Fragment>
         )}
-        {payment.status === WeeklyPaymentStatus.APPROVED && (
+        {payment.status === WeeklyPaymentStatus.BLOCKED && (
           <Button onClick={handleDialogOpen} color="primary" variant="outlined">
             Revert Approval
           </Button>
@@ -363,18 +431,13 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
       {isDialogOpen && (
         <ConfirmationDialog
           isOpen={isDialogOpen}
+          description="If you confirm this action, that will block this file! Are you sure you want to approve payment on this file?"
           label={
             payment.status === WeeklyPaymentStatus.IN_PROGRESS
               ? 'Please confirm payment approval'
               : 'Please confirm approved reversal'
           }
-          handleConfirm={() =>
-            handleChangePaymentStatus(
-              payment.status === WeeklyPaymentStatus.IN_PROGRESS
-                ? WeeklyPaymentStatus.APPROVED
-                : WeeklyPaymentStatus.IN_PROGRESS,
-            )
-          }
+          handleConfirm={handleChangePaymentStatus}
           handleClose={handleDialogClose}
         />
       )}
