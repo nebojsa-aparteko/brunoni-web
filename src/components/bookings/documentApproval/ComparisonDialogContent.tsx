@@ -26,6 +26,7 @@ import PDFViewer from '../../pdfViewer/PDFViewer';
 import HTMLViewer from '../../HTMLViewer';
 import { RejectionInput } from './RejectionModal';
 import ExpandingBookingContent from './ExpandingBookingContent';
+import DocViewer, { DocViewerRenderers } from 'react-doc-viewer';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -71,10 +72,27 @@ const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name
 const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => (
   <DocumentLayout name={document.name}>
     {fileType === 'pdf' ? (
+      // <DocViewer documents={[{ uri: document.url, fileType: "pdf" }]} pluginRenderers={[PDFRenderer]} />
       <PDFViewer file={document} />
     ) : fileType === 'html' ? (
       <div>
         <HTMLViewer file={{ url: document.url }} />
+      </div>
+    ) : fileType && ['xlsx', 'xls', 'docx', 'doc', 'png'].includes(fileType) ? (
+      <div>
+        <DocViewer
+          // documents={[{uri: require("./../../../assets/Brochure.docx")}]}
+          documents={[{ uri: document.url, fileType: fileType }]}
+          pluginRenderers={DocViewerRenderers}
+          config={{
+            header: {
+              disableHeader: true,
+              disableFileName: false,
+              retainURLParams: true,
+            },
+          }}
+          style={{ height: 500 }}
+        />
       </div>
     ) : (
       <Typography style={{ flex: 1, margin: 'auto' }}>
