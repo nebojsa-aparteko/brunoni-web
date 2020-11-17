@@ -1,5 +1,18 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { Box, Button, Divider, Grid, IconButton, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Menu,
+  MenuItem,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
@@ -22,6 +35,9 @@ import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
 import TourButton from './BookingTour';
+import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
+import { GlobalContext } from '../../store/GlobalStore';
+import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -98,10 +114,6 @@ function ScrollToTopOnMount() {
   return null;
 }
 
-const handlePrint = () => {
-  window.print();
-};
-
 export const isLongVersion = (version: BookingVersion) => {
   return version === 'Long';
 };
@@ -125,8 +137,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
-  // const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [, dispatch] = useContext(GlobalContext);
+  const [printRequested, setPrintRequested] = useState(false);
+  const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(localStorage.getItem('checklistTab'));
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
@@ -167,39 +182,49 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           : [...(booking.watchers || []), userRecord],
       )
         .then(_ =>
-          enqueueSnackbar(
-            <Typography color="inherit">
-              {isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!'}
-            </Typography>,
-            {
-              variant: 'success',
-              autoHideDuration: 1000,
-            },
-          ),
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
+          }),
         )
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord],
+    [booking.id, booking.watchers, userRecord, enqueueSnackbar],
   );
-  // const [anchorEl, setAnchorEl] = React.useState(null);
-  //
-  // const handleClickMenu = (event: any) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-  //
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  useLayoutEffect(() => {
+    if (printRequested) {
+      window.print();
+      setPrintRequested(false);
+    }
+  }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {tasks && (
+      {tasks === undefined && (
+        <Grid item xs={12} md={11}>
+          <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
+            <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CircularProgress style={{ margin: 'auto' }} />
+            </Paper>
+          </Box>
+        </Grid>
+      )}
+      {tasks && tasks.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
             <BookingTaskExpansionPanel tasks={tasks} />
           </Box>
         </Grid>
       )}
-      <Grid className="bookingHeader" item md={7} xs={12}>
+      <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
           <WatchersDialog
             booking={booking}
@@ -282,42 +307,45 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   />
                 )}
 
-                <IconButton aria-label="print" size="small" onClick={handlePrint}>
+                <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
                   <PrintIcon />
                 </IconButton>
-                <TourButton />
-                {/*<Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>*/}
-                {/*  <MenuItem*/}
-                {/*    onClick={() => {*/}
-                {/*      setPrintWithCost(false);*/}
-                {/*      handlePrint();*/}
-                {/*      handleClose();*/}
-                {/*    }}*/}
-                {/*  >*/}
-                {/*    Print without costs*/}
-                {/*  </MenuItem>*/}
-                {/*  <MenuItem*/}
-                {/*    onClick={() => {*/}
-                {/*      setPrintWithCost(true);*/}
-                {/*      handlePrint();*/}
-                {/*      handleClose();*/}
-                {/*    }}*/}
-                {/*  >*/}
-                {/*    Print with cost*/}
-                {/*  </MenuItem>*/}
-                {/*</Menu>*/}
+                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+                  <MenuItem
+                    onClick={() => {
+                      setPrintWithCost(false);
+                      setPrintRequested(true);
+                      handleClose();
+                    }}
+                  >
+                    Print without costs
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setPrintWithCost(true);
+                      setPrintRequested(true);
+                      handleClose();
+                    }}
+                  >
+                    Print with cost
+                  </MenuItem>
+                </Menu>
               </Box>
             </Box>
 
             <Grid item xs={12}>
-              <BookingViewMainContent booking={booking} />
+              {selectedTab === '1' ? (
+                <ExpandingBookingContent booking={booking} isPrintWithCost={isPrintWithCost} />
+              ) : (
+                <BookingViewMainContent booking={booking} isPrintWithCost={isPrintWithCost} />
+              )}
             </Grid>
           </Paper>
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
         <Box displayPrint="none">
-          <CheckList booking={booking} />
+          <CheckList booking={booking} onTabChange={setSelectedTab} />
         </Box>
       </Grid>
     </Grid>

@@ -22,13 +22,13 @@ import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlin
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import CompareIcon from '@material-ui/icons/Compare';
 import {
-  ActivityChangeType,
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
   ChecklistNames,
+  DocumentValue,
+  DocumentValueStatus,
 } from './ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import { useActivityLogState } from './ActivityLogContext';
@@ -38,14 +38,13 @@ import UserRecordContext from '../../../contexts/UserRecordContext';
 import { invoke } from 'lodash/fp';
 import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
-import { addActivityItem } from './ActivityLogContainer';
-import { createActivityObject } from './ChecklistItemRow';
 import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
 import theme from '../../../theme';
 import RejectionModal from '../documentApproval/RejectionModal';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
 import { showCrispChat } from '../../../index';
+import { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,7 +81,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const { NODE_ENV } = process.env;
 
-const findClassName = (item: ChecklistItemValueDocumentStatus | undefined, classes: any) => {
+const findClassName = (item: DocumentValueStatus | undefined, classes: any) => {
   if (!item) {
     return '';
   }
@@ -107,17 +106,21 @@ const DocumentListItem = ({
   checklistItem,
   booking,
   changeStatus,
+  deleteFile,
   storageBasePath,
   internal,
+  isAccountingDocument,
   markAsFinal,
   comparableDocuments,
   selectForComparison,
+  paymentStatus,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
   const userRecord = useContext(UserRecordContext);
   const [actingAs] = useContext(ActingAs);
+  const { enqueueSnackbar } = useSnackbar();
   const isAdmin = !actingAs;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isComparisonDialog, setIsComparisonDialog] = useState<boolean>(false);
@@ -132,7 +135,6 @@ const DocumentListItem = ({
     showCrispChat(false);
     setIsDialogOpen(true);
   }, [setIsDialogOpen]);
-  const { enqueueSnackbar } = useSnackbar();
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -146,40 +148,6 @@ const DocumentListItem = ({
     [userRecord],
   );
 
-  const checklistItemFileDeletedHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], deletedFile: ChecklistItemValueDocument, internal: boolean) => {
-      firebase
-        .firestore()
-        .collection('bookings')
-        .doc(booking.id!)
-        .collection('checklist')
-        .doc(checklistItem?.id)
-        .update(internal ? 'valuesAdmin' : 'values', documents)
-        .then(_ => {
-          console.log('File deleted', deletedFile, documents, internal, checklistItem);
-          return addActivityItem(
-            booking.id!,
-            createActivityObject(
-              ActivityChangeType.DELETE_FILE,
-              getActivityLogUserData(),
-              checklistItem,
-              [deletedFile],
-              undefined,
-              internal,
-            ),
-          );
-        })
-        .catch(error => {
-          console.error('failed to update deleted items', error);
-          enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
-            variant: 'error',
-            autoHideDuration: 1000,
-          });
-        });
-    },
-    [booking, checklistItem, enqueueSnackbar, getActivityLogUserData],
-  );
-
   const [removalInProgress, setRemovalInProgress] = useState(false); //used when file is being removed from the list
 
   const handleMention = useCallback(
@@ -187,14 +155,15 @@ const DocumentListItem = ({
       activityLogContext.setState({
         documentReference: { ...item, isInternal: internal },
         checklistReference: checklistItem,
-        internal: internal,
+        internal: isAccountingDocument ? true : internal,
+        isAccountingActivity: isAccountingDialog,
       }),
-    [checklistItem, internal, item],
+    [checklistItem, internal, item, activityLogContext, isAccountingDialog, isAccountingDocument],
   );
-  const checklistCheckedRule = useCallback(() => checklistItem.checked, [checklistItem]);
+  const checklistCheckedRule = useCallback(() => checklistItem?.checked, [checklistItem]);
 
-  const deleteFile = useCallback(
-    (item: ChecklistItemValueDocument, internal: boolean) => {
+  const handleDeleteFile = useCallback(
+    (item: ChecklistItemValueDocument | DocumentValue, internal: boolean) => {
       setRemovalInProgress(true);
       try {
         if (!editRestriction(item.uploadedAt as Date)) {
@@ -211,9 +180,13 @@ const DocumentListItem = ({
         const path = [storageBasePath, `${item.storedName}`].join('/');
         const storageRef = firebase.storage().ref();
         const documentRef = storageRef.child(encodeURI(path));
-        if (!internal && checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) !== -1) {
+        if (
+          !internal &&
+          checklistItem &&
+          checklistItem.valuesAdmin?.findIndex(f => f.storedName === item.storedName) !== -1
+        ) {
           const newItemArray = checklistItem.values?.filter(chkItem => chkItem !== item);
-          checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+          deleteFile && deleteFile(item, newItemArray || [], internal);
         } else {
           documentRef
             .delete()
@@ -226,10 +199,15 @@ const DocumentListItem = ({
             .finally(() => {
               // remove item from the list in any case since if it is an error with the storage means file is alrady out
               setRemovalInProgress(false);
-              const newItemArray = internal
-                ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
-                : checklistItem.values?.filter(chkItem => chkItem !== item);
-              checklistItemFileDeletedHandler(newItemArray || [], item, internal);
+              let newItemArray: ChecklistItemValueDocument[] | DocumentValue[] | undefined = [];
+              if (checklistItem) {
+                newItemArray = internal
+                  ? checklistItem.valuesAdmin?.filter(chkItem => chkItem !== item)
+                  : checklistItem.values?.filter(chkItem => chkItem !== item);
+                deleteFile && deleteFile(item, newItemArray || [], internal);
+              } else {
+                deleteFile && deleteFile(item);
+              }
             });
         }
       } catch (error) {
@@ -240,7 +218,7 @@ const DocumentListItem = ({
         });
       }
     },
-    [storageBasePath, checklistItem, removalInProgress],
+    [storageBasePath, checklistItem, deleteFile, enqueueSnackbar],
   );
 
   return (
@@ -287,6 +265,7 @@ const DocumentListItem = ({
           <div className={classes.progressWrapper}>
             {isAdmin &&
             !internal &&
+            checklistItem &&
             (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
               <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
                 <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
@@ -304,7 +283,7 @@ const DocumentListItem = ({
                   aria-label="Remove File"
                   onClick={event => {
                     event.stopPropagation();
-                    deleteFile(item, internal);
+                    handleDeleteFile(item, internal);
                   }}
                   aria-labelledby={`filelistitem-${item.storedName}`}
                 >
@@ -312,7 +291,7 @@ const DocumentListItem = ({
                 </IconButton>
               )}
             {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
-            {checklistItem.id === ChecklistNames.B_L && (
+            {checklistItem && checklistItem.id === ChecklistNames.B_L && (
               <IconButton
                 size="small"
                 aria-label="Mark as final"
@@ -327,12 +306,14 @@ const DocumentListItem = ({
       </ListItem>
       {(isAdmin ? true : !item.final) &&
         ((internal && isAdmin) || (!internal && !isAdmin)) &&
-        (item.status?.at ? editRestriction(item.status.at) : true) &&
-        (!internal && !isAdmin && NODE_ENV === 'production'
-          ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
-          : true) &&
-        !checklistCheckedRule() &&
-        checkIfShouldShowStatusAction(checklistItem.id) && (
+        (((item.status?.at ? editRestriction(item.status.at) : true) &&
+          (!internal && !isAdmin && NODE_ENV === 'production'
+            ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
+            : true) &&
+          !checklistCheckedRule() &&
+          checklistItem &&
+          checkIfShouldShowStatusAction(checklistItem.id)) ||
+          (isAccountingDocument && paymentStatus && paymentStatus === WeeklyPaymentStatus.IN_PROGRESS)) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
             {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
               <Box display="flex" ml={2} mb={2}>
@@ -371,7 +352,7 @@ const DocumentListItem = ({
                 </Link>
               </Box>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+            {!isAccountingDocument && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
                 <Link
@@ -388,6 +369,7 @@ const DocumentListItem = ({
               </Box>
             )}
             {!isAdmin &&
+              !isAccountingDocument &&
               (internal ? true : item.isSelectedForComparison) &&
               item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
                 <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
@@ -404,24 +386,22 @@ const DocumentListItem = ({
                   </Link>
                 </Box>
               )}
-            {!isAdmin &&
-              (internal ? true : item.isSelectedForComparison) &&
-              item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-                <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                      setIsComparisonDialog(true);
-                      setIsAccountingDialog(true);
+            {isAdmin && internal && isAccountingDocument && (
+              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    setIsComparisonDialog(true);
+                    setIsAccountingDialog(true);
 
-                      handleDialogOpen();
-                    }}
-                  >
-                    Check Accounting Document
-                  </Link>
-                </Box>
-              )}
+                    handleDialogOpen();
+                  }}
+                >
+                  Check Accounting Document
+                </Link>
+              </Box>
+            )}
           </Box>
         )}
       {isDialogOpen && (
@@ -444,14 +424,21 @@ const DocumentListItem = ({
 export default DocumentListItem;
 
 export interface DocumentListItemPropsBase {
-  checklistItem: ChecklistItem;
+  checklistItem?: ChecklistItem;
   booking: Booking;
   storageBasePath: string;
-  changeStatus: (item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) => void;
+  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
+  deleteFile?: (
+    item: ChecklistItemValueDocument | DocumentValue,
+    documents?: ChecklistItemValueDocument[] | DocumentValue[],
+    internal?: boolean,
+  ) => void;
   internal: boolean;
+  isAccountingDocument?: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;
   comparableDocuments: ChecklistItemValueDocument[];
   selectForComparison: (item: ChecklistItemValueDocument) => void;
+  paymentStatus?: WeeklyPaymentStatus;
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {

@@ -53,7 +53,7 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
       .then(doc => {
         if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
-  }, [booking.assignedUser]);
+  }, [booking]);
 
   useEffect(() => {
     firebase
@@ -65,7 +65,7 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
       .then(doc => {
         if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
-  }, [booking.assignedCustomerUser]);
+  }, [booking]);
   return (
     <MentionsInput
       classNames={mentionsClassNames}

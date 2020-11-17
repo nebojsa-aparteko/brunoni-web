@@ -65,10 +65,10 @@ export interface Booking {
 export interface CheckListData {
   label: string;
   checked?: boolean;
-  documents?: CheckListDocument[];
+  documents?: StoredDocument[];
 }
 
-export interface CheckListDocument {
+export interface StoredDocument {
   isAdmin: boolean;
   url: string;
   name: string;

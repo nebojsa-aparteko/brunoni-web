@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref, useMemo } from 'react';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, useMemo } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
+import { CircularProgress, makeStyles, Paper, Popper, TextField } from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { TaskStatus } from '../TaskStatusChip';
@@ -20,7 +20,7 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -96,30 +96,6 @@ const TaskStatusInput: React.FC<Props> = ({
     />
   );
 };
-
-const usePopupStyles = makeStyles((theme: Theme) => ({
-  popper: {
-    width: theme.breakpoints.values.md / 2,
-    zIndex: 100,
-  },
-}));
-
-function Popup(props: PopperProps) {
-  const { popperRef, anchorEl, open, children } = props;
-  const classes = usePopupStyles();
-
-  return (
-    <Popper
-      placement="bottom-start"
-      popperRef={popperRef as Ref<any>}
-      anchorEl={anchorEl}
-      open={open}
-      children={children}
-      className={classes.popper}
-      onClick={event => event.stopPropagation()}
-    />
-  );
-}
 
 const Papyrus: React.FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => <Paper {...props} />;
 

@@ -1,12 +1,15 @@
-export interface ChecklistItemValueDocument {
+export interface DocumentValue {
   uploadedBy: ActivityLogUserData;
   uploadedAt: Date;
   url: string;
   name: string;
   storedName: string;
-  status?: ChecklistItemValueDocumentStatus;
-  id: string;
+  status?: DocumentValueStatus;
   mentionCount?: number;
+  id: string;
+}
+
+export interface ChecklistItemValueDocument extends DocumentValue {
   isInternal?: boolean;
   final?: boolean;
   isSelectedForComparison?: boolean;
@@ -19,7 +22,7 @@ export enum ChecklistItemValueDocumentStatusType {
   REJECTED,
 }
 
-export interface ChecklistItemValueDocumentStatus {
+export interface DocumentValueStatus {
   type: ChecklistItemValueDocumentStatusType;
   at?: Date;
   by?: ActivityLogUserData;
@@ -28,7 +31,7 @@ export interface ChecklistItemValueDocumentStatus {
 export interface ShortChecklistItemValueDocument {
   url: string;
   name: string;
-  status?: ChecklistItemValueDocumentStatus;
+  status?: DocumentValueStatus;
   isInternal?: boolean;
 }
 
@@ -95,6 +98,13 @@ export enum ActivityText {
   DEFAULTED_FILE = ' has undo changes on ',
   APPROVED_FILE = ' has approved ',
   REJECTED_FILE = ' has sent on revision ',
+  SELECT_FOR_COMPARISON = ' has selected ',
+  UNSELECT_FOR_COMPARISON = ' has unselected ',
+  MARK_AS_FINAL = ' has marked as final ',
+  UNMARK_AS_FINAL = ' has marked as not final ',
+  POSTPONE_PAYMENT = ' has postponed payment ',
+  APPROVE_PAYMENT = ' has approved payment ',
+  REVERT_PAYMENT_APPROVAL = ' has reverted the approval of payment ',
 }
 
 export enum ActivityChangeType {
@@ -105,6 +115,13 @@ export enum ActivityChangeType {
   DOCUMENT_STATUS_CHANGED,
   DONE_BY_CUSTOMER,
   UNDO_COMPLETED_CUSTOMER,
+  SELECT_FOR_COMPARISON,
+  UNSELECT_FOR_COMPARISON,
+  MARK_AS_FINAL,
+  UNMARK_AS_FINAL,
+  POSTPONE_PAYMENT,
+  APPROVE_PAYMENT,
+  REVERT_PAYMENT_APPROVAL,
 }
 
 export enum ChecklistNames {

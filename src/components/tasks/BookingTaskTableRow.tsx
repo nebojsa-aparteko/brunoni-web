@@ -1,11 +1,21 @@
 import React from 'react';
-import Task from '../../model/Task';
-import { TaskDescription, UserRole } from '../../model/Task';
-import { Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/core';
+import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/Task';
+import { Box, Checkbox, Link, TableCell, TableRow, Typography } from '@material-ui/core';
 import formatDate from 'date-fns/format';
 import TaskStatusChip from '../TaskStatusChip';
 import TaskManualResolveButton from '../TaskManualResolveButton';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
+import TaskManualDeclineButton from '../TaskManualDeclineButton';
+
+const TaskManualResolveAction: React.FC<{ task: Task }> = ({ task }) =>
+  task.manualResolve === ManualResolveType.RESOLVE_OR_DECLINE ? (
+    <Box display="flex" flexDirection="row">
+      <TaskManualResolveButton task={task} />
+      <TaskManualDeclineButton task={task} />
+    </Box>
+  ) : (
+    <TaskManualResolveButton task={task} />
+  );
 
 const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
   return (
@@ -44,7 +54,9 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
 
       <TableCell align="center">
         {task.additionalInfo && <TaskAdditionalInfoView additionalInfo={task.additionalInfo} />}
-        {task.manualResolve && <TaskManualResolveButton task={task} />}
+        {task.manualResolve && task.manualResolve !== ManualResolveType.NO_MANUAL_RESOLVE && (
+          <TaskManualResolveAction task={task} />
+        )}
       </TableCell>
     </TableRow>
   );

@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import map from 'lodash/fp/map';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -7,11 +7,11 @@ import { MentionItem } from 'react-mentions';
 import ActivityLogView from '../bookings/checklist/ActivityLogView';
 import { ActivityType, QuoteActivityModel, QuoteGroupActivityModel } from '../bookings/checklist/ActivityModel';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import ActingAs from '../../contexts/ActingAs';
 import { Quote } from '../../providers/QuoteGroupsProvider';
+import firebase from '../../firebase';
 
 interface Props {
   groupId: string;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId, quote }) => {
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const [actingAs] = useContext(ActingAs);
   const quoteActivityLogCollection = useFirestoreCollection(
     'quotes-group-comments',
     useCallback(

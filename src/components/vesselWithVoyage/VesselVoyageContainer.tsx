@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
 import useVesselWithVoyage from '../../hooks/useVesselWithVoyage';
 import VesselVoyageItem from './VesselVoyageItem';
@@ -85,7 +85,7 @@ const VesselVoyageContainer: React.FC<Props> = () => {
         {!normalizedVessel && <ChartsCircularProgress />}
 
         {normalizedVessel && Object.entries(normalizedVessel).length > 0 ? (
-          Object.entries(normalizedVessel).map(([vessel, items]: any, index: number) => (
+          Object.entries(normalizedVessel).map(([vessel, items]: any) => (
             <VesselVoyageItem vessel={vessel} items={items} key={vessel} handleDialogOpen={handleDialogOpen} />
           ))
         ) : (

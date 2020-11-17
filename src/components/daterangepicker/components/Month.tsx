@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Paper, Grid, Typography, createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
-import { getDate, isSameMonth, isToday, format, isWithinInterval } from 'date-fns';
-import { chunks, getDaysInMonth, isStartOfRange, isEndOfRange, inDateRange, isRangeSameDay } from '../utils';
+import { createStyles, Grid, Paper, Typography, WithStyles, withStyles } from '@material-ui/core';
+import { format, getDate, isSameMonth, isToday, isWithinInterval } from 'date-fns';
+import { chunks, getDaysInMonth, inDateRange, isEndOfRange, isRangeSameDay, isStartOfRange } from '../utils';
 import Header from './Header';
 import Day from './Day';
-import { NavigationAction, DateRange } from '../types';
+import { DateRange, NavigationAction } from '../types';
 
 const WEEK_DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 

@@ -1,34 +1,59 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import useTeams from '../../hooks/useTeams';
-import { Box, Button, Container } from '@material-ui/core';
-import TeamTeamRow from './TeamTeamRow';
-import { firestore } from 'firebase';
+import {
+  Box,
+  Button,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
+} from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import OperationsTeamsTable from './OperationsTeamsTable';
+import AccountingTeamsTable from './AccountingTeamsTable';
+import { TeamType } from '../../model/Teams';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
+  expansionPanel: {
+    marginBottom: 8,
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  expansionPanelSummary: {
+    display: 'flex',
+  },
+  expansionPanelTitle: {
+    alignSelf: 'center',
+    marginRight: 16,
   },
 });
 
 const TeamsTeamsContainer: React.FC = () => {
   const classes = useStyles();
-
   const teams = useTeams();
 
-  const onAdd = () => {
-    firestore()
+  const onAdd = (isAccounting: boolean, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    firebase
+      .firestore()
       .collection('teams')
-      .add({ name: '' })
-      .then(docRef => console.log('Added doc ref ', docRef.id))
+      .add({ name: '', teamType: isAccounting ? TeamType.ACCOUNTING : TeamType.OPERATIONS })
+      .then(docRef => {
+        console.log('Added doc ref ', docRef.id);
+      })
       .catch(err => console.error('Failed to add new item ', err));
   };
 
@@ -38,39 +63,34 @@ const TeamsTeamsContainer: React.FC = () => {
         <ChartsCircularProgress />
       ) : (
         <div>
-          <Box display="flex" flexDirection="row">
-            <Button onClick={onAdd} size="small" color="primary" variant="contained">
-              Add
-            </Button>
+          <Box flex={1} display="flex" flexDirection="column" m={1}>
+            <ExpansionPanel className={classes.expansionPanel}>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+                <Typography variant="h5" className={classes.expansionPanelTitle}>
+                  Accounting teams
+                </Typography>
+                <Button onClick={event => onAdd(true, event)} color="primary" variant="outlined" size="small">
+                  Create New Accounting Team
+                </Button>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <AccountingTeamsTable teams={teams.filter(team => team.teamType === TeamType.ACCOUNTING)} />
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+            <ExpansionPanel defaultExpanded={true} className={classes.expansionPanel}>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+                <Typography variant="h5" className={classes.expansionPanelTitle}>
+                  Operations teams
+                </Typography>
+                <Button onClick={event => onAdd(false, event)} color="primary" variant="outlined" size="small">
+                  Create New Operations team
+                </Button>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <OperationsTeamsTable teams={teams.filter(team => team.teamType === TeamType.OPERATIONS)} />
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
           </Box>
-
-          <TableContainer component={Paper} style={{ overflowY: 'auto' }}>
-            <Table className={classes.table} aria-label="a dense table">
-              <colgroup>
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '5%' }} />
-              </colgroup>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="center">Members</TableCell>
-                  <TableCell align="center">Carriers</TableCell>
-                  <TableCell align="center">Categories</TableCell>
-                  <TableCell align="center">Checklist Items</TableCell>
-                  <TableCell align="right" />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {teams?.map((team, index) => (
-                  <TeamTeamRow team={team} key={`teams-${team.id}`} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </div>
       )}
     </div>

@@ -1,0 +1,21 @@
+import { useCallback } from 'react';
+
+import useFirestoreCollection from './useFirestoreCollection';
+import { DocumentValue } from '../components/bookings/checklist/ChecklistItemModel';
+import safeInvoke from '../utilities/safeInvoke';
+import { update } from 'lodash/fp';
+
+export default function useAccountingDocuments(paymentReference: string) {
+  let query = useCallback(q => q.orderBy('uploadedAt', 'asc'), []);
+
+  const accountingDocumentsCollection = useFirestoreCollection(
+    'weeklyPayment',
+    query,
+    paymentReference,
+    'accounting-documents',
+  );
+
+  return accountingDocumentsCollection?.docs.map(doc => {
+    return update('uploadedAt', safeInvoke('toDate'))({ id: doc.id, ...doc.data() } as DocumentValue);
+  }) as DocumentValue[];
+}

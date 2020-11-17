@@ -77,18 +77,18 @@ const BookingsPageContainer: React.FC = () => {
   const [bookings, isLoading] = useBookingsContext();
 
   // Remember scroll position
-  useEffect(() => {
-    if (bookingPaginationContextData.scrollPosition && !isLoading) {
-      window.scroll(0, bookingPaginationContextData.scrollPosition);
-    }
-
-    return () => {
-      // as it will be remounted a few times we do not want to store position if the scroll did not actually happen
-      if (window.scrollY > 200 && setBookingPaginationContextData) {
-        setBookingPaginationContextData(set('scrollPosition', window.scrollY)(bookingPaginationContextData));
-      }
-    };
-  }, [isLoading, bookingPaginationContextData.scrollPosition]);
+  // useEffect(() => {
+  //   if (bookingPaginationContextData.scrollPosition && !isLoading) {
+  //     window.scroll(0, bookingPaginationContextData.scrollPosition);
+  //   }
+  //
+  //   return () => {
+  //     // as it will be remounted a few times we do not want to store position if the scroll did not actually happen
+  //     if (window.scrollY > 200 && setBookingPaginationContextData) {
+  //       setBookingPaginationContextData(prevState => set('scrollPosition', window.scrollY)(prevState));
+  //     }
+  //   };
+  // }, [isLoading, bookingPaginationContextData.scrollPosition]);
 
   useEffect(() => {
     if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {

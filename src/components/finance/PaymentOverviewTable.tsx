@@ -1,12 +1,19 @@
-import React, { Fragment, useEffect, useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
-import WeeklyPayment, { Currency } from '../../model/WeeklyPayment';
+import WeeklyPayment from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
+import Commission from '../../model/Commission';
+import Payment, { Currency } from '../../model/Payment';
 
-const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
+const PaymentOverviewTable: React.FC<Props> = ({
+  overviewData,
+  selectedPayments,
+  handleSelect,
+  handleOpenPreviewDialog,
+}) => {
   const total = useMemo(() => {
     return overviewData
       ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(([key, value]) => ({
@@ -15,9 +22,7 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
         }))
       : [];
   }, [overviewData]);
-  useEffect(() => {
-    console.log('Total', total);
-  }, [total]);
+
   return (
     <Fragment>
       {!overviewData || overviewData.length === 0 ? (
@@ -27,19 +32,28 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell align="center">File No.</TableCell>
+                {selectedPayments && <TableCell align="center" />}
+                <TableCell align="left">File No.</TableCell>
                 <TableCell align="center">B/L No.</TableCell>
                 <TableCell align="center">Vessel</TableCell>
+                <TableCell align="center">Status</TableCell>
                 <TableCell align="center">Currency</TableCell>
-                <TableCell align="center">Amount</TableCell>
+                <TableCell align="right">Amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {overviewData.map(payment => (
-                <PaymentOverviewTableRow paymentData={payment} key={payment.id} />
+              {(overviewData as Payment[]).map((payment, index) => (
+                <PaymentOverviewTableRow
+                  paymentData={payment}
+                  status={overviewData[index].status}
+                  key={payment.id}
+                  selectedPayments={selectedPayments}
+                  handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}
+                  handleOpenPreviewDialog={handleOpenPreviewDialog}
+                />
               ))}
               {total.map((value, index) => (
-                <PaymentOverviewTableTotalRow total={value} key={index} />
+                <PaymentOverviewTableTotalRow total={value} key={index} hasSelection={!!selectedPayments} />
               ))}
             </TableBody>
           </Table>
@@ -52,5 +66,8 @@ const PaymentOverviewTable: React.FC<Props> = ({ overviewData }) => {
 export default PaymentOverviewTable;
 
 interface Props {
-  overviewData: WeeklyPayment[];
+  overviewData: WeeklyPayment[] | Commission[];
+  selectedPayments?: string[];
+  handleSelect?: (selectedId: string | undefined) => void;
+  handleOpenPreviewDialog: (bookingId: string) => void;
 }

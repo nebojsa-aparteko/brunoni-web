@@ -15,7 +15,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import Papa, { ParseConfig, ParseResult } from 'papaparse';
 import LoadListContainerModel from '../../../model/LoadListContainerModel';
 import firebase from '../../../firebase';
-import useContainers from '../../../hooks/useContainers';
 import { useDropzone } from 'react-dropzone';
 import { useSnackbar } from 'notistack';
 
@@ -72,7 +71,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             return header;
         }
       },
-      complete(results: ParseResult, file?: File): void {
+      complete(results: ParseResult): void {
         console.log(results.data);
         const batch = firebase.firestore().batch();
 
@@ -106,18 +105,9 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           variant: 'error',
         });
       }
-      // if (!isHeaderValid) {
-      //   setIsHeaderValid(true);
-      //   return enqueueSnackbar(
-      //     <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
-      //     {
-      //       variant: 'error',
-      //     },
-      //   );
-      // }
       acceptedFiles.forEach(file => parseCSV(file));
     },
-    [isHeaderValid, enqueueSnackbar, parseCSV],
+    [enqueueSnackbar, parseCSV],
   );
 
   useEffect(() => {
@@ -141,7 +131,7 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
 
   const handleLoadListSave = useCallback(() => {
     parseCSV(loadListInput);
-  }, [loadListInput, setIsHeaderValid, parseCSV]);
+  }, [loadListInput, parseCSV]);
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
       <Box className={classes.dialogBody}>

@@ -6,7 +6,7 @@ import firebase from '../firebase';
 const UserNotificationRedirectionSwitch = ({ userUid, user }: Props) => {
   const saveUserChanges = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      if (!userUid || userUid == '') return;
+      if (!userUid || userUid === '') return;
       return firebase
         .firestore()
         .collection('users')

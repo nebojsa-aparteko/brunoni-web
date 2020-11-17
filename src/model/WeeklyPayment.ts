@@ -1,27 +1,17 @@
-import { BookingCategory } from './Booking';
+import Payment from './Payment';
 
-export default interface WeeklyPayment {
-  id?: string;
-  bookingId: string;
-  recId: string;
-  reference: string;
-  blNumber: string;
-  category: BookingCategory;
-  vessel: string;
-  carrier: string;
-  currency: Currency;
-  amount: number;
-  debitCredit: DebitCredit;
-  payDate: Date;
+export default interface WeeklyPayment extends Payment {
+  status: WeeklyPaymentStatus;
 }
 
-export enum Currency {
-  USD = 'USD',
-  EUR = 'EUR',
-  CHF = 'CHF',
+export enum WeeklyPaymentStatus {
+  IN_PROGRESS = 'In Progress',
+  BLOCKED = 'Blocked',
+  PAID = 'Paid',
 }
 
-export enum DebitCredit {
-  DEBIT = 'Debit',
-  CREDIT = 'Credit',
+export enum WeeklyPaymentApiAction {
+  MOVE = 'Move',
+  BLOCK = 'Block',
+  UNBLOCK = 'Unblock',
 }

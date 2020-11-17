@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Card, CardContent, CardHeader, Typography } from '@material-ui/core';
+import { Box, Button, Card, CardContent, CardHeader, Grid, Switch, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks, { normalizeTaskData } from '../../hooks/useTasks';
 import MyDayTable from './MyDayTable';
@@ -15,8 +15,8 @@ import ActingAs from '../../contexts/ActingAs';
 import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 import TaskStatusInput from '../tasks/TaskStatusInput';
 import { getTaskFilter } from '../TaskStatusChip';
-import Task, { UserRole } from '../../model/Task';
-import { Team } from '../../model/Teams';
+import Task, { TaskCategory, UserRole } from '../../model/Task';
+import { Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
 
 const MyDayContainer = () => {
@@ -36,15 +36,22 @@ const MyDayContainer = () => {
     [selectedTasks],
   );
 
-  const { assignee, taskStatus } = filters;
+  const { assignee, taskStatus, taskCategory } = filters;
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const actingAs = useContext(ActingAs)[0];
   const onAssignedFilter = useCallback(
     (_, user) => {
       if (setFilters) setFilters(set('assignee', user || undefined)(filters));
     },
-    [filters],
+    [filters, setFilters],
   );
+
+  useEffect(() => {
+    //calling this only once on load
+    if (setFilters) {
+      setFilters(set('taskCategory', localStorage.getItem('taskCategory') as TaskCategory)(filters));
+    }
+  }, []);
 
   useEffect(() => {
     if (assignee && !actingAs)
@@ -61,7 +68,10 @@ const MyDayContainer = () => {
     if (teams) {
       teams
         ?.reduce(async (previousValue, currentValue) => {
-          const tasksPerTeam = await getTeamTasks(currentValue.checklistItems!);
+          const tasksPerTeam =
+            (await currentValue.teamType) === TeamType.OPERATIONS
+              ? await getOperationsTeamTasks(currentValue.checklistItems || [])
+              : await getAccountingTeamTasks(currentValue.taskTypes || []);
           const p = await previousValue;
 
           const newTuple = [
@@ -95,7 +105,17 @@ const MyDayContainer = () => {
     (_, status) => {
       if (setFilters) setFilters(set('taskStatus', status || undefined)(filters));
     },
-    [filters],
+    [filters, setFilters],
+  );
+
+  const onCategoryChange = useCallback(
+    (category: TaskCategory) => {
+      if (setFilters) {
+        setFilters(set('taskCategory', category)(filters));
+        localStorage.setItem('taskCategory', `${category}`);
+      }
+    },
+    [filters, setFilters],
   );
 
   /*
@@ -104,7 +124,6 @@ const MyDayContainer = () => {
   const filteredTasks = useMemo(() => (taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks), [
     taskStatus,
     tasks,
-    getTaskFilter,
   ]);
 
   const onAssignUser = useCallback(() => {
@@ -124,7 +143,7 @@ const MyDayContainer = () => {
           setAssignedUserTrigger(prevState => !prevState);
         });
     });
-  }, [selectedTasks, assignTo, pick, UserRecordMinProperties]);
+  }, [selectedTasks, assignTo]);
   return (
     <Card>
       <CardHeader
@@ -172,6 +191,24 @@ const MyDayContainer = () => {
                 />
               </Box>
             </Box>
+            <Box display="flex" alignItems="center">
+              <Typography component="div">
+                <Grid component="label" container alignItems="center" spacing={1}>
+                  <Grid item>Operations</Grid>
+                  <Grid item>
+                    <Switch
+                      checked={taskCategory === TaskCategory.ACCOUNTING}
+                      onChange={(_, checked) =>
+                        onCategoryChange(checked ? TaskCategory.ACCOUNTING : TaskCategory.OPERATIONS)
+                      }
+                      name="taskCategorySwitch"
+                      color="primary"
+                    />
+                  </Grid>
+                  <Grid item>Accounting</Grid>
+                </Grid>
+              </Typography>
+            </Box>
           </Box>
         )}
         {filteredTasks && normalizedTasks ? (
@@ -193,15 +230,13 @@ const MyDayContainer = () => {
 
 export default MyDayContainer;
 
-const getTeamTasks = (checklistItems: string[]) => {
+const getOperationsTeamTasks = (checklistItems: string[]) => {
   const stages: ChecklistNames[] = [];
-  const checklists: ChecklistNames[] = [];
   checklistItems.forEach(c => {
     const ch = getChecklistItem(c as ChecklistNames);
     if (ch.checklistStageId) {
       stages.push(ch.checklistStageId);
     }
-    checklists.push(ch.checklistId);
   });
   return stages.length > 0
     ? firebase
@@ -221,6 +256,16 @@ const getTeamTasks = (checklistItems: string[]) => {
         .where('userRole', '==', UserRole.ADMIN)
         .get();
 };
+
+const getAccountingTeamTasks = (taskTypes: string[]) =>
+  firebase
+    .firestore()
+    .collectionGroup('tasks')
+    .where('id', 'in', taskTypes)
+    .where('resolved', '==', false)
+    .where('show', '==', true)
+    .where('userRole', '==', UserRole.ADMIN)
+    .get();
 
 export const getTeamsPerUser = (assignee: UserRecord) =>
   firebase

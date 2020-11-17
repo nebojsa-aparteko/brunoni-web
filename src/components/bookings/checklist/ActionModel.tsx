@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import {
   Box,
   Button,
@@ -9,10 +9,10 @@ import {
   DialogTitle,
   IconButton,
   makeStyles,
-  Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-const useStyles = makeStyles(theme =>
+
+const useStyles = makeStyles(() =>
   createStyles({
     closeModal: {
       position: 'absolute',

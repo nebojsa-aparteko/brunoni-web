@@ -36,6 +36,7 @@ import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
 import invoke from 'lodash/fp/invoke';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
+import { detectAndInsertLink } from '../../utilities/detectAndInsertLink';
 
 interface Props {
   cargoDetail: CargoDetail[];
@@ -103,7 +104,7 @@ const useStyles = makeStyles(theme => ({
   },
   tableRow: {
     verticalAlign: 'top',
-    ['@media not print']: {
+    '@media not print': {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
         marginTop: theme.spacing(1),
@@ -473,7 +474,10 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                     <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
                   )}
                   {arrivalItemRemark && (
-                    <TableRowData label={'Arrival Items Remark'} content={arrivalItemRemark.RemarkTxt} />
+                    <TableRowData
+                      label={'Arrival Items Remark'}
+                      content={detectAndInsertLink(arrivalItemRemark.RemarkTxt)}
+                    />
                   )}
                 </TableBody>
               </Table>
@@ -494,10 +498,6 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tar
 
   return (
     <Grid item xs={12}>
-      <Box marginTop="2em" marginBottom="2em">
-        <Divider />
-      </Box>
-
       {cargoDetail &&
         cargoDetail.map((cargoDetailItem, index) => (
           <ContainerItem

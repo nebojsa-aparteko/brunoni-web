@@ -41,7 +41,7 @@ const QuoteGroups: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const actingAs = useContext(ActingAs)[0];
 
-  const [_, isLoading, quoteFilters, setQuoteFilters] = useQuotesContext();
+  const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);

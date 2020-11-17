@@ -1,18 +1,7 @@
 import React, { useContext } from 'react';
 import Carriers from '../contexts/Carriers';
 import Meta from '../components/Meta';
-import {
-  Avatar,
-  Box,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
-  Theme,
-  Typography,
-} from '@material-ui/core';
+import { Box, Grid, List, ListItem, ListItemAvatar, ListItemText, Paper, Theme, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import SideCharges from '../components/admin/SideCharges';

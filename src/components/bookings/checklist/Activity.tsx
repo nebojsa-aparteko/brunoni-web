@@ -1,11 +1,9 @@
-import React, { Fragment, useState } from 'react';
-import { Box, Link, Tooltip, Typography } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
-import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
-import formatDate from 'date-fns/format';
 import DateFormattedText from '../../DateFormattedText';
 
 const makeActivityRepresentation = (activity: ActivityLogItem) => {
@@ -31,8 +29,23 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.DONE_BY_CUSTOMER;
       case ActivityChangeType.UNDO_COMPLETED_CUSTOMER:
         return ActivityText.UNDO_COMPLETED_CUSTOMER;
+      case ActivityChangeType.SELECT_FOR_COMPARISON:
+        return ActivityText.SELECT_FOR_COMPARISON;
+      case ActivityChangeType.UNSELECT_FOR_COMPARISON:
+        return ActivityText.UNSELECT_FOR_COMPARISON;
+      case ActivityChangeType.MARK_AS_FINAL:
+        return ActivityText.MARK_AS_FINAL;
+      case ActivityChangeType.UNMARK_AS_FINAL:
+        return ActivityText.UNMARK_AS_FINAL;
+      case ActivityChangeType.POSTPONE_PAYMENT:
+        return ActivityText.POSTPONE_PAYMENT;
+      case ActivityChangeType.APPROVE_PAYMENT:
+        return ActivityText.APPROVE_PAYMENT;
+      case ActivityChangeType.REVERT_PAYMENT_APPROVAL:
+        return ActivityText.REVERT_PAYMENT_APPROVAL;
     }
   };
+
   return (
     <Typography>
       <Link href={`mailto:${activity.by.emailAddress}`}>
@@ -42,7 +55,14 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
       {activity.stage && ` '${activity.stage?.label}' stage in `}
       {activity.documents &&
         activity.documents.map((doc, index) => {
-          return [ActivityChangeType.ADD_FILE].includes(activity.changeType as ActivityChangeType) ? (
+          return [
+            ActivityChangeType.ADD_FILE,
+            ActivityChangeType.SELECT_FOR_COMPARISON,
+            ActivityChangeType.UNSELECT_FOR_COMPARISON,
+            ActivityChangeType.MARK_AS_FINAL,
+            ActivityChangeType.UNMARK_AS_FINAL,
+            ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+          ].includes(activity.changeType as ActivityChangeType) ? (
             <Fragment key={doc.url}>
               <Link href={doc.url} target="_blank">
                 {doc.name}
@@ -53,20 +73,39 @@ const makeActivityRepresentation = (activity: ActivityLogItem) => {
             `${doc.name} `
           );
         })}
-      {activity.documents ? (activity.changeType === ActivityChangeType.ADD_FILE ? ' into ' : 'from ') : null}
-      {activity.checklistItem ? (
-        <Fragment>
-          <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
-        </Fragment>
-      ) : (
-        'Internal storage.'
-      )}
+      {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
+        activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
+        ' for comparison'}
+      {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
+      activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
+      activity.changeType === ActivityChangeType.POSTPONE_PAYMENT
+        ? activity.paymentReference
+        : null}
+      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
+      (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
+        ? activity.changeType === ActivityChangeType.ADD_FILE
+          ? ' into '
+          : ' from '
+        : null}
+
+      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER ? (
+        activity.checklistItem ? (
+          <Fragment>
+            <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+          </Fragment>
+        ) : !activity.isAccountingActivity ? (
+          activity.isInternal ? (
+            'Internal storage.'
+          ) : null
+        ) : (
+          'Accounting.'
+        )
+      ) : null}
     </Typography>
   );
 };
 
 const Activity = ({ activity, ...other }: Props) => {
-  const [isFullDateFormat, setIsFullDateFormat] = useState(false);
   return (
     <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
       <Avatar

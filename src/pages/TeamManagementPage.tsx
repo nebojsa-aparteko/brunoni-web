@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import Meta from '../components/Meta';
-import { Box, Container, makeStyles, Paper, Tab, Tabs, Theme, Typography } from '@material-ui/core';
+import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import { TabPanel } from './BookingsPage';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';

@@ -7,11 +7,11 @@ import { MentionItem } from 'react-mentions';
 import ActivityLogView from '../bookings/checklist/ActivityLogView';
 import { ActivityType, QuoteActivityModel } from '../bookings/checklist/ActivityModel';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import firebase from 'firebase';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import ActingAs from '../../contexts/ActingAs';
 import { Quote } from '../../providers/QuoteGroupsProvider';
+import firebase from '../../firebase';
 
 interface Props {
   quoteId: string;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId, quote }) => {
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const [actingAs] = useContext(ActingAs);
 
   const quoteActivityLogCollection = useFirestoreCollection(
     'quotes',

@@ -56,7 +56,7 @@ const UserWidget: React.FC = () => {
       setActingAs(user.uid);
     }
     history.push('/');
-  }, [setAnchorEl, setActingAs, user, history]);
+  }, [setAnchorEl, setActingAs, user, history, actingAs]);
 
   const handleLogOut = useCallback(async () => {
     try {
@@ -69,7 +69,7 @@ const UserWidget: React.FC = () => {
         variant: 'error',
       });
     }
-  }, [setAnchorEl]);
+  }, [setAnchorEl, enqueueSnackbar]);
 
   return (
     <Fragment>

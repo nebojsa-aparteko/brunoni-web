@@ -22,6 +22,7 @@ import { a11yProps, TabPanel } from '../../pages/BookingsPage';
 
 interface Props {
   freightDetails: FreightDetail[];
+  initiallySelectedTab?: number;
 }
 
 const getSpecificFreight = (freightDetails: FreightDetail[], group: FreightDetailGroup) =>
@@ -66,8 +67,10 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AdminBookingFreight: React.FC<Props> = ({ freightDetails }) => {
-  const [value, setValue] = React.useState(0);
+const AdminBookingFreight: React.FC<Props> = ({ freightDetails, initiallySelectedTab }) => {
+  const [value, setValue] = React.useState(
+    initiallySelectedTab && [0, 1, 2].includes(initiallySelectedTab) ? initiallySelectedTab : 0,
+  );
 
   const handleChange = (event: any, newValue: number) => {
     setValue(newValue);
@@ -152,10 +155,10 @@ const BookingFreightTable: React.FC<Props> = ({ freightDetails }) => {
   );
 };
 
-const BookingFreight: React.FC<Props> = ({ freightDetails }) => {
+const BookingFreight: React.FC<Props> = ({ freightDetails, initiallySelectedTab }) => {
   const [actingAs] = useContext(ActingAs);
   return !actingAs && freightDetails.some(f => f.Group) ? (
-    <AdminBookingFreight freightDetails={freightDetails} />
+    <AdminBookingFreight freightDetails={freightDetails} initiallySelectedTab={initiallySelectedTab} />
   ) : (
     <BookingFreightTable
       freightDetails={

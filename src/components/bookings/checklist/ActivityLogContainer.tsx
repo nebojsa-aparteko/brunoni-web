@@ -17,6 +17,7 @@ import { Booking } from '../../../model/Booking';
 interface Props {
   booking: Booking;
   isAdmin: boolean;
+  isAccounting?: boolean;
 }
 
 export const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
@@ -29,8 +30,8 @@ export const addActivityItem = (bookingId: string, activityLog: ActivityLogItem)
     .set(activityLog);
 };
 
-const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
-  const [showMore, setShowMore] = useState(false);
+const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting }) => {
+  const [showMore, setShowMore] = useState<boolean>(false);
   const activityLogContext = useActivityLogState();
 
   const activityLogCollection = useFirestoreCollection(
@@ -58,8 +59,18 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
 
   const filteredActivityLog = useMemo(
     () =>
-      normalizedActivityLog?.filter((item: ActivityLogItem) => (showMore ? true : item.type === ActivityType.COMMENT)),
-    [showMore, normalizedActivityLog],
+      normalizedActivityLog?.filter((item: ActivityLogItem) =>
+        isAccounting
+          ? item.isAccountingActivity
+            ? showMore
+              ? true
+              : item.type === ActivityType.COMMENT
+            : false
+          : showMore
+          ? true
+          : item.type === ActivityType.COMMENT,
+      ),
+    [showMore, normalizedActivityLog, isAccounting],
   );
 
   const userRecord = useContext(UserRecordContext);
@@ -85,6 +96,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
             at: new Date(),
             by: userActivityLogData,
             isInternal: internal,
+            isAccountingActivity: isAccounting,
             checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
             documents: shortenedDocumentValue(activityLogContext.state?.documentReference),
             mentions: mentions,
@@ -96,7 +108,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
         })
         .catch(err => console.log(err));
     },
-    [booking.id, userRecord, activityLogContext],
+    [booking.id, userRecord, activityLogContext, isAccounting],
   );
 
   const handleShowMore = () => {
@@ -109,6 +121,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin }) => {
       showMore={showMore}
       onChange={handleShowMore}
       booking={booking}
+      isAccounting={isAccounting}
     />
   );
 };

@@ -1,5 +1,15 @@
 import React, { useLayoutEffect } from 'react';
-import { Box, Card, CardContent, CardHeader, makeStyles, Switch, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControlLabel,
+  makeStyles,
+  Switch,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import WriteComment from './WriteComment';
 import { ActivityLogItem } from './ActivityModel';
 import { MentionItem } from 'react-mentions';
@@ -18,6 +28,7 @@ interface Props {
   onChange?: () => void;
   booking?: Booking;
   quote?: Quote;
+  isAccounting?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -34,6 +45,7 @@ const ActivityLogView: React.FC<Props> = ({
   quoteActivityLog,
   booking,
   quote,
+  isAccounting,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -64,13 +76,19 @@ const ActivityLogView: React.FC<Props> = ({
         history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
       }
     }, 1000);
-  }, [window.location.search]);
+  }, [history]);
 
   return (
     <Card className={classes.spacing} style={{ overflow: 'unset' }}>
       <CardHeader
         action={
-          !quoteActivityLog ? <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" /> : null
+          !quoteActivityLog ? (
+            <FormControlLabel
+              control={<Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />}
+              label="Show Activity"
+              labelPlacement="start"
+            />
+          ) : null
         }
         title={<Typography variant="subtitle1">Activity</Typography>}
       />
@@ -80,7 +98,7 @@ const ActivityLogView: React.FC<Props> = ({
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
         ) : (
-          <WriteComment onCommentSave={onCommentSave} booking={booking} />
+          <WriteComment onCommentSave={onCommentSave} booking={booking} isAccounting={isAccounting} />
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <Box id={activity.id} key={`act-${activity.id}`}>

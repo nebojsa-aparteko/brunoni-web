@@ -51,7 +51,7 @@ const getBookings = (bookings: string[]) => {
 const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems, vessel }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
-  const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems, CHUNK_SIZE]);
+  const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems]);
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
   useEffect(() => {
     let didCancel = false;
@@ -69,7 +69,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
     return () => {
       didCancel = true;
     };
-  }, [bookingsIds, normalizeBooking, getBookings, isOpen]);
+  }, [bookingsIds, isOpen]);
 
   const handleBookingClick = (bookingId: string) => {
     window.open(`/bookings/${bookingId}`, '_blank');

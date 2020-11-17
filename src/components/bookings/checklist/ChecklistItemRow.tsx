@@ -18,10 +18,10 @@ import {
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  ChecklistItemValueDocumentStatus,
   ChecklistItemValueDocumentStatusType,
   CustomerAction,
   CustomerChecklistActionType,
+  DocumentValueStatus,
   ShortChecklistItem,
   Stage,
 } from './ChecklistItemModel';
@@ -29,7 +29,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import { flow, isNil, omit, omitBy } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
-import { Booking, BookingLocType, CheckListDocument } from '../../../model/Booking';
+import { Booking, StoredDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';
@@ -41,6 +41,7 @@ import DocumentList from './DocumentList';
 import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
+import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -143,37 +144,35 @@ const checkStageDependency = (stages: Stage[], stageId: string) => {
   } else return stages[index - 1].checked;
 };
 
-export const createActivityObject = (
-  changeType: ActivityChangeType,
-  by: ActivityLogUserData,
-  checklistItem: ChecklistItem,
-  documents?: ChecklistItemValueDocument[],
-  stage?: Stage,
-  internal?: boolean,
-): ActivityLogItem =>
-  flow(omitBy(isNil))({
+export const createActivityObject = (data: {
+  changeType: ActivityChangeType;
+  by: ActivityLogUserData;
+  checklistItem?: ChecklistItem;
+  documents?: ChecklistItemValueDocument[];
+  stage?: Stage;
+  internal?: boolean;
+  isAccountingActivity?: boolean;
+  paymentReference?: string;
+}): ActivityLogItem => {
+  const { by, changeType, internal, checklistItem, paymentReference, documents, stage, isAccountingActivity } = data;
+  return flow(omitBy(isNil))({
     changeType: changeType,
     by: by,
     at: new Date(),
     type: ActivityType.ACTIVITY,
     isInternal: internal,
-    checklistItem: {
-      id: checklistItem.id,
-      label: checklistItem.label,
-      checked: !!checklistItem.checked,
-    } as ShortChecklistItem,
+    checklistItem: checklistItem
+      ? omitBy(isNil)({
+          id: checklistItem?.id,
+          label: checklistItem?.label,
+          checked: checklistItem?.checked,
+        } as ShortChecklistItem)
+      : undefined,
     documents: documents,
     stage: stage,
+    isAccountingActivity: !!isAccountingActivity,
+    paymentReference: paymentReference,
   } as ActivityLogItem);
-
-const makeContentDispositionFileName = (checklistItem: ChecklistItem, booking: Booking, file: File) => {
-  if (['IMO', 'OOG'].includes(checklistItem.id)) {
-    const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
-    if (deliveryRef) {
-      return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}.${file.name.split('.').pop()}`;
-    }
-  }
-  return `attachment; filename=${file.name}`;
 };
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
@@ -204,22 +203,25 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   const activityLogContext = useActivityLogState();
 
-  const storeActivity = (checklistItemActivityHandler: () => Promise<void>) => {
-    checklistItemActivityHandler()
-      .then(_ => {
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1000,
+  const storeActivity = useCallback(
+    (checklistItemActivityHandler: () => Promise<void>) => {
+      checklistItemActivityHandler()
+        .then(_ => {
+          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+            variant: 'success',
+            autoHideDuration: 1000,
+          });
+        })
+        .catch(error => {
+          console.error('error storing activity', error);
+          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
         });
-      })
-      .catch(error => {
-        console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      });
-  };
+    },
+    [enqueueSnackbar],
+  );
 
   const saveChecklistChanges = useCallback(
     (
@@ -234,7 +236,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         .doc(checklistItem?.id)
         .update(field, value);
     },
-    [booking?.id, checklistItem.id],
+    [booking, checklistItem],
   );
 
   const checklistItemCheckedHandler = useCallback(
@@ -242,11 +244,15 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('checked', checked).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(ActivityChangeType.CHECKED, getActivityLogUserData(), { ...checklistItem, checked }),
+          createActivityObject({
+            changeType: ActivityChangeType.CHECKED,
+            by: getActivityLogUserData(),
+            checklistItem: { ...checklistItem, checked },
+          }),
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemMarkCompletedHandler = useCallback(
@@ -254,15 +260,15 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('customerAction', action).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(
-            type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
-            getActivityLogUserData(),
-            checklistItem,
-          ),
+          createActivityObject({
+            changeType: type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+          }),
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemFileAddedHandler = useCallback(
@@ -272,19 +278,18 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         .then(_ =>
           addActivityItem(
             booking!.id,
-            createActivityObject(
-              ActivityChangeType.ADD_FILE,
-              getActivityLogUserData(),
-              checklistItem,
-              addedFiles,
-              undefined,
-              internal,
-            ),
+            createActivityObject({
+              changeType: ActivityChangeType.ADD_FILE,
+              by: getActivityLogUserData(),
+              checklistItem: checklistItem,
+              documents: addedFiles,
+              internal: internal,
+            }),
           ),
         )
         .catch(error => console.error('Error saving new document list', error));
     },
-    [booking?.id, checklistItem, getActivityLogUserData],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemStageChangeHandler = useCallback(
@@ -292,17 +297,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges('stages', stages).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(
-            ActivityChangeType.STAGE_CHECKED,
-            getActivityLogUserData(),
-            checklistItem,
-            undefined,
-            stage,
-          ),
+          createActivityObject({
+            changeType: ActivityChangeType.STAGE_CHECKED,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+            stage: stage,
+          }),
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
 
   const checklistItemDocumentStatusChangeHandler = useCallback(
@@ -310,14 +314,18 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
         addActivityItem(
           booking!.id,
-          createActivityObject(ActivityChangeType.DOCUMENT_STATUS_CHANGED, getActivityLogUserData(), checklistItem, [
-            document,
-          ]),
+          createActivityObject({
+            changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+            by: getActivityLogUserData(),
+            checklistItem: checklistItem,
+            documents: [document],
+          }),
         ),
       );
     },
-    [booking?.id, checklistItem],
+    [booking, checklistItem, saveChecklistChanges, getActivityLogUserData],
   );
+
   const handleMention = () => {
     activityLogContext.setState({ checklistReference: checklistItem });
   };
@@ -344,7 +352,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     (value: boolean) => {
       storeActivity(() => checklistItemCheckedHandler(value));
     },
-    [checklistItemCheckedHandler],
+    [checklistItemCheckedHandler, storeActivity],
   );
 
   const saveFiles = useCallback(
@@ -399,7 +407,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
       return Promise.all(requests);
     },
-    [storageBasePath],
+    [storageBasePath, booking, checklistItem, enqueueSnackbar],
   );
 
   const handleSelectForComparison = (item: ChecklistItemValueDocument) => {
@@ -408,7 +416,20 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       checklistItem.values?.map(value =>
         value.url === item.url ? { ...value, isSelectedForComparison: !item.isSelectedForComparison } : value,
       ),
-    ).then(() => console.log('done'));
+    ).then(() => {
+      console.log('done');
+      return addActivityItem(
+        booking!.id,
+        createActivityObject({
+          changeType: !item.isSelectedForComparison
+            ? ActivityChangeType.SELECT_FOR_COMPARISON
+            : ActivityChangeType.UNSELECT_FOR_COMPARISON,
+          by: getActivityLogUserData(),
+          checklistItem: checklistItem,
+          documents: [item],
+        }),
+      );
+    });
   };
 
   const handleMarkAsFinal = (item: ChecklistItemValueDocument, internal: boolean) => {
@@ -417,12 +438,23 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       (internal ? checklistItem.valuesAdmin : checklistItem.values)?.map(value =>
         value.url === item.url ? { ...value, final: !item.final } : value,
       ),
-    ).then(() => console.log('done'));
+    ).then(() => {
+      console.log('done');
+      return addActivityItem(
+        booking!.id,
+        createActivityObject({
+          changeType: !item.final ? ActivityChangeType.MARK_AS_FINAL : ActivityChangeType.UNMARK_AS_FINAL,
+          by: getActivityLogUserData(),
+          checklistItem: checklistItem,
+          documents: [item],
+        }),
+      );
+    });
   };
 
   const handleDocumentStatusChange = (
     item: ChecklistItemValueDocument,
-    status: ChecklistItemValueDocumentStatus,
+    status: DocumentValueStatus,
     internal: boolean,
   ) => {
     let newItemArray: ChecklistItemValueDocument[];
@@ -475,7 +507,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   const onDrop = useCallback(
     (acceptedFiles: File[], internal: boolean) => {
       saveFiles(acceptedFiles)
-        .then((documents: CheckListDocument[]) => {
+        .then((documents: StoredDocument[]) => {
           console.log(documents, 'DOCUMENTS');
           const values = documents.map(item => {
             return {
@@ -499,13 +531,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, false),
     noClick: true,
   });
-
-  const {
-    getRootProps: getRootPropsDraft,
-    getInputProps: getInputPropsDraft,
-    open: openDraft,
-    isDragActive: isDragActiveDraft,
-  } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true) });
 
   const {
     getRootProps: getRootPropsDraftNoClick,
@@ -611,7 +636,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           checklistItemValues={checklistItem.values || []}
           booking={booking}
           checklistItem={checklistItem}
-          changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
             handleDocumentStatusChange(item, status, false)
           }
           internal={false}
@@ -646,7 +671,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               checklistItemValues={checklistItem.valuesAdmin || []}
               booking={booking}
               checklistItem={checklistItem}
-              changeStatus={(item: ChecklistItemValueDocument, status: ChecklistItemValueDocumentStatus) =>
+              changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
                 handleDocumentStatusChange(item, status, true)
               }
               internal={true}
@@ -660,22 +685,14 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       {isAdmin && checklistItem.valuesAdmin?.length === 0 && (
         <Fragment>
           <Divider orientation="vertical" flexItem={true} />
-          <Box
-            {...getRootPropsDraft()}
-            className={
-              isDragActiveDraft ? classes.draftDragZone : isDragActive ? classes.draftEmpty : classes.draftRoot
-            }
-            flexBasis="fit-content"
-            display="flex"
-            flexDirection="column"
-            id={checklistItem.id}
-            justifyContent="center"
-            alignItems="center"
-            px={1}
-          >
-            <input {...getInputPropsDraft()} />
-            Internals
-          </Box>
+          <DropZone
+            label={'Internals'}
+            storageBasePath={storageBasePath}
+            booking={booking}
+            checklistItem={checklistItem}
+            internal={true}
+            onUpload={(values, internal) => storeActivity(() => checklistItemFileAddedHandler(values, internal))}
+          />
         </Fragment>
       )}
       {isActionDialogOpen && (

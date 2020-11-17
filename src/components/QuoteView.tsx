@@ -46,6 +46,8 @@ import InternalStorage from './bookings/InternalStorage';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
 import { formatDateSafe } from '../utilities/formattingHelpers';
 import { useSnackbar } from 'notistack';
+import { GlobalContext } from '../store/GlobalStore';
+import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
 
 interface Props {
   quote?: Quote;
@@ -143,7 +145,8 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
-  const [actingAs, setActingAs] = useContext(ActingAs);
+  const [actingAs] = useContext(ActingAs);
+  const [, dispatch] = useContext(GlobalContext);
 
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
@@ -244,7 +247,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
       })
       .catch(error => {
         console.log(`Error while assignment in quote ${error}`);
-        enqueueSnackbar(<Typography color="inherit">{`There was an error ${error}`}</Typography>, { variant: 'error' });
+        dispatch({
+          type: SHOW_ERROR_SNACKBAR,
+          message: `There was an error ${error}`,
+        });
       });
   };
 

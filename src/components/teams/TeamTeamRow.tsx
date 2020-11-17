@@ -3,11 +3,10 @@ import TableCell from '@material-ui/core/TableCell';
 import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
-import { Team } from '../../model/Teams';
+import { Team, TeamType } from '../../model/Teams';
 import { Button, IconButton, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord, { UserRecordMinProperties } from '../../model/UserRecord';
-import { firestore } from 'firebase';
 import asArray from '../../utilities/asArray';
 import Carriers from '../../contexts/Carriers';
 import firebase from '../../firebase';
@@ -19,29 +18,11 @@ import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
 import DeleteIcon from '@material-ui/icons/Delete';
 import pick from 'lodash/fp/pick';
+import { TaskType } from '../../model/Task';
 
 interface Props extends React.Attributes {
   team: Team;
 }
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const saveChanges = (field: string, value: any, teamId: string) => {
-  return firebase
-    .firestore()
-    .collection('teams')
-    .doc(teamId)
-    .update(field, value);
-};
 
 const deleteTeam = (teamId: string) =>
   firebase
@@ -63,6 +44,8 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   const categories = Object.keys(BookingCategory);
   const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]);
   const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
+  const taskTypes = Object.keys(TaskType);
+  const taskTypeNamesPreview = Object.entries(TaskType);
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
@@ -79,8 +62,19 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       set(
         'checklistItems',
         asArray(value)
-          .map(val => checklistNamesPreview.find(([id, name]) => name === val)?.[0])
+          .map(val => checklistNamesPreview.find(([, name]) => name === val)?.[0])
           .map(val => ChecklistNames[val as keyof typeof ChecklistNames]),
+      )(activeTeam),
+    );
+    setChanged(true);
+  };
+  const handleTaskTypeChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
+    setActiveTeam(
+      set(
+        'taskTypes',
+        asArray(value)
+          .map(val => taskTypeNamesPreview.find(([, name]) => name === val)?.[0])
+          .map(val => TaskType[val as keyof typeof TaskType]),
       )(activeTeam),
     );
     setChanged(true);
@@ -101,7 +95,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   };
 
   const onSave = useCallback(() => {
-    const teamsCollection = firestore().collection('teams');
+    const teamsCollection = firebase.firestore().collection('teams');
 
     teamsCollection
       .doc(activeTeam.id)
@@ -120,7 +114,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
           autoHideDuration: 3000,
         });
       });
-  }, [activeTeam]);
+  }, [activeTeam, enqueueSnackbar]);
 
   return (
     <TableRow key={key} {...other}>
@@ -165,22 +159,41 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
       </TableCell>
 
       <TableCell align="right">
-        <Autocomplete
-          multiple
-          autoHighlight
-          options={checklistItems || []}
-          defaultValue={team.checklistItems
-            ?.map(value => Object.entries(ChecklistNames).find(([id, name]) => value === name)?.[0] || '')
-            ?.map(val => checklistNamesPreview.find(([id, name]) => id === val)?.[1] || '')}
-          getOptionSelected={(option, value) => option === value}
-          onChange={handleChecklistItemChange}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
-          }
-          renderInput={params => (
-            <TextField {...params} label="Checklist" placeholder="Type to filter" variant="outlined" />
-          )}
-        />
+        {team.teamType === TeamType.OPERATIONS ? (
+          <Autocomplete
+            multiple
+            autoHighlight
+            options={checklistItems || []}
+            defaultValue={team.checklistItems
+              ?.map(value => Object.entries(ChecklistNames).find(([, name]) => value === name)?.[0] || '')
+              ?.map(val => checklistNamesPreview.find(([id]) => id === val)?.[1] || '')}
+            getOptionSelected={(option, value) => option === value}
+            onChange={handleChecklistItemChange}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
+            }
+            renderInput={params => (
+              <TextField {...params} label="Checklist" placeholder="Type to filter" variant="outlined" />
+            )}
+          />
+        ) : (
+          <Autocomplete
+            multiple
+            autoHighlight
+            options={taskTypes || []}
+            defaultValue={team.taskTypes
+              ?.map(value => Object.entries(TaskType).find(([, name]) => value === name)?.[0] || '')
+              ?.map(val => taskTypeNamesPreview.find(([id]) => id === val)?.[1] || '')}
+            getOptionSelected={(option, value) => option === value}
+            onChange={handleTaskTypeChange}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
+            }
+            renderInput={params => (
+              <TextField {...params} label="Task type" placeholder="Type to filter" variant="outlined" />
+            )}
+          />
+        )}
       </TableCell>
       <TableCell align="right">
         {changed && (

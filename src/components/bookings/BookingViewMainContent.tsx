@@ -1,4 +1,4 @@
-import { Box, Typography } from '@material-ui/core';
+import { Box, Divider, makeStyles } from '@material-ui/core';
 import BookingSummary from './BookingSummary';
 import ContainerDetails from './ContainerDetails';
 import React, { Fragment, useMemo } from 'react';
@@ -12,14 +12,28 @@ import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import BookingRemarks from './BookingRemarks';
 
-const remark = {
+export const remark = {
   special: 'SPECIAL REMARKS',
   final: 'FINAL REMARKS',
 };
 
-const BookingViewMainContent = ({ booking }: Props) => {
+const useStyles = makeStyles(() => ({
+  hidePrint: {
+    ['@media print']: {
+      display: 'none',
+    },
+  },
+  showPrint: {
+    ['@media print']: {
+      display: 'initial',
+    },
+  },
+}));
+const BookingViewMainContent = ({ booking, isPrintWithCost }: Props) => {
   const bookingAgent = useUserByAlphacomId(booking?.BkgAgentContact || undefined);
+  const classes = useStyles();
 
   const specialRemarks: Remark[] = useMemo(
     () =>
@@ -31,23 +45,16 @@ const BookingViewMainContent = ({ booking }: Props) => {
         : [],
     [booking],
   );
-  const finalRemarks: Remark[] = useMemo(
-    () =>
-      booking
-        ? flow(
-            get('Remarks'),
-            filter((item: Remark) => item.RemarkType === remark.final),
-          )(booking)
-        : [],
-    [booking],
-  );
 
   return (
     <Page title={getBookingTitle(booking)}>
-      <Box className="bookingSummary" marginTop="1em" marginBottom="0em">
+      <Box marginTop="1em" marginBottom="0em">
         <BookingSummary booking={booking} bookingAgent={bookingAgent} />
       </Box>
-      <Box className="bookingContainerDetails" marginTop="0em" marginBottom="0em">
+      <Box marginTop="0em" marginBottom="0em">
+        <Box marginTop="2em" marginBottom="2em">
+          <Divider />
+        </Box>
         <ContainerDetails
           cargoDetail={booking.CargoDetails}
           version={booking.Version}
@@ -68,25 +75,12 @@ const BookingViewMainContent = ({ booking }: Props) => {
       ) : null}
 
       {booking.FreightDetails && (
-        <Box marginTop="0em" marginBottom="0em" displayPrint="none">
+        <Box marginTop="0em" marginBottom="0em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
           <BookingFreight freightDetails={booking.FreightDetails} />
         </Box>
       )}
       <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
-        {finalRemarks.map((item, index) => {
-          const text = item.RemarkTxt.split('<br/><br/>'); // split the string into an array for each new paragraph
-
-          return item.RemarkTxt ? (
-            <Typography variant="body2" key={`final-remark-${index}`}>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: text.map(remark => remark.split('<br/>').join('')).join('<br/><br/>'),
-                }}
-              />
-              {/* remove all <br/> from the elements of the string array to get rid of manual new rows and join the elements, aka paragraphs with <br/><br/> as they were initially */}
-            </Typography>
-          ) : null;
-        })}
+        <BookingRemarks booking={booking} />
       </Box>
     </Page>
   );
@@ -94,6 +88,7 @@ const BookingViewMainContent = ({ booking }: Props) => {
 
 interface Props {
   booking: Booking;
+  isPrintWithCost: boolean;
 }
 
 export default BookingViewMainContent;

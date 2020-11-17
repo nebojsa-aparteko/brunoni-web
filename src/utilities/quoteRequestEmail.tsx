@@ -1,6 +1,5 @@
 import formatDate from 'date-fns/format';
 import flatMap from 'lodash/fp/flatMap';
-import isArray from 'lodash/fp/isArray';
 import DetailedRouteSearchParams from '../model/get-quotes/DetailedRouteSearchParams';
 import { getLocationLabel } from '../components/inputs/LocationInput';
 import IMO from '../model/IMO';

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Box, createStyles, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { capitalCase } from 'change-case';

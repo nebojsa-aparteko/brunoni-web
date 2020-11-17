@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, FormControl, IconButton, MenuItem, Select } from '@material-ui/core';
 import TodayIcon from '@material-ui/icons/Today';
 

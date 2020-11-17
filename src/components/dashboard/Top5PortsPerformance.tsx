@@ -1,24 +1,20 @@
-import React, { useContext, useMemo } from 'react';
-import { Card, CardHeader, Divider, CardContent, Theme, Table, TableRow, TableCell } from '@material-ui/core';
+import React, { useMemo } from 'react';
+import { Card, CardContent, CardHeader, Divider, Table, TableCell, TableRow, Theme } from '@material-ui/core';
 import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import values from 'lodash/fp/values';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
-import find from 'lodash/fp/find';
 import groupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/fp/mapValues';
 import sum from 'lodash/fp/sum';
 import slice from 'lodash/fp/slice';
-import flatMap from 'lodash/fp/flatMap';
 import toPairs from 'lodash/fp/toPairs';
 import orderBy from 'lodash/fp/orderBy';
 import TableBody from '@material-ui/core/TableBody';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
-import Ports from '../../contexts/Ports';
-import Port from '../../model/Port';
 import TextSkeleton from '../TextSkeleton';
 
 interface Props {
@@ -44,32 +40,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface StringReplacementPair {
-  match: string;
-  replace: string;
-}
-
-const shortenedCountries: StringReplacementPair[] = [
-  {
-    match: 'UNITED ARAB EMIRATES',
-    replace: 'UAE',
-  },
-  {
-    match: 'UNITED KINGDOM',
-    replace: 'UK',
-  },
-];
-
-function replaceAll(str: string, mapObj: StringReplacementPair[]) {
-  const re = new RegExp(flatMap((pair: StringReplacementPair) => pair.match)(mapObj).join('|'), 'gi');
-
-  return str.replace(re, (matched: string) => {
-    const foundItem = find((pair: StringReplacementPair) => pair.match === matched)(mapObj);
-    return foundItem ? foundItem.replace : matched;
-  });
-}
-
-const extractPortsAggregatedData = (year: number, ports: Port[] | undefined) =>
+const extractPortsAggregatedData = (year: number) =>
   flow(
     get('Locations'),
     values,
@@ -129,13 +100,7 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
 };
 
 const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
-  const ports = useContext(Ports);
-
-  const data = useMemo(() => extractPortsAggregatedData(year, ports)(clientPerformance), [
-    year,
-    clientPerformance,
-    ports,
-  ]);
+  const data = useMemo(() => extractPortsAggregatedData(year)(clientPerformance), [year, clientPerformance]);
 
   return (
     <Grid container spacing={2}>
