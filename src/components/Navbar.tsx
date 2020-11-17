@@ -37,6 +37,8 @@ import NotificationsButton from './notifications/NotificationsButton';
 import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 import { Omit } from '@material-ui/types';
+import { camelCase } from 'lodash';
+import TourButton from './bookings/BookingTour';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -147,7 +149,7 @@ function ListItemLink(props: ListItemLinkProps) {
   );
 
   return (
-    <li>
+    <li id={camelCase(primary) + 'Nav'}>
       <ListItem button component={renderLink} onClick={onClick}>
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
@@ -161,7 +163,7 @@ function ButtonMenuItem(props: ListItemLinkProps) {
   const { primary, to, variant, typographyStyle, color } = props;
 
   return (
-    <div className={classes.item}>
+    <div className={classes.item} id={camelCase(primary) + 'Nav'}>
       <Button component={RouterLink} variant={variant} color={color} to={to}>
         <Typography variant="body1" style={typographyStyle}>
           {primary}
@@ -183,7 +185,7 @@ function MenuItemLink(props: ListItemLinkProps) {
   );
 
   return (
-    <MenuItem onClick={onClick} component={renderLink}>
+    <MenuItem id={camelCase(primary) + 'Nav'} onClick={onClick} component={renderLink}>
       {primary}
     </MenuItem>
   );
@@ -255,7 +257,7 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <div className={classes.item}>
+                        <div id="otherMenuNav" className={classes.item}>
                           <Button
                             endIcon={<KeyboardArrowDownIcon />}
                             aria-controls="simple-menu"
@@ -326,6 +328,7 @@ const Navbar: React.FC = () => {
                         typographyStyle={{ color: 'white' }}
                       />
                       <IconButton
+                        id="quickSearchNav"
                         buttonRef={quickSearchButtonRef}
                         onClick={() => setIsSearchDialogOpen(true)}
                         style={{ padding: 8 }}
@@ -365,11 +368,14 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                <div className={classes.item}>{user !== undefined && user !== null && <NotificationsButton />}</div>
-                <div className={classes.item}>
+                <div id="notificationsNav" className={classes.item}>
+                  {user !== undefined && user !== null && <NotificationsButton />}
+                </div>
+                <div id="identityWidgetNav" className={classes.item}>
                   <IdentityWidget />
                 </div>
               </Box>
+              {actingAs !== null && <TourButton />}
             </Toolbar>
           </Container>
         </AppBar>

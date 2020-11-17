@@ -74,6 +74,7 @@ const UserWidget: React.FC = () => {
   return (
     <Fragment>
       <Chip
+        id="userMenuNav"
         avatar={
           <Avatar className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}>
             {isDashboardUser(userData) ? (
@@ -139,10 +140,12 @@ const UserWidget: React.FC = () => {
             {client && <MenuItem onClick={handleSwitch}>Switch to {client.name}</MenuItem>}
           </div>
         )}
-        <MenuItem component={Link} href={'/my-profile'}>
+        <MenuItem id={anchorEl ? 'myProfileNav' : undefined} component={Link} href={'/my-profile'}>
           My profile
         </MenuItem>
-        <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
+        <MenuItem id={anchorEl ? 'logOutNav' : undefined} onClick={handleLogOut}>
+          Log Out
+        </MenuItem>
       </Menu>
     </Fragment>
   );
