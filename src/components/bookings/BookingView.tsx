@@ -34,7 +34,6 @@ import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
-import TourButton from './BookingTour';
 import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';

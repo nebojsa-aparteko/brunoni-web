@@ -203,7 +203,9 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
                       Bookings {archived && '- Archive'}
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
-                    <CategoryFilter value={bookingsContextData.category} onChange={handleImportOrExportChange} />
+                    <div id="exportImportBkgView">
+                      <CategoryFilter value={bookingsContextData.category} onChange={handleImportOrExportChange} />
+                    </div>
                     <Box flex={1} />
 
                     <Search

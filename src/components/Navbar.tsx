@@ -38,7 +38,8 @@ import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 import { Omit } from '@material-ui/types';
 import { camelCase } from 'lodash';
-import TourButton from './bookings/BookingTour';
+import GuideButton from './GuideButton';
+import { bookingsTableShepherdTour } from './guides/BookingsTableGuide';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -375,7 +376,7 @@ const Navbar: React.FC = () => {
                   <IdentityWidget />
                 </div>
               </Box>
-              {actingAs !== null && <TourButton />}
+              {actingAs !== null && <GuideButton guide={bookingsTableShepherdTour} />}
             </Toolbar>
           </Container>
         </AppBar>

@@ -14,13 +14,13 @@ const DashboardCharts: React.FC<Props> = ({ client, year }) => {
   return clientPerformance ? (
     <Page title="Analytics Dashboard">
       <Grid container spacing={2}>
-        <Grid item md={8} xs={12}>
+        <Grid id="TEUPerformanceDash" item md={8} xs={12}>
           <TEUPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
-        <Grid item md={4} xs={12}>
+        <Grid id="sharePerCarrierDash" item md={4} xs={12}>
           <CarrierPerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
-        <Grid item md={4} xs={12}>
+        <Grid id="containerTypePerformanceDash" item md={4} xs={12}>
           <ContainerTypePerformance clientPerformance={clientPerformance} year={year} />
         </Grid>
         <Grid item md={8} xs={12}>

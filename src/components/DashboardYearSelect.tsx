@@ -8,7 +8,7 @@ const DashboardYearSelect: React.FC<Props> = ({ year, handleYearChange }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <Box display="flex" alignItems="flex-end">
+    <Box id="dateDash" display="flex" alignItems="flex-end">
       <Box my={-1}>
         <IconButton color="inherit" component="span" onClick={() => setOpen(true)}>
           <TodayIcon />

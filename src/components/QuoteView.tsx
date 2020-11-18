@@ -288,6 +288,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
 
                 <Box className={classes.actions} displayPrint="none">
                   <Button
+                    id="bookNowButtonQuote"
                     color="primary"
                     variant="contained"
                     size="small"
@@ -298,6 +299,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                   </Button>
 
                   <Button
+                    id="printQuote"
                     aria-label="print"
                     variant="outlined"
                     size="small"
@@ -307,6 +309,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                     Print
                   </Button>
                   <Button
+                    id="specialRequestQuote"
                     aria-label="special request"
                     variant="outlined"
                     size="small"
