@@ -47,6 +47,7 @@
     "react": "^16.13.1",
     "react-avatar": "^3.9.3",
     "react-chartjs-2": "^2.9.0",
+    "react-doc-viewer": "^0.1.5",
     "react-dom": "^16.13.1",
     "react-dropzone": "^10.2.2",
     "react-helmet": "^6.0.0",

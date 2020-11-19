@@ -69,52 +69,26 @@ const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name
   );
 };
 
-// const fetchFile = (url: string) => {
-//     return Promise.resolve(
-//       fetch(
-//         url,
-//       )
-//       .then(response => response.blob())
-//       .then(blob => {
-//           return blob
-//       }))
-// };
-
-const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => {
-  // if(fileType && ['xlsx'].includes(fileType)) {
-  //   console.log("rerender");
-  //   const blob = fetchFile(document.url);
-  //   // const data = XLSX.read(blob, { type: "array" });
-  //   return(
-  //     <DocumentLayout name={document.name}>
-  //       <div>
-  //         {/*<iframe title={document.name} dangerouslySetInnerHTML={XLSX.write(data, {sheet: "WorkSheet1", type: "binary", bookType: "html"})}/>*/}
-  //       </div>
-  //     </DocumentLayout>
-  //   );
-  // }
-
-  return (
-    <DocumentLayout name={document.name}>
-      {fileType === 'pdf' ? (
-        <PDFViewer file={document} />
-      ) : fileType === 'html' ? (
-        <div>
-          <HTMLViewer file={{ url: document.url }} />
-        </div>
-      ) : fileType === 'xlsx' || fileType === 'xls' ? (
-        <div>
-          <XLSXViewer file={{ url: document.url }} />
-        </div>
-      ) : (
-        <Typography style={{ flex: 1, margin: 'auto' }}>
-          The comparing option is currently only available for PDF files. The same functionality for other document
-          types will be available soon.
-        </Typography>
-      )}
-    </DocumentLayout>
-  );
-};
+const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => (
+  <DocumentLayout name={document.name}>
+    {fileType === 'pdf' ? (
+      <PDFViewer file={document} />
+    ) : fileType === 'html' ? (
+      <div>
+        <HTMLViewer file={{ url: document.url }} />
+      </div>
+    ) : fileType === 'xlsx' || fileType === 'xls' ? (
+      <div>
+        <XLSXViewer file={{ url: document.url }} />
+      </div>
+    ) : (
+      <Typography style={{ flex: 1, margin: 'auto' }}>
+        The comparing option is currently only available for PDF files. The same functionality for other document types
+        will be available soon.
+      </Typography>
+    )}
+  </DocumentLayout>
+);
 
 const ComparisonDialogContent = ({
   booking,
