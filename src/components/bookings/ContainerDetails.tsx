@@ -497,7 +497,7 @@ const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tar
   const containerTypes = useContext(ContainerTypes);
 
   return (
-    <Grid item xs={12}>
+    <Grid id="equipmentDetailsBkg" item xs={12}>
       {cargoDetail &&
         cargoDetail.map((cargoDetailItem, index) => (
           <ContainerItem

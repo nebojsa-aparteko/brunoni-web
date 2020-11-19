@@ -6,7 +6,7 @@ import 'shepherd.js/dist/css/shepherd.css';
 
 const GuideButton: React.FC<Props> = ({ guide }) => {
   return (
-    <IconButton aria-label="tour-button-icon" onClick={guide.start} style={{ padding: 8 }}>
+    <IconButton id="helpButtonNav" aria-label="tour-button-icon" onClick={guide.start} style={{ padding: 8 }}>
       <HelpOutlineIcon color="disabled" fontSize="default" />
     </IconButton>
   );

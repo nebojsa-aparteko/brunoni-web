@@ -169,7 +169,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
   };
 
   return (
-    <Box display="flex" flexDirection="column">
+    <Box id="commentInputField" display="flex" flexDirection="column">
       <Box className={classes.writeCommentContainer}>
         <Avatar
           name={`${userRecord?.firstName} ${userRecord?.lastName}`}

@@ -68,4 +68,15 @@ scheduleShepherdTour.addSteps([
       },
     ],
   },
+  {
+    title: 'Help',
+    text: 'If needed, you can start the guide again at any moment by clicking on this button.',
+    attachTo: { element: '#helpButtonNav', on: 'bottom' },
+    buttons: [
+      {
+        text: 'Finish',
+        action: scheduleShepherdTour.next,
+      },
+    ],
+  },
 ]);
