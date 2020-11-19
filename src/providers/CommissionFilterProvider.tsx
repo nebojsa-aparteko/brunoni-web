@@ -6,14 +6,14 @@ import { CommissionStatus } from '../model/Commission';
 
 export interface CommissionFilterContext {
   carrier: Carrier;
-  paymentDate: Date;
+  dueDate: Date;
   currency: Currency[];
   commissionStatus: CommissionStatus[];
 }
 
 export const COMMISSION_FILTERS_INITIAL_STATE = {
   currency: [Currency.USD],
-  paymentDate: startOfDay(new Date()),
+  dueDate: startOfDay(new Date()),
   commissionStatus: [CommissionStatus.INVOICED],
 } as CommissionFilterContext;
 
