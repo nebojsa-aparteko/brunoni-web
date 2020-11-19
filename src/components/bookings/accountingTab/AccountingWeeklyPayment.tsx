@@ -105,12 +105,14 @@ const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyP
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        action: WeeklyPaymentApiAction.MOVE,
-        recId: weeklyPayment.recId,
-        reference: weeklyPayment.reference,
-        payDate: addDays(weeklyPayment.payDate, offset),
-      }),
+      body: JSON.stringify([
+        {
+          action: WeeklyPaymentApiAction.MOVE,
+          recId: weeklyPayment.recId,
+          reference: weeklyPayment.reference,
+          payDate: addDays(weeklyPayment.payDate, offset),
+        },
+      ]),
     });
 
     if (response.ok) {
@@ -140,14 +142,16 @@ const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => 
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        action:
-          weeklyPayment.status === WeeklyPaymentStatus.BLOCKED
-            ? WeeklyPaymentApiAction.UNBLOCK
-            : WeeklyPaymentApiAction.BLOCK,
-        recId: weeklyPayment.recId,
-        reference: weeklyPayment.reference,
-      }),
+      body: JSON.stringify([
+        {
+          action:
+            weeklyPayment.status === WeeklyPaymentStatus.BLOCKED
+              ? WeeklyPaymentApiAction.UNBLOCK
+              : WeeklyPaymentApiAction.BLOCK,
+          recId: weeklyPayment.recId,
+          reference: weeklyPayment.reference,
+        },
+      ]),
     });
 
     if (response.ok) {

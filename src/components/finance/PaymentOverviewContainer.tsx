@@ -18,7 +18,7 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import WeeklyPayment, { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentApiAction, WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
@@ -29,13 +29,13 @@ import Carriers from '../../contexts/Carriers';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
-import { changeWeeklyPayment } from '../bookings/accountingTab/AccountingWeeklyPayment';
 import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { addDays } from 'date-fns';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
 import { showCrispChat } from '../../index';
 import { Currency, DebitCredit } from '../../model/Payment';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -84,6 +84,43 @@ const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, chan
   );
 };
 
+const postponePayments = async (offset: number, user: any, weeklyPayment: WeeklyPayment[]) => {
+  try {
+    const token = await user.getIdToken();
+    console.log('Postponing');
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(
+        weeklyPayment.map(w => ({
+          action: WeeklyPaymentApiAction.MOVE,
+          recId: w.recId,
+          reference: w.reference,
+          payDate: addDays(w.payDate, offset),
+        })),
+      ),
+    });
+
+    if (response.ok) {
+      const body = await response.json();
+      console.log('Body', body);
+    } else {
+      const body = await response.json();
+      console.error(`Failed to request`, response, body);
+    }
+  } catch (e) {
+    console.error('Failed to perform request', e);
+  } finally {
+  }
+};
+
 const PaymentOverviewContainer = () => {
   const overviewData = usePaymentOverview(DebitCredit.DEBIT) as WeeklyPayment[];
 
@@ -94,6 +131,7 @@ const PaymentOverviewContainer = () => {
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
+  const [user] = useUser();
 
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
@@ -177,12 +215,14 @@ const PaymentOverviewContainer = () => {
 
   const handleChangePayDates = useCallback(
     (offset: number) => {
-      return Promise.all(
-        filteredOverviewData
-          .filter(payment => payment.id && selectedPayments && selectedPayments.indexOf(payment.id) > -1)
-          .map(payment => {
-            handleSelect(payment.id);
-            return changeWeeklyPayment(payment.reference, { payDate: addDays(payment.payDate, offset) }).then(_ =>
+      const selectedPaymentsObjects = filteredOverviewData.filter(
+        payment => payment.id && selectedPayments && selectedPayments.indexOf(payment.id) > -1,
+      );
+
+      return Promise.resolve(postponePayments(offset, user, selectedPaymentsObjects))
+        .then(() => {
+          return Promise.all(
+            selectedPaymentsObjects.map(payment =>
               addActivityItem(
                 payment.bookingId,
                 createActivityObject({
@@ -192,10 +232,11 @@ const PaymentOverviewContainer = () => {
                   paymentReference: payment.reference,
                 }),
               ),
-            );
-          }),
-      )
+            ),
+          );
+        })
         .then(_ => {
+          setSelectedPayments([]);
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
             autoHideDuration: 1500,
@@ -209,7 +250,7 @@ const PaymentOverviewContainer = () => {
           });
         });
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect],
+    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect, user],
   );
 
   return (
