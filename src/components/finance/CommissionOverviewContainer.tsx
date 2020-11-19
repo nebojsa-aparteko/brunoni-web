@@ -76,7 +76,7 @@ const CommissionOverviewContainer = () => {
     [setIsDialogOpen],
   );
 
-  const { currency, paymentDate, carrier, commissionStatus } = filters;
+  const { currency, dueDate, carrier, commissionStatus } = filters;
 
   const classes = useStyles();
 
@@ -94,7 +94,7 @@ const CommissionOverviewContainer = () => {
   );
   const handleDateChange = useCallback(
     (date: Date) => {
-      setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
+      setFilters(prevState => set('dueDate', startOfDay(date))(prevState));
       setDateOpen(false);
     },
     [setFilters],
@@ -161,7 +161,7 @@ const CommissionOverviewContainer = () => {
           </FormControl>
           <Box className={classes.spacer}>
             <DateInput
-              value={paymentDate}
+              value={dueDate}
               onChange={handleDateChange}
               open={dateOpen}
               onOpen={() => setDateOpen(true)}

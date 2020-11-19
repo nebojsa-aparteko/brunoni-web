@@ -8,7 +8,7 @@ import { useCommissionFilterProviderContext } from '../providers/CommissionFilte
 
 export default (bookingId?: string) => {
   const [filters] = useCommissionFilterProviderContext();
-  const { carrier, paymentDate } = filters;
+  const { carrier, dueDate } = filters;
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
@@ -16,8 +16,8 @@ export default (bookingId?: string) => {
         return collection.where('bookingId', '==', bookingId);
       }
       let query = collection.orderBy('bookingId', 'asc').limit(100);
-      if (paymentDate) {
-        query = query.where('payDate', '==', paymentDate);
+      if (dueDate) {
+        query = query.where('dueDate', '==', dueDate);
       }
       if (carrier) {
         query = query.where(
@@ -28,7 +28,7 @@ export default (bookingId?: string) => {
       }
       return query;
     },
-    [paymentDate, carrier, bookingId],
+    [dueDate, carrier, bookingId],
   );
 
   const paymentCollection = useFirestoreCollection('commission', query);
