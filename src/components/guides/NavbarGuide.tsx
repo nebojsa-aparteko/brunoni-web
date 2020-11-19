@@ -1,5 +1,10 @@
 import Shepherd from 'shepherd.js';
 
+const handleFinishNavbarGuide = () => {
+  localStorage.setItem('finishedNavbarGuide', 'true');
+  navbarShepherdTour.next();
+};
+
 export let navbarShepherdTour: Shepherd.Tour = new Shepherd.Tour({
   useModalOverlay: true,
   exitOnEsc: true,
@@ -169,7 +174,7 @@ navbarShepherdTour.addSteps([
     attachTo: { element: '#logOutNav', on: 'right' },
     buttons: [
       {
-        text: 'Finish tour',
+        text: 'Next',
         action: navbarShepherdTour.next,
       },
     ],
@@ -181,7 +186,7 @@ navbarShepherdTour.addSteps([
     buttons: [
       {
         text: 'Finish',
-        action: navbarShepherdTour.next,
+        action: handleFinishNavbarGuide,
       },
     ],
   },

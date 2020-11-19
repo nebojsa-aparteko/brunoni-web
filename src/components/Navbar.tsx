@@ -39,7 +39,16 @@ import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-d
 import { Omit } from '@material-ui/types';
 import { camelCase } from 'lodash';
 import GuideButton from './GuideButton';
+import Shepherd from 'shepherd.js';
+import { bookingsTableShepherdTour } from './guides/BookingsTableGuide';
+import { quotesShepherdTour } from './guides/QuotesGuide';
+import { dashboardShepherdTour } from './guides/DashboardGuide';
+import { scheduleShepherdTour } from './guides/ScheduleGuide';
+import { myDayShepherdTour } from './guides/MyDayGuide';
 import { bookingShepherdTour } from './guides/BookingGuide';
+import { quoteShepherdTour } from './guides/QuoteGuide';
+import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
+import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,6 +137,29 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
   },
 }));
 
+const getPageGuide = () => {
+  switch (window.location.pathname) {
+    case '':
+      return dashboardShepherdTour;
+    case '/schedule' || '/schedule/':
+      return scheduleShepherdTour;
+    case '/bookings' || '/bookings/':
+      return bookingsTableShepherdTour;
+    case '/quotes/groups' || '/quotes/groups/':
+      return quotesShepherdTour;
+    case '/quotes/get' || '/quotes/get/':
+      return getQuotesShepherdTour;
+    case '/my-day' || '/my-day/':
+      return myDayShepherdTour;
+    default: {
+      if (window.location.pathname.startsWith('/bookings/')) return bookingShepherdTour;
+      if (window.location.pathname.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
+      if (window.location.pathname.startsWith('/quotes/')) return quoteShepherdTour;
+      return undefined;
+    }
+  }
+};
+
 interface ListItemLinkProps {
   icon?: React.ReactElement;
   primary: string;
@@ -203,6 +235,11 @@ const Navbar: React.FC = () => {
   }, [setIsSearchDialogOpen]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [guide, setGuide] = useState<Shepherd.Tour | undefined>(undefined);
+
+  useEffect(() => {
+    setGuide(getPageGuide());
+  }, [window.location.pathname]);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
@@ -376,7 +413,7 @@ const Navbar: React.FC = () => {
                   <IdentityWidget />
                 </div>
               </Box>
-              {actingAs !== null && <GuideButton guide={bookingShepherdTour} />}
+              {guide && actingAs !== null && <GuideButton guide={guide} />}
             </Toolbar>
           </Container>
         </AppBar>
