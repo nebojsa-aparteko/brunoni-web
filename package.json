@@ -10,6 +10,7 @@
     "@material-ui/lab": "^4.0.0-alpha.53",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.14",
+    "@react-pdf/renderer": "1.6.11",
     "@types/autosuggest-highlight": "^3.1.0",
     "@types/classnames": "^2.2.10",
     "@types/fontfaceobserver": "^0.0.6",
@@ -53,13 +54,13 @@
     "react-linkify": "^1.0.0-alpha",
     "react-mentions": "^3.3.1",
     "react-pdf": "^5.0.0",
-    "@react-pdf/renderer": "1.6.11",
     "react-perfect-scrollbar": "^1.5.8",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.1",
     "react-stickynode": "^2.1.1",
     "react-use": "^14.1.0",
-    "typescript": "^3.9.2"
+    "typescript": "^3.9.2",
+    "xlsx": "^0.16.8"
   },
   "scripts": {
     "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
