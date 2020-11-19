@@ -25,7 +25,7 @@ export default () => {
           CARRIERS.
         </Typography>
       </Box>
-      <Grid container spacing={3}>
+      <Grid id="offersSched" container spacing={3}>
         {specialOffers.map(specialOffer => (
           <Grid item md={4} xs={12} key={specialOffer.id}>
             <SpecialOffer {...specialOffer} />

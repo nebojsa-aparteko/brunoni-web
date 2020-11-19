@@ -318,7 +318,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                 <InfoBoxItem
                   title="Progress"
                   label1={
-                    <Box onClick={onProgressClick} style={{ width: '64px' }}>
+                    <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
                       <ShipmentProgress booking={booking!} />
                     </Box>
                   }
@@ -438,7 +438,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
         </MUIContainer>
       ) : (
         bookings.map(booking => (
-          <Card className={classes.card} key={booking.id}>
+          <Card id="bookingSummaryBkgTable" className={classes.card} key={booking.id}>
             <BookingRow
               isAdmin={isAdmin}
               booking={booking}

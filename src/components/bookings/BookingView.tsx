@@ -34,7 +34,6 @@ import BookingTaskExpansionPanel from './BookingTaskExpansionPanel';
 import brunoniLogo from '../../assets/logo.brunoni.png';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import BookingViewMainContent from './BookingViewMainContent';
-import TourButton from './BookingTour';
 import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
@@ -344,7 +343,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
-        <Box displayPrint="none">
+        <Box id="checklistBkg" displayPrint="none">
           <CheckList booking={booking} onTabChange={setSelectedTab} />
         </Box>
       </Grid>

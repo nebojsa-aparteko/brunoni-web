@@ -45,7 +45,7 @@ const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateCom
             <Checkbox checked={selected} onChange={onSelectRow} onFocus={event => event.stopPropagation()} />
           )}
         </TableCell>
-        <TableCell align="left" onClick={() => setOpen(prevState => !prevState)}>
+        <TableCell id="taskDescriptionMyDay" align="left" onClick={() => setOpen(prevState => !prevState)}>
           {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
         </TableCell>
         <TableCell align="center">
@@ -56,10 +56,10 @@ const MyDayTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateCom
         <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
           {task.assignedUser?.emailAddress || '-'}
         </TableCell>
-        <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
+        <TableCell id="dueDateMyDay" align="center" onClick={() => setOpen(prevState => !prevState)}>
           {task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}
         </TableCell>
-        <TableCell align="center" onClick={() => setOpen(prevState => !prevState)}>
+        <TableCell id="taskStatusMyDay" align="center" onClick={() => setOpen(prevState => !prevState)}>
           <TaskStatusChip task={task} />
         </TableCell>
         <TableCell onClick={() => setOpen(prevState => !prevState)}>

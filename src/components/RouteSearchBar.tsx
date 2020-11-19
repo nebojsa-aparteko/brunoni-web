@@ -119,7 +119,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
   return (
     <Paper className={`${paperVisibility} ${classes.paperRoot}`}>
       <Grid container justify="center" spacing={2}>
-        <Grid item sm={3} xs={12}>
+        <Grid id="originSched" item sm={3} xs={12}>
           <PortInput
             label="Origin"
             ports={ports || []}
@@ -131,7 +131,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
             onClose={() => setOriginPortOpen(false)}
           />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid id="destinationSched" item sm={3} xs={12}>
           <PortInput
             label="Destination"
             ports={ports || []}
@@ -143,7 +143,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
             onClose={() => setDestinationPortOpen(false)}
           />
         </Grid>
-        <Grid item sm="auto" xs={6}>
+        <Grid id="dateSched" item sm="auto" xs={6}>
           <DateInput
             value={date}
             onChange={handleDateChange}
@@ -152,7 +152,7 @@ const RouteSearchBar: React.FC<Props> = ({ value, onChange, onSearch, paperVisib
             onClose={() => setDateOpen(false)}
           />
         </Grid>
-        <Grid item sm="auto" xs={6}>
+        <Grid id="weeksSched" item sm="auto" xs={6}>
           <WeeksInput
             value={weeks}
             onChange={handleWeeksChange}

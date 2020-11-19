@@ -541,6 +541,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   return (
     <Box
+      id="checklistItemRow"
       display="flex"
       justifyContent="space-between"
       my={1}
@@ -609,7 +610,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           </Box>
           <Box flex="1" />
           <Box display="flex">
-            <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
+            <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
               {/*<Badge badgeContent={checklistItem.mentionCount || 0} color="primary">*/}
               <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
               {/*</Badge>*/}

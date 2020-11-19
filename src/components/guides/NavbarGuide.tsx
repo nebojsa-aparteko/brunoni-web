@@ -1,10 +1,11 @@
-import React from 'react';
 import Shepherd from 'shepherd.js';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import IconButton from '@material-ui/core/IconButton';
-import 'shepherd.js/dist/css/shepherd.css';
 
-let navbarShepherdTour: Shepherd.Tour = new Shepherd.Tour({
+const handleFinishNavbarGuide = () => {
+  localStorage.setItem('finishedNavbarGuide', 'true');
+  navbarShepherdTour.next();
+};
+
+export let navbarShepherdTour: Shepherd.Tour = new Shepherd.Tour({
   useModalOverlay: true,
   exitOnEsc: true,
   defaultStepOptions: {
@@ -173,19 +174,20 @@ navbarShepherdTour.addSteps([
     attachTo: { element: '#logOutNav', on: 'right' },
     buttons: [
       {
-        text: 'Finish tour',
+        text: 'Next',
         action: navbarShepherdTour.next,
       },
     ],
   },
+  {
+    title: 'Help',
+    text: 'If needed, you can start the guide again at any moment by clicking on this button.',
+    attachTo: { element: '#helpButtonNav', on: 'bottom' },
+    buttons: [
+      {
+        text: 'Finish',
+        action: handleFinishNavbarGuide,
+      },
+    ],
+  },
 ]);
-
-const TourButton = () => {
-  return (
-    <IconButton aria-label="tour-button-icon" onClick={navbarShepherdTour.start} style={{ padding: 8 }}>
-      <HelpOutlineIcon color="disabled" fontSize="default" />
-    </IconButton>
-  );
-};
-
-export default TourButton;
