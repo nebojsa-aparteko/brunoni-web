@@ -188,7 +188,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         )
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord, enqueueSnackbar],
+    [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],
   );
   const [anchorEl, setAnchorEl] = React.useState(null);
 

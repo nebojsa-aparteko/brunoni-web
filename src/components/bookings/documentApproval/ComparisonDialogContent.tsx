@@ -60,11 +60,13 @@ const useStyles = makeStyles(theme =>
 
 const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name, children }) => {
   return (
-    <Box width="100%" position="relative" display="flex" flexDirection="column">
+    <Box width="100%" height="100%" position="relative" display="flex" flexDirection="column">
       <Paper style={{ padding: 8, maxWidth: '48vw' }}>
         <Typography style={{ fontWeight: 'bolder' }}>{name}</Typography>
       </Paper>
-      <Box style={{ flexFlow: 'column scroll', backgroundColor: 'grey', overflow: 'auto' }}>{children}</Box>
+      <Box style={{ flexFlow: 'column scroll', height: '100%', backgroundColor: 'grey', overflow: 'auto' }}>
+        {children}
+      </Box>
     </Box>
   );
 };
@@ -75,11 +77,11 @@ const renderDocument = (document: ChecklistItemValueDocument, fileType: string |
       <PDFViewer file={document} />
     ) : fileType === 'html' ? (
       <div>
-        <HTMLViewer file={{ url: document.url }} />
+        <HTMLViewer url={document.url} />
       </div>
-    ) : fileType === 'xlsx' || fileType === 'xls' ? (
-      <div>
-        <XLSXViewer file={{ url: document.url }} />
+    ) : fileType && ['xlsx', 'xls', 'xml', 'csv'].includes(fileType) ? (
+      <div style={{ backgroundColor: 'grey' }}>
+        <XLSXViewer url={document.url} />
       </div>
     ) : (
       <Typography style={{ flex: 1, margin: 'auto' }}>
@@ -120,7 +122,7 @@ const ComparisonDialogContent = ({
   })) as ActivityLogItem[];
 
   const filteredActivities = activityCollection?.filter(activity => activity.documents && activity.documents);
-
+  console.log('rerender');
   return (
     <Grid
       container

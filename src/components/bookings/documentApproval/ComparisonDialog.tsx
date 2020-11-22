@@ -95,10 +95,12 @@ const ComparisonDialog: React.FC<Props> = ({
   }, [sortedDocuments]);
 
   const handleChangeLeftDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
+    event.stopPropagation();
     setLeftDocument(sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument);
   };
 
   const handleChangeRightDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
+    event.stopPropagation();
     setRightDocument(sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
   };
 

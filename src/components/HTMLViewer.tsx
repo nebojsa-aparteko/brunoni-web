@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import isString from '../utilities/isString';
 
 const HTMLViewer: React.FC<{
-  file: string | { url: string };
-}> = ({ file }) => {
-  const [fileData, setFileData] = useState(isString(file) ? file : undefined);
+  url: string;
+}> = ({ url }) => {
+  const [fileData, setFileData] = useState(url);
 
   useEffect(() => {
-    if (isString(file)) return;
-    fetch(file.url)
-      .then(response => response.text())
-      .then(response => {
-        setFileData(response);
-      });
-  }, [file]);
+    if (url)
+      fetch(url)
+        .then(response => response.text())
+        .then(response => {
+          setFileData(response);
+        });
+  }, [url]);
 
   return fileData ? <div dangerouslySetInnerHTML={{ __html: fileData }} /> : null;
 };
