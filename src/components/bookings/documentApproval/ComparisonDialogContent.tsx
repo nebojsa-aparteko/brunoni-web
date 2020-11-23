@@ -122,7 +122,7 @@ const ComparisonDialogContent = ({
   })) as ActivityLogItem[];
 
   const filteredActivities = activityCollection?.filter(activity => activity.documents && activity.documents);
-  console.log('rerender');
+
   return (
     <Grid
       container
