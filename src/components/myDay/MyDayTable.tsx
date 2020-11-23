@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
-import Task from '../../model/Task';
-import MyDayTableRow from './MyDayTableRow';
+import Task, { TaskCategory } from '../../model/Task';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
+import MyDayTableRow from './MyDayTableRow';
 
 const MyDayTable: React.FC<Props> = ({
   tasks,
@@ -12,6 +12,8 @@ const MyDayTable: React.FC<Props> = ({
   selectedTasks,
   onSelectRow,
   updateComponent,
+  taskCategory,
+  handleOpenPreviewDialog,
 }) => {
   return (
     <Fragment>
@@ -28,7 +30,7 @@ const MyDayTable: React.FC<Props> = ({
                 <TableCell align="center">Assigned To</TableCell>
                 <TableCell align="center">Due Date</TableCell>
                 <TableCell align="center">Task status</TableCell>
-                <TableCell align="center" />
+                {taskCategory === TaskCategory.OPERATIONS && <TableCell align="center" />}
                 <TableCell align="center" />
               </TableRow>
             </TableHead>
@@ -38,8 +40,10 @@ const MyDayTable: React.FC<Props> = ({
                   task={task}
                   key={`${task.bookingId}/${task.id}`}
                   selected={selectedTasks.includes(`${task.bookingId}/${task.id}`)}
-                  onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}`)}
+                  onSelectRow={event => onSelectRow(event, `${task.bookingId}/${task.id}`)}
                   updateComponent={updateComponent}
+                  handleOpenPreviewDialog={handleOpenPreviewDialog}
+                  taskCategory={taskCategory}
                 />
               ))}
               {normalizedTasks ? (
@@ -57,8 +61,10 @@ const MyDayTable: React.FC<Props> = ({
                           task={task}
                           key={`${task.bookingId}/${task.id}-${normalizedTask[0]}`}
                           selected={selectedTasks.includes(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
-                          onSelectRow={() => onSelectRow(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
+                          onSelectRow={event => onSelectRow(event, `${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
                           updateComponent={updateComponent}
+                          handleOpenPreviewDialog={handleOpenPreviewDialog}
+                          taskCategory={taskCategory}
                         />
                       ))}
                     </Fragment>
@@ -81,7 +87,9 @@ interface Props {
   tasks: Task[];
   normalizedTasks: [string, Task[]][] | undefined;
   shouldShowTeamTasks: boolean;
-  onSelectRow: (id: string) => void;
+  onSelectRow: (event: React.MouseEvent<HTMLElement>, id: string) => void;
   selectedTasks: string[];
   updateComponent: () => void;
+  taskCategory: TaskCategory;
+  handleOpenPreviewDialog: (bookingId: string) => void;
 }

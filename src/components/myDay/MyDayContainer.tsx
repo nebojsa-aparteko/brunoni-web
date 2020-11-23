@@ -29,6 +29,8 @@ import { getTaskFilter } from '../TaskStatusChip';
 import Task, { TaskCategory, UserRole } from '../../model/Task';
 import { Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
+import { showCrispChat } from '../../index';
+import PaymentOverviewDialog from '../finance/PaymentOverviewDialog';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -36,14 +38,19 @@ const MyDayContainer = () => {
   const users = useAdminUsers();
   const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
+
   //we use this only to render again after assigning users, because we dont work with live data
   const [assignedUserTrigger, setAssignedUserTrigger] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const onSelectRow = useCallback(
-    (id: string) =>
+    (event: React.MouseEvent<HTMLElement>, id: string) => {
+      event.stopPropagation();
       setSelectedTasks(prevState =>
         selectedTasks.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
-      ),
+      );
+    },
     [selectedTasks],
   );
 
@@ -56,6 +63,7 @@ const MyDayContainer = () => {
     },
     [filters, setFilters],
   );
+
   const filteredTeams = useMemo(() => teams?.filter(t => t.teamType === taskCategory.toLowerCase()), [
     teams,
     taskCategory,
@@ -64,7 +72,9 @@ const MyDayContainer = () => {
   useEffect(() => {
     //calling this only once on load
     if (setFilters) {
-      setFilters(set('taskCategory', localStorage.getItem('taskCategory') as TaskCategory)(filters));
+      setFilters(
+        set('taskCategory', (localStorage.getItem('taskCategory') as TaskCategory) || TaskCategory.OPERATIONS)(filters),
+      );
     }
   }, []);
 
@@ -159,6 +169,22 @@ const MyDayContainer = () => {
         });
     });
   }, [selectedTasks, assignTo]);
+
+  const handleDialogClose = useCallback(() => {
+    showCrispChat(true);
+    setIsDialogOpen(false);
+    setOpenBooking(undefined);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(
+    (bookingId: string) => {
+      showCrispChat(false);
+      setIsDialogOpen(true);
+      setOpenBooking(bookingId);
+    },
+    [setIsDialogOpen],
+  );
+
   return (
     <Card>
       <CardHeader
@@ -244,9 +270,14 @@ const MyDayContainer = () => {
             selectedTasks={selectedTasks}
             onSelectRow={onSelectRow}
             updateComponent={() => setAssignedUserTrigger(prevState => !prevState)}
+            taskCategory={taskCategory}
+            handleOpenPreviewDialog={handleDialogOpen}
           />
         ) : (
           <ChartsCircularProgress />
+        )}
+        {isDialogOpen && (
+          <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
         )}
       </CardContent>
     </Card>
