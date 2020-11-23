@@ -34,8 +34,9 @@ import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { addDays } from 'date-fns';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
 import { showCrispChat } from '../../index';
-import { Currency, DebitCredit } from '../../model/Payment';
+import { Currency } from '../../model/Payment';
 import useUser from '../../hooks/useUser';
+import { GlobalContext } from '../../store/GlobalStore';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -122,7 +123,7 @@ const postponePayments = async (offset: number, user: any, weeklyPayment: Weekly
 };
 
 const PaymentOverviewContainer = () => {
-  const overviewData = usePaymentOverview(DebitCredit.DEBIT) as WeeklyPayment[];
+  const overviewData = usePaymentOverview() as WeeklyPayment[];
 
   const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
@@ -132,6 +133,7 @@ const PaymentOverviewContainer = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
   const [user] = useUser();
+  const [, dispatch] = useContext(GlobalContext);
 
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
@@ -215,6 +217,7 @@ const PaymentOverviewContainer = () => {
 
   const handleChangePayDates = useCallback(
     (offset: number) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
       const selectedPaymentsObjects = filteredOverviewData.filter(
         payment => payment.id && selectedPayments && selectedPayments.indexOf(payment.id) > -1,
       );
@@ -236,7 +239,8 @@ const PaymentOverviewContainer = () => {
           );
         })
         .then(_ => {
-          setSelectedPayments([]);
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
             autoHideDuration: 1500,
@@ -248,9 +252,10 @@ const PaymentOverviewContainer = () => {
             variant: 'error',
             autoHideDuration: 3000,
           });
-        });
+        })
+        .finally(() => setSelectedPayments([]));
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect, user],
+    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect, user, dispatch],
   );
 
   return (
@@ -346,7 +351,9 @@ const PaymentOverviewContainer = () => {
           handleSelect={handleSelect}
           handleOpenPreviewDialog={handleDialogOpen}
         />
-        <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+        {isDialogOpen && (
+          <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+        )}
       </CardContent>
     </Card>
   );

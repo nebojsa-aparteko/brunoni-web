@@ -37,6 +37,7 @@ import DropZone from '../../DropZone';
 import { addDays } from 'date-fns';
 import { DebitCredit } from '../../../model/Payment';
 import useUser from '../../../hooks/useUser';
+import { GlobalContext } from '../../../store/GlobalStore';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -173,6 +174,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [user] = useUser();
+  const [, dispatch] = useContext(GlobalContext);
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -302,20 +304,26 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 
   const handleChangePayDate = useCallback(
     (offset: number) => {
-      return Promise.resolve(postponePayment(offset, user, payment)).then(_ => {
-        handleClose();
-        storeAccountingActivity(() =>
-          addActivityItem(
-            booking!.id,
-            createActivityObject({
-              changeType: ActivityChangeType.POSTPONE_PAYMENT,
-              by: getActivityLogUserData(),
-              isAccountingActivity: true,
-              paymentReference: payment.reference,
-            }),
-          ),
-        );
-      });
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      return Promise.resolve(postponePayment(offset, user, payment))
+        .then(_ => {
+          handleClose();
+          storeAccountingActivity(() =>
+            addActivityItem(
+              booking!.id,
+              createActivityObject({
+                changeType: ActivityChangeType.POSTPONE_PAYMENT,
+                by: getActivityLogUserData(),
+                isAccountingActivity: true,
+                paymentReference: payment.reference,
+              }),
+            ),
+          );
+        })
+        .finally(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          handleClose();
+        });
     },
     [payment, booking, getActivityLogUserData, storeAccountingActivity, user],
   );
@@ -325,20 +333,25 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
       payment.status === WeeklyPaymentStatus.BLOCKED
         ? ActivityChangeType.REVERT_PAYMENT_APPROVAL
         : ActivityChangeType.APPROVE_PAYMENT;
-    return approveWeeklyPayment(user, payment).then(_ => {
-      handleDialogClose();
-      storeAccountingActivity(() =>
-        addActivityItem(
-          booking!.id,
-          createActivityObject({
-            changeType: activityType,
-            by: getActivityLogUserData(),
-            isAccountingActivity: true,
-            paymentReference: payment.reference,
-          }),
-        ),
-      );
-    });
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    return approveWeeklyPayment(user, payment)
+      .then(_ => {
+        handleDialogClose();
+        storeAccountingActivity(() =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject({
+              changeType: activityType,
+              by: getActivityLogUserData(),
+              isAccountingActivity: true,
+              paymentReference: payment.reference,
+            }),
+          ),
+        );
+      })
+      .finally(() => {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      });
   }, [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose, user]);
 
   return (
