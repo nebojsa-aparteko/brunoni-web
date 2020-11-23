@@ -61,7 +61,8 @@
     "react-stickynode": "^2.1.1",
     "react-use": "^14.1.0",
     "typescript": "^3.9.2",
-    "xlsx": "^0.16.8"
+    "xlsx": "^0.16.8",
+    "shepherd.js": "^8.1.0"
   },
   "scripts": {
     "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
