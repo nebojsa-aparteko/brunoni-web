@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   createStyles,
   Dialog,
@@ -12,8 +12,9 @@ import {
 import { Booking } from '../../model/Booking';
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandingBookingContent from '../bookings/documentApproval/ExpandingBookingContent';
-import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import AccountingTabContent from '../bookings/accountingTab/AccountingTabContent';
+import firebase from '../../firebase';
+import { normalizeBooking } from '../../providers/BookingsProvider';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -47,11 +48,23 @@ const useStyles = makeStyles(() =>
   }),
 );
 
+const getBooking = (bookingId: string) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .get();
+
 const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId }) => {
   const classes = useStyles();
-  const bookingSnapshot = useFirestoreDocument('bookings', bookingId);
-  const booking = bookingSnapshot ? ({ id: bookingSnapshot.id, ...bookingSnapshot.data() } as Booking) : undefined;
+  const [booking, setBooking] = useState<Booking | undefined>();
+  useEffect(() => {
+    if (!bookingId) return;
 
+    getBooking(bookingId).then(b => {
+      setBooking(normalizeBooking(b.data()) as Booking);
+    });
+  }, [bookingId]);
   return (
     <Dialog
       open={isOpen}

@@ -218,16 +218,18 @@ const BookingsPageContainer: React.FC = () => {
         </Box>
       ) : (
         <Box className={classes.tabContainer}>
-          <Tabs
-            value={selectedTab}
-            onChange={setSelectedTab}
-            orientation="vertical"
-            aria-label="Booking tabs"
-            className={classes.tabs}
-          >
-            <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
-            <Tab icon={<ArchiveIcon />} label="History" {...a11yProps(1)} />
-          </Tabs>
+          <div id="tabsBkgPage">
+            <Tabs
+              value={selectedTab}
+              onChange={setSelectedTab}
+              orientation="vertical"
+              aria-label="Booking tabs"
+              className={classes.tabs}
+            >
+              <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
+              <Tab icon={<ArchiveIcon />} label="History" {...a11yProps(1)} />
+            </Tabs>
+          </div>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
           </TabPanel>

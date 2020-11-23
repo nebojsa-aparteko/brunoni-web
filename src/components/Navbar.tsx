@@ -37,6 +37,18 @@ import NotificationsButton from './notifications/NotificationsButton';
 import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
 import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
 import { Omit } from '@material-ui/types';
+import { camelCase } from 'lodash';
+import GuideButton from './GuideButton';
+import Shepherd from 'shepherd.js';
+import { bookingsTableShepherdTour } from './guides/BookingsTableGuide';
+import { quotesShepherdTour } from './guides/QuotesGuide';
+import { dashboardShepherdTour } from './guides/DashboardGuide';
+import { scheduleShepherdTour } from './guides/ScheduleGuide';
+import { myDayShepherdTour } from './guides/MyDayGuide';
+import { bookingShepherdTour } from './guides/BookingGuide';
+import { quoteShepherdTour } from './guides/QuoteGuide';
+import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
+import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -125,6 +137,29 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
   },
 }));
 
+const getPageGuide = () => {
+  switch (window.location.pathname) {
+    case '':
+      return dashboardShepherdTour;
+    case '/schedule' || '/schedule/':
+      return scheduleShepherdTour;
+    case '/bookings' || '/bookings/':
+      return bookingsTableShepherdTour;
+    case '/quotes/groups' || '/quotes/groups/':
+      return quotesShepherdTour;
+    case '/quotes/get' || '/quotes/get/':
+      return getQuotesShepherdTour;
+    case '/my-day' || '/my-day/':
+      return myDayShepherdTour;
+    default: {
+      if (window.location.pathname.startsWith('/bookings/')) return bookingShepherdTour;
+      if (window.location.pathname.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
+      if (window.location.pathname.startsWith('/quotes/')) return quoteShepherdTour;
+      return undefined;
+    }
+  }
+};
+
 interface ListItemLinkProps {
   icon?: React.ReactElement;
   primary: string;
@@ -147,7 +182,7 @@ function ListItemLink(props: ListItemLinkProps) {
   );
 
   return (
-    <li>
+    <li id={camelCase(primary) + 'Nav'}>
       <ListItem button component={renderLink} onClick={onClick}>
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
@@ -161,7 +196,7 @@ function ButtonMenuItem(props: ListItemLinkProps) {
   const { primary, to, variant, typographyStyle, color } = props;
 
   return (
-    <div className={classes.item}>
+    <div className={classes.item} id={camelCase(primary) + 'Nav'}>
       <Button component={RouterLink} variant={variant} color={color} to={to}>
         <Typography variant="body1" style={typographyStyle}>
           {primary}
@@ -183,7 +218,7 @@ function MenuItemLink(props: ListItemLinkProps) {
   );
 
   return (
-    <MenuItem onClick={onClick} component={renderLink}>
+    <MenuItem id={camelCase(primary) + 'Nav'} onClick={onClick} component={renderLink}>
       {primary}
     </MenuItem>
   );
@@ -200,6 +235,11 @@ const Navbar: React.FC = () => {
   }, [setIsSearchDialogOpen]);
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [guide, setGuide] = useState<Shepherd.Tour | undefined>(undefined);
+
+  useEffect(() => {
+    setGuide(getPageGuide());
+  }, [window.location.pathname]);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
@@ -255,7 +295,7 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <div className={classes.item}>
+                        <div id="otherMenuNav" className={classes.item}>
                           <Button
                             endIcon={<KeyboardArrowDownIcon />}
                             aria-controls="simple-menu"
@@ -326,6 +366,7 @@ const Navbar: React.FC = () => {
                         typographyStyle={{ color: 'white' }}
                       />
                       <IconButton
+                        id="quickSearchNav"
                         buttonRef={quickSearchButtonRef}
                         onClick={() => setIsSearchDialogOpen(true)}
                         style={{ padding: 8 }}
@@ -365,11 +406,14 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
                 ) : null}
-                <div className={classes.item}>{user !== undefined && user !== null && <NotificationsButton />}</div>
-                <div className={classes.item}>
+                <div id="notificationsNav" className={classes.item}>
+                  {user !== undefined && user !== null && <NotificationsButton />}
+                </div>
+                <div id="identityWidgetNav" className={classes.item}>
                   <IdentityWidget />
                 </div>
               </Box>
+              {guide && actingAs !== null && <GuideButton guide={guide} />}
             </Toolbar>
           </Container>
         </AppBar>

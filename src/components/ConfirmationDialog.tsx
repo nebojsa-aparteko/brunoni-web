@@ -5,14 +5,17 @@ import {
   createStyles,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
   makeStyles,
+  Theme,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     closeModal: {
       position: 'absolute',
@@ -26,6 +29,9 @@ const useStyles = makeStyles(() =>
       justifyContent: 'space-evenly',
       alignItems: 'center',
     },
+    content: {
+      margin: theme.spacing(3),
+    },
   }),
 );
 
@@ -34,9 +40,16 @@ interface ConfirmationDialogProps {
   label: string;
   handleConfirm: () => void;
   handleClose: () => void;
+  description: string;
 }
 
-const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ isOpen, label, handleConfirm, handleClose }) => {
+const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
+  isOpen,
+  label,
+  description,
+  handleConfirm,
+  handleClose,
+}) => {
   const classes = useStyles();
 
   return (
@@ -48,6 +61,11 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ isOpen, label, 
             <CloseIcon />
           </IconButton>
         </DialogTitle>
+        <DialogContent>
+          <Typography className={classes.content}>{description}</Typography>
+        </DialogContent>
+        <Divider />
+
         <DialogActions className={classes.dialogActions}>
           <Button onClick={handleClose} color="primary" variant="outlined">
             Cancel

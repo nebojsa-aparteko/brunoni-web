@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
 import PaymentOverviewTable from './PaymentOverviewTable';
-import usePaymentOverview from '../../hooks/usePaymentOverview';
 import {
   Box,
   Card,
@@ -17,7 +16,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import { set } from 'lodash/fp';
-import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
 import { startOfDay } from 'date-fns/fp';
 import CarrierInput from '../inputs/CarrierInput';
@@ -25,8 +23,10 @@ import theme from '../../theme';
 import Carriers from '../../contexts/Carriers';
 import PaymentOverviewDialog from './PaymentOverviewDialog';
 import { showCrispChat } from '../../index';
-import { Currency, DebitCredit } from '../../model/Payment';
-import Commission, { CommissionStatus } from '../../model/Commission';
+import { Currency } from '../../model/Payment';
+import { CommissionStatus } from '../../model/Commission';
+import useCommissions from '../../hooks/useCommissions';
+import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -53,9 +53,9 @@ const MenuProps = {
 };
 
 const CommissionOverviewContainer = () => {
-  const overviewData = usePaymentOverview(DebitCredit.CREDIT) as Commission[];
+  const overviewData = useCommissions();
 
-  const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
+  const [filters, setFilters] = useCommissionFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
   const carriers = useContext(Carriers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -76,26 +76,25 @@ const CommissionOverviewContainer = () => {
     [setIsDialogOpen],
   );
 
-  const { currency, paymentDate, carrier, commissionStatus } = filters;
+  const { currency, dueDate, carrier, commissionStatus } = filters;
 
   const classes = useStyles();
 
   const onCurrencyChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters) setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
+      setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
     },
     [setFilters],
   );
   const onStatusChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters)
-        setFilters(prevState => set('commissionStatus', event.target.value as CommissionStatus[])(prevState));
+      setFilters(prevState => set('commissionStatus', event.target.value as CommissionStatus[])(prevState));
     },
     [setFilters],
   );
   const handleDateChange = useCallback(
     (date: Date) => {
-      if (setFilters) setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
+      setFilters(prevState => set('dueDate', startOfDay(date))(prevState));
       setDateOpen(false);
     },
     [setFilters],
@@ -162,7 +161,7 @@ const CommissionOverviewContainer = () => {
           </FormControl>
           <Box className={classes.spacer}>
             <DateInput
-              value={paymentDate}
+              value={dueDate}
               onChange={handleDateChange}
               open={dateOpen}
               onOpen={() => setDateOpen(true)}

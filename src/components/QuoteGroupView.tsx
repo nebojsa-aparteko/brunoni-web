@@ -344,7 +344,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
             ))}
           </Grid>
         </Box>
-        <Box mb={6}>
+        <Box id="optionsQuoteGroup" mb={6}>
           {quotesByCarrier?.map(([carrierId, quotes], index) => {
             // need to find all of the quoteDetail items across provided quotes
             const quoteDetailItemsMerged = flow(
@@ -380,10 +380,12 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
                       {carriers?.find(carrier => carrier.id === carrierId)?.name || carrierId}
                     </Typography>
                     <Box flex="1" />
-                    <UserAssignment
-                      onChange={(user: UserRecord | null) => setAssignedUser(user, quotes)}
-                      value={(quotes[0] as Quote).assignedTo}
-                    />
+                    <div id="assignedAdminQuoteGroup">
+                      <UserAssignment
+                        onChange={(user: UserRecord | null) => setAssignedUser(user, quotes)}
+                        value={(quotes[0] as Quote).assignedTo}
+                      />
+                    </div>
                   </ExpansionPanelSummary>
 
                   <ExpansionPanelDetails>

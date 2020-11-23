@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import { Route, Switch } from 'react-router';
-import { makeStyles, Theme } from '@material-ui/core';
+import { Backdrop, CircularProgress, makeStyles, Theme } from '@material-ui/core';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -40,6 +40,7 @@ import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 import firebase from './firebase';
 import CommissionsPage from './pages/CommissionsPage';
+import { GlobalContext } from './store/GlobalStore';
 
 const anonymousRoutes = (
   <Switch>
@@ -130,12 +131,18 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(7),
     },
   },
+  backdrop: {
+    zIndex: 10000,
+    color: '#fff',
+  },
 }));
 
 const App: React.FC = () => {
   const classes = useStyles();
   const [user] = useUser();
   const history = useHistory();
+  const [state] = useContext(GlobalContext);
+  const { isGlobalLoadingInProgress } = state;
 
   // If we come from email notification, we want to read that notification and delete it from url
   useEffect(() => {
@@ -160,6 +167,9 @@ const App: React.FC = () => {
         <BookingListPaginationProvider>
           <BookingListFilterProvider>
             <Navbar />
+            <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
+              <CircularProgress color="inherit" />
+            </Backdrop>
             <div className={classes.deviceControl}>
               {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
             </div>

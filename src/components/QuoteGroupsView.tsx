@@ -169,15 +169,17 @@ const QuoteGroupsView: React.FC<Props> = ({
                     Quotes
                   </Typography>
                   {showGetQuoteButton && (
-                    <Box ml={4}>
+                    <Box id="getQuoteQuotes" ml={4}>
                       <GetQuotesButton />
                     </Box>
                   )}
                   <Box flex={1} />
-                  <Search
-                    onSearch={handleSearch}
-                    style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
-                  />
+                  <div id="searchQuotes">
+                    <Search
+                      onSearch={handleSearch}
+                      style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
+                    />
+                  </div>
                 </Box>
               }
             />

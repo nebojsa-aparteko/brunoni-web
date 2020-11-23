@@ -1,5 +1,16 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Box, Button, Card, CardContent, CardHeader, Grid, Switch, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  FormControlLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useTasks, { normalizeTaskData } from '../../hooks/useTasks';
 import MyDayTable from './MyDayTable';
@@ -45,6 +56,10 @@ const MyDayContainer = () => {
     },
     [filters, setFilters],
   );
+  const filteredTeams = useMemo(() => teams?.filter(t => t.teamType === taskCategory.toLowerCase()), [
+    teams,
+    taskCategory,
+  ]);
 
   useEffect(() => {
     //calling this only once on load
@@ -65,8 +80,8 @@ const MyDayContainer = () => {
   }, [assignee, actingAs]);
 
   useEffect(() => {
-    if (teams) {
-      teams
+    if (filteredTeams) {
+      filteredTeams
         ?.reduce(async (previousValue, currentValue) => {
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
@@ -99,7 +114,7 @@ const MyDayContainer = () => {
         }, Promise.resolve([] as [string, Task[]][]))
         .then(n => setNormalizedTasks(n || []));
     }
-  }, [teams, setNormalizedTasks, assignedUserTrigger]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -194,18 +209,28 @@ const MyDayContainer = () => {
             <Box display="flex" alignItems="center">
               <Typography component="div">
                 <Grid component="label" container alignItems="center" spacing={1}>
-                  <Grid item>Operations</Grid>
                   <Grid item>
-                    <Switch
-                      checked={taskCategory === TaskCategory.ACCOUNTING}
-                      onChange={(_, checked) =>
-                        onCategoryChange(checked ? TaskCategory.ACCOUNTING : TaskCategory.OPERATIONS)
-                      }
-                      name="taskCategorySwitch"
-                      color="primary"
-                    />
+                    <RadioGroup
+                      aria-label="taskCategory"
+                      name="taskCategory"
+                      value={taskCategory}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        onCategoryChange(event.target.value as TaskCategory);
+                      }}
+                      style={{ flexDirection: 'row' }}
+                    >
+                      <FormControlLabel value={TaskCategory.OPERATIONS} control={<Radio />} label="Operations" />
+                      <FormControlLabel value={TaskCategory.ACCOUNTING} control={<Radio />} label="Accounting" />
+                    </RadioGroup>
+                    {/*<Switch*/}
+                    {/*  checked={taskCategory === TaskCategory.ACCOUNTING}*/}
+                    {/*  onChange={(_, checked) =>*/}
+                    {/*    onCategoryChange(checked ? TaskCategory.ACCOUNTING : TaskCategory.OPERATIONS)*/}
+                    {/*  }*/}
+                    {/*  name="taskCategorySwitch"*/}
+                    {/*  color="primary"*/}
+                    {/*/>*/}
                   </Grid>
-                  <Grid item>Accounting</Grid>
                 </Grid>
               </Typography>
             </Box>

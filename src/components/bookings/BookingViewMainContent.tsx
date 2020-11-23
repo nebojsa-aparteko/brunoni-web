@@ -48,7 +48,7 @@ const BookingViewMainContent = ({ booking, isPrintWithCost }: Props) => {
 
   return (
     <Page title={getBookingTitle(booking)}>
-      <Box marginTop="1em" marginBottom="0em">
+      <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
         <BookingSummary booking={booking} bookingAgent={bookingAgent} />
       </Box>
       <Box marginTop="0em" marginBottom="0em">
@@ -63,24 +63,26 @@ const BookingViewMainContent = ({ booking, isPrintWithCost }: Props) => {
           remarks={booking.Remarks}
         />
       </Box>
-      {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
-        <Fragment>
-          <Box marginTop="0em" marginBottom="0em">
-            <PortTerms portTerms={booking.PortTerms} />
-          </Box>
-          <Box marginTop="0em" marginBottom="0em">
-            <SpecialRemarks remarks={specialRemarks} />
-          </Box>
-        </Fragment>
-      ) : null}
+      <Box id="otherBookingInfoBkg">
+        {isLongVersion(booking.Version) && !isImport(booking?.Category) ? (
+          <Fragment>
+            <Box id="portTermsBkg" marginTop="0em" marginBottom="0em">
+              <PortTerms portTerms={booking.PortTerms} />
+            </Box>
+            <Box marginTop="0em" marginBottom="0em">
+              <SpecialRemarks remarks={specialRemarks} />
+            </Box>
+          </Fragment>
+        ) : null}
 
-      {booking.FreightDetails && (
-        <Box marginTop="0em" marginBottom="0em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
-          <BookingFreight freightDetails={booking.FreightDetails} />
+        {booking.FreightDetails && (
+          <Box marginTop="0em" marginBottom="0em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
+            <BookingFreight freightDetails={booking.FreightDetails} />
+          </Box>
+        )}
+        <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
+          <BookingRemarks booking={booking} />
         </Box>
-      )}
-      <Box style={{ paddingTop: '10px', textAlign: 'justify' }}>
-        <BookingRemarks booking={booking} />
       </Box>
     </Page>
   );

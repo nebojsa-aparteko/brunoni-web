@@ -16,7 +16,7 @@ export interface WeeklyPaymentFilterContext {
 export const TASK_FILTERS_INITIAL_STATE = {
   currency: [Currency.USD],
   paymentDate: startOfDay(new Date()),
-  status: [WeeklyPaymentStatus.IN_PROGRESS, WeeklyPaymentStatus.APPROVED],
+  status: [WeeklyPaymentStatus.IN_PROGRESS, WeeklyPaymentStatus.BLOCKED],
   commissionStatus: [CommissionStatus.INVOICED],
 } as WeeklyPaymentFilterContext;
 

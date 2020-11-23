@@ -326,7 +326,7 @@ const GetQuotes: React.FC<Props> = () => {
               </Typography>
             </Box>
             <Grid container spacing={2}>
-              <Grid item sm={4} xs={12}>
+              <Grid id="originGetQuote" item sm={4} xs={12}>
                 <PortInput
                   label="Origin"
                   ports={ports || []}
@@ -338,7 +338,7 @@ const GetQuotes: React.FC<Props> = () => {
                   onClose={() => setOriginPortOpen(false)}
                 />
               </Grid>
-              <Grid item sm={4} xs={12}>
+              <Grid id="destinationGetQuote" item sm={4} xs={12}>
                 <PortInput
                   label="Destination"
                   ports={ports || []}
@@ -350,7 +350,7 @@ const GetQuotes: React.FC<Props> = () => {
                   onClose={() => setDestinationPortOpen(false)}
                 />
               </Grid>
-              <Grid item sm={2} xs={6}>
+              <Grid id="earliestDateGetQuote" item sm={2} xs={6}>
                 <DateInput
                   value={date}
                   onChange={handleDateChange}
@@ -359,7 +359,7 @@ const GetQuotes: React.FC<Props> = () => {
                   onClose={closeDialog}
                 />
               </Grid>
-              <Grid item sm={2} xs={6}>
+              <Grid id="weeksGetQuote" item sm={2} xs={6}>
                 <WeeksInput
                   value={weeks}
                   onChange={handleWeeksChange}
@@ -368,7 +368,7 @@ const GetQuotes: React.FC<Props> = () => {
                   onClose={() => setWeeksOpen(false)}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid id="addCargoGetQuote" item xs={12}>
                 <Typography variant="h5" gutterBottom>
                   Containers
                 </Typography>
@@ -383,7 +383,7 @@ const GetQuotes: React.FC<Props> = () => {
                   onChange={setContainers}
                 />
               </Grid>
-              <Grid item sm="auto" xs={12}>
+              <Grid id="requestGetQuote" item sm="auto" xs={12}>
                 <Button
                   variant="contained"
                   size="large"

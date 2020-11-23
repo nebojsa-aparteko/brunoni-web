@@ -343,7 +343,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         </Page>
       </Grid>
       <Grid item md={4} xs={12}>
-        <Box displayPrint="none">
+        <Box id="checklistBkg" displayPrint="none">
           <CheckList booking={booking} onTabChange={setSelectedTab} />
         </Box>
       </Grid>

@@ -62,10 +62,10 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
             </Box>
           </Grid>
         )}
-        <Grid item sm={3} xs={12}>
+        <Grid id="originQuotes" item sm={3} xs={12}>
           <PortInput label="Origin" ports={ports || []} value={originPort} onChange={setOriginPort} />
         </Grid>
-        <Grid item sm={3} xs={12}>
+        <Grid id="destinationQuotes" item sm={3} xs={12}>
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
 

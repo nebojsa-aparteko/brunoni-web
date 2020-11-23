@@ -44,7 +44,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
   return (
     <Fragment>
       <ActivityLogProvider>
-        <Card>
+        <Card id="cardChecklist">
           <CardHeader
             title={
               <Tabs value={tabValue} onChange={!actingAs ? handleChangeTab : () => {}}>
