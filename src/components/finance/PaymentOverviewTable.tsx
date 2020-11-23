@@ -1,6 +1,6 @@
 import React, { Fragment, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
 import WeeklyPayment from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
@@ -13,6 +13,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
   selectedPayments,
   handleSelect,
   handleOpenPreviewDialog,
+  handleSelectDeselectAll,
 }) => {
   const total = useMemo(() => {
     return overviewData
@@ -32,7 +33,15 @@ const PaymentOverviewTable: React.FC<Props> = ({
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                {selectedPayments && <TableCell align="center" />}
+                {selectedPayments && handleSelectDeselectAll && (
+                  <TableCell align="left">
+                    <Checkbox
+                      checked={selectedPayments.length === overviewData.length}
+                      onClick={handleSelectDeselectAll}
+                      onFocus={event => event.stopPropagation()}
+                    />
+                  </TableCell>
+                )}
                 <TableCell align="left">File No.</TableCell>
                 <TableCell align="center">B/L No.</TableCell>
                 <TableCell align="center">Vessel</TableCell>
@@ -70,4 +79,5 @@ interface Props {
   selectedPayments?: string[];
   handleSelect?: (selectedId: string | undefined) => void;
   handleOpenPreviewDialog: (bookingId: string) => void;
+  handleSelectDeselectAll?: () => void;
 }

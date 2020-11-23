@@ -37,6 +37,7 @@ import { showCrispChat } from '../../index';
 import { Currency } from '../../model/Payment';
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
+import { notEmpty } from '../../utilities/notEmpty';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -258,6 +259,14 @@ const PaymentOverviewContainer = () => {
     [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect, user, dispatch],
   );
 
+  const selectDeselectAll = () => {
+    if (filteredOverviewData && selectedPayments.length !== filteredOverviewData.length) {
+      setSelectedPayments(filteredOverviewData.map(data => data.id).filter(notEmpty));
+    } else {
+      setSelectedPayments([]);
+    }
+  };
+
   return (
     <Card>
       <CardHeader
@@ -350,6 +359,7 @@ const PaymentOverviewContainer = () => {
           selectedPayments={selectedPayments || []}
           handleSelect={handleSelect}
           handleOpenPreviewDialog={handleDialogOpen}
+          handleSelectDeselectAll={selectDeselectAll}
         />
         {isDialogOpen && (
           <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
