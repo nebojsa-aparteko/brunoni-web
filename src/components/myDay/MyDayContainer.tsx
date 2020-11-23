@@ -170,6 +170,14 @@ const MyDayContainer = () => {
     });
   }, [selectedTasks, assignTo]);
 
+  const selectDeselectAll = () => {
+    if (filteredTasks && selectedTasks.length !== filteredTasks.length) {
+      setSelectedTasks(filteredTasks.map(task => `${task.bookingId}/${task.id}`));
+    } else {
+      setSelectedTasks([]);
+    }
+  };
+
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
     setIsDialogOpen(false);
@@ -272,6 +280,7 @@ const MyDayContainer = () => {
             updateComponent={() => setAssignedUserTrigger(prevState => !prevState)}
             taskCategory={taskCategory}
             handleOpenPreviewDialog={handleDialogOpen}
+            handleSelectDeselectAll={selectDeselectAll}
           />
         ) : (
           <ChartsCircularProgress />

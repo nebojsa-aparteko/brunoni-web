@@ -1,5 +1,15 @@
 import React, { Fragment } from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@material-ui/core';
+import {
+  Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@material-ui/core';
 import Task, { TaskCategory } from '../../model/Task';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
@@ -14,6 +24,7 @@ const MyDayTable: React.FC<Props> = ({
   updateComponent,
   taskCategory,
   handleOpenPreviewDialog,
+  handleSelectDeselectAll,
 }) => {
   return (
     <Fragment>
@@ -24,7 +35,13 @@ const MyDayTable: React.FC<Props> = ({
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell align="center" />
+                <TableCell align="left" style={{ paddingLeft: 4 }}>
+                  <Checkbox
+                    checked={selectedTasks.length === tasks.length}
+                    onClick={handleSelectDeselectAll}
+                    onFocus={event => event.stopPropagation()}
+                  />
+                </TableCell>
                 <TableCell align="center">Task</TableCell>
                 <TableCell align="center">File No.</TableCell>
                 <TableCell align="center">Assigned To</TableCell>
@@ -92,4 +109,5 @@ interface Props {
   updateComponent: () => void;
   taskCategory: TaskCategory;
   handleOpenPreviewDialog: (bookingId: string) => void;
+  handleSelectDeselectAll: () => void;
 }
