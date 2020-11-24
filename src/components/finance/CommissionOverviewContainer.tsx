@@ -16,8 +16,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import { set } from 'lodash/fp';
-import DateInput from '../inputs/DateInput';
-import { startOfDay } from 'date-fns/fp';
 import CarrierInput from '../inputs/CarrierInput';
 import theme from '../../theme';
 import Carriers from '../../contexts/Carriers';
@@ -27,6 +25,8 @@ import { Currency } from '../../model/Payment';
 import { CommissionStatus } from '../../model/Commission';
 import useCommissions from '../../hooks/useCommissions';
 import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
+import { DateRange } from '../daterangepicker/types';
+import DateRangeInput from '../inputs/DateRangeInput';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -56,7 +56,6 @@ const CommissionOverviewContainer = () => {
   const overviewData = useCommissions();
 
   const [filters, setFilters] = useCommissionFilterProviderContext();
-  const [dateOpen, setDateOpen] = useState<boolean>(false);
   const carriers = useContext(Carriers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
@@ -76,7 +75,7 @@ const CommissionOverviewContainer = () => {
     [setIsDialogOpen],
   );
 
-  const { currency, dueDate, carrier, commissionStatus } = filters;
+  const { currency, carrier, commissionStatus, dateRange } = filters;
 
   const classes = useStyles();
 
@@ -92,13 +91,9 @@ const CommissionOverviewContainer = () => {
     },
     [setFilters],
   );
-  const handleDateChange = useCallback(
-    (date: Date) => {
-      setFilters(prevState => set('dueDate', startOfDay(date))(prevState));
-      setDateOpen(false);
-    },
-    [setFilters],
-  );
+
+  const setDateRange = (dateRange: DateRange) =>
+    setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));
 
   const filteredOverviewData = useMemo(() => {
     return (overviewData || []).filter(
@@ -118,7 +113,7 @@ const CommissionOverviewContainer = () => {
         }
       />
       <CardContent>
-        <Box display="flex" flexDirection="row">
+        <Box display="flex" flexDirection="row" alignItems="center">
           <FormControl className={classes.formControl}>
             <InputLabel id="currency-select">Currency</InputLabel>
             <Select
@@ -159,15 +154,6 @@ const CommissionOverviewContainer = () => {
               ))}
             </Select>
           </FormControl>
-          <Box className={classes.spacer}>
-            <DateInput
-              value={dueDate}
-              onChange={handleDateChange}
-              open={dateOpen}
-              onOpen={() => setDateOpen(true)}
-              label="Commission Date"
-            />
-          </Box>
           <Box display="flex" style={{ minWidth: theme.spacing(35) }} className={classes.spacer}>
             <CarrierInput
               label={'Carriers'}
@@ -177,6 +163,9 @@ const CommissionOverviewContainer = () => {
               }}
               value={carrier}
             />
+          </Box>
+          <Box className={classes.spacer}>
+            <DateRangeInput onChange={setDateRange} value={dateRange} />
           </Box>
         </Box>
         <PaymentOverviewTable overviewData={filteredOverviewData} handleOpenPreviewDialog={handleDialogOpen} />

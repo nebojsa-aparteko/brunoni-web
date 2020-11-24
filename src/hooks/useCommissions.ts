@@ -8,16 +8,19 @@ import { useCommissionFilterProviderContext } from '../providers/CommissionFilte
 
 export default (bookingId?: string) => {
   const [filters] = useCommissionFilterProviderContext();
-  const { carrier, dueDate } = filters;
+  const { carrier, dateRange } = filters;
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       if (bookingId) {
         return collection.where('bookingId', '==', bookingId);
       }
-      let query = collection.orderBy('bookingId', 'asc').limit(100);
-      if (dueDate) {
-        query = query.where('dueDate', '==', dueDate);
+      let query = collection.limit(100);
+      if (filters.dateRange?.startDate) {
+        query = query.where('dueDate', '>=', filters.dateRange.startDate);
+      }
+      if (filters.dateRange?.endDate) {
+        query = query.where('dueDate', '<=', filters.dateRange.endDate);
       }
       if (carrier) {
         query = query.where(
@@ -26,9 +29,12 @@ export default (bookingId?: string) => {
           carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
         );
       }
+      if (dateRange) {
+        query = filters.dateRange ? query.orderBy('dueDate', 'asc') : query.orderBy('payDate', 'asc');
+      }
       return query;
     },
-    [dueDate, carrier, bookingId],
+    [dateRange, carrier, bookingId],
   );
 
   const paymentCollection = useFirestoreCollection('commission', query);

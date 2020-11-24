@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createStyles, Grid, Paper, Typography, WithStyles, withStyles } from '@material-ui/core';
-import { format, getDate, isSameMonth, isToday, isWithinInterval } from 'date-fns';
+import { format, getDate, getWeek, isSameMonth, isToday, isWithinInterval, subDays } from 'date-fns';
 import { chunks, getDaysInMonth, inDateRange, isEndOfRange, isRangeSameDay, isStartOfRange } from '../utils';
 import Header from './Header';
 import Day from './Day';
@@ -46,8 +46,8 @@ interface MonthProps extends WithStyles<typeof styles> {
 
 const Month: React.FunctionComponent<MonthProps> = props => {
   const { classes, helpers, handlers, value: date, dateRange, marker, setValue: setDate, minDate, maxDate } = props;
-
   const [back, forward] = props.navState;
+
   return (
     <Paper square elevation={0} className={classes.root}>
       <Grid container>
@@ -70,29 +70,36 @@ const Month: React.FunctionComponent<MonthProps> = props => {
 
         <Grid item container direction="column" justify="space-between" className={classes.daysContainer}>
           {chunks(getDaysInMonth(date), 7).map((week, idx) => (
-            <Grid key={idx} container direction="row" justify="center">
-              {week.map(day => {
-                const isStart = isStartOfRange(dateRange, day);
-                const isEnd = isEndOfRange(dateRange, day);
-                const isRangeOneDay = isRangeSameDay(dateRange);
-                const highlighted = inDateRange(dateRange, day) || helpers.inHoverRange(day);
+            <div key={'Week_start_' + format(week[idx], 'MM-dd-yyyy')}>
+              <div style={{ position: 'absolute', marginTop: 9, marginLeft: -8, fontSize: '0.8em', color: 'grey' }}>
+                {getWeek(subDays(week[idx], idx), { weekStartsOn: 0, firstWeekContainsDate: 4 })}
+              </div>
+              <Grid key={idx} container direction="row" justify="center">
+                {week.map(day => {
+                  const isStart = isStartOfRange(dateRange, day);
+                  const isEnd = isEndOfRange(dateRange, day);
+                  const isRangeOneDay = isRangeSameDay(dateRange);
+                  const highlighted = inDateRange(dateRange, day) || helpers.inHoverRange(day);
 
-                return (
-                  <Day
-                    key={format(day, 'MM-dd-yyyy')}
-                    filled={isStart || isEnd}
-                    outlined={isToday(day)}
-                    highlighted={highlighted && !isRangeOneDay}
-                    disabled={!isSameMonth(date, day) || !isWithinInterval(day, { start: minDate, end: maxDate })}
-                    startOfRange={isStart && !isRangeOneDay}
-                    endOfRange={isEnd && !isRangeOneDay}
-                    onClick={() => handlers.onDayClick(day)}
-                    onHover={() => handlers.onDayHover(day)}
-                    value={getDate(day)}
-                  />
-                );
-              })}
-            </Grid>
+                  return (
+                    <div key={format(day, 'MM-dd-yyyy')}>
+                      <Day
+                        // key={format(day, 'MM-dd-yyyy')}
+                        filled={isStart || isEnd}
+                        outlined={isToday(day)}
+                        highlighted={highlighted && !isRangeOneDay}
+                        disabled={!isSameMonth(date, day) || !isWithinInterval(day, { start: minDate, end: maxDate })}
+                        startOfRange={isStart && !isRangeOneDay}
+                        endOfRange={isEnd && !isRangeOneDay}
+                        onClick={() => handlers.onDayClick(day)}
+                        onHover={() => handlers.onDayHover(day)}
+                        value={getDate(day)}
+                      />
+                    </div>
+                  );
+                })}
+              </Grid>
+            </div>
           ))}
         </Grid>
       </Grid>
