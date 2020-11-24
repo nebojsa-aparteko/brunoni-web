@@ -541,7 +541,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   return (
     <Box
-      id="checklistItemRow"
+      id={'checklistItemRow_' + checklistItem.id}
       display="flex"
       justifyContent="space-between"
       my={1}

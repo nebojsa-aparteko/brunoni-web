@@ -63,7 +63,7 @@ bookingShepherdTour.addSteps([
     title: 'Attach files',
     text:
       'You can upload documents by dragging them onto the desired item or by clicking on the paperclip icon. As soon as this has been done, it triggers a task for us, which is immediately processed by our team.',
-    attachTo: { element: '#checklistItemRow', on: 'left' },
+    attachTo: { element: '#checklistItemRow_SHIPPING_INSTRUCTIONS', on: 'left' },
     buttons: [
       {
         text: 'Next',
