@@ -70,7 +70,8 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
     if (!bookingId) return;
 
     getBooking(bookingId).then(b => {
-      setBooking(normalizeBooking(b.data()) as Booking);
+      const data = b.data();
+      setBooking(data ? { id: b.id, ...normalizeBooking(data) } : undefined);
     });
   }, [bookingId]);
   return (
@@ -89,9 +90,11 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}
       >
         <Typography variant="h4">{`File No: ${bookingId}`}</Typography>
-        <Link href={`/bookings/${bookingId}`} style={{ marginLeft: 12 }}>
-          View Booking
-        </Link>
+        {booking && (
+          <Link href={`/bookings/${bookingId}`} style={{ marginLeft: 12 }}>
+            View Booking
+          </Link>
+        )}
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -104,31 +107,34 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
           className={classes.dialogContent}
           style={{ flex: 1, minHeight: 0, padding: 16, paddingLeft: 22 }}
         >
-          <Grid item md style={{ display: 'flex', overflow: 'hidden' }}>
-            <Grid
-              container
-              direction="row"
-              spacing={1}
-              style={{ flex: 1, overflow: 'hidden', width: '100%', minHeight: 0 }}
-            >
-              <Grid item xs={12} md={8} className={classes.bookingViewContainer} style={{ paddingTop: 8 }}>
-                {booking && <ExpandingBookingContent booking={booking} initialFreightTab={1} />}
-              </Grid>
-              <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
-                {booking && (
-                  <React.Fragment>
-                    <Paper style={{ display: 'flex', overflow: 'scroll' }}>
-                      <AccountingTabContent booking={booking} />
-                    </Paper>
-                    <Box style={{ flexGrow: 0 }}>
-                      <ActivityLogProvider>
-                        <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
-                      </ActivityLogProvider>
-                    </Box>
-                  </React.Fragment>
-                )}
-              </Grid>
-            </Grid>
+          <Grid
+            container
+            direction="row"
+            spacing={1}
+            style={{ display: 'flex', overflow: 'hidden', width: '100%', minHeight: 0 }}
+          >
+            {booking ? (
+              <React.Fragment>
+                <Grid item xs={12} md={8} className={classes.bookingViewContainer} style={{ paddingTop: 8 }}>
+                  <ExpandingBookingContent booking={booking} initialFreightTab={1} />
+                </Grid>
+                <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
+                  <Paper style={{ display: 'flex', overflow: 'scroll' }}>
+                    <AccountingTabContent booking={booking} />
+                  </Paper>
+                  <Box style={{ flexGrow: 0 }}>
+                    <ActivityLogProvider>
+                      <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
+                    </ActivityLogProvider>
+                  </Box>
+                </Grid>
+              </React.Fragment>
+            ) : (
+              <Typography variant={'h5'} style={{ margin: 'auto' }}>
+                It appears that the booking you selected doesn't exist, please contact an administrator for further
+                instructions.
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </DialogContent>
