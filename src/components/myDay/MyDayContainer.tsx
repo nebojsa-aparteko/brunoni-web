@@ -207,7 +207,7 @@ const MyDayContainer = () => {
       <CardContent>
         {!actingAs && (
           <Box display="flex" flexDirection="row" mb={2} justifyContent="space-between">
-            <Box display="flex">
+            <Box display="flex" alignItems="center">
               <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
                 <UserInput
                   label="Assign task to"
@@ -218,20 +218,25 @@ const MyDayContainer = () => {
                   value={assignTo}
                 />
               </Box>
-              <Button color="primary" variant="contained" onClick={onAssignUser}>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={onAssignUser}
+                style={{ minWidth: 140, minHeight: 54 }}
+              >
                 Assign user
               </Button>
             </Box>
 
             <Box display="flex" alignItems="center">
-              {!actingAs && <TaskClientFilterSwitch />}
+              <TaskClientFilterSwitch />
               <Typography variant="h4" display="inline">
                 Filter by:
               </Typography>
               <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
                 <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
               </Box>
-              <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={2}>
+              <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
                 <TaskStatusInput
                   label="Task status"
                   onChange={onStatusFilter}
@@ -240,7 +245,7 @@ const MyDayContainer = () => {
                 />
               </Box>
             </Box>
-            <Box display="flex" alignItems="center">
+            <Box display="flex" alignItems="center" pl={4}>
               <Typography component="div">
                 <Grid component="label" container alignItems="center" spacing={1}>
                   <Grid item>
@@ -256,14 +261,6 @@ const MyDayContainer = () => {
                       <FormControlLabel value={TaskCategory.OPERATIONS} control={<Radio />} label="Operations" />
                       <FormControlLabel value={TaskCategory.ACCOUNTING} control={<Radio />} label="Accounting" />
                     </RadioGroup>
-                    {/*<Switch*/}
-                    {/*  checked={taskCategory === TaskCategory.ACCOUNTING}*/}
-                    {/*  onChange={(_, checked) =>*/}
-                    {/*    onCategoryChange(checked ? TaskCategory.ACCOUNTING : TaskCategory.OPERATIONS)*/}
-                    {/*  }*/}
-                    {/*  name="taskCategorySwitch"*/}
-                    {/*  color="primary"*/}
-                    {/*/>*/}
                   </Grid>
                 </Grid>
               </Typography>
