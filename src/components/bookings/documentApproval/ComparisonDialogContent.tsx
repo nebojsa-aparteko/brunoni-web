@@ -27,6 +27,7 @@ import HTMLViewer from '../../HTMLViewer';
 import { RejectionInput } from './RejectionModal';
 import ExpandingBookingContent from './ExpandingBookingContent';
 import XLSXViewer from '../../XLSXViewer';
+import DOCXViewer from '../../DOCXViewer';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -75,6 +76,8 @@ const renderDocument = (document: ChecklistItemValueDocument, fileType: string |
   <DocumentLayout name={document.name}>
     {fileType === 'pdf' ? (
       <PDFViewer file={document} />
+    ) : fileType && ['docx', 'doc'].includes(fileType) ? (
+      <DOCXViewer url={document.url} />
     ) : fileType === 'html' ? (
       <div>
         <HTMLViewer url={document.url} />
@@ -85,8 +88,8 @@ const renderDocument = (document: ChecklistItemValueDocument, fileType: string |
       </div>
     ) : (
       <Typography style={{ flex: 1, margin: 'auto' }}>
-        The comparing option is currently only available for PDF files. The same functionality for other document types
-        will be available soon.
+        The comparing option is currently only available for PDF, HTML, CSV, XLS, XLSX and DOCX files. The same
+        functionality for other document types will be available soon.
       </Typography>
     )}
   </DocumentLayout>

@@ -34,6 +34,7 @@
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.3.1",
     "date-fns": "^2.13.0",
+    "docx-preview": "^0.1.4",
     "dotenv": "^8.2.0",
     "firebase": "7.13.2",
     "fontfaceobserver": "^2.1.0",
@@ -60,9 +61,9 @@
     "react-shepherd": "^3.3.0",
     "react-stickynode": "^2.1.1",
     "react-use": "^14.1.0",
+    "shepherd.js": "^8.1.0",
     "typescript": "^3.9.2",
-    "xlsx": "^0.16.8",
-    "shepherd.js": "^8.1.0"
+    "xlsx": "^0.16.8"
   },
   "scripts": {
     "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
