@@ -31,13 +31,13 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
   const [tabValue, setTabValue] = React.useState(0);
   useEffect(() => {
     const value = localStorage.getItem('checklistTab');
-    setTabValue(value ? +value : 0);
+    setTabValue(value && value === 'accounting' ? 1 : 0);
   }, []);
   useEffect(() => {
-    localStorage.setItem('checklistTab', `${tabValue}`);
+    localStorage.setItem('checklistTab', `${tabValue === 1 ? 'accounting' : 'operations'}`);
   }, [tabValue]);
   const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
-    onTabChange && onTabChange(newValue.toString());
+    onTabChange && onTabChange(newValue === 1 ? 'accounting' : 'operations');
     setTabValue(newValue);
   };
 

@@ -147,8 +147,14 @@ const App: React.FC = () => {
   // If we come from email notification, we want to read that notification and delete it from url
   useEffect(() => {
     const params = QueryString.parse(window.location.search.replace('?', ''));
+
     if (params.readNotification) {
       const notificationId = params.readNotification as string;
+
+      if (params.checklistTab) {
+        localStorage.setItem('checklistTab', `${params.checklistTab as string}`);
+        delete params.checklistTab;
+      }
       //read that notification
       firebase
         .firestore()

@@ -333,7 +333,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             </Box>
 
             <Grid item xs={12}>
-              {selectedTab === '1' ? (
+              {selectedTab === 'accounting' ? (
                 <ExpandingBookingContent booking={booking} isPrintWithCost={isPrintWithCost} />
               ) : (
                 <BookingViewMainContent booking={booking} isPrintWithCost={isPrintWithCost} />
