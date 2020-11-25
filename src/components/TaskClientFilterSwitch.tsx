@@ -21,7 +21,7 @@ const TaskClientFilterSwitch = () => {
   };
   return (
     <FormControlLabel
-      style={{ marginRight: theme.spacing(4), marginLeft: theme.spacing(2) }}
+      style={{ marginLeft: theme.spacing(2) }}
       control={
         <Switch
           checked={showClientTasks}
