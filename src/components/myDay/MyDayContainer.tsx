@@ -182,11 +182,7 @@ const MyDayContainer = () => {
     //check if the length of selected tasks is equal to the number of all tasks
     const filteredTasksLength: number = filteredTasks?.length || 0;
     const normalizedTasksLength: number = normalizedTasks
-      ? normalizedTasks.length > 0
-        ? normalizedTasks.length > 2
-          ? normalizedTasks.map(normalizedTask => normalizedTask[1].length).reduce((a, b) => a + b)
-          : normalizedTasks[0][1].length
-        : 0
+      ? normalizedTasks?.reduce((prev, current) => prev + current[1].length, 0)
       : 0;
     if (selectedTasks.length !== filteredTasksLength + normalizedTasksLength) {
       const filteredTasksSelection = filteredTasks?.map(task => `${task.bookingId}/${task.id}`) || [];
