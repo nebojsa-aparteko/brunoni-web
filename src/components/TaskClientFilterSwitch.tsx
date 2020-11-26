@@ -11,13 +11,16 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const TaskClientFilterSwitch = () => {
+const TaskClientFilterSwitch: React.FC<Props> = ({ setSelectedTasks }) => {
   const [filters, setFilters] = useTaskFilterProviderContext();
   const { showClientTasks } = filters;
   const classes = useStyles();
 
   const changeShowClientTasks = (change: React.ChangeEvent<HTMLInputElement>) => {
-    if (setFilters) setFilters(set('showClientTasks', change.target.checked || false)(filters));
+    if (setFilters) {
+      setSelectedTasks([]);
+      setFilters(set('showClientTasks', change.target.checked || false)(filters));
+    }
   };
   return (
     <FormControlLabel
@@ -36,4 +39,7 @@ const TaskClientFilterSwitch = () => {
   );
 };
 
+interface Props {
+  setSelectedTasks: (array: []) => void;
+}
 export default TaskClientFilterSwitch;

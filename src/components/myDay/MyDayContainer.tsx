@@ -59,7 +59,10 @@ const MyDayContainer = () => {
   const actingAs = useContext(ActingAs)[0];
   const onAssignedFilter = useCallback(
     (_, user) => {
-      if (setFilters) setFilters(set('assignee', user || undefined)(filters));
+      if (setFilters) {
+        setSelectedTasks([]);
+        setFilters(set('assignee', user || undefined)(filters));
+      }
     },
     [filters, setFilters],
   );
@@ -81,6 +84,7 @@ const MyDayContainer = () => {
   useEffect(() => {
     if (assignee && !actingAs)
       getTeamsPerUser(assignee).then(fbTeams => {
+        setSelectedTasks([]);
         setTeams(
           fbTeams.docs.map(doc => {
             return { id: doc.id, ...doc.data() } as Team;
@@ -128,7 +132,10 @@ const MyDayContainer = () => {
 
   const onStatusFilter = useCallback(
     (_, status) => {
-      if (setFilters) setFilters(set('taskStatus', status || undefined)(filters));
+      if (setFilters) {
+        setSelectedTasks([]);
+        setFilters(set('taskStatus', status || undefined)(filters));
+      }
     },
     [filters, setFilters],
   );
@@ -136,6 +143,7 @@ const MyDayContainer = () => {
   const onCategoryChange = useCallback(
     (category: TaskCategory) => {
       if (setFilters) {
+        setSelectedTasks([]);
         setFilters(set('taskCategory', category)(filters));
         localStorage.setItem('taskCategory', `${category}`);
       }
@@ -171,8 +179,24 @@ const MyDayContainer = () => {
   }, [selectedTasks, assignTo]);
 
   const selectDeselectAll = () => {
-    if (filteredTasks && selectedTasks.length !== filteredTasks.length) {
-      setSelectedTasks(filteredTasks.map(task => `${task.bookingId}/${task.id}`));
+    //check if the length of selected tasks is equal to the number of all tasks
+    const filteredTasksLength: number = filteredTasks?.length || 0;
+    const normalizedTasksLength: number = normalizedTasks
+      ? normalizedTasks.length > 0
+        ? normalizedTasks.length > 2
+          ? normalizedTasks.map(normalizedTask => normalizedTask[1].length).reduce((a, b) => a + b)
+          : normalizedTasks[0][1].length
+        : 0
+      : 0;
+    if (selectedTasks.length !== filteredTasksLength + normalizedTasksLength) {
+      const filteredTasksSelection = filteredTasks?.map(task => `${task.bookingId}/${task.id}`) || [];
+      const normalizedTasksSelection = normalizedTasks
+        ? normalizedTasks.map(normalizedTask =>
+            normalizedTask[1].map(task => `${task.bookingId}/${task.id}-${normalizedTask[0]}`),
+          )
+        : [];
+
+      setSelectedTasks(filteredTasksSelection.concat(normalizedTasksSelection.flat()));
     } else {
       setSelectedTasks([]);
     }
@@ -222,7 +246,7 @@ const MyDayContainer = () => {
                 Assign user
               </Button>
               <Box style={{ minWidth: 'fit-content', alignItems: 'center' }}>
-                <TaskClientFilterSwitch />
+                <TaskClientFilterSwitch setSelectedTasks={setSelectedTasks} />
               </Box>
             </Box>
             <Box display="flex" alignItems="center" mb={2}>
