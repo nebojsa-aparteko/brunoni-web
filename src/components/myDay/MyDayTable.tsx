@@ -27,16 +27,12 @@ const MyDayTable: React.FC<Props> = ({
   handleSelectDeselectAll,
 }) => {
   const normalizedTasksLength: number = normalizedTasks
-    ? normalizedTasks.length > 0
-      ? normalizedTasks.length > 2
-        ? normalizedTasks.map(normalizedTask => normalizedTask[1].length).reduce((a, b) => a + b)
-        : normalizedTasks[0][1].length
-      : 0
+    ? normalizedTasks?.reduce((prev, current) => prev + current[1].length, 0)
     : 0;
 
   return (
     <Fragment>
-      {tasks.length === 0 && normalizedTasks?.reduce((prev, current) => prev + current[1].length, 0) === 0 ? (
+      {tasks.length === 0 && normalizedTasksLength === 0 ? (
         <BookingsEmptyResults message={'No tasks found for your filter criteria. Try changing filters.'} />
       ) : (
         <TableContainer component={Paper}>
