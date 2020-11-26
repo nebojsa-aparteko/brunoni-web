@@ -75,7 +75,7 @@ const VesselVoyageContainer: React.FC<Props> = () => {
                   if (setFilters) setFilters(set('dateRange', dateRange)(filters));
                 }}
                 value={dateRange}
-                isMaxDateSet={false}
+                maxDate={new Date()}
               />
             </Box>
           </Box>

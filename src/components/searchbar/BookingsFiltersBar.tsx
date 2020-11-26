@@ -85,7 +85,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
-              <DateRangeInput onChange={setDateRange} value={dateRange} />
+              <DateRangeInput onChange={setDateRange} value={dateRange} maxDate={new Date()} />
             </Box>
           </Grid>
         )}
