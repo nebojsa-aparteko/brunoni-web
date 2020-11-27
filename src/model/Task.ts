@@ -133,6 +133,6 @@ export enum TaskDescription {
   // ACCOUNTING TASKS
   UPLOAD_INVOICE = 'Please upload invoice from Shipping Line.',
   COMPARE_COSTS = 'Please compare and approve costs.',
-  COMPARE_SYSTEMS = 'Please compare Systems, upload documentation and approve correctness.',
+  COMPARE_SYSTEMS = 'Please compare Commission and approve.',
   CORRECT_COMMISSION = 'Please correct commissioned amount.',
 }
