@@ -1,9 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Checkbox,
   createStyles,
   Divider,
+  FormControlLabel,
   Grid,
   IconButton,
   ListItem,
@@ -41,8 +43,40 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
+const notificationsSort = (a: Notification, b: Notification) => {
+  if (a.seen === b.seen) {
+    if (a.at > b.at) {
+      return -1;
+    } else {
+      return 1;
+    }
+  } else {
+    if (a.seen) return 1;
+    else return -1;
+  }
+};
+
 const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
+  const [showOnlyUnread, setShowOnlyUnread] = useState(true);
+  const [sortedNotifications, setSortedNotifications] = useState<Notification[] | undefined>(
+    notifications
+      ? showOnlyUnread
+        ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
+        : notifications.sort((a, b) => notificationsSort(a, b))
+      : undefined,
+  );
   const classes = useStyles();
+
+  useEffect(() => {
+    setSortedNotifications(
+      notifications
+        ? showOnlyUnread
+          ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
+          : notifications.sort((a, b) => notificationsSort(a, b))
+        : undefined,
+    );
+  }, [notifications, showOnlyUnread]);
+
   const markAllAsRead = useCallback(() => {
     (async () => {
       const batch = firebase.firestore().batch();
@@ -94,10 +128,15 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
           </IconButton>
         </Box>
         <Divider />
-        <Box display="flex" justifyContent="flex-end">
+        <Box display="flex" justifyContent="space-between">
+          <FormControlLabel
+            control={<Checkbox checked={showOnlyUnread} onChange={() => setShowOnlyUnread(!showOnlyUnread)} />}
+            label="Show only unread"
+            style={{ paddingLeft: 12 }}
+          />
           <Button onClick={markAllAsRead}>Mark all as read</Button>
         </Box>
-        {notifications?.map(notification => (
+        {sortedNotifications?.map(notification => (
           <ListItem key={notification.id}>
             <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
           </ListItem>
