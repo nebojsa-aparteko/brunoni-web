@@ -91,7 +91,7 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
       >
         <Typography variant="h4">{`File No: ${bookingId}`}</Typography>
         {booking && (
-          <Link href={`/bookings/${bookingId}`} style={{ marginLeft: 12 }}>
+          <Link href={`/bookings/${bookingId}`} style={{ marginLeft: 12 }} target="_blank">
             View Booking
           </Link>
         )}
