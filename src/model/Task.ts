@@ -90,6 +90,7 @@ export enum TaskType {
   COMPARE_COSTS = 'COMPARE_COSTS',
   COMPARE_SYSTEMS = 'COMPARE_SYSTEMS',
   CORRECT_COMMISSION = 'CORRECT_COMMISSION',
+  CHECK_FILE = 'CHECK_FILE',
 }
 
 export enum TaskDescription {
@@ -135,4 +136,5 @@ export enum TaskDescription {
   COMPARE_COSTS = 'Please compare and approve costs.',
   COMPARE_SYSTEMS = 'Please compare Commission and approve.',
   CORRECT_COMMISSION = 'Please correct commissioned amount.',
+  CHECK_FILE = 'Please check this file, here is something wrong.',
 }
