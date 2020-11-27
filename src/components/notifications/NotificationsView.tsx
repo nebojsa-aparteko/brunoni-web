@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   Box,
   Button,
-  Checkbox,
   createStyles,
   Divider,
-  FormControlLabel,
   Grid,
   IconButton,
   ListItem,
@@ -56,26 +54,25 @@ const notificationsSort = (a: Notification, b: Notification) => {
   }
 };
 
-const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
-  const [showOnlyUnread, setShowOnlyUnread] = useState(true);
-  const [sortedNotifications, setSortedNotifications] = useState<Notification[] | undefined>(
-    notifications
-      ? showOnlyUnread
-        ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
-        : notifications.sort((a, b) => notificationsSort(a, b))
-      : undefined,
-  );
+const NotificationsView: React.FC<Props> = ({ notifications, handleShow, filterByUnread, onFilterByUnread }) => {
+  // const [sortedNotifications, setSortedNotifications] = useState<Notification[] | undefined>(
+  //   notifications
+  //     ? showOnlyUnread
+  //       ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
+  //       : notifications.sort((a, b) => notificationsSort(a, b))
+  //     : undefined,
+  // );
   const classes = useStyles();
 
-  useEffect(() => {
-    setSortedNotifications(
-      notifications
-        ? showOnlyUnread
-          ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
-          : notifications.sort((a, b) => notificationsSort(a, b))
-        : undefined,
-    );
-  }, [notifications, showOnlyUnread]);
+  // useEffect(() => {
+  //   setSortedNotifications(
+  //     notifications
+  //       ? showOnlyUnread
+  //         ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
+  //         : notifications.sort((a, b) => notificationsSort(a, b))
+  //       : undefined,
+  //   );
+  // }, [notifications, showOnlyUnread]);
 
   const markAllAsRead = useCallback(() => {
     (async () => {
@@ -129,14 +126,10 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow }) => {
         </Box>
         <Divider />
         <Box display="flex" justifyContent="space-between">
-          <FormControlLabel
-            control={<Checkbox checked={showOnlyUnread} onChange={() => setShowOnlyUnread(!showOnlyUnread)} />}
-            label="Show only unread"
-            style={{ paddingLeft: 12 }}
-          />
+          <Button onClick={onFilterByUnread}>{filterByUnread ? 'View all' : 'Filter by unread'}</Button>
           <Button onClick={markAllAsRead}>Mark all as read</Button>
         </Box>
-        {sortedNotifications?.map(notification => (
+        {notifications?.map(notification => (
           <ListItem key={notification.id}>
             <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
           </ListItem>
@@ -150,4 +143,6 @@ export default NotificationsView;
 interface Props {
   notifications: Notification[];
   handleShow: () => void;
+  filterByUnread: boolean;
+  onFilterByUnread: () => void;
 }

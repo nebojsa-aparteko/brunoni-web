@@ -6,14 +6,18 @@ import Notification from '../model/Notification';
 import { invoke, update, flow } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 
-export default function useNotifications(userId?: string) {
+export default function useNotifications(userId?: string, isFilterByUnread?: boolean) {
   const query = useCallback(
-    q =>
-      q
-        .where('userAlphacomId', '==', userId)
-        .orderBy('at', 'desc')
-        .limit(100),
-    [userId],
+    q => {
+      let query = q.where('userAlphacomId', '==', userId);
+      if (isFilterByUnread) {
+        query = query.where('seen', '==', false);
+      } else {
+        query = query.limit(100);
+      }
+      return query.orderBy('at', 'desc');
+    },
+    [userId, isFilterByUnread],
   );
   const notificationsCollection = useFirestoreCollection('notifications', userId ? query : null);
 
