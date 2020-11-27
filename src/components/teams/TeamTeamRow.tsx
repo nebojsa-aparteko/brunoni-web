@@ -18,7 +18,7 @@ import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
 import DeleteIcon from '@material-ui/icons/Delete';
 import pick from 'lodash/fp/pick';
-import { TaskType } from '../../model/Task';
+import { TaskDescription, TaskType } from '../../model/Task';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -31,6 +31,12 @@ const deleteTeam = (teamId: string) =>
     .doc(teamId)
     .delete();
 
+const categories = Object.keys(BookingCategory);
+const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]);
+const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
+const taskTypes = Object.entries(TaskDescription).map(t => t[1]);
+const taskTypeNamesPreview = Object.entries(TaskDescription);
+
 const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   const adminUsers = useAdminUsers();
 
@@ -41,11 +47,6 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const carriers = useContext(Carriers);
-  const categories = Object.keys(BookingCategory);
-  const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]);
-  const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
-  const taskTypes = Object.keys(TaskType);
-  const taskTypeNamesPreview = Object.entries(TaskType);
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
