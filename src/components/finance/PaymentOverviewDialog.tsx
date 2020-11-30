@@ -119,10 +119,10 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
                   <ExpandingBookingContent booking={booking} initialFreightTab={1} />
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
-                  <Paper style={{ display: 'flex', overflow: 'scroll' }}>
+                  <Paper style={{ maxHeight: '55vh', overflow: 'scroll', flex: '1 0 auto' }}>
                     <AccountingTabContent booking={booking} />
                   </Paper>
-                  <Box style={{ flexGrow: 0 }}>
+                  <Box style={{ overflow: 'scroll', flex: '1 1 auto', marginTop: 4, paddingLeft: 1, paddingRight: 1 }}>
                     <ActivityLogProvider>
                       <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
                     </ActivityLogProvider>
