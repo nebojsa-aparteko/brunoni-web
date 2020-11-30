@@ -38,6 +38,7 @@ import { addDays } from 'date-fns';
 import { DebitCredit } from '../../../model/Payment';
 import useUser from '../../../hooks/useUser';
 import { GlobalContext } from '../../../store/GlobalStore';
+import { ActivityLogProvider } from '../checklist/ActivityLogContext';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -384,24 +385,26 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
               <ChartsCircularProgress />
             </Container>
           ) : (
-            accountingDocuments.map(item => (
-              <DocumentListItem
-                key={item.id}
-                item={item}
-                booking={booking}
-                storageBasePath={storageBasePath}
-                changeStatus={(item: DocumentValue, status: DocumentValueStatus) =>
-                  handleDocumentStatusChange(item, status)
-                }
-                deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
-                internal={true}
-                isAccountingDocument={true}
-                markAsFinal={() => {}}
-                comparableDocuments={[]}
-                selectForComparison={() => {}}
-                paymentStatus={payment.status}
-              />
-            ))
+            <ActivityLogProvider>
+              {accountingDocuments.map(item => (
+                <DocumentListItem
+                  key={item.id}
+                  item={item}
+                  booking={booking}
+                  storageBasePath={storageBasePath}
+                  changeStatus={(item: DocumentValue, status: DocumentValueStatus) =>
+                    handleDocumentStatusChange(item, status)
+                  }
+                  deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
+                  internal={true}
+                  isAccountingDocument={true}
+                  markAsFinal={() => {}}
+                  comparableDocuments={[]}
+                  selectForComparison={() => {}}
+                  paymentStatus={payment.status}
+                />
+              ))}
+            </ActivityLogProvider>
           )}
           {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
             <DropZone
