@@ -14,6 +14,9 @@ import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
 import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
+import Carrier from '../../model/Carrier';
+import CarrierInput from '../inputs/CarrierInput';
+import Carriers from '../../contexts/Carriers';
 
 interface Props {
   showClientFilter?: boolean;
@@ -31,9 +34,10 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const clients = useClients();
   const users = useAdminUsers();
   const ports = useContext(Ports);
+  const carriers = useContext(Carriers);
   const [filters, setFilters] = useBookingListFilterContext();
 
-  const { clientFilter, originPort, destinationPort, assignee, dateRange } = filters;
+  const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 
   const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
 
@@ -48,6 +52,9 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const setDateRange = (dateRange: DateRange) =>
     setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));
+
+  const setCarrier = (carrier: Carrier | null | undefined) =>
+    setFilters && setFilters(set('carrier', carrier || undefined)(filters));
 
   return (
     <Box
@@ -81,7 +88,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
 
-        {!showClientFilter && <Grid item sm={3} xs={12} />}
+        {!showClientFilter && <Grid item sm={3} xs={12} style={{ paddingTop: 4 }} />}
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
@@ -99,6 +106,9 @@ const BookingsFiltersBar: React.FC<Props> = ({
             />
           </Grid>
         )}
+        <Grid item sm={3} xs={12}>
+          <CarrierInput label={'Choose Carrier'} carriers={carriers} onChange={setCarrier} value={carrier} />
+        </Grid>
       </Grid>
       {showAssigneeFilter && showDateRange && users && (
         <Grid container spacing={2} style={{ marginTop: 8 }}>

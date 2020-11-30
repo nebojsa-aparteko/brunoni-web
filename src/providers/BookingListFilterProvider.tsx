@@ -3,10 +3,12 @@ import { ContextFilters } from './filterActions';
 import { BookingCategory } from '../model/Booking';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
+import Carrier from '../model/Carrier';
 
 export interface BookingContextFilters extends ContextFilters {
   category: string;
   activeTab?: number;
+  carrier?: Carrier | undefined;
 }
 
 export const BOOKING_FILTERS_INITIAL_STATE = {

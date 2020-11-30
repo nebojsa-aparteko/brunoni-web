@@ -4,6 +4,7 @@ import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
 import { subMonths, subWeeks } from 'date-fns';
+import Carrier from '../model/Carrier';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =

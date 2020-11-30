@@ -86,6 +86,10 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         query = query.where('watchers', 'array-contains', pick(UserRecordMinProperties)(filters.assignee));
       }
 
+      if (filters.carrier) {
+        query = query.where('CarrierID', '==', filters.carrier.id.toUpperCase());
+      }
+
       if (filters.originPort) {
         query = query.where('POL', '==', filters.originPort.id);
       }
@@ -118,7 +122,7 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         ...doc.data(),
       } as Booking;
     }) as Booking[] | undefined;
-
+    console.log(bookings);
     return normalizeBookings(bookings);
   }, [bookingsSnapshot]);
 
