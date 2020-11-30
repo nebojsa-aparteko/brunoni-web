@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, createStyles, makeStyles, Theme } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
+import { makeActivityRepresentation } from './Activity';
 import ActivityComment from './ActivityComment';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Comment = ({ activity, handleCommentClick, ...other }: CommentProp) => {
+const ActivityWithComment = ({ activity, handleCommentClick, ...other }: ActivityWithCommentProp) => {
   const classes = useStyles();
   // const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);
   return (
@@ -49,6 +50,9 @@ const Comment = ({ activity, handleCommentClick, ...other }: CommentProp) => {
           round={true}
         />
         <Box display="flex" flexDirection="column" flex={1} ml={1}>
+          <Box display="flex" flexDirection="column" ml={1}>
+            {makeActivityRepresentation(activity)}
+          </Box>
           <ActivityComment activity={activity} />
         </Box>
       </Box>
@@ -56,9 +60,9 @@ const Comment = ({ activity, handleCommentClick, ...other }: CommentProp) => {
   );
 };
 
-export default Comment;
+export default ActivityWithComment;
 
-interface CommentProp {
+interface ActivityWithCommentProp {
   activity: ActivityLogItem;
   handleCommentClick?: () => void;
   handleEdit?: () => void;

@@ -201,7 +201,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         {notification.type === NotificationType.COMMENT && notification.activity ? (
           <Fragment>
             <Comment
-              comment={notification.activity}
+              activity={notification.activity}
               handleCommentClick={() => {
                 firebase
                   .firestore()

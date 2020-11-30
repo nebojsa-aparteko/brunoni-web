@@ -217,7 +217,7 @@ interface Props {
   isOpen: boolean;
   handleClose: () => void;
   booking: Booking;
-  updateDocumentStatus: (newStatus: ChecklistItemValueDocumentStatusType) => void;
+  updateDocumentStatus: (newStatus: ChecklistItemValueDocumentStatusType, dontCreateActivity?: boolean) => void;
   sortedDocuments: ChecklistItemValueDocument[];
   onReject: () => void;
   rejectionInput: RejectionInput | undefined;

@@ -2,11 +2,12 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Booking } from '../../../model/Booking';
 import { MentionItem } from 'react-mentions';
 import {
+  ActivityChangeType,
   ActivityLogUserData,
   ChecklistItem,
   ChecklistItemValueDocument,
-  DocumentValueStatus,
   ChecklistItemValueDocumentStatusType,
+  DocumentValueStatus,
 } from '../checklist/ChecklistItemModel';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
@@ -53,12 +54,16 @@ const RejectionModal: React.FC<Props> = ({
   }, []);
 
   const updateDocumentStatus = useCallback(
-    (newStatus: ChecklistItemValueDocumentStatusType) => {
-      changeStatus(document, {
-        type: newStatus,
-        by: userActivityLogData,
-        at: new Date(),
-      });
+    (newStatus: ChecklistItemValueDocumentStatusType, dontCreateActivity?: boolean) => {
+      changeStatus(
+        document,
+        {
+          type: newStatus,
+          by: userActivityLogData,
+          at: new Date(),
+        },
+        dontCreateActivity,
+      );
       handleClose();
     },
     [document, changeStatus, handleClose, userActivityLogData],
@@ -69,19 +74,20 @@ const RejectionModal: React.FC<Props> = ({
       addActivityItem(
         booking.id,
         flow(omitBy(isNil))({
-          type: ActivityType.COMMENT,
+          type: ActivityType.ACTIVITY_WITH_COMMENT,
           comment: messageBody,
+          changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
           at: new Date(),
           by: userActivityLogData,
           isInternal: internal,
           isAccountingActivity: isAccountingDialog,
           checklistItem: shortenedChecklist(checklistItem),
-          documents: shortenedDocumentValue(document),
+          documents: [shortenedDocumentValue(document)],
           mentions: mentions,
         } as ActivityLogItem),
       )
         .then(_ => {
-          updateDocumentStatus(ChecklistItemValueDocumentStatusType.REJECTED);
+          updateDocumentStatus(ChecklistItemValueDocumentStatusType.REJECTED, true);
           console.log('Success saving message');
         })
         .catch(err => console.log(err));
@@ -129,7 +135,7 @@ interface Props {
   booking: Booking;
   document: ChecklistItemValueDocument;
   checklistItem?: ChecklistItem;
-  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
+  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) => void;
   allDocuments?: ChecklistItemValueDocument[];
   isComparisonDialog: boolean;
   isAccountingDialog?: boolean;

@@ -427,7 +427,7 @@ export interface DocumentListItemPropsBase {
   checklistItem?: ChecklistItem;
   booking: Booking;
   storageBasePath: string;
-  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus) => void;
+  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) => void;
   deleteFile?: (
     item: ChecklistItemValueDocument | DocumentValue,
     documents?: ChecklistItemValueDocument[] | DocumentValue[],

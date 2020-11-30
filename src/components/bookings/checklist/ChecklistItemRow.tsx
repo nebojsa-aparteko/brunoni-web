@@ -310,18 +310,25 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   );
 
   const checklistItemDocumentStatusChangeHandler = useCallback(
-    (documents: ChecklistItemValueDocument[], document: ChecklistItemValueDocument, internal: boolean) => {
-      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ =>
-        addActivityItem(
-          booking!.id,
-          createActivityObject({
-            changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
-            by: getActivityLogUserData(),
-            checklistItem: checklistItem,
-            documents: [document],
-          }),
-        ),
-      );
+    (
+      documents: ChecklistItemValueDocument[],
+      document: ChecklistItemValueDocument,
+      internal: boolean,
+      dontCreateActivity?: boolean,
+    ) => {
+      return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', documents).then(_ => {
+        if (!dontCreateActivity) {
+          return addActivityItem(
+            booking!.id,
+            createActivityObject({
+              changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+              by: getActivityLogUserData(),
+              checklistItem: checklistItem,
+              documents: [document],
+            }),
+          );
+        }
+      });
     },
     [booking, checklistItem, saveChecklistChanges, getActivityLogUserData],
   );
@@ -456,6 +463,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     item: ChecklistItemValueDocument,
     status: DocumentValueStatus,
     internal: boolean,
+    dontCreateActivity?: boolean,
   ) => {
     let newItemArray: ChecklistItemValueDocument[];
     if (item.status && !editRestriction(item.status!.at as Date)) {
@@ -501,7 +509,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       newItemArray = [...(checklistItem.values || [])];
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item, status: status };
     }
-    storeActivity(() => checklistItemDocumentStatusChangeHandler(newItemArray, { ...item, status: status }, internal));
+    storeActivity(() =>
+      checklistItemDocumentStatusChangeHandler(newItemArray, { ...item, status: status }, internal, dontCreateActivity),
+    );
   };
 
   const onDrop = useCallback(
@@ -637,8 +647,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           checklistItemValues={checklistItem.values || []}
           booking={booking}
           checklistItem={checklistItem}
-          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
-            handleDocumentStatusChange(item, status, false)
+          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) =>
+            handleDocumentStatusChange(item, status, false, dontCreateActivity)
           }
           internal={false}
           markAsFinal={item => handleMarkAsFinal(item, false)}
@@ -672,9 +682,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               checklistItemValues={checklistItem.valuesAdmin || []}
               booking={booking}
               checklistItem={checklistItem}
-              changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus) =>
-                handleDocumentStatusChange(item, status, true)
-              }
+              changeStatus={(
+                item: ChecklistItemValueDocument,
+                status: DocumentValueStatus,
+                dontCreateActivity?: boolean,
+              ) => handleDocumentStatusChange(item, status, true, dontCreateActivity)}
               internal={true}
               markAsFinal={item => handleMarkAsFinal(item, true)}
               comparableDocuments={comparableDocuments}

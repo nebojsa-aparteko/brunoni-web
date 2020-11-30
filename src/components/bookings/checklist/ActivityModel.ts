@@ -27,6 +27,7 @@ export interface ActivityLogItem {
 export enum ActivityType {
   COMMENT,
   ACTIVITY,
+  ACTIVITY_WITH_COMMENT,
 }
 
 export interface QuoteActivityModel {

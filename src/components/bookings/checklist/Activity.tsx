@@ -6,7 +6,7 @@ import { capitalCase } from 'change-case';
 import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
 import DateFormattedText from '../../DateFormattedText';
 
-const makeActivityRepresentation = (activity: ActivityLogItem) => {
+export const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
     activity.documents && index !== activity.documents?.length - 1 ? ', ' : ' ';
   const mapChangeTypeToText = (): ActivityText | undefined => {
