@@ -37,8 +37,7 @@ const ActivityComment = ({ activity }: ActivityWithCommentProp) => {
         </Typography>
         <DateFormattedText date={activity.at} />
       </Box>
-      {/*<div dangerouslySetInnerHTML={{ __html: htmlComment || comment?.comment! }} style={{ fontSize: 14 }} />*/}
-      <Typography style={{ wordBreak: 'break-word' }}>{activity?.comment}</Typography>
+      <Typography style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{activity?.comment}</Typography>
       {activity.checklistItem && (
         <Box>
           Ref - <a href={`#${activity.checklistItem?.id}`}>{activity.checklistItem?.label}</a>
