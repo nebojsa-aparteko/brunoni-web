@@ -6,7 +6,7 @@ export default interface WeeklyPayment extends Payment {
 
 export enum WeeklyPaymentStatus {
   IN_PROGRESS = 'In Progress',
-  BLOCKED = 'Blocked',
+  BLOCKED = 'Approved',
   PAID = 'Paid',
 }
 
