@@ -87,7 +87,15 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (filters.carrier) {
-        query = query.where('CarrierID', '==', filters.carrier.id.toUpperCase());
+        query = query.where(
+          'CarrierID',
+          '==',
+          filters.carrier.id === 'HSG'
+            ? 'Hamburg Süd'
+            : filters.carrier.id === 'SLOM'
+            ? 'SLOMAN NEPTUN'
+            : filters.carrier.id,
+        );
       }
 
       if (filters.originPort) {
@@ -122,7 +130,6 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         ...doc.data(),
       } as Booking;
     }) as Booking[] | undefined;
-    console.log(bookings);
     return normalizeBookings(bookings);
   }, [bookingsSnapshot]);
 
