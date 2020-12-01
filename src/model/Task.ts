@@ -138,5 +138,5 @@ export enum TaskDescription {
   COMPARE_SYSTEMS = 'Please compare Commission and approve.',
   CORRECT_COMMISSION = 'Please correct commissioned amount.',
   CHECK_FILE = 'Please check this file, here is something wrong.',
-  CLEAR_INVOICE = 'Please clear invoice in the system of the Shipping Line',
+  CLEAR_INVOICE = 'Please clear invoice in the system of the Shipping Line.',
 }
