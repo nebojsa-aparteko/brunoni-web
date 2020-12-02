@@ -6,7 +6,7 @@ import usePaymentOverview from '../../../hooks/usePaymentOverview';
 import AccountingWeeklyPayment from './AccountingWeeklyPayment';
 import WeeklyPayment from '../../../model/WeeklyPayment';
 
-const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
+const AccountingTabContent = ({ booking, updateComponent }: AccountingTabContentProps) => {
   const weeklyPayments = usePaymentOverview(booking.id) as WeeklyPayment[];
 
   if (!weeklyPayments) {
@@ -21,7 +21,12 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
     <Box display="flex" flex={1} flexDirection="column" px={0} style={{ listStyle: 'none' }}>
       {weeklyPayments.length > 0 ? (
         weeklyPayments.map(payment => (
-          <AccountingWeeklyPayment key={payment.reference} payment={payment} booking={booking} />
+          <AccountingWeeklyPayment
+            key={payment.reference}
+            payment={payment}
+            booking={booking}
+            updateComponent={updateComponent}
+          />
         ))
       ) : (
         <Box flex={1} p={2}>
@@ -34,6 +39,7 @@ const AccountingTabContent = ({ booking }: AccountingTabContentProps) => {
 
 interface AccountingTabContentProps {
   booking: Booking;
+  updateComponent?: () => void;
 }
 
 export default AccountingTabContent;

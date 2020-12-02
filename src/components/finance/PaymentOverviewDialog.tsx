@@ -62,7 +62,7 @@ const getBooking = (bookingId: string) =>
     .doc(bookingId)
     .get();
 
-const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId }) => {
+const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId, updateComponent }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [booking, setBooking] = useState<Booking | undefined>();
@@ -120,7 +120,7 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
                   <Paper style={{ maxHeight: '55vh', overflow: 'scroll', flex: '1 0 auto' }}>
-                    <AccountingTabContent booking={booking} />
+                    <AccountingTabContent booking={booking} updateComponent={updateComponent} />
                   </Paper>
                   <Box style={{ overflow: 'scroll', flex: '1 1 auto', marginTop: 4, paddingLeft: 1, paddingRight: 1 }}>
                     <ActivityLogProvider>
@@ -146,6 +146,7 @@ interface Props {
   isOpen: boolean;
   handleClose: () => void;
   bookingId: string | undefined;
+  updateComponent?: () => void;
 }
 
 export default PaymentOverviewDialog;

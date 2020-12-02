@@ -172,7 +172,7 @@ const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => 
   }
 };
 
-const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentProps) => {
+const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
@@ -327,6 +327,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
         })
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          updateComponent ? updateComponent() : null;
           handleClose();
         });
     },
@@ -356,6 +357,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
       })
       .finally(() => {
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        updateComponent ? updateComponent() : null;
       });
   }, [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose, user]);
 
@@ -472,6 +474,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
 interface AccountingWeeklyPaymentProps {
   payment: WeeklyPayment;
   booking: Booking;
+  updateComponent?: () => void;
 }
 
 export default AccountingWeeklyPayment;

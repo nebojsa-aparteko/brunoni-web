@@ -299,7 +299,12 @@ const MyDayContainer = () => {
           <ChartsCircularProgress />
         )}
         {isDialogOpen && (
-          <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+          <PaymentOverviewDialog
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingId={openBooking}
+            updateComponent={() => setAssignedUserTrigger(prevState => !prevState)}
+          />
         )}
       </CardContent>
     </Card>
