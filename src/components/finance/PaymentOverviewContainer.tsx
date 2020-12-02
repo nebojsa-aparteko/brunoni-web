@@ -192,7 +192,6 @@ const PaymentOverviewContainer = () => {
 
   const filteredOverviewData = useMemo(() => {
     return (overviewData || []).filter(data => {
-      console.log(data.status, status);
       return currency.includes(data.currency) && (data.status ? status.includes(data.status) : true);
     });
   }, [overviewData, status, currency]);

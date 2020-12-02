@@ -1,4 +1,8 @@
-import WeeklyPayment, { WeeklyPaymentApiAction, WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
+import WeeklyPayment, {
+  WeeklyPaymentApiAction,
+  WeeklyPaymentStatus,
+  WeeklyPaymentStatusLabel,
+} from '../../../model/WeeklyPayment';
 import {
   Box,
   Button,
@@ -370,7 +374,7 @@ const AccountingWeeklyPayment = ({ payment, booking }: AccountingWeeklyPaymentPr
             variant={'h5'}
             style={{ fontWeight: 700, color: payment.status === WeeklyPaymentStatus.PAID ? 'rgba(0,200,81)' : '#000' }}
           >
-            {payment.status}
+            {WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
           </Typography>
         </Box>
       </ExpansionPanelSummary>
