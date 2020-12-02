@@ -88,19 +88,17 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
           : ' from '
         : null}
 
-      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER ? (
-        activity.checklistItem ? (
-          <Fragment>
-            <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
-          </Fragment>
-        ) : !activity.isAccountingActivity ? (
-          activity.isInternal ? (
-            'Internal storage.'
-          ) : null
-        ) : (
-          'Accounting.'
-        )
-      ) : null}
+      {activity.checklistItem ? (
+        <Fragment>
+          <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+        </Fragment>
+      ) : !activity.isAccountingActivity ? (
+        activity.isInternal ? (
+          'Internal storage.'
+        ) : null
+      ) : (
+        'Accounting.'
+      )}
     </Typography>
   );
 };
