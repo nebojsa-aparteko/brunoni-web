@@ -327,7 +327,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
         })
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          updateComponent ? updateComponent() : null;
+          if (updateComponent) updateComponent();
           handleClose();
         });
     },
@@ -357,7 +357,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
       })
       .finally(() => {
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        updateComponent ? updateComponent() : null;
+        if (updateComponent) updateComponent();
       });
   }, [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose, user]);
 
