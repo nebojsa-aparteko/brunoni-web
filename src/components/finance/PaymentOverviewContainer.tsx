@@ -18,7 +18,11 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import WeeklyPayment, { WeeklyPaymentApiAction, WeeklyPaymentStatus } from '../../model/WeeklyPayment';
+import WeeklyPayment, {
+  WeeklyPaymentApiAction,
+  WeeklyPaymentStatus,
+  WeeklyPaymentStatusLabel,
+} from '../../model/WeeklyPayment';
 import { set } from 'lodash/fp';
 import { useWeeklyPaymentFilterProviderContext } from '../../providers/WeeklyPaymentFilterProvider';
 import DateInput from '../inputs/DateInput';
@@ -187,9 +191,10 @@ const PaymentOverviewContainer = () => {
   );
 
   const filteredOverviewData = useMemo(() => {
-    return (overviewData || []).filter(
-      data => currency.includes(data.currency) && (data.status ? status.includes(data.status) : true),
-    );
+    return (overviewData || []).filter(data => {
+      console.log(data.status, status);
+      return currency.includes(data.currency) && (data.status ? status.includes(data.status) : true);
+    });
   }, [overviewData, status, currency]);
 
   const handleSelect = useCallback(
@@ -309,12 +314,14 @@ const PaymentOverviewContainer = () => {
               value={status}
               onChange={onStatusChange}
               input={<Input />}
-              renderValue={selected => (selected as any[]).join(', ')}
+              renderValue={selected =>
+                (selected as any[]).map(s => WeeklyPaymentStatusLabel[s as WeeklyPaymentStatus]).join(', ')
+              }
               MenuProps={MenuProps}
             >
-              {Object.entries(WeeklyPaymentStatus).map(([key, value]) => (
-                <MenuItem key={key} value={value}>
-                  <Checkbox checked={status.indexOf(value) > -1} />
+              {Object.entries(WeeklyPaymentStatusLabel).map(([key, value]) => (
+                <MenuItem key={key} value={key}>
+                  <Checkbox checked={status.indexOf(key as WeeklyPaymentStatus) > -1} />
                   <ListItemText primary={value} />
                 </MenuItem>
               ))}

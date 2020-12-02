@@ -1,5 +1,5 @@
 import React from 'react';
-import { WeeklyPaymentStatus } from '../../model/WeeklyPayment';
+import { WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/WeeklyPayment';
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
@@ -47,7 +47,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         {status && (
           <Chip
             size="small"
-            label={status}
+            label={WeeklyPaymentStatusLabel[status as WeeklyPaymentStatus]}
             style={{
               backgroundColor:
                 status === WeeklyPaymentStatus.BLOCKED
