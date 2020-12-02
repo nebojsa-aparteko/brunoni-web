@@ -10,16 +10,17 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) =>
     <IconButton
       aria-label="mark-as-resolved"
       size="small"
-      onClick={() =>
-        firebase
+      onClick={event => {
+        event.stopPropagation();
+        return firebase
           .firestore()
           .collection('bookings')
           .doc(task.bookingId)
           .collection('tasks')
           .doc(task.id)
           .set({ resolved: false }, { merge: true })
-          .then(() => (updateComponent ? updateComponent() : null))
-      }
+          .then(() => (updateComponent ? updateComponent() : null));
+      }}
     >
       <CheckCircleIcon />
     </IconButton>
@@ -27,7 +28,8 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) =>
     <IconButton
       aria-label="mark-as-unresolved"
       size="small"
-      onClick={() =>
+      onClick={event => {
+        event.stopPropagation();
         firebase
           .firestore()
           .collection('bookings')
@@ -35,8 +37,8 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) =>
           .collection('tasks')
           .doc(task.id)
           .set({ resolved: true }, { merge: true })
-          .then(() => (updateComponent ? updateComponent() : null))
-      }
+          .then(() => (updateComponent ? updateComponent() : null));
+      }}
     >
       <CheckCircleOutlineIcon />
     </IconButton>
