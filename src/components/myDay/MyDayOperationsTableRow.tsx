@@ -9,8 +9,8 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import TaskStatusChip from '../TaskStatusChip';
-import TaskManualResolveButton from '../TaskManualResolveButton';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
+import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
 
 const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateComponent }) => {
   const [open, setOpen] = React.useState(false);
@@ -74,7 +74,7 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
         <TableCell align="center">
           {task.additionalInfo && <TaskAdditionalInfoView additionalInfo={task.additionalInfo} />}
           {task.manualResolve && task.manualResolve !== ManualResolveType.NO_MANUAL_RESOLVE && (
-            <TaskManualResolveButton task={task} updateComponent={updateComponent} />
+            <TaskManualResolveAction task={task} updateComponent={updateComponent} />
           )}
         </TableCell>
       </TableRow>

@@ -7,11 +7,14 @@ import TaskManualResolveButton from '../TaskManualResolveButton';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import TaskManualDeclineButton from '../TaskManualDeclineButton';
 
-const TaskManualResolveAction: React.FC<{ task: Task }> = ({ task }) =>
+export const TaskManualResolveAction: React.FC<{ task: Task; updateComponent?: () => void }> = ({
+  task,
+  updateComponent,
+}) =>
   task.manualResolve === ManualResolveType.RESOLVE_OR_DECLINE ? (
     <Box display="flex" flexDirection="row">
-      <TaskManualResolveButton task={task} />
-      <TaskManualDeclineButton task={task} />
+      <TaskManualResolveButton task={task} updateComponent={updateComponent} />
+      <TaskManualDeclineButton task={task} updateComponent={updateComponent} />
     </Box>
   ) : (
     <TaskManualResolveButton task={task} />
