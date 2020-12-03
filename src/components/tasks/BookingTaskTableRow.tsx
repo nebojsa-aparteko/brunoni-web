@@ -12,7 +12,7 @@ export const TaskManualResolveAction: React.FC<{ task: Task; updateComponent?: (
   updateComponent,
 }) =>
   task.manualResolve === ManualResolveType.RESOLVE_OR_DECLINE ? (
-    <Box display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="row" justifyContent="space-between">
       <TaskManualResolveButton task={task} updateComponent={updateComponent} />
       <TaskManualDeclineButton task={task} updateComponent={updateComponent} />
     </Box>
