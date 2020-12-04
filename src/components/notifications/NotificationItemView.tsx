@@ -27,6 +27,7 @@ import InfoNotification from './InfoNotification';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ActingAs from '../../contexts/ActingAs';
 import firebase from '../../firebase';
+import ActivityWithComment from '../bookings/checklist/ActivityWithComment';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -171,6 +172,23 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       .catch(err => console.log(err));
   };
 
+  const handleCommentClick = () => {
+    firebase
+      .firestore()
+      .collection('notifications')
+      .doc(notification.id)
+      .set({ seen: true } as Notification, { merge: true })
+      .then(() => {
+        handleShowDrawer();
+        notification.referenceObject &&
+          history.push(
+            `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
+              notification.referenceID
+            }?focusComment=${notification.activity?.id}`,
+          );
+      });
+  };
+
   return (
     <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
       <CardHeader
@@ -200,25 +218,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       <CardContent>
         {notification.type === NotificationType.COMMENT && notification.activity ? (
           <Fragment>
-            <Comment
-              activity={notification.activity}
-              handleCommentClick={() => {
-                firebase
-                  .firestore()
-                  .collection('notifications')
-                  .doc(notification.id)
-                  .set({ seen: true } as Notification, { merge: true })
-                  .then(() => {
-                    handleShowDrawer();
-                    notification.referenceObject &&
-                      history.push(
-                        `/${
-                          notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject
-                        }/${notification.referenceID}?focusComment=${notification.activity?.id}`,
-                      );
-                  });
-              }}
-            />
+            <Comment activity={notification.activity} handleCommentClick={handleCommentClick} />
           </Fragment>
         ) : notification.activity && notification.type === NotificationType.ACTIVITY ? (
           <Activity activity={notification!.activity} />
@@ -229,12 +229,11 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           <TaskNotification task={notification.createdTaskType} />
         ) : notification.type === NotificationType.INFO && notification.infoType ? (
           <InfoNotification infoType={notification.infoType} />
+        ) : notification.type === NotificationType.ACTIVITY_WITH_COMMENT && notification.activity ? (
+          <ActivityWithComment activity={notification.activity} handleCommentClick={handleCommentClick} />
         ) : null}
       </CardContent>
       <CardActions>
-        {/*<IconButton>*/}
-        {/*  <HelpIcon />*/}
-        {/*</IconButton>*/}
         <Button size="small" style={{ marginLeft: 'auto' }} variant="contained" color="primary" onClick={handleClick}>
           {notification.referenceObject === 'quoteGroup'
             ? 'View Quote Group'

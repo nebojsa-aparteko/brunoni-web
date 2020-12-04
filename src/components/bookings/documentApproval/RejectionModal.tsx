@@ -96,7 +96,7 @@ const RejectionModal: React.FC<Props> = ({
   );
 
   const onReject = useCallback(() => {
-    handleCommentSave(rejectionInput!.message, rejectionInput!.mentions, !actingAs);
+    handleCommentSave(rejectionInput!.messagePlain, rejectionInput!.mentions, !actingAs);
   }, [rejectionInput, actingAs, handleCommentSave]);
 
   return !isComparisonDialog ? (
