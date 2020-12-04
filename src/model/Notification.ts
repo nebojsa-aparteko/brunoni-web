@@ -9,6 +9,7 @@ export enum NotificationType {
   ALERT,
   TASK,
   INFO,
+  ACTIVITY_WITH_COMMENT,
 }
 export default interface Notification {
   userAlphacomId: string;
