@@ -52,7 +52,7 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         {`${capitalCase(activity.by.firstName)} ${capitalCase(activity.by.lastName)}`}
       </Link>
       {mapChangeTypeToText()}
-      {activity.stage && ` '${activity.stage?.label}' stage in `}
+      {activity.stage && ` '${activity.stage?.label}' stage `}
       {activity.documents &&
         activity.documents.map((doc, index) => {
           return [
