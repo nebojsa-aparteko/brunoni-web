@@ -1,5 +1,5 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
-import { Checkbox, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import { Box, Checkbox, CircularProgress, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -7,23 +7,45 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { BookingRow, BoookingProgressDialog } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
-import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import TaskStatusChip from '../TaskStatusChip';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
+import { Booking } from '../../model/Booking';
+import firebase from '../../firebase';
+
+const getBooking = (bookingId: string) =>
+  firebase
+    .firestore()
+    .collection('bookings')
+    .doc(bookingId)
+    .get();
 
 const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateComponent }) => {
   const [open, setOpen] = React.useState(false);
   const actingAs = useContext(ActingAs)[0];
-  const snapshot = useFirestoreDocument('bookings', task.bookingId);
-  const booking = useMemo(() => normalizeBooking(snapshot?.data()), [snapshot]);
+  const [booking, setBooking] = useState<Booking | undefined>(undefined);
+  const [isFirstOpen, setIsFirstOpen] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (!task.bookingId) return;
+
+    if (open)
+      getBooking(task.bookingId).then(b => {
+        setBooking(normalizeBooking(b.data()) as Booking);
+      });
+  }, [task.bookingId]);
 
   const handleProgressClick = useCallback(
     (event: React.MouseEvent<unknown>) => {
       event.stopPropagation();
-
-      if (booking.Category === 'Export' || booking.Category === 'Import') {
+      if (isFirstOpen && !booking) {
+        setIsFirstOpen(false);
+        getBooking(task.bookingId).then(b => {
+          setBooking(normalizeBooking(b.data()) as Booking);
+        });
+      }
+      if (booking && (booking.Category === 'Export' || booking.Category === 'Import')) {
         setIsDialogOpen(true);
       }
     },
@@ -34,12 +56,22 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
 
+  const handleRowClick = () => {
+    setOpen(prevState => !prevState);
+    if (isFirstOpen && !booking) {
+      setIsFirstOpen(false);
+      getBooking(task.bookingId).then(b => {
+        setBooking(normalizeBooking(b.data()) as Booking);
+      });
+    }
+  };
+
   return (
     <Fragment>
       <TableRow
         key={task.id}
         hover
-        onClick={() => setOpen(prevState => !prevState)}
+        onClick={handleRowClick}
         style={{ cursor: 'pointer', backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff' }}
       >
         <TableCell padding="checkbox">
@@ -81,7 +113,13 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            {booking && <BookingRow booking={booking} isAdmin={!actingAs} onProgressClick={handleProgressClick} />}
+            {booking === undefined ? (
+              <Box display="flex" height={250}>
+                <CircularProgress style={{ padding: 8, margin: 'auto' }} />
+              </Box>
+            ) : (
+              <BookingRow booking={booking} isAdmin={!actingAs} onProgressClick={handleProgressClick} />
+            )}
           </Collapse>
         </TableCell>
       </TableRow>
