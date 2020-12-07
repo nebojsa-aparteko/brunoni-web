@@ -34,7 +34,7 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
       getBooking(task.bookingId).then(b => {
         setBooking(normalizeBooking(b.data()) as Booking);
       });
-  }, [task.bookingId]);
+  }, [task.bookingId, open]);
 
   const handleProgressClick = useCallback(
     (event: React.MouseEvent<unknown>) => {
@@ -49,7 +49,7 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
         setIsDialogOpen(true);
       }
     },
-    [setIsDialogOpen, booking],
+    [setIsDialogOpen, booking, isFirstOpen, task.bookingId],
   );
 
   const handleDialogClose = useCallback(() => {
