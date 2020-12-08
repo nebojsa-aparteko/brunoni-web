@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   Box,
   CardActions,
@@ -19,12 +19,9 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import Mousetrap from 'mousetrap';
 import ActingAs from '../../contexts/ActingAs';
 import chunk from 'lodash/fp/chunk';
-import { useBookingListPaginationContext } from '../../providers/BookingListPaginationProvider';
-import get from 'lodash/fp/get';
-import set from 'lodash/fp/set';
-import flow from 'lodash/fp/flow';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -47,44 +44,61 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
+const searchBookings = async (bookingIds: string[] | undefined) => {
+  if (bookingIds && bookingIds.length > 0)
+    return firebase
+      .firestore()
+      .collection('bookings')
+      .where('id', 'in', bookingIds)
+      .get()
+      .then(bookings => {
+        return new Promise<Booking[]>(resolve =>
+          resolve(bookings.docs.map(_ => normalizeBooking(_.data() as Booking))),
+        );
+      })
+      .catch(error => {
+        return new Promise<Booking[]>((resolve, reject) => reject(error));
+      });
+  return undefined;
+};
+
+const QuickSearchBooking: React.FC<Props> = ({ label, getBookingChunks }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
-  const [searchResult, setSearchResult] = useState<Booking[]>([]);
+  const [searchIDs, setSearchIDs] = useState<string[][]>();
+  const [searchResult, setSearchResult] = useState<Booking[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [, dispatch] = useContext(GlobalContext);
+  const [page, setPage] = useState<number>(0);
+  const [numberOfResults, setNumberOfResults] = useState(0);
   const actingAs = useContext(ActingAs)[0];
-  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
-  const { page, rowsPerPage } = bookingPaginationContextData;
 
-  const handleChangePage = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
-      if (setBookingPaginationContextData)
-        setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
-    },
-    [setBookingPaginationContextData, bookingPaginationContextData],
-  );
-
-  const handleChangeRowsPerPage = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      if (setBookingPaginationContextData)
-        setBookingPaginationContextData(
-          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
-        );
-    },
-    [setBookingPaginationContextData, bookingPaginationContextData],
-  );
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+    event?.stopPropagation();
+    setPage(page);
+    searchIDs &&
+      searchBookings(searchIDs[page]).then(result => {
+        setSearchResult(result || []);
+      });
+  };
 
   const handleBookingClick = (index: number) => {
-    window.open(`/bookings/${searchResult[index].id}`);
+    searchResult && searchResult[index] && window.open(`/bookings/${searchResult[index].id}`);
   };
+
   const handleBookingSearch = useCallback(() => {
     setIsLoading(true);
-    searchBookings(inputValue)
-      .then(result => {
-        console.log('Got Results ', result);
-        setSearchResult([].concat(normalizeBooking(result)));
-        setIsLoading(false);
+    getBookingChunks(inputValue)
+      .then(foundBookingIds => {
+        setNumberOfResults(foundBookingIds?.length || 0);
+        const chunkedIds = chunk(10)(foundBookingIds);
+        setSearchIDs(chunkedIds);
+        setPage(0);
+        foundBookingIds &&
+          foundBookingIds.length > 0 &&
+          searchBookings(chunkedIds[0]).then(bookings => {
+            setSearchResult(bookings || []);
+          });
       })
       .catch(error => {
         console.log('got error ', error);
@@ -93,11 +107,11 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           type: SHOW_ERROR_SNACKBAR,
           message: `There is no record with this criteria.`,
         });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-  }, [inputValue, dispatch, searchBookings]);
-  const resultChunks = useMemo(() => {
-    return chunk(rowsPerPage)(searchResult);
-  }, [searchResult, rowsPerPage]);
+  }, [inputValue, dispatch, getBookingChunks, page]);
 
   const inputRef = useRef();
 
@@ -130,12 +144,12 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           <SearchIcon />
         </IconButton>
       </FormControl>
-      {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+      {isLoading && !searchResult ? <CircularProgress color="inherit" size={20} /> : null}
       {!isLoading && searchResult && (
         <Box>
           <CardContent className={classes.content}>
-            {resultChunks &&
-              (get(page)(resultChunks) || []).map((result, index) => (
+            {searchResult &&
+              searchResult.map((result, index) => (
                 <Box key={index} onClick={() => handleBookingClick(index)}>
                   <BookingRow booking={searchResult[index]} isAdmin={!actingAs} preventDefaultClick />
                   <Divider />
@@ -144,15 +158,14 @@ const QuickSearchBooking: React.FC<Props> = ({ label, searchBookings }) => {
           </CardContent>
 
           <CardActions className={classes.actions}>
-            {searchResult && searchResult.length > rowsPerPage && (
+            {searchResult && searchResult.length > 0 && numberOfResults > 10 && (
               <TablePagination
                 component="div"
-                count={searchResult ? searchResult.length : 0}
+                count={numberOfResults}
                 onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
                 page={page}
-                rowsPerPage={rowsPerPage}
-                rowsPerPageOptions={[3, 5, 10, 25]}
+                rowsPerPage={10}
+                rowsPerPageOptions={[10]}
               />
             )}
           </CardActions>
@@ -166,5 +179,5 @@ export default QuickSearchBooking;
 
 interface Props {
   label: string;
-  searchBookings: (inputValue: string) => Promise<Booking[] | undefined>;
+  getBookingChunks: (inputValue: string) => Promise<string[] | undefined>;
 }

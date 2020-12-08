@@ -13,10 +13,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import QuickSearchBooking from './QuickSearchBooking';
 import QuickSearchQuote from './QuickSearchQuote';
 import firebase from '../../firebase';
-import { Booking } from '../../model/Booking';
 import ActingAs from '../../contexts/ActingAs';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { normalizeBooking } from '../../providers/BookingsProvider';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -52,7 +50,7 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const nestedSearchBookings = async (
+const getBookingIds = async (
   collection: string,
   fieldPath: string,
   inputValue: string,
@@ -60,7 +58,7 @@ const nestedSearchBookings = async (
   isAdmin: boolean,
   clientId?: string,
 ) => {
-  if (isAdmin && !clientId) return new Promise<Booking[]>((resolve, reject) => reject('No booking found'));
+  if (isAdmin && !clientId) return new Promise<string[]>((resolve, reject) => reject('No booking found'));
   const searchRef = isAdmin
     ? firebase.firestore().collection(collection)
     : firebase
@@ -72,29 +70,12 @@ const nestedSearchBookings = async (
     .get()
     .then(result => {
       if (result.docs.length > 0) {
-        const bookingIds = result.docs.map(_ => _.data().bookingId);
-        return (
-          firebase
-            .firestore()
-            .collection('bookings')
-            // .doc(bookingId)
-            .where('id', 'in', bookingIds)
-            .get()
-            .then(bookings => {
-              return new Promise<Booking[]>(resolve =>
-                resolve(bookings.docs.map(_ => normalizeBooking(_.data() as Booking))),
-              );
-            })
-            .catch(error => {
-              return new Promise<Booking[]>((resolve, reject) => reject(error));
-            })
-        );
-      } else return new Promise<Booking[]>((resolve, reject) => reject('No booking found'));
-    })
-    .catch(error => {
-      return new Promise<Booking[]>((resolve, reject) => reject(error));
+        return result.docs.map(_ => _.data().bookingId as string);
+      }
+      return [] as string[];
     });
 };
+
 const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
@@ -115,81 +96,81 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           <Typography>Find booking by:</Typography>
           <QuickSearchBooking
             label="File number"
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'bookings-search',
                 'bookingId',
                 inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
           <QuickSearchBooking
             label="BL number"
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'bookings-search',
                 'BL-No',
                 inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
           <QuickSearchBooking
             label={`${!actingAs ? "Customer's" : 'Your'} reference`}
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'bookings-search',
                 'Cust-BkgRef',
                 inputValue.toLowerCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
           <QuickSearchBooking
             label="Container number"
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'containers',
                 'container',
                 inputValue.toUpperCase().trim(),
                 '==',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
           <QuickSearchBooking
             label="Delivery reference"
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'bookings-search',
                 'deliveryRef',
                 inputValue.toLowerCase().trim(),
                 'array-contains',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
           <QuickSearchBooking
             label="Pickup reference"
-            searchBookings={inputValue =>
-              nestedSearchBookings(
+            getBookingChunks={inputValue => {
+              return getBookingIds(
                 'bookings-search',
                 'pickupRef',
                 inputValue.toLowerCase().trim(),
                 'array-contains',
                 !actingAs,
                 userRecord?.alphacomClientId,
-              )
-            }
+              );
+            }}
           />
         </DialogContent>
       </Box>
