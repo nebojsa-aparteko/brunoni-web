@@ -9,12 +9,9 @@ import UserInput from '../inputs/UserInput';
 import firebase from '../../firebase';
 import { pick } from 'lodash/fp';
 import UserNotificationRedirectionSwitch from '../UserNotificationRedirectionSwitch';
+import { Checkbox } from '@material-ui/core';
 
-interface Props {
-  user: UserRecord;
-}
-
-const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
+const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
   const assignableUsersWithoutCurrent = useMemo(
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
@@ -33,6 +30,14 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
   );
   return (
     <TableRow {...other}>
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={selected}
+          onClick={event => onSelectRow(event)}
+          onFocus={event => event.stopPropagation()}
+          color="primary"
+        />
+      </TableCell>
       <TableCell component="th" scope="row">
         {user.firstName} {user.lastName}
       </TableCell>
@@ -55,5 +60,11 @@ const TeamUserRow: React.FC<Props> = ({ user, ...other }) => {
     </TableRow>
   );
 };
+
+interface Props {
+  user: UserRecord;
+  selected: boolean;
+  onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
+}
 
 export default TeamUserRow;

@@ -48,7 +48,7 @@ const TaskStatusInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(event: ChangeEvent<{}>, user: TaskStatus | null) => onChange(event, user)}
+      onChange={(event: ChangeEvent<{}>, status: TaskStatus | null) => onChange(event, status)}
       autoHighlight
       open={open}
       onOpen={onOpen}

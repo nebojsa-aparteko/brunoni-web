@@ -111,7 +111,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, getBookingChunks }) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [inputValue, dispatch, getBookingChunks, page]);
+  }, [inputValue, dispatch, getBookingChunks]);
 
   const inputRef = useRef();
 
