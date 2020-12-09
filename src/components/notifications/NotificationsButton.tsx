@@ -5,6 +5,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import useNotifications from '../../hooks/useNotifications';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import NotificationsView from './NotificationsView';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
@@ -32,16 +33,18 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
-      {isNotificationDrawerOpen && (
-        <Drawer open={isNotificationDrawerOpen} anchor="right" onClose={handleShowNotifications}>
+      <Drawer open={isNotificationDrawerOpen} anchor="right" onClose={handleShowNotifications}>
+        {!notifications ? (
+          <ChartsCircularProgress />
+        ) : (
           <NotificationsView
             handleShow={handleShowNotifications}
             notifications={notifications}
             filterByUnread={showOnlyUnread}
             onFilterByUnread={() => setShowOnlyUnread(prevState => !prevState)}
           />
-        </Drawer>
-      )}
+        )}
+      </Drawer>
     </Fragment>
   );
 };

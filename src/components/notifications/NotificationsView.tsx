@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import {
   Box,
   Button,
@@ -14,6 +14,8 @@ import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
 import firebase from '../../firebase';
+import { GlobalContext } from '../../store/GlobalStore';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -41,77 +43,63 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const notificationsSort = (a: Notification, b: Notification) => {
-  if (a.seen === b.seen) {
-    if (a.at > b.at) {
-      return -1;
-    } else {
-      return 1;
-    }
-  } else {
-    if (a.seen) return 1;
-    else return -1;
-  }
+const readAllNotifications = async (notifications: Notification[]) => {
+  const batch = firebase.firestore().batch();
+  await Promise.all(
+    notifications
+      ?.filter(notification => !notification.seen)
+      .map(async notification => {
+        const sentNotifications = (
+          await firebase
+            .firestore()
+            .collection('email-notifications')
+            .doc(notification.userAlphacomId)
+            .get()
+        ).data() as {
+          lastSend: Date;
+          notifications: string[];
+        };
+        if (sentNotifications) {
+          await firebase
+            .firestore()
+            .collection('email-notifications')
+            .doc(notification.userAlphacomId)
+            .set({
+              lastSend: sentNotifications.lastSend,
+              notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+            });
+        }
+        return batch.update(
+          firebase
+            .firestore()
+            .collection('notifications')
+            .doc(notification.id),
+          { seen: true },
+        );
+      }),
+  );
+  batch.commit().catch(err => console.log(err));
 };
 
 const NotificationsView: React.FC<Props> = ({ notifications, handleShow, filterByUnread, onFilterByUnread }) => {
-  // const [sortedNotifications, setSortedNotifications] = useState<Notification[] | undefined>(
-  //   notifications
-  //     ? showOnlyUnread
-  //       ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
-  //       : notifications.sort((a, b) => notificationsSort(a, b))
-  //     : undefined,
-  // );
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
 
-  // useEffect(() => {
-  //   setSortedNotifications(
-  //     notifications
-  //       ? showOnlyUnread
-  //         ? notifications.filter(notification => !notification.seen).sort((a, b) => notificationsSort(a, b))
-  //         : notifications.sort((a, b) => notificationsSort(a, b))
-  //       : undefined,
-  //   );
-  // }, [notifications, showOnlyUnread]);
-
-  const markAllAsRead = useCallback(() => {
-    (async () => {
-      const batch = firebase.firestore().batch();
-      await Promise.all(
-        notifications
-          ?.filter(notification => !notification.seen)
-          .map(async notification => {
-            const sentNotifications = (
-              await firebase
-                .firestore()
-                .collection('email-notifications')
-                .doc(notification.userAlphacomId)
-                .get()
-            ).data() as {
-              lastSend: Date;
-              notifications: string[];
-            };
-            if (sentNotifications) {
-              await firebase
-                .firestore()
-                .collection('email-notifications')
-                .doc(notification.userAlphacomId)
-                .set({
-                  lastSend: sentNotifications.lastSend,
-                  notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-                });
-            }
-            return batch.update(
-              firebase
-                .firestore()
-                .collection('notifications')
-                .doc(notification.id),
-              { seen: true },
-            );
-          }),
-      );
-      batch.commit().catch(err => console.log(err));
-    })();
+  const markAllAsRead = useCallback(async () => {
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    readAllNotifications(notifications)
+      .then(() =>
+        enqueueSnackbar(<Typography color="inherit">Success.</Typography>, {
+          variant: 'success',
+        }),
+      )
+      .catch(error =>
+        enqueueSnackbar(<Typography color="inherit">Error marking all notifications as read - {error}</Typography>, {
+          variant: 'error',
+        }),
+      )
+      .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   }, [notifications]);
   return (
     <Grid xs={12} className={classes.root}>

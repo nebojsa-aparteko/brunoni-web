@@ -28,6 +28,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ActingAs from '../../contexts/ActingAs';
 import firebase from '../../firebase';
 import ActivityWithComment from '../bookings/checklist/ActivityWithComment';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -100,11 +101,45 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
   );
 };
 
+const handleSeenStatusChange = async (notification: Notification) => {
+  const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
+    lastSend: Date;
+    notifications: string[];
+  };
+  if (sentNotifications) {
+    await firebase
+      .firestore()
+      .collection('email-notifications')
+      .doc(notification.userAlphacomId)
+      .set({
+        lastSend: sentNotifications.lastSend,
+        notifications: sentNotifications.notifications.filter(u => u !== notification.id),
+      });
+  }
+  return firebase
+    .firestore()
+    .collection('notifications')
+    .doc(notification.id)
+    .set({ ...notification, seen: !notification.seen }, { merge: true })
+    .then(_ => console.log('Successfully saved'))
+    .catch(err => console.log(err));
+};
+
+const deleteNotification = async (notificationId: string | undefined) => {
+  if (notificationId)
+    return firebase
+      .firestore()
+      .collection('notifications')
+      .doc(notificationId)
+      .delete();
+};
+
 const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
   const history = useHistory();
   const [actingAs] = useContext(ActingAs);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -151,29 +186,6 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         }
       });
   }, [notification, handleShowDrawer, history]);
-  const handleSeenStatusChange = async () => {
-    const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
-      lastSend: Date;
-      notifications: string[];
-    };
-    if (sentNotifications) {
-      await firebase
-        .firestore()
-        .collection('email-notifications')
-        .doc(notification.userAlphacomId)
-        .set({
-          lastSend: sentNotifications.lastSend,
-          notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-        });
-    }
-    return firebase
-      .firestore()
-      .collection('notifications')
-      .doc(notification.id)
-      .set({ ...notification, seen: !notification.seen }, { merge: true })
-      .then(_ => console.log('Successfully saved'))
-      .catch(err => console.log(err));
-  };
 
   const handleCommentClick = () => {
     firebase
@@ -192,6 +204,23 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       });
   };
 
+  const handleDeleteNotification = () => {
+    deleteNotification(notification.id)
+      .then(() => {
+        enqueueSnackbar(<Typography color="inherit">Successfully deleted</Typography>, {
+          variant: 'success',
+          autoHideDuration: 1000,
+        });
+      })
+      .catch(error => {
+        console.error('failed to update deleted items', error);
+        enqueueSnackbar(<Typography color="inherit">Failed to delete notification - {error.message}</Typography>, {
+          variant: 'error',
+          autoHideDuration: 1000,
+        });
+      });
+  };
+
   return (
     <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
       <CardHeader
@@ -202,7 +231,10 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           <Fragment>
             {/*<Button onClick={onReadForAll}>Read for all</Button>*/}
 
-            <IconButton aria-label="close-button-notification-center" onClick={handleSeenStatusChange}>
+            <IconButton
+              aria-label="close-button-notification-center"
+              onClick={() => handleSeenStatusChange(notification)}
+            >
               {notification.seen ? <RadioButtonUncheckedIcon /> : <RadioButtonCheckedIcon />}
             </IconButton>
             {!actingAs && (
@@ -213,6 +245,9 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
             {!actingAs && (
               <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
                 <MenuItem onClick={onReadForAll}>Read for all</MenuItem>
+                <MenuItem onClick={handleDeleteNotification} style={{ color: '#ff0000' }}>
+                  Delete
+                </MenuItem>
               </Menu>
             )}
           </Fragment>
