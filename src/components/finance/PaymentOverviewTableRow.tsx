@@ -54,6 +54,8 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
                   ? theme.palette.primary.main
                   : status === WeeklyPaymentStatus.PAID
                   ? '#10881a'
+                  : status === WeeklyPaymentStatus.CLEARED
+                  ? '#b186df'
                   : '#999',
               color: 'white',
             }}

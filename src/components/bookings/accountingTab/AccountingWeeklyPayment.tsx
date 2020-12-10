@@ -374,7 +374,15 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
           </Typography>
           <Typography
             variant={'h5'}
-            style={{ fontWeight: 700, color: payment.status === WeeklyPaymentStatus.PAID ? 'rgba(0,200,81)' : '#000' }}
+            style={{
+              fontWeight: 700,
+              color:
+                payment.status === WeeklyPaymentStatus.PAID
+                  ? 'rgba(0,200,81)'
+                  : payment.status === WeeklyPaymentStatus.CLEARED
+                  ? '#b186df'
+                  : '#000',
+            }}
           >
             {WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
           </Typography>
