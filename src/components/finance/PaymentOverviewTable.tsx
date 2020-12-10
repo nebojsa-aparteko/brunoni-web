@@ -14,6 +14,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
   handleSelect,
   handleOpenPreviewDialog,
   handleSelectDeselectAll,
+  relevantCommissions,
 }) => {
   const total = useMemo(() => {
     return overviewData
@@ -23,6 +24,18 @@ const PaymentOverviewTable: React.FC<Props> = ({
         }))
       : [];
   }, [overviewData]);
+
+  const totalWithoutCommissions = useMemo(() => {
+    return relevantCommissions
+      ? Object.entries(groupBy((item: Commission) => item.currency)(relevantCommissions)).map(([key, value]) => ({
+          currency: key as Currency,
+          amount: value.reduce(
+            (previousValue, currentValue) => previousValue - currentValue.amount,
+            total.find(total => total.currency === (key as Currency))?.amount || 0,
+          ),
+        }))
+      : [];
+  }, [relevantCommissions, total]);
 
   return (
     <Fragment>
@@ -62,7 +75,20 @@ const PaymentOverviewTable: React.FC<Props> = ({
                 />
               ))}
               {total.map((value, index) => (
-                <PaymentOverviewTableTotalRow total={value} key={index} hasSelection={!!selectedPayments} />
+                <PaymentOverviewTableTotalRow
+                  total={value}
+                  key={index}
+                  hasSelection={!!selectedPayments}
+                  isTotal1={true}
+                />
+              ))}
+              {totalWithoutCommissions.map((value, index) => (
+                <PaymentOverviewTableTotalRow
+                  total={value}
+                  key={index}
+                  hasSelection={!!selectedPayments}
+                  isTotal1={false}
+                />
               ))}
             </TableBody>
           </Table>
@@ -80,4 +106,5 @@ interface Props {
   handleSelect?: (selectedId: string | undefined) => void;
   handleOpenPreviewDialog: (bookingId: string) => void;
   handleSelectDeselectAll?: () => void;
+  relevantCommissions?: Commission[];
 }

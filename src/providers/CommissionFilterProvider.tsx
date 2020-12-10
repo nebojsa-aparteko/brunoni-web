@@ -7,7 +7,7 @@ import { DateRange } from '../components/daterangepicker/types';
 import { LAST_3_MONTHS } from './filterActions';
 
 export interface CommissionFilterContext {
-  carrier: Carrier;
+  carriers: Carrier[];
   dueDate: Date;
   currency: Currency[];
   commissionStatus: CommissionStatus[];

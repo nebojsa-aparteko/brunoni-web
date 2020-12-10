@@ -56,7 +56,7 @@ const CommissionOverviewContainer = () => {
   const overviewData = useCommissions();
 
   const [filters, setFilters] = useCommissionFilterProviderContext();
-  const carriers = useContext(Carriers);
+  const availableCarriers = useContext(Carriers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
 
@@ -75,7 +75,7 @@ const CommissionOverviewContainer = () => {
     [setIsDialogOpen],
   );
 
-  const { currency, carrier, commissionStatus, dateRange } = filters;
+  const { currency, carriers, commissionStatus, dateRange } = filters;
 
   const classes = useStyles();
 
@@ -157,11 +157,11 @@ const CommissionOverviewContainer = () => {
           <Box display="flex" style={{ minWidth: theme.spacing(35) }} className={classes.spacer}>
             <CarrierInput
               label={'Carriers'}
-              carriers={carriers}
+              carriers={availableCarriers}
               onChange={carrier => {
-                if (setFilters) setFilters(set('carrier', carrier)(filters));
+                if (setFilters) setFilters(set('carriers', carrier ? [carrier] : undefined)(filters));
               }}
-              value={carrier}
+              value={carriers ? carriers[0] : undefined}
             />
           </Box>
           <Box className={classes.spacer}>

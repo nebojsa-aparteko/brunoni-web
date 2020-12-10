@@ -42,6 +42,10 @@ import { Currency } from '../../model/Payment';
 import useUser from '../../hooks/useUser';
 import { GlobalContext } from '../../store/GlobalStore';
 import { notEmpty } from '../../utilities/notEmpty';
+import useCommissions from '../../hooks/useCommissions';
+import Commission from '../../model/Commission';
+import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
+import Carrier from '../../model/Carrier';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -129,8 +133,9 @@ const postponePayments = async (offset: number, user: any, weeklyPayment: Weekly
 
 const PaymentOverviewContainer = () => {
   const overviewData = usePaymentOverview() as WeeklyPayment[];
-
+  const commissions = useCommissions() as Commission[];
   const [filters, setFilters] = useWeeklyPaymentFilterProviderContext();
+  const [, setCommissionsFilter] = useCommissionFilterProviderContext();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const carriers = useContext(Carriers);
@@ -139,6 +144,13 @@ const PaymentOverviewContainer = () => {
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
   const [user] = useUser();
   const [, dispatch] = useContext(GlobalContext);
+
+  useMemo(() => {
+    if (setCommissionsFilter)
+      setCommissionsFilter(prevState =>
+        set('carriers', [{ id: 'HSG' }, { id: 'DAL DEUTSCHE AFRIKA-LINIEN' }] as Carrier[])(prevState),
+      );
+  }, [setCommissionsFilter]);
 
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
@@ -185,9 +197,10 @@ const PaymentOverviewContainer = () => {
   const handleDateChange = useCallback(
     (date: Date) => {
       if (setFilters) setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
+      if (setCommissionsFilter) setCommissionsFilter(prevState => set('dueDate', startOfDay(date))(prevState));
       setDateOpen(false);
     },
-    [setFilters],
+    [setFilters, setCommissionsFilter],
   );
 
   const filteredOverviewData = useMemo(() => {
@@ -195,6 +208,10 @@ const PaymentOverviewContainer = () => {
       return currency.includes(data.currency) && (data.status ? status.includes(data.status) : true);
     });
   }, [overviewData, status, currency]);
+  const relevantBookingIds = filteredOverviewData.map(weeklyPayment => weeklyPayment.bookingId);
+  const relevantCommissions = commissions
+    ? commissions.filter(commission => relevantBookingIds.includes(commission.bookingId))
+    : [];
 
   const handleSelect = useCallback(
     (paymentId: string | undefined) => {
@@ -366,6 +383,7 @@ const PaymentOverviewContainer = () => {
           handleSelect={handleSelect}
           handleOpenPreviewDialog={handleDialogOpen}
           handleSelectDeselectAll={selectDeselectAll}
+          relevantCommissions={relevantCommissions}
         />
         {isDialogOpen && (
           <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />

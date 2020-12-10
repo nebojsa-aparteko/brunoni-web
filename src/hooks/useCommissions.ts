@@ -8,8 +8,7 @@ import { useCommissionFilterProviderContext } from '../providers/CommissionFilte
 
 export default (bookingId?: string) => {
   const [filters] = useCommissionFilterProviderContext();
-  const { carrier, dateRange } = filters;
-
+  const { carriers, dateRange } = filters;
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       if (bookingId) {
@@ -22,11 +21,13 @@ export default (bookingId?: string) => {
       if (filters.dateRange?.endDate) {
         query = query.where('dueDate', '<=', filters.dateRange.endDate);
       }
-      if (carrier) {
+      if (carriers && carriers.length > 0) {
         query = query.where(
           'carrier',
-          '==',
-          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+          'in',
+          carriers.map(carrier =>
+            carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+          ),
         );
       }
       if (dateRange) {
@@ -34,7 +35,7 @@ export default (bookingId?: string) => {
       }
       return query;
     },
-    [dateRange, carrier, bookingId],
+    [dateRange, carriers, bookingId],
   );
 
   const paymentCollection = useFirestoreCollection('commission', query);
@@ -43,7 +44,7 @@ export default (bookingId?: string) => {
   }) as Commission[];
 };
 
-const normalizeCommissionData = (item: any) =>
+export const normalizeCommissionData = (item: any) =>
   flow(
     update('dueDate', safeInvoke('toDate')),
     update('invDate', safeInvoke('toDate')),
