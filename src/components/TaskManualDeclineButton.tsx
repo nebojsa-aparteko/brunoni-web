@@ -19,7 +19,8 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
     <IconButton
       aria-label="mark-as-resolved"
       size="small"
-      onClick={() =>
+      onClick={event => {
+        event.stopPropagation();
         taskRef(task.bookingId, task.id)
           .set({ resolved: false }, { merge: true })
           .then(() =>
@@ -30,8 +31,8 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
                 )
               : new Promise(resolve => resolve()),
           )
-          .then(() => (updateComponent ? updateComponent() : null))
-      }
+          .then(() => (updateComponent ? updateComponent() : null));
+      }}
     >
       <HighlightOffIcon />
     </IconButton>
@@ -39,7 +40,8 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
     <IconButton
       aria-label="mark-as-unresolved"
       size="small"
-      onClick={() =>
+      onClick={event => {
+        event.stopPropagation();
         taskRef(task.bookingId, task.id)
           .set({ resolved: true }, { merge: true })
           .then(() =>
@@ -50,8 +52,8 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
                 )
               : new Promise(resolve => resolve()),
           )
-          .then(() => (updateComponent ? updateComponent() : null))
-      }
+          .then(() => (updateComponent ? updateComponent() : null));
+      }}
     >
       <HighlightOffOutlinedIcon />
     </IconButton>

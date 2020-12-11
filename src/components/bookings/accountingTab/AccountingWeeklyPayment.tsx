@@ -455,7 +455,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
             </Button>
           </React.Fragment>
         )}
-        {payment.status === WeeklyPaymentStatus.BLOCKED && (
+        {[WeeklyPaymentStatus.BLOCKED, WeeklyPaymentStatus.CLEARED].includes(payment.status) && (
           <Button onClick={handleDialogOpen} color="primary" variant="outlined">
             Revert Approval
           </Button>
