@@ -42,6 +42,7 @@ import ChecklistUserAction from './ChecklistUserAction';
 import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
+import { MentionItem } from 'react-mentions';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -153,13 +154,28 @@ export const createActivityObject = (data: {
   internal?: boolean;
   isAccountingActivity?: boolean;
   paymentReference?: string;
+  type?: ActivityType;
+  comment?: string;
+  mentions?: MentionItem[];
 }): ActivityLogItem => {
-  const { by, changeType, internal, checklistItem, paymentReference, documents, stage, isAccountingActivity } = data;
+  const {
+    by,
+    changeType,
+    internal,
+    checklistItem,
+    paymentReference,
+    documents,
+    stage,
+    isAccountingActivity,
+    type,
+    comment,
+    mentions,
+  } = data;
   return flow(omitBy(isNil))({
     changeType: changeType,
     by: by,
     at: new Date(),
-    type: ActivityType.ACTIVITY,
+    type: type || ActivityType.ACTIVITY,
     isInternal: internal,
     checklistItem: checklistItem
       ? omitBy(isNil)({
@@ -170,6 +186,8 @@ export const createActivityObject = (data: {
       : undefined,
     documents: documents,
     stage: stage,
+    comment: comment,
+    mentions: mentions,
     isAccountingActivity: !!isAccountingActivity,
     paymentReference: paymentReference,
   } as ActivityLogItem);

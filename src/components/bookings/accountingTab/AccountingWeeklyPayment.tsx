@@ -7,12 +7,21 @@ import {
   Box,
   Button,
   Container,
+  createStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   ExpansionPanel,
   ExpansionPanelActions,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  IconButton,
+  makeStyles,
   Menu,
   MenuItem,
+  Theme,
   Typography,
 } from '@material-ui/core';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
@@ -43,6 +52,31 @@ import { DebitCredit } from '../../../model/Payment';
 import useUser from '../../../hooks/useUser';
 import { GlobalContext } from '../../../store/GlobalStore';
 import { ActivityLogProvider } from '../checklist/ActivityLogContext';
+import CloseIcon from '@material-ui/icons/Close';
+import CommentInput from '../../CommentInput';
+import { ActivityType } from '../checklist/ActivityModel';
+import { RejectionInput } from '../documentApproval/RejectionModal';
+import ActingAs from '../../../contexts/ActingAs';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    closeModal: {
+      position: 'absolute',
+      top: '5px',
+      right: '12px',
+      width: '47px',
+      height: '47px',
+    },
+    dialogActions: {
+      display: 'flex',
+      justifyContent: 'space-evenly',
+      alignItems: 'center',
+    },
+    content: {
+      margin: theme.spacing(1),
+    },
+  }),
+);
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -172,6 +206,68 @@ const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => 
   }
 };
 
+interface RevertApprovalDialogProps {
+  isOpen: boolean;
+  payment: WeeklyPayment;
+  booking: Booking;
+  handleChangePaymentStatus: (rejectionInput?: RejectionInput) => void;
+  handleClose: () => void;
+}
+
+const RevertApprovalDialog: React.FC<RevertApprovalDialogProps> = ({
+  isOpen,
+  payment,
+  booking,
+  handleChangePaymentStatus,
+  handleClose,
+}) => {
+  const classes = useStyles();
+  const [rejectionInput, setRejectionInput] = useState<RejectionInput | undefined>(undefined);
+
+  const onRejectionInputChange = useCallback((input: RejectionInput) => {
+    setRejectionInput(input);
+  }, []);
+
+  const onReject = useCallback(() => {
+    handleChangePaymentStatus(rejectionInput);
+  }, [rejectionInput, handleChangePaymentStatus]);
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Box>
+        <DialogTitle disableTypography>
+          <Typography variant="h4">
+            {payment.status === WeeklyPaymentStatus.IN_PROGRESS
+              ? 'Please confirm payment approval'
+              : 'Please confirm approvement reversal'}
+          </Typography>
+          <IconButton onClick={handleClose} className={classes.closeModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Typography className={classes.content}>
+            {payment.status === WeeklyPaymentStatus.IN_PROGRESS
+              ? 'If you confirm this action, that will block this file! Are you sure you want to approve payment on this file?'
+              : 'Enter the reason for reversal:'}
+          </Typography>
+          <CommentInput booking={booking} onInputChange={rejectionInput => onRejectionInputChange(rejectionInput)} />
+        </DialogContent>
+        <Divider />
+
+        <DialogActions className={classes.dialogActions}>
+          <Button onClick={handleClose} color="primary" variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={onReject} color="primary" variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
+  );
+};
+
 const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
@@ -179,6 +275,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [user] = useUser();
+  const actingAs = useContext(ActingAs)[0];
   const [, dispatch] = useContext(GlobalContext);
 
   const handleClickMenu = (event: any) => {
@@ -334,32 +431,49 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
     [payment, booking, getActivityLogUserData, storeAccountingActivity, user],
   );
 
-  const handleChangePaymentStatus = useCallback(() => {
-    const activityType: ActivityChangeType =
-      payment.status === WeeklyPaymentStatus.BLOCKED
-        ? ActivityChangeType.REVERT_PAYMENT_APPROVAL
-        : ActivityChangeType.APPROVE_PAYMENT;
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    return approveWeeklyPayment(user, payment)
-      .then(_ => {
-        handleDialogClose();
-        storeAccountingActivity(() =>
-          addActivityItem(
-            booking!.id,
-            createActivityObject({
-              changeType: activityType,
-              by: getActivityLogUserData(),
-              isAccountingActivity: true,
-              paymentReference: payment.reference,
-            }),
-          ),
-        );
-      })
-      .finally(() => {
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        if (updateComponent) updateComponent();
-      });
-  }, [payment, booking, getActivityLogUserData, storeAccountingActivity, handleDialogClose, user]);
+  const handleChangePaymentStatus = useCallback(
+    (rejectionInput?: RejectionInput) => {
+      const activityType: ActivityChangeType =
+        payment.status === WeeklyPaymentStatus.BLOCKED
+          ? ActivityChangeType.REVERT_PAYMENT_APPROVAL
+          : ActivityChangeType.APPROVE_PAYMENT;
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      return approveWeeklyPayment(user, payment)
+        .then(_ => {
+          handleDialogClose();
+          storeAccountingActivity(() =>
+            addActivityItem(
+              booking!.id,
+              createActivityObject({
+                type: rejectionInput ? ActivityType.ACTIVITY_WITH_COMMENT : ActivityType.ACTIVITY,
+                changeType: activityType,
+                by: getActivityLogUserData(),
+                comment: rejectionInput?.messagePlain,
+                internal: !actingAs,
+                mentions: rejectionInput?.mentions,
+                isAccountingActivity: true,
+                paymentReference: payment.reference,
+              }),
+            ),
+          );
+        })
+        .finally(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          if (updateComponent) updateComponent();
+        });
+    },
+    [
+      payment,
+      booking,
+      getActivityLogUserData,
+      storeAccountingActivity,
+      handleDialogClose,
+      user,
+      actingAs,
+      dispatch,
+      updateComponent,
+    ],
+  );
 
   return (
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
@@ -462,19 +576,23 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
         )}
       </ExpansionPanelActions>
       {anchorEl && <PostponeMenu anchorEl={anchorEl} handleClose={handleClose} changePayment={handleChangePayDate} />}
-      {isDialogOpen && (
+      {payment.status === WeeklyPaymentStatus.IN_PROGRESS ? (
         <ConfirmationDialog
           isOpen={isDialogOpen}
           description="If you confirm this action, that will block this file! Are you sure you want to approve payment on this file?"
-          label={
-            payment.status === WeeklyPaymentStatus.IN_PROGRESS
-              ? 'Please confirm payment approval'
-              : 'Please confirm approved reversal'
-          }
+          label="Please confirm payment approval"
           handleConfirm={handleChangePaymentStatus}
           handleClose={handleDialogClose}
         />
-      )}
+      ) : payment.status === WeeklyPaymentStatus.BLOCKED ? (
+        <RevertApprovalDialog
+          isOpen={isDialogOpen}
+          payment={payment}
+          booking={booking}
+          handleChangePaymentStatus={rejectionInput => handleChangePaymentStatus(rejectionInput)}
+          handleClose={handleDialogClose}
+        />
+      ) : null}
     </ExpansionPanel>
   );
 };
