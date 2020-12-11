@@ -9,7 +9,7 @@ import UserRecordContext from '../../../contexts/UserRecordContext';
 import { ActivityLogUserData } from './ChecklistItemModel';
 import firebase from '../../../firebase';
 import { useActivityLogState } from './ActivityLogContext';
-import { flow, omitBy, isNil } from 'lodash/fp';
+import { flow, isNil, omitBy } from 'lodash/fp';
 import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import { MentionItem } from 'react-mentions';
 import { Booking } from '../../../model/Booking';
@@ -38,7 +38,9 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
     'bookings',
     useCallback(
       query => {
-        const queryByItemFilter = showMore ? query : query.where('type', '==', ActivityType.COMMENT);
+        const queryByItemFilter = showMore
+          ? query
+          : query.where('type', 'in', [ActivityType.COMMENT, ActivityType.ACTIVITY_WITH_COMMENT]);
         const queryByAdminRole = isAdmin ? query : queryByItemFilter.where('isInternal', '==', isAdmin);
         return queryByAdminRole.orderBy('at', 'desc');
       },
@@ -64,11 +66,11 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
           ? item.isAccountingActivity
             ? showMore
               ? true
-              : item.type === ActivityType.COMMENT
+              : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT
             : false
           : showMore
           ? true
-          : item.type === ActivityType.COMMENT,
+          : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT,
       ),
     [showMore, normalizedActivityLog, isAccounting],
   );
