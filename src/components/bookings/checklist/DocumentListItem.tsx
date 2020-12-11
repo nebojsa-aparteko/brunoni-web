@@ -21,6 +21,7 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import CheckCircleOutlineOutlinedIcon from '@material-ui/icons/CheckCircleOutlineOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
 import CompareIcon from '@material-ui/icons/Compare';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import {
   ActivityLogUserData,
   ChecklistItem,
@@ -45,6 +46,7 @@ import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
 import { showCrispChat } from '../../../index';
 import { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
+import { fileWithExt } from './ChecklistItemRow';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -221,6 +223,19 @@ const DocumentListItem = ({
     [storageBasePath, checklistItem, deleteFile, enqueueSnackbar],
   );
 
+  function copyFilenameToClipboard() {
+    let dummy = document.createElement('textarea');
+    document.body.appendChild(dummy);
+    dummy.value = fileWithExt(item.name).name;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+    enqueueSnackbar(<Typography color="inherit">Copied file name to clipboard!</Typography>, {
+      variant: 'default',
+      autoHideDuration: 1000,
+    });
+  }
+
   return (
     <div {...other}>
       <ListItem>
@@ -263,6 +278,9 @@ const DocumentListItem = ({
         </a>
         <ListItemSecondaryAction>
           <div className={classes.progressWrapper}>
+            <IconButton size="small" aria-label="Add Comment" onClick={copyFilenameToClipboard}>
+              <AssignmentIcon />
+            </IconButton>
             {isAdmin &&
             !internal &&
             checklistItem &&
