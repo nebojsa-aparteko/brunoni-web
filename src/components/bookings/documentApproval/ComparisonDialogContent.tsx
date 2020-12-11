@@ -155,7 +155,7 @@ const ComparisonDialogContent = ({
             ) : null
           ) : (
             <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
-              <ExpandingBookingContent booking={booking} />
+              <ExpandingBookingContent booking={booking} initialFreightTab={1} />
             </Grid>
           )}
           {!isAccountingDialog ? (
