@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  Box,
   createStyles,
   Dialog,
   DialogContent,
@@ -21,6 +20,8 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import ActivityLogContainer from '../bookings/checklist/ActivityLogContainer';
+import BookingTaskExpansionPanel from '../bookings/BookingTaskExpansionPanel';
+import useTasksPerBooking from '../../hooks/useTasksPerBooking';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -32,6 +33,12 @@ const useStyles = makeStyles(() =>
     },
     dialogTitleBar: {
       height: '48px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'left',
+    },
+    bookingLink: {
+      marginLeft: 12,
     },
     closeModal: {
       position: 'absolute',
@@ -52,6 +59,42 @@ const useStyles = makeStyles(() =>
       height: '100%',
       overflow: 'scroll',
     },
+    bookingTasksContainer: {
+      flex: '0 0 auto',
+      padding: 4,
+      maxHeight: '30%',
+      overflow: 'scroll',
+    },
+    mainContentContainer: {
+      flex: '1 1 auto',
+      padding: 4,
+      marginTop: 8,
+      height: '68%',
+    },
+    gridContainer: {
+      display: 'flex',
+      flexGrow: 1,
+      overflow: 'hidden',
+      height: '100%',
+    },
+    bookingContentContainer: {
+      paddingTop: 8,
+      maxHeight: '100%',
+      overflow: 'scroll',
+    },
+    accountingTabContainer: {
+      maxHeight: '55%',
+      overflow: 'scroll',
+      flex: '1 0 auto',
+    },
+    activityLogContainer: {
+      overflow: 'scroll',
+      flex: '1 1 auto',
+      marginTop: 4,
+    },
+    noBookingText: {
+      margin: 'auto',
+    },
   }),
 );
 
@@ -66,6 +109,8 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [booking, setBooking] = useState<Booking | undefined>();
+  const tasks = useTasksPerBooking(bookingId || '');
+
   useEffect(() => {
     if (!bookingId) return;
 
@@ -83,15 +128,10 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
       fullWidth
       classes={{ paper: classes.dialogPaper }}
     >
-      <DialogTitle
-        disableTypography
-        id="dialog-title-check-list"
-        className={classes.dialogTitleBar}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}
-      >
+      <DialogTitle disableTypography id="dialog-title-check-list" className={classes.dialogTitleBar}>
         <Typography variant="h4">{`File No: ${bookingId}`}</Typography>
         {booking && (
-          <Link href={`/bookings/${bookingId}`} style={{ marginLeft: 12 }} target="_blank">
+          <Link href={`/bookings/${bookingId}`} target="_blank" className={classes.bookingLink}>
             View Booking
           </Link>
         )}
@@ -100,43 +140,35 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
-        <Grid
-          container
-          direction="column"
-          spacing={1}
-          className={classes.dialogContent}
-          style={{ flex: 1, minHeight: 0, padding: 16, paddingLeft: 22 }}
-        >
-          <Grid
-            container
-            direction="row"
-            spacing={1}
-            style={{ display: 'flex', overflow: 'hidden', width: '100%', minHeight: 0 }}
-          >
-            {booking ? (
-              <React.Fragment>
-                <Grid item xs={12} md={8} className={classes.bookingViewContainer} style={{ paddingTop: 8 }}>
-                  <ExpandingBookingContent booking={booking} initialFreightTab={1} />
-                </Grid>
-                <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
-                  <Paper style={{ maxHeight: '55vh', overflow: 'scroll', flex: '1 0 auto' }}>
-                    <AccountingTabContent booking={booking} updateComponent={updateComponent} />
-                  </Paper>
-                  <Box style={{ overflow: 'scroll', flex: '1 1 auto', marginTop: 4, paddingLeft: 1, paddingRight: 1 }}>
-                    <ActivityLogProvider>
-                      <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
-                    </ActivityLogProvider>
-                  </Box>
-                </Grid>
-              </React.Fragment>
-            ) : (
-              <Typography variant={'h5'} style={{ margin: 'auto' }}>
-                It appears that the booking you selected doesn't exist, please contact an administrator for further
-                instructions.
-              </Typography>
-            )}
-          </Grid>
-        </Grid>
+        {tasks && tasks.length > 0 && (
+          <Paper elevation={2} className={classes.bookingTasksContainer}>
+            <BookingTaskExpansionPanel tasks={tasks} />
+          </Paper>
+        )}
+        <Paper elevation={2} className={classes.mainContentContainer}>
+          {booking ? (
+            <Grid container direction="row" spacing={1} className={classes.gridContainer}>
+              <Grid item xs={12} md={8} className={classes.bookingContentContainer}>
+                <ExpandingBookingContent booking={booking} initialFreightTab={1} />
+              </Grid>
+              <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
+                <Paper elevation={2} className={classes.accountingTabContainer}>
+                  <AccountingTabContent booking={booking} updateComponent={updateComponent} />
+                </Paper>
+                <Paper elevation={2} className={classes.activityLogContainer}>
+                  <ActivityLogProvider>
+                    <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
+                  </ActivityLogProvider>
+                </Paper>
+              </Grid>
+            </Grid>
+          ) : (
+            <Typography variant={'h5'} className={classes.noBookingText}>
+              It appears that the booking you selected doesn't exist, please contact an administrator for further
+              instructions.
+            </Typography>
+          )}
+        </Paper>
       </DialogContent>
     </Dialog>
   );
