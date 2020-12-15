@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Box,
   Button,
   createStyles,
   Dialog,
@@ -12,6 +13,7 @@ import {
   makeStyles,
   MenuItem,
   Select,
+  Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { Booking } from '../../../model/Booking';
@@ -34,6 +36,9 @@ const useStyles = makeStyles(theme =>
     },
     dialogTitleBar: {
       height: '48px',
+    },
+    fileNumber: {
+      alignSelf: 'baseline',
     },
     closeModal: {
       position: 'absolute',
@@ -121,42 +126,46 @@ const ComparisonDialog: React.FC<Props> = ({
         disableTypography
         id="dialog-title-check-list"
         className={classes.dialogTitleBar}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}
       >
-        {!isAccountingDialog && leftDocument && sortedDocuments ? (
-          <FormControl className={classes.formControl}>
-            <InputLabel>Left Document</InputLabel>
-            <Select value={leftDocument?.url} onChange={handleChangeLeftDocument} MenuProps={MenuProps}>
-              {sortedDocuments
-                .filter(document => document.url !== rightDocument?.url)
-                .map(document => (
-                  <MenuItem key={document.url} value={document.url}>
-                    {(document.name || document.storedName) +
-                      ' (' +
-                      formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
-                      ')'}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-        ) : null}
-        {!isAccountingDialog && rightDocument && sortedDocuments ? (
-          <FormControl className={classes.formControl}>
-            <InputLabel>Right Document</InputLabel>
-            <Select value={rightDocument?.url} onChange={handleChangeRightDocument} MenuProps={MenuProps}>
-              {sortedDocuments
-                .filter(document => document.url !== leftDocument?.url)
-                .map(document => (
-                  <MenuItem key={document.url} value={document.url}>
-                    {(document.name || document.storedName) +
-                      ' (' +
-                      formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
-                      ')'}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-        ) : null}
+        <Typography variant="h4" className={classes.fileNumber}>{`File No: ${booking.id}`}</Typography>
+        <Box style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          {!isAccountingDialog && leftDocument && sortedDocuments ? (
+            <FormControl className={classes.formControl}>
+              <InputLabel>Left Document</InputLabel>
+              <Select value={leftDocument?.url} onChange={handleChangeLeftDocument} MenuProps={MenuProps}>
+                {sortedDocuments
+                  .filter(document => document.url !== rightDocument?.url)
+                  .map(document => (
+                    <MenuItem key={document.url} value={document.url}>
+                      {(document.name || document.storedName) +
+                        ' (' +
+                        formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
+                        ')'}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          ) : null}
+          {!isAccountingDialog && rightDocument && sortedDocuments ? (
+            <FormControl className={classes.formControl}>
+              <InputLabel>Right Document</InputLabel>
+              <Select value={rightDocument?.url} onChange={handleChangeRightDocument} MenuProps={MenuProps}>
+                {sortedDocuments
+                  .filter(document => document.url !== leftDocument?.url)
+                  .map(document => (
+                    <MenuItem key={document.url} value={document.url}>
+                      {(document.name || document.storedName) +
+                        ' (' +
+                        formatDateSafe(document.uploadedAt, 'HH:MM - dd.MM.yyyy') +
+                        ')'}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          ) : null}
+        </Box>
+
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
