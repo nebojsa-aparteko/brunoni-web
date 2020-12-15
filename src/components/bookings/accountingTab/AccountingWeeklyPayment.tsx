@@ -51,7 +51,6 @@ import { addDays } from 'date-fns';
 import { DebitCredit } from '../../../model/Payment';
 import useUser from '../../../hooks/useUser';
 import { GlobalContext } from '../../../store/GlobalStore';
-import { ActivityLogProvider } from '../checklist/ActivityLogContext';
 import CloseIcon from '@material-ui/icons/Close';
 import CommentInput from '../../CommentInput';
 import { ActivityType } from '../checklist/ActivityModel';
@@ -513,26 +512,24 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               <ChartsCircularProgress />
             </Container>
           ) : (
-            <ActivityLogProvider>
-              {accountingDocuments.map(item => (
-                <DocumentListItem
-                  key={item.id}
-                  item={item}
-                  booking={booking}
-                  storageBasePath={storageBasePath}
-                  changeStatus={(item: DocumentValue, status: DocumentValueStatus) =>
-                    handleDocumentStatusChange(item, status)
-                  }
-                  deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
-                  internal={true}
-                  isAccountingDocument={true}
-                  markAsFinal={() => {}}
-                  comparableDocuments={[]}
-                  selectForComparison={() => {}}
-                  paymentStatus={payment.status}
-                />
-              ))}
-            </ActivityLogProvider>
+            accountingDocuments.map(item => (
+              <DocumentListItem
+                key={item.id}
+                item={item}
+                booking={booking}
+                storageBasePath={storageBasePath}
+                changeStatus={(item: DocumentValue, status: DocumentValueStatus) =>
+                  handleDocumentStatusChange(item, status)
+                }
+                deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
+                internal={true}
+                isAccountingDocument={true}
+                markAsFinal={() => {}}
+                comparableDocuments={[]}
+                selectForComparison={() => {}}
+                paymentStatus={payment.status}
+              />
+            ))
           )}
           {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
             <DropZone

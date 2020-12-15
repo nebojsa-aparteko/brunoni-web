@@ -155,12 +155,12 @@ const DocumentListItem = ({
   const handleMention = useCallback(
     () =>
       activityLogContext.setState({
-        documentReference: { ...item, isInternal: internal },
+        documentReference: { ...item, isInternal: internal } as ChecklistItemValueDocument,
         checklistReference: checklistItem,
         internal: isAccountingDocument ? true : internal,
-        isAccountingActivity: isAccountingDialog,
+        isAccountingActivity: isAccountingDocument,
       }),
-    [checklistItem, internal, item, activityLogContext, isAccountingDialog, isAccountingDocument],
+    [checklistItem, internal, item, activityLogContext, isAccountingDocument],
   );
   const checklistCheckedRule = useCallback(() => checklistItem?.checked, [checklistItem]);
 

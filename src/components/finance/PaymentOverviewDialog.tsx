@@ -146,28 +146,28 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
           </Paper>
         )}
         <Paper elevation={2} className={classes.mainContentContainer}>
-          {booking ? (
-            <Grid container direction="row" spacing={1} className={classes.gridContainer}>
-              <Grid item xs={12} md={8} className={classes.bookingContentContainer}>
-                <ExpandingBookingContent booking={booking} initialFreightTab={1} />
-              </Grid>
-              <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
-                <Paper elevation={2} className={classes.accountingTabContainer}>
-                  <AccountingTabContent booking={booking} updateComponent={updateComponent} />
-                </Paper>
-                <Paper elevation={2} className={classes.activityLogContainer}>
-                  <ActivityLogProvider>
+          <ActivityLogProvider>
+            {booking ? (
+              <Grid container direction="row" spacing={1} className={classes.gridContainer}>
+                <Grid item xs={12} md={8} className={classes.bookingContentContainer}>
+                  <ExpandingBookingContent booking={booking} initialFreightTab={1} />
+                </Grid>
+                <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
+                  <Paper elevation={2} className={classes.accountingTabContainer}>
+                    <AccountingTabContent booking={booking} updateComponent={updateComponent} />
+                  </Paper>
+                  <Paper elevation={2} className={classes.activityLogContainer}>
                     <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
-                  </ActivityLogProvider>
-                </Paper>
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
-          ) : (
-            <Typography variant={'h5'} className={classes.noBookingText}>
-              It appears that the booking you selected doesn't exist, please contact an administrator for further
-              instructions.
-            </Typography>
-          )}
+            ) : (
+              <Typography variant={'h5'} className={classes.noBookingText}>
+                It appears that the booking you selected doesn't exist, please contact an administrator for further
+                instructions.
+              </Typography>
+            )}
+          </ActivityLogProvider>
         </Paper>
       </DialogContent>
     </Dialog>
