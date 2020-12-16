@@ -349,6 +349,7 @@ const PaymentOverviewContainer = () => {
               onChange={handleDateChange}
               open={dateOpen}
               onOpen={() => setDateOpen(true)}
+              onClose={() => setDateOpen(false)}
               label="Payment Date"
             />
           </Box>

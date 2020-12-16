@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
+  Box,
   createStyles,
   Dialog,
   DialogContent,
@@ -60,13 +61,11 @@ const useStyles = makeStyles(() =>
       overflow: 'scroll',
     },
     bookingTasksContainer: {
-      flex: '0 0 auto',
+      flex: '0 1 auto',
       padding: 4,
-      maxHeight: '30%',
-      overflow: 'scroll',
     },
     mainContentContainer: {
-      flex: '1 1 auto',
+      flex: '1 0 auto',
       padding: 4,
       marginTop: 8,
       height: '68%',
@@ -90,7 +89,9 @@ const useStyles = makeStyles(() =>
     activityLogContainer: {
       overflow: 'scroll',
       flex: '1 1 auto',
-      marginTop: 4,
+      marginTop: 8,
+      padding: 1,
+      paddingBottom: 4,
     },
     noBookingText: {
       margin: 'auto',
@@ -153,12 +154,12 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
                   <ExpandingBookingContent booking={booking} initialFreightTab={1} />
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
-                  <Paper elevation={2} className={classes.accountingTabContainer}>
+                  <Paper className={classes.accountingTabContainer}>
                     <AccountingTabContent booking={booking} updateComponent={updateComponent} />
                   </Paper>
-                  <Paper elevation={2} className={classes.activityLogContainer}>
+                  <Box className={classes.activityLogContainer}>
                     <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
-                  </Paper>
+                  </Box>
                 </Grid>
               </Grid>
             ) : (
