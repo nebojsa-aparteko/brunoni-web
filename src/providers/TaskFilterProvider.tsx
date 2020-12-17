@@ -3,12 +3,14 @@ import useUser from '../hooks/useUser';
 import { UserRecordMin } from '../model/UserRecord';
 import { TaskStatus } from '../components/TaskStatusChip';
 import { TaskCategory } from '../model/Task';
+import Carrier from '../model/Carrier';
 
 export interface TaskFilterProviderContextFilters {
   assignee?: UserRecordMin | undefined;
   showClientTasks: boolean;
   taskStatus: TaskStatus;
   taskCategory: TaskCategory;
+  carrier?: Carrier;
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {

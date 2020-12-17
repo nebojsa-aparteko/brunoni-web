@@ -12,7 +12,7 @@ import UserRecordContext from '../contexts/UserRecordContext';
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
   const [filters] = useTaskFilterProviderContext();
-  const { assignee, showClientTasks, taskCategory } = filters;
+  const { assignee, showClientTasks, taskCategory, carrier } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
 
@@ -21,6 +21,13 @@ export default function useTasks() {
       let query = collection.where('resolved', '==', false).where('show', '==', true);
       if (taskCategory) {
         query = query.where('taskCategory', '==', taskCategory);
+      }
+      if (carrier) {
+        query = query.where(
+          'carrierId',
+          '==',
+          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
+        );
       }
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
@@ -33,7 +40,7 @@ export default function useTasks() {
       }
       return query;
     },
-    [assignee, showClientTasks, actingAs, userRecord, taskCategory],
+    [assignee, showClientTasks, actingAs, userRecord, taskCategory, carrier],
   );
 
   useEffect(() => {

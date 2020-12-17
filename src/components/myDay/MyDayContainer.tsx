@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -20,7 +19,7 @@ import set from 'lodash/fp/set';
 import { useTaskFilterProviderContext } from '../../providers/TaskFilterProvider';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import theme from '../../theme';
-import UserRecord, { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { UserRecordMinProperties } from '../../model/UserRecord';
 import pick from 'lodash/fp/pick';
 import ActingAs from '../../contexts/ActingAs';
 import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
@@ -31,6 +30,9 @@ import { Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
 import { showCrispChat } from '../../index';
 import PaymentOverviewDialog from '../finance/PaymentOverviewDialog';
+import CarrierInput from '../inputs/CarrierInput';
+import Carriers from '../../contexts/Carriers';
+import Carrier from '../../model/Carrier';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -54,9 +56,9 @@ const MyDayContainer = () => {
     [selectedTasks],
   );
 
-  const { assignee, taskStatus, taskCategory } = filters;
-  const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+  const { assignee, taskStatus, taskCategory, carrier } = filters;
   const actingAs = useContext(ActingAs)[0];
+  const availableCarriers = useContext(Carriers);
   const onAssignedFilter = useCallback(
     (_, user) => {
       if (setFilters) {
@@ -140,6 +142,16 @@ const MyDayContainer = () => {
     [filters, setFilters],
   );
 
+  const onCarrierFilter = useCallback(
+    (carrier: Carrier | null | undefined) => {
+      if (setFilters) {
+        setSelectedTasks([]);
+        setFilters(set('carrier', carrier || undefined)(filters));
+      }
+    },
+    [filters, setFilters],
+  );
+
   const onCategoryChange = useCallback(
     (category: TaskCategory) => {
       if (setFilters) {
@@ -158,25 +170,6 @@ const MyDayContainer = () => {
     taskStatus,
     tasks,
   ]);
-
-  const onAssignUser = useCallback(() => {
-    selectedTasks.forEach(id => {
-      const teamTasks = id.split('-');
-      const [bookingId, taskId] = teamTasks[0].split('/');
-
-      firebase
-        .firestore()
-        .collection('bookings')
-        .doc(bookingId)
-        .collection('tasks')
-        .doc(taskId)
-        .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
-        .then(() => {
-          setSelectedTasks([]);
-          setAssignedUserTrigger(prevState => !prevState);
-        });
-    });
-  }, [selectedTasks, assignTo]);
 
   const selectDeselectAll = () => {
     //check if the length of selected tasks is equal to the number of all tasks
@@ -228,19 +221,6 @@ const MyDayContainer = () => {
         {!actingAs && (
           <Box display="flex" flexDirection="row" mb={2} justifyContent="flex-start" flexWrap="wrap">
             <Box display="flex" alignItems="center" mb={2}>
-              <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
-                <UserInput
-                  label="Assign task to"
-                  users={users}
-                  onChange={(_, user) => {
-                    setAssignTo(user || undefined);
-                  }}
-                  value={assignTo}
-                />
-              </Box>
-              <Button color="primary" variant="contained" onClick={onAssignUser} style={{ minWidth: 140, height: 54 }}>
-                Assign user
-              </Button>
               <Box style={{ minWidth: 'fit-content', alignItems: 'center' }}>
                 <TaskClientFilterSwitch setSelectedTasks={setSelectedTasks} />
               </Box>
@@ -259,6 +239,9 @@ const MyDayContainer = () => {
                   tasksStatus={['Overdue', 'Pending']}
                   value={taskStatus}
                 />
+              </Box>
+              <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
+                <CarrierInput label="Carrier" onChange={onCarrierFilter} carriers={availableCarriers} value={carrier} />
               </Box>
             </Box>
             <Box display="flex" alignItems="center" mb={2} pl={4}>
@@ -289,6 +272,8 @@ const MyDayContainer = () => {
             normalizedTasks={normalizedTasks}
             shouldShowTeamTasks={!!(assignee && assignee.alphacomId)}
             selectedTasks={selectedTasks}
+            setSelectedTasks={setSelectedTasks}
+            trigger={() => setAssignedUserTrigger(prevState => !prevState)}
             onSelectRow={onSelectRow}
             updateComponent={() => setAssignedUserTrigger(prevState => !prevState)}
             taskCategory={taskCategory}
