@@ -45,6 +45,7 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
         <TableCell id="taskDescriptionMyDay" align="left">
           {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
         </TableCell>
+        <TableCell align="center">{task.blNumber || '-'}</TableCell>
         <TableCell align="center">
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
