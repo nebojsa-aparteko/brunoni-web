@@ -15,6 +15,7 @@ export default interface Task {
   additionalInfo?: TaskAdditionalInfo;
   createAt?: Date;
   carrierId?: string;
+  blNumber?: string;
   category?: BookingCategory;
   checklistId: string;
   checklistStageId?: string;
