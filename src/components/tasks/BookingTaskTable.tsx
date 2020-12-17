@@ -11,6 +11,7 @@ const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask 
           <TableRow>
             <TableCell align="center" />
             <TableCell align="center">Task</TableCell>
+            <TableCell align="center">B/L Number</TableCell>
             <TableCell align="center">File No.</TableCell>
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>

@@ -93,7 +93,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         </Typography>
       ) : (
         <Typography className={classes.toolbarTitle} variant="h5" id="tableTitle" component="div">
-          Admins
+          Tasks
         </Typography>
       )}
       <Box display="flex" style={{ minWidth: theme.spacing(25) }} mr={1}>

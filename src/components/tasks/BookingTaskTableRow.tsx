@@ -44,6 +44,7 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
           {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
         </Typography>
       </TableCell>
+      <TableCell align="center">{task.blNumber || '-'}</TableCell>
       <TableCell align="center">
         <Link target="_blank" href={`/bookings/${task.bookingId}`}>
           {task.bookingId}
