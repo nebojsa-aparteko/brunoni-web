@@ -81,7 +81,14 @@ const readAllNotifications = async (notifications: Notification[]) => {
   batch.commit().catch(err => console.log(err));
 };
 
-const NotificationsView: React.FC<Props> = ({ notifications, handleShow, filterByUnread, onFilterByUnread }) => {
+const NotificationsView: React.FC<Props> = ({
+  notifications,
+  handleShow,
+  filterByUnread,
+  onFilterByUnread,
+  onShowMore,
+  numberToLoad,
+}) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
@@ -101,6 +108,7 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow, filterB
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   }, [notifications]);
+
   return (
     <Grid xs={12} className={classes.root}>
       <Box flexDirection="column" justifyContent="center">
@@ -122,6 +130,11 @@ const NotificationsView: React.FC<Props> = ({ notifications, handleShow, filterB
             <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
           </ListItem>
         ))}
+        {notifications.length == numberToLoad && (
+          <Box display="flex" justifyContent="center">
+            <Button onClick={onShowMore}>Show More</Button>
+          </Box>
+        )}
       </Box>
     </Grid>
   );
@@ -133,4 +146,6 @@ interface Props {
   handleShow: () => void;
   filterByUnread: boolean;
   onFilterByUnread: () => void;
+  onShowMore: () => void;
+  numberToLoad: number;
 }

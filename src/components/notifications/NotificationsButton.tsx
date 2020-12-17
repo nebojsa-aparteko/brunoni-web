@@ -9,10 +9,14 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-  const handleShowNotifications = () => setIsNotificationDrawerOpen(prevState => !prevState);
+  const [numberToLoad, setNumberToLoad] = useState<number>(10);
+  const handleShowNotifications = () => {
+    isNotificationDrawerOpen && setNumberToLoad(10);
+    setIsNotificationDrawerOpen(prevState => !prevState);
+  };
   const userRecord = useContext(UserRecordContext);
   const [showOnlyUnread, setShowOnlyUnread] = useState(false);
-  const notifications = useNotifications(userRecord?.alphacomId, showOnlyUnread);
+  const notifications = useNotifications(userRecord?.alphacomId, showOnlyUnread, numberToLoad);
 
   const notificationCount = useMemo(
     () =>
@@ -20,6 +24,10 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
       0,
     [notifications],
   );
+
+  const handleShowMore = () => {
+    setNumberToLoad(prevState => prevState + 10);
+  };
 
   return (
     <Fragment>
@@ -42,6 +50,8 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
             notifications={notifications}
             filterByUnread={showOnlyUnread}
             onFilterByUnread={() => setShowOnlyUnread(prevState => !prevState)}
+            onShowMore={handleShowMore}
+            numberToLoad={numberToLoad}
           />
         )}
       </Drawer>
