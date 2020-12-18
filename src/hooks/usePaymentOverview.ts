@@ -15,7 +15,7 @@ export default (bookingId?: string) => {
       if (bookingId) {
         return collection.where('bookingId', '==', bookingId);
       }
-      let query = collection.orderBy('bookingId', 'asc').limit(500);
+      let query = collection.orderBy('bookingId', 'asc');
       if (paymentDate) {
         query = query.where('payDate', '==', paymentDate);
       }
