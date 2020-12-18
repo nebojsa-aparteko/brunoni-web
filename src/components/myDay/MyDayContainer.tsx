@@ -101,8 +101,14 @@ const MyDayContainer = () => {
         ?.reduce(async (previousValue, currentValue) => {
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
-              ? await getOperationsTeamTasks(currentValue.checklistItems || [])
-              : await getAccountingTeamTasks(currentValue.taskTypes || []);
+              ? await getOperationsTeamTasks(
+                  currentValue.checklistItems || [],
+                  carrier?.name ? getId(carrier?.name) : undefined,
+                )
+              : await getAccountingTeamTasks(
+                  currentValue.taskTypes || [],
+                  carrier?.name ? getId(carrier?.name) : undefined,
+                );
           const p = await previousValue;
 
           const newTuple = [
@@ -130,7 +136,7 @@ const MyDayContainer = () => {
         }, Promise.resolve([] as [string, Task[]][]))
         .then(n => setNormalizedTasks(n || []));
     }
-  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -170,6 +176,17 @@ const MyDayContainer = () => {
     taskStatus,
     tasks,
   ]);
+
+  const filteredNormalizedTasks = useMemo(
+    () =>
+      taskStatus
+        ? (normalizedTasks?.map(normalizedTask => [
+            normalizedTask[0],
+            normalizedTask[1].filter(getTaskFilter(taskStatus)),
+          ]) as [string, Task[]][] | undefined)
+        : normalizedTasks,
+    [taskStatus, normalizedTasks],
+  );
 
   const selectDeselectAll = () => {
     //check if the length of selected tasks is equal to the number of all tasks
@@ -269,7 +286,7 @@ const MyDayContainer = () => {
         {filteredTasks && normalizedTasks ? (
           <MyDayTable
             tasks={filteredTasks}
-            normalizedTasks={normalizedTasks}
+            normalizedTasks={filteredNormalizedTasks}
             shouldShowTeamTasks={!!(assignee && assignee.alphacomId)}
             selectedTasks={selectedTasks}
             setSelectedTasks={setSelectedTasks}
@@ -298,7 +315,7 @@ const MyDayContainer = () => {
 
 export default MyDayContainer;
 
-const getOperationsTeamTasks = (checklistItems: string[]) => {
+const getOperationsTeamTasks = (checklistItems: string[], carrierId: string | undefined) => {
   const stages: ChecklistNames[] = [];
   checklistItems.forEach(c => {
     const ch = getChecklistItem(c as ChecklistNames);
@@ -306,18 +323,16 @@ const getOperationsTeamTasks = (checklistItems: string[]) => {
       stages.push(ch.checklistStageId);
     }
   });
+  let query = firebase.firestore().collectionGroup('tasks');
+  if (carrierId) query = query.where('carrierId', '==', carrierId);
   return stages.length > 0
-    ? firebase
-        .firestore()
-        .collectionGroup('tasks')
+    ? query
         .where('checklistStageId', 'in', stages)
         .where('resolved', '==', false)
         .where('show', '==', true)
         .where('userRole', '==', UserRole.ADMIN)
         .get()
-    : firebase
-        .firestore()
-        .collectionGroup('tasks')
+    : query
         .where('checklistId', 'in', checklistItems)
         .where('resolved', '==', false)
         .where('show', '==', true)
@@ -325,15 +340,16 @@ const getOperationsTeamTasks = (checklistItems: string[]) => {
         .get();
 };
 
-const getAccountingTeamTasks = (taskTypes: string[]) =>
-  firebase
-    .firestore()
-    .collectionGroup('tasks')
+const getAccountingTeamTasks = (taskTypes: string[], carrierId: string | undefined) => {
+  let query = firebase.firestore().collectionGroup('tasks');
+  if (carrierId) query = query.where('carrierId', '==', carrierId);
+  return query
     .where('id', 'in', taskTypes)
     .where('resolved', '==', false)
     .where('show', '==', true)
     .where('userRole', '==', UserRole.ADMIN)
     .get();
+};
 
 export const getTeamsPerUser = (assignee: UserRecord) =>
   firebase
