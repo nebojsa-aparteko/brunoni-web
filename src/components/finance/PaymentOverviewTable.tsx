@@ -6,7 +6,7 @@ import WeeklyPayment from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
 import Commission from '../../model/Commission';
-import Payment, { Currency } from '../../model/Payment';
+import Payment, { Currency, DebitCredit } from '../../model/Payment';
 
 const PaymentOverviewTable: React.FC<Props> = ({
   overviewData,
@@ -20,7 +20,13 @@ const PaymentOverviewTable: React.FC<Props> = ({
     return overviewData
       ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(([key, value]) => ({
           currency: key as Currency,
-          amount: value.reduce((previousValue, currentValue) => currentValue.amount + previousValue, 0),
+          amount: value.reduce(
+            (previousValue, currentValue) =>
+              currentValue.debitCredit === DebitCredit.DEBIT
+                ? previousValue + currentValue.amount
+                : previousValue - currentValue.amount,
+            0,
+          ),
         }))
       : [];
   }, [overviewData]);

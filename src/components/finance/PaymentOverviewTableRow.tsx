@@ -3,7 +3,7 @@ import { WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/Weekl
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
-import Payment from '../../model/Payment';
+import Payment, { DebitCredit } from '../../model/Payment';
 import { CommissionStatus } from '../../model/Commission';
 
 const PaymentOverviewTableRow: React.FC<Props> = ({
@@ -63,7 +63,9 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         )}
       </TableCell>
       <TableCell align="center">{paymentData.currency}</TableCell>
-      <TableCell align="right">{currencyFormatter(paymentData.currency)(paymentData.amount)}</TableCell>
+      <TableCell align="right">{`${paymentData.debitCredit === DebitCredit.CREDIT ? '-' : ''} ${currencyFormatter(
+        paymentData.currency,
+      )(paymentData.amount)}`}</TableCell>
     </TableRow>
   );
 };
