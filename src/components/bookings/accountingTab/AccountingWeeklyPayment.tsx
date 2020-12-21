@@ -1,5 +1,6 @@
 import WeeklyPayment, {
   WeeklyPaymentApiAction,
+  WeeklyPaymentPlatformStatus,
   WeeklyPaymentStatus,
   WeeklyPaymentStatusLabel,
 } from '../../../model/WeeklyPayment';
@@ -22,6 +23,7 @@ import {
   Menu,
   MenuItem,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
@@ -56,6 +58,8 @@ import CommentInput from '../../CommentInput';
 import { ActivityType } from '../checklist/ActivityModel';
 import { RejectionInput } from '../documentApproval/RejectionModal';
 import ActingAs from '../../../contexts/ActingAs';
+import PanToolIcon from '@material-ui/icons/PanTool';
+import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -474,6 +478,44 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
     ],
   );
 
+  const handleChangePaymentPlatformStatus = useCallback(
+    (newStatus: WeeklyPaymentPlatformStatus | null) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      if (payment.id)
+        return Promise.resolve(changeWeeklyPayment(payment.id, { platformStatus: newStatus }))
+          .then(_ => {
+            storeAccountingActivity(() =>
+              addActivityItem(
+                booking!.id,
+                createActivityObject({
+                  changeType:
+                    newStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+                      ? ActivityChangeType.PUT_ON_HOLD
+                      : ActivityChangeType.REVERT_PUT_ON_HOLD,
+                  by: getActivityLogUserData(),
+                  isAccountingActivity: true,
+                  paymentReference: payment.reference,
+                }),
+              ),
+            );
+          })
+          .finally(() => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+            if (updateComponent) updateComponent();
+          });
+      else return undefined;
+    },
+    [
+      booking,
+      dispatch,
+      getActivityLogUserData,
+      payment.id,
+      payment.reference,
+      storeAccountingActivity,
+      updateComponent,
+    ],
+  );
+
   return (
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
       <ExpansionPanelSummary style={{ backgroundColor: 'rgba(198,238,241,0.24)', display: 'flex' }}>
@@ -492,12 +534,16 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               color:
                 payment.status === WeeklyPaymentStatus.PAID
                   ? 'rgba(0,200,81)'
-                  : payment.status === WeeklyPaymentStatus.CLEARED
+                  : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
                   ? '#b186df'
+                  : payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+                  ? '#df6b00'
                   : '#000',
             }}
           >
-            {WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
+            {payment.platformStatus
+              ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+              : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
           </Typography>
         </Box>
       </ExpansionPanelSummary>
@@ -544,6 +590,21 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
       <ExpansionPanelActions>
         {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
           <React.Fragment>
+            {payment.status === WeeklyPaymentStatus.IN_PROGRESS ? (
+              payment.platformStatus !== WeeklyPaymentPlatformStatus.ON_HOLD ? (
+                <Tooltip title={'Put this weekly payment on hold'}>
+                  <IconButton onClick={() => handleChangePaymentPlatformStatus(WeeklyPaymentPlatformStatus.ON_HOLD)}>
+                    <PanToolIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                <Tooltip title={'Revert to in progress'}>
+                  <IconButton onClick={() => handleChangePaymentPlatformStatus(null)}>
+                    <SettingsBackupRestoreIcon />
+                  </IconButton>
+                </Tooltip>
+              )
+            ) : null}
             <Button onClick={handleClickMenu} color="primary" variant="outlined">
               Postpone Payment
             </Button>
@@ -552,6 +613,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               color="primary"
               variant="contained"
               disabled={
+                payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD ||
                 !(
                   payment.status === WeeklyPaymentStatus.IN_PROGRESS &&
                   (accountingDocuments && accountingDocuments.length > 0
@@ -566,7 +628,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
             </Button>
           </React.Fragment>
         )}
-        {[WeeklyPaymentStatus.BLOCKED, WeeklyPaymentStatus.CLEARED].includes(payment.status) && (
+        {((payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
+          payment.status === WeeklyPaymentStatus.BLOCKED) && (
           <Button onClick={handleDialogOpen} color="primary" variant="outlined">
             Revert Approval
           </Button>
@@ -581,7 +644,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
           handleConfirm={handleChangePaymentStatus}
           handleClose={handleDialogClose}
         />
-      ) : payment.status === WeeklyPaymentStatus.BLOCKED ? (
+      ) : (payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
+        payment.status === WeeklyPaymentStatus.BLOCKED ? (
         <RevertApprovalDialog
           isOpen={isDialogOpen}
           payment={payment}

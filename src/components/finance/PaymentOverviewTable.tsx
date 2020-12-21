@@ -73,7 +73,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
               {(overviewData as Payment[]).map((payment, index) => (
                 <PaymentOverviewTableRow
                   paymentData={payment}
-                  status={overviewData[index].status}
+                  status={(overviewData[index] as WeeklyPayment).platformStatus || overviewData[index].status}
                   key={payment.id}
                   selectedPayments={selectedPayments}
                   handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}

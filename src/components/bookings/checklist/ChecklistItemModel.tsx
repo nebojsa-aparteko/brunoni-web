@@ -105,6 +105,8 @@ export enum ActivityText {
   POSTPONE_PAYMENT = ' has postponed payment ',
   APPROVE_PAYMENT = ' has approved payment ',
   REVERT_PAYMENT_APPROVAL = ' has reverted the approval of payment ',
+  PUT_ON_HOLD = ' has put on hold payment ',
+  REVERT_PUT_ON_HOLD = ' has reverted the "On Hold" status of payment ',
 }
 
 export enum ActivityChangeType {
@@ -122,6 +124,8 @@ export enum ActivityChangeType {
   POSTPONE_PAYMENT,
   APPROVE_PAYMENT,
   REVERT_PAYMENT_APPROVAL,
+  PUT_ON_HOLD,
+  REVERT_PUT_ON_HOLD,
 }
 
 export enum ChecklistNames {

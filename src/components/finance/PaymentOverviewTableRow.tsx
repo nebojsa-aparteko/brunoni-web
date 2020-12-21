@@ -1,5 +1,5 @@
 import React from 'react';
-import { WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/WeeklyPayment';
+import { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/WeeklyPayment';
 import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
@@ -47,15 +47,17 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         {status && (
           <Chip
             size="small"
-            label={WeeklyPaymentStatusLabel[status as WeeklyPaymentStatus]}
+            label={WeeklyPaymentStatusLabel[status as WeeklyPaymentStatus | WeeklyPaymentPlatformStatus]}
             style={{
               backgroundColor:
                 status === WeeklyPaymentStatus.BLOCKED
                   ? theme.palette.primary.main
                   : status === WeeklyPaymentStatus.PAID
                   ? '#10881a'
-                  : status === WeeklyPaymentStatus.CLEARED
+                  : status === WeeklyPaymentPlatformStatus.CLEARED
                   ? '#b186df'
+                  : status === WeeklyPaymentPlatformStatus.ON_HOLD
+                  ? '#df6b00'
                   : '#999',
               color: 'white',
             }}
@@ -74,7 +76,7 @@ export default PaymentOverviewTableRow;
 
 interface Props {
   paymentData: Payment;
-  status: WeeklyPaymentStatus | CommissionStatus;
+  status: WeeklyPaymentStatus | WeeklyPaymentPlatformStatus | CommissionStatus;
   selectedPayments: string[] | undefined;
   handleSelect?: () => void;
   handleOpenPreviewDialog: (bookingId: string) => void;

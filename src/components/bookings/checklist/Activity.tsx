@@ -43,6 +43,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.APPROVE_PAYMENT;
       case ActivityChangeType.REVERT_PAYMENT_APPROVAL:
         return ActivityText.REVERT_PAYMENT_APPROVAL;
+      case ActivityChangeType.PUT_ON_HOLD:
+        return ActivityText.PUT_ON_HOLD;
+      case ActivityChangeType.REVERT_PUT_ON_HOLD:
+        return ActivityText.REVERT_PUT_ON_HOLD;
     }
   };
 
@@ -78,7 +82,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         ' for comparison'}
       {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
       activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
-      activity.changeType === ActivityChangeType.POSTPONE_PAYMENT
+      activity.changeType === ActivityChangeType.POSTPONE_PAYMENT ||
+      activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
+      activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD
         ? activity.paymentReference
         : null}
       {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&

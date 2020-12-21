@@ -45,10 +45,12 @@ export interface TaskAdditionalInfo {
 
 export enum TaskAdditionalInfoType {
   AMS_CLOSING = 'AMS_CLOSING',
+  ON_HOLD = 'ON_HOLD',
 }
 
 export enum TaskAdditionalInfoTypeDescription {
   AMS_CLOSING = 'AMS Closing:',
+  ON_HOLD = 'This payment is on hold.',
 }
 export enum TaskType {
   // EXPORT TASKS

@@ -1,6 +1,6 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react';
 import Carrier from '../model/Carrier';
-import { WeeklyPaymentStatus } from '../model/WeeklyPayment';
+import { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus } from '../model/WeeklyPayment';
 import { startOfDay } from 'date-fns/fp';
 import { Currency } from '../model/Payment';
 import { CommissionStatus } from '../model/Commission';
@@ -10,6 +10,7 @@ export interface WeeklyPaymentFilterContext {
   paymentDate: Date;
   currency: Currency[];
   status: WeeklyPaymentStatus[];
+  platformStatus: WeeklyPaymentPlatformStatus[];
   commissionStatus: CommissionStatus[];
 }
 
@@ -17,6 +18,7 @@ export const TASK_FILTERS_INITIAL_STATE = {
   currency: [Currency.USD],
   paymentDate: startOfDay(new Date()),
   status: [WeeklyPaymentStatus.IN_PROGRESS, WeeklyPaymentStatus.BLOCKED],
+  platformStatus: [WeeklyPaymentPlatformStatus.ON_HOLD],
   commissionStatus: [CommissionStatus.INVOICED],
 } as WeeklyPaymentFilterContext;
 

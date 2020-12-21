@@ -20,6 +20,7 @@ import {
 } from '@material-ui/core';
 import WeeklyPayment, {
   WeeklyPaymentApiAction,
+  WeeklyPaymentPlatformStatus,
   WeeklyPaymentStatus,
   WeeklyPaymentStatusLabel,
 } from '../../model/WeeklyPayment';
@@ -65,7 +66,7 @@ const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      maxHeight: ITEM_HEIGHT * 5.5 + ITEM_PADDING_TOP,
       width: 250,
     },
   },
@@ -170,7 +171,10 @@ const PaymentOverviewContainer = () => {
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { currency, paymentDate, carrier, status } = filters;
+  const { currency, paymentDate, carrier, status, platformStatus } = filters;
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
+    status ? status.map(status => status.toString()).concat(platformStatus as string[]) : [],
+  );
 
   const classes = useStyles();
 
@@ -188,12 +192,30 @@ const PaymentOverviewContainer = () => {
     },
     [setFilters],
   );
+
   const onStatusChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters) setFilters(prevState => set('status', event.target.value as WeeklyPaymentStatus[])(prevState));
+      const newSelectedValues = event.target.value as string[];
+      setSelectedStatuses(newSelectedValues);
+
+      if (setFilters) {
+        const platformStatuses = newSelectedValues.filter(status =>
+          Object.values(WeeklyPaymentPlatformStatus).includes(status as WeeklyPaymentPlatformStatus),
+        );
+        const paymentStatuses = newSelectedValues.filter(status =>
+          Object.values(WeeklyPaymentStatus).includes(status as WeeklyPaymentStatus),
+        );
+
+        setFilters(prevState =>
+          set('platformStatus', platformStatuses.length > 0 ? platformStatuses : undefined)(prevState),
+        );
+
+        setFilters(prevState => set('status', paymentStatuses.length > 0 ? paymentStatuses : undefined)(prevState));
+      }
     },
     [setFilters],
   );
+
   const handleDateChange = useCallback(
     (date: Date) => {
       if (setFilters) setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
@@ -205,9 +227,17 @@ const PaymentOverviewContainer = () => {
 
   const filteredOverviewData = useMemo(() => {
     return (overviewData || []).filter(data => {
-      return currency.includes(data.currency) && (data.status ? status.includes(data.status) : true);
+      return (
+        currency.includes(data.currency) &&
+        selectedStatuses &&
+        selectedStatuses.length > 0 &&
+        (data.platformStatus
+          ? platformStatus && platformStatus.includes(data.platformStatus)
+          : selectedStatuses.includes(data.status))
+      );
     });
-  }, [overviewData, status, currency]);
+  }, [overviewData, status, platformStatus, currency]);
+
   const relevantBookingIds = filteredOverviewData.map(weeklyPayment => weeklyPayment.bookingId);
   const relevantCommissions = commissions
     ? commissions.filter(commission => relevantBookingIds.includes(commission.bookingId))
@@ -327,17 +357,15 @@ const PaymentOverviewContainer = () => {
               labelId="status-select"
               id="status-select-checkbox"
               multiple
-              value={status}
+              value={selectedStatuses}
               onChange={onStatusChange}
               input={<Input />}
-              renderValue={selected =>
-                (selected as any[]).map(s => WeeklyPaymentStatusLabel[s as WeeklyPaymentStatus]).join(', ')
-              }
+              renderValue={selected => (selected as any[]).map(s => s as string).join(', ')}
               MenuProps={MenuProps}
             >
               {Object.entries(WeeklyPaymentStatusLabel).map(([key, value]) => (
                 <MenuItem key={key} value={key}>
-                  <Checkbox checked={status.indexOf(key as WeeklyPaymentStatus) > -1} />
+                  <Checkbox checked={selectedStatuses.includes(key)} />
                   <ListItemText primary={value} />
                 </MenuItem>
               ))}
