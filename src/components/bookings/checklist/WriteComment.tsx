@@ -15,6 +15,7 @@ import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import UserRecord from '../../../model/UserRecord';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
+import { TeamType } from '../../../model/Teams';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,7 +106,13 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
       if (assignedCustomerUser) {
         return admins
           ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
-          .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)))
+          .concat(
+            teams
+              ?.filter(team =>
+                isAccounting ? team.teamType === TeamType.ACCOUNTING : team.teamType === TeamType.OPERATIONS,
+              )
+              .map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)),
+          )
           .concat([
             {
               id: assignedCustomerUser.id,

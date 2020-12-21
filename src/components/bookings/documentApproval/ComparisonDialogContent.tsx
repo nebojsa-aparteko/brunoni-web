@@ -28,6 +28,7 @@ import { RejectionInput } from './RejectionModal';
 import ExpandingBookingContent from './ExpandingBookingContent';
 import XLSXViewer from '../../XLSXViewer';
 import DOCXViewer from '../../DOCXViewer';
+import { TeamType } from '../../../model/Teams';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -187,7 +188,11 @@ const ComparisonDialogContent = ({
         {amendmentRequested ? (
           <React.Fragment>
             <Typography style={{ marginTop: 8 }}>Please enter the description of what needs to be changed:</Typography>
-            <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+            <CommentInput
+              booking={booking}
+              onInputChange={onRejectionInputChange}
+              mentionTeamsType={isAccountingDialog ? TeamType.ACCOUNTING : TeamType.OPERATIONS}
+            />
           </React.Fragment>
         ) : filteredActivities && filteredActivities.length > 0 ? (
           <ExpansionPanel>

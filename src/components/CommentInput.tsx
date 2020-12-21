@@ -8,8 +8,9 @@ import UserRecord from '../model/UserRecord';
 import useAdminUsers from '../hooks/useAdminUsers';
 import useTeams from '../hooks/useTeams';
 import { RejectionInput } from './bookings/documentApproval/RejectionModal';
+import { TeamType } from '../model/Teams';
 
-const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
+const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsType }) => {
   const [messageText, setMessageText] = useState('');
   const actingAs = useContext(ActingAs)[0];
   const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(undefined);
@@ -22,7 +23,11 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
     if (!actingAs) {
       const tempUsers = admins
         ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
-        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
+        .concat(
+          teams
+            ?.filter(team => (mentionTeamsType ? team.teamType === mentionTeamsType : true))
+            .map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)),
+        );
       return assignedCustomerUser
         ? tempUsers.concat([
             {
@@ -41,7 +46,7 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange }) => {
           ]
         : [];
     }
-  }, [actingAs, assignedUser, teams, admins, assignedCustomerUser]);
+  }, [actingAs, assignedUser, teams, admins, assignedCustomerUser, mentionTeamsType]);
 
   useEffect(() => {
     firebase
@@ -93,4 +98,5 @@ export default CommentInput;
 interface Props {
   booking: Booking;
   onInputChange: (input: RejectionInput) => void;
+  mentionTeamsType?: TeamType;
 }

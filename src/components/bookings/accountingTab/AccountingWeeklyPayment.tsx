@@ -60,6 +60,7 @@ import { RejectionInput } from '../documentApproval/RejectionModal';
 import ActingAs from '../../../contexts/ActingAs';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
+import { TeamType } from '../../../model/Teams';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -254,7 +255,11 @@ const RevertApprovalDialog: React.FC<RevertApprovalDialogProps> = ({
               ? 'If you confirm this action, that will block this file! Are you sure you want to approve payment on this file?'
               : 'Enter the reason for reversal:'}
           </Typography>
-          <CommentInput booking={booking} onInputChange={rejectionInput => onRejectionInputChange(rejectionInput)} />
+          <CommentInput
+            booking={booking}
+            onInputChange={rejectionInput => onRejectionInputChange(rejectionInput)}
+            mentionTeamsType={TeamType.ACCOUNTING}
+          />
         </DialogContent>
         <Divider />
 

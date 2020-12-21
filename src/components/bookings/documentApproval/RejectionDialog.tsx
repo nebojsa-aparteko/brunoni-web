@@ -16,6 +16,7 @@ import CommentInput from '../../CommentInput';
 import { Booking } from '../../../model/Booking';
 import { ChecklistItem } from '../checklist/ChecklistItemModel';
 import { RejectionInput } from './RejectionModal';
+import { TeamType } from '../../../model/Teams';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -54,7 +55,11 @@ const RejectionDialog: React.FC<Props> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
-          <CommentInput booking={booking} onInputChange={onRejectionInputChange} />
+          <CommentInput
+            booking={booking}
+            onInputChange={onRejectionInputChange}
+            mentionTeamsType={TeamType.OPERATIONS}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" variant="outlined" autoFocus>
