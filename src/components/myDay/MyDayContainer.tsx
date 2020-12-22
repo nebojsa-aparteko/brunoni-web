@@ -33,6 +33,7 @@ import PaymentOverviewDialog from '../finance/PaymentOverviewDialog';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import Carrier from '../../model/Carrier';
+import { GlobalContext } from '../../store/GlobalStore';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -42,6 +43,7 @@ const MyDayContainer = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
+  const [, dispatch] = useContext(GlobalContext);
 
   //we use this only to render again after assigning users, because we dont work with live data
   const [assignedUserTrigger, setAssignedUserTrigger] = useState(false);
@@ -99,11 +101,18 @@ const MyDayContainer = () => {
     if (filteredTeams) {
       filteredTeams
         ?.reduce(async (previousValue, currentValue) => {
+          dispatch({ type: 'START_GLOBAL_LOADING' });
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
               ? await getOperationsTeamTasks(
                   currentValue.checklistItems || [],
-                  carrier?.name ? getId(carrier?.name) : undefined,
+                  carrier?.id
+                    ? carrier.id === 'HSG'
+                      ? 'Hamburg Süd'
+                      : carrier.id === 'SLOM'
+                      ? 'SLOMAN NEPTUN'
+                      : carrier.id
+                    : undefined,
                 )
               : await getAccountingTeamTasks(
                   currentValue.taskTypes || [],
@@ -134,9 +143,12 @@ const MyDayContainer = () => {
           ] as [string, Task[]];
           return [...p, newTuple];
         }, Promise.resolve([] as [string, Task[]][]))
-        .then(n => setNormalizedTasks(n || []));
+        .then(n => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          setNormalizedTasks(n || []);
+        });
     }
-  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
