@@ -22,29 +22,19 @@ export default (bookingId?: string) => {
       if (status || (platformStatus && platformStatus.length > 0)) {
         // we must add IN_PROGRESS if platformStatus ON_HOLD is selected and BLOCKED if platformStatus CLEARED is selected and filter them locally
         let extendedStatusArray: string[] = status ? [...status] : [];
-        if (platformStatus && platformStatus.length > 0) {
-          if (platformStatus && platformStatus.length === 1) {
-            if (
-              platformStatus.includes(WeeklyPaymentPlatformStatus.ON_HOLD) &&
-              !extendedStatusArray.includes(WeeklyPaymentStatus.IN_PROGRESS)
-            ) {
-              extendedStatusArray = extendedStatusArray.concat(WeeklyPaymentStatus.IN_PROGRESS as string);
-              query = query.where('platformStatus', '==', WeeklyPaymentPlatformStatus.ON_HOLD);
-            }
-            if (
-              platformStatus.includes(WeeklyPaymentPlatformStatus.CLEARED) &&
-              !extendedStatusArray.includes(WeeklyPaymentStatus.BLOCKED)
-            ) {
-              extendedStatusArray = extendedStatusArray.concat(WeeklyPaymentStatus.BLOCKED as string);
-              query = query.where('platformStatus', '==', WeeklyPaymentPlatformStatus.CLEARED);
-            }
-          } else {
-            extendedStatusArray = extendedStatusArray.concat(
-              WeeklyPaymentStatus.IN_PROGRESS as string,
-              WeeklyPaymentStatus.BLOCKED as string,
-            );
-          }
+        if (
+          platformStatus.includes(WeeklyPaymentPlatformStatus.ON_HOLD) &&
+          !extendedStatusArray.includes(WeeklyPaymentStatus.IN_PROGRESS)
+        ) {
+          extendedStatusArray = extendedStatusArray.concat(WeeklyPaymentStatus.IN_PROGRESS as string);
         }
+        if (
+          platformStatus.includes(WeeklyPaymentPlatformStatus.CLEARED) &&
+          !extendedStatusArray.includes(WeeklyPaymentStatus.BLOCKED)
+        ) {
+          extendedStatusArray = extendedStatusArray.concat(WeeklyPaymentStatus.BLOCKED as string);
+        }
+
         if (extendedStatusArray.length > 0) {
           query = query.where('status', 'in', extendedStatusArray);
         }

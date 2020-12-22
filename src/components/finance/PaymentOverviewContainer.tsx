@@ -226,17 +226,16 @@ const PaymentOverviewContainer = () => {
   );
 
   const filteredOverviewData = useMemo(() => {
-    return (overviewData || []).filter(data => {
-      return (
+    return (overviewData || []).filter(
+      data =>
         currency.includes(data.currency) &&
         selectedStatuses &&
         selectedStatuses.length > 0 &&
         (data.platformStatus
           ? platformStatus && platformStatus.includes(data.platformStatus)
-          : selectedStatuses.includes(data.status))
-      );
-    });
-  }, [overviewData, status, platformStatus, currency]);
+          : selectedStatuses.includes(data.status)),
+    );
+  }, [overviewData, status, platformStatus, currency, selectedStatuses]);
 
   const relevantBookingIds = filteredOverviewData.map(weeklyPayment => weeklyPayment.bookingId);
   const relevantCommissions = commissions

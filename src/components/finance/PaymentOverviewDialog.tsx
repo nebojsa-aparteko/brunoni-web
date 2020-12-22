@@ -143,7 +143,7 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
       <DialogContent className={classes.dialogContent}>
         {tasks && tasks.length > 0 && (
           <Paper elevation={2} className={classes.bookingTasksContainer}>
-            <BookingTaskExpansionPanel tasks={tasks} />
+            <BookingTaskExpansionPanel tasks={tasks} updateComponent={updateComponent} />
           </Paper>
         )}
         <Paper elevation={2} className={classes.mainContentContainer}>

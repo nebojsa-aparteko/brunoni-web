@@ -325,8 +325,9 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
   const handleAddFile = useCallback(
     (addedFiles: DocumentValue[]) => {
       return Promise.all(addedFiles.map(file => addAccountingDocument(file, payment.reference)))
-        .then(_ =>
-          addActivityItem(
+        .then(_ => {
+          updateComponent?.();
+          return addActivityItem(
             booking!.id,
             createActivityObject({
               changeType: ActivityChangeType.ADD_FILE,
@@ -334,8 +335,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               documents: addedFiles,
               isAccountingActivity: true,
             }),
-          ),
-        )
+          );
+        })
         .catch(error => console.error('Error saving new document list', error));
     },
     [booking, getActivityLogUserData, payment.reference],
@@ -344,8 +345,9 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
   const handleDeleteFile = useCallback(
     (deletedFile: DocumentValue) => {
       return Promise.resolve(deleteAccountingDocument(deletedFile, payment.reference))
-        .then(_ =>
-          addActivityItem(
+        .then(_ => {
+          updateComponent?.();
+          return addActivityItem(
             booking!.id,
             createActivityObject({
               changeType: ActivityChangeType.DELETE_FILE,
@@ -353,8 +355,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               documents: [deletedFile],
               isAccountingActivity: true,
             }),
-          ),
-        )
+          );
+        })
         .catch(error => console.error('Error during document deletion', error));
     },
     [booking, getActivityLogUserData, payment.reference],
@@ -364,6 +366,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
     (accountingActivityHandler: () => Promise<void>) => {
       accountingActivityHandler()
         .then(_ => {
+          updateComponent?.();
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
             autoHideDuration: 1500,
@@ -396,8 +399,9 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
       const newItem: DocumentValue = { ...item, status: status };
 
       storeAccountingActivity(() =>
-        changeAccountingDocument(newItem, payment.reference).then(_ =>
-          addActivityItem(
+        changeAccountingDocument(newItem, payment.reference).then(_ => {
+          updateComponent?.();
+          return addActivityItem(
             booking!.id,
             createActivityObject({
               changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
@@ -405,8 +409,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
               documents: [newItem],
               isAccountingActivity: true,
             }),
-          ),
-        ),
+          );
+        }),
       );
     },
     [payment.reference, booking, enqueueSnackbar, getActivityLogUserData, storeAccountingActivity],
@@ -432,7 +436,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
         })
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          if (updateComponent) updateComponent();
+          updateComponent?.();
           handleClose();
         });
     },
@@ -467,7 +471,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
         })
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          if (updateComponent) updateComponent();
+          updateComponent?.();
         });
     },
     [
@@ -506,7 +510,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
           })
           .finally(() => {
             dispatch({ type: 'STOP_GLOBAL_LOADING' });
-            if (updateComponent) updateComponent();
+            updateComponent?.();
           });
       else return undefined;
     },
