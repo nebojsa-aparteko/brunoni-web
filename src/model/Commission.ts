@@ -20,4 +20,5 @@ export default interface Commission {
 export enum CommissionStatus {
   INVOICED = 'Invoiced',
   PAID = 'Paid',
+  OPEN = 'Open',
 }
