@@ -42,13 +42,7 @@ const useStyles = makeStyles(theme => ({
 const SpecialRemarks: React.FC<Props> = ({ remarks }) => {
   const classes = useStyles();
 
-  const remarkTexts = remarks
-    .map(remark => {
-      return remark.RemarkTxt?.split('<br/><br/>')
-        .map(remark => remark?.split('<br/>').join(''))
-        .join('<br/><br/>');
-    })
-    .join('<br />');
+  const remarkTexts = remarks.map(remark => remark.RemarkTxt).join('<br />');
 
   return (
     <Table size="small" aria-label="a dense table">
