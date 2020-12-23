@@ -5,6 +5,7 @@ import useFirestoreCollection from './useFirestoreCollection';
 import { useWeeklyPaymentFilterProviderContext } from '../providers/WeeklyPaymentFilterProvider';
 import { update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
+import { formatCarrierId } from '../components/myDay/MyDayContainer';
 
 export default (bookingId?: string) => {
   const [filters] = useWeeklyPaymentFilterProviderContext();
@@ -40,11 +41,7 @@ export default (bookingId?: string) => {
         }
       }
       if (carrier) {
-        query = query.where(
-          'carrier',
-          '==',
-          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
-        );
+        query = query.where('carrier', '==', formatCarrierId(carrier.id));
       }
       return query;
     },

@@ -104,20 +104,8 @@ const MyDayContainer = () => {
           dispatch({ type: 'START_GLOBAL_LOADING' });
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
-              ? await getOperationsTeamTasks(
-                  currentValue.checklistItems || [],
-                  carrier?.id
-                    ? carrier.id === 'HSG'
-                      ? 'Hamburg Süd'
-                      : carrier.id === 'SLOM'
-                      ? 'SLOMAN NEPTUN'
-                      : carrier.id
-                    : undefined,
-                )
-              : await getAccountingTeamTasks(
-                  currentValue.taskTypes || [],
-                  carrier?.name ? getId(carrier?.name) : undefined,
-                );
+              ? await getOperationsTeamTasks(currentValue.checklistItems || [], formatCarrierId(carrier?.id))
+              : await getAccountingTeamTasks(currentValue.taskTypes || [], formatCarrierId(carrier?.id));
           const p = await previousValue;
 
           const newTuple = [
@@ -392,6 +380,17 @@ interface ChecklistItemType {
   checklistId: ChecklistNames;
   checklistStageId?: ChecklistNames;
 }
+
+export const formatCarrierId = (carrierId: string | undefined) => {
+  return carrierId
+    ? carrierId === 'HSG'
+      ? 'Hamburg Süd'
+      : carrierId === 'SLOM'
+      ? 'SLOMAN NEPTUN'
+      : carrierId
+    : undefined;
+};
+
 const getId = (carrierName: string) => {
   return carrierIds[carrierName.toLowerCase()];
 };

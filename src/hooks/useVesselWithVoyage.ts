@@ -4,6 +4,7 @@ import safeInvoke from '../utilities/safeInvoke';
 import VesselWithVoyage from '../model/VesselWithVoyage';
 import firebase from '../firebase';
 import { useVesselFilterContext } from '../providers/VesselOverviewFilterProvider';
+import { formatCarrierId } from '../components/myDay/MyDayContainer';
 
 export default function useVesselWithVoyage() {
   const [snapshot, setSnapshot] = useState<VesselWithVoyage[] | undefined>();
@@ -20,11 +21,7 @@ export default function useVesselWithVoyage() {
       }
 
       if (carrier) {
-        query = query.where(
-          'carrier',
-          '==',
-          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
-        );
+        query = query.where('carrier', '==', formatCarrierId(carrier.id));
       }
 
       return query;

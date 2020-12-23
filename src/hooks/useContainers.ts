@@ -5,6 +5,7 @@ import LoadListContainerModel from '../model/LoadListContainerModel';
 import firebase from '../firebase';
 import { useLoadListFilterContext } from '../providers/LoadListFilterProvider';
 import { BookingCategory, BookingVersion } from '../model/Booking';
+import { formatCarrierId } from '../components/myDay/MyDayContainer';
 
 export default function useContainers(q?: () => any) {
   const [filters] = useLoadListFilterContext();
@@ -23,11 +24,7 @@ export default function useContainers(q?: () => any) {
       }
 
       if (carrier) {
-        query = query.where(
-          'carrierId',
-          '==',
-          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
-        );
+        query = query.where('carrierId', '==', formatCarrierId(carrier.id));
       }
       query = query.orderBy('ets', 'asc').orderBy('bookingId', 'asc');
       return query;

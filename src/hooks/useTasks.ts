@@ -8,6 +8,7 @@ import pick from 'lodash/fp/pick';
 import { UserRecordMinProperties } from '../model/UserRecord';
 import ActingAs from '../contexts/ActingAs';
 import UserRecordContext from '../contexts/UserRecordContext';
+import { formatCarrierId } from '../components/myDay/MyDayContainer';
 
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
@@ -23,11 +24,7 @@ export default function useTasks() {
         query = query.where('taskCategory', '==', taskCategory);
       }
       if (carrier) {
-        query = query.where(
-          'carrierId',
-          '==',
-          carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
-        );
+        query = query.where('carrierId', '==', formatCarrierId(carrier.id));
       }
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));

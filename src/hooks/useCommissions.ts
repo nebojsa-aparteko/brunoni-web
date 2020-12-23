@@ -5,6 +5,7 @@ import { flow, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import Commission from '../model/Commission';
 import { useCommissionFilterProviderContext } from '../providers/CommissionFilterProvider';
+import { formatCarrierId } from '../components/myDay/MyDayContainer';
 
 export default (bookingId?: string) => {
   const [filters] = useCommissionFilterProviderContext();
@@ -25,9 +26,7 @@ export default (bookingId?: string) => {
         query = query.where(
           'carrier',
           'in',
-          carriers.map(carrier =>
-            carrier.id === 'HSG' ? 'Hamburg Süd' : carrier.id === 'SLOM' ? 'SLOMAN NEPTUN' : carrier.id,
-          ),
+          carriers.map(carrier => formatCarrierId(carrier.id)),
         );
       }
       if (dateRange) {
