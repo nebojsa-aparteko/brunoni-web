@@ -359,7 +359,9 @@ const PaymentOverviewContainer = () => {
               value={selectedStatuses}
               onChange={onStatusChange}
               input={<Input />}
-              renderValue={selected => (selected as any[]).map(s => s as string).join(', ')}
+              renderValue={selected =>
+                (selected as any[]).map(s => ((s as string) === 'Blocked' ? 'Approved' : (s as string))).join(', ')
+              }
               MenuProps={MenuProps}
             >
               {Object.entries(WeeklyPaymentStatusLabel).map(([key, value]) => (
