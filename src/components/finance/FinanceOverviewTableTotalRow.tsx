@@ -3,7 +3,7 @@ import { TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import { Currency } from '../../model/Payment';
 
-const PaymentOverviewTableTotalRow: React.FC<Props> = ({ total, hasSelection, isTotal1 }) => (
+const FinanceOverviewTableTotalRow: React.FC<Props> = ({ total, hasSelection, isTotal1 }) => (
   <TableRow style={{ backgroundColor: '#eee' }}>
     {hasSelection && <TableCell align="left" />}
     <TableCell align="center" />
@@ -15,7 +15,7 @@ const PaymentOverviewTableTotalRow: React.FC<Props> = ({ total, hasSelection, is
   </TableRow>
 );
 
-export default PaymentOverviewTableTotalRow;
+export default FinanceOverviewTableTotalRow;
 
 interface Props {
   total: { currency: Currency; amount: number };

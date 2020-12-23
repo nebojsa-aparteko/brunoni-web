@@ -4,17 +4,19 @@ import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
 import WeeklyPayment from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
-import PaymentOverviewTableTotalRow from './PaymentOverviewTableTotalRow';
+import FinanceOverviewTableTotalRow from './FinanceOverviewTableTotalRow';
 import Commission from '../../model/Commission';
-import Payment, { Currency, DebitCredit } from '../../model/Payment';
+import { Currency, DebitCredit } from '../../model/Payment';
+import CommissionOverviewTableRow from './CommissionOverviewTableRow';
 
-const PaymentOverviewTable: React.FC<Props> = ({
+const FinanceOverviewTable: React.FC<Props> = ({
   overviewData,
   selectedPayments,
   handleSelect,
   handleOpenPreviewDialog,
   handleSelectDeselectAll,
-  relevantCommissions,
+  commissionsForWeeklyPayments,
+  isWeeklyPaymentOverview,
 }) => {
   const total = useMemo(() => {
     return overviewData
@@ -32,16 +34,18 @@ const PaymentOverviewTable: React.FC<Props> = ({
   }, [overviewData]);
 
   const totalWithoutCommissions = useMemo(() => {
-    return relevantCommissions
-      ? Object.entries(groupBy((item: Commission) => item.currency)(relevantCommissions)).map(([key, value]) => ({
-          currency: key as Currency,
-          amount: value.reduce(
-            (previousValue, currentValue) => previousValue - currentValue.amount,
-            total.find(total => total.currency === (key as Currency))?.amount || 0,
-          ),
-        }))
+    return commissionsForWeeklyPayments
+      ? Object.entries(groupBy((item: Commission) => item.currency)(commissionsForWeeklyPayments)).map(
+          ([key, value]) => ({
+            currency: key as Currency,
+            amount: value.reduce(
+              (previousValue, currentValue) => previousValue - currentValue.amount,
+              total.find(total => total.currency === (key as Currency))?.amount || 0,
+            ),
+          }),
+        )
       : [];
-  }, [relevantCommissions, total]);
+  }, [commissionsForWeeklyPayments, total]);
 
   return (
     <Fragment>
@@ -70,18 +74,29 @@ const PaymentOverviewTable: React.FC<Props> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {(overviewData as Payment[]).map((payment, index) => (
-                <PaymentOverviewTableRow
-                  paymentData={payment}
-                  status={(overviewData[index] as WeeklyPayment).platformStatus || overviewData[index].status}
-                  key={payment.id}
-                  selectedPayments={selectedPayments}
-                  handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}
-                  handleOpenPreviewDialog={handleOpenPreviewDialog}
-                />
-              ))}
+              {isWeeklyPaymentOverview
+                ? (overviewData as WeeklyPayment[]).map(payment => (
+                    <PaymentOverviewTableRow
+                      paymentData={payment}
+                      status={payment.platformStatus || payment.status}
+                      key={payment.id}
+                      selectedPayments={selectedPayments}
+                      handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}
+                      handleOpenPreviewDialog={handleOpenPreviewDialog}
+                    />
+                  ))
+                : (overviewData as Commission[]).map(commission => (
+                    <CommissionOverviewTableRow
+                      commission={commission}
+                      status={commission.status}
+                      key={commission.id}
+                      selectedPayments={selectedPayments}
+                      handleSelect={handleSelect ? () => handleSelect(commission.id) : undefined}
+                      handleOpenPreviewDialog={handleOpenPreviewDialog}
+                    />
+                  ))}
               {total.map((value, index) => (
-                <PaymentOverviewTableTotalRow
+                <FinanceOverviewTableTotalRow
                   total={value}
                   key={index}
                   hasSelection={!!selectedPayments}
@@ -89,7 +104,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
                 />
               ))}
               {totalWithoutCommissions.map((value, index) => (
-                <PaymentOverviewTableTotalRow
+                <FinanceOverviewTableTotalRow
                   total={value}
                   key={index}
                   hasSelection={!!selectedPayments}
@@ -104,7 +119,7 @@ const PaymentOverviewTable: React.FC<Props> = ({
   );
 };
 
-export default PaymentOverviewTable;
+export default FinanceOverviewTable;
 
 interface Props {
   overviewData: WeeklyPayment[] | Commission[];
@@ -112,5 +127,6 @@ interface Props {
   handleSelect?: (selectedId: string | undefined) => void;
   handleOpenPreviewDialog: (bookingId: string) => void;
   handleSelectDeselectAll?: () => void;
-  relevantCommissions?: Commission[];
+  commissionsForWeeklyPayments?: Commission[];
+  isWeeklyPaymentOverview: boolean;
 }

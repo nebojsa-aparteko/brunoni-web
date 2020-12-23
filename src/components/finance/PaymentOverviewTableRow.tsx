@@ -4,7 +4,6 @@ import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
 import Payment, { DebitCredit } from '../../model/Payment';
-import { CommissionStatus } from '../../model/Commission';
 
 const PaymentOverviewTableRow: React.FC<Props> = ({
   paymentData,
@@ -32,7 +31,7 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
           <Checkbox
             checked={paymentData.id ? selectedPayments.some(pid => pid === paymentData.id) : false}
             onClick={e => onClick(e)}
-            disabled={status !== WeeklyPaymentStatus.IN_PROGRESS && status !== CommissionStatus.INVOICED}
+            disabled={status !== WeeklyPaymentStatus.IN_PROGRESS}
           />
         </TableCell>
       )}
@@ -76,7 +75,7 @@ export default PaymentOverviewTableRow;
 
 interface Props {
   paymentData: Payment;
-  status: WeeklyPaymentStatus | WeeklyPaymentPlatformStatus | CommissionStatus;
+  status: WeeklyPaymentStatus | WeeklyPaymentPlatformStatus;
   selectedPayments: string[] | undefined;
   handleSelect?: () => void;
   handleOpenPreviewDialog: (bookingId: string) => void;

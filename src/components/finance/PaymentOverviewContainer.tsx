@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
-import PaymentOverviewTable from './PaymentOverviewTable';
+import FinanceOverviewTable from './FinanceOverviewTable';
 import usePaymentOverview from '../../hooks/usePaymentOverview';
 import {
   Box,
@@ -407,13 +407,14 @@ const PaymentOverviewContainer = () => {
             changePayment={offset => handleChangePayDates(offset)}
           />
         </Box>
-        <PaymentOverviewTable
+        <FinanceOverviewTable
           overviewData={filteredOverviewData}
           selectedPayments={selectedPayments || []}
           handleSelect={handleSelect}
           handleOpenPreviewDialog={handleDialogOpen}
           handleSelectDeselectAll={selectDeselectAll}
-          relevantCommissions={relevantCommissions}
+          commissionsForWeeklyPayments={relevantCommissions}
+          isWeeklyPaymentOverview={true}
         />
         {isDialogOpen && (
           <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />

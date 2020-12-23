@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
-import PaymentOverviewTable from './PaymentOverviewTable';
+import FinanceOverviewTable from './FinanceOverviewTable';
 import {
   Box,
   Card,
@@ -168,7 +168,11 @@ const CommissionOverviewContainer = () => {
             <DateRangeInput onChange={setDateRange} value={dateRange} />
           </Box>
         </Box>
-        <PaymentOverviewTable overviewData={filteredOverviewData} handleOpenPreviewDialog={handleDialogOpen} />
+        <FinanceOverviewTable
+          overviewData={filteredOverviewData}
+          handleOpenPreviewDialog={handleDialogOpen}
+          isWeeklyPaymentOverview={false}
+        />
         <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
       </CardContent>
     </Card>
