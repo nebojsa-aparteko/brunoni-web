@@ -31,7 +31,7 @@ const DocumentList: React.FC<Props> = ({
   changeStatus,
   internal,
   markAsFinal,
-  comparableDocuments,
+  otherDocuments,
   selectForComparison,
 }) => {
   const classes = useStyles();
@@ -107,7 +107,7 @@ const DocumentList: React.FC<Props> = ({
             deleteFile={checklistFileDeletedHandler}
             internal={internal}
             markAsFinal={markAsFinal}
-            comparableDocuments={comparableDocuments}
+            otherDocuments={otherDocuments}
             selectForComparison={selectForComparison}
           />
         ))
@@ -123,7 +123,7 @@ const DocumentList: React.FC<Props> = ({
             deleteFile={checklistFileDeletedHandler}
             internal={internal}
             markAsFinal={markAsFinal}
-            comparableDocuments={comparableDocuments}
+            otherDocuments={otherDocuments}
             selectForComparison={selectForComparison}
           />
         </Fragment>
