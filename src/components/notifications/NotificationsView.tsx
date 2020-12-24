@@ -21,13 +21,13 @@ const useStyles = makeStyles(theme =>
   createStyles({
     root: {
       [theme.breakpoints.up('sm')]: {
-        maxWidth: theme.spacing(50),
+        width: theme.spacing(50),
       },
       [theme.breakpoints.up('md')]: {
-        maxWidth: theme.spacing(65),
+        width: theme.spacing(65),
       },
       [theme.breakpoints.up('lg')]: {
-        maxWidth: theme.spacing(70),
+        width: theme.spacing(70),
       },
     },
     title: {
@@ -110,9 +110,9 @@ const NotificationsView: React.FC<Props> = ({
   }, [notifications]);
 
   return (
-    <Grid xs={12} className={classes.root}>
-      <Box flexDirection="column" justifyContent="center">
-        <Box display="flex" justifyContent="space-between" className={classes.titleRoot}>
+    <Grid className={classes.root}>
+      <Box width="100%" flexDirection="column" justifyContent="center">
+        <Box flex={1} display="flex" justifyContent="space-between" className={classes.titleRoot}>
           <Typography variant="subtitle1" className={classes.title} align="center">
             Notifications
           </Typography>
@@ -121,19 +121,32 @@ const NotificationsView: React.FC<Props> = ({
           </IconButton>
         </Box>
         <Divider />
-        <Box display="flex" justifyContent="space-between">
-          <Button onClick={onFilterByUnread}>{filterByUnread ? 'View all' : 'Filter by unread'}</Button>
-          <Button onClick={markAllAsRead}>Mark all as read</Button>
-        </Box>
-        {notifications?.map(notification => (
-          <ListItem key={notification.id}>
-            <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
-          </ListItem>
-        ))}
-        {notifications.length == numberToLoad && (
-          <Box display="flex" justifyContent="center">
-            <Button onClick={onShowMore}>Show More</Button>
+        {notifications && notifications.length === 0 && filterByUnread ? (
+          <Box flex={1} display="flex">
+            <Box display="flex" flexDirection="column" margin="auto" padding={2}>
+              <Typography style={{ padding: 2 }}>You don't have any unread notifications.</Typography>
+              <Button variant="contained" onClick={onFilterByUnread} style={{ margin: 'auto' }}>
+                View all
+              </Button>
+            </Box>
           </Box>
+        ) : (
+          <React.Fragment>
+            <Box flex={1} display="flex" justifyContent="space-between">
+              <Button onClick={onFilterByUnread}>{filterByUnread ? 'View all' : 'Filter by unread'}</Button>
+              <Button onClick={markAllAsRead}>Mark all as read</Button>
+            </Box>
+            {notifications?.map(notification => (
+              <ListItem key={notification.id}>
+                <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
+              </ListItem>
+            ))}
+            {notifications.length == numberToLoad && (
+              <Box display="flex" justifyContent="center">
+                <Button onClick={onShowMore}>Show More</Button>
+              </Box>
+            )}
+          </React.Fragment>
         )}
       </Box>
     </Grid>

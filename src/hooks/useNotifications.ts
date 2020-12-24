@@ -12,9 +12,9 @@ export default function useNotifications(userId?: string, isFilterByUnread?: boo
       let query = q.where('userAlphacomId', '==', userId);
       if (isFilterByUnread) {
         query = query.where('seen', '==', false);
-      } else {
-        query = query.limit(limit || 100);
       }
+      query = query.limit(limit || 100);
+
       return query.orderBy('at', 'desc');
     },
     [userId, isFilterByUnread, limit],
