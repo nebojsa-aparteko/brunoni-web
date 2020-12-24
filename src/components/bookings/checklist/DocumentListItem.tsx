@@ -45,8 +45,9 @@ import RejectionModal from '../documentApproval/RejectionModal';
 import { Booking } from '../../../model/Booking';
 import FlagIcon from '@material-ui/icons/Flag';
 import { showCrispChat } from '../../../index';
-import { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import { fileWithExt } from './ChecklistItemRow';
+import CheckAccountingDocumentDialog from '../documentApproval/CheckAccountingDocumentDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -113,9 +114,9 @@ const DocumentListItem = ({
   internal,
   isAccountingDocument,
   markAsFinal,
-  comparableDocuments,
+  otherDocuments,
   selectForComparison,
-  paymentStatus,
+  payment,
   ...other
 }: DocumentListItemProps) => {
   const classes = useStyles();
@@ -331,7 +332,7 @@ const DocumentListItem = ({
           !checklistCheckedRule() &&
           checklistItem &&
           checkIfShouldShowStatusAction(checklistItem.id)) ||
-          (isAccountingDocument && paymentStatus && paymentStatus === WeeklyPaymentStatus.IN_PROGRESS)) && (
+          (isAccountingDocument && payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS)) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
             {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
               <Box display="flex" ml={2} mb={2}>
@@ -422,19 +423,30 @@ const DocumentListItem = ({
             )}
           </Box>
         )}
-      {isDialogOpen && (
-        <RejectionModal
-          isOpen={isDialogOpen}
-          handleClose={handleDialogClose}
-          booking={booking}
-          checklistItem={checklistItem}
-          document={item}
-          changeStatus={changeStatus}
-          allDocuments={comparableDocuments}
-          isComparisonDialog={isComparisonDialog}
-          isAccountingDialog={isAccountingDialog}
-        />
-      )}
+      {isDialogOpen &&
+        (isAccountingDialog && payment ? (
+          <CheckAccountingDocumentDialog
+            document={item}
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            booking={booking}
+            payment={payment}
+            accountingDocuments={otherDocuments}
+            changeStatus={changeStatus}
+          />
+        ) : (
+          <RejectionModal
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            booking={booking}
+            checklistItem={checklistItem}
+            document={item}
+            changeStatus={changeStatus}
+            allDocuments={otherDocuments}
+            isComparisonDialog={isComparisonDialog}
+            isAccountingDialog={isAccountingDialog}
+          />
+        ))}
     </div>
   );
 };
@@ -454,9 +466,9 @@ export interface DocumentListItemPropsBase {
   internal: boolean;
   isAccountingDocument?: boolean;
   markAsFinal: (item: ChecklistItemValueDocument) => void;
-  comparableDocuments: ChecklistItemValueDocument[];
+  otherDocuments: ChecklistItemValueDocument[];
   selectForComparison: (item: ChecklistItemValueDocument) => void;
-  paymentStatus?: WeeklyPaymentStatus;
+  payment?: WeeklyPayment;
 }
 
 interface DocumentListItemProps extends DocumentListItemPropsBase {

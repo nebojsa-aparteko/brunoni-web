@@ -670,7 +670,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           }
           internal={false}
           markAsFinal={item => handleMarkAsFinal(item, false)}
-          comparableDocuments={comparableDocuments}
+          otherDocuments={comparableDocuments}
           selectForComparison={item => handleSelectForComparison(item)}
         />
       </Box>
@@ -707,7 +707,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               ) => handleDocumentStatusChange(item, status, true, dontCreateActivity)}
               internal={true}
               markAsFinal={item => handleMarkAsFinal(item, true)}
-              comparableDocuments={comparableDocuments}
+              otherDocuments={comparableDocuments}
               selectForComparison={item => handleSelectForComparison(item)}
             />
           </Box>
