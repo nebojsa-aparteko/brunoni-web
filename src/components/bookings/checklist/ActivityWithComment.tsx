@@ -53,7 +53,7 @@ const ActivityWithComment = ({ activity, handleCommentClick, ...other }: Activit
           <Box display="flex" flexDirection="column" ml={1}>
             {makeActivityRepresentation(activity)}
           </Box>
-          <ActivityComment activity={activity} />
+          {activity.comment && activity.comment.trim() !== '' ? <ActivityComment activity={activity} /> : null}
         </Box>
       </Box>
     </Box>

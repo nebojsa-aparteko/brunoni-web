@@ -155,7 +155,12 @@ const RevertApprovalDialog: React.FC<RevertApprovalDialogProps> = ({
           <Button onClick={handleClose} color="primary" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={onReject} color="primary" variant="contained">
+          <Button
+            onClick={onReject}
+            disabled={!rejectionInput || rejectionInput.messagePlain.trim() === ''}
+            color="primary"
+            variant="contained"
+          >
             Confirm
           </Button>
         </DialogActions>
@@ -307,7 +312,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           isOpen={isDialogOpen}
           description="If you confirm this action, that will block this file! Are you sure you want to approve payment on this file?"
           label="Please confirm payment approval"
-          handleConfirm={handleChangePaymentStatus}
+          handleConfirm={() => handleChangePaymentStatus(undefined)}
           handleClose={handleDialogClose}
         />
       ) : (payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||

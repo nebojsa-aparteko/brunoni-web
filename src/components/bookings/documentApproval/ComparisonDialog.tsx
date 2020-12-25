@@ -191,7 +191,7 @@ const ComparisonDialog: React.FC<Props> = ({
               onClick={onReject}
               variant="contained"
               color="primary"
-              disabled={!rejectionInput || rejectionInput?.messagePlain.length < 1}
+              disabled={!rejectionInput || rejectionInput.messagePlain.trim() === ''}
             >
               Send request
             </Button>
