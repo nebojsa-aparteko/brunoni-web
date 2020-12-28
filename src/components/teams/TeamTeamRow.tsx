@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team, TeamType } from '../../model/Teams';
-import { Button, IconButton, TextField, Typography } from '@material-ui/core';
+import { Button, Checkbox, TextField, Typography } from '@material-ui/core';
 import set from 'lodash/fp/set';
 import UserRecord, { UserRecordMinProperties } from '../../model/UserRecord';
 import asArray from '../../utilities/asArray';
@@ -16,20 +16,14 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Chip from '@material-ui/core/Chip';
 import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
-import DeleteIcon from '@material-ui/icons/Delete';
 import pick from 'lodash/fp/pick';
 import { TaskDescription, TaskType } from '../../model/Task';
 
 interface Props extends React.Attributes {
   team: Team;
+  selected: boolean;
+  onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
-
-const deleteTeam = (teamId: string) =>
-  firebase
-    .firestore()
-    .collection('teams')
-    .doc(teamId)
-    .delete();
 
 const categories = Object.keys(BookingCategory);
 const checklistItems = Object.entries(ChecklistNamesPreview).map(t => t[1]);
@@ -37,7 +31,7 @@ const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
 const taskTypes = Object.entries(TaskDescription).map(t => t[1]);
 const taskTypeNamesPreview = Object.entries(TaskDescription);
 
-const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
+const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...other }) => {
   const adminUsers = useAdminUsers();
 
   const [activeTeam, setActiveTeam] = useState(team);
@@ -119,6 +113,14 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
 
   return (
     <TableRow key={key} {...other}>
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={selected}
+          onClick={event => onSelectRow(event)}
+          onFocus={event => event.stopPropagation()}
+          color="primary"
+        />
+      </TableCell>
       <TableCell component="th" scope="row" style={{ minWidth: '150px' }}>
         <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
@@ -202,9 +204,6 @@ const TeamTeamRow: React.FC<Props> = ({ team, key, ...other }) => {
             Save
           </Button>
         )}
-        <IconButton onClick={() => deleteTeam(team.id || '')}>
-          <DeleteIcon />
-        </IconButton>
       </TableCell>
     </TableRow>
   );

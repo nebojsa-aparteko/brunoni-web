@@ -1,14 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import useTeams from '../../hooks/useTeams';
-import {
-  Box,
-  Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
-} from '@material-ui/core';
+import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import OperationsTeamsTable from './OperationsTeamsTable';
@@ -41,12 +34,26 @@ const useStyles = makeStyles({
   },
 });
 
+export const deleteTeam = (teamId: string) =>
+  firebase
+    .firestore()
+    .collection('teams')
+    .doc(teamId)
+    .delete();
+
+export const deleteTeams = async (teamIds: string[]): Promise<any> => {
+  const requests = teamIds.map((teamId: string) => {
+    return deleteTeam(teamId);
+  });
+
+  return Promise.all(requests);
+};
+
 const TeamsTeamsContainer: React.FC = () => {
   const classes = useStyles();
   const teams = useTeams();
 
-  const onAdd = (isAccounting: boolean, event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
+  const onAdd = (isAccounting: boolean) => {
     firebase
       .firestore()
       .collection('teams')
@@ -69,12 +76,12 @@ const TeamsTeamsContainer: React.FC = () => {
                 <Typography variant="h5" className={classes.expansionPanelTitle}>
                   Accounting teams
                 </Typography>
-                <Button onClick={event => onAdd(true, event)} color="primary" variant="outlined" size="small">
-                  Create New Accounting Team
-                </Button>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
-                <AccountingTeamsTable teams={teams.filter(team => team.teamType === TeamType.ACCOUNTING)} />
+                <AccountingTeamsTable
+                  teams={teams.filter(team => team.teamType === TeamType.ACCOUNTING)}
+                  onAdd={onAdd}
+                />
               </ExpansionPanelDetails>
             </ExpansionPanel>
             <ExpansionPanel defaultExpanded={true} className={classes.expansionPanel}>
@@ -82,12 +89,12 @@ const TeamsTeamsContainer: React.FC = () => {
                 <Typography variant="h5" className={classes.expansionPanelTitle}>
                   Operations teams
                 </Typography>
-                <Button onClick={event => onAdd(false, event)} color="primary" variant="outlined" size="small">
-                  Create New Operations team
-                </Button>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
-                <OperationsTeamsTable teams={teams.filter(team => team.teamType === TeamType.OPERATIONS)} />
+                <OperationsTeamsTable
+                  teams={teams.filter(team => team.teamType === TeamType.OPERATIONS)}
+                  onAdd={onAdd}
+                />
               </ExpansionPanelDetails>
             </ExpansionPanel>
           </Box>

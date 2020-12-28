@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useContext, useState } from 'react';
-import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -24,20 +24,16 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Toolbar,
-  Tooltip,
   Typography,
 } from '@material-ui/core';
 import UserInput from '../inputs/UserInput';
 import { ADMIN_ROLES, UserRecordMin } from '../../model/UserRecord';
 import firebase from '../../firebase';
 import CloseIcon from '@material-ui/icons/Close';
-import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
-import clsx from 'clsx';
 import ConfirmationDialog from '../ConfirmationDialog';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
+import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,23 +54,6 @@ const useStyles = makeStyles((theme: Theme) =>
       right: '12px',
       width: '47px',
       height: '47px',
-    },
-    toolbarRoot: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-    },
-    toolbarHighlight:
-      theme.palette.type === 'light'
-        ? {
-            color: theme.palette.error.main,
-            backgroundColor: lighten(theme.palette.error.light, 0.85),
-          }
-        : {
-            color: theme.palette.error.dark,
-            backgroundColor: theme.palette.error.dark,
-          },
-    toolbarTitle: {
-      flex: '1 1 100%',
     },
   }),
 );
@@ -155,48 +134,6 @@ const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose })
   );
 };
 
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-  addAdmin: () => void;
-  deleteSelectedUsers: () => void;
-}
-
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const classes = useStyles();
-  const { numSelected, addAdmin, deleteSelectedUsers } = props;
-
-  return (
-    <Toolbar
-      className={clsx(classes.toolbarRoot, {
-        [classes.toolbarHighlight]: numSelected > 0,
-      })}
-    >
-      {numSelected > 0 ? (
-        <Typography className={classes.toolbarTitle} color="error" variant="subtitle1" component="div">
-          {numSelected === 1 ? `${numSelected} admin selected` : `${numSelected} admins selected`}
-        </Typography>
-      ) : (
-        <Typography className={classes.toolbarTitle} variant="h5" id="tableTitle" component="div">
-          Admins
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete admins">
-          <IconButton aria-label="delete" onClick={deleteSelectedUsers}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Add new admin">
-          <IconButton aria-label="filter list" onClick={addAdmin}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
-};
-
 const removeAdminRights = async (userIds: string[]): Promise<any> => {
   const removeAdmin = async (userId: string): Promise<any> => {
     return firebase
@@ -271,8 +208,14 @@ const TeamsUsersContainer: React.FC = () => {
         <Paper>
           <EnhancedTableToolbar
             numSelected={selectedUsers.length}
-            addAdmin={() => setIsAdminDialogOpen(true)}
-            deleteSelectedUsers={() => setIsConfirmationDialogOpen(true)}
+            handleAdd={() => setIsAdminDialogOpen(true)}
+            handleDelete={() => setIsConfirmationDialogOpen(true)}
+            labelWhenSelected={
+              selectedUsers.length === 1
+                ? `${selectedUsers.length} admin selected`
+                : `${selectedUsers.length} admins selected`
+            }
+            labelWhenNotSelected={'Admins'}
           />
           <TableContainer>
             <Table className={classes.table} size="small" aria-label="a dense table">
