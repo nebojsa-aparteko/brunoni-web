@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Box,
   createStyles,
@@ -12,7 +12,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import WatchersChipMultiInput from './WatchersChipMultiInput';
 import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
@@ -22,6 +22,10 @@ import uniqBy from 'lodash/fp/uniqBy';
 import asArray from '../../utilities/asArray';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR, SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
+import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import useUser from '../../hooks/useUser';
+import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
+import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -112,25 +116,87 @@ const handleChangeWatchers = (
       ).map(item => pick(UserRecordMinProperties)(item)),
     );
 
+enum WatchersChangeType {
+  ASSIGN_AGENT,
+  ASSIGN_CLIENT,
+  SET_WATCHERS,
+}
+
 const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
   const classes = useStyles();
+  const userRecord = useUser()[1];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(booking.ForwAdrId);
+  const [currentWatchers, setCurrentWatchers] = useState(booking.watchers);
   const [, dispatch] = useContext(GlobalContext);
 
-  const watchers = booking.watchers
-    ? booking.watchers.filter(
-        user => user.alphacomId !== booking.ForwAdrId && user.alphacomId !== booking.BkgAgentContact,
-      )
-    : [];
+  useEffect(() => {
+    setCurrentWatchers(booking.watchers);
+  }, [booking.watchers]);
+
+  const getActivityLogUserData = useCallback(
+    (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
+      ({
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        alphacomClientId: user?.alphacomClientId,
+        alphacomId: user?.alphacomId,
+        emailAddress: user?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
 
   const handleResponse = useCallback(
-    (fn: Promise<any>) => {
-      fn.then(_ => dispatch({ message: 'Saved user successfully!', type: SHOW_SUCCESS_SNACKBAR })).catch(error =>
-        dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }),
-      );
+    (fn: Promise<any>, users: ActivityLogUserData[] | null, changeType: WatchersChangeType) => {
+      fn.then(_ => {
+        const usersToAdd = users
+          ? users.filter(user => currentWatchers.findIndex(watcher => watcher.alphacomId === user.alphacomId) === -1)
+          : [];
+        const usersToRemove =
+          changeType === WatchersChangeType.SET_WATCHERS && currentWatchers && users
+            ? (currentWatchers.filter(
+                watcher => users.findIndex(user => user.alphacomId === watcher.alphacomId) === -1,
+              ) as ActivityLogUserData[])
+            : [];
+
+        dispatch({ message: 'Saved user successfully!', type: SHOW_SUCCESS_SNACKBAR });
+        let activityChangeType;
+        switch (changeType) {
+          case WatchersChangeType.ASSIGN_AGENT:
+            activityChangeType = ActivityChangeType.ASSIGNED_AGENT;
+            break;
+          case WatchersChangeType.ASSIGN_CLIENT:
+            activityChangeType = ActivityChangeType.ASSIGNED_CLIENT;
+            break;
+          case WatchersChangeType.SET_WATCHERS:
+            setCurrentWatchers(users || []);
+            activityChangeType = ActivityChangeType.SET_WATCHERS;
+            break;
+        }
+
+        return addActivityItem(
+          booking!.id,
+          createActivityObject({
+            changeType: activityChangeType,
+            by: getActivityLogUserData(userRecord),
+            addedUsers:
+              activityChangeType === ActivityChangeType.SET_WATCHERS
+                ? usersToAdd.length > 0
+                  ? usersToAdd
+                  : undefined
+                : users
+                ? users
+                : undefined,
+            removedUsers: usersToRemove.length > 0 ? usersToRemove : undefined,
+          }),
+        );
+      })
+        .then(() => {
+          console.log('New watchers have been set');
+        })
+        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }));
     },
-    [dispatch],
+    [dispatch, currentWatchers],
   );
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">
@@ -153,7 +219,13 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Agent"
               users={assignableUsers || []}
-              onChange={(_, user) => handleResponse(handleChangeAgent(booking.id, user, booking.watchers))}
+              onChange={(_, user) =>
+                handleResponse(
+                  handleChangeAgent(booking.id, user, booking.watchers),
+                  [getActivityLogUserData(user)],
+                  WatchersChangeType.ASSIGN_AGENT,
+                )
+              }
             />
           </Box>
           <Box my={1}>
@@ -168,18 +240,31 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               }
               label="Assigned Client"
               users={assignableCustomers || []}
-              onChange={(_, user) => handleResponse(handleChangeCustomer(booking.id, user, booking.watchers))}
+              onChange={(_, user) =>
+                handleResponse(
+                  handleChangeCustomer(booking.id, user, booking.watchers),
+                  [getActivityLogUserData(user)],
+                  WatchersChangeType.ASSIGN_CLIENT,
+                )
+              }
             />
           </Box>
           <Box my={1}>
             <WatchersChipMultiInput
               options={assignableUsers || []}
-              onChange={(_, value) => {
+              onChange={(event, value) => {
                 handleResponse(
                   handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser),
+                  value
+                    ? Array.isArray(value)
+                      ? value.map(user => getActivityLogUserData(user))
+                      : [getActivityLogUserData(value)]
+                    : null,
+                  WatchersChangeType.SET_WATCHERS,
                 );
               }}
-              values={watchers}
+              values={currentWatchers}
+              fixedValues={[booking.assignedUser, booking.assignedCustomerUser]}
             />
           </Box>
         </DialogContent>

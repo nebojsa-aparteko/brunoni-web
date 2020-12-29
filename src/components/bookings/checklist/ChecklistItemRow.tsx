@@ -157,6 +157,8 @@ export const createActivityObject = (data: {
   type?: ActivityType;
   comment?: string;
   mentions?: MentionItem[];
+  addedUsers?: ActivityLogUserData[];
+  removedUsers?: ActivityLogUserData[];
 }): ActivityLogItem => {
   const {
     by,
@@ -170,6 +172,8 @@ export const createActivityObject = (data: {
     type,
     comment,
     mentions,
+    addedUsers,
+    removedUsers,
   } = data;
   return flow(omitBy(isNil))({
     changeType: changeType,
@@ -190,6 +194,8 @@ export const createActivityObject = (data: {
     mentions: mentions,
     isAccountingActivity: !!isAccountingActivity,
     paymentReference: paymentReference,
+    addedUsers: addedUsers,
+    removedUsers: removedUsers,
   } as ActivityLogItem);
 };
 

@@ -107,6 +107,11 @@ export enum ActivityText {
   REVERT_PAYMENT_APPROVAL = ' has reverted the approval of payment ',
   PUT_ON_HOLD = ' has put on hold payment ',
   REVERT_PUT_ON_HOLD = ' has reverted the "On Hold" status of payment ',
+  SET_WATCHING = ' has started watching this booking.',
+  UNSET_WATCHING = ' has stopped watching this booking.',
+  ASSIGNED_AGENT = ' has assigned agent ',
+  ASSIGNED_CLIENT = ' has assigned client ',
+  SET_WATCHERS = ' has ',
 }
 
 export enum ActivityChangeType {
@@ -126,6 +131,11 @@ export enum ActivityChangeType {
   REVERT_PAYMENT_APPROVAL,
   PUT_ON_HOLD,
   REVERT_PUT_ON_HOLD,
+  SET_WATCHING,
+  UNSET_WATCHING,
+  ASSIGNED_AGENT,
+  ASSIGNED_CLIENT,
+  SET_WATCHERS,
 }
 
 export enum ChecklistNames {

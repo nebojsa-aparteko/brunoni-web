@@ -37,6 +37,9 @@ import BookingViewMainContent from './BookingViewMainContent';
 import ExpandingBookingContent from './documentApproval/ExpandingBookingContent';
 import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
+import { ActivityChangeType, ActivityLogUserData } from './checklist/ChecklistItemModel';
+import { addActivityItem } from './checklist/ActivityLogContainer';
+import { createActivityObject } from './checklist/ChecklistItemRow';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -146,6 +149,18 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const tasks = useTasksPerBooking(booking.id);
 
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
   const onArchiveClick = useCallback(() => {
     firebase
       .firestore()
@@ -180,12 +195,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           ? booking.watchers.filter(u => u.alphacomId !== userRecord.alphacomId)
           : [...(booking.watchers || []), userRecord],
       )
-        .then(_ =>
+        .then(_ => {
           dispatch({
             type: SHOW_SUCCESS_SNACKBAR,
             message: isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
-          }),
-        )
+          });
+          return addActivityItem(
+            booking!.id,
+            createActivityObject({
+              changeType: isWatching ? ActivityChangeType.UNSET_WATCHING : ActivityChangeType.SET_WATCHING,
+              by: getActivityLogUserData(),
+            }),
+          );
+        })
+        .then(() => {
+          console.log(isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!');
+        })
         .catch(err => console.log(err));
     },
     [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],

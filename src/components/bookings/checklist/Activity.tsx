@@ -3,8 +3,28 @@ import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { capitalCase } from 'change-case';
-import { ActivityChangeType, ActivityText, ChecklistItemValueDocumentStatusType } from './ChecklistItemModel';
+import {
+  ActivityChangeType,
+  ActivityLogUserData,
+  ActivityText,
+  ChecklistItemValueDocumentStatusType,
+} from './ChecklistItemModel';
 import DateFormattedText from '../../DateFormattedText';
+
+const createUsersRepresentation = (users: ActivityLogUserData[]) => {
+  return users.map((user, index) => {
+    return (
+      <Fragment key={user.alphacomId}>
+        {user.emailAddress ? (
+          <Link href={`mailto:${user.emailAddress}`}>{`${user.firstName} ${user.lastName}`}</Link>
+        ) : (
+          user.firstName + ' ' + user.lastName
+        )}
+        {index === users.length - 1 ? '.' : ', '}
+      </Fragment>
+    );
+  });
+};
 
 export const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
@@ -47,6 +67,16 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.PUT_ON_HOLD;
       case ActivityChangeType.REVERT_PUT_ON_HOLD:
         return ActivityText.REVERT_PUT_ON_HOLD;
+      case ActivityChangeType.SET_WATCHING:
+        return ActivityText.SET_WATCHING;
+      case ActivityChangeType.UNSET_WATCHING:
+        return ActivityText.UNSET_WATCHING;
+      case ActivityChangeType.ASSIGNED_AGENT:
+        return ActivityText.ASSIGNED_AGENT;
+      case ActivityChangeType.ASSIGNED_CLIENT:
+        return ActivityText.ASSIGNED_CLIENT;
+      case ActivityChangeType.SET_WATCHERS:
+        return ActivityText.SET_WATCHERS;
     }
   };
 
@@ -57,6 +87,36 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       </Link>
       {mapChangeTypeToText()}
       {activity.stage && ` '${activity.stage?.label}' stage `}
+      {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
+        activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&
+      activity.addedUsers
+        ? createUsersRepresentation(activity.addedUsers)
+        : null}
+      {activity.changeType === ActivityChangeType.SET_WATCHERS ? (
+        activity.addedUsers && activity.addedUsers.length > 0 ? (
+          <Fragment>
+            <Fragment>
+              {'added to watchers '}
+              {createUsersRepresentation(activity.addedUsers)}
+            </Fragment>
+
+            {activity.removedUsers && activity.removedUsers.length > 0 && (
+              <Fragment>
+                {' and removed '}
+                {createUsersRepresentation(activity.removedUsers)}
+              </Fragment>
+            )}
+          </Fragment>
+        ) : (
+          activity.removedUsers &&
+          activity.removedUsers.length > 0 && (
+            <Fragment>
+              {'removed from watchers '}
+              {createUsersRepresentation(activity.removedUsers)}
+            </Fragment>
+          )
+        )
+      ) : null}
       {activity.documents &&
         activity.documents.map((doc, index) => {
           return [
