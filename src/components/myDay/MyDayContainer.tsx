@@ -344,7 +344,7 @@ const getAccountingTeamTasks = (taskTypes: string[], carrierId: string | undefin
   let query = firebase.firestore().collectionGroup('tasks');
   if (carrierId) query = query.where('carrierId', '==', carrierId);
   return query
-    .where('id', 'in', taskTypes)
+    .where('type', 'in', taskTypes)
     .where('resolved', '==', false)
     .where('show', '==', true)
     .where('userRole', '==', UserRole.ADMIN)

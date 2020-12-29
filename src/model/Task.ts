@@ -21,6 +21,7 @@ export default interface Task {
   checklistStageId?: string;
   bookingId: string;
   selected?: boolean;
+  paymentReference?: string;
 }
 
 export enum ManualResolveType {
@@ -136,10 +137,10 @@ export enum TaskDescription {
   FREIGHT_COLLECTION_CHECK = 'Please check if payment received and inform agent at destination.',
 
   // ACCOUNTING TASKS
-  UPLOAD_INVOICE = 'Please upload and approve invoice from Shipping Line.',
-  COMPARE_COSTS = 'Please compare and approve costs.',
-  COMPARE_SYSTEMS = 'Please compare Commission and approve.',
-  CORRECT_COMMISSION = 'Please correct commissioned amount.',
-  CHECK_FILE = 'Please check this file, here is something wrong.',
-  CLEAR_INVOICE = 'Please clear invoice in the system of the Shipping Line.',
+  UPLOAD_INVOICE = 'Please upload and approve invoice from Shipping Line',
+  COMPARE_COSTS = 'Please compare and approve costs',
+  COMPARE_SYSTEMS = 'Please compare Commission and approve',
+  CORRECT_COMMISSION = 'Please correct commissioned amount',
+  CHECK_FILE = 'Please check this file, here is something wrong',
+  CLEAR_INVOICE = 'Please clear invoice in the system of the Shipping Line',
 }

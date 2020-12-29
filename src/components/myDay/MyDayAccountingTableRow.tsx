@@ -21,7 +21,7 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
   const snapshot = useFirestoreDocument('bookings', task.bookingId);
   const booking = useMemo(() => normalizeBooking(snapshot?.data()), [snapshot]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  const label = useMemo(() => Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1], [task.type]);
   const handleRowClick = () => {
     handleOpenPreviewDialog(task.bookingId);
   };
@@ -43,9 +43,10 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
           )}
         </TableCell>
         <TableCell id="taskDescriptionMyDay" align="left">
-          {Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1] || '-'}
+          {label || '-'}
         </TableCell>
         <TableCell align="center">{task.blNumber || '-'}</TableCell>
+        <TableCell align="center">{task.paymentReference || '-'}</TableCell>
         <TableCell align="center">
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
