@@ -46,6 +46,7 @@ import { notEmpty } from '../../utilities/notEmpty';
 import useCommissions from '../../hooks/useCommissions';
 import Commission from '../../model/Commission';
 import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
+import { DateRange } from '../daterangepicker/types';
 import Carrier from '../../model/Carrier';
 
 const useStyles = makeStyles(theme => ({
@@ -146,13 +147,13 @@ const PaymentOverviewContainer = () => {
   const [user] = useUser();
   const [, dispatch] = useContext(GlobalContext);
 
-  useMemo(() => {
-    if (setCommissionsFilter)
-      setCommissionsFilter(prevState =>
-        set('carriers', [{ id: 'HSG' }, { id: 'DAL DEUTSCHE AFRIKA-LINIEN' }] as Carrier[])(prevState),
-      );
-  }, [setCommissionsFilter]);
-
+  // We only need to calculate the total for commissions with status "Open"
+  // useEffect(() => {
+  //     if (setCommissionsFilter)
+  //       setCommissionsFilter(prevState =>
+  //         set('commissionStatus', [CommissionStatus.OPEN] as CommissionStatus[])(prevState),
+  //       );
+  //   }, []);
   const handleDialogClose = useCallback(() => {
     showCrispChat(true);
     setIsDialogOpen(false);
@@ -188,7 +189,24 @@ const PaymentOverviewContainer = () => {
 
   const onCurrencyChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      if (setFilters) setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
+      if (setFilters) {
+        setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
+      }
+      if (setCommissionsFilter) {
+        setCommissionsFilter(prevState => set('currency', event.target.value as Currency[])(prevState));
+      }
+    },
+    [setFilters],
+  );
+
+  const onCarrierChange = useCallback(
+    (carrier: Carrier | null | undefined) => {
+      if (setFilters) {
+        setFilters(prevState => set('carrier', carrier)(prevState));
+      }
+      if (setCommissionsFilter) {
+        setCommissionsFilter(prevState => set('carriers', [carrier])(prevState));
+      }
     },
     [setFilters],
   );
@@ -218,8 +236,14 @@ const PaymentOverviewContainer = () => {
 
   const handleDateChange = useCallback(
     (date: Date) => {
-      if (setFilters) setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
-      if (setCommissionsFilter) setCommissionsFilter(prevState => set('dueDate', startOfDay(date))(prevState));
+      if (setFilters) {
+        setFilters(prevState => set('paymentDate', startOfDay(date))(prevState));
+      }
+      if (setCommissionsFilter) {
+        setCommissionsFilter(prevState =>
+          set('dateRange', { startDate: startOfDay(date), endDate: startOfDay(date) } as DateRange)(prevState),
+        );
+      }
       setDateOpen(false);
     },
     [setFilters, setCommissionsFilter],
@@ -386,9 +410,7 @@ const PaymentOverviewContainer = () => {
             <CarrierInput
               label={'Carriers'}
               carriers={carriers}
-              onChange={carrier => {
-                if (setFilters) setFilters(set('carrier', carrier)(filters));
-              }}
+              onChange={carrier => onCarrierChange(carrier)}
               value={carrier}
             />
           </Box>
