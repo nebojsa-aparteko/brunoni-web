@@ -15,7 +15,7 @@ export default (bookingId?: string) => {
       if (bookingId) {
         return collection.where('bookingId', '==', bookingId);
       }
-      let query = collection.limit(100);
+      let query = collection;
       if (filters.dateRange?.startDate) {
         query = query.where('dueDate', '>=', filters.dateRange.startDate);
       }

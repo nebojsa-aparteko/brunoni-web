@@ -1,6 +1,5 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react';
 import Carrier from '../model/Carrier';
-import { startOfDay } from 'date-fns/fp';
 import { Currency } from '../model/Payment';
 import { CommissionStatus } from '../model/Commission';
 import { DateRange } from '../components/daterangepicker/types';
@@ -8,7 +7,6 @@ import { LAST_3_MONTHS } from './filterActions';
 
 export interface CommissionFilterContext {
   carriers: Carrier[];
-  dueDate: Date;
   currency: Currency[];
   commissionStatus: CommissionStatus[];
   dateRange?: DateRange;
@@ -16,7 +14,6 @@ export interface CommissionFilterContext {
 
 export const COMMISSION_FILTERS_INITIAL_STATE = {
   currency: [Currency.USD],
-  dueDate: startOfDay(new Date()),
   commissionStatus: [CommissionStatus.INVOICED],
   dateRange: LAST_3_MONTHS,
 } as CommissionFilterContext;
