@@ -9,13 +9,14 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-  const [numberToLoad, setNumberToLoad] = useState<number>(10);
+  const [numberToLoad, setNumberToLoad] = useState<number>(100);
   const [showOnlyUnread, setShowOnlyUnread] = useState(true);
   const handleShowNotifications = () => {
     if (isNotificationDrawerOpen) {
-      setNumberToLoad(10);
+      setNumberToLoad(100);
       setShowOnlyUnread(true);
     }
+
     setIsNotificationDrawerOpen(prevState => !prevState);
   };
   const userRecord = useContext(UserRecordContext);
@@ -29,7 +30,16 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   );
 
   const handleShowMore = () => {
-    setNumberToLoad(prevState => prevState + 10);
+    setNumberToLoad(prevState => prevState + (showOnlyUnread ? 100 : 10));
+  };
+
+  const handleToggleShowUnread = () => {
+    if (!showOnlyUnread && isNotificationDrawerOpen) {
+      setNumberToLoad(100);
+    } else {
+      setNumberToLoad(10);
+    }
+    setShowOnlyUnread(prevState => !prevState);
   };
 
   return (
@@ -40,7 +50,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
         style={{ padding: 8 }}
         {...props}
       >
-        <Badge badgeContent={notificationCount >= 10 ? '10+' : notificationCount} color="secondary">
+        <Badge badgeContent={notificationCount >= 100 ? '100+' : notificationCount} color="secondary">
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
@@ -52,7 +62,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
             handleShow={handleShowNotifications}
             notifications={notifications}
             filterByUnread={showOnlyUnread}
-            onFilterByUnread={() => setShowOnlyUnread(prevState => !prevState)}
+            onFilterByUnread={handleToggleShowUnread}
             onShowMore={handleShowMore}
             numberToLoad={numberToLoad}
           />
