@@ -334,7 +334,7 @@ const DocumentListItem = ({
           checkIfShouldShowStatusAction(checklistItem.id)) ||
           (isAccountingDocument && payment)) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
-            {payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
+            {(payment ? payment.status === WeeklyPaymentStatus.IN_PROGRESS : true) && (
               <React.Fragment>
                 {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
                   <Box display="flex" ml={2} mb={2}>

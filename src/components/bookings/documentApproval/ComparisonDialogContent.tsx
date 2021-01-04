@@ -73,12 +73,12 @@ const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name
   );
 };
 
-const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined) => (
+const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined, containerId: string) => (
   <DocumentLayout name={document.name}>
     {fileType === 'pdf' ? (
       <PDFViewer file={document} />
     ) : fileType && ['docx', 'doc'].includes(fileType) ? (
-      <DOCXViewer url={document.url} />
+      <DOCXViewer url={document.url} containerId={containerId} />
     ) : fileType === 'html' ? (
       <div>
         <HTMLViewer url={document.url} />
@@ -151,6 +151,7 @@ const ComparisonDialogContent = ({
                     .split('.')
                     .pop()
                     ?.toLowerCase(),
+                  'leftDocumentContainer',
                 )}
               </Grid>
             ) : null
@@ -168,6 +169,7 @@ const ComparisonDialogContent = ({
                     .split('.')
                     .pop()
                     ?.toLowerCase(),
+                  'rightDocumentContainer',
                 )}
               </Grid>
             ) : null
@@ -179,6 +181,7 @@ const ComparisonDialogContent = ({
                   .split('.')
                   .pop()
                   ?.toLowerCase(),
+                'documentContainer',
               )}
             </Grid>
           )}

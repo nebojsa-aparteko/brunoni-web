@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react';
 import React from 'react';
 import { GlobalContext } from '../store/GlobalStore';
 
-const DOCXViewer: React.FC<{ url: string }> = ({ url }) => {
+const DOCXViewer: React.FC<{ url: string; containerId: string }> = ({ url, containerId }) => {
   const [, dispatch] = useContext(GlobalContext);
   useEffect(() => {
     if (!url) {
@@ -13,7 +13,7 @@ const DOCXViewer: React.FC<{ url: string }> = ({ url }) => {
     fetch(url)
       .then(res => res.blob())
       .then(res => {
-        const container = document.getElementById('container');
+        const container = document.getElementById(containerId);
         if (!container) return Promise.reject(() => 'Cant load file');
         return renderAsync(res, container);
       })
@@ -21,7 +21,7 @@ const DOCXViewer: React.FC<{ url: string }> = ({ url }) => {
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `${error}` });
       });
   }, [dispatch, url]);
-  return <div id="container" />;
+  return <div id={containerId} />;
 };
 
 export default DOCXViewer;
