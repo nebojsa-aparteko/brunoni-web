@@ -90,8 +90,10 @@ const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, chan
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
+      <MenuItem onClick={() => changePayment(-14)}>2 Weeks Earlier</MenuItem>
       <MenuItem onClick={() => changePayment(-7)}>1 Week Earlier</MenuItem>
       <MenuItem onClick={() => changePayment(7)}>1 Week Later</MenuItem>
+      <MenuItem onClick={() => changePayment(14)}>2 Weeks Later</MenuItem>
     </Menu>
   );
 };
