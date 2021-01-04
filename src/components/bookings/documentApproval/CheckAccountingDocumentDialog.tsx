@@ -24,7 +24,7 @@ import {
 import { RejectionInput } from './RejectionModal';
 import ComparisonDialogContent from './ComparisonDialogContent';
 import PaymentApprovalButton from '../accountingTab/PaymentApprovalButton';
-import WeeklyPayment from '../../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { MentionItem } from 'react-mentions';
 import { addActivityItem } from '../checklist/ActivityLogContainer';
@@ -225,7 +225,12 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
                 <Button
                   onClick={() => setAmendmentRequested(true)}
                   variant="contained"
-                  style={{ backgroundColor: 'rgb(200,74,77)', color: 'white' }}
+                  disabled={payment.status !== WeeklyPaymentStatus.IN_PROGRESS}
+                  style={{
+                    backgroundColor:
+                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS ? 'lightgray' : 'rgb(200,74,77)',
+                    color: 'white',
+                  }}
                   className={classes.button}
                 >
                   Request amendment
@@ -234,7 +239,12 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
                   onClick={handleApproveDocument}
                   variant="contained"
                   autoFocus
-                  style={{ backgroundColor: 'rgba(0,200,81, 1)' }}
+                  disabled={payment.status !== WeeklyPaymentStatus.IN_PROGRESS}
+                  style={{
+                    backgroundColor:
+                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS ? 'lightgray' : 'rgba(0,200,81, 1)',
+                    color: 'white',
+                  }}
                   className={classes.button}
                 >
                   Approve File

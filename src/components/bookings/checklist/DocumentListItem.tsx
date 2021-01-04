@@ -332,79 +332,83 @@ const DocumentListItem = ({
           !checklistCheckedRule() &&
           checklistItem &&
           checkIfShouldShowStatusAction(checklistItem.id)) ||
-          (isAccountingDocument && payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS)) && (
+          (isAccountingDocument && payment)) && (
           <Box display="flex" ml={2} flexBasis="fit-content">
-            {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
-              <Box display="flex" ml={2} mb={2}>
-                <AccessTimeIcon style={{ color: '#5f91c5' }} />
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    changeStatus(item, {
-                      type: ChecklistItemValueDocumentStatusType.DEFAULT,
-                      by: getActivityLogUserData(),
-                    });
-                    activityLogContext.setState(undefined);
-                  }}
-                >
-                  Undo
-                </Link>
-              </Box>
+            {payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
+              <React.Fragment>
+                {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
+                  <Box display="flex" ml={2} mb={2}>
+                    <AccessTimeIcon style={{ color: '#5f91c5' }} />
+                    <Link
+                      component="button"
+                      variant="body2"
+                      onClick={() => {
+                        changeStatus(item, {
+                          type: ChecklistItemValueDocumentStatusType.DEFAULT,
+                          by: getActivityLogUserData(),
+                        });
+                        activityLogContext.setState(undefined);
+                      }}
+                    >
+                      Undo
+                    </Link>
+                  </Box>
+                )}
+                {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
+                  <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                    <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
+                    <Link
+                      component="button"
+                      variant="body2"
+                      onClick={() => {
+                        changeStatus(item, {
+                          type: ChecklistItemValueDocumentStatusType.APPROVED,
+                          by: getActivityLogUserData(),
+                          at: new Date(),
+                        });
+                        activityLogContext.setState(undefined);
+                      }}
+                    >
+                      Approve
+                    </Link>
+                  </Box>
+                )}
+                {!isAccountingDocument && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+                  <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                    <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
+                    <Link
+                      component="button"
+                      variant="body2"
+                      onClick={() => {
+                        setIsComparisonDialog(false);
+                        setIsAccountingDialog(false);
+                        handleDialogOpen();
+                      }}
+                    >
+                      Request amendment
+                    </Link>
+                  </Box>
+                )}
+                {!isAdmin &&
+                  !isAccountingDocument &&
+                  (internal ? true : item.isSelectedForComparison) &&
+                  item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+                    <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                      <Link
+                        component="button"
+                        variant="body2"
+                        onClick={() => {
+                          setIsComparisonDialog(true);
+                          setIsAccountingDialog(false);
+                          handleDialogOpen();
+                        }}
+                      >
+                        Compare Documents
+                      </Link>
+                    </Box>
+                  )}
+              </React.Fragment>
             )}
-            {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
-              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    changeStatus(item, {
-                      type: ChecklistItemValueDocumentStatusType.APPROVED,
-                      by: getActivityLogUserData(),
-                      at: new Date(),
-                    });
-                    activityLogContext.setState(undefined);
-                  }}
-                >
-                  Approve
-                </Link>
-              </Box>
-            )}
-            {!isAccountingDocument && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-              <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
-                <Link
-                  component="button"
-                  variant="body2"
-                  onClick={() => {
-                    setIsComparisonDialog(false);
-                    setIsAccountingDialog(false);
-                    handleDialogOpen();
-                  }}
-                >
-                  Request amendment
-                </Link>
-              </Box>
-            )}
-            {!isAdmin &&
-              !isAccountingDocument &&
-              (internal ? true : item.isSelectedForComparison) &&
-              item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-                <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                      setIsComparisonDialog(true);
-                      setIsAccountingDialog(false);
-                      handleDialogOpen();
-                    }}
-                  >
-                    Compare Documents
-                  </Link>
-                </Box>
-              )}
             {isAdmin && internal && isAccountingDocument && (
               <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                 <Link
