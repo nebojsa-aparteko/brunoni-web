@@ -147,7 +147,7 @@ export const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) =
   );
 };
 
-export const BoookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
+export const BookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
   const classes = useStyles();
 
   return (
@@ -447,7 +447,7 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
           </Card>
         ))
       )}
-      <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />
+      <BookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />
     </Fragment>
   );
 };

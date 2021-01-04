@@ -4,7 +4,7 @@ import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { BookingRow, BoookingProgressDialog } from '../bookings/BookingsTable';
+import { BookingRow, BookingProgressDialog } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import TaskStatusChip from '../TaskStatusChip';
@@ -125,7 +125,7 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
         </TableCell>
       </TableRow>
       {isDialogOpen && booking && (
-        <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={booking} />
+        <BookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={booking} />
       )}
     </Fragment>
   );

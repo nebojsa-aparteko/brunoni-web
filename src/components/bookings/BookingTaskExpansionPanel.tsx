@@ -86,7 +86,12 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent }) 
                   value={assignTo}
                 />
               </Box>
-              <Button color="primary" variant="contained" onClick={assignUser}>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={assignUser}
+                disabled={selectedTasks && selectedTasks.length === 0}
+              >
                 Assign user
               </Button>
             </Box>

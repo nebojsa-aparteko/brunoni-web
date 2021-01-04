@@ -1,11 +1,8 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import { Checkbox, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { ManualResolveType, TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
-import { BoookingProgressDialog } from '../bookings/BookingsTable';
-import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
-import useFirestoreDocument from '../../hooks/useFirestoreDocument';
 import TaskStatusChip from '../TaskStatusChip';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
@@ -18,17 +15,10 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
   handleOpenPreviewDialog,
 }) => {
   const actingAs = useContext(ActingAs)[0];
-  const snapshot = useFirestoreDocument('bookings', task.bookingId);
-  const booking = useMemo(() => normalizeBooking(snapshot?.data()), [snapshot]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const label = useMemo(() => Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1], [task.type]);
   const handleRowClick = () => {
     handleOpenPreviewDialog(task.bookingId);
   };
-
-  const handleDialogClose = useCallback(() => {
-    setIsDialogOpen(false);
-  }, [setIsDialogOpen]);
 
   return (
     <Fragment>
@@ -66,9 +56,6 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
           )}
         </TableCell>
       </TableRow>
-      {isDialogOpen && booking && (
-        <BoookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={booking} />
-      )}
     </Fragment>
   );
 };

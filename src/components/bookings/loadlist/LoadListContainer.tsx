@@ -21,7 +21,7 @@ import {
 import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import formatDate from 'date-fns/format';
-import { BoookingProgressDialog } from '../BookingsTable';
+import { BookingProgressDialog } from '../BookingsTable';
 import { Booking } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import LoadListContainerModel from '../../../model/LoadListContainerModel';
@@ -285,7 +285,7 @@ const LoadListContainer = () => {
       </CardContent>
 
       {dialogData && (
-        <BoookingProgressDialog
+        <BookingProgressDialog
           isOpen={isProgressDialogOpen}
           handleClose={handleProgressDialogClose}
           booking={dialogData!}

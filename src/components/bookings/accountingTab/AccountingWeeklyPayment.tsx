@@ -313,8 +313,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
             );
           })
           .finally(() => {
-            dispatch({ type: 'STOP_GLOBAL_LOADING' });
             updateComponent?.();
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
           });
       else return undefined;
     },
