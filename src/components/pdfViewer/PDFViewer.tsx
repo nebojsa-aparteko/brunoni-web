@@ -10,7 +10,7 @@ import DocumentView from './DocumentView';
 
 const PDFViewer: React.FC<Props> = ({ file }) => {
   const [numPages, setNumPages] = useState<number>(0);
-  const [scale, setScale] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1.2);
 
   const onDocumentLoadSuccess = (determinedNumPages: PDFDocumentProxy) => {
     setNumPages(determinedNumPages.numPages);

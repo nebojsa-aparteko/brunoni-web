@@ -68,14 +68,6 @@ const useStyles = makeStyles(theme =>
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 const ComparisonDialog: React.FC<Props> = ({
   document,
@@ -133,7 +125,23 @@ const ComparisonDialog: React.FC<Props> = ({
           {!isAccountingDialog && leftDocument && sortedDocuments ? (
             <FormControl className={classes.formControl}>
               <InputLabel>Left Document</InputLabel>
-              <Select value={leftDocument?.url} onChange={handleChangeLeftDocument} MenuProps={MenuProps}>
+              <Select
+                value={leftDocument?.url}
+                onChange={handleChangeLeftDocument}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  },
+                  PaperProps: {
+                    style: {
+                      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                      width: 250,
+                    },
+                  },
+                  getContentAnchorEl: null,
+                }}
+              >
                 {sortedDocuments
                   .filter(document => document.url !== rightDocument?.url)
                   .map(document => (
@@ -150,7 +158,23 @@ const ComparisonDialog: React.FC<Props> = ({
           {!isAccountingDialog && rightDocument && sortedDocuments ? (
             <FormControl className={classes.formControl}>
               <InputLabel>Right Document</InputLabel>
-              <Select value={rightDocument?.url} onChange={handleChangeRightDocument} MenuProps={MenuProps}>
+              <Select
+                value={rightDocument?.url}
+                onChange={handleChangeRightDocument}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  },
+                  PaperProps: {
+                    style: {
+                      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                      width: 250,
+                    },
+                  },
+                  getContentAnchorEl: null,
+                }}
+              >
                 {sortedDocuments
                   .filter(document => document.url !== leftDocument?.url)
                   .map(document => (
