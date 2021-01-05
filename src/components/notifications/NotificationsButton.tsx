@@ -56,20 +56,22 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
-      <Drawer open={isNotificationDrawerOpen} anchor="right" onClose={handleShowNotifications}>
-        {!notifications ? (
-          <ChartsCircularProgress />
-        ) : (
-          <NotificationsView
-            handleShow={handleShowNotifications}
-            notifications={notifications}
-            filterByUnread={showOnlyUnread}
-            onFilterByUnread={handleToggleShowUnread}
-            onShowMore={handleShowMore}
-            numberToLoad={numberToLoad}
-          />
-        )}
-      </Drawer>
+      {isNotificationDrawerOpen ? (
+        <Drawer open={true} anchor="right" onClose={handleShowNotifications}>
+          {!notifications ? (
+            <ChartsCircularProgress />
+          ) : (
+            <NotificationsView
+              handleShow={handleShowNotifications}
+              notifications={notifications}
+              filterByUnread={showOnlyUnread}
+              onFilterByUnread={handleToggleShowUnread}
+              onShowMore={handleShowMore}
+              numberToLoad={numberToLoad}
+            />
+          )}
+        </Drawer>
+      ) : null}
     </Fragment>
   );
 };

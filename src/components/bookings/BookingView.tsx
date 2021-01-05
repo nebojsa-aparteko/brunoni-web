@@ -250,12 +250,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       )}
       <Grid item md={7} xs={12}>
         <Page title={getBookingTitle(booking)}>
-          <WatchersDialog
-            booking={booking}
-            isOpen={isOpenWatcherDialog}
-            handleClose={handleCloseWatcherDialog}
-            id={booking.id}
-          />
+          {isOpenWatcherDialog ? (
+            <WatchersDialog booking={booking} isOpen={true} handleClose={handleCloseWatcherDialog} id={booking.id} />
+          ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
