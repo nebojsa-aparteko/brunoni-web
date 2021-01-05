@@ -41,6 +41,7 @@ import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 import firebase from './firebase';
 import CommissionsPage from './pages/CommissionsPage';
 import { GlobalContext } from './store/GlobalStore';
+import TaskFilterProvider from './providers/TaskFilterProvider';
 
 const anonymousRoutes = (
   <Switch>
@@ -170,23 +171,25 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <QuoteFilterListProvider>
-        <BookingListPaginationProvider>
-          <BookingListFilterProvider>
-            <Navbar />
-            <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
-              <CircularProgress color="inherit" />
-            </Backdrop>
-            <div className={classes.deviceControl}>
-              {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
-            </div>
-            <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
-            {process.env.REACT_APP_BRAND === 'brunoni' ? (
-              <BrunoniFooter />
-            ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-              <AllmarineFooter />
-            ) : null}
-          </BookingListFilterProvider>
-        </BookingListPaginationProvider>
+        <TaskFilterProvider>
+          <BookingListPaginationProvider>
+            <BookingListFilterProvider>
+              <Navbar />
+              <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
+                <CircularProgress color="inherit" />
+              </Backdrop>
+              <div className={classes.deviceControl}>
+                {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+              </div>
+              <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
+              {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                <BrunoniFooter />
+              ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                <AllmarineFooter />
+              ) : null}
+            </BookingListFilterProvider>
+          </BookingListPaginationProvider>
+        </TaskFilterProvider>
       </QuoteFilterListProvider>
     </Fragment>
   );
