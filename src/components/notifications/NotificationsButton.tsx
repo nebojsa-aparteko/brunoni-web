@@ -15,8 +15,10 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
     if (isNotificationDrawerOpen) {
       setNumberToLoad(100);
       setShowOnlyUnread(true);
+    } else {
+      setNumberToLoad(10);
+      setShowOnlyUnread(false);
     }
-
     setIsNotificationDrawerOpen(prevState => !prevState);
   };
   const userRecord = useContext(UserRecordContext);
