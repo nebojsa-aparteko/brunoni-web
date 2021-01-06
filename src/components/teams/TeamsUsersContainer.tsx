@@ -87,7 +87,7 @@ const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose })
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         });
     }
-  }, [selectedUser, selectedRole, handleClose]);
+  }, [selectedUser, selectedRole, handleClose, dispatch]);
 
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="addAdminsDialogTitle" maxWidth="md">

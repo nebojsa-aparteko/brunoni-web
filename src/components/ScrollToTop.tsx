@@ -3,14 +3,11 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { Box, Fab } from '@material-ui/core';
 
 interface Props {
-  scrollStepInPx: number;
-  delayInMs: number;
   className: any;
 }
 
-const ScrollToTop: React.FC<Props> = ({ scrollStepInPx, delayInMs, className }) => {
+const ScrollToTop: React.FC<Props> = ({ className }) => {
   const [shouldShow, setShouldShow] = useState(false);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timer | undefined>(undefined);
 
   const scrollListener = useCallback(() => {
     if (window.scrollY > 170) {
@@ -19,14 +16,6 @@ const ScrollToTop: React.FC<Props> = ({ scrollStepInPx, delayInMs, className }) 
       setShouldShow(false);
     }
   }, [setShouldShow]);
-
-  const onScrollStep = useCallback(() => {
-    if (window.pageYOffset === 0 && intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(undefined);
-    }
-    window.scroll(0, window.pageYOffset - scrollStepInPx);
-  }, [scrollStepInPx, intervalId]);
 
   useEffect(() => {
     document.addEventListener('scroll', scrollListener);
@@ -37,10 +26,9 @@ const ScrollToTop: React.FC<Props> = ({ scrollStepInPx, delayInMs, className }) 
     };
   }, [scrollListener]);
 
-  const scrollToTop = useCallback(() => {
-    let intervalId = setInterval(onScrollStep, delayInMs);
-    setIntervalId(intervalId);
-  }, [setIntervalId, delayInMs, onScrollStep]);
+  const scrollToTop = () => {
+    window['scrollTo']({ top: 0, behavior: 'smooth' });
+  };
 
   const renderGoTopIcon = () => {
     if (shouldShow) {

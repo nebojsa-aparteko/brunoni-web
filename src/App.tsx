@@ -181,7 +181,7 @@ const App: React.FC = () => {
               <div className={classes.deviceControl}>
                 {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
               </div>
-              <ScrollToTop scrollStepInPx={50} delayInMs={30} className={classes.goTop} />
+              <ScrollToTop className={classes.goTop} />
               {process.env.REACT_APP_BRAND === 'brunoni' ? (
                 <BrunoniFooter />
               ) : process.env.REACT_APP_BRAND === 'allmarine' ? (

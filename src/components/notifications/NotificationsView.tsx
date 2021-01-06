@@ -107,7 +107,7 @@ const NotificationsView: React.FC<Props> = ({
         }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notifications]);
+  }, [notifications, dispatch, enqueueSnackbar]);
 
   return (
     <Grid className={classes.root}>
