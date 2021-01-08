@@ -112,6 +112,8 @@ export enum ActivityText {
   ASSIGNED_AGENT = ' has assigned agent ',
   ASSIGNED_CLIENT = ' has assigned client ',
   SET_WATCHERS = ' has ',
+  CLEAR_PAYMENT = ' has cleared payment ',
+  REVERT_CLEAR_PAYMENT = ' has reverted the clearing of payment ',
 }
 
 export enum ActivityChangeType {
@@ -136,6 +138,8 @@ export enum ActivityChangeType {
   ASSIGNED_AGENT,
   ASSIGNED_CLIENT,
   SET_WATCHERS,
+  CLEAR_PAYMENT,
+  REVERT_CLEAR_PAYMENT,
 }
 
 export enum ChecklistNames {

@@ -77,6 +77,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.ASSIGNED_CLIENT;
       case ActivityChangeType.SET_WATCHERS:
         return ActivityText.SET_WATCHERS;
+      case ActivityChangeType.CLEAR_PAYMENT:
+        return ActivityText.CLEAR_PAYMENT;
+      case ActivityChangeType.REVERT_CLEAR_PAYMENT:
+        return ActivityText.REVERT_CLEAR_PAYMENT;
     }
   };
 
@@ -144,7 +148,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
       activity.changeType === ActivityChangeType.POSTPONE_PAYMENT ||
       activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
-      activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD
+      activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
+      activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
+      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT
         ? activity.paymentReference
         : null}
       {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
