@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useCallback, useContext } from 'react';
 import { Card, CardActions, CardContent, CardHeader, Divider, Tab, Tabs } from '@material-ui/core';
 import { Booking } from '../../../model/Booking';
 import { differenceInMilliseconds } from 'date-fns';
@@ -9,6 +9,8 @@ import InternalStorage from '../InternalStorage';
 import TabPanel from '../../TabPanel';
 import ChecklistContent from './ChecklistContent';
 import AccountingTabContent from '../accountingTab/AccountingTabContent';
+import useUser from '../../../hooks/useUser';
+import firebase from '../../../firebase';
 
 interface CheckListProps {
   booking: Booking;
@@ -25,21 +27,32 @@ function a11yProps(index: any) {
   };
 }
 
+const setLastOpenedChecklistTab = async (value: string, userId: string) =>
+  await firebase
+    .firestore()
+    .collection('users')
+    .doc(userId)
+    .update('lastOpenedChecklistTab', value);
+
 const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
   const actingAs = useContext(ActingAs)[0];
+  const [user, userRecord] = useUser();
+  const [tabValue, setTabValue] = React.useState(
+    userRecord.lastOpenedChecklistTab && userRecord.lastOpenedChecklistTab === 'accounting' ? 1 : 0,
+  );
 
-  const [tabValue, setTabValue] = React.useState(0);
-  useEffect(() => {
-    const value = localStorage.getItem('checklistTab');
-    setTabValue(value && value === 'accounting' ? 1 : 0);
-  }, []);
-  useEffect(() => {
-    localStorage.setItem('checklistTab', `${tabValue === 1 ? 'accounting' : 'operations'}`);
-  }, [tabValue]);
-  const handleChangeTab = (event: React.ChangeEvent<{}>, newValue: number) => {
-    onTabChange && onTabChange(newValue === 1 ? 'accounting' : 'operations');
-    setTabValue(newValue);
-  };
+  const handleChangeTab = useCallback(
+    (event: React.ChangeEvent<{}>, newValue: number) => {
+      onTabChange && onTabChange(newValue === 1 ? 'accounting' : 'operations');
+      setTabValue(newValue);
+      if (newValue !== (userRecord.lastOpenedChecklistTab === 'accounting' ? 1 : 0)) {
+        setLastOpenedChecklistTab(newValue === 1 ? 'accounting' : 'operations', user.uid).then(() =>
+          console.log('Saved preferred checklist tab.'),
+        );
+      }
+    },
+    [onTabChange, setTabValue, setTabValue, user.uid],
+  );
 
   return (
     <Fragment>
