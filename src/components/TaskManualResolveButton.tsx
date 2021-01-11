@@ -122,11 +122,11 @@ const events = {
   CLEAR_INVOICE: {
     resolve: async (task: Task): Promise<ActivityChangeType | null> => {
       const weeklyPayment = await getWeeklyPayment(task.paymentReference);
-
+      const ref = task.paymentReference ? task.paymentReference : getPaymentRefFromTaskId(task.id);
       await firebase
         .firestore()
         .collection('weeklyPayment')
-        .doc(task.paymentReference)
+        .doc(ref)
         .set(
           {
             platformStatus:
@@ -140,11 +140,12 @@ const events = {
     },
     unResolve: async (task: Task): Promise<ActivityChangeType | null> => {
       const weeklyPayment = await getWeeklyPayment(task.paymentReference);
+      const ref = task.paymentReference ? task.paymentReference : getPaymentRefFromTaskId(task.id);
 
       await firebase
         .firestore()
         .collection('weeklyPayment')
-        .doc(task.paymentReference)
+        .doc(ref)
         .set(
           {
             platformStatus:
@@ -158,4 +159,8 @@ const events = {
       return ActivityChangeType.REVERT_CLEAR_PAYMENT;
     },
   },
+};
+
+const getPaymentRefFromTaskId = (taskId: string) => {
+  return taskId.split('_')?.[1];
 };
