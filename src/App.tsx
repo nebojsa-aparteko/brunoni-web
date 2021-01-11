@@ -42,6 +42,7 @@ import firebase from './firebase';
 import CommissionsPage from './pages/CommissionsPage';
 import { GlobalContext } from './store/GlobalStore';
 import TaskFilterProvider from './providers/TaskFilterProvider';
+import { setLastOpenedChecklistTab } from './components/bookings/checklist/CheckList';
 
 const anonymousRoutes = (
   <Switch>
@@ -153,19 +154,32 @@ const App: React.FC = () => {
       const notificationId = params.readNotification as string;
 
       if (params.checklistTab) {
-        localStorage.setItem('checklistTab', `${params.checklistTab as string}`);
-        delete params.checklistTab;
+        setLastOpenedChecklistTab(`${params.checklistTab as string}`, user.uid)
+          .then(() => delete params.checklistTab)
+          .then(() => {
+            //read that notification
+            firebase
+              .firestore()
+              .collection('notifications')
+              .doc(notificationId)
+              .set({ seen: true }, { merge: true })
+              .then(() => {
+                delete params.readNotification;
+                history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+              });
+          });
+      } else {
+        //read that notification
+        firebase
+          .firestore()
+          .collection('notifications')
+          .doc(notificationId)
+          .set({ seen: true }, { merge: true })
+          .then(() => {
+            delete params.readNotification;
+            history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+          });
       }
-      //read that notification
-      firebase
-        .firestore()
-        .collection('notifications')
-        .doc(notificationId)
-        .set({ seen: true }, { merge: true })
-        .then(() => {
-          delete params.readNotification;
-          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-        });
     }
   }, [history]);
   return (

@@ -143,7 +143,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(localStorage.getItem('checklistTab'));
+  const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 

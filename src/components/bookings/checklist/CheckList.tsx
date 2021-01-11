@@ -27,7 +27,7 @@ function a11yProps(index: any) {
   };
 }
 
-const setLastOpenedChecklistTab = async (value: string, userId: string) =>
+export const setLastOpenedChecklistTab = async (value: string, userId: string) =>
   await firebase
     .firestore()
     .collection('users')
