@@ -11,6 +11,7 @@ export interface TaskFilterProviderContextFilters {
   taskStatus: TaskStatus;
   taskCategory: TaskCategory;
   carrier?: Carrier;
+  payDate?: Date;
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {

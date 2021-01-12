@@ -34,6 +34,10 @@ import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import Carrier from '../../model/Carrier';
 import { GlobalContext } from '../../store/GlobalStore';
+import DateInput from '../inputs/DateInput';
+import ClearIcon from '@material-ui/icons/Clear';
+import IconButton from '@material-ui/core/IconButton';
+import { startOfDay } from 'date-fns/fp';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -42,6 +46,8 @@ const MyDayContainer = () => {
   const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPayDatePickerOpen, setIsPayDatePickerOpen] = useState(false);
+  const [payDate, setPayDate] = useState<Date | null>(null);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
   const [, dispatch] = useContext(GlobalContext);
 
@@ -126,6 +132,7 @@ const MyDayContainer = () => {
                     ?.map(carrier => getId(carrier.name) || carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
                   currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
+                  (payDate && task.payDate ? startOfDay(task.payDate) === startOfDay(payDate) : true) &&
                   (!task.assignedUser || !task.assignedUser.alphacomId),
               ),
           ] as [string, Task[]];
@@ -136,7 +143,7 @@ const MyDayContainer = () => {
           setNormalizedTasks(n || []);
         });
     }
-  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name, payDate]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -164,6 +171,18 @@ const MyDayContainer = () => {
         setSelectedTasks([]);
         setFilters(set('taskCategory', category)(filters));
         localStorage.setItem('taskCategory', `${category}`);
+      }
+    },
+    [filters, setFilters],
+  );
+
+  const onPayDateChange = useCallback(
+    date => {
+      setPayDate(date);
+      setIsPayDatePickerOpen(false);
+      if (setFilters) {
+        setSelectedTasks([]);
+        setFilters(set('payDate', date ? startOfDay(date) : undefined)(filters));
       }
     },
     [filters, setFilters],
@@ -260,6 +279,31 @@ const MyDayContainer = () => {
               <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
                 <CarrierInput label="Carrier" onChange={onCarrierFilter} carriers={availableCarriers} value={carrier} />
               </Box>
+              {taskCategory === TaskCategory.ACCOUNTING ? (
+                <Box display="flex" style={{ minWidth: theme.spacing(15), display: 'flex' }} ml={2}>
+                  <DateInput
+                    value={payDate}
+                    onChange={onPayDateChange}
+                    open={isPayDatePickerOpen}
+                    onOpen={() => setIsPayDatePickerOpen(true)}
+                    onClose={() => setIsPayDatePickerOpen(false)}
+                    label="Pay date"
+                  />
+                  {payDate ? (
+                    <IconButton
+                      aria-label="cancel"
+                      onClick={event => {
+                        event.stopPropagation();
+                        onPayDateChange(null);
+                      }}
+                      size="small"
+                      style={{ position: 'relative', right: 32, marginRight: -32, height: 32, alignSelf: 'center' }}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  ) : null}
+                </Box>
+              ) : null}
             </Box>
             <Box display="flex" alignItems="center" mb={2} pl={4}>
               <Typography component="div">

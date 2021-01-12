@@ -10,7 +10,7 @@ import { getWeek } from 'date-fns';
 
 interface Props {
   label?: string;
-  value?: Date;
+  value?: Date | null;
   onChange: (date: Date) => void;
   open: boolean;
   onOpen?: () => void;

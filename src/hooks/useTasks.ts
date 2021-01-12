@@ -13,7 +13,7 @@ import { formatCarrierId } from '../components/myDay/MyDayContainer';
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
   const [filters] = useTaskFilterProviderContext();
-  const { assignee, showClientTasks, taskCategory, carrier } = filters;
+  const { assignee, showClientTasks, taskCategory, carrier, payDate } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
 
@@ -26,6 +26,9 @@ export default function useTasks() {
       if (carrier) {
         query = query.where('carrierId', '==', formatCarrierId(carrier.id));
       }
+      if (payDate) {
+        query = query.where('payDate', '==', payDate);
+      }
       if (assignee) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(assignee));
       }
@@ -37,7 +40,7 @@ export default function useTasks() {
       }
       return query;
     },
-    [assignee, showClientTasks, actingAs, userRecord, taskCategory, carrier],
+    [assignee, showClientTasks, actingAs, userRecord, taskCategory, carrier, payDate],
   );
 
   useEffect(() => {
@@ -81,4 +84,5 @@ export default function useTasks() {
   return snapshot;
 }
 
-export const normalizeTaskData = (item: any) => flow(update('dueDate', safeInvoke('toDate')))(item) as Task;
+export const normalizeTaskData = (item: any) =>
+  flow(update('dueDate', safeInvoke('toDate')), update('payDate', safeInvoke('toDate')))(item) as Task;

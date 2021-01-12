@@ -22,6 +22,7 @@ export default interface Task {
   bookingId: string;
   selected?: boolean;
   paymentReference?: string;
+  payDate?: Date;
 }
 
 export enum ManualResolveType {
