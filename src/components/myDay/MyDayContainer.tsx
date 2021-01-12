@@ -132,7 +132,9 @@ const MyDayContainer = () => {
                     ?.map(carrier => getId(carrier.name) || carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
                   currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
-                  (payDate && task.payDate ? startOfDay(task.payDate) === startOfDay(payDate) : true) &&
+                  (payDate && task.payDate
+                    ? startOfDay(task.payDate).getTime() === startOfDay(payDate).getTime()
+                    : true) &&
                   (!task.assignedUser || !task.assignedUser.alphacomId),
               ),
           ] as [string, Task[]];
@@ -144,7 +146,7 @@ const MyDayContainer = () => {
         });
     }
   }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name, payDate]);
-
+  console.log(payDate && startOfDay(payDate).getTime());
   const onStatusFilter = useCallback(
     (_, status) => {
       if (setFilters) {
