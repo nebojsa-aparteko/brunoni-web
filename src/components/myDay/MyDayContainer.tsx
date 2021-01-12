@@ -34,6 +34,9 @@ import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import Carrier from '../../model/Carrier';
 import { GlobalContext } from '../../store/GlobalStore';
+import DateInput from '../inputs/DateInput';
+import ClearIcon from '@material-ui/icons/Clear';
+import IconButton from '@material-ui/core/IconButton';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -42,6 +45,8 @@ const MyDayContainer = () => {
   const [normalizedTasks, setNormalizedTasks] = useState<[string, Task[]][] | undefined>(undefined);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPayDatePickerOpen, setIsPayDatePickerOpen] = useState(false);
+  const [payDate, setPayDate] = useState<Date | null>(null);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
   const [, dispatch] = useContext(GlobalContext);
 
@@ -169,6 +174,18 @@ const MyDayContainer = () => {
     [filters, setFilters],
   );
 
+  const onPayDateChange = useCallback(
+    date => {
+      setPayDate(date);
+      setIsPayDatePickerOpen(false);
+      if (setFilters) {
+        setSelectedTasks([]);
+        setFilters(set('payDate', date || undefined)(filters));
+      }
+    },
+    [filters, setFilters],
+  );
+
   /*
     Overdue / Future, make array of filter functions, and add that function into filter function of an array
    */
@@ -260,6 +277,31 @@ const MyDayContainer = () => {
               <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
                 <CarrierInput label="Carrier" onChange={onCarrierFilter} carriers={availableCarriers} value={carrier} />
               </Box>
+              {taskCategory === TaskCategory.ACCOUNTING ? (
+                <Box display="flex" style={{ minWidth: theme.spacing(15), display: 'flex' }} ml={2}>
+                  <DateInput
+                    value={payDate}
+                    onChange={onPayDateChange}
+                    open={isPayDatePickerOpen}
+                    onOpen={() => setIsPayDatePickerOpen(true)}
+                    onClose={() => setIsPayDatePickerOpen(false)}
+                    label="Pay date"
+                  />
+                  {payDate ? (
+                    <IconButton
+                      aria-label="cancel"
+                      onClick={event => {
+                        event.stopPropagation();
+                        setPayDate(null);
+                      }}
+                      size="small"
+                      style={{ position: 'relative', right: 32, marginRight: -32, height: 32, alignSelf: 'center' }}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  ) : null}
+                </Box>
+              ) : null}
             </Box>
             <Box display="flex" alignItems="center" mb={2} pl={4}>
               <Typography component="div">
