@@ -16,7 +16,6 @@ export interface TaskFilterProviderContextFilters {
 
 export const TASK_FILTERS_INITIAL_STATE = {
   showClientTasks: false,
-  taskCategory: (localStorage.getItem('taskCategory') as TaskCategory) || TaskCategory.OPERATIONS,
 } as TaskFilterProviderContextFilters;
 
 const TaskFilterProviderContext = createContext<
@@ -29,6 +28,10 @@ const TaskFilterProvider = (props: any) => {
   const [state, setState] = useState<TaskFilterProviderContextFilters>({
     ...TASK_FILTERS_INITIAL_STATE,
     assignee: userRecord,
+    taskCategory:
+      userRecord && userRecord.lastOpenedChecklistTab && userRecord.lastOpenedChecklistTab === 'accounting'
+        ? TaskCategory.ACCOUNTING
+        : TaskCategory.OPERATIONS,
   });
 
   return (

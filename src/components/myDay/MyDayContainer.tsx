@@ -38,6 +38,8 @@ import DateInput from '../inputs/DateInput';
 import ClearIcon from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
 import { startOfDay } from 'date-fns/fp';
+import { setLastOpenedChecklistTab } from '../bookings/checklist/CheckList';
+import useUser from '../../hooks/useUser';
 
 const MyDayContainer = () => {
   const tasks = useTasks();
@@ -65,6 +67,7 @@ const MyDayContainer = () => {
   );
 
   const { assignee, taskStatus, taskCategory, carrier } = filters;
+  const user = useUser()[0];
   const actingAs = useContext(ActingAs)[0];
   const availableCarriers = useContext(Carriers);
   const onAssignedFilter = useCallback(
@@ -81,15 +84,6 @@ const MyDayContainer = () => {
     teams,
     taskCategory,
   ]);
-
-  useEffect(() => {
-    //calling this only once on load
-    if (setFilters) {
-      setFilters(
-        set('taskCategory', (localStorage.getItem('taskCategory') as TaskCategory) || TaskCategory.OPERATIONS)(filters),
-      );
-    }
-  }, []);
 
   useEffect(() => {
     if (assignee && !actingAs)
@@ -146,7 +140,7 @@ const MyDayContainer = () => {
         });
     }
   }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name, payDate]);
-  console.log(payDate && startOfDay(payDate).getTime());
+
   const onStatusFilter = useCallback(
     (_, status) => {
       if (setFilters) {
@@ -168,11 +162,11 @@ const MyDayContainer = () => {
   );
 
   const onCategoryChange = useCallback(
-    (category: TaskCategory) => {
+    async (category: TaskCategory) => {
       if (setFilters) {
         setSelectedTasks([]);
         setFilters(set('taskCategory', category)(filters));
-        localStorage.setItem('taskCategory', `${category}`);
+        await setLastOpenedChecklistTab(category === TaskCategory.ACCOUNTING ? 'accounting' : 'operations', user.uid);
       }
     },
     [filters, setFilters],
