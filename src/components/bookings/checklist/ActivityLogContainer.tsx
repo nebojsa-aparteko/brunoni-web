@@ -69,8 +69,9 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
               : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT
             : false
           : showMore
-          ? true
-          : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT,
+          ? !item.isAccountingActivity
+          : !item.isAccountingActivity &&
+            (item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT),
       ),
     [showMore, normalizedActivityLog, isAccounting],
   );
