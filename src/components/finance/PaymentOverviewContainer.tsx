@@ -302,17 +302,22 @@ const PaymentOverviewContainer = () => {
       return Promise.resolve(postponePayments(offset, user, selectedPaymentsObjects))
         .then(() => {
           return Promise.all(
-            selectedPaymentsObjects.map(payment =>
-              addActivityItem(
+            selectedPaymentsObjects.map(payment => {
+              const dateBeforeChange = payment.payDate;
+              return addActivityItem(
                 payment.bookingId,
                 createActivityObject({
                   changeType: ActivityChangeType.POSTPONE_PAYMENT,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
-                  paymentReference: payment.reference,
+                  paymentActivityData: {
+                    paymentReference: payment.reference,
+                    dateBeforeChange: dateBeforeChange,
+                    dateAfterChange: addDays(dateBeforeChange, offset),
+                  },
                 }),
-              ),
-            ),
+              );
+            }),
           );
         })
         .then(_ => {

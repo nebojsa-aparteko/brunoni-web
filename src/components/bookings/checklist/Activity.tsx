@@ -10,6 +10,7 @@ import {
   ChecklistItemValueDocumentStatusType,
 } from './ChecklistItemModel';
 import DateFormattedText from '../../DateFormattedText';
+import { formatDateSafe } from '../../../utilities/formattingHelpers';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -150,26 +151,40 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
       activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
       activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
-      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT
-        ? activity.paymentReference
-        : null}
-      {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
-      (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
-        ? activity.changeType === ActivityChangeType.ADD_FILE
-          ? ' into '
-          : ' from '
-        : null}
-
-      {activity.checklistItem ? (
+      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ? (
         <Fragment>
-          <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+          {activity.paymentActivityData?.paymentReference || activity.paymentReference}
+          {activity.changeType === ActivityChangeType.POSTPONE_PAYMENT &&
+          activity.paymentActivityData?.dateBeforeChange &&
+          activity.paymentActivityData.dateAfterChange
+            ? ` from ${formatDateSafe(
+                activity.paymentActivityData.dateBeforeChange,
+                'd. MMMM yyyy',
+              )} to ${formatDateSafe(activity.paymentActivityData.dateAfterChange, 'd. MMMM yyyy')}`
+            : null}
+          .
         </Fragment>
-      ) : !activity.isAccountingActivity ? (
-        activity.isInternal ? (
-          'Internal storage.'
-        ) : null
       ) : (
-        'Accounting.'
+        <Fragment>
+          {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
+          (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
+            ? activity.changeType === ActivityChangeType.ADD_FILE
+              ? ' into '
+              : ' from '
+            : null}
+
+          {activity.checklistItem ? (
+            <Fragment>
+              <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+            </Fragment>
+          ) : !activity.isAccountingActivity ? (
+            activity.isInternal ? (
+              'Internal storage.'
+            ) : null
+          ) : (
+            'Accounting.'
+          )}
+        </Fragment>
       )}
     </Typography>
   );

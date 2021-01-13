@@ -63,7 +63,7 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) => 
                   changeType: result as ActivityChangeType,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
-                  paymentReference: task.paymentReference,
+                  paymentActivityData: { paymentReference: task.paymentReference },
                 }),
               ).then(() => console.log('Reverted invoice clearing.'));
             }
@@ -98,7 +98,7 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) => 
                   changeType: result as ActivityChangeType,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
-                  paymentReference: task.paymentReference,
+                  paymentActivityData: { paymentReference: task.paymentReference },
                 }),
               ).then(() => console.log('Invoice cleared.'));
             }

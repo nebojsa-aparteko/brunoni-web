@@ -33,7 +33,7 @@ import { Booking, StoredDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';
-import { ActivityLogItem, ActivityType } from './ActivityModel';
+import { ActivityLogItem, ActivityType, PaymentActivityData } from './ActivityModel';
 import ChecklistStagesView from './ChecklistStagesView';
 import { useActivityLogState } from './ActivityLogContext';
 import { addActivityItem } from './ActivityLogContainer';
@@ -153,7 +153,7 @@ export const createActivityObject = (data: {
   stage?: Stage;
   internal?: boolean;
   isAccountingActivity?: boolean;
-  paymentReference?: string;
+  paymentActivityData?: PaymentActivityData;
   type?: ActivityType;
   comment?: string;
   mentions?: MentionItem[];
@@ -165,7 +165,7 @@ export const createActivityObject = (data: {
     changeType,
     internal,
     checklistItem,
-    paymentReference,
+    paymentActivityData,
     documents,
     stage,
     isAccountingActivity,
@@ -193,7 +193,7 @@ export const createActivityObject = (data: {
     comment: comment,
     mentions: mentions,
     isAccountingActivity: !!isAccountingActivity,
-    paymentReference: paymentReference,
+    paymentActivityData: paymentActivityData,
     addedUsers: addedUsers,
     removedUsers: removedUsers,
   } as ActivityLogItem);
@@ -489,6 +489,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     internal: boolean,
     dontCreateActivity?: boolean,
   ) => {
+    console.log(dontCreateActivity);
     let newItemArray: ChecklistItemValueDocument[];
     if (item.status && !editRestriction(item.status!.at as Date)) {
       return enqueueSnackbar(

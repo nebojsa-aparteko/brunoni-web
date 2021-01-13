@@ -24,6 +24,7 @@ export interface ActivityLogItem {
   isAccountingActivity?: boolean;
   addedUsers?: ActivityLogUserData[];
   removedUsers?: ActivityLogUserData[];
+  paymentActivityData?: PaymentActivityData;
 }
 
 export enum ActivityType {
@@ -50,4 +51,10 @@ export interface QuoteGroupActivityModel {
   isInternal: boolean;
   mentions?: MentionItem[];
   groupId: string;
+}
+
+export interface PaymentActivityData {
+  paymentReference?: string;
+  dateBeforeChange?: Date;
+  dateAfterChange?: Date;
 }

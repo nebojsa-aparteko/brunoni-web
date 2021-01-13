@@ -234,7 +234,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
   );
 
   const handleDocumentStatusChange = useCallback(
-    (item: DocumentValue, status: DocumentValueStatus) => {
+    (item: DocumentValue, status: DocumentValueStatus, dontCreateActivity?: boolean) => {
       if (item.status && !editRestriction(item.status!.at as Date)) {
         return enqueueSnackbar(
           <Typography color="inherit">
@@ -251,15 +251,17 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
       storeAccountingActivity(() =>
         changeAccountingDocument(newItem, payment.reference).then(_ => {
           updateComponent?.();
-          return addActivityItem(
-            booking!.id,
-            createActivityObject({
-              changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
-              by: getActivityLogUserData(),
-              documents: [newItem],
-              isAccountingActivity: true,
-            }),
-          );
+          if (!dontCreateActivity) {
+            return addActivityItem(
+              booking!.id,
+              createActivityObject({
+                changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
+                by: getActivityLogUserData(),
+                documents: [newItem],
+                isAccountingActivity: true,
+              }),
+            );
+          }
         }),
       );
     },
@@ -268,6 +270,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
 
   const handleChangePayDate = useCallback(
     (offset: number) => {
+      const dateBeforeChange = payment.payDate;
       dispatch({ type: 'START_GLOBAL_LOADING' });
       return Promise.resolve(postponePayment(offset, user, payment))
         .then(_ => {
@@ -279,7 +282,11 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
                 changeType: ActivityChangeType.POSTPONE_PAYMENT,
                 by: getActivityLogUserData(),
                 isAccountingActivity: true,
-                paymentReference: payment.reference,
+                paymentActivityData: {
+                  paymentReference: payment.reference,
+                  dateBeforeChange: dateBeforeChange,
+                  dateAfterChange: addDays(dateBeforeChange, offset),
+                },
               }),
             ),
           );
@@ -309,7 +316,9 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
                       : ActivityChangeType.REVERT_PUT_ON_HOLD,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
-                  paymentReference: payment.reference,
+                  paymentActivityData: {
+                    paymentReference: payment.reference,
+                  },
                 }),
               ),
             );
@@ -379,8 +388,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
                 item={item}
                 booking={booking}
                 storageBasePath={storageBasePath}
-                changeStatus={(item: DocumentValue, status: DocumentValueStatus) =>
-                  handleDocumentStatusChange(item, status)
+                changeStatus={(item: DocumentValue, status: DocumentValueStatus, dontCreateActivity?: boolean) =>
+                  handleDocumentStatusChange(item, status, dontCreateActivity)
                 }
                 deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
                 internal={true}

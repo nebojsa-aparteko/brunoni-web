@@ -59,6 +59,10 @@ const useStyles = makeStyles(theme =>
     },
   }),
 );
+export const normalizePaymentActivityData = flow(
+  update('dateBeforeChange', invoke('toDate')),
+  update('dateAfterChange', invoke('toDate')),
+);
 
 const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name, children }) => {
   return (
@@ -118,7 +122,10 @@ const ComparisonDialogContent = ({
     'activity',
   );
 
-  const normalizeActivity = flow(update('at', invoke('toDate')));
+  const normalizeActivity = flow(
+    update('at', invoke('toDate')),
+    update('paymentActivityData', normalizePaymentActivityData),
+  );
 
   const activityCollection = activityLogCollection?.docs.map(doc => ({
     id: doc.id,

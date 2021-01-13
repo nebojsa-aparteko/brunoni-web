@@ -13,6 +13,7 @@ import { flow, isNil, omitBy } from 'lodash/fp';
 import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import { MentionItem } from 'react-mentions';
 import { Booking } from '../../../model/Booking';
+import { normalizePaymentActivityData } from '../documentApproval/ComparisonDialogContent';
 
 interface Props {
   booking: Booking;
@@ -55,9 +56,13 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
     ...doc.data(),
   })) as ActivityLogItem[];
 
-  const normalizedActivityLog = useMemo(() => map(update('at', invoke('toDate')))(activityCollection), [
-    activityCollection,
-  ]);
+  const normalizedActivityLog = useMemo(
+    () =>
+      map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
+        activityCollection,
+      ),
+    [activityCollection],
+  );
 
   const filteredActivityLog = useMemo(
     () =>
