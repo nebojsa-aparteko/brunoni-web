@@ -103,9 +103,6 @@ const BrunoniFooter: React.FC<Props> = () => {
                 <Typography variant="body1" color="inherit">
                   Phone +41 44 455 58 58
                 </Typography>
-                <Typography variant="body1" color="inherit">
-                  Fax +41 44 455 58 55
-                </Typography>
               </Box>
             </Grid>
 
