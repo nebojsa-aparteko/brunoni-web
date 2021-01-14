@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -149,6 +149,14 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const tasks = useTasksPerBooking(booking.id);
 
+  const filteredTasks = useMemo(() => {
+    return tasks?.filter(task =>
+      task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
+    );
+  }, [tasks, userRecord]);
+
+  // console.log(tasks);
+  // console.log(filteredTasks);
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -241,10 +249,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Box>
         </Grid>
       )}
-      {tasks && tasks.length > 0 && (
+      {filteredTasks && filteredTasks.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
-            <BookingTaskExpansionPanel tasks={tasks} />
+            <BookingTaskExpansionPanel tasks={filteredTasks} />
           </Box>
         </Grid>
       )}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   createStyles,
@@ -23,6 +23,7 @@ import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import ActivityLogContainer from '../bookings/checklist/ActivityLogContainer';
 import BookingTaskExpansionPanel from '../bookings/BookingTaskExpansionPanel';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
+import { TaskCategory } from '../../model/Task';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -120,6 +121,12 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
       setBooking(data ? { id: b.id, ...normalizeBooking(data) } : undefined);
     });
   }, [bookingId]);
+
+  const filteredTasks = useMemo(
+    () => tasks?.filter(task => (task.taskCategory ? task.taskCategory === TaskCategory.ACCOUNTING : false)),
+    [tasks],
+  );
+
   return (
     <Dialog
       open={isOpen}
@@ -141,9 +148,9 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
-        {tasks && tasks.length > 0 && (
+        {filteredTasks && filteredTasks.length > 0 && (
           <Paper elevation={2} className={classes.bookingTasksContainer}>
-            <BookingTaskExpansionPanel tasks={tasks} updateComponent={updateComponent} />
+            <BookingTaskExpansionPanel tasks={filteredTasks} updateComponent={updateComponent} />
           </Paper>
         )}
         <Paper elevation={2} className={classes.mainContentContainer}>
