@@ -54,7 +54,6 @@ export interface QuoteGroupActivityModel {
 }
 
 export interface PaymentActivityData {
-  paymentReference?: string;
   dateBeforeChange?: Date;
   dateAfterChange?: Date;
 }

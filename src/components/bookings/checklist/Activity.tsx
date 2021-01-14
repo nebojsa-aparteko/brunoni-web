@@ -153,7 +153,7 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
       activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ? (
         <Fragment>
-          {activity.paymentActivityData?.paymentReference || activity.paymentReference}
+          {activity.paymentReference}
           {activity.changeType === ActivityChangeType.POSTPONE_PAYMENT &&
           activity.paymentActivityData?.dateBeforeChange &&
           activity.paymentActivityData.dateAfterChange

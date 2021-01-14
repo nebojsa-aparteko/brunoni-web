@@ -246,7 +246,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
                 internal: !actingAs,
                 mentions: rejectionInput?.mentions,
                 isAccountingActivity: true,
-                paymentActivityData: { paymentReference: payment.reference },
+                paymentReference: payment.reference,
               }),
             ),
           );

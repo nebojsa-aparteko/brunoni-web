@@ -310,8 +310,8 @@ const PaymentOverviewContainer = () => {
                   changeType: ActivityChangeType.POSTPONE_PAYMENT,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
+                  paymentReference: payment.reference,
                   paymentActivityData: {
-                    paymentReference: payment.reference,
                     dateBeforeChange: dateBeforeChange,
                     dateAfterChange: addDays(dateBeforeChange, offset),
                   },
