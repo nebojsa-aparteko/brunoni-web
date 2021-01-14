@@ -153,6 +153,7 @@ export const createActivityObject = (data: {
   stage?: Stage;
   internal?: boolean;
   isAccountingActivity?: boolean;
+  paymentReference?: string;
   paymentActivityData?: PaymentActivityData;
   type?: ActivityType;
   comment?: string;
@@ -165,6 +166,7 @@ export const createActivityObject = (data: {
     changeType,
     internal,
     checklistItem,
+    paymentReference,
     paymentActivityData,
     documents,
     stage,
@@ -193,6 +195,7 @@ export const createActivityObject = (data: {
     comment: comment,
     mentions: mentions,
     isAccountingActivity: !!isAccountingActivity,
+    paymentReference: paymentReference,
     paymentActivityData: paymentActivityData,
     addedUsers: addedUsers,
     removedUsers: removedUsers,

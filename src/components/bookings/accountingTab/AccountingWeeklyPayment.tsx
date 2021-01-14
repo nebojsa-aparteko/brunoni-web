@@ -282,8 +282,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
                 changeType: ActivityChangeType.POSTPONE_PAYMENT,
                 by: getActivityLogUserData(),
                 isAccountingActivity: true,
+                paymentReference: payment.reference,
                 paymentActivityData: {
-                  paymentReference: payment.reference,
                   dateBeforeChange: dateBeforeChange,
                   dateAfterChange: addDays(dateBeforeChange, offset),
                 },
@@ -316,9 +316,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
                       : ActivityChangeType.REVERT_PUT_ON_HOLD,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
-                  paymentActivityData: {
-                    paymentReference: payment.reference,
-                  },
+                  paymentReference: payment.reference,
                 }),
               ),
             );
