@@ -23,6 +23,7 @@ export default interface UserRecord extends UserRecordMin {
   isRedirectionActive?: boolean;
   dontShowGuide?: boolean;
   lastOpenedChecklistTab?: string;
+  unreadNotifications?: number;
 }
 
 export type Role = 'superadmin' | 'sales' | 'operations';

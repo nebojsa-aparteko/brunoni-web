@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Badge, Drawer, IconButtonProps } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
@@ -9,14 +9,10 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const NotificationsButton: React.FC<IconButtonProps> = props => {
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
-  const [numberToLoad, setNumberToLoad] = useState<number>(100);
-  const [showOnlyUnread, setShowOnlyUnread] = useState(true);
+  const [numberToLoad, setNumberToLoad] = useState<number>(20);
+  const [showOnlyUnread, setShowOnlyUnread] = useState(false);
   const handleShowNotifications = () => {
     if (isNotificationDrawerOpen) {
-      setNumberToLoad(100);
-      setShowOnlyUnread(true);
-    } else {
-      setNumberToLoad(10);
       setShowOnlyUnread(false);
     }
     setIsNotificationDrawerOpen(prevState => !prevState);
@@ -24,23 +20,11 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
   const userRecord = useContext(UserRecordContext);
   const notifications = useNotifications(userRecord?.alphacomId, showOnlyUnread, numberToLoad);
 
-  const notificationCount = useMemo(
-    () =>
-      notifications?.reduce((accumulator, currentValue) => (!currentValue.seen ? accumulator + 1 : accumulator), 0) ||
-      0,
-    [notifications],
-  );
-
   const handleShowMore = () => {
-    setNumberToLoad(prevState => prevState + (showOnlyUnread ? 100 : 10));
+    setNumberToLoad(prevState => prevState + 20);
   };
 
   const handleToggleShowUnread = () => {
-    if (!showOnlyUnread && isNotificationDrawerOpen) {
-      setNumberToLoad(100);
-    } else {
-      setNumberToLoad(10);
-    }
     setShowOnlyUnread(prevState => !prevState);
   };
 
@@ -52,7 +36,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
         style={{ padding: 8 }}
         {...props}
       >
-        <Badge badgeContent={notificationCount >= 100 ? '100+' : notificationCount} color="secondary">
+        <Badge badgeContent={userRecord?.unreadNotifications || 0} color="secondary">
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
