@@ -8,14 +8,13 @@ const Unauthorized: React.FC = () => (
   <Container>
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
-        <Box p={6} textAlign="center">
+        <Box p={6} display="flex" flexDirection="column" textAlign="center">
           <Image src={require(`../assets/state.error.svg`)} aspectRatio={16 / 9} color="transparent" disableSpinner />
-          <Typography variant="h5" gutterBottom>
-            <Box fontWeight="fontWeightBold">401 Unauthorized</Box>
+          <Typography variant="h4" style={{ fontWeight: 500 }}>
+            You have to be logged in to view this page.
           </Typography>
-          <Typography variant="subtitle1">You have to be logged in to view this page.</Typography>
-          <Box p={2} display="flex" justifyContent="center">
-            <Box mr={2}>
+          <Box p={2} display="flex" flexDirection="column" justifyContent="center">
+            <Box mb={1}>
               <LoginWidget />
             </Box>
             <Box>
