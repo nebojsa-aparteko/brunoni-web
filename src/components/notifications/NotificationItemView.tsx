@@ -213,7 +213,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   };
   const handleSeenStatusChange = async (notification: Notification) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification, userRecord)
+    notificationSeenStatusChange(notification, userRecord, !notification.seen)
       .then(() => console.log('Changed notification status'))
       .catch(error => {
         console.error('Failed to update notification status', error);
@@ -304,13 +304,6 @@ interface NotificationTitleProps extends Props {
 interface NotificationItemProps extends Props {
   handleShowDrawer: () => void;
 }
-
-const getEmailNotifications = (userId: string) =>
-  firebase
-    .firestore()
-    .collection('email-notifications')
-    .doc(userId)
-    .get();
 
 const getReferenceLabel = (referenceObject: string) =>
   referenceObject === 'bookings' ? 'Booking File No.' : 'Quote number';

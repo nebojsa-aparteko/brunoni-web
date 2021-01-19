@@ -15,7 +15,8 @@ import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
 import firebase from '../../firebase';
 import { GlobalContext } from '../../store/GlobalStore';
-import { useSnackbar } from 'notistack';
+import { FirebaseActionType } from '../../model/FirebaseAction';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -43,43 +44,18 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
-const readAllNotifications = async (notifications: Notification[]) => {
-  const batch = firebase.firestore().batch();
-  await Promise.all(
-    notifications
-      ?.filter(notification => !notification.seen)
-      .map(async notification => {
-        const sentNotifications = (
-          await firebase
-            .firestore()
-            .collection('email-notifications')
-            .doc(notification.userAlphacomId)
-            .get()
-        ).data() as {
-          lastSend: Date;
-          notifications: string[];
-        };
-        if (sentNotifications) {
-          await firebase
-            .firestore()
-            .collection('email-notifications')
-            .doc(notification.userAlphacomId)
-            .set({
-              lastSend: sentNotifications.lastSend,
-              notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-            });
-        }
-        return batch.update(
-          firebase
-            .firestore()
-            .collection('notifications')
-            .doc(notification.id),
-          { seen: true },
-        );
-      }),
-  );
-  batch.commit().catch(err => console.log(err));
-};
+const readAllNotifications = async (userEmail: string, userAlphacomId: string) =>
+  firebase
+    .firestore()
+    .collection('functions-action')
+    .doc()
+    .set({
+      date: new Date(),
+      type: FirebaseActionType.MARK_ALL_NOTIFICATIONS_AS_READ,
+      done: false,
+      userEmail,
+      userAlphacomId,
+    });
 
 const NotificationsView: React.FC<Props> = ({
   notifications,
@@ -90,24 +66,18 @@ const NotificationsView: React.FC<Props> = ({
   numberToLoad,
 }) => {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
-
+  const [, userRecord] = useUser();
   const markAllAsRead = useCallback(async () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    readAllNotifications(notifications)
-      .then(() =>
-        enqueueSnackbar(<Typography color="inherit">Success.</Typography>, {
-          variant: 'success',
-        }),
-      )
+    if (!userRecord.emailAddress) return;
+    readAllNotifications(userRecord.emailAddress, userRecord.alphacomId)
+      .then(() => dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' }))
       .catch(error =>
-        enqueueSnackbar(<Typography color="inherit">Error marking all notifications as read - {error}</Typography>, {
-          variant: 'error',
-        }),
+        dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notifications, dispatch, enqueueSnackbar]);
+  }, [notifications, dispatch, userRecord]);
 
   return (
     <Grid className={classes.root}>
