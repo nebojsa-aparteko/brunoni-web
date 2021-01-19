@@ -29,6 +29,9 @@ import ActingAs from '../../contexts/ActingAs';
 import firebase from '../../firebase';
 import ActivityWithComment from '../bookings/checklist/ActivityWithComment';
 import { useSnackbar } from 'notistack';
+import { GlobalContext } from '../../store/GlobalStore';
+import UserRecord from '../../model/UserRecord';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -101,28 +104,18 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
   );
 };
 
-const handleSeenStatusChange = async (notification: Notification) => {
-  const sentNotifications = (await getEmailNotifications(notification.userAlphacomId)).data() as {
-    lastSend: Date;
-    notifications: string[];
-  };
-  if (sentNotifications) {
-    await firebase
-      .firestore()
-      .collection('email-notifications')
-      .doc(notification.userAlphacomId)
-      .set({
-        lastSend: sentNotifications.lastSend,
-        notifications: sentNotifications.notifications.filter(u => u !== notification.id),
-      });
-  }
-  return firebase
-    .firestore()
-    .collection('notifications')
-    .doc(notification.id)
-    .set({ ...notification, seen: !notification.seen }, { merge: true })
-    .then(_ => console.log('Successfully saved'))
-    .catch(err => console.log(err));
+export const notificationSeenStatusChange = async (
+  notification: Notification | string,
+  user: UserRecord,
+  isRead?: boolean,
+) => {
+  const changeNotificationSeenStatus = firebase.functions().httpsCallable('changeNotificationSeenStatus');
+  return await changeNotificationSeenStatus({
+    notificationId: typeof notification === 'string' ? notification : notification.id,
+    userAlphacomId: user.alphacomId,
+    userEmail: user.emailAddress,
+    isRead: isRead,
+  });
 };
 
 const deleteNotification = async (notificationId: string | undefined) => {
@@ -137,9 +130,11 @@ const deleteNotification = async (notificationId: string | undefined) => {
 const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
   const classes = useStyles();
   const history = useHistory();
+  const userRecord = useUser()[1];
   const [actingAs] = useContext(ActingAs);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -162,11 +157,8 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       .catch(() => handleClose());
   }, [notification, handleClose]);
   const handleClick = useCallback(() => {
-    firebase
-      .firestore()
-      .collection('notifications')
-      .doc(notification.id)
-      .set({ seen: true } as Notification, { merge: true })
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    notificationSeenStatusChange(notification, userRecord, true)
       .then(() => {
         handleShowDrawer();
         if (notification.type === NotificationType.COMMENT) {
@@ -184,15 +176,13 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
               }`,
             );
         }
-      });
+      })
+      .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   }, [notification, handleShowDrawer, history]);
 
   const handleCommentClick = () => {
-    firebase
-      .firestore()
-      .collection('notifications')
-      .doc(notification.id)
-      .set({ seen: true } as Notification, { merge: true })
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    notificationSeenStatusChange(notification, userRecord, true)
       .then(() => {
         handleShowDrawer();
         notification.referenceObject &&
@@ -201,7 +191,8 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
               notification.referenceID
             }?focusComment=${notification.activity?.id}`,
           );
-      });
+      })
+      .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   };
 
   const handleDeleteNotification = () => {
@@ -219,6 +210,22 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           autoHideDuration: 1000,
         });
       });
+  };
+  const handleSeenStatusChange = async (notification: Notification) => {
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    notificationSeenStatusChange(notification, userRecord)
+      .then(() => console.log('Changed notification status'))
+      .catch(error => {
+        console.error('Failed to update notification status', error);
+        enqueueSnackbar(
+          <Typography color="inherit">Failed to update notification status - {error.message}</Typography>,
+          {
+            variant: 'error',
+            autoHideDuration: 1000,
+          },
+        );
+      })
+      .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   };
 
   return (

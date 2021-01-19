@@ -43,6 +43,7 @@ import CommissionsPage from './pages/CommissionsPage';
 import { GlobalContext } from './store/GlobalStore';
 import TaskFilterProvider from './providers/TaskFilterProvider';
 import { setLastOpenedChecklistTab } from './components/bookings/checklist/CheckList';
+import { notificationSeenStatusChange } from './components/notifications/NotificationItemView';
 
 const anonymousRoutes = (
   <Switch>
@@ -141,7 +142,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const App: React.FC = () => {
   const classes = useStyles();
-  const [user] = useUser();
+  const [user, userRecord] = useUser();
   const history = useHistory();
   const [state] = useContext(GlobalContext);
   const { isGlobalLoadingInProgress } = state;
@@ -158,27 +159,17 @@ const App: React.FC = () => {
           .then(() => delete params.checklistTab)
           .then(() => {
             //read that notification
-            firebase
-              .firestore()
-              .collection('notifications')
-              .doc(notificationId)
-              .set({ seen: true }, { merge: true })
-              .then(() => {
-                delete params.readNotification;
-                history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-              });
+            notificationSeenStatusChange(notificationId, userRecord, true).then(() => {
+              delete params.readNotification;
+              history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+            });
           });
       } else {
         //read that notification
-        firebase
-          .firestore()
-          .collection('notifications')
-          .doc(notificationId)
-          .set({ seen: true }, { merge: true })
-          .then(() => {
-            delete params.readNotification;
-            history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-          });
+        notificationSeenStatusChange(notificationId, userRecord, true).then(() => {
+          delete params.readNotification;
+          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+        });
       }
     }
   }, [history]);

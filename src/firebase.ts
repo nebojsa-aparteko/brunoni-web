@@ -8,6 +8,7 @@ import 'firebase/analytics';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
+import 'firebase/firebase-functions';
 
 const developmentConfig = {
   apiKey: 'AIzaSyCGqNPUnvvO9sGCfYeC3IdeAw_jMUpJ5NQ',
