@@ -72,7 +72,10 @@ const NotificationsView: React.FC<Props> = ({
     dispatch({ type: 'START_GLOBAL_LOADING' });
     if (!userRecord.emailAddress) return;
     readAllNotifications(userRecord.emailAddress, userRecord.alphacomId)
-      .then(() => dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' }))
+      .then(() => {
+        handleShow();
+        dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' });
+      })
       .catch(error =>
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
       )
