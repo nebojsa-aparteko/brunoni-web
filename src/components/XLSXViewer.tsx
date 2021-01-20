@@ -9,8 +9,12 @@ const XLSXViewer: React.FC<{
   const [currentSheet, setCurrentSheet] = useState<string | undefined>(undefined);
   const sheetHTML = useMemo(
     () =>
-      fileData && fileData.Sheets && currentSheet
-        ? '<style>table, td {border: 1px solid dimgray; background-color: white; border-collapse: collapse;  padding: 8px;}</style>' +
+      fileData &&
+      fileData.Sheets &&
+      currentSheet &&
+      fileData.Sheets[currentSheet] &&
+      Object.keys(fileData.Sheets[currentSheet]).length > 1
+        ? '<style>#xlsxContainer table, #xlsxContainer td {border: 1px solid dimgray; background-color: white; border-collapse: collapse;  padding: 8px;}</style>' +
           XLSX.utils.sheet_to_html(fileData.Sheets[currentSheet])
         : undefined,
     [fileData, currentSheet],
@@ -46,9 +50,11 @@ const XLSXViewer: React.FC<{
               variant="scrollable"
               scrollButtons="auto"
             >
-              {fileData?.SheetNames.map(sheet => (
-                <Tab key={sheet} label={sheet} value={sheet} />
-              ))}
+              {fileData?.SheetNames.map(sheet =>
+                fileData?.Sheets && fileData.Sheets[sheet] && Object.keys(fileData.Sheets[sheet]).length > 1 ? (
+                  <Tab key={sheet} label={sheet} value={sheet} />
+                ) : null,
+              )}
             </Tabs>
           </AppBar>
         </Box>

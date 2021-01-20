@@ -88,7 +88,7 @@ const renderDocument = (document: ChecklistItemValueDocument, fileType: string |
         <HTMLViewer url={document.url} />
       </div>
     ) : fileType && ['xlsx', 'xls', 'xml', 'csv'].includes(fileType) ? (
-      <div style={{ backgroundColor: 'grey' }}>
+      <div style={{ backgroundColor: 'grey' }} id="xlsxContainer">
         <XLSXViewer url={document.url} />
       </div>
     ) : (
