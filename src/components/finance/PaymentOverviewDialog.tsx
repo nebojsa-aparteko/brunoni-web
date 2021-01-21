@@ -162,7 +162,7 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
                   <Paper className={classes.accountingTabContainer}>
-                    <AccountingTabContent booking={booking} updateComponent={updateComponent} />
+                    <AccountingTabContent booking={booking} updateComponent={updateComponent} tasks={tasks} />
                   </Paper>
                   <Box className={classes.activityLogContainer}>
                     <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />

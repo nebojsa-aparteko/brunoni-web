@@ -8,8 +8,9 @@ import WeeklyPayment from '../../../model/WeeklyPayment';
 import useCommissions from '../../../hooks/useCommissions';
 import Commission from '../../../model/Commission';
 import AccountingCommission from './AccountingCommission';
+import Task from '../../../model/Task';
 
-const AccountingTabContent = ({ booking, updateComponent }: AccountingTabContentProps) => {
+const AccountingTabContent = ({ booking, updateComponent, tasks }: AccountingTabContentProps) => {
   const weeklyPayments = usePaymentOverview(booking.id) as WeeklyPayment[];
   const commissions = useCommissions(booking.id) as Commission[];
 
@@ -31,6 +32,7 @@ const AccountingTabContent = ({ booking, updateComponent }: AccountingTabContent
               payment={payment}
               booking={booking}
               updateComponent={updateComponent}
+              tasks={tasks}
             />
           ))}
           {weeklyPayments.length > 0 && commissions.length > 0 && <Divider style={{ margin: 8 }} />}
@@ -57,6 +59,7 @@ const AccountingTabContent = ({ booking, updateComponent }: AccountingTabContent
 interface AccountingTabContentProps {
   booking: Booking;
   updateComponent?: () => void;
+  tasks?: Task[];
 }
 
 export default AccountingTabContent;

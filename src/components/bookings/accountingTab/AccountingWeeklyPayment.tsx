@@ -45,6 +45,8 @@ import { GlobalContext } from '../../../store/GlobalStore';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import PaymentApprovalButton from './PaymentApprovalButton';
+import TaskManualResolveButton from '../../TaskManualResolveButton';
+import Task, { TaskType } from '../../../model/Task';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -138,14 +140,18 @@ const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyP
   }
 };
 
-const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: AccountingWeeklyPaymentProps) => {
+const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [user] = useUser();
   const [, dispatch] = useContext(GlobalContext);
-
+  const clearInvoiceTask = useMemo(() => {
+    return tasks && tasks.length > 0
+      ? tasks.find(task => task.type === TaskType.CLEAR_INVOICE && task.id.includes(payment.reference))
+      : undefined;
+  }, [tasks]);
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -432,6 +438,13 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent }: Accounti
             </Button>
           </React.Fragment>
         )}
+        {payment.status === WeeklyPaymentStatus.BLOCKED && clearInvoiceTask && clearInvoiceTask.show && (
+          <Tooltip title={clearInvoiceTask.resolved ? 'Revert clearing of this invoice' : 'Clear this invoice'}>
+            <span>
+              <TaskManualResolveButton task={clearInvoiceTask} />
+            </span>
+          </Tooltip>
+        )}
         <PaymentApprovalButton
           payment={payment}
           booking={booking}
@@ -448,6 +461,7 @@ interface AccountingWeeklyPaymentProps {
   payment: WeeklyPayment;
   booking: Booking;
   updateComponent?: () => void;
+  tasks?: Task[];
 }
 
 export default AccountingWeeklyPayment;

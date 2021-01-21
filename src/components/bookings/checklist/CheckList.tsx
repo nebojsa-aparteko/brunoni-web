@@ -11,10 +11,12 @@ import ChecklistContent from './ChecklistContent';
 import AccountingTabContent from '../accountingTab/AccountingTabContent';
 import useUser from '../../../hooks/useUser';
 import firebase from '../../../firebase';
+import Task from '../../../model/Task';
 
 interface CheckListProps {
   booking: Booking;
   onTabChange?: (newValue: string) => void;
+  tasks?: Task[];
 }
 
 export const editRestriction = (date: Date) =>
@@ -34,7 +36,7 @@ export const setLastOpenedChecklistTab = async (value: string, userId: string) =
     .doc(userId)
     .update('lastOpenedChecklistTab', value);
 
-const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
+const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange, tasks }) => {
   const actingAs = useContext(ActingAs)[0];
   const [user, userRecord] = useUser();
   const [tabValue, setTabValue] = React.useState(
@@ -79,7 +81,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange }) => {
             </TabPanel>
             {!actingAs && (
               <TabPanel index={1} value={tabValue}>
-                <AccountingTabContent booking={booking} />
+                <AccountingTabContent booking={booking} tasks={tasks} />
               </TabPanel>
             )}
           </CardContent>
