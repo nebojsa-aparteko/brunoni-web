@@ -32,6 +32,7 @@ import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../../store/GlobalStore';
 import UserRecord from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
+import { FirebaseActionType } from '../../model/FirebaseAction';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -144,17 +145,23 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
     setAnchorEl(null);
   }, []);
   const onReadForAll = useCallback(() => {
-    if (!notification.readId) return;
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    if (!(notification.readId && userRecord)) return;
     firebase
       .firestore()
-      .collection('notifications')
-      .where('readId', '==', notification.readId)
-      .get()
-      .then(notifications => {
-        return Promise.all(notifications.docs.map(notificationRef => notificationRef.ref.update('seen', true)));
+      .collection('functions-action')
+      .doc()
+      .set({
+        date: new Date(),
+        type: FirebaseActionType.MARK_AS_READ_FOR_ALL,
+        done: false,
+        userEmail: userRecord.emailAddress,
+        userAlphacomId: userRecord.alphacomId,
+        readId: notification.readId,
       })
       .then(() => handleClose())
-      .catch(() => handleClose());
+      .catch(() => handleClose())
+      .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   }, [notification, handleClose]);
   const handleClick = useCallback(() => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
@@ -251,7 +258,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
             )}
             {!actingAs && (
               <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                <MenuItem onClick={onReadForAll}>Read for all</MenuItem>
+                {notification.readId ? <MenuItem onClick={onReadForAll}>Read for all</MenuItem> : null}
                 <MenuItem onClick={handleDeleteNotification} style={{ color: '#ff0000' }}>
                   Delete
                 </MenuItem>
