@@ -38,12 +38,14 @@ import * as QueryString from 'querystring';
 import { useHistory } from 'react-router-dom';
 import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
-import firebase from './firebase';
 import CommissionsPage from './pages/CommissionsPage';
 import { GlobalContext } from './store/GlobalStore';
 import TaskFilterProvider from './providers/TaskFilterProvider';
 import { setLastOpenedChecklistTab } from './components/bookings/checklist/CheckList';
-import { notificationSeenStatusChange } from './components/notifications/NotificationItemView';
+import {
+  notificationSeenStatusChange,
+  NotificationStatusAction,
+} from './components/notifications/NotificationItemView';
 
 const anonymousRoutes = (
   <Switch>
@@ -151,7 +153,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const params = QueryString.parse(window.location.search.replace('?', ''));
 
-    if (params.readNotification) {
+    if (params.readNotification && userRecord) {
       const notificationId = params.readNotification as string;
 
       if (params.checklistTab) {
@@ -159,17 +161,21 @@ const App: React.FC = () => {
           .then(() => delete params.checklistTab)
           .then(() => {
             //read that notification
-            notificationSeenStatusChange(notificationId, userRecord, true).then(() => {
-              delete params.readNotification;
-              history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-            });
+            notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
+              () => {
+                delete params.readNotification;
+                history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+              },
+            );
           });
       } else {
         //read that notification
-        notificationSeenStatusChange(notificationId, userRecord, true).then(() => {
-          delete params.readNotification;
-          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-        });
+        notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
+          () => {
+            delete params.readNotification;
+            history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+          },
+        );
       }
     }
   }, [history]);

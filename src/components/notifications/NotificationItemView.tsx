@@ -105,17 +105,23 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
   );
 };
 
+export enum NotificationStatusAction {
+  READ_NOTIFICATION,
+  UNREAD_NOTIFICATION,
+}
+
 export const notificationSeenStatusChange = async (
-  notification: Notification | string,
+  notificationId: string | undefined,
   user: UserRecord,
-  isRead?: boolean,
+  action?: NotificationStatusAction,
 ) => {
   const changeNotificationSeenStatus = firebase.functions().httpsCallable('changeNotificationSeenStatus');
+  if (!notificationId) return;
   return await changeNotificationSeenStatus({
-    notificationId: typeof notification === 'string' ? notification : notification.id,
+    action: action,
+    notification: notificationId,
     userAlphacomId: user.alphacomId,
     userEmail: user.emailAddress,
-    isRead: isRead,
   });
 };
 
@@ -153,7 +159,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       .doc()
       .set({
         date: new Date(),
-        type: FirebaseActionType.MARK_AS_READ_FOR_ALL,
+        type: FirebaseActionType.READ_FOR_ALL,
         done: false,
         userEmail: userRecord.emailAddress,
         userAlphacomId: userRecord.alphacomId,
@@ -165,7 +171,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   }, [notification, handleClose]);
   const handleClick = useCallback(() => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification, userRecord, true)
+    notificationSeenStatusChange(notification.id, userRecord, NotificationStatusAction.READ_NOTIFICATION)
       .then(() => {
         handleShowDrawer();
         if (notification.type === NotificationType.COMMENT) {
@@ -189,7 +195,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
 
   const handleCommentClick = () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification, userRecord, true)
+    notificationSeenStatusChange(notification.id, userRecord, NotificationStatusAction.READ_NOTIFICATION)
       .then(() => {
         handleShowDrawer();
         notification.referenceObject &&
@@ -220,7 +226,11 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   };
   const handleSeenStatusChange = async (notification: Notification) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification, userRecord, !notification.seen)
+    notificationSeenStatusChange(
+      notification.id,
+      userRecord,
+      notification.seen ? NotificationStatusAction.UNREAD_NOTIFICATION : NotificationStatusAction.READ_NOTIFICATION,
+    )
       .then(() => console.log('Changed notification status'))
       .catch(error => {
         console.error('Failed to update notification status', error);
@@ -243,8 +253,6 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         className={classes.header}
         action={
           <Fragment>
-            {/*<Button onClick={onReadForAll}>Read for all</Button>*/}
-
             <IconButton
               aria-label="close-button-notification-center"
               onClick={() => handleSeenStatusChange(notification)}
