@@ -2,7 +2,7 @@ import React, { Fragment, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
-import WeeklyPayment from '../../model/WeeklyPayment';
+import WeeklyPayment, { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus } from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import FinanceOverviewTableTotalRow from './FinanceOverviewTableTotalRow';
 import Commission from '../../model/Commission';
@@ -78,7 +78,15 @@ const FinanceOverviewTable: React.FC<Props> = ({
                 ? (overviewData as WeeklyPayment[]).map(payment => (
                     <PaymentOverviewTableRow
                       paymentData={payment}
-                      status={payment.platformStatus || payment.status}
+                      status={
+                        payment.platformStatus
+                          ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+                            ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
+                              ? payment.platformStatus
+                              : payment.status
+                            : payment.platformStatus
+                          : payment.status
+                      }
                       key={payment.id}
                       selectedPayments={selectedPayments}
                       handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}

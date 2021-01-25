@@ -364,13 +364,18 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                   ? 'rgba(0,200,81)'
                   : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
                   ? '#b186df'
-                  : payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+                  : payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD &&
+                    payment.status === WeeklyPaymentStatus.IN_PROGRESS
                   ? '#df6b00'
                   : '#000',
             }}
           >
             {payment.platformStatus
-              ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+              ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+                ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
+                  ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+                  : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
+                : WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
               : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
           </Typography>
         </Box>
