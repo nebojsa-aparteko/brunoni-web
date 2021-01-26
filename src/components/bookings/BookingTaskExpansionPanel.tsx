@@ -20,7 +20,7 @@ import useAdminUsers from '../../hooks/useAdminUsers';
 import BookingTaskTable from '../tasks/BookingTaskTable';
 import ActingAs from '../../contexts/ActingAs';
 
-const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent }) => {
+const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent, selectedTab }) => {
   const users = useAdminUsers();
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
@@ -115,7 +115,12 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent }) 
           label="Show resolved tasks"
           labelPlacement="start"
         />
-        <BookingTaskTable tasks={filteredTasks} selectedTasks={selectedTasks} onSelectTask={onSelectTask} />
+        <BookingTaskTable
+          tasks={filteredTasks}
+          selectedTasks={selectedTasks}
+          onSelectTask={onSelectTask}
+          tab={selectedTab}
+        />
       </ExpansionPanelDetails>
     </ExpansionPanel>
   );
@@ -126,4 +131,5 @@ export default BookingTaskExpansionPanel;
 interface Props {
   tasks: Task[];
   updateComponent?: () => void;
+  selectedTab?: string;
 }

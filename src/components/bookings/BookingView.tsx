@@ -252,7 +252,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       {filteredTasks && filteredTasks.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
-            <BookingTaskExpansionPanel tasks={filteredTasks} />
+            <BookingTaskExpansionPanel tasks={filteredTasks} selectedTab={selectedTab} />
           </Box>
         </Grid>
       )}

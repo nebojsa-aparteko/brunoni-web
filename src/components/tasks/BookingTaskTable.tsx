@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 import Task from '../../model/Task';
 import BookingTaskTableRow from './BookingTaskTableRow';
 
-const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask }) => {
+const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask, tab }) => {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
@@ -12,6 +12,7 @@ const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask 
             <TableCell align="center" />
             <TableCell align="center">Task</TableCell>
             <TableCell align="center">B/L Number</TableCell>
+            {tab === 'accounting' && <TableCell align="center">Reference</TableCell>}
             <TableCell align="center">File No.</TableCell>
             <TableCell align="center">Assigned To</TableCell>
             <TableCell align="center">Due Date</TableCell>
@@ -26,6 +27,7 @@ const BookingTaskTable: React.FC<Props> = ({ tasks, selectedTasks, onSelectTask 
               key={task.id}
               selected={selectedTasks.includes(`${task.bookingId}/${task.id}`)}
               onSelectTask={onSelectTask}
+              tab={tab}
             />
           ))}
         </TableBody>
@@ -40,4 +42,5 @@ interface Props {
   tasks: Task[];
   selectedTasks: string[];
   onSelectTask: (bookingId: string) => void;
+  tab?: string;
 }

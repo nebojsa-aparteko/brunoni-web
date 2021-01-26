@@ -20,7 +20,7 @@ export const TaskManualResolveAction: React.FC<{ task: Task; updateComponent?: (
     <TaskManualResolveButton task={task} />
   );
 
-const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) => {
+const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected, tab }) => {
   return (
     <TableRow
       key={task.id}
@@ -45,6 +45,7 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected }) 
         </Typography>
       </TableCell>
       <TableCell align="center">{task.blNumber || '-'}</TableCell>
+      {tab === 'accounting' && <TableCell align="center">{task.paymentReference || '-'}</TableCell>}
       <TableCell align="center">
         <Link target="_blank" href={`/bookings/${task.bookingId}`}>
           {task.bookingId}
@@ -72,4 +73,5 @@ interface Props {
   task: Task;
   selected: boolean;
   onSelectTask: (id: string) => void;
+  tab?: string;
 }
