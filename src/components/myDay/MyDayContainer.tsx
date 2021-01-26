@@ -49,7 +49,6 @@ const MyDayContainer = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPayDatePickerOpen, setIsPayDatePickerOpen] = useState(false);
-  const [payDate, setPayDate] = useState<Date | null>(null);
   const [openBooking, setOpenBooking] = useState<string | undefined>(undefined);
   const [, dispatch] = useContext(GlobalContext);
 
@@ -66,7 +65,7 @@ const MyDayContainer = () => {
     [selectedTasks],
   );
 
-  const { assignee, taskStatus, taskCategory, carrier } = filters;
+  const { assignee, taskStatus, taskCategory, carrier, payDate } = filters;
   const user = useUser()[0];
   const actingAs = useContext(ActingAs)[0];
   const availableCarriers = useContext(Carriers);
@@ -174,7 +173,6 @@ const MyDayContainer = () => {
 
   const onPayDateChange = useCallback(
     date => {
-      setPayDate(date);
       setIsPayDatePickerOpen(false);
       if (setFilters) {
         setSelectedTasks([]);
@@ -278,7 +276,7 @@ const MyDayContainer = () => {
               {taskCategory === TaskCategory.ACCOUNTING ? (
                 <Box display="flex" style={{ minWidth: theme.spacing(15), display: 'flex' }} ml={2}>
                   <DateInput
-                    value={payDate}
+                    value={payDate || null}
                     onChange={onPayDateChange}
                     open={isPayDatePickerOpen}
                     onOpen={() => setIsPayDatePickerOpen(true)}
