@@ -114,6 +114,7 @@ export enum ActivityText {
   SET_WATCHERS = ' has ',
   CLEAR_PAYMENT = ' has cleared payment ',
   REVERT_CLEAR_PAYMENT = ' has reverted the clearing of payment ',
+  MARK_SOMETHING_WRONG = ' has marked that something is wrong with payment ',
 }
 
 export enum ActivityChangeType {
@@ -140,6 +141,7 @@ export enum ActivityChangeType {
   SET_WATCHERS,
   CLEAR_PAYMENT,
   REVERT_CLEAR_PAYMENT,
+  MARK_SOMETHING_WRONG,
 }
 
 export enum ChecklistNames {

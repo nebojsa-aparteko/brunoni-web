@@ -82,6 +82,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.CLEAR_PAYMENT;
       case ActivityChangeType.REVERT_CLEAR_PAYMENT:
         return ActivityText.REVERT_CLEAR_PAYMENT;
+      case ActivityChangeType.MARK_SOMETHING_WRONG:
+        return ActivityText.MARK_SOMETHING_WRONG;
     }
   };
 
@@ -151,7 +153,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
       activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
       activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
-      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ? (
+      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ||
+      activity.changeType === ActivityChangeType.MARK_SOMETHING_WRONG ? (
         <Fragment>
           {activity.paymentReference}
           {activity.changeType === ActivityChangeType.POSTPONE_PAYMENT &&

@@ -47,6 +47,8 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import PaymentApprovalButton from './PaymentApprovalButton';
 import TaskManualResolveButton from '../../TaskManualResolveButton';
 import Task, { TaskType } from '../../../model/Task';
+import BlockIcon from '@material-ui/icons/Block';
+import ActingAs from '../../../contexts/ActingAs';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -68,7 +70,7 @@ const deleteAccountingDocument = (file: DocumentValue, paymentReference: string)
     .delete();
 };
 
-const changeAccountingDocument = (file: DocumentValue, paymentReference: string) => {
+export const changeAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
     .firestore()
     .collection('weeklyPayment')
@@ -140,11 +142,23 @@ const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyP
   }
 };
 
+const showSomethingWrongTask = (booking: Booking, reference: string) => {
+  return firebase
+    .firestore()
+    .collection('bookings')
+    .doc(booking?.id)
+    .collection('tasks')
+    .doc(TaskType.CHECK_FILE)
+    .set({ show: true, resolved: false, paymentReference: reference }, { merge: true });
+};
+
 const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
   const [user] = useUser();
   const [, dispatch] = useContext(GlobalContext);
   const clearInvoiceTask = useMemo(() => {
@@ -344,6 +358,24 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
     ],
   );
 
+  const handleSetIsSomethingWrong = () => {
+    payment &&
+      payment.reference &&
+      showSomethingWrongTask(booking, payment.reference).then(() =>
+        storeAccountingActivity(() =>
+          addActivityItem(
+            booking!.id,
+            createActivityObject({
+              changeType: ActivityChangeType.MARK_SOMETHING_WRONG,
+              by: getActivityLogUserData(),
+              isAccountingActivity: true,
+              paymentReference: payment.reference,
+            }),
+          ),
+        ),
+      );
+  };
+
   return (
     <ExpansionPanel key={payment.reference} style={{ margin: 4 }}>
       <ExpansionPanelSummary style={{ backgroundColor: 'rgba(198,238,241,0.24)', display: 'flex' }}>
@@ -423,6 +455,20 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
       <ExpansionPanelActions>
         {payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
           <React.Fragment>
+            {payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
+              <Tooltip title="Mark that something is wrong">
+                <span>
+                  <IconButton
+                    size="small"
+                    aria-label="Mark that something is wrong"
+                    onClick={handleSetIsSomethingWrong}
+                    disabled={!isAdmin}
+                  >
+                    <BlockIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
             {payment.status === WeeklyPaymentStatus.IN_PROGRESS ? (
               payment.platformStatus !== WeeklyPaymentPlatformStatus.ON_HOLD ? (
                 <Tooltip title={'Put this weekly payment on hold'}>

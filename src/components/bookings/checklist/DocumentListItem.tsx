@@ -224,7 +224,7 @@ const DocumentListItem = ({
     [storageBasePath, checklistItem, deleteFile, enqueueSnackbar],
   );
 
-  function copyFilenameToClipboard() {
+  const copyFilenameToClipboard = () => {
     let dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
     dummy.value = fileWithExt(item.name).name;
@@ -235,7 +235,7 @@ const DocumentListItem = ({
       variant: 'default',
       autoHideDuration: 1000,
     });
-  }
+  };
 
   return (
     <div {...other}>
