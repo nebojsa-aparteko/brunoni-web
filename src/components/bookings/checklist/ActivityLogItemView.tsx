@@ -9,10 +9,12 @@ import Icon from '@mdi/react';
 import { mdiPin, mdiPinOff } from '@mdi/js';
 import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
+import ConditionalTooltip from '../../ConditionalTooltip';
 
 export interface ActivityLogItemViewProps {
   activityItem: ActivityLogItem;
   booking?: Booking;
+  canPin?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -35,7 +37,7 @@ const setIsPinned = (activityItemId: string, bookingId: string, isPinned: boolea
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true });
 
-const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem, booking, ...other }) => {
+const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem, booking, canPin, ...other }) => {
   const [showPinButton, setShowPinButton] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
@@ -76,13 +78,25 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem,
         )}
         {showPinButton && booking && activityItem.type !== ActivityType.ACTIVITY ? (
           <Box display="flex" flexDirection="column">
-            <IconButton edge="end" size="small" aria-label="" onClick={handleSetIsPinned}>
-              {activityItem.isPinned ? (
-                <Icon path={mdiPinOff} title="Unpin Comment" size={1} />
-              ) : (
-                <Icon path={mdiPin} title="Pin Comment" size={1} />
-              )}
-            </IconButton>
+            <ConditionalTooltip
+              title="You can't pin more than 2 comments."
+              hide={canPin && activityItem.isPinned}
+              placement="bottom"
+            >
+              <IconButton
+                edge="end"
+                size="small"
+                aria-label=""
+                onClick={handleSetIsPinned}
+                disabled={canPin && !activityItem.isPinned}
+              >
+                {activityItem.isPinned ? (
+                  <Icon path={mdiPinOff} title="Unpin Comment" size={1} />
+                ) : (
+                  <Icon path={mdiPin} title="Pin Comment" size={1} />
+                )}
+              </IconButton>
+            </ConditionalTooltip>
           </Box>
         ) : null}
       </Box>

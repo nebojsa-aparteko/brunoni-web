@@ -60,10 +60,12 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
     () =>
       map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
         activityCollection,
-      ),
+      ) as ActivityLogItem[],
     [activityCollection],
   );
-
+  const pinnedCommentsCount = useMemo(() => normalizedActivityLog?.filter(item => item.isPinned).length, [
+    normalizedActivityLog,
+  ]);
   const filteredActivityLog = useMemo(
     () =>
       normalizedActivityLog?.filter((item: ActivityLogItem) =>
@@ -130,6 +132,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
       onChange={handleShowMore}
       booking={booking}
       isAccounting={isAccounting}
+      canPin={pinnedCommentsCount === 2}
     />
   );
 };
