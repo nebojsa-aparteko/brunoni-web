@@ -10,6 +10,8 @@
     "@material-ui/lab": "^4.0.0-alpha.53",
     "@material-ui/pickers": "^3.2.10",
     "@material-ui/styles": "^4.9.14",
+    "@mdi/js": "^5.9.55",
+    "@mdi/react": "^1.4.0",
     "@react-pdf/renderer": "1.6.11",
     "@types/autosuggest-highlight": "^3.1.0",
     "@types/classnames": "^2.2.10",

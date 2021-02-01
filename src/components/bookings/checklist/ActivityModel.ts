@@ -25,6 +25,7 @@ export interface ActivityLogItem {
   addedUsers?: ActivityLogUserData[];
   removedUsers?: ActivityLogUserData[];
   paymentActivityData?: PaymentActivityData;
+  isPinned?: boolean;
 }
 
 export enum ActivityType {

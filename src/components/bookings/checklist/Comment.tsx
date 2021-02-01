@@ -3,6 +3,7 @@ import { Box, createStyles, makeStyles, Theme } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import ActivityComment from './ActivityComment';
+import { Booking } from '../../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Comment = ({ activity, handleCommentClick, ...other }: CommentProp) => {
+const Comment = ({ activity, handleCommentClick, booking, ...other }: CommentProp) => {
   const classes = useStyles();
 
   return (
@@ -49,7 +50,7 @@ const Comment = ({ activity, handleCommentClick, ...other }: CommentProp) => {
           round={true}
         />
         <Box display="flex" flexDirection="column" flex={1} ml={1}>
-          <ActivityComment activity={activity} />
+          <ActivityComment activity={activity} booking={booking} />
         </Box>
       </Box>
     </Box>
@@ -61,6 +62,5 @@ export default Comment;
 interface CommentProp {
   activity: ActivityLogItem;
   handleCommentClick?: () => void;
-  handleEdit?: () => void;
-  handleDelete?: () => void;
+  booking?: Booking;
 }

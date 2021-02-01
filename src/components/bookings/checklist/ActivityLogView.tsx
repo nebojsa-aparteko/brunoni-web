@@ -103,7 +103,7 @@ const ActivityLogView: React.FC<Props> = ({
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <Box id={activity.id} key={`act-${activity.id}`}>
-            <ActivityLogItemView activityItem={activity} />
+            <ActivityLogItemView activityItem={activity} booking={booking} />
           </Box>
         ))}
       </CardContent>

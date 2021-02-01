@@ -40,6 +40,14 @@ import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
 import { ActivityChangeType, ActivityLogUserData } from './checklist/ChecklistItemModel';
 import { addActivityItem } from './checklist/ActivityLogContainer';
 import { createActivityObject } from './checklist/ChecklistItemRow';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import BookingPinnedActivities from './BookingPinnedActivities';
+import { ActivityLogItem } from './checklist/ActivityModel';
+import map from 'lodash/fp/map';
+import { flow } from 'lodash/fp';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
+import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -134,8 +142,13 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
       watchers.map(item => pick(UserRecordMinProperties)(item)),
     );
 
+//TODO
+// - don't allow pinning more than two comments
+// - add unpin button to pinned comments component
+
 const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
+  const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
   const { enqueueSnackbar } = useSnackbar();
@@ -147,6 +160,32 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
 
+  const pinnedActivities = useFirestoreCollection(
+    'bookings',
+    useCallback(
+      query => {
+        const queryByAdminRole = isAdmin ? query : query.where('isInternal', '==', isAdmin);
+        return queryByAdminRole
+          .where('isPinned', '==', true)
+          .limit(2)
+          .orderBy('at', 'desc');
+      },
+      [isAdmin],
+    ),
+    booking.id,
+    'activity',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  const normalizedPinnedActivities = useMemo(
+    () =>
+      map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
+        pinnedActivities,
+      ) as ActivityLogItem[],
+    [pinnedActivities],
+  );
+
   const tasks = useTasksPerBooking(booking.id);
 
   const filteredTasks = useMemo(() => {
@@ -155,8 +194,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     );
   }, [tasks, userRecord]);
 
-  // console.log(tasks);
-  // console.log(filteredTasks);
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -240,6 +277,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      {normalizedPinnedActivities === undefined && (
+        <Grid item xs={12} md={11}>
+          <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
+            <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CircularProgress style={{ margin: 'auto' }} />
+            </Paper>
+          </Box>
+        </Grid>
+      )}
+      {normalizedPinnedActivities && normalizedPinnedActivities.length > 0 && (
+        <Grid item xs={12} md={11}>
+          <Box displayPrint="none">
+            <BookingPinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />
+          </Box>
+        </Grid>
+      )}
       {tasks === undefined && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
