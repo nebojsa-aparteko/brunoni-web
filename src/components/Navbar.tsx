@@ -15,10 +15,10 @@ import {
   Theme,
   Toolbar,
   Typography,
+  Container,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
-import Container from './Container';
 import IdentityWidget from './IdentityWidget';
 import useUser from '../hooks/useUser';
 import Hidden from '@material-ui/core/Hidden';
@@ -267,7 +267,7 @@ const Navbar: React.FC = () => {
     <Fragment>
       <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
-          <Container>
+          <Container maxWidth="xl">
             <Toolbar className={classes.toolbar} disableGutters>
               <Link className={classes.logo} to="/">
                 <img
