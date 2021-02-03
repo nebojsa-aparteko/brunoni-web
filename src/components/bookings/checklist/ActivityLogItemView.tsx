@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import Comment from './Comment';
 import Activity from './Activity';
@@ -10,11 +10,12 @@ import { mdiPin, mdiPinOff } from '@mdi/js';
 import firebase from '../../../firebase';
 import { useSnackbar } from 'notistack';
 import ConditionalTooltip from '../../ConditionalTooltip';
+import { FirebaseActionType } from '../../../model/FirebaseAction';
 
 export interface ActivityLogItemViewProps {
   activityItem: ActivityLogItem;
   booking?: Booking;
-  canPin?: boolean;
+  pinnedCommentsCount?: number;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,24 +29,51 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const setIsPinned = (activityItemId: string, bookingId: string, isPinned: boolean) =>
+export const setIsPinned = (
+  activityItemId: string,
+  bookingId: string,
+  isPinned: boolean,
+  bookingHasPinnedComments: boolean,
+) =>
   firebase
     .firestore()
     .collection('bookings')
     .doc(bookingId)
     .collection('activity')
     .doc(activityItemId)
-    .set({ isPinned: isPinned }, { merge: true });
+    .set({ isPinned: isPinned }, { merge: true })
+    .then(() => updateTasksWithPinnedCommentsFlag(bookingId, bookingHasPinnedComments));
 
-const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem, booking, canPin, ...other }) => {
+const updateTasksWithPinnedCommentsFlag = async (bookingId: string, bookingHasPinnedComments: boolean) =>
+  firebase
+    .firestore()
+    .collection('functions-action')
+    .doc()
+    .set({
+      date: new Date(),
+      type: FirebaseActionType.UPDATE_TASKS_WHEN_COMMENT_IS_PINNED,
+      done: false,
+      bookingId,
+      bookingHasPinnedComments,
+    });
+
+const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
+  activityItem,
+  booking,
+  pinnedCommentsCount,
+  ...other
+}) => {
   const [showPinButton, setShowPinButton] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
+  const cantPin = useMemo(() => pinnedCommentsCount === 2, [pinnedCommentsCount]);
 
   const handleSetIsPinned = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
-    if (booking?.id && activityItem.id)
-      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned)
+
+    if (booking?.id && activityItem.id) {
+      const pinnedCommentsCountAfterChange = (pinnedCommentsCount || 0) + (activityItem.isPinned ? -1 : 1);
+      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned, pinnedCommentsCountAfterChange !== 0)
         .then(() =>
           enqueueSnackbar(
             <Typography color="inherit">
@@ -59,6 +87,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem,
             variant: 'error',
           }),
         );
+    }
   };
 
   return (
@@ -80,7 +109,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem,
           <Box display="flex" flexDirection="column">
             <ConditionalTooltip
               title="You can't pin more than 2 comments."
-              hide={canPin && activityItem.isPinned}
+              hide={!cantPin || activityItem.isPinned}
               placement="bottom"
             >
               <IconButton
@@ -88,7 +117,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({ activityItem,
                 size="small"
                 aria-label=""
                 onClick={handleSetIsPinned}
-                disabled={canPin && !activityItem.isPinned}
+                disabled={cantPin && !activityItem.isPinned}
               >
                 {activityItem.isPinned ? (
                   <Icon path={mdiPinOff} title="Unpin Comment" size={1} />

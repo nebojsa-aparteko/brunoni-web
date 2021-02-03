@@ -142,10 +142,6 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
       watchers.map(item => pick(UserRecordMinProperties)(item)),
     );
 
-//TODO
-// - don't allow pinning more than two comments
-// - add unpin button to pinned comments component
-
 const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
   const isAdmin = !actingAs;
@@ -165,10 +161,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     useCallback(
       query => {
         const queryByAdminRole = isAdmin ? query : query.where('isInternal', '==', isAdmin);
-        return queryByAdminRole
-          .where('isPinned', '==', true)
-          .limit(2)
-          .orderBy('at', 'desc');
+        return queryByAdminRole.where('isPinned', '==', true).orderBy('at', 'desc');
       },
       [isAdmin],
     ),
@@ -286,7 +279,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Box>
         </Grid>
       )}
-      {normalizedPinnedActivities && normalizedPinnedActivities.length > 0 && (
+      {isAdmin && normalizedPinnedActivities && normalizedPinnedActivities.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
             <BookingPinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />

@@ -132,7 +132,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
       onChange={handleShowMore}
       booking={booking}
       isAccounting={isAccounting}
-      canPin={pinnedCommentsCount === 2}
+      pinnedCommentsCount={pinnedCommentsCount}
     />
   );
 };

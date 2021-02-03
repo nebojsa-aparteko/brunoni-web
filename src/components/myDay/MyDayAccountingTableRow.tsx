@@ -1,11 +1,13 @@
 import React, { Fragment, useContext, useMemo } from 'react';
-import { Checkbox, Link, TableCell, TableRow } from '@material-ui/core';
+import { Checkbox, Link, TableCell, TableRow, Tooltip } from '@material-ui/core';
 import Task, { ManualResolveType, TaskDescription } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import ActingAs from '../../contexts/ActingAs';
 import TaskStatusChip from '../TaskStatusChip';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
+import Icon from '@mdi/react';
+import { mdiStar } from '@mdi/js';
 
 const MyDayAccountingTableRow: React.FC<Props> = ({
   task,
@@ -41,6 +43,13 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
           </Link>
+          {task.bookingHasPinnedComments && (
+            <Tooltip title="This booking has pinned comments">
+              <span>
+                <Icon path={mdiStar} size={0.8} color="orange" style={{ position: 'relative', top: 4, left: 4 }} />
+              </span>
+            </Tooltip>
+          )}
         </TableCell>
         <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
         <TableCell id="dueDateMyDay" align="center">

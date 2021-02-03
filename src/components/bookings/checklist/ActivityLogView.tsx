@@ -29,7 +29,7 @@ interface Props {
   booking?: Booking;
   quote?: Quote;
   isAccounting?: boolean;
-  canPin?: boolean;
+  pinnedCommentsCount?: number;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -47,7 +47,7 @@ const ActivityLogView: React.FC<Props> = ({
   booking,
   quote,
   isAccounting,
-  canPin,
+  pinnedCommentsCount,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -105,7 +105,7 @@ const ActivityLogView: React.FC<Props> = ({
         )}
         {activityLog?.map((activity: ActivityLogItem) => (
           <Box id={activity.id} key={`act-${activity.id}`}>
-            <ActivityLogItemView activityItem={activity} booking={booking} canPin={canPin} />
+            <ActivityLogItemView activityItem={activity} booking={booking} pinnedCommentsCount={pinnedCommentsCount} />
           </Box>
         ))}
       </CardContent>
