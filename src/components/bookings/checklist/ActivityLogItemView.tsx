@@ -29,12 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const setIsPinned = (
-  activityItemId: string,
-  bookingId: string,
-  isPinned: boolean,
-  bookingHasPinnedComments: boolean,
-) =>
+export const setIsPinned = (activityItemId: string, bookingId: string, isPinned: boolean) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -42,9 +37,9 @@ export const setIsPinned = (
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(bookingId, bookingHasPinnedComments));
+    .then(() => updateTasksWithPinnedCommentsFlag(bookingId));
 
-const updateTasksWithPinnedCommentsFlag = async (bookingId: string, bookingHasPinnedComments: boolean) =>
+const updateTasksWithPinnedCommentsFlag = async (bookingId: string) =>
   firebase
     .firestore()
     .collection('functions-action')
@@ -54,7 +49,6 @@ const updateTasksWithPinnedCommentsFlag = async (bookingId: string, bookingHasPi
       type: FirebaseActionType.UPDATE_TASKS_WHEN_COMMENT_IS_PINNED,
       done: false,
       bookingId,
-      bookingHasPinnedComments,
     });
 
 const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
@@ -72,8 +66,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
     event.stopPropagation();
 
     if (booking?.id && activityItem.id) {
-      const pinnedCommentsCountAfterChange = (pinnedCommentsCount || 0) + (activityItem.isPinned ? -1 : 1);
-      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned, pinnedCommentsCountAfterChange !== 0)
+      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned)
         .then(() =>
           enqueueSnackbar(
             <Typography color="inherit">

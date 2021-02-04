@@ -1,20 +1,10 @@
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Box,
-  Checkbox,
-  CircularProgress,
-  Collapse,
-  IconButton,
-  Link,
-  TableCell,
-  TableRow,
-  Tooltip,
-} from '@material-ui/core';
+import { Box, Checkbox, CircularProgress, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
 import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { BookingRow, BookingProgressDialog } from '../bookings/BookingsTable';
+import { BookingProgressDialog, BookingRow } from '../bookings/BookingsTable';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 import TaskStatusChip from '../TaskStatusChip';
@@ -22,8 +12,6 @@ import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
 import { Booking } from '../../model/Booking';
 import firebase from '../../firebase';
-import { mdiStar } from '@mdi/js';
-import Icon from '@mdi/react';
 
 const getBooking = (bookingId: string) =>
   firebase
@@ -103,13 +91,6 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
           </Link>
-          {task.bookingHasPinnedComments && (
-            <Tooltip title="This booking has pinned comments">
-              <span>
-                <Icon path={mdiStar} size={0.8} color="orange" style={{ position: 'relative', top: 4, left: 4 }} />
-              </span>
-            </Tooltip>
-          )}
         </TableCell>
         <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
         <TableCell id="dueDateMyDay" align="center">

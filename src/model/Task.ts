@@ -12,7 +12,7 @@ export default interface Task {
   manualResolve: ManualResolveType;
   taskCategory: TaskCategory;
   declineManualResolveAction?: TaskType;
-  additionalInfo?: TaskAdditionalInfo;
+  additionalInfo?: TaskAdditionalInfo[] | TaskAdditionalInfo;
   createAt?: Date;
   carrierId?: string;
   blNumber?: string;
@@ -23,7 +23,6 @@ export default interface Task {
   selected?: boolean;
   paymentReference?: string;
   payDate?: Date;
-  bookingHasPinnedComments?: boolean;
 }
 
 export enum ManualResolveType {
@@ -49,6 +48,7 @@ export interface TaskAdditionalInfo {
 export enum TaskAdditionalInfoType {
   AMS_CLOSING = 'AMS_CLOSING',
   ON_HOLD = 'ON_HOLD',
+  BOOKING_HAS_PINNED_COMMENTS = 'BOOKING_HAS_PINNED_COMMENTS',
 }
 
 export enum TaskAdditionalInfoTypeDescription {
