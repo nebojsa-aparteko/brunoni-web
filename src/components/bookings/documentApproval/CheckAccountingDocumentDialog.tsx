@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useState } from 'react';
 import {
+  Box,
   Button,
   createStyles,
   Dialog,
@@ -32,6 +33,7 @@ import { flow, isNil, omitBy } from 'lodash/fp';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
 import { shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import ActingAs from '../../../contexts/ActingAs';
+import MarkThatSomethingIsWrongButton from '../../MarkThatSomethingIsWrongButton';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -196,6 +198,11 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
             xs={amendmentRequested ? 12 : 9}
             style={{ display: 'flex', alignItems: 'top', justifyContent: 'center' }}
           >
+            {payment && payment.status === WeeklyPaymentStatus.IN_PROGRESS && (
+              <Box style={{ alignSelf: 'center' }}>
+                <MarkThatSomethingIsWrongButton payment={payment} booking={booking} />
+              </Box>
+            )}
             {amendmentRequested ? (
               <React.Fragment>
                 <Button
