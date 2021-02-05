@@ -9,6 +9,20 @@ import Commission from '../../model/Commission';
 import { Currency, DebitCredit } from '../../model/Payment';
 import CommissionOverviewTableRow from './CommissionOverviewTableRow';
 
+const determinePaymentStatus = (payment: WeeklyPayment) => {
+  return payment.platformStatus
+    ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+      ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
+        ? payment.platformStatus
+        : payment.status
+      : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
+      ? payment.status !== WeeklyPaymentStatus.PAID
+        ? payment.platformStatus
+        : payment.status
+      : payment.platformStatus
+    : payment.status;
+};
+
 const FinanceOverviewTable: React.FC<Props> = ({
   overviewData,
   selectedPayments,
@@ -78,15 +92,7 @@ const FinanceOverviewTable: React.FC<Props> = ({
                 ? (overviewData as WeeklyPayment[]).map(payment => (
                     <PaymentOverviewTableRow
                       paymentData={payment}
-                      status={
-                        payment.platformStatus
-                          ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
-                            ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
-                              ? payment.platformStatus
-                              : payment.status
-                            : payment.platformStatus
-                          : payment.status
-                      }
+                      status={determinePaymentStatus(payment)}
                       key={payment.id}
                       selectedPayments={selectedPayments}
                       handleSelect={handleSelect ? () => handleSelect(payment.id) : undefined}

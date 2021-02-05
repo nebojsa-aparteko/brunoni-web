@@ -98,6 +98,24 @@ const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, chan
   );
 };
 
+const checkIfStatusSelected = (
+  payment: WeeklyPayment,
+  platformStatus: WeeklyPaymentPlatformStatus[],
+  selectedStatuses: string[],
+) => {
+  return payment.platformStatus
+    ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+      ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
+        ? platformStatus && platformStatus.includes(payment.platformStatus)
+        : selectedStatuses && selectedStatuses.includes(payment.status)
+      : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
+      ? payment.status !== WeeklyPaymentStatus.PAID
+        ? platformStatus && platformStatus.includes(payment.platformStatus)
+        : selectedStatuses && selectedStatuses.includes(payment.status)
+      : platformStatus && platformStatus.includes(payment.platformStatus)
+    : selectedStatuses && selectedStatuses.includes(payment.status);
+};
+
 const postponePayments = async (offset: number, user: any, weeklyPayment: WeeklyPayment[]) => {
   try {
     const token = await user.getIdToken();
@@ -257,9 +275,7 @@ const PaymentOverviewContainer = () => {
         currency.includes(data.currency) &&
         selectedStatuses &&
         selectedStatuses.length > 0 &&
-        (data.platformStatus
-          ? platformStatus && platformStatus.includes(data.platformStatus)
-          : selectedStatuses.includes(data.status)),
+        checkIfStatusSelected(data, platformStatus, selectedStatuses),
     );
   }, [overviewData, status, platformStatus, currency, selectedStatuses]);
 
