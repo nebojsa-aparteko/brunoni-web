@@ -140,7 +140,19 @@ const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyP
   } finally {
   }
 };
-
+const getPaymentDisplayedStatus = (payment: WeeklyPayment) => {
+  return payment.platformStatus
+    ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
+      ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
+        ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+        : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
+      : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
+      ? payment.status !== WeeklyPaymentStatus.PAID
+        ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+        : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
+      : WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+    : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus];
+};
 const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
@@ -371,13 +383,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                   : '#000',
             }}
           >
-            {payment.platformStatus
-              ? payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD
-                ? payment.status === WeeklyPaymentStatus.IN_PROGRESS
-                  ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
-                  : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
-                : WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
-              : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]}
+            {getPaymentDisplayedStatus(payment)}
           </Typography>
         </Box>
       </ExpansionPanelSummary>
