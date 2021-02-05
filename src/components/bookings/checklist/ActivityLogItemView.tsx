@@ -4,13 +4,13 @@ import Comment from './Comment';
 import Activity from './Activity';
 import ActivityWithComment from './ActivityWithComment';
 import { Booking } from '../../../model/Booking';
-import { Box, createStyles, IconButton, makeStyles, Theme, Typography } from '@material-ui/core';
+import { Box, createStyles, IconButton, makeStyles, Theme } from '@material-ui/core';
 import Icon from '@mdi/react';
 import { mdiPin, mdiPinOff } from '@mdi/js';
 import firebase from '../../../firebase';
-import { useSnackbar } from 'notistack';
-import ConditionalTooltip from '../../ConditionalTooltip';
 import { FirebaseActionType } from '../../../model/FirebaseAction';
+import useGlobalAppState from '../../../hooks/useGlobalAppState';
+import { SHOW_ERROR_SNACKBAR, SHOW_SUCCESS_SNACKBAR } from '../../../store/types/globalAppState';
 
 export interface ActivityLogItemViewProps {
   activityItem: ActivityLogItem;
@@ -37,7 +37,8 @@ export const setIsPinned = (activityItemId: string, bookingId: string, isPinned:
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(bookingId));
+    .then(() => updateTasksWithPinnedCommentsFlag(bookingId))
+    .catch(err => console.error(err));
 
 const updateTasksWithPinnedCommentsFlag = async (bookingId: string) =>
   firebase
@@ -58,7 +59,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
   ...other
 }) => {
   const [showPinButton, setShowPinButton] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useGlobalAppState();
   const classes = useStyles();
   const cantPin = useMemo(() => pinnedCommentsCount === 2, [pinnedCommentsCount]);
 
@@ -68,18 +69,12 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
     if (booking?.id && activityItem.id) {
       setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned)
         .then(() =>
-          enqueueSnackbar(
-            <Typography color="inherit">
-              {`The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`}
-            </Typography>,
-            { variant: 'success' },
-          ),
-        )
-        .catch(error =>
-          enqueueSnackbar(<Typography color="inherit">{`An error has occurred - ` + error}</Typography>, {
-            variant: 'error',
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
-        );
+        )
+        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
     }
   };
 
@@ -100,25 +95,18 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
         )}
         {showPinButton && booking && activityItem.type !== ActivityType.ACTIVITY ? (
           <Box display="flex" flexDirection="column">
-            <ConditionalTooltip
-              title="You can't pin more than 2 comments."
-              hide={!cantPin || activityItem.isPinned}
-              placement="bottom"
+            <IconButton
+              edge="end"
+              size="small"
+              onClick={handleSetIsPinned}
+              disabled={cantPin && !activityItem.isPinned}
             >
-              <IconButton
-                edge="end"
-                size="small"
-                aria-label=""
-                onClick={handleSetIsPinned}
-                disabled={cantPin && !activityItem.isPinned}
-              >
-                {activityItem.isPinned ? (
-                  <Icon path={mdiPinOff} title="Unpin Comment" size={1} />
-                ) : (
-                  <Icon path={mdiPin} title="Pin Comment" size={1} />
-                )}
-              </IconButton>
-            </ConditionalTooltip>
+              {activityItem.isPinned ? (
+                <Icon path={mdiPinOff} title="Unpin Comment" size={1} />
+              ) : (
+                <Icon path={mdiPin} title="Pin Comment" size={1} />
+              )}
+            </IconButton>
           </Box>
         ) : null}
       </Box>
