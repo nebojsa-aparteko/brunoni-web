@@ -258,7 +258,10 @@ const PaymentOverviewContainer = () => {
         selectedStatuses &&
         selectedStatuses.length > 0 &&
         (data.platformStatus
-          ? platformStatus && platformStatus.includes(data.platformStatus)
+          ? platformStatus &&
+            (data.status === WeeklyPaymentStatus.PAID
+              ? selectedStatuses.includes(data.status)
+              : platformStatus.includes(data.platformStatus))
           : selectedStatuses.includes(data.status)),
     );
   }, [overviewData, status, platformStatus, currency, selectedStatuses]);
