@@ -4,6 +4,7 @@ import {
   AppBar,
   Box,
   Button,
+  Container,
   createStyles,
   Drawer,
   List,
@@ -15,7 +16,6 @@ import {
   Theme,
   Toolbar,
   Typography,
-  Container,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -73,8 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
         ({
           brunoni: {
             position: 'relative',
-            top: 6,
-            height: 78,
+            height: 58,
           },
           allmarine: {
             maxHeight: 80,
@@ -136,6 +135,12 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
     },
   },
 }));
+
+const getLogo = () => {
+  return process.env.REACT_APP_BRAND === 'brunoni'
+    ? require(`../assets/logo.${process.env.REACT_APP_BRAND}.svg`)
+    : require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`);
+};
 
 const getPageGuide = () => {
   switch (window.location.pathname) {
@@ -271,7 +276,7 @@ const Navbar: React.FC = () => {
             <Toolbar className={classes.toolbar} disableGutters>
               <Link className={classes.logo} to="/">
                 <img
-                  src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                  src={getLogo()}
                   alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   className={classes.logo}
                 />
@@ -425,7 +430,7 @@ const Navbar: React.FC = () => {
             <Toolbar>
               <Link className={classes.logo} to="/">
                 <img
-                  src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                  src={getLogo()}
                   alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                   className={classes.logo}
                 />
