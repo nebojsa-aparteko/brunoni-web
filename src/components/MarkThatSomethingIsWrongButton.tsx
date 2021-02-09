@@ -19,7 +19,7 @@ const showSomethingWrongTask = (booking: Booking, reference: string) => {
     .collection('bookings')
     .doc(booking?.id)
     .collection('tasks')
-    .doc(TaskType.CHECK_FILE)
+    .doc(`${TaskType.CHECK_FILE}_${reference}`)
     .set(
       { show: true, resolved: false, createAt: new Date(), dueDate: endOfDay(new Date()), paymentReference: reference },
       { merge: true },
