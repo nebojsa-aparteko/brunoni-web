@@ -1,5 +1,7 @@
+import { Platform } from './ActivityModel';
+
 export interface DocumentValue {
-  uploadedBy: ActivityLogUserData;
+  uploadedBy: ActivityLogUserData | Platform;
   uploadedAt: Date;
   url: string;
   name: string;

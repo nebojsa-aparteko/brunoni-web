@@ -48,6 +48,7 @@ import { showCrispChat } from '../../../index';
 import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment';
 import { fileWithExt } from './ChecklistItemRow';
 import CheckAccountingDocumentDialog from '../documentApproval/CheckAccountingDocumentDialog';
+import { isPlatformActivity } from '../../../utilities/activityHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -262,7 +263,7 @@ const DocumentListItem = ({
               <span>
                 <Typography variant="caption">
                   {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
-                    isAdmin ? ` by ${item.uploadedBy.firstName}` : ''
+                    isAdmin ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}` : ''
                   }`}
                 </Typography>
                 <br />
@@ -327,7 +328,8 @@ const DocumentListItem = ({
         ((internal && isAdmin) || (!internal && !isAdmin)) &&
         (((item.status?.at ? editRestriction(item.status.at) : true) &&
           (!internal && !isAdmin && NODE_ENV === 'production'
-            ? userRecord?.emailAddress !== item.uploadedBy.emailAddress
+            ? userRecord?.emailAddress !==
+              (isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.emailAddress)
             : true) &&
           !checklistCheckedRule() &&
           checklistItem &&
