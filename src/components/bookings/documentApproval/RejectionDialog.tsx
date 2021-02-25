@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,21 +17,19 @@ import { ChecklistItem } from '../checklist/ChecklistItemModel';
 import { RejectionInput } from './RejectionModal';
 import { TeamType } from '../../../model/Teams';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogContent: {
-      display: 'flex',
-      flexFlow: 'column',
-    },
-  }),
-);
+const useStyles = makeStyles(() => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogContent: {
+    display: 'flex',
+    flexFlow: 'column',
+  },
+}));
 
 const RejectionDialog: React.FC<Props> = ({
   isOpen,

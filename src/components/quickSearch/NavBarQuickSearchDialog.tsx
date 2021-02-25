@@ -1,14 +1,5 @@
 import React, { useContext } from 'react';
-import {
-  Box,
-  createStyles,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Typography,
-} from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import QuickSearchBooking from './QuickSearchBooking';
 import QuickSearchQuote from './QuickSearchQuote';
@@ -16,39 +7,37 @@ import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
 import UserRecordContext from '../../contexts/UserRecordContext';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
+const useStyles = makeStyles(theme => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogBody: {
+    minWidth: theme.spacing(100),
+    width: 'auto',
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+  },
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& *': {
+      margin: `0 ${theme.spacing(1)}`,
     },
-    dialogBody: {
-      minWidth: theme.spacing(100),
-      width: 'auto',
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'flex-start',
-      flexDirection: 'column',
-    },
-    formControl: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      '& *': {
-        margin: `0 ${theme.spacing(1)}`,
-      },
-    },
-    searchInput: {
-      flex: 1,
-    },
-  }),
-);
+  },
+  searchInput: {
+    flex: 1,
+  },
+}));
 
 const getBookingIds = async (
   collection: string,

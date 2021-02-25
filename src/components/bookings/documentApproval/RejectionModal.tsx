@@ -73,7 +73,7 @@ const RejectionModal: React.FC<Props> = ({
     (messageBody: string, mentions: MentionItem[], internal: boolean) => {
       addActivityItem(
         booking.id,
-        flow(omitBy(isNil))({
+        omitBy(isNil)({
           type: ActivityType.ACTIVITY_WITH_COMMENT,
           comment: messageBody,
           changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
@@ -84,7 +84,7 @@ const RejectionModal: React.FC<Props> = ({
           checklistItem: shortenedChecklist(checklistItem),
           documents: [shortenedDocumentValue(document)],
           mentions: mentions,
-        } as ActivityLogItem),
+        }) as ActivityLogItem,
       )
         .then(_ => {
           updateDocumentStatus(ChecklistItemValueDocumentStatusType.REJECTED, true);

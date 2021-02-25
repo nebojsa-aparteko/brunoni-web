@@ -1,14 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Box,
-  createStyles,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Typography,
-} from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
@@ -27,40 +18,38 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
+const useStyles = makeStyles(theme => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogBody: {
+    minWidth: theme.spacing(100),
+    width: 'auto',
+    minHeight: theme.spacing(60),
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+  },
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& *': {
+      margin: `0 ${theme.spacing(1)}`,
     },
-    dialogBody: {
-      minWidth: theme.spacing(100),
-      width: 'auto',
-      minHeight: theme.spacing(60),
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-      display: 'flex',
-      flexWrap: 'wrap',
-      justifyContent: 'flex-start',
-      flexDirection: 'column',
-    },
-    formControl: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      '& *': {
-        margin: `0 ${theme.spacing(1)}`,
-      },
-    },
-    searchInput: {
-      flex: 1,
-    },
-  }),
-);
+  },
+  searchInput: {
+    flex: 1,
+  },
+}));
 
 const handleChangeAgent = (id: string, user: UserRecordMin | null, watchers: UserRecordMin[] | null) =>
   firebase

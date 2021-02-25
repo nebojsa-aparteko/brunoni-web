@@ -100,7 +100,7 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
         .doc(booking.id)
         .collection('activity')
         .add(
-          flow(omitBy(isNil))({
+          omitBy(isNil)({
             type: ActivityType.COMMENT,
             comment: messageBody,
             at: new Date(),

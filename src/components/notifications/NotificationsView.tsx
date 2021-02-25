@@ -80,7 +80,7 @@ const NotificationsView: React.FC<Props> = ({
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notifications, dispatch, userRecord]);
+  }, [notifications, dispatch, userRecord, handleShow]);
 
   return (
     <Grid className={classes.root}>
@@ -114,7 +114,7 @@ const NotificationsView: React.FC<Props> = ({
                 <NotificationItemView notification={notification} handleShowDrawer={handleShow} />
               </ListItem>
             ))}
-            {notifications.length == numberToLoad && (
+            {notifications.length === numberToLoad && (
               <Box display="flex" justifyContent="center">
                 <Button onClick={onShowMore}>Show More</Button>
               </Box>

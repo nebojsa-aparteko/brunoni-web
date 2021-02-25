@@ -1,5 +1,5 @@
 import React, { useState, Fragment, useContext, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Box, CircularProgress, createStyles, FormControl, IconButton, makeStyles, TextField } from '@material-ui/core';
+import { Box, CircularProgress, FormControl, IconButton, makeStyles, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import firebase from '../../firebase';
 import { useHistory } from 'react-router';
@@ -12,21 +12,19 @@ import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
 import Mousetrap from 'mousetrap';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    formControl: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      '& *': {
-        margin: `0 ${theme.spacing(1)}`,
-      },
+const useStyles = makeStyles(theme => ({
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& *': {
+      margin: `0 ${theme.spacing(1)}`,
     },
-    searchInput: {
-      flex: 1,
-    },
-  }),
-);
+  },
+  searchInput: {
+    flex: 1,
+  },
+}));
 
 const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) => {
   const classes = useStyles();

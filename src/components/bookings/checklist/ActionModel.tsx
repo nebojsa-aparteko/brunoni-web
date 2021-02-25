@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,17 +11,15 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-  }),
-);
+const useStyles = makeStyles(() => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+}));
 
 const ActionModal: React.FC<Props> = ({ isOpen, handleClose, onSuccess, children }) => {
   const classes = useStyles();

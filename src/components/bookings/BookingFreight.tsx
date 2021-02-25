@@ -2,7 +2,6 @@ import React, { Fragment, useContext, useMemo } from 'react';
 import {
   AppBar,
   Box,
-  createStyles,
   Grid,
   makeStyles,
   Tab,
@@ -28,44 +27,42 @@ interface Props {
 const getSpecificFreight = (freightDetails: FreightDetail[], group: FreightDetailGroup) =>
   freightDetails.filter(f => f.Group === group);
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    width: '100%',
+  },
+  paper: {
+    marginTop: theme.spacing(3),
+    width: '100%',
+    overflowX: 'auto',
+    marginBottom: theme.spacing(2),
+  },
+  table: {
+    minWidth: 650,
+    overflowX: 'auto',
+  },
+  emptyState: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
+  // tableHead: {
+  //   fontWeight: theme.typography.fontWeightBold,
+  // },
+  tableRow: {
+    verticalAlign: 'top',
+    '& td': {
+      whiteSpace: 'nowrap',
     },
-    paper: {
-      marginTop: theme.spacing(3),
-      width: '100%',
-      overflowX: 'auto',
-      marginBottom: theme.spacing(2),
-    },
-    table: {
-      minWidth: 650,
-      overflowX: 'auto',
-    },
-    emptyState: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-    },
-    // tableHead: {
-    //   fontWeight: theme.typography.fontWeightBold,
-    // },
-    tableRow: {
-      verticalAlign: 'top',
+    ['@media print']: {
       '& td': {
-        whiteSpace: 'nowrap',
-      },
-      ['@media print']: {
-        '& td': {
-          padding: theme.spacing(0),
-        },
+        padding: theme.spacing(0),
       },
     },
-    tableWrapper: {
-      overflowX: 'auto',
-    },
-  }),
-);
+  },
+  tableWrapper: {
+    overflowX: 'auto',
+  },
+}));
 
 const AdminBookingFreight: React.FC<Props> = ({ freightDetails, initiallySelectedTab }) => {
   const [value, setValue] = React.useState(

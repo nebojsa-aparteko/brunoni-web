@@ -1,33 +1,31 @@
 import React from 'react';
-import { Box, Button, createStyles, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
-import { capitalCase } from 'change-case';
+import { Box,Button, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import { ActivityLogItem } from './ActivityModel';
 import classNames from 'classnames';
 import asArray from '../../../utilities/asArray';
 import DateFormattedText from '../../DateFormattedText';
+import { getFullName } from '../../../utilities/activityHelper';
 import CommentInput from '../../CommentInput';
 import { Booking } from '../../../model/Booking';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    rowContainer: {
-      display: 'flex',
-      flex: 1,
-      justifyContent: 'space-between',
-    },
-    name: {
-      marginRight: theme.spacing(1),
-    },
-    comment: {
-      padding: theme.spacing(1),
-      flex: 1,
-      whiteSpace: 'normal',
-    },
-    adminMessage: {
-      backgroundColor: '#eee',
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  rowContainer: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  name: {
+    marginRight: theme.spacing(1),
+  },
+  comment: {
+    padding: theme.spacing(1),
+    flex: 1,
+    whiteSpace: 'normal',
+  },
+  adminMessage: {
+    backgroundColor: '#eee',
+  },
+}));
 
 const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, booking }: ActivityWithCommentProp) => {
   const classes = useStyles();
@@ -41,7 +39,7 @@ const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, boo
     <Paper className={classNames(classes.comment, activity.isInternal ? classes.adminMessage : '')}>
       <Box className={classes.rowContainer}>
         <Typography className={classes.name} color="textPrimary">
-          {`${capitalCase(activity.by.firstName)} ${capitalCase(activity.by.lastName)}`}
+          {getFullName(activity)}
         </Typography>
         <DateFormattedText date={activity.at} />
       </Box>

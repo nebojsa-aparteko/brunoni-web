@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Divider,
   IconButton,
   LinearProgress,
@@ -47,51 +46,49 @@ interface DocumentsListProps {
   onDelete?: any;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    root: {
-      width: '100%',
+const useStyles = makeStyles(() => ({
+  root: {
+    width: '100%',
+  },
+  dragZone: {
+    height: '50px',
+    border: '1px dashed #ccc',
+    padding: '10px',
+    textAlign: 'center',
+    fontSize: '12px',
+    lineHeight: 1,
+    cursor: 'pointer',
+    '&:hover': {
+      borderColor: '#999',
     },
-    dragZone: {
-      height: '50px',
-      border: '1px dashed #ccc',
-      padding: '10px',
-      textAlign: 'center',
-      fontSize: '12px',
-      lineHeight: 1,
-      cursor: 'pointer',
-      '&:hover': {
-        borderColor: '#999',
-      },
-      '&:focus': {
-        outline: 'none',
-      },
+    '&:focus': {
+      outline: 'none',
     },
-    documents: {
-      listStyle: 'none',
-      padding: 0,
-      margin: 0,
-      display: 'flex',
-      flexWrap: 'wrap',
+  },
+  documents: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  documentItem: {
+    margin: '5px',
+  },
+  documentButton: {
+    padding: 0,
+    minWidth: 'auto',
+  },
+  menuLink: {
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  tinyIconButton: {
+    '& svg': {
+      fontSize: 10,
     },
-    documentItem: {
-      margin: '5px',
-    },
-    documentButton: {
-      padding: 0,
-      minWidth: 'auto',
-    },
-    menuLink: {
-      textDecoration: 'none',
-      color: 'inherit',
-    },
-    tinyIconButton: {
-      '& svg': {
-        fontSize: 10,
-      },
-    },
-  }),
-);
+  },
+}));
 
 export const makeContentDispositionFilePrefix = (
   checklistItem: ChecklistItem | undefined,
@@ -137,10 +134,9 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({ documents, onDelet
   }, []);
 
   const handleDelete = useCallback(
-    (event: React.MouseEvent<unknown>, name: string) => {
+    (event: React.MouseEvent<unknown>, name?: string) => {
       event.preventDefault();
       event.stopPropagation();
-
       onDelete(name);
     },
     [onDelete],
@@ -303,7 +299,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, internal),
+    onDrop: acceptedFiles => onDrop(acceptedFiles, internal),
   });
 
   return (

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
-  createStyles,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -25,80 +24,78 @@ import BookingTaskExpansionPanel from '../bookings/BookingTaskExpansionPanel';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
 import { TaskCategory } from '../../model/Task';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    dialogPaper: {
-      minHeight: '100vh',
-      maxHeight: '100vh',
-      minWidth: '100vw',
-      maxWidth: '100vw',
-    },
-    dialogTitleBar: {
-      height: '48px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'left',
-    },
-    bookingLink: {
-      marginLeft: 12,
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogContent: {
-      display: 'flex',
-      flexFlow: 'column',
-      height: '90vh',
-    },
-    bookingViewContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: 0,
-      height: '100%',
-      overflow: 'scroll',
-    },
-    bookingTasksContainer: {
-      flex: '0 1 auto',
-      padding: 4,
-    },
-    mainContentContainer: {
-      flex: '1 0 auto',
-      padding: 4,
-      marginTop: 8,
-      height: '68%',
-    },
-    gridContainer: {
-      display: 'flex',
-      flexGrow: 1,
-      overflow: 'hidden',
-      height: '100%',
-    },
-    bookingContentContainer: {
-      paddingTop: 8,
-      maxHeight: '100%',
-      overflow: 'scroll',
-    },
-    accountingTabContainer: {
-      maxHeight: '55%',
-      overflow: 'scroll',
-      flex: '1 0 auto',
-    },
-    activityLogContainer: {
-      overflow: 'scroll',
-      flex: '1 1 auto',
-      marginTop: 8,
-      padding: 1,
-      paddingBottom: 4,
-    },
-    noBookingText: {
-      margin: 'auto',
-    },
-  }),
-);
+const useStyles = makeStyles(() => ({
+  dialogPaper: {
+    minHeight: '100vh',
+    maxHeight: '100vh',
+    minWidth: '100vw',
+    maxWidth: '100vw',
+  },
+  dialogTitleBar: {
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'left',
+  },
+  bookingLink: {
+    marginLeft: 12,
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogContent: {
+    display: 'flex',
+    flexFlow: 'column',
+    height: '90vh',
+  },
+  bookingViewContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    height: '100%',
+    overflow: 'scroll',
+  },
+  bookingTasksContainer: {
+    flex: '0 1 auto',
+    padding: 4,
+  },
+  mainContentContainer: {
+    flex: '1 0 auto',
+    padding: 4,
+    marginTop: 8,
+    height: '68%',
+  },
+  gridContainer: {
+    display: 'flex',
+    flexGrow: 1,
+    overflow: 'hidden',
+    height: '100%',
+  },
+  bookingContentContainer: {
+    paddingTop: 8,
+    maxHeight: '100%',
+    overflow: 'scroll',
+  },
+  accountingTabContainer: {
+    maxHeight: '55%',
+    overflow: 'scroll',
+    flex: '1 0 auto',
+  },
+  activityLogContainer: {
+    overflow: 'scroll',
+    flex: '1 1 auto',
+    marginTop: 8,
+    padding: 1,
+    paddingBottom: 4,
+  },
+  noBookingText: {
+    margin: 'auto',
+  },
+}));
 
 const getBooking = (bookingId: string) =>
   firebase

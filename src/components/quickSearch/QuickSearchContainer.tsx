@@ -18,18 +18,16 @@ import { normalizeBooking } from '../../providers/BookingsProvider';
 import { BookingRow } from '../bookings/BookingsTable';
 import Mousetrap from 'mousetrap';
 import { useSnackbar } from 'notistack';
-const useStyles = makeStyles(theme =>
-  createStyles({
-    formControl: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    searchInput: {
-      flex: 1,
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchInput: {
+    flex: 1,
+  },
+}));
 
 const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }: Props) => {
   const classes = useStyles();

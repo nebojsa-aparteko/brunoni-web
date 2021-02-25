@@ -4,7 +4,6 @@ import {
   CardActions,
   CardContent,
   CircularProgress,
-  createStyles,
   Divider,
   FormControl,
   IconButton,
@@ -23,26 +22,24 @@ import { GlobalContext } from '../../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../../store/types/globalAppState';
 import firebase from '../../firebase';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    formControl: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    searchInput: {
-      flex: 1,
-    },
-    content: {
-      padding: 0,
-      overflowX: 'auto',
-    },
-    actions: {
-      padding: theme.spacing(1),
-      justifyContent: 'flex-end',
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchInput: {
+    flex: 1,
+  },
+  content: {
+    padding: 0,
+    overflowX: 'auto',
+  },
+  actions: {
+    padding: theme.spacing(1),
+    justifyContent: 'flex-end',
+  },
+}));
 
 const searchBookings = async (bookingIds: string[] | undefined) => {
   if (bookingIds && bookingIds.length > 0)

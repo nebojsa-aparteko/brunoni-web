@@ -1,36 +1,35 @@
 import React from 'react';
-import { Box, createStyles, makeStyles, Theme } from '@material-ui/core';
+import { Box, makeStyles, Theme } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
 import { makeActivityRepresentation } from './Activity';
 import ActivityComment from './ActivityComment';
+import { getFullName } from '../../../utilities/activityHelper';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      padding: theme.spacing(1),
-    },
-    rowContainer: {
-      display: 'flex',
-      flex: 1,
-      justifyContent: 'space-between',
-    },
-    name: {
-      marginRight: theme.spacing(1),
-    },
-    comment: {
-      padding: theme.spacing(1),
-      flex: 1,
-      whiteSpace: 'normal',
-    },
-    adminMessage: {
-      backgroundColor: '#eee',
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    padding: theme.spacing(1),
+  },
+  rowContainer: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  name: {
+    marginRight: theme.spacing(1),
+  },
+  comment: {
+    padding: theme.spacing(1),
+    flex: 1,
+    whiteSpace: 'normal',
+  },
+  adminMessage: {
+    backgroundColor: '#eee',
+  },
+}));
 
 const ActivityWithComment = ({ activity, handleCommentClick, ...other }: ActivityWithCommentProp) => {
   const classes = useStyles();
@@ -43,12 +42,7 @@ const ActivityWithComment = ({ activity, handleCommentClick, ...other }: Activit
       onClick={handleCommentClick}
     >
       <Box className={classes.rowContainer}>
-        <Avatar
-          name={`${activity.by?.firstName} ${activity.by?.lastName}`}
-          title={`${activity.by?.firstName} ${activity.by?.lastName}`}
-          size="30"
-          round={true}
-        />
+        <Avatar name={getFullName(activity)} title={getFullName(activity)} size="30" round={true} />
         <Box display="flex" flexDirection="column" flex={1} ml={1}>
           <Box display="flex" flexDirection="column" ml={1}>
             {makeActivityRepresentation(activity)}
