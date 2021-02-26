@@ -17,7 +17,7 @@ const BookingPinnedActivities: React.FC<Props> = ({ pinnedActivities, booking })
   const handleUnpin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, activity: ActivityLogItem) => {
     event.stopPropagation();
     if (booking?.id && activity.id)
-      setIsPinned(activity.id, booking?.id, false)
+      setIsPinned(activity.id, booking?.id, false, pinnedActivities.length)
         .then(() =>
           enqueueSnackbar(<Typography color="inherit">{`The activity has been unpinned successfully.`}</Typography>, {
             variant: 'success',

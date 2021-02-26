@@ -29,7 +29,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export const setIsPinned = (activityItemId: string, bookingId: string, isPinned: boolean) =>
+export const setIsPinned = (
+  activityItemId: string,
+  bookingId: string,
+  isPinned: boolean,
+  numberOfPinnedComments: number,
+) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -37,10 +42,10 @@ export const setIsPinned = (activityItemId: string, bookingId: string, isPinned:
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(bookingId))
+    .then(() => updateTasksWithPinnedCommentsFlag(bookingId, numberOfPinnedComments + (isPinned ? 1 : -1)))
     .catch(err => console.error(err));
 
-const updateTasksWithPinnedCommentsFlag = async (bookingId: string) =>
+const updateTasksWithPinnedCommentsFlag = async (bookingId: string, numberOfPinnedComments: number) =>
   firebase
     .firestore()
     .collection('functions-action')
@@ -50,6 +55,7 @@ const updateTasksWithPinnedCommentsFlag = async (bookingId: string) =>
       type: FirebaseActionType.UPDATE_TASKS_WHEN_COMMENT_IS_PINNED,
       done: false,
       bookingId,
+      numberOfPinnedComments,
     });
 
 const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
@@ -67,7 +73,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
     event.stopPropagation();
 
     if (booking?.id && activityItem.id) {
-      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned)
+      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
         .then(() =>
           dispatch({
             type: SHOW_SUCCESS_SNACKBAR,
