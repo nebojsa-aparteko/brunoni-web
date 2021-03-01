@@ -53,7 +53,10 @@ const FinanceOverviewTable: React.FC<Props> = ({
           ([key, value]) => ({
             currency: key as Currency,
             amount: value.reduce(
-              (previousValue, currentValue) => previousValue - currentValue.amount,
+              (previousValue, currentValue) =>
+                currentValue.debitCredit === DebitCredit.DEBIT
+                  ? previousValue + currentValue.amount
+                  : previousValue - currentValue.amount,
               total.find(total => total.currency === (key as Currency))?.amount || 0,
             ),
           }),

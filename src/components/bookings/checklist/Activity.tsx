@@ -11,6 +11,7 @@ import {
 } from './ChecklistItemModel';
 import DateFormattedText from '../../DateFormattedText';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
+import { activityHasLink, getFullName, isPlatformActivity } from '../../../utilities/activityHelper';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -89,9 +90,11 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 
   return (
     <Typography>
-      <Link href={`mailto:${activity.by.emailAddress}`}>
-        {`${capitalCase(activity.by.firstName)} ${capitalCase(activity.by.lastName)}`}
-      </Link>
+      {isPlatformActivity(activity.by) ? (
+        `Platform`
+      ) : (
+        <Link href={`mailto:${activity.by.emailAddress}`}>{getFullName(activity)}</Link>
+      )}
       {mapChangeTypeToText()}
       {activity.stage && ` '${activity.stage?.label}' stage `}
       {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
@@ -126,14 +129,7 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       ) : null}
       {activity.documents &&
         activity.documents.map((doc, index) => {
-          return [
-            ActivityChangeType.ADD_FILE,
-            ActivityChangeType.SELECT_FOR_COMPARISON,
-            ActivityChangeType.UNSELECT_FOR_COMPARISON,
-            ActivityChangeType.MARK_AS_FINAL,
-            ActivityChangeType.UNMARK_AS_FINAL,
-            ActivityChangeType.DOCUMENT_STATUS_CHANGED,
-          ].includes(activity.changeType as ActivityChangeType) ? (
+          return activityHasLink(activity) ? (
             <Fragment key={doc.url}>
               <Link href={doc.url} target="_blank">
                 {doc.name}
@@ -196,12 +192,7 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 const Activity = ({ activity, ...other }: Props) => {
   return (
     <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
-      <Avatar
-        name={`${activity.by.firstName} ${activity.by.lastName}`}
-        title={`${activity.by.firstName} ${activity.by.lastName}`}
-        size="40"
-        round={true}
-      />
+      <Avatar name={getFullName(activity)} title={getFullName(activity)} size="40" round={true} />
       <Box display="flex" flexDirection="column" ml={1}>
         {makeActivityRepresentation(activity)}
         <DateFormattedText date={activity.at} />

@@ -19,6 +19,7 @@ import { green } from '@material-ui/core/colors';
 import safeInvoke from '../../utilities/safeInvoke';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import theme from '../../theme';
+import { isPlatformActivity } from '../../utilities/activityHelper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -67,7 +68,7 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
           secondary={
             <Typography variant="caption">
               {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
-                item.uploadedBy.firstName
+                isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName
               }`}
             </Typography>
           }

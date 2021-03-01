@@ -14,7 +14,7 @@ export interface ActivityLogItem {
   checklistItem?: ShortChecklistItem;
   paymentReference?: string;
   stage?: Stage;
-  by: ActivityLogUserData;
+  by: ActivityLogUserData | Platform;
   at: Date;
   type: ActivityType;
   isInternal: boolean;
@@ -58,3 +58,5 @@ export interface PaymentActivityData {
   dateBeforeChange?: Date;
   dateAfterChange?: Date;
 }
+
+export type Platform = 'PLATFORM';

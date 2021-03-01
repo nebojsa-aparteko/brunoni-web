@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Container,
-  createStyles,
   Drawer,
   List,
   ListItem,
@@ -50,79 +49,78 @@ import { quoteShepherdTour } from './guides/QuoteGuide';
 import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
 import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      height: 100,
-    },
-    appBar: {
-      background: theme.palette.background.paper,
+const useStyles = makeStyles((theme: Theme) => ({
+  container: {
+    height: 100,
+  },
+  appBar: {
+    background: theme.palette.background.paper,
 
-      ['@media print']: {
-        display: 'none',
-      },
+    ['@media print']: {
+      display: 'none',
     },
-    toolbar: {
-      height: 100,
-    },
-    toolbarItem: {},
-    logo: {
-      marginRight: 'auto',
-      display: 'flex',
-      '& > img':
-        ({
-          brunoni: {
-            position: 'relative',
-            height: 58,
-          },
-          allmarine: {
-            maxHeight: 80,
-            width: 'auto',
-          },
-        } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
-      [theme.breakpoints.down('sm')]: {
-        '& > img': {
-          top: 0,
-          maxHeight: '4em',
+  },
+  toolbar: {
+    height: 100,
+  },
+  toolbarItem: {},
+  logo: {
+    marginRight: 'auto',
+    display: 'flex',
+    '& > img':
+      ({
+        brunoni: {
+          position: 'relative',
+
+          height: 58,
+        },
+        allmarine: {
+          maxHeight: 80,
           width: 'auto',
         },
+      } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
+    [theme.breakpoints.down('sm')]: {
+      '& > img': {
+        top: 0,
+        maxHeight: '4em',
+        width: 'auto',
       },
     },
-    spacer: {
-      flex: 1,
+  },
+  spacer: {
+    flex: 1,
+  },
+  item: {
+    display: 'flex',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    [theme.breakpoints.down('sm')]: {
+      marginTop: theme.spacing(2),
     },
-    item: {
-      display: 'flex',
-      marginLeft: theme.spacing(1),
-      marginRight: theme.spacing(1),
-      [theme.breakpoints.down('sm')]: {
-        marginTop: theme.spacing(2),
-      },
-    },
-    goToQuote: {
-      marginTop: theme.spacing(0.5),
-      width: 120,
-    },
-    input: {
-      margin: theme.spacing(1),
-    },
-    drawer: {
-      [theme.breakpoints.up('sm')]: {
-        width: 240,
-        flexShrink: 0,
-      },
-    },
-    drawerPaper: {
+  },
+  goToQuote: {
+    marginTop: theme.spacing(0.5),
+    width: 120,
+  },
+  input: {
+    margin: theme.spacing(1),
+  },
+  drawer: {
+    [theme.breakpoints.up('sm')]: {
       width: 240,
+      flexShrink: 0,
     },
-    nested: {
-      paddingLeft: theme.spacing(4),
-    },
-    menu: {
-      textTransform: 'uppercase',
-    },
-  }),
-);
+  },
+  drawerPaper: {
+    width: 240,
+  },
+  nested: {
+    paddingLeft: theme.spacing(4),
+  },
+  menu: {
+    textTransform: 'uppercase',
+  },
+}));
 
 const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
   item: {

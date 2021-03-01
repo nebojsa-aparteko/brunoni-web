@@ -1,15 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  createStyles,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Paper,
-  Typography,
-} from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Paper, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import VesselWithVoyage from '../../model/VesselWithVoyage';
 import { chunk } from 'lodash/fp';
@@ -20,24 +10,22 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { normalizeBooking } from '../../providers/BookingsProvider';
 import ActingAs from '../../contexts/ActingAs';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogBody: {
-      minWidth: theme.spacing(100),
-      width: 'auto',
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogBody: {
+    minWidth: theme.spacing(100),
+    width: 'auto',
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+  },
+}));
 const CHUNK_SIZE = 10;
 
 const getBookings = (bookings: string[]) => {

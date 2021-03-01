@@ -15,7 +15,6 @@ import {
   Box,
   Button,
   Checkbox,
-  createStyles,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -35,28 +34,26 @@ import { GlobalContext } from '../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    table: {
-      minWidth: 650,
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      padding: 4,
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  table: {
+    minWidth: 650,
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: 4,
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+}));
 
 interface AddAdminsDialogProps {
   isOpen: boolean;

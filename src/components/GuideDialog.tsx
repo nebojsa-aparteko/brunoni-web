@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,25 +20,23 @@ import { navbarShepherdTour } from './guides/NavbarGuide';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogActions: {
-      display: 'flex',
-      justifyContent: 'space-evenly',
-      alignItems: 'center',
-    },
-    content: {
-      margin: theme.spacing(3),
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  content: {
+    margin: theme.spacing(3),
+  },
+}));
 
 interface ConfirmationDialogProps {
   isOpen: boolean;

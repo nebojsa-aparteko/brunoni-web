@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,45 +25,43 @@ import { RejectionInput } from './RejectionModal';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
 import ComparisonDialogContent from './ComparisonDialogContent';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    dialogPaper: {
-      minHeight: '100vh',
-      maxHeight: '100vh',
-      minWidth: '100vw',
-      maxWidth: '100vw',
-    },
-    dialogTitleBar: {
-      height: '48px',
-    },
-    fileNumber: {
-      alignSelf: 'baseline',
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogContent: {
-      display: 'flex',
-      flexFlow: 'column',
-    },
-    dialogActions: {
-      height: '48px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    formControl: {
-      marginTop: -4,
-      marginRight: theme.spacing(4),
-      minWidth: 400,
-      height: 40,
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  dialogPaper: {
+    minHeight: '100vh',
+    maxHeight: '100vh',
+    minWidth: '100vw',
+    maxWidth: '100vw',
+  },
+  dialogTitleBar: {
+    height: '48px',
+  },
+  fileNumber: {
+    alignSelf: 'baseline',
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogContent: {
+    display: 'flex',
+    flexFlow: 'column',
+  },
+  dialogActions: {
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formControl: {
+    marginTop: -4,
+    marginRight: theme.spacing(4),
+    minWidth: 400,
+    height: 40,
+  },
+}));
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

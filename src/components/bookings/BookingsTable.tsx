@@ -33,72 +33,70 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    button: {
-      position: 'relative',
-    },
-    progressButton: {
-      position: 'absolute',
-    },
-    tableRowHeader: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-    },
-    progress: {
-      width: '100%',
-      backgroundColor: 'white',
-      border: '1px solid #ccc',
-    },
-    progressBar: {
-      width: '0%',
-      height: '20px',
-      backgroundColor: 'green',
-    },
-    avatarCell: {
-      textAlign: 'center',
-    },
-    avatar: {
-      width: '40px',
-      height: '40px',
-      borderRadius: '20px',
-      display: 'block',
-    },
-    textEmphasized: {
-      textTransform: 'uppercase',
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    checkListBackdrop: {
-      zIndex: 1,
-    },
-    dialogBody: {
-      width: theme.spacing(100),
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-    },
-    actionBarGridItem: {
-      marginRight: 0,
-      textAlign: 'right',
-    },
-    divider: {
-      marginTop: theme.spacing(2),
-    },
-    card: {
-      marginTop: '2em',
-      marginLeft: '1px',
-      marginRight: '1px',
-      marginBottom: '1px',
-    },
-  }),
-);
+const useStyles = makeStyles(() => ({
+  button: {
+    position: 'relative',
+  },
+  progressButton: {
+    position: 'absolute',
+  },
+  tableRowHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  progress: {
+    width: '100%',
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+  },
+  progressBar: {
+    width: '0%',
+    height: '20px',
+    backgroundColor: 'green',
+  },
+  avatarCell: {
+    textAlign: 'center',
+  },
+  avatar: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '20px',
+    display: 'block',
+  },
+  textEmphasized: {
+    textTransform: 'uppercase',
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  checkListBackdrop: {
+    zIndex: 1,
+  },
+  dialogBody: {
+    width: theme.spacing(100),
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+  },
+  actionBarGridItem: {
+    marginRight: 0,
+    textAlign: 'right',
+  },
+  divider: {
+    marginTop: theme.spacing(2),
+  },
+  card: {
+    marginTop: '2em',
+    marginLeft: '1px',
+    marginRight: '1px',
+    marginBottom: '1px',
+  },
+}));
 
 interface BookingsTableProps {
   bookings: Booking[] | undefined;

@@ -35,49 +35,47 @@ import { shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import ActingAs from '../../../contexts/ActingAs';
 import MarkThatSomethingIsWrongButton from '../../MarkThatSomethingIsWrongButton';
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    dialogPaper: {
-      minHeight: '100vh',
-      maxHeight: '100vh',
-      minWidth: '100vw',
-      maxWidth: '100vw',
-    },
-    dialogTitleBar: {
-      height: '48px',
-    },
-    fileNumber: {
-      alignSelf: 'baseline',
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogContent: {
-      display: 'flex',
-      flexFlow: 'column',
-    },
-    dialogActions: {
-      height: '48px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    formControl: {
-      marginTop: -4,
-      marginRight: theme.spacing(4),
-      minWidth: 400,
-      height: 40,
-    },
-    button: {
-      margin: '0px 8px',
-      height: '36px',
-    },
-  }),
-);
+const useStyles = makeStyles(theme => ({
+  dialogPaper: {
+    minHeight: '100vh',
+    maxHeight: '100vh',
+    minWidth: '100vw',
+    maxWidth: '100vw',
+  },
+  dialogTitleBar: {
+    height: '48px',
+  },
+  fileNumber: {
+    alignSelf: 'baseline',
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogContent: {
+    display: 'flex',
+    flexFlow: 'column',
+  },
+  dialogActions: {
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formControl: {
+    marginTop: -4,
+    marginRight: theme.spacing(4),
+    minWidth: 400,
+    height: 40,
+  },
+  button: {
+    margin: '0px 8px',
+    height: '36px',
+  },
+}));
 
 const CheckAccountingDocumentDialog: React.FC<Props> = ({
   document,
@@ -133,7 +131,7 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
     (messageBody: string, mentions: MentionItem[], internal: boolean) => {
       addActivityItem(
         booking.id,
-        flow(omitBy(isNil))({
+        omitBy(isNil)({
           type: ActivityType.ACTIVITY_WITH_COMMENT,
           comment: messageBody,
           changeType: ActivityChangeType.DOCUMENT_STATUS_CHANGED,
@@ -143,7 +141,7 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
           isAccountingActivity: true,
           documents: [shortenedDocumentValue(document)],
           mentions: mentions,
-        } as ActivityLogItem),
+        }) as ActivityLogItem,
       )
         .then(_ => {
           updateComponent?.();

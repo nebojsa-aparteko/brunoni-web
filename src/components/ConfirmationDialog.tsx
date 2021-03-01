@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -15,25 +14,23 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogActions: {
-      display: 'flex',
-      justifyContent: 'space-evenly',
-      alignItems: 'center',
-    },
-    content: {
-      margin: theme.spacing(3),
-    },
-  }),
-);
+const useStyles = makeStyles((theme: Theme) => ({
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  content: {
+    margin: theme.spacing(3),
+  },
+}));
 
 interface ConfirmationDialogProps {
   isOpen: boolean;

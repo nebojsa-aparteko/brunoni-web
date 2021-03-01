@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import Linkify from 'react-linkify';
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
+import { Theme, makeStyles } from '@material-ui/core/styles';
 import { Grid, Link } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -14,43 +14,41 @@ interface Props {
   quoteDetails: QuoteDetail[];
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    width: '100%',
+  },
+  paper: {
+    marginTop: theme.spacing(3),
+    width: '100%',
+    overflowX: 'auto',
+    marginBottom: theme.spacing(2),
+  },
+  table: {
+    minWidth: 650,
+    overflowX: 'auto',
+  },
+  tableHead: {
+    fontWeight: theme.typography.fontWeightBold,
+  },
+  costUnitCell: {
+    paddingLeft: 0,
+    minWidth: '150px',
+  },
+  tableRow: {
+    '& td': {
+      whiteSpace: 'nowrap',
     },
-    paper: {
-      marginTop: theme.spacing(3),
-      width: '100%',
-      overflowX: 'auto',
-      marginBottom: theme.spacing(2),
-    },
-    table: {
-      minWidth: 650,
-      overflowX: 'auto',
-    },
-    tableHead: {
-      fontWeight: theme.typography.fontWeightBold,
-    },
-    costUnitCell: {
-      paddingLeft: 0,
-      minWidth: '150px',
-    },
-    tableRow: {
+    ['@media print']: {
       '& td': {
-        whiteSpace: 'nowrap',
-      },
-      ['@media print']: {
-        '& td': {
-          padding: theme.spacing(0),
-        },
+        padding: theme.spacing(0),
       },
     },
-    tableWrapper: {
-      overflowX: 'auto',
-    },
-  }),
-);
+  },
+  tableWrapper: {
+    overflowX: 'auto',
+  },
+}));
 
 const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
   const classes = useStyles();
