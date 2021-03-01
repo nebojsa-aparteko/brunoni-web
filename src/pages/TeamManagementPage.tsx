@@ -4,8 +4,10 @@ import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import { TabPanel } from './BookingsPage';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
+import RecentActorsIcon from '@material-ui/icons/RecentActors';
 import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
 import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
+import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -38,8 +40,8 @@ const TeamManagementPage: React.FC = () => {
         break;
       case 1:
         break;
-      // case 2:
-      //   break;
+      case 2:
+        break;
       default:
         break;
     }
@@ -59,7 +61,7 @@ const TeamManagementPage: React.FC = () => {
           >
             <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(0)} />
             <Tab icon={<PersonIcon />} label="Users" {...a11yProps(1)} />
-            {/*<Tab icon={<PersonIcon />} label="Assignee" {...a11yProps(2)} />*/}
+            <Tab icon={<RecentActorsIcon />} label="Reassign users" {...a11yProps(2)} />
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
@@ -70,9 +72,9 @@ const TeamManagementPage: React.FC = () => {
           <TeamsUsersContainer />
         </TabPanel>
 
-        {/*<TabPanel value={selectedTab} index={2}>*/}
-        {/*  <TeamsAssigneeContainer />*/}
-        {/*</TabPanel>*/}
+        <TabPanel value={selectedTab} index={2}>
+          <ReassignUsersContainer />
+        </TabPanel>
       </Box>
     </Fragment>
   );

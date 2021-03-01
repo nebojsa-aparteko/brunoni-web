@@ -20,7 +20,7 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -100,7 +100,7 @@ const CarrierInput: React.FC<Props> = ({
 const usePopupStyles = makeStyles((theme: Theme) => ({
   popper: {
     width: theme.breakpoints.values.md / 2,
-    zIndex: 100,
+    zIndex: 5000,
   },
 }));
 
