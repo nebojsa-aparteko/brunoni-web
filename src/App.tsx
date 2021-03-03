@@ -46,6 +46,7 @@ import {
   notificationSeenStatusChange,
   NotificationStatusAction,
 } from './components/notifications/NotificationItemView';
+import EquipmentControlPage from './pages/EquipmentControl';
 
 const anonymousRoutes = (
   <Switch>
@@ -75,6 +76,7 @@ const adminRoutes = (
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     <Route exact path="/loadList" component={LoadListPage} />
+    <Route exact path="/equipment-control" component={EquipmentControlPage} />
     <Route exact path="/my-day" component={MyDayPage} />
     <Route exact path="/my-profile" component={MyProfilePage} />
     <Route exact path="/equipment" component={EquipmentSituation} />
