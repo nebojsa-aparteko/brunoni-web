@@ -3,7 +3,6 @@ import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
-// import {a11yProps, TabPanel} from "../../pages/BookingsPage";
 import ImportFlowsContainer from './ImportFlowsContainer';
 import ExportFlowsContainer from './ExportFlowsContainer';
 import OverviewsContainer from './OverviewsContainer';
