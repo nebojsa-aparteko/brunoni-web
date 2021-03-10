@@ -4,8 +4,8 @@ import firebase from '../firebase';
 export default function useFirestoreDocument(
   collection: string,
   id?: string,
-  documentPath?: string,
   subCollection?: string,
+  subCollectionPath?: string,
 ) {
   const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined | null>();
 
@@ -17,13 +17,13 @@ export default function useFirestoreDocument(
     const cleanup = (async () => {
       try {
         const document =
-          (await documentPath) && subCollection
+          (await subCollectionPath) && subCollection
             ? firebase
                 .firestore()
                 .collection(collection)
-                .doc(documentPath)
-                .collection(subCollection)
                 .doc(id)
+                .collection(subCollection)
+                .doc(subCollectionPath)
             : firebase
                 .firestore()
                 .collection(collection)
@@ -56,7 +56,7 @@ export default function useFirestoreDocument(
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [collection, id, documentPath, subCollection]);
+  }, [collection, id, subCollectionPath, subCollection]);
 
   return snapshot;
 }

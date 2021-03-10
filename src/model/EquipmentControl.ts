@@ -1,8 +1,9 @@
 import { BookingCategory, BookingVersion } from './Booking';
 
-export interface EquipmentSummary {
+export default interface EquipmentControl {
   bookingId: string;
   containerType: string;
+  containerQuantity: number;
   carrierId: string;
   locId: string;
   locTxt?: string;
@@ -14,3 +15,13 @@ export interface EquipmentSummary {
   ETA: Date;
   ETS: Date;
 }
+
+export interface EquipmentImportSummary {
+  Arrived: CountedValue;
+  'On Water': CountedValue;
+  'Gate Out': CountedValue;
+  Total: CountedValue;
+  Today: CountedValue;
+}
+
+export type CountedValue = { [k: string]: number };

@@ -33,6 +33,7 @@ const TeamManagementPage: React.FC = () => {
 
   const classes = useStyles();
 
+  // todo Check if we need this here
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
     switch (newValue) {

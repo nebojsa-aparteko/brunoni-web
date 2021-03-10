@@ -4,10 +4,12 @@ import CarrierInput from '../inputs/CarrierInput';
 import Carrier from '../../model/Carrier';
 import Carriers from '../../contexts/Carriers';
 import ImportFlowsTable from './ImportFlowsTable';
+import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 
 const ImportFlowsContainer: React.FC = () => {
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
   const availableCarriers = useContext(Carriers);
+  const summary = useEquipmentSummary('Hamburg Süd', ['005654']);
 
   return (
     <Box width="95vw">
@@ -20,7 +22,7 @@ const ImportFlowsContainer: React.FC = () => {
           value={selectedCarrier}
         />
       </Box>
-      <ImportFlowsTable equipment={[]} />
+      <ImportFlowsTable summary={summary} />
     </Box>
   );
 };

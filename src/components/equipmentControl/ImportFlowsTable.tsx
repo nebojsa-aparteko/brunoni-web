@@ -1,14 +1,14 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import PickupLocations from '../../contexts/PickupLocations';
-import { EquipmentSummary } from '../../model/EquipmentSummary';
-import PickupLocation from '../../model/PickupLocation';
+import { EquipmentImportSummary } from '../../model/EquipmentControl';
 import { makeStyles, Theme } from '@material-ui/core';
 import theme from '../../theme';
+import TableBody from '@material-ui/core/TableBody';
+import EquipmentControlRow from './EquipmentControlRow';
 
 const useStyles = makeStyles((theme: Theme) => ({
   defaultCell: {
@@ -16,51 +16,42 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: 'white',
   },
   statusCell: {
-    borderLeft: `1px solid black`,
+    border: `1px solid black`,
     alignItems: 'center',
   },
 }));
 
-const statuses = ['ON WATER', 'ARRIVED', 'GATE OUT'];
-const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
+const statuses = ['ON WATER', 'ARRIVED', 'GATE OUT', 'TOTAL', 'TODAY'];
+// const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
+const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT', '40OT'];
 
 const getContainerTypeCells = () => (
   <>
     {containerTypes.map(containerType => (
-      <TableCell style={{ border: `1px solid ${theme.palette.divider}`, backgroundColor: 'white' }}>
+      <TableCell
+        padding="checkbox"
+        size="small"
+        style={{ border: `1px solid ${theme.palette.divider}`, backgroundColor: 'white' }}
+      >
         {containerType}
       </TableCell>
     ))}
   </>
 );
 
-//TODO replace EquipmentSummary[] with container counts depending on the structure
 interface ImportFlowsTableProps {
-  equipment: EquipmentSummary[];
+  summary: EquipmentImportSummary[];
 }
 
-const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ equipment }) => {
+const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const classes = useStyles();
-  const pickupLocations = useContext(PickupLocations);
-  const [filteredPickupLocations, setFilteredLocations] = useState<PickupLocation[] | undefined>();
-
-  //TODO display only CH depots if "show more" isn't enabled
-  useMemo(() => {
-    setFilteredLocations(
-      pickupLocations
-        ? pickupLocations.filter(
-            location => location.countryCode === 'CH' && equipment.some(e => e.locId === location.id),
-          )
-        : undefined,
-    );
-  }, [pickupLocations, equipment]);
 
   return (
     <TableContainer>
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
-            <TableCell colSpan={1} style={{ backgroundColor: 'white' }} />
+            <TableCell style={{ backgroundColor: 'white' }} />
             {statuses.map(status => (
               <TableCell colSpan={8} className={classes.statusCell}>
                 {status}
@@ -68,16 +59,15 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ equipment }) => {
             ))}
           </TableRow>
           <TableRow>
-            <TableCell>Depot Location / C. Type</TableCell>
+            <TableCell>Depot Location</TableCell>
             {statuses.map(() => getContainerTypeCells())}
           </TableRow>
-          {filteredPickupLocations &&
-            filteredPickupLocations?.map(location => (
-              <TableRow>
-                <TableCell align="left">{location.name}</TableCell>
-              </TableRow>
-            ))}
         </TableHead>
+        <TableBody>
+          {summary?.map(equipment => (
+            <EquipmentControlRow equipmentControl={equipment} />
+          ))}
+        </TableBody>
       </Table>
     </TableContainer>
   );
