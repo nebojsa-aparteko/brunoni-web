@@ -10,7 +10,7 @@ const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT',
 const EquipmentControlRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   return (
     <TableRow>
-      <TableCell>{get(equipmentControl, 'locId', '-')}</TableCell>
+      <TableCell>{get(equipmentControl, 'id', '-')}</TableCell>
       {statuses.map(s => {
         const status = get(equipmentControl, s, {});
         return (

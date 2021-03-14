@@ -16,12 +16,22 @@ export default interface EquipmentControl {
   ETS: Date;
 }
 
-export interface EquipmentImportSummary {
+interface Summary {
+  id?: string;
+  locId: string;
+  show: boolean;
+}
+
+export interface EquipmentImportSummary extends Summary {
   Arrived: CountedValue;
   'On Water': CountedValue;
   'Gate Out': CountedValue;
   Total: CountedValue;
   Today: CountedValue;
+}
+
+export interface EquipmentExportSummary extends Summary {
+  week: number;
 }
 
 export type CountedValue = { [k: string]: number };

@@ -27,8 +27,9 @@ const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT',
 
 const getContainerTypeCells = () => (
   <>
-    {containerTypes.map(containerType => (
+    {containerTypes.map((containerType, index) => (
       <TableCell
+        key={`${containerType}-${index}`}
         padding="checkbox"
         size="small"
         style={{ border: `1px solid ${theme.palette.divider}`, backgroundColor: 'white' }}
@@ -53,7 +54,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           <TableRow>
             <TableCell style={{ backgroundColor: 'white' }} />
             {statuses.map(status => (
-              <TableCell colSpan={8} className={classes.statusCell}>
+              <TableCell colSpan={8} className={classes.statusCell} key={status}>
                 {status}
               </TableCell>
             ))}
@@ -64,8 +65,8 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {summary?.map(equipment => (
-            <EquipmentControlRow equipmentControl={equipment} />
+          {summary?.map((equipment, index) => (
+            <EquipmentControlRow equipmentControl={equipment} key={index} />
           ))}
         </TableBody>
       </Table>
