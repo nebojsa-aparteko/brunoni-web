@@ -3,9 +3,9 @@ import useFirestoreCollection from './useFirestoreCollection';
 import firebase from '../firebase';
 import { EquipmentImportSummary } from '../model/EquipmentControl';
 import { useEquipmentControlFilterProviderContext } from '../providers/EquipmentControlFilterProvider';
-import { BookingCategory } from '../model/Booking';
+import { BookingCategory, BookingVersion } from '../model/Booking';
 
-export default function useEquipmentSummary(category: BookingCategory) {
+export default function useEquipmentSummary(category: BookingCategory, version: BookingVersion) {
   const [filters] = useEquipmentControlFilterProviderContext();
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
@@ -21,7 +21,7 @@ export default function useEquipmentSummary(category: BookingCategory) {
   const equipmentSummary = useFirestoreCollection(
     'sum-equipment-control',
     query,
-    `${filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id}-${category}`,
+    `${filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id}-${category}-${version}`,
     'summary',
   );
   return equipmentSummary?.docs.map(doc => {

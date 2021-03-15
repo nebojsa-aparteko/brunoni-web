@@ -22,8 +22,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const statuses = ['ON WATER', 'ARRIVED', 'GATE OUT', 'TOTAL', 'TODAY'];
-// const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
-const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT', '40OT'];
+const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
+// const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT', '40OT'];
 
 const getContainerTypeCells = () => (
   <>
@@ -60,7 +60,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             ))}
           </TableRow>
           <TableRow>
-            <TableCell>Depot Location</TableCell>
+            <TableCell colSpan={4}>Depot Location</TableCell>
             {statuses.map(() => getContainerTypeCells())}
           </TableRow>
         </TableHead>

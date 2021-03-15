@@ -1,12 +1,16 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
+import { BookingVersion } from '../model/Booking';
 
 export interface EquipmentControlFilterContext {
   carrier?: Carrier;
+  version: BookingVersion;
 }
 
-export const TASK_FILTERS_INITIAL_STATE = {} as EquipmentControlFilterContext;
+export const TASK_FILTERS_INITIAL_STATE = {
+  version: BookingVersion.long,
+} as EquipmentControlFilterContext;
 
 const EquipmentControlFilterProviderContext = createContext<
   [EquipmentControlFilterContext, Dispatch<SetStateAction<EquipmentControlFilterContext>>]

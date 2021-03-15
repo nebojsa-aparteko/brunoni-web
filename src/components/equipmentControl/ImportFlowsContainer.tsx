@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
@@ -7,23 +7,33 @@ import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import { set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
+import CategoryFilter from '../CategoryFilter';
+import VersionFilter from '../VersionFilter';
 
 const ImportFlowsContainer: React.FC = () => {
   const availableCarriers = useContext(Carriers);
-  const summary = useEquipmentSummary(BookingCategory.Import);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
+  const { version, carrier } = filters;
+  const summary = useEquipmentSummary(BookingCategory.Import, filters.version);
 
   return (
     <Box width="95vw">
       <Typography variant="h4">Import Flows</Typography>
-      <Box minWidth={250} maxWidth={400} margin={4} marginLeft={0} paddingRight={1}>
-        <CarrierInput
-          label="Select a carrier"
-          onChange={carrier => setFilters(prevState => set('carrier', carrier)(prevState))}
-          carriers={availableCarriers}
-          value={filters.carrier}
+      <Box width="95vw" display="flex" flexDirection="row">
+        <VersionFilter
+          value={version}
+          onChange={event => setFilters(prevState => set('version', event.target.value)(prevState))}
         />
+        <Box minWidth={250} maxWidth={400} margin={4} marginLeft={0} paddingRight={1}>
+          <CarrierInput
+            label="Select a carrier"
+            onChange={carrier => setFilters(prevState => set('carrier', carrier)(prevState))}
+            carriers={availableCarriers}
+            value={carrier}
+          />
+        </Box>
       </Box>
+
       <ImportFlowsTable summary={summary} />
     </Box>
   );
