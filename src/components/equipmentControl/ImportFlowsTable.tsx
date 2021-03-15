@@ -52,7 +52,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
-            <TableCell style={{ backgroundColor: 'white' }} />
+            <TableCell style={{ backgroundColor: 'white' }} colSpan={1} />
             {statuses.map(status => (
               <TableCell colSpan={8} className={classes.statusCell} key={status}>
                 {status}
@@ -60,7 +60,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             ))}
           </TableRow>
           <TableRow>
-            <TableCell colSpan={4}>Depot Location</TableCell>
+            <TableCell>Depot Location</TableCell>
             {statuses.map(() => getContainerTypeCells())}
           </TableRow>
         </TableHead>

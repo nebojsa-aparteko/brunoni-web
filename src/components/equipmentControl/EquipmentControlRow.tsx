@@ -13,7 +13,7 @@ const EquipmentControlRow: React.FC<EquipmentControlRowProps> = ({ equipmentCont
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
   return (
     <TableRow>
-      <TableCell colSpan={4}>{location?.name}</TableCell>
+      <TableCell>{location?.name}</TableCell>
       {statuses.map(s => {
         const status = get(equipmentControl, s, {});
         return (
