@@ -6,7 +6,7 @@ import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
 
 const statuses = ['On Water', 'Arrived', 'Gate Out', 'Total', 'Today'];
-const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
+const containerTypes = ['22G1', '42G1', '45G1', '22R1', '45R1', '22U1', '42U1', '45U1'];
 
 const EquipmentControlRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   const locations = useContext(PickupLocations);
