@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
@@ -7,7 +7,6 @@ import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import { set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
-import CategoryFilter from '../CategoryFilter';
 import VersionFilter from '../VersionFilter';
 
 const ImportFlowsContainer: React.FC = () => {
@@ -20,10 +19,6 @@ const ImportFlowsContainer: React.FC = () => {
     <Box width="95vw">
       <Typography variant="h4">Import Flows</Typography>
       <Box width="95vw" display="flex" flexDirection="row">
-        <VersionFilter
-          value={version}
-          onChange={event => setFilters(prevState => set('version', event.target.value)(prevState))}
-        />
         <Box minWidth={250} maxWidth={400} margin={4} marginLeft={0} paddingRight={1}>
           <CarrierInput
             label="Select a carrier"
@@ -32,6 +27,10 @@ const ImportFlowsContainer: React.FC = () => {
             value={carrier}
           />
         </Box>
+        <VersionFilter
+          value={version}
+          onChange={event => setFilters(prevState => set('version', event.target.value)(prevState))}
+        />
       </Box>
 
       <ImportFlowsTable summary={summary} />
