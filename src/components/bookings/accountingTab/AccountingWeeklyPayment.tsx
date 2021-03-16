@@ -44,6 +44,7 @@ import useUser from '../../../hooks/useUser';
 import { GlobalContext } from '../../../store/GlobalStore';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
+import SpellcheckIcon from '@material-ui/icons/Spellcheck';
 import PaymentApprovalButton from './PaymentApprovalButton';
 import TaskManualResolveButton from '../../TaskManualResolveButton';
 import Task, { TaskType } from '../../../model/Task';
@@ -368,6 +369,11 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
               payment.debitCredit === DebitCredit.CREDIT ? '-' : '',
             )}
           </Typography>
+          {payment.approvedByOCR && (
+            <Tooltip title={'Approved by OCR'}>
+              <SpellcheckIcon htmlColor={'rgba(0,200,81)'} />
+            </Tooltip>
+          )}
           <Typography
             variant={'h5'}
             style={{

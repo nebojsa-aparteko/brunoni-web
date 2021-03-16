@@ -1,6 +1,7 @@
 import Payment from './Payment';
 
 export default interface WeeklyPayment extends Payment {
+  approvedByOCR?: boolean;
   status: WeeklyPaymentStatus;
   platformStatus?: WeeklyPaymentPlatformStatus;
 }
