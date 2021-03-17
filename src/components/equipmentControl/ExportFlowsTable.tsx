@@ -4,13 +4,12 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import { EquipmentImportSummary } from '../../model/EquipmentControl';
+import { EquipmentExportSummary } from '../../model/EquipmentControl';
 import { makeStyles, Theme } from '@material-ui/core';
 import theme from '../../theme';
 import TableBody from '@material-ui/core/TableBody';
-import EquipmentControlImportRow from './EquipmentControlImportRow';
-import { get, set } from 'lodash';
-import mergeAndSumObjects from '../../utilities/mergeAndSumObjects';
+import EquipmentControlExportRow from './EquipmentControlExportRow';
+import { groupBy } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) => ({
   defaultCell: {
@@ -23,9 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const statuses = ['ON WATER', 'ARRIVED', 'GATE OUT', 'TOTAL', 'RETURNED TODAY'];
+const columns = ['WK1', 'WK2', 'WK3', 'EXPORT TOTAL', 'SHIPPED TODAY'];
 const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
-const containerTypesVal = ['22G1', '42G1', '45G1', '22R1', '45R1', '22U1', '42U1', '45U1'];
+// const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT', '40OT'];
 
 const getContainerTypeCells = () => (
   <>
@@ -43,29 +42,21 @@ const getContainerTypeCells = () => (
 );
 
 interface ImportFlowsTableProps {
-  summary: EquipmentImportSummary[];
+  summary: EquipmentExportSummary[];
 }
-const keys = ['On Water', 'Arrived', 'Gate Out', 'Total', 'Today'];
 
-const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
+const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const classes = useStyles();
-  const total = useMemo(() => {
-    return summary?.reduce((previousValue, currentValue) => {
-      const sum = {};
-      keys.forEach(key => {
-        set(sum, key, mergeAndSumObjects(get(previousValue, key), get(currentValue, key)));
-      });
-      return sum;
-    }, {});
-  }, [summary]);
-
+  const groupedSummary = useMemo(() => Object.entries(groupBy<EquipmentExportSummary>(value => value.locId)(summary)), [
+    summary,
+  ]);
   return (
     <TableContainer>
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
             <TableCell style={{ backgroundColor: 'white' }} colSpan={1} />
-            {statuses.map(status => (
+            {columns.map(status => (
               <TableCell colSpan={8} className={classes.statusCell} key={status}>
                 {status}
               </TableCell>
@@ -73,31 +64,17 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           </TableRow>
           <TableRow>
             <TableCell>Depot Location</TableCell>
-            {statuses.map(() => getContainerTypeCells())}
+            {columns.map(() => getContainerTypeCells())}
           </TableRow>
         </TableHead>
         <TableBody>
-          {summary?.map((equipment, index) => (
-            <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+          {groupedSummary?.map(([locId, equipment], index) => (
+            <EquipmentControlExportRow equipmentControl={equipment} key={index} locId={locId} />
           ))}
-          <TableRow>
-            <TableCell>Total</TableCell>
-            {keys.map(key => {
-              const status = get(total, `${key}`, {});
-              return (
-                <>
-                  {containerTypesVal.map(type => {
-                    const c = get(status, type, '-');
-                    return <TableCell>{c}</TableCell>;
-                  })}
-                </>
-              );
-            })}
-          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
   );
 };
 
-export default ImportFlowsTable;
+export default ExportFlowsTable;

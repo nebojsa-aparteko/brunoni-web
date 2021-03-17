@@ -32,6 +32,8 @@ export interface EquipmentImportSummary extends Summary {
 
 export interface EquipmentExportSummary extends Summary {
   week: number;
+  year: number;
+  containers: CountedValue;
 }
 
 export type CountedValue = { [k: string]: number };

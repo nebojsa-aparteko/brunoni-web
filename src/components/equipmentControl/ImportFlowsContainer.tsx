@@ -13,7 +13,7 @@ const ImportFlowsContainer: React.FC = () => {
   const availableCarriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
   const { version, carrier } = filters;
-  const summary = useEquipmentSummary(BookingCategory.Import, filters.version);
+  const summary = useEquipmentSummary(BookingCategory.Import);
 
   return (
     <Box width="95vw">
