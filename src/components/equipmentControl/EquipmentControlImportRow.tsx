@@ -9,7 +9,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const locations = useContext(PickupLocations);
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
   return (
-    <TableRow>
+    <TableRow hover>
       <TableCell>{location?.name}</TableCell>
       {statusKeys.map(s => {
         const status = get(equipmentControl, s, {});

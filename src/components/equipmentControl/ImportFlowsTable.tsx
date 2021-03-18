@@ -82,7 +82,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             <EquipmentControlImportRow equipmentControl={equipment} key={index} />
           ))}
           {summary?.length > 0 && (
-            <TableRow>
+            <TableRow hover>
               <TableCell>Total</TableCell>
               {statusKeys.map(key => {
                 const status = get(total, `${key}`, {});
