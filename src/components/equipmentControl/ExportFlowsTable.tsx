@@ -4,7 +4,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import { EquipmentExportSummary } from '../../model/EquipmentControl';
+import { containerTypesLabels, EquipmentExportSummary } from '../../model/EquipmentControl';
 import { makeStyles, Theme } from '@material-ui/core';
 import theme from '../../theme';
 import TableBody from '@material-ui/core/TableBody';
@@ -23,12 +23,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const columns = ['WK1', 'WK2', 'WK3', 'EXPORT TOTAL', 'SHIPPED TODAY'];
-const containerTypes = ['20DC', '40DC', '40HC', '20RF', '40RH', '20OT', '40OT', '40OH'];
-// const containerTypes = ['20DC', '15G12', '45G1', '40HC', '20RF', '40RH', '20OT', '40OT'];
 
 const getContainerTypeCells = () => (
   <>
-    {containerTypes.map((containerType, index) => (
+    {containerTypesLabels.map((containerType, index) => (
       <TableCell
         key={`${containerType}-${index}`}
         padding="checkbox"
