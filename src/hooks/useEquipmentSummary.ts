@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useFirestoreCollection from './useFirestoreCollection';
-import firebase from '../firebase';
+import firebase from 'firebase';
 import { EquipmentExportSummary, EquipmentImportSummary } from '../model/EquipmentControl';
 import { useEquipmentControlFilterProviderContext } from '../providers/EquipmentControlFilterProvider';
 import { BookingCategory } from '../model/Booking';
@@ -13,6 +13,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection;
+      query = query.where(firebase.firestore.FieldPath.documentId(), '!=', '0');
       if (category === BookingCategory.Export) {
         query = query.where('year', '==', getYear(new Date()));
         query = query.where('week', '>=', getWeek(new Date(), { weekStartsOn: 1 }));

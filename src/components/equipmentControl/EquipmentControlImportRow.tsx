@@ -10,7 +10,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
   return (
     <TableRow hover>
-      <TableCell>{location?.name}</TableCell>
+      <TableCell>{location?.name || equipmentControl.id}</TableCell>
       {statusKeys.map(s => {
         const status = get(equipmentControl, s, {});
         return (

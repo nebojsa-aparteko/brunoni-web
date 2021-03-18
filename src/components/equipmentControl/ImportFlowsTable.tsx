@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -17,6 +17,9 @@ import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
 import { get, set } from 'lodash';
 import mergeAndSumObjects from '../../utilities/mergeAndSumObjects';
+import PickupLocations from '../../contexts/PickupLocations';
+import { groupBy } from 'lodash/fp';
+import CountryCodes from '../../model/CountryCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   defaultCell: {
@@ -50,6 +53,18 @@ interface ImportFlowsTableProps {
 
 const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const classes = useStyles();
+  const locations = useContext(PickupLocations);
+  // const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
+
+  const groupedSummary = useMemo(
+    () =>
+      Object.entries(
+        groupBy<EquipmentImportSummary>(s => locations?.find(loc => loc.id === get(s, 'id', '-'))?.countryCode)(
+          summary,
+        ),
+      ),
+    [summary, locations],
+  );
   const total = useMemo(() => {
     return summary?.reduce((previousValue, currentValue) => {
       const sum = {};
@@ -78,8 +93,15 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {summary?.map((equipment, index) => (
-            <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+          {groupedSummary.map(([countryCode, group]) => (
+            <>
+              <TableRow>
+                <TableCell style={{ fontWeight: 'bold' }}>{get(CountryCodes, countryCode, '-')}</TableCell>
+              </TableRow>
+              {group?.map((equipment, index) => (
+                <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+              ))}
+            </>
           ))}
           {summary?.length > 0 && (
             <TableRow hover>

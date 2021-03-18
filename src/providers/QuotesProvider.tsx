@@ -6,7 +6,7 @@ import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
 import { subWeeks } from 'date-fns';
 import Carrier from '../model/Carrier';
-
+import firebase from '../firebase';
 interface Props {
   children: React.ReactNode;
 }
