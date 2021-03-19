@@ -40,7 +40,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import { buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
@@ -129,6 +129,7 @@ interface ActionButtonsProps {
 const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const history = useHistory();
 
   const [user, userData] = useUser();
   const client = userData?.company!;
@@ -141,6 +142,12 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
     setMoreAnchorEl(null);
   };
 
+  const handleBookNow = () => {
+    localStorage.setItem('quote', JSON.stringify(quote));
+    localStorage.setItem('client', JSON.stringify(client));
+    history.push('/online-booking');
+  };
+
   return (
     <Box display="flex" alignItems="center" justifyContent="center" className={classes.buttons}>
       <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
@@ -150,8 +157,9 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         color="primary"
         variant="contained"
         size="small"
-        href={buildMailToLink(quote, [user, userData, client])}
-        target="_blank"
+        onClick={handleBookNow}
+        // href={buildMailToLink(quote, [user, userData, client])}
+        // target="_blank"
       >
         Book Now
       </Button>

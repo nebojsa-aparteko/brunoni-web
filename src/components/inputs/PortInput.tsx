@@ -17,6 +17,7 @@ interface Props {
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
+  margin?: 'none' | 'dense' | 'normal';
 }
 
 const useStyles = makeStyles({
@@ -25,7 +26,7 @@ const useStyles = makeStyles({
   },
 });
 
-const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, open, onOpen, onClose }) => {
+const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, open, onOpen, onClose, margin }) => {
   const classes = useStyles();
   const loading = open && !ports;
 
@@ -45,6 +46,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
           {...params}
           inputRef={inputRef}
           label={label}
+          margin={margin}
           fullWidth
           variant="outlined"
           InputProps={{

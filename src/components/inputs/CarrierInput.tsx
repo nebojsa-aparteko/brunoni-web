@@ -18,6 +18,7 @@ interface Props {
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
+  margin?: 'none' | 'dense' | 'normal';
 }
 
 const useStyles = makeStyles(() => ({
@@ -38,6 +39,7 @@ const CarrierInput: React.FC<Props> = ({
   open,
   onOpen,
   onClose,
+  margin,
   ...rest
 }) => {
   const classes = useStyles();
@@ -63,6 +65,7 @@ const CarrierInput: React.FC<Props> = ({
           {...params}
           inputRef={inputRef}
           label={label}
+          margin={margin}
           fullWidth
           variant="outlined"
           InputProps={{

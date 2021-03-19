@@ -1,10 +1,10 @@
-import React, { forwardRef, ForwardRefRenderFunction, Fragment, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, ForwardRefRenderFunction, Fragment, useImperativeHandle, useRef, useState } from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
-import { Grid, makeStyles, Theme } from '@material-ui/core';
+import { Grid, makeStyles, TextField, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
@@ -22,6 +22,7 @@ import IMO from '../../model/IMO';
 import OOG from '../../model/OOG';
 import ContainerDetails from '../../model/ContainerDetails';
 import FormControl from '@material-ui/core/FormControl';
+import DateInput from './DateInput';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -60,6 +61,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
   const locationInput = useRef();
+  const [dateOpen, setDateOpen] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -113,6 +115,26 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange(set('oog', v)(value));
   };
 
+  const handlePickupDateChange = (v: Date | null) => {
+    onChange(set('pickupDate', v)(value));
+  };
+
+  const handleWeightChange = (v: number | null) => {
+    onChange(set('weight', v)(value));
+  };
+
+  const handleTemperatureChange = (v: number | null) => {
+    onChange(set('temperature', v)(value));
+  };
+
+  const handleHumidityChange = (v: string | null) => {
+    onChange(set('humidity', v)(value));
+  };
+
+  const handleVentilationChange = (v: string | null) => {
+    onChange(set('ventilation', v)(value));
+  };
+
   return (
     <Fragment>
       <Grid container spacing={2}>
@@ -133,7 +155,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           />
         </Grid>
         {get('showLocations')(rest) && !value.containerType?.description?.endsWith('S.O.') && (
-          <Grid item md={4} xs={12}>
+          <Grid item md={3} xs={12}>
             <LocationInput
               ref={locationInput}
               margin="dense"
@@ -145,6 +167,69 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         <Grid item md={2} xs={12}>
           <QuantityInput value={value.quantity} margin="dense" onChange={handleQuantityChange} />
         </Grid>
+        {get('isDetailedInput')(rest) && (
+          <>
+            <Grid item md={1} xs={12}>
+              <DateInput
+                value={value.pickupDate}
+                onChange={handlePickupDateChange}
+                open={dateOpen}
+                onOpen={() => setDateOpen(true)}
+                onClose={() => setDateOpen(false)}
+                label="Pickup Date"
+                margin="dense"
+                fullWidth
+              />
+            </Grid>
+            <Grid item md={2} xs={12}>
+              <TextField
+                label="Weight (Kg)"
+                type="number"
+                margin="dense"
+                variant="outlined"
+                fullWidth
+                value={value.weight}
+                onChange={event => handleWeightChange(parseInt(event.target.value))}
+              />
+            </Grid>
+            {(value.containerType?.id === '45R1' || value.containerType?.id === '22R1') && (
+              <React.Fragment>
+                <Grid item md={2} xs={12}>
+                  <TextField
+                    label="Temperature (°C)"
+                    type="number"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.temperature}
+                    onChange={event => handleTemperatureChange(parseInt(event.target.value))}
+                  />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <TextField
+                    label="Humidity (%)"
+                    type="number"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.humidity}
+                    onChange={event => handleHumidityChange(event.target.value)}
+                  />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <TextField
+                    label="Ventilation"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.ventilation}
+                    onChange={event => handleVentilationChange(event.target.value)}
+                  />
+                </Grid>
+              </React.Fragment>
+            )}
+          </>
+        )}
       </Grid>
       <FormControl margin="dense" className={classes.inlineForm}>
         <OptionalInput

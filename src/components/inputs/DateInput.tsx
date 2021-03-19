@@ -15,6 +15,8 @@ interface Props {
   open: boolean;
   onOpen?: () => void;
   onClose?: () => void;
+  margin?: 'none' | 'dense' | 'normal';
+  fullWidth?: boolean;
 }
 
 const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersDate, dayInCurrentMonth: boolean) => {
@@ -48,7 +50,16 @@ const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersD
   );
 };
 
-const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, label = 'Earliest Date' }) => {
+const DateInput: React.FC<Props> = ({
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  label = 'Earliest Date',
+  margin,
+  fullWidth,
+}) => {
   const theme = useTheme();
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enLocale}>
@@ -64,6 +75,8 @@ const DateInput: React.FC<Props> = ({ value, onChange, open, onOpen, onClose, la
         value={value}
         onChange={date => onChange(date as Date)}
         format="d.MMMM"
+        margin={margin}
+        fullWidth={fullWidth}
         PopoverProps={{
           anchorOrigin: {
             vertical: 'bottom',
