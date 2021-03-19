@@ -5,12 +5,15 @@ import { ContextFilters } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
 import { subWeeks } from 'date-fns';
-
+import Carrier from '../model/Carrier';
+import firebase from '../firebase';
 interface Props {
   children: React.ReactNode;
 }
 
-interface QuoteContextFilters extends ContextFilters {}
+interface QuoteContextFilters extends ContextFilters {
+  carrier?: Carrier;
+}
 
 const defaultFilters = {} as QuoteContextFilters;
 
@@ -69,6 +72,10 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       if (filters.clientFilter) {
         query = (query || collection).where('clientId', '==', filters.clientFilter.id);
+      }
+
+      if (filters.carrier) {
+        query = (query || collection).where('carrier', '==', filters.carrier.name);
       }
 
       query = filters.dateRange

@@ -11,6 +11,7 @@ import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
 import { UserRecordMinProperties } from '../model/UserRecord';
 import { useBookingListFilterContext } from './BookingListFilterProvider';
+import firebase from '../firebase';
 
 interface Props {
   children: React.ReactNode;

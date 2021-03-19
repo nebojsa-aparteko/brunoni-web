@@ -16,7 +16,7 @@ import {
 import pick from 'lodash/fp/pick';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from './Page';
-import { Booking, BookingCategory, BookingLocType, BookingVersion, CargoDetail } from '../../model/Booking';
+import { Booking, BookingCategory, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import CheckList from './checklist/CheckList';
 import ArchiveIcon from '@material-ui/icons/Archive';
@@ -44,7 +44,7 @@ import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import BookingPinnedActivities from './BookingPinnedActivities';
 import { ActivityLogItem } from './checklist/ActivityModel';
 import map from 'lodash/fp/map';
-import { flow, groupBy } from 'lodash/fp';
+import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
@@ -77,6 +77,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     ['@media print']: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
+    },
+  },
+  logo: {
+    width: '5em',
+    ['@media print']: {
+      width: '20em',
     },
   },
   title: {
@@ -314,7 +320,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 <img
                   src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
                   alt=""
-                  style={{ width: '5em' }}
+                  className={classes.logo}
                 />
               </Box>
               <Divider />

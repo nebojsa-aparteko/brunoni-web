@@ -71,6 +71,12 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(0),
     },
   },
+  logo: {
+    width: '5em',
+    ['@media print']: {
+      width: '20em',
+    },
+  },
   title: {
     fontSize: '1.2em',
   },
@@ -270,7 +276,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                   <img
                     src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
                     alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
-                    style={{ width: '5em' }}
+                    className={classes.logo}
                   />
                 </Box>
                 <Divider />
