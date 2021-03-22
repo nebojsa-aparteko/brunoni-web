@@ -4,6 +4,7 @@ import { Box, Button, Paper, IconButton, makeStyles, Theme } from '@material-ui/
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputProps from '../../model/InputProps';
+import palette from '../../theme/palette';
 
 interface Props<T> {
   ref?: React.Ref<unknown>;
@@ -20,6 +21,9 @@ interface Props<T> {
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
     marginBottom: theme.spacing(1),
+    '&:hover': {
+      backgroundColor: palette.background.hover,
+    },
   },
   actionSection: {
     backgroundColor: theme.palette.grey['50'],

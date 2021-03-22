@@ -155,7 +155,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           />
         </Grid>
         {get('showLocations')(rest) && !value.containerType?.description?.endsWith('S.O.') && (
-          <Grid item md={3} xs={12}>
+          <Grid item md={4} xs={12}>
             <LocationInput
               ref={locationInput}
               margin="dense"
@@ -169,7 +169,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         </Grid>
         {get('isDetailedInput')(rest) && (
           <>
-            <Grid item md={1} xs={12}>
+            <Grid item md={2} xs={12}>
               <DateInput
                 value={value.pickupDate}
                 onChange={handlePickupDateChange}

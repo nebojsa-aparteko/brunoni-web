@@ -2,15 +2,17 @@ import React, { useContext, useRef, useState } from 'react';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Checkbox,
+  Container as ContainerView,
   FormControlLabel,
   Grid,
+  makeStyles,
+  Paper,
   Step,
   StepLabel,
   Stepper,
   TextField,
+  Theme,
 } from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
@@ -28,6 +30,20 @@ import ListInput from '../inputs/ListInput';
 import Container from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import { BookingRequest } from '../../model/BookingRequest';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    flex: 4,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+  },
+  content: {
+    width: '100%',
+  },
+}));
 
 const ShippingInfo = (
   quote: Quote | undefined,
@@ -159,7 +175,7 @@ const CargoInfo = (
   };
 
   return (
-    <Grid container direction="column" spacing={4}>
+    <Grid container direction="column" spacing={4} style={{ width: '100%' }}>
       <ListInput
         listRef={listInput}
         addButtonRef={addButton}
@@ -264,6 +280,7 @@ const AdditionalInfo = (
 const getSteps = () => ['General Information', 'Cargo Details', 'Additional Information'];
 
 const OnlineBookingContainer = () => {
+  const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
 
   const quoteJson = localStorage.getItem('quote');
@@ -283,17 +300,9 @@ const OnlineBookingContainer = () => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
-  //TODO re-comment this if needed
-  if (quote) {
-    localStorage.removeItem('quote');
-  }
-  if (client) {
-    localStorage.removeItem('client');
-  }
-
   return (
-    <Card>
-      <CardContent>
+    <ContainerView className={classes.root}>
+      <Paper>
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map(label => (
             <Step key={label}>
@@ -301,7 +310,7 @@ const OnlineBookingContainer = () => {
             </Step>
           ))}
         </Stepper>
-        <Box p={3}>
+        <Box p={3} className={classes.content}>
           <TabPanel value={activeStep} index={0}>
             {ShippingInfo(quote, client, handleNext, bookingRequest, setBookingRequest)}
           </TabPanel>
@@ -312,8 +321,8 @@ const OnlineBookingContainer = () => {
             {AdditionalInfo(handleBack, bookingRequest, setBookingRequest)}
           </TabPanel>
         </Box>
-      </CardContent>
-    </Card>
+      </Paper>
+    </ContainerView>
   );
 };
 
