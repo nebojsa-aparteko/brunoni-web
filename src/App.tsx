@@ -48,6 +48,7 @@ import {
 } from './components/notifications/NotificationItemView';
 import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
+import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 
 const anonymousRoutes = (
   <Switch>
@@ -72,6 +73,7 @@ const adminRoutes = (
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/online-booking" component={OnlineBookingPage} />
+    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/teams" component={TeamManagementPage} />

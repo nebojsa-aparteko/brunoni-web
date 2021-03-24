@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -29,7 +29,11 @@ import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import Container from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import useUser from '../../hooks/useUser';
+import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import firebase from '../../firebase';
+import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -44,6 +48,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
   },
 }));
+
+const createRequest = (bookingRequest: BookingRequest) => {
+  console.log(bookingRequest);
+  return firebase
+    .firestore()
+    .collection('booking-requests')
+    .add(bookingRequest);
+};
 
 const ShippingInfo = (
   quote: Quote | undefined,
@@ -163,10 +175,13 @@ const CargoInfo = (
   );
 
   const handleContinue = () => {
+    const writableContainers = containers.map(container => {
+      return { ...container, imo: null, oog: null };
+    });
     setBookingRequest(
       omitBy(isNil)({
         ...bookingRequest,
-        containers: containers,
+        containers: writableContainers,
         imo: checkRequestForIMO(containers) || undefined,
         soc: checkRequestForSOC(containers) || undefined,
       }) as BookingRequest,
@@ -200,6 +215,7 @@ const CargoInfo = (
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers && containers.some((container: Container & ContainerDetails) => container.imo && container.imo[0]);
+
 const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers &&
   containers.some(
@@ -215,15 +231,39 @@ const AdditionalInfo = (
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
 ) => {
   const [additionalInfo, setAdditionalInfo] = useState<string | undefined>();
+  const [, userRecord] = useUser();
+
+  const getShortUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
 
   const handleFinish = () => {
-    setBookingRequest(
-      omitBy(isNil)({
-        ...bookingRequest,
-        additionalInfo: additionalInfo,
-      }) as BookingRequest,
-    );
-    console.log(JSON.stringify(bookingRequest));
+    const writableRequest = {
+      ...bookingRequest,
+      additionalInfo: additionalInfo,
+      createdAt: new Date(),
+      createdBy: getShortUserData(),
+      status: BookingRequestStatus.CREATED,
+    };
+    omitEmptyDeep(writableRequest);
+    setBookingRequest(writableRequest as BookingRequest);
+    try {
+      bookingRequest &&
+        createRequest(writableRequest)
+          .then(() => console.log(JSON.stringify(writableRequest)))
+          .catch(error => console.log(error));
+    } catch (error) {
+      console.error('useFirestoreCollection threw an error', error);
+      return null;
+    }
   };
 
   return (

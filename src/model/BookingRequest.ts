@@ -4,13 +4,23 @@ import Container from './Container';
 import ContainerDetails from './ContainerDetails';
 
 export interface BookingRequest {
-  origin: Port;
-  destination: Port;
-  carrier: Carrier;
+  id?: string;
+  origin?: Port;
+  destination?: Port;
+  carrier?: Carrier;
   quoteNumber?: number;
   customerReference?: string;
-  containers: (Container & ContainerDetails)[];
+  containers?: (Container & ContainerDetails)[];
   additionalInfo?: string;
   imo?: boolean;
   soc?: boolean;
+  createdAt?: Date;
+  createdBy?: any;
+  status: BookingRequestStatus;
+}
+
+export enum BookingRequestStatus {
+  CREATED = 'Created',
+  IN_PROGRESS = 'In Progress',
+  CONFIRMED = 'Confirmed',
 }

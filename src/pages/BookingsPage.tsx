@@ -12,6 +12,8 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
+import BookingRequestsProvider from '../providers/BookingRequestsProvider';
+import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -200,6 +202,7 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
             <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
+            <Tab icon={<ArchiveIcon />} label="Requests" {...a11yProps(3)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
@@ -214,6 +217,17 @@ const BookingsPageContainer: React.FC = () => {
               archived
               showDateRangeFilter
             />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={3}>
+            <BookingRequestsProvider>
+              <BookingRequestsView isAdmin={!actingAs} />
+            </BookingRequestsProvider>
+            {/*<BookingsView*/}
+            {/*  bookings={isLoading ? undefined : bookings}*/}
+            {/*  isAdmin={!actingAs}*/}
+            {/*  archived*/}
+            {/*  showDateRangeFilter*/}
+            {/*/>*/}
           </TabPanel>
         </Box>
       ) : (
