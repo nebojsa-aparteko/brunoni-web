@@ -1,50 +1,15 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Grid,
-  IconButton,
-  makeStyles,
-  Menu,
-  MenuItem,
-  Paper,
-  Theme,
-  Typography,
-} from '@material-ui/core';
-import pick from 'lodash/fp/pick';
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { Box, Button, Divider, Grid, IconButton, makeStyles, Menu, MenuItem, Paper, Theme } from '@material-ui/core';
 import PrintIcon from '@material-ui/icons/Print';
-import { Booking, BookingCategory, BookingVersion } from '../../model/Booking';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
-import firebase from '../../firebase';
 import ActingAs from '../../contexts/ActingAs';
-import WatchersDialog from '../watchers/WatchersDialog';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
-import useUser from '../../hooks/useUser';
-import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
-import { useSnackbar } from 'notistack';
-import WatcherIconButton from '../watchers/WatcherIconButton';
-import WarningIcon from '@material-ui/icons/Warning';
-import useTasksPerBooking from '../../hooks/useTasksPerBooking';
-import { GlobalContext } from '../../store/GlobalStore';
-import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import map from 'lodash/fp/map';
-import { flow } from 'lodash/fp';
-import update from 'lodash/fp/update';
-import invoke from 'lodash/fp/invoke';
 import Page from '../bookings/Page';
-import { addActivityItem } from '../bookings/checklist/ActivityLogContainer';
-import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
-import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
-import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
-import { normalizePaymentActivityData } from '../bookings/documentApproval/ComparisonDialogContent';
 import brunoniLogo from '../../assets/logo.brunoni.svg';
 import allmarineLogo from '../../assets/logo.allmarine.png';
 import { BookingRequest } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
+import BookingRequestCheckList from './checklist/BookingRequestChecklist';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -93,20 +58,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginBottom: theme.spacing(0),
     },
   },
-  tableWrapper: {
-    overflowX: 'auto',
-    ['@media print']: {
-      width: '30%',
-    },
-  },
   actions: {
     '& > *': {
       marginLeft: theme.spacing(1),
-    },
-  },
-  hidePrint: {
-    ['@media print']: {
-      display: 'none',
     },
   },
 }));
@@ -127,71 +81,12 @@ function ScrollToTopOnMount() {
   return null;
 }
 
-// export const isLongVersion = (version: BookingVersion) => {
-//   return version === 'Long';
-// };
-//
-// export const isImport = (category: BookingCategory) => {
-//   return category === BookingCategory.Import;
-// };
-//
-// const handleWatch = (id: string, watchers: UserRecord[]) =>
-//   firebase
-//     .firestore()
-//     .collection('bookings')
-//     .doc(id)
-//     .update(
-//       'watchers',
-//       watchers.map(item => pick(UserRecordMinProperties)(item)),
-//     );
-
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
-  // const isAdmin = !actingAs;
   const classes = useStyles();
-  // const userRecord = useUser()[1];
-  // const { enqueueSnackbar } = useSnackbar();
-  // const [, dispatch] = useContext(GlobalContext);
+
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
-  // const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
-
-  // const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
-
-  // const pinnedActivities = useFirestoreCollection(
-  //   'bookings',
-  //   useCallback(
-  //     query => {
-  //       const queryByAdminRole = isAdmin ? query : query.where('isInternal', '==', isAdmin);
-  //       return queryByAdminRole.where('isPinned', '==', true).orderBy('at', 'desc');
-  //     },
-  //     [isAdmin],
-  //   ),
-  //   bookingRequest.id,
-  //   'activity',
-  // )?.docs.map(doc => ({
-  //   id: doc.id,
-  //   ...doc.data(),
-  // }));
-  // const normalizedPinnedActivities = useMemo(
-  //   () =>
-  //     map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
-  //       pinnedActivities,
-  //     ) as ActivityLogItem[],
-  //   [pinnedActivities],
-  // );
-
-  // const getActivityLogUserData = useCallback(
-  //   (): ActivityLogUserData =>
-  //     ({
-  //       firstName: userRecord?.firstName,
-  //       lastName: userRecord?.lastName,
-  //       alphacomClientId: userRecord?.alphacomClientId,
-  //       alphacomId: userRecord?.alphacomId,
-  //       emailAddress: userRecord?.emailAddress,
-  //     } as ActivityLogUserData),
-  //   [userRecord],
-  // );
 
   const onArchiveClick = useCallback(() => {
     // firebase
@@ -211,34 +106,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // }
   }, [bookingRequest]);
 
-  // const onWatch = useCallback(
-  //   (isWatching: boolean) => {
-  // handleWatch(
-  //   bookingRequest.id,
-  //   isWatching
-  //     ? bookingRequest.watchers.filter(u => u.alphacomId !== userRecord.alphacomId)
-  //     : [...(bookingRequest.watchers || []), userRecord],
-  // )
-  //   .then(_ => {
-  //     dispatch({
-  //       type: SHOW_SUCCESS_SNACKBAR,
-  //       message: isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
-  //     });
-  //     return addActivityItem(
-  //       bookingRequest!.id,
-  //       createActivityObject({
-  //         changeType: isWatching ? ActivityChangeType.UNSET_WATCHING : ActivityChangeType.SET_WATCHING,
-  //         by: getActivityLogUserData(),
-  //       }),
-  //     );
-  //   })
-  //   .then(() => {
-  //     console.log(isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!');
-  //   })
-  //   .catch(err => console.log(err));
-  //   },
-  //   [bookingRequest.id, userRecord, enqueueSnackbar, dispatch],
-  // );
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClickMenu = (event: any) => {
@@ -256,15 +123,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {/*{normalizedPinnedActivities === undefined && (*/}
-      {/*  <Grid item xs={12} md={11}>*/}
-      {/*    <Box displayPrint="none" display="flex" justifyContent="center" height={78}>*/}
-      {/*      <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>*/}
-      {/*        <CircularProgress style={{ margin: 'auto' }} />*/}
-      {/*      </Paper>*/}
-      {/*    </Box>*/}
-      {/*  </Grid>*/}
-      {/*)}*/}
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <ScrollToTopOnMount />
@@ -311,18 +169,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                   </Fragment>
                 )}
 
-                {/*{actingAs === null &&*/}
-                {/*(isDashboardUser(userRecord) || bookingRequest.assignedUser.alphacomId === userRecord.alphacomId) ? (*/}
-                {/*  <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>*/}
-                {/*    <SupervisedUserCircleIcon />*/}
-                {/*  </IconButton>*/}
-                {/*) : (*/}
-                {/*  <WatcherIconButton*/}
-                {/*    isWatching={bookingRequest.watchers?.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}*/}
-                {/*    handleWatch={onWatch}*/}
-                {/*  />*/}
-                {/*)}*/}
-
                 <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
                   <PrintIcon />
                 </IconButton>
@@ -357,7 +203,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       </Grid>
       <Grid item md={4} xs={12}>
         <Box id="checklistBkg" displayPrint="none">
-          {/*<CheckList booking={booking} onTabChange={setSelectedTab} tasks={tasks} />*/}
+          <BookingRequestCheckList bookingRequest={bookingRequest} />
         </Box>
       </Grid>
     </Grid>

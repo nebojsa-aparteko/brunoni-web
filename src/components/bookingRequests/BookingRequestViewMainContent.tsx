@@ -18,6 +18,7 @@ import BookingRequestSummary from './BookingRequestSummary';
 import useUser from '../../hooks/useUser';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import invoke from 'lodash/fp/invoke';
+import IMO from '../../model/IMO';
 
 export const remark = {
   special: 'SPECIAL REMARKS',
@@ -40,17 +41,17 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
   // const bookingAgent = useUserByAlphacomId(bookingRequest?.BkgAgentContact || undefined);
   const classes = useStyles();
   const [, userRecord] = useUser();
-
-  const specialRemarks: Remark[] = useMemo(
-    () =>
-      bookingRequest
-        ? flow(
-            get('Remarks'),
-            filter((item: Remark) => item.RemarkType === remark.special),
-          )(bookingRequest)
-        : [],
-    [bookingRequest],
-  );
+  console.log(bookingRequest.containers);
+  // const specialRemarks: Remark[] = useMemo(
+  //   () =>
+  //     bookingRequest
+  //       ? flow(
+  //           get('Remarks'),
+  //           filter((item: Remark) => item.RemarkType === remark.special),
+  //         )(bookingRequest)
+  //       : [],
+  //   [bookingRequest],
+  // );
 
   return (
     <Page title={getBookingRequestTitle(bookingRequest)}>
@@ -63,12 +64,16 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
         </Box>
         {bookingRequest.containers?.map(container => (
           <Typography>
-            {`${container.quantity} x ${container.containerType?.description} - ${container.commodityType?.name} (${
-              container.pickupLocation?.city
-            }, ${container.pickupLocation?.countryCode} - ${formatDateSafe(
-              invoke('toDate')(container.pickupDate),
-              DateFormats.LONG,
-            )})`}
+            {`${container.quantity} x ${container.containerType?.description}`}
+            {container.commodityType && ` - ${container.commodityType?.name}`}
+            {container.pickupLocation &&
+              ` (${container.pickupLocation?.city}, ${container.pickupLocation?.countryCode} - ${formatDateSafe(
+                invoke('toDate')(container.pickupDate),
+                DateFormats.LONG,
+              )})`}
+            {container.imo &&
+              container.imo.length > 0 &&
+              container.imo.map((imoItem: IMO) => `(${imoItem.IMOClass} - ${imoItem.PGNumber} - ${imoItem.UNNumber} )`)}
           </Typography>
         ))}
         {/*<ContainerDetails*/}

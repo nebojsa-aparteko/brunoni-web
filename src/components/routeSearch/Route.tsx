@@ -50,6 +50,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 interface Props {
   route?: RouteSearchResult;
+  isPicker?: boolean;
+  handleBookNow?: (schedule?: RouteSearchResult) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -90,7 +92,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.LONG);
 
-const Route: React.FC<Props> = ({ route }) => {
+const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const classes = useStyles();
   const theme = useTheme();
   const carriers = useContext(Carriers);
@@ -144,7 +146,6 @@ const Route: React.FC<Props> = ({ route }) => {
     setMoreAnchorEl(null);
   };
 
-  console.log('Route ', route);
   const buildMailToLink = (route: RouteSearchResult | undefined) => {
     if (route) {
       const mailtoAddress =
@@ -320,7 +321,12 @@ const Route: React.FC<Props> = ({ route }) => {
               >
                 <Box>
                   {route &&
-                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 4) && (
+                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 4) &&
+                    (isPicker && handleBookNow ? (
+                      <Button color="primary" variant="contained" size="small" onClick={() => handleBookNow(route)}>
+                        Book Now
+                      </Button>
+                    ) : (
                       <Fragment>
                         <IconButton aria-label="actions" onClick={onMoreButtonClick}>
                           <MoreVertIcon />
@@ -372,7 +378,7 @@ const Route: React.FC<Props> = ({ route }) => {
                           </MenuItem>
                         </Menu>
                       </Fragment>
-                    )}
+                    ))}
                 </Box>
 
                 <Box>

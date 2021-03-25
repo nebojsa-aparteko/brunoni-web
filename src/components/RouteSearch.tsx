@@ -23,8 +23,17 @@ import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import SpecialOffers from './SpecialOffers';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
+import Port from '../model/Port';
+import set from 'lodash/fp/set';
+import Carrier from '../model/Carrier';
 
-interface Props {}
+interface Props {
+  isPicker?: boolean;
+  origin?: Port;
+  destination?: Port;
+  handleBookNow?: (schedule?: RouteSearchResult) => void;
+  carrier?: Carrier;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   containerRoot: {
@@ -46,6 +55,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingBottom: theme.spacing(10),
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
+  },
+  heroPicker: {
+    '> .sticky-outer-wrapper > .sticky-inner-wrapper': {
+      display: 'flex',
+    },
+    position: 'sticky',
+    top: 0,
+    width: '100%',
+    zIndex: 100,
   },
   content: {
     marginTop: theme.spacing(2),
@@ -77,13 +95,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSearch: React.FC<Props> = () => {
+const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBookNow, carrier }) => {
   const classes = useStyles();
 
   const [params, setParams] = useContext(RouteSearchContext);
   const [sorting, setSorting] = useState<Sorting>(sortingOptions[0]);
   const [carrierFilter, setCarrierFilter] = useState(
-    isObject(params.carrier) ? (params.carrier as any).name : params.carrier,
+    carrier?.name || (isObject(params.carrier) ? (params.carrier as any).name : params.carrier),
   );
   const [visibility, setVisibility] = useState(false);
 
@@ -101,6 +119,9 @@ const RouteSearch: React.FC<Props> = () => {
 
   const [user, userData] = useUser();
 
+  useEffect(() => {
+    setParams({ ...params, originPort: origin, destinationPort: destination });
+  }, []);
   useEffect(() => {
     if (!busy || error || result) {
       return;
@@ -196,13 +217,9 @@ const RouteSearch: React.FC<Props> = () => {
     }
   };
 
-  // const handleFiltersChange = (carrier: string | undefined) => {
-  //   setCarrierFilter(carrierFilterFn(carrier));
-  // };
-
   return (
     <Fragment>
-      <Box className={classes.hero}>
+      <Box className={isPicker ? classes.heroPicker : classes.hero}>
         <Sticky enabled={true} top={0} innerZ={3} onStateChange={handleStateChange}>
           <Paper square className={handleVisibility(visibility)}>
             <Container className={classes.containerRoot}>
@@ -222,12 +239,14 @@ const RouteSearch: React.FC<Props> = () => {
             <SearchEmptyResults />
           ) : (
             <Grid container spacing={4}>
-              <Grid item md={3} xs={12}>
-                <Paper className={classes.sidebar}>
-                  <RouteSearchFilters only={carriers} value={carrierFilter} onChange={setCarrierFilter} />
-                </Paper>
-              </Grid>
-              <Grid item md={9}>
+              {!carrier && (
+                <Grid item md={3} xs={12}>
+                  <Paper className={classes.sidebar}>
+                    <RouteSearchFilters only={carriers} value={carrierFilter} onChange={setCarrierFilter} />
+                  </Paper>
+                </Grid>
+              )}
+              <Grid item md={carrier ? 12 : 9}>
                 <Grid container>
                   <Grid item xs={12}>
                     <Paper className={classes.sorting}>
@@ -236,17 +255,25 @@ const RouteSearch: React.FC<Props> = () => {
                   </Grid>
 
                   <Grid item xs={12}>
-                    {results ? results.Routes.map((route, i) => <Route key={i} route={route} />) : <Route />}
+                    {results ? (
+                      results.Routes.map((route, i) => (
+                        <Route key={i} route={route} isPicker={isPicker} handleBookNow={handleBookNow} />
+                      ))
+                    ) : (
+                      <Route />
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
           )
         ) : (
-          <Fragment>
-            <SpecialOffers />
-            <SearchHowTo />
-          </Fragment>
+          !isPicker && (
+            <Fragment>
+              <SpecialOffers />
+              <SearchHowTo />
+            </Fragment>
+          )
         )}
       </Container>
     </Fragment>

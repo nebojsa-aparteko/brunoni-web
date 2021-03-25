@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -20,7 +20,6 @@ import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
-import Client from '../../model/Client';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { TabPanel } from '../../pages/BookingsPage';
 import { isNil, omitBy } from 'lodash/fp';
@@ -34,6 +33,7 @@ import useUser from '../../hooks/useUser';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import firebase from '../../firebase';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -59,16 +59,35 @@ const createRequest = (bookingRequest: BookingRequest) => {
 
 const ShippingInfo = (
   quote: Quote | undefined,
-  client: Client | undefined,
+  schedule: RouteSearchResult | undefined,
   handleNext: () => void,
   bookingRequest: BookingRequest | undefined,
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
 ) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
-  const [originPort, setOriginPort] = useState<Port | undefined>(quote ? quote.origin : undefined);
-  const [destinationPort, setDestinationPort] = useState<Port | undefined>(quote ? quote.destination : undefined);
-  const [carrier, setCarrier] = useState<Carrier | undefined>(quote ? quote.carrier : undefined);
+  const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
+
+  const scheduleCarrier = useMemo(
+    () =>
+      carriers?.find(carrier => carrier.name.toLowerCase() === carrierName) ||
+      carriers?.find(carrier => carrier.id.toLowerCase() === carrierName),
+    [carrierName, carriers],
+  );
+
+  const [originPort, setOriginPort] = useState<Port | undefined>(
+    schedule && ports ? ports?.find(port => port.id === schedule.OriginInfo.Port.ID) : quote ? quote.origin : undefined,
+  );
+  const [destinationPort, setDestinationPort] = useState<Port | undefined>(
+    schedule && ports
+      ? ports?.find(port => port.id === schedule.DestinationInfo.Port.ID)
+      : quote
+      ? quote.destination
+      : undefined,
+  );
+  const [carrier, setCarrier] = useState<Carrier | undefined>(
+    scheduleCarrier ? scheduleCarrier : quote ? quote.carrier : undefined,
+  );
   const [customerReference, setCustomerReference] = useState<string | undefined>();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -81,6 +100,7 @@ const ShippingInfo = (
         carrier: carrier,
         quoteNumber: quote ? quote.id : undefined,
         customerReference: customerReference,
+        schedule: schedule,
       }) as BookingRequest,
     );
     handleNext();
@@ -251,7 +271,7 @@ const AdditionalInfo = (
       additionalInfo: additionalInfo,
       createdAt: new Date(),
       createdBy: getShortUserData(),
-      status: BookingRequestStatus.CREATED,
+      status: BookingRequestStatus.REQUESTED,
     };
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest as BookingRequest);
@@ -326,9 +346,10 @@ const OnlineBookingContainer = () => {
   const quoteJson = localStorage.getItem('quote');
   const [quote] = React.useState(quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined);
 
-  const clientJson = localStorage.getItem('client');
-  const [client] = React.useState(clientJson ? (JSON.parse(clientJson) as Client) : undefined);
   const [bookingRequest, setBookingRequest] = useState<BookingRequest | undefined>();
+
+  const scheduleJson = localStorage.getItem('schedule');
+  const [schedule] = React.useState(scheduleJson ? (JSON.parse(scheduleJson) as RouteSearchResult) : undefined);
 
   const steps = getSteps();
 
@@ -352,7 +373,7 @@ const OnlineBookingContainer = () => {
         </Stepper>
         <Box p={3} className={classes.content}>
           <TabPanel value={activeStep} index={0}>
-            {ShippingInfo(quote, client, handleNext, bookingRequest, setBookingRequest)}
+            {ShippingInfo(quote, schedule, handleNext, bookingRequest, setBookingRequest)}
           </TabPanel>
           <TabPanel value={activeStep} index={1}>
             {CargoInfo(quote, handleNext, handleBack, bookingRequest, setBookingRequest)}

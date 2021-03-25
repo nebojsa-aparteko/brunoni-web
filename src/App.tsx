@@ -100,6 +100,7 @@ const userRoutes = (
     <Route exact path="/quotes/get" component={GetQuotes} />
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
     <Route exact path="/online-booking" component={OnlineBookingPage} />
+    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />

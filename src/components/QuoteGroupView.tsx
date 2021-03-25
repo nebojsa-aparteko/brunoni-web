@@ -61,6 +61,8 @@ import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
 import { useHistory } from 'react-router';
+import SchedulePicker from './bookingRequests/SchedulePicker';
+import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 
 interface Props {
   id: string;
@@ -129,6 +131,7 @@ interface ActionButtonsProps {
 const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
   const history = useHistory();
 
   const [user, userData] = useUser();
@@ -142,14 +145,28 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
     setMoreAnchorEl(null);
   };
 
-  const handleBookNow = () => {
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleDialogOpen = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('quote', JSON.stringify(quote));
-    localStorage.setItem('client', JSON.stringify(client));
+    localStorage.setItem('schedule', JSON.stringify(schedule));
     history.push('/online-booking');
   };
 
   return (
     <Box display="flex" alignItems="center" justifyContent="center" className={classes.buttons}>
+      <SchedulePicker
+        isOpen={isDialogOpen}
+        handleClose={handleDialogClose}
+        quote={quote}
+        handleBookNow={handleBookNow}
+      />
       <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
         View more
       </Button>
@@ -157,7 +174,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         color="primary"
         variant="contained"
         size="small"
-        onClick={handleBookNow}
+        onClick={handleDialogOpen}
         // href={buildMailToLink(quote, [user, userData, client])}
         // target="_blank"
       >

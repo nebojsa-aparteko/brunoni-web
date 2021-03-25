@@ -10,7 +10,7 @@ export interface BookingRequest {
   carrier?: Carrier;
   quoteNumber?: number;
   customerReference?: string;
-  containers?: (Container & ContainerDetails)[];
+  containers?: any[];
   additionalInfo?: string;
   imo?: boolean;
   soc?: boolean;
@@ -20,7 +20,7 @@ export interface BookingRequest {
 }
 
 export enum BookingRequestStatus {
-  CREATED = 'Created',
+  REQUESTED = 'Requested',
   IN_PROGRESS = 'In Progress',
   CONFIRMED = 'Confirmed',
 }
