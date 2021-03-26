@@ -236,7 +236,15 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           label="This container contains IMO"
           ItemInput={IMOListInput}
           defaultItemValue={[]}
-          value={value.imo}
+          value={
+            value.imo && value.imo.length > 0 && typeof value.imo[0] !== 'boolean'
+              ? value.imo
+                ? value.imo.length > 0
+                  ? [true, (value.imo as unknown) as IMO[]]
+                  : [false]
+                : [false]
+              : value.imo || [false]
+          }
           onChange={handleIMOChange}
         />
         {(value.containerType || {}).couldBeOversize && (
@@ -244,7 +252,15 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             label="This container is out of gauge"
             ItemInput={OOGListInput}
             defaultItemValue={[]}
-            value={value.oog}
+            value={
+              value.oog && value.oog.length > 0 && typeof value.oog[0] !== 'boolean'
+                ? value.oog
+                  ? value.oog.length > 0
+                    ? [true, (value.oog as unknown) as OOG[]]
+                    : [false]
+                  : [false]
+                : value.oog || [false]
+            }
             onChange={handleOOGChange}
           />
         )}

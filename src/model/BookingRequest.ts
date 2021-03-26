@@ -1,7 +1,6 @@
 import Port from './Port';
 import Carrier from './Carrier';
-import Container from './Container';
-import ContainerDetails from './ContainerDetails';
+import { RouteSearchResult } from './route-search/RouteSearchResults';
 
 export interface BookingRequest {
   id?: string;
@@ -17,6 +16,7 @@ export interface BookingRequest {
   createdAt?: Date;
   createdBy?: any;
   status: BookingRequestStatus;
+  schedule?: RouteSearchResult;
 }
 
 export enum BookingRequestStatus {

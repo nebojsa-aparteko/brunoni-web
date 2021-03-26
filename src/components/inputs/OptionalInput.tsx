@@ -40,7 +40,7 @@ function OptionalInput<T>({ label, itemRef, ItemInput, defaultItemValue, value, 
 
   return (
     <Box>
-      <FormControlLabel control={<Checkbox checked={value[0]} onChange={handleChange} />} label={label} />
+      <FormControlLabel control={<Checkbox checked={value && value[0]} onChange={handleChange} />} label={label} />
       {value[0] && (
         <Box>
           <ItemInput ref={ref} value={value[1]} onChange={handleItemChange} />

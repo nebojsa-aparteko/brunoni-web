@@ -3,7 +3,6 @@ import { renderToString } from 'react-dom/server';
 import {
   Box,
   Button,
-  Chip,
   Divider,
   ExpansionPanel,
   ExpansionPanelActions,
@@ -19,19 +18,10 @@ import {
   useTheme,
 } from '@material-ui/core';
 import formatDate from 'date-fns/format';
-import ItineraryItem from '../ItineraryItem';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import Stepper from '@material-ui/core/Stepper';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-import WavesIcon from '@material-ui/icons/Waves';
-import InfoBoxItem from '../InfoBoxItem';
-import TextSkeleton from '../TextSkeleton';
 
 import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 import Carriers from '../../contexts/Carriers';
-import { Skeleton } from '@material-ui/lab';
-import ShareIcon from '@material-ui/icons/Share';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link as RouterLink } from 'react-router-dom';
@@ -46,7 +36,9 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import { DateFormats } from '../../utilities/formattingHelpers';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import RouteDeadlines from './RouteDeaadlines';
+import RouteItinerary from './RouteItinerary';
+import RouteSummary from './RouteSummary';
 
 interface Props {
   route?: RouteSearchResult;
@@ -90,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.LONG);
+export const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.LONG);
 
 const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const classes = useStyles();
@@ -194,122 +186,7 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
         >
           <Grid container spacing={2}>
             <Grid item xs={10}>
-              <Grid container spacing={2}>
-                <Grid item md={6} xs={12}>
-                  <Typography variant="subtitle2" display="block" gutterBottom>
-                    <Box fontWeight="fontWeightBold">Carrier</Box>
-                  </Typography>
-                  <Typography variant="h5" display="block">
-                    <Box display="flex" alignItems="center" lineHeight="normal">
-                      {carrier ? (
-                        <Fragment>
-                          <FiberManualRecordIcon className={classes.carrierAvatar} style={{ color: carrier!.color }} />
-                          <span>{carrier.name.toUpperCase()}</span>
-                        </Fragment>
-                      ) : route ? (
-                        <Fragment>
-                          <Skeleton variant="circle" className={classes.carrierAvatar} />
-                          <span>{route!.OriginInfo.VoyageInfo.Carrier}</span>
-                        </Fragment>
-                      ) : (
-                        <Fragment>
-                          <Skeleton variant="circle" className={classes.carrierAvatar} />
-                          <TextSkeleton width={[60, 90]} />
-                        </Fragment>
-                      )}
-                    </Box>
-                  </Typography>
-                </Grid>
-                <Grid item md={3} xs={12}>
-                  <InfoBoxItem
-                    title="Vessel"
-                    label1={route?.OriginInfo.VoyageInfo.VesselName}
-                    label2={route?.OriginInfo.VoyageInfo.VoyageNr}
-                    gutterBottom
-                  />
-                </Grid>
-                {route?.SpaceInfo && (
-                  <Grid item md={3} xs={12}>
-                    <Typography variant="subtitle2" display="block" gutterBottom>
-                      <Box fontWeight="fontWeightBold">Space Availability</Box>
-                    </Typography>
-                    <Chip
-                      size="small"
-                      label={route?.SpaceInfo}
-                      style={{ backgroundColor: route?.SpaceInfoColor }}
-                      className={classes.chip}
-                    />
-                  </Grid>
-                )}
-
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-
-                <Grid item md={3} sm={12} xs={12}>
-                  <InfoBoxItem
-                    IconComponent={ChevronRightIcon}
-                    title="Departure"
-                    label1={
-                      route ? (
-                        `
-  ETS ${formatDateString(route!.OriginInfo.DepartureDate)}`
-                      ) : (
-                        <TextSkeleton width={100} />
-                      )
-                    }
-                    label2={
-                      route ? (
-                        `${route!.OriginInfo.Port.HarbourName}, ${route!.OriginInfo.Port.Land}`
-                      ) : (
-                        <TextSkeleton width={[80, 120]} />
-                      )
-                    }
-                  />
-                </Grid>
-                <Grid item md={3} sm={12} xs={12}>
-                  <InfoBoxItem
-                    IconComponent={LastPageIcon}
-                    title="Arrival"
-                    label1={
-                      route ? (
-                        `
-  ETA ${formatDateString(route!.DestinationInfo.ArrivalDate)}`
-                      ) : (
-                        <TextSkeleton width={100} />
-                      )
-                    }
-                    label2={
-                      route ? (
-                        `${route!.DestinationInfo.Port.HarbourName}, ${route!.DestinationInfo.Port.Land}`
-                      ) : (
-                        <TextSkeleton width={[80, 120]} />
-                      )
-                    }
-                  />
-                </Grid>
-                <Grid item md={3} sm={6} xs={12}>
-                  <InfoBoxItem
-                    IconComponent={WavesIcon}
-                    title="Transit Time"
-                    label1={
-                      route ? (
-                        `${route!.TransitTime}
-  DAYS`
-                      ) : (
-                        <TextSkeleton width={70} />
-                      )
-                    }
-                  />
-                </Grid>
-                <Grid item md={3} sm={6} xs={12}>
-                  <InfoBoxItem
-                    IconComponent={ShareIcon}
-                    title="Routing"
-                    label1={route ? route!.Routing : <TextSkeleton width={[50, 80]} />}
-                  />
-                </Grid>
-              </Grid>
+              {route && <RouteSummary route={route} />}
             </Grid>
             <Grid item xs={2} className={classes.actionBarGridItem}>
               <Box
@@ -394,28 +271,12 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
         {route && (
           <Fragment>
             <ExpansionPanelDetails className={classes.expansionPanel}>
-              {/* Deadlines Display */}
               <Grid container>
                 <Grid item container xs={12} spacing={2} className={classes.deadlines}>
-                  {route!.Deadlines.map((deadline, i) => (
-                    <Grid key={i} item md={4} sm={4}>
-                      <InfoBoxItem
-                        title={`${deadline.Typ}
-  closing`}
-                        label1={deadline.Time}
-                      />
-                    </Grid>
-                  ))}
+                  <RouteDeadlines route={route} />
                 </Grid>
-                {/* Itinerary */}
                 <Grid item xs={12}>
-                  <Stepper orientation="vertical" className={classes.stepper}>
-                    {route!.OriginInfo && <ItineraryItem noLine={false} itineraryItem={route!.OriginInfo} />}
-                    {route!.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                      <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
-                    ))}
-                    {route!.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route!.DestinationInfo} />}
-                  </Stepper>
+                  <RouteItinerary route={route} />
                 </Grid>
               </Grid>
             </ExpansionPanelDetails>
