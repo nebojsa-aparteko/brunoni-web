@@ -1,12 +1,11 @@
-import { Booking } from '../../model/Booking';
 import UserRecord from '../../model/UserRecord';
 import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
 import React, { Fragment, useMemo } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import { BookingRequest } from '../../model/BookingRequest';
+import { ClientDetails } from '../bookings/BookingSummary';
 
 interface Props {
   bookingRequest: BookingRequest;
@@ -85,31 +84,6 @@ interface TableRowProps {
   className?: any;
 }
 
-export const ClientDetails: React.FC<{
-  forwarder: UserRecord | null | undefined;
-  forwarderText: string | null;
-  bkgRef: string;
-}> = ({ forwarder, bkgRef, forwarderText }) => {
-  const forwarderEmail = forwarder ? forwarder?.emailAddress : null;
-  const forwarderFullName = forwarder ? `${forwarder?.firstName} ${forwarder?.lastName}` : null;
-  return (
-    <Typography variant="body2">
-      {forwarder ? (
-        <span>
-          {forwarder?.emailAddress ? (
-            <a href={'mailto:' + forwarderEmail}>{forwarderFullName || forwarderEmail?.toUpperCase()}</a>
-          ) : (
-            forwarderFullName || ' '
-          )}
-        </span>
-      ) : (
-        <span>{forwarderText}</span>
-      )}
-      ({'REF. ' + bkgRef})
-    </Typography>
-  );
-};
-
 const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
@@ -123,6 +97,8 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }) => {
   const classes = useStyles();
   const client = useClientById(bookingRequest.createdBy.alphacomClientId);
+  const forwarder = useUserByAlphacomId(bookingRequest.createdBy.alphacomId);
+
   const clientInfo = useMemo(() => {
     if (!client) {
       return `${bookingRequest.createdBy.firstName || ''}`;
@@ -131,7 +107,7 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }
     return (
       <Fragment>
         {client.name}, {client.city}
-        {/*<ClientDetails forwarder={forwarder} forwarderText={bookingRequest.ForwarderPersTxt} bkgRef={bookingRequest['Cust-BkgRef']} />*/}
+        <ClientDetails forwarder={forwarder} />
       </Fragment>
     );
   }, [client, bookingRequest]);
@@ -149,34 +125,45 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }
 
             <TableRowData
               label={'Vessel'}
-              content={
-                'Vessel and Voyage Info'
-                // [bookingRequest.Vessel, bookingRequest.Voyage].join(' VOY. ')
-              }
+              content={[
+                bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
+                bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+              ].join(' VOY. ')}
             />
+            {/*TODO add rules to determine which of the following exist Place of Receipt, Port of Loading, Port of Discharge and Place of Delivery */}
+            {bookingRequest.schedule?.OriginInfo && (
+              <TableRowData
+                label={'Place of Receipt'}
+                content={[
+                  bookingRequest.schedule?.OriginInfo.Port.HarbourName,
+                  bookingRequest.schedule?.OriginInfo.DepartureDate,
+                ].join('<br/>ETS: ')}
+              />
+            )}
 
-            {/*{bookingRequest.placeOfReceipt !== bookingRequest.PlaceOfRecieptName ? (*/}
-            <TableRowData
-              label={'Place of Receipt'}
-              content={['Place of receipt name', 'Place of receipt ETS'].join('<br/>ETS: ')}
-            />
-            {/*) : null}*/}
+            {bookingRequest.schedule?.IntermediatePortInfos &&
+              bookingRequest.schedule?.IntermediatePortInfos.length > 0 && (
+                <>
+                  <TableRowData
+                    label={'Port of Loading'}
+                    content={['Port of loading name', 'Port of landing ETS'].join('<br/>ETS: ')}
+                  />
+                  <TableRowData
+                    label={'Port of Discharge'}
+                    content={['Port of discharge name', 'Port of discharge ETA'].join('<br/>ETA: ')}
+                  />
+                </>
+              )}
 
-            <TableRowData
-              label={'Port of Loading'}
-              content={['Port of landing name', 'Port of landing ETS'].join('<br/>ETS: ')}
-            />
-            <TableRowData
-              label={'Port of Discharge'}
-              content={['Port of discharge name', 'Port of discharge ETA'].join('<br/>ETA: ')}
-            />
-
-            {/*{bookingRequest.PODName !== bookingRequest.FinalDestinationName ? (*/}
-            <TableRowData
-              label={'Place of Delivery'}
-              content={['Place of delivery name', 'Port of delivery ETA'].join('<br/>ETA: ')}
-            />
-            {/*) : null}*/}
+            {bookingRequest.schedule?.DestinationInfo && (
+              <TableRowData
+                label={'Place of Delivery'}
+                content={[
+                  bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
+                  bookingRequest.schedule?.DestinationInfo.ArrivalDate,
+                ].join('<br/>ETA: ')}
+              />
+            )}
           </TableBody>
         </Table>
       </Grid>

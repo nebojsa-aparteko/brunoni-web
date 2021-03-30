@@ -5,7 +5,7 @@ import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../../components/dashboard/ChartsCircularProgress';
 import { BookingRequest } from '../../model/BookingRequest';
 import BookingRequestView from './BookingRequestView';
-import { normalizeBooking } from '../../providers/BookingsProvider';
+import { normalizeBookingRequest } from '../../providers/BookingRequestsProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -26,7 +26,7 @@ const BookingRequestContainer: React.FC<Props> = ({ match }) => {
     ? ({ id: bookingRequestSnapshot.id, ...bookingRequestSnapshot.data() } as BookingRequest)
     : undefined;
 
-  const bookingRequest = useMemo(() => (bookingRequestDoc ? normalizeBooking(bookingRequestDoc) : undefined), [
+  const bookingRequest = useMemo(() => (bookingRequestDoc ? normalizeBookingRequest(bookingRequestDoc) : undefined), [
     bookingRequestDoc,
   ]);
 

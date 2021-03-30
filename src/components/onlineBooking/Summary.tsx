@@ -9,10 +9,7 @@ import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
 import RouteSummary from '../routeSearch/RouteSummary';
-import InfoBoxItem from '../InfoBoxItem';
-import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
-import IMO from '../../model/IMO';
-import OOG from '../../model/OOG';
+import ContainersList from './ContainersList';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -87,60 +84,13 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
           </Grid>
           {bookingRequest.containers && (
             <>
-              <Grid container item xs={12} title={'Containers'}>
-                {bookingRequest.containers.map(container => (
-                  <Grid item xs={4}>
-                    <InfoBoxItem
-                      title={
-                        <>
-                          {`${container.quantity} x ${container.containerType?.description}`}
-                          {container.commodityType && ` - ${container.commodityType?.name}`}
-                        </>
-                      }
-                      label1={
-                        <>
-                          {(container.pickupLocation || container.pickupDate) && ` (`}
-                          {container.pickupLocation &&
-                            `${container.pickupLocation?.city}, ${container.pickupLocation?.countryCode}`}
-                          {container.pickupDate &&
-                            ` - ${formatDateSafe(container.pickupDate as Date, DateFormats.LONG)}`}
-                          {(container.pickupLocation || container.pickupDate) && `)`}
-                        </>
-                      }
-                      label2={
-                        <>
-                          {container.containerType &&
-                            container.containerType?.description &&
-                            container.containerType?.description.includes('S.O.') &&
-                            'Container is shipper owned'}
-                          {container.imo &&
-                            container.imo.length > 0 &&
-                            container.imo.map(
-                              (imoItem: IMO) =>
-                                `(${'IMO Class: ' + imoItem.IMOClass} - ${'PG Number: ' +
-                                  imoItem.PGNumber} - ${'UN Number: ' + imoItem.UNNumber} )`,
-                            )}
-                          {container.oog &&
-                            container.oog.length > 0 &&
-                            container.oog.map(
-                              (oogItem: OOG) =>
-                                `(${'Length: ' + oogItem.length} - ${'Width: ' + oogItem.width} - ${'Height: ' +
-                                  oogItem.height} - ${'Weight: ' + oogItem.weight})`,
-                            )}
-                        </>
-                      }
-                      gutterBottom
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+              <ContainersList containers={bookingRequest?.containers} />
               <Grid item xs={12}>
                 <Divider />
               </Grid>
             </>
           )}
           <Grid container item xs={8}>
-            {/*<Container maxWidth={"sm"}>*/}
             <Grid item container xs={12} spacing={2} className={classes.deadlines}>
               <RouteDeadlines route={bookingRequest.schedule} />
             </Grid>

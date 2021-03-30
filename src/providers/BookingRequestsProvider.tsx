@@ -8,12 +8,16 @@ import invoke from 'lodash/fp/invoke';
 import ActingAs from '../contexts/ActingAs';
 import firebase from '../firebase';
 import { BookingRequest } from '../model/BookingRequest';
+import safeInvoke from '../utilities/safeInvoke';
 
 interface Props {
   children: React.ReactNode;
 }
 
-export const normalizeBookingRequest = flow(update('createdAt', invoke('toDate')));
+export const normalizeBookingRequest = flow(
+  update('createdAt', invoke('toDate')),
+  update('containers', flow(map(flow(update('pickupDate', safeInvoke('toDate')))))),
+);
 
 export const normalizeBookingRequests = map(normalizeBookingRequest);
 

@@ -86,9 +86,10 @@ interface TableRowProps {
 
 export const ClientDetails: React.FC<{
   forwarder: UserRecord | null | undefined;
-  forwarderText: string | null;
-  bkgRef: string;
+  forwarderText?: string | null;
+  bkgRef?: string;
 }> = ({ forwarder, bkgRef, forwarderText }) => {
+  console.log(forwarder);
   const forwarderEmail = forwarder ? forwarder?.emailAddress : null;
   const forwarderFullName = forwarder ? `${forwarder?.firstName} ${forwarder?.lastName}` : null;
   return (
@@ -102,9 +103,9 @@ export const ClientDetails: React.FC<{
           )}
         </span>
       ) : (
-        <span>{forwarderText}</span>
+        forwarderText && <span>{forwarderText}</span>
       )}
-      ({'REF. ' + bkgRef})
+      {bkgRef && <span>{'REF. ' + bkgRef}</span>}
     </Typography>
   );
 };
