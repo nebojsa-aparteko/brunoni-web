@@ -1,45 +1,139 @@
-import { useMemo } from 'react';
-import useFirestoreCollection from './useFirestoreCollection';
-import firebase from 'firebase';
+import { useEffect, useMemo, useState } from 'react';
 import { EquipmentExportSummary, EquipmentImportSummary } from '../model/EquipmentControl';
 import { useEquipmentControlFilterProviderContext } from '../providers/EquipmentControlFilterProvider';
-import { BookingCategory } from '../model/Booking';
-import { addWeeks, getWeek, getYear } from 'date-fns';
+import { BookingCategory, BookingVersion } from '../model/Booking';
+import useUser from './useUser';
+import { flatMap } from 'lodash';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
 ): T extends BookingCategory.Export ? EquipmentExportSummary[] : EquipmentImportSummary[] {
   const [filters] = useEquipmentControlFilterProviderContext();
-  const query = useMemo(
-    () => (collection: firebase.firestore.Query) => {
-      let query = collection;
-      query = query.where(firebase.firestore.FieldPath.documentId(), '!=', '0');
-      if (category === BookingCategory.Export) {
-        query = query.where('year', '==', getYear(new Date()));
-        query = query.where('week', '>=', getWeek(new Date(), { weekStartsOn: 1 }));
-        query = query.where('week', '<=', getWeek(addWeeks(new Date(), 3), { weekStartsOn: 1 }));
-        query = query.orderBy('week', 'asc');
-      }
-      return query;
-    },
-    [category],
-  );
+  const [user, userAuth] = useUser();
+  const [equipmentControl, setEquipmentControl] = useState<any[]>([]);
+  // const query = useMemo(
+  //   () => (collection: firebase.firestore.Query) => {
+  //     let query = collection;
+  //     // query = query.where(firebase.firestore.FieldPath.documentId(), '!=', '0');
+  //     if (category === BookingCategory.Export) {
+  //       query = query.where('year', '==', getYear(new Date()));
+  //       query = query.where('week', '>=', getWeek(new Date(), { weekStartsOn: 1 }));
+  //       query = query.where('week', '<=', getWeek(addWeeks(new Date(), 3), { weekStartsOn: 1 }));
+  //       query = query.orderBy('week', 'asc');
+  //     }
+  //     return query;
+  //   },
+  //   [category],
+  // );
+  useEffect(() => {
+    const unsubscribe = setInterval(() => {
+      user
+        .getIdToken()
+        .then(token => {
+          return getEquipmentSummary(
+            token,
+            filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+            filters.version,
+          );
+        })
+        .then(
+          (
+            value: {
+              [k: string]: {
+                [k: string]: {};
+              };
+            }[],
+          ) => {
+            setEquipmentControl(
+              flatMap(
+                value.map(e =>
+                  Object.entries(e)?.map(([k, v]) => ({
+                    id: k,
+                    ...v,
+                  })),
+                ),
+              ),
+            );
+          },
+        );
 
-  const equipmentSummary = useFirestoreCollection(
-    'sum-equipment-control',
-    query,
-    `${filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id}-${category}-${filters.version}`,
-    'summary',
-  );
-  if (category === BookingCategory.Export) {
-    return equipmentSummary?.docs.map(doc => {
-      console.log('Equipment control', doc.data());
-      return { ...doc.data(), id: doc.id } as EquipmentExportSummary;
-    }) as any;
-  } else {
-    return equipmentSummary?.docs.map(doc => {
-      console.log('Equipment control', doc.data());
-      return { ...doc.data(), id: doc.id } as EquipmentImportSummary;
-    }) as any;
-  }
+      return () => clearInterval(unsubscribe);
+    }, 600000);
+  }, [filters]);
+  useEffect(() => {
+    user
+      .getIdToken()
+      .then(token => {
+        return getEquipmentSummary(
+          token,
+          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+          filters.version,
+        );
+      })
+      .then(
+        (
+          value: {
+            [k: string]: {
+              [k: string]: {};
+            };
+          }[],
+        ) => {
+          setEquipmentControl(flatMap(value.map(e => Object.entries(e).map(([k, v]) => ({ id: k, ...v })))));
+        },
+      );
+  }, [filters]);
+
+  // const equipmentSummary = useFirestoreCollection(
+  //   'sum-equipment-control',
+  //   query,
+  //   `${filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id}-${category}-${filters.version}`,
+  //   'summary',
+  // );
+  // if (category === BookingCategory.Export) {
+  //   return equipmentSummary?.docs.map(doc => {
+  //     return { ...doc.data(), id: doc.id } as EquipmentExportSummary;
+  //   }) as any;
+  // } else {
+  //   return equipmentSummary?.docs.map(doc => {
+  //     return { ...doc.data(), id: doc.id } as EquipmentImportSummary;
+  //   }) as any;
+  // }
+
+  return useMemo(() => {
+    console.log(equipmentControl);
+    return equipmentControl as any;
+  }, [equipmentControl]);
 }
+
+const getEquipmentSummary = async (token: string, carrierId: string, version: BookingVersion) => {
+  try {
+    console.log('Postponing');
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}`,
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.ok) {
+      const body = await response.json();
+      console.log('Body', body);
+      return body;
+    } else {
+      const body = await response.json();
+      console.error(`Failed to request`, response, body);
+      return body;
+    }
+  } catch (e) {
+    console.error('Failed to perform request', e);
+  } finally {
+  }
+};

@@ -4,19 +4,12 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import {
-  containerTypesLabels,
-  containerTypesValues,
-  EquipmentImportSummary,
-  statusKeys,
-  statusLabels,
-} from '../../model/EquipmentControl';
+import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
 import { makeStyles, Theme } from '@material-ui/core';
 import theme from '../../theme';
 import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
-import { get, set } from 'lodash';
-import mergeAndSumObjects from '../../utilities/mergeAndSumObjects';
+import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import CountryCodes from '../../model/CountryCodes';
@@ -59,21 +52,22 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const groupedSummary = useMemo(
     () =>
       Object.entries(
-        groupBy<EquipmentImportSummary>(s => locations?.find(loc => loc.id === get(s, 'id', '-'))?.countryCode)(
-          summary,
-        ),
+        groupBy<EquipmentImportSummary>(s => {
+          const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
+          return `${location?.countryCode || '-'}~${location?.city || '-'}`;
+        })(summary),
       ),
     [summary, locations],
   );
-  const total = useMemo(() => {
-    return summary?.reduce((previousValue, currentValue) => {
-      const sum = {};
-      statusKeys.forEach(key => {
-        set(sum, key, mergeAndSumObjects(get(previousValue, key), get(currentValue, key)));
-      });
-      return sum;
-    }, {});
-  }, [summary]);
+  // const total = useMemo(() => {
+  //   return summary?.reduce((previousValue, currentValue) => {
+  //     const sum = {};
+  //     statusKeys.forEach(key => {
+  //       set(sum, key, mergeAndSumObjects(get(previousValue, key), get(currentValue, key)));
+  //     });
+  //     return sum;
+  //   }, {});
+  // }, [summary]);
 
   return (
     <TableContainer>
@@ -93,32 +87,34 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {groupedSummary.map(([countryCode, group]) => (
-            <>
-              <TableRow>
+          {groupedSummary.map(([id, group]) => {
+            const [countryCode, city] = id.split('~');
+            return (
+              <>
                 <TableCell style={{ fontWeight: 'bold' }}>{get(CountryCodes, countryCode, '-')}</TableCell>
-              </TableRow>
-              {group?.map((equipment, index) => (
-                <EquipmentControlImportRow equipmentControl={equipment} key={index} />
-              ))}
-            </>
-          ))}
-          {summary?.length > 0 && (
-            <TableRow hover>
-              <TableCell>Total</TableCell>
-              {statusKeys.map(key => {
-                const status = get(total, `${key}`, {});
-                return (
-                  <>
-                    {containerTypesValues.map(type => {
-                      const c = get(status, type, '-');
-                      return <TableCell>{c}</TableCell>;
-                    })}
-                  </>
-                );
-              })}
-            </TableRow>
-          )}
+                <TableCell style={{ fontWeight: 'bold' }}>{city}</TableCell>
+                {group?.map((equipment, index) => (
+                  <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+                ))}
+              </>
+            );
+          })}
+          {/*{summary?.length > 0 && (*/}
+          {/*  <TableRow hover>*/}
+          {/*    <TableCell>Total</TableCell>*/}
+          {/*    {statusKeys.map(key => {*/}
+          {/*      const status = get(total, `${key}`, {});*/}
+          {/*      return (*/}
+          {/*        <>*/}
+          {/*          {containerTypesValues.map(type => {*/}
+          {/*            const c = get(status, type, '-');*/}
+          {/*            return <TableCell>{c}</TableCell>;*/}
+          {/*          })}*/}
+          {/*        </>*/}
+          {/*      );*/}
+          {/*    })}*/}
+          {/*  </TableRow>*/}
+          {/*)}*/}
         </TableBody>
       </Table>
     </TableContainer>

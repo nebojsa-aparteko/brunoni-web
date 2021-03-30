@@ -52,7 +52,15 @@ const firebaseConfig =
     ? productionConfig.allmarine
     : developmentConfig;
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp({
+  apiKey: 'AIzaSyBuI3STGixq5uWBcCzrUuMGfbifkDOZYN0',
+  authDomain: 'brunoni.firebaseapp.com',
+  databaseURL: 'https://brunoni.firebaseio.com',
+  projectId: 'brunoni',
+  storageBucket: 'brunoni.appspot.com',
+  messagingSenderId: '154343276895',
+  appId: '1:154343276895:web:a30fe5aced02b0373af6ea',
+});
 
 firebase.firestore().settings({
   cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,

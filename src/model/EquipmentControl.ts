@@ -36,7 +36,7 @@ export interface EquipmentExportSummary extends Summary {
   containers: CountedValue;
 }
 
-export type CountedValue = { [k: string]: number };
+export type CountedValue = { [k: string]: { [key: string]: string; count: string } };
 
 export enum ImportEquipmentControlStatus {
   'On Water' = 'ON WATER',
