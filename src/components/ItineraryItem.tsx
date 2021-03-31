@@ -38,7 +38,8 @@ interface Props {
 
 const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.SHORT_HUMAN);
 
-const isIntermediary = (itineraryItem: ItineraryItemModel) => itineraryItem.ArrivalDate && itineraryItem.DepartureDate;
+export const isIntermediary = (itineraryItem: ItineraryItemModel) =>
+  itineraryItem.ArrivalDate && itineraryItem.DepartureDate;
 
 const createMarkup = (port: SearchResultsPort) => ({
   __html: port.PortName ? port.PortName : `${port.HarbourName}<br/>${port.Land}`,

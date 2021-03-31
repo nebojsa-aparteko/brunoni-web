@@ -1,11 +1,13 @@
 import UserRecord from '../../model/UserRecord';
 import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
+import { isIntermediary } from '../ItineraryItem';
+import { formatDateString } from '../routeSearch/Route';
 
 interface Props {
   bookingRequest: BookingRequest;
@@ -78,6 +80,85 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+interface IntermediateInfosProps {
+  bookingRequest: BookingRequest;
+}
+
+const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest }) => {
+  const [isOriginIntermediary] = useState<boolean | undefined>(
+    bookingRequest.schedule?.OriginInfo ? !!isIntermediary(bookingRequest.schedule?.OriginInfo) : undefined,
+  );
+
+  return (
+    <React.Fragment>
+      {bookingRequest.schedule?.IntermediatePortInfos.length === 1 ? (
+        <TableRowData
+          label={isOriginIntermediary ? 'Port of Loading' : 'Port of Discharge'}
+          content={[
+            bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName,
+            formatDateString(bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate),
+          ].join(isOriginIntermediary ? '<br/>ETS: ' : '<br/>ETA: ')}
+        />
+      ) : (
+        bookingRequest.schedule?.IntermediatePortInfos.map((info, index) => (
+          <TableRowData
+            label={index === 0 ? 'Port of Loading' : 'Port of Discharge'}
+            content={[info.Port.HarbourName, formatDateString(info.DepartureDate)].join(
+              index === 0 ? '<br/>ETS: ' : '<br/>ETA: ',
+            )}
+          />
+        ))
+      )}
+    </React.Fragment>
+  );
+};
+
+const isVesselIntermediate = (vessel: string) => {
+  return ['TRUCK', 'BARGE', 'RAIL', 'FEEDER', 'RAIL/TRUCK', 'BARGE/TRUCK'].includes(vessel);
+};
+
+interface ItineraryInfoProps {
+  bookingRequest: BookingRequest;
+}
+
+const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest }) => {
+  return (
+    <React.Fragment>
+      {bookingRequest.schedule?.OriginInfo && (
+        <TableRowData
+          label={
+            isVesselIntermediate(bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName)
+              ? 'Place of Receipt'
+              : 'Port of Loading'
+          }
+          content={[
+            bookingRequest.schedule?.OriginInfo.Port.HarbourName,
+            formatDateString(bookingRequest.schedule?.OriginInfo.DepartureDate),
+          ].join('<br/>ETS: ')}
+        />
+      )}
+
+      {bookingRequest.schedule?.IntermediatePortInfos && bookingRequest.schedule?.IntermediatePortInfos.length > 0 && (
+        <IntermediateInfos bookingRequest={bookingRequest} />
+      )}
+
+      {bookingRequest.schedule?.DestinationInfo && (
+        <TableRowData
+          label={
+            isVesselIntermediate(bookingRequest.schedule?.DestinationInfo.VoyageInfo.VesselName)
+              ? 'Place of Delivery'
+              : 'Port of Discharge'
+          }
+          content={[
+            bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
+            formatDateString(bookingRequest.schedule?.DestinationInfo.ArrivalDate),
+          ].join('<br/>ETA: ')}
+        />
+      )}
+    </React.Fragment>
+  );
+};
+
 interface TableRowProps {
   label: string;
   content: string;
@@ -130,40 +211,8 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }
                 bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
               ].join(' VOY. ')}
             />
-            {/*TODO add rules to determine which of the following exist Place of Receipt, Port of Loading, Port of Discharge and Place of Delivery */}
-            {bookingRequest.schedule?.OriginInfo && (
-              <TableRowData
-                label={'Place of Receipt'}
-                content={[
-                  bookingRequest.schedule?.OriginInfo.Port.HarbourName,
-                  bookingRequest.schedule?.OriginInfo.DepartureDate,
-                ].join('<br/>ETS: ')}
-              />
-            )}
 
-            {bookingRequest.schedule?.IntermediatePortInfos &&
-              bookingRequest.schedule?.IntermediatePortInfos.length > 0 && (
-                <>
-                  <TableRowData
-                    label={'Port of Loading'}
-                    content={['Port of loading name', 'Port of landing ETS'].join('<br/>ETS: ')}
-                  />
-                  <TableRowData
-                    label={'Port of Discharge'}
-                    content={['Port of discharge name', 'Port of discharge ETA'].join('<br/>ETA: ')}
-                  />
-                </>
-              )}
-
-            {bookingRequest.schedule?.DestinationInfo && (
-              <TableRowData
-                label={'Place of Delivery'}
-                content={[
-                  bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
-                  bookingRequest.schedule?.DestinationInfo.ArrivalDate,
-                ].join('<br/>ETA: ')}
-              />
-            )}
+            <ItineraryInfo bookingRequest={bookingRequest} />
           </TableBody>
         </Table>
       </Grid>

@@ -84,7 +84,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
 const usePopupStyles = makeStyles((theme: Theme) => ({
   popper: {
     width: theme.breakpoints.values.md / 2,
-    zIndex: 100,
+    zIndex: 2000,
   },
 }));
 
