@@ -27,7 +27,7 @@ import QuoteItemRemarks from './quotes/QuoteItemRemarks';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import PrintIcon from '@material-ui/icons/Print';
-import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import { buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
 import QuoteNav from './quotes/QuoteItemNav';
@@ -48,6 +48,9 @@ import { formatDateSafe } from '../utilities/formattingHelpers';
 import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
+import SchedulePicker from './bookingRequests/SchedulePicker';
+import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
+import { useHistory } from 'react-router';
 
 interface Props {
   quote?: Quote;
@@ -148,12 +151,14 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const [user, userData] = useUser();
   const clients = useClients();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
   const [actingAs] = useContext(ActingAs);
   const [, dispatch] = useContext(GlobalContext);
 
+  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState(!actingAs);
   useEffect(() => {
     setIsAdmin(!actingAs);
@@ -260,8 +265,22 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
       });
   };
 
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleDialogOpen = () => {
+    setIsDialogOpen(true);
+  };
+
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {
     addStatus(event.target.value as QuoteStatus, quoteId).then(_ => console.log('Successful status change'));
+  };
+
+  const handleBookNow = (schedule?: RouteSearchResult) => {
+    localStorage.setItem('quote', JSON.stringify(quote));
+    localStorage.setItem('schedule', JSON.stringify(schedule));
+    history.push('/online-booking');
   };
 
   return (
@@ -298,8 +317,9 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                     color="primary"
                     variant="contained"
                     size="small"
-                    href={buildMailToLink(quote, [user, userData, client!])}
-                    target="_blank"
+                    onClick={handleDialogOpen}
+                    // href={buildMailToLink(quote, [user, userData, client!])}
+                    // target="_blank"
                   >
                     Book Now
                   </Button>
@@ -430,6 +450,12 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               <QuoteActivityLogContainer quoteId={quote.id} quote={quote} />
             </ActivityLogProvider>
           </Box>
+          <SchedulePicker
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            quote={quote}
+            handleBookNow={handleBookNow}
+          />
         </Grid>
       }
     </Grid>
