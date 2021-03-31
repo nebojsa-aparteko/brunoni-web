@@ -10,6 +10,7 @@ import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
 import RouteSummary from '../routeSearch/RouteSummary';
 import ContainersList from './ContainersList';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -38,6 +39,7 @@ const createRequest = (bookingRequest: BookingRequest) =>
 
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest }) => {
   const classes = useStyles();
+  const history = useHistory();
   const [, userRecord] = useUser();
 
   const getShortUserData = useCallback(
@@ -64,7 +66,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     try {
       bookingRequest &&
         createRequest(writableRequest)
-          .then(() => console.log(JSON.stringify(writableRequest)))
+          .then(docReference => history.push(`/booking-requests/${docReference.id}`))
           .catch(error => console.log(error));
     } catch (error) {
       console.error('useFirestoreCollection threw an error', error);
@@ -116,7 +118,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
           Previous
         </Button>
         <Button variant="contained" color="primary" onClick={handleCreateRequest}>
-          Finish
+          Submit
         </Button>
       </Grid>
     </Grid>
