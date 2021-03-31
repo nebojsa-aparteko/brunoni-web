@@ -5,47 +5,98 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
-import { makeStyles, Theme } from '@material-ui/core';
-import theme from '../../theme';
+import { Box, CircularProgress, makeStyles, Theme } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
 import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import CountryCodes from '../../model/CountryCodes';
+import clsx from 'clsx';
 
-const useStyles = makeStyles((theme: Theme) => ({
+export const importFlowsStyles = makeStyles((theme: Theme) => ({
+  container: {
+    marginBottom: theme.spacing(3),
+  },
+  row: {
+    '&:hover': {
+      '& > td': {
+        backgroundColor: 'inherit',
+      },
+    },
+  },
   defaultCell: {
     border: `1px solid ${theme.palette.divider}`,
     backgroundColor: 'white',
   },
   statusCell: {
-    border: `1px solid black`,
     alignItems: 'center',
+    fontSize: theme.typography.caption.fontSize,
+    borderCollapse: 'collapse',
+  },
+  headerCell: {
+    fontSize: theme.typography.caption.fontSize,
+    backgroundColor: theme.palette.grey['100'],
+  },
+  borderRight: {
+    borderRight: `3px solid ${theme.palette.divider}`,
+  },
+  tightCell: {
+    lineHeight: 1,
+  },
+  stickySide: {
+    position: 'sticky',
+    left: 0,
+    zIndex: 3,
+  },
+  hoverColorControl: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  list: {
+    minWidth: '20rem',
+  },
+  root: {
+    position: 'relative',
+    left: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+    border: `1px solid ${theme.palette.divider}`,
+  },
+  table: {
+    // overflow: 'hidden',
+    //
+    // '& tr': {
+    //   '&:hover':{
+    //     backgroundColor: '#ffa',
+    //   }
+    // },
+    //
+    // '& td': {
+    //   position: 'relative',
+    //
+    //   '&:hover': {
+    //     backgroundColor: 'red',
+    //
+    //     '&::after': {
+    //       content: '""',
+    //       position: 'absolute',
+    //       backgroundColor: '#ffa',
+    //       left: 0,
+    //       top: -5000,
+    //       height: 10000,
+    //       width: '100%',
+    //       zIndex: -1,
+    //     }
+    //   }
+    // },
   },
 }));
-
-const getContainerTypeCells = () => (
-  <>
-    {containerTypesLabels.map((containerType, index) => (
-      <TableCell
-        key={`${containerType}-${index}`}
-        padding="checkbox"
-        size="small"
-        style={{ border: `1px solid ${theme.palette.divider}`, backgroundColor: 'white' }}
-      >
-        {containerType}
-      </TableCell>
-    ))}
-  </>
-);
 
 interface ImportFlowsTableProps {
   summary: EquipmentImportSummary[];
 }
 
 const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
-  const classes = useStyles();
+  const classes = importFlowsStyles();
   const locations = useContext(PickupLocations);
   // const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
 
@@ -70,35 +121,77 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   // }, [summary]);
 
   return (
-    <TableContainer>
-      <Table size="small" aria-label="a dense table">
-        <TableHead>
+    <TableContainer className={classes.container}>
+      <Table stickyHeader size="small" aria-label="a dense table" className={classes.root}>
+        <TableHead className={classes.table}>
           <TableRow>
-            <TableCell style={{ backgroundColor: 'white' }} colSpan={1} />
-            {statusLabels.map(status => (
-              <TableCell colSpan={8} className={classes.statusCell} key={status}>
+            <TableCell rowSpan={2} />
+            <TableCell rowSpan={2} className={clsx([classes.stickySide, classes.headerCell, classes.borderRight])}>
+              Depot Location
+            </TableCell>
+            {statusLabels.map((status, index) => (
+              <TableCell key={index} colSpan={8} className={clsx(classes.statusCell, classes.borderRight)}>
                 {status}
               </TableCell>
             ))}
           </TableRow>
           <TableRow>
-            <TableCell>Depot Location</TableCell>
-            {statusLabels.map(() => getContainerTypeCells())}
+            {statusLabels.map(() =>
+              containerTypesLabels.map((label, index) => (
+                <TableCell
+                  key={index}
+                  size="small"
+                  className={clsx(classes.statusCell, {
+                    [classes.borderRight]: containerTypesLabels.length === index + 1,
+                  })}
+                >
+                  {label}
+                </TableCell>
+              )),
+            )}
           </TableRow>
         </TableHead>
-        <TableBody>
-          {groupedSummary.map(([id, group]) => {
-            const [countryCode, city] = id.split('~');
-            return (
-              <>
-                <TableCell style={{ fontWeight: 'bold' }}>{get(CountryCodes, countryCode, '-')}</TableCell>
-                {/*<TableCell style={{ fontWeight: 'bold' }}>{city}</TableCell>*/}
-                {group?.map((equipment, index) => (
-                  <EquipmentControlImportRow equipmentControl={equipment} key={index} />
-                ))}
-              </>
-            );
-          })}
+
+        <TableBody className={classes.table}>
+          {(groupedSummary.length !== 0 &&
+            groupedSummary.map(([id, group]) => {
+              const [countryCode, city] = id.split('~');
+              return (
+                <>
+                  <TableRow>
+                    <TableCell
+                      style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
+                      colSpan={statusLabels.length * containerTypesLabels.length + 2}
+                      className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
+                    >
+                      {get(CountryCodes, countryCode, '-')}
+                    </TableCell>
+                  </TableRow>
+                  {group?.map((equipment, index) => (
+                    <TableRow key={index} hover className={classes.row}>
+                      {index === 0 && (
+                        <TableCell
+                          rowSpan={group.length}
+                          className={classes.borderRight}
+                          style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
+                        >
+                          {city}
+                        </TableCell>
+                      )}
+                      <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+                    </TableRow>
+                  ))}
+                </>
+              );
+            })) || (
+            <TableRow>
+              <TableCell colSpan={10000}>
+                <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+                  <CircularProgress />
+                </Box>
+              </TableCell>
+            </TableRow>
+          )}
           {/*{summary?.length > 0 && (*/}
           {/*  <TableRow hover>*/}
           {/*    <TableCell>Total</TableCell>*/}

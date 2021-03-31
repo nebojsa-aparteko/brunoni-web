@@ -1,12 +1,27 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
-import { containerTypesValues, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
-import TableRow from '@material-ui/core/TableRow';
-import { Box, Link, Popover, TableCell, Typography } from '@material-ui/core';
+import React, { Fragment, useContext, useMemo, useState } from 'react';
+import clsx from 'clsx';
+import {
+  containerTypesLabels,
+  containerTypesValues,
+  EquipmentImportSummary,
+  statusLabels,
+} from '../../model/EquipmentControl';
+import {
+  Box,
+  CircularProgress,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Popover,
+  TableCell,
+} from '@material-ui/core';
 import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import useUser from '../../hooks/useUser';
 import { useHistory } from 'react-router';
+import { importFlowsStyles } from './ImportFlowsTable';
 
 const getBookingsByEC = async (token: string, containerType: string, equipmentStatus: string, locId: string) => {
   try {
@@ -41,6 +56,7 @@ const getBookingsByEC = async (token: string, containerType: string, equipmentSt
 };
 
 const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
+  const classes = importFlowsStyles();
   const [user] = useUser();
   const locations = useContext(PickupLocations);
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
@@ -54,19 +70,25 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
   return (
-    <TableRow hover>
-      <TableCell>{location?.name || equipmentControl.id}</TableCell>
+    <Fragment>
+      <TableCell
+        style={{ whiteSpace: 'nowrap' }}
+        className={clsx(classes.stickySide, classes.hoverColorControl, classes.borderRight)}
+      >
+        {location?.name || equipmentControl.id}
+      </TableCell>
       {statusLabels.map(s => {
         const status = get(equipmentControl, s, {});
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
           <>
-            {containerTypesValues.map(type => {
+            {containerTypesValues.map((type, index) => {
               const c = get(groupedStatus, type, []);
               return (
                 <TableCell
                   aria-describedby={id}
                   key={`${type}-${s}`}
+                  className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
                   onClick={event => {
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
@@ -100,21 +122,33 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           horizontal: 'center',
         }}
       >
-        <Box display="flex" flexDirection="column" padding={3}>
+        <List
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          subheader={
+            <ListSubheader component="div" id="nested-list-subheader">
+              Bookings
+            </ListSubheader>
+          }
+          className={classes.list}
+        >
           {bookings?.map(bkg => (
-            <Link
-              component="button"
+            <ListItem
+              button
               onClick={() => {
                 history.push(`/bookings/${bkg.bookingId}`);
               }}
-              style={{ paddingTop: 1, paddingBottom: 1 }}
             >
-              {bkg.bookingId}
-            </Link>
-          ))}
-        </Box>
+              <ListItemText primary={bkg.bookingId} />
+            </ListItem>
+          )) || (
+            <Box pb={4} width={1} display="flex" alignItems="center" justifyContent="center">
+              <CircularProgress />
+            </Box>
+          )}
+        </List>
       </Popover>
-    </TableRow>
+    </Fragment>
   );
 };
 
