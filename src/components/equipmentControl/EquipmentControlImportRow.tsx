@@ -7,11 +7,18 @@ import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import useUser from '../../hooks/useUser';
 import { useHistory } from 'react-router';
+import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 
-const getBookingsByEC = async (token: string, containerType: string, equipmentStatus: string, locId: string) => {
+const getBookingsByEC = async (
+  token: string,
+  containerType: string,
+  equipmentStatus: string,
+  locId: string,
+  carrierId: string,
+) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}`,
+      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}`,
       {
         method: 'GET',
         mode: 'cors',
@@ -47,6 +54,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
     locations,
     equipmentControl,
   ]);
+  const [filters] = useEquipmentControlFilterProviderContext();
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
   const [bookings, setBookings] = useState<{ bookingId: string }[]>();
   const handleClose = () => {
@@ -75,7 +83,15 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                     setBookings(undefined);
                     user
                       .getIdToken()
-                      .then(token => getBookingsByEC(token, type, s === 'TOTAL' ? '-' : s, equipmentControl.id || '-'))
+                      .then(token =>
+                        getBookingsByEC(
+                          token,
+                          type,
+                          s === 'TOTAL' ? '-' : s,
+                          equipmentControl.id || '-',
+                          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+                        ),
+                      )
                       .then(response => {
                         setBookings(response);
                       });
