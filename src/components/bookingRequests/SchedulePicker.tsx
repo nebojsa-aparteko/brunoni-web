@@ -11,6 +11,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   table: {
     minWidth: 650,
   },
+  dialogPaper: {
+    border: '4px solid #00b0ff',
+    borderRadius: '7px',
+  },
   dialogContent: {
     paddingBottom: theme.spacing(3),
     display: 'flex',
@@ -39,7 +43,7 @@ const SchedulePicker: React.FC<Props> = ({ isOpen, handleClose, quote, handleBoo
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="lg">
+    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="lg" classes={{ paper: classes.dialogPaper }}>
       <DialogTitle disableTypography id="schedulePickerDialogTitle">
         <Typography variant="h4">Choose the schedule that best suits your needs</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
