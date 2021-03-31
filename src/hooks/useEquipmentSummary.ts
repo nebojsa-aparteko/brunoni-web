@@ -44,16 +44,17 @@ export default function useEquipmentSummary<T extends BookingCategory>(
               };
             }[],
           ) => {
-            setEquipmentControl(
-              flatMap(
-                value?.map(e =>
-                  Object.entries(e)?.map(([k, v]) => ({
-                    id: k,
-                    ...v,
-                  })),
+            if (value && Array.isArray(value))
+              setEquipmentControl(
+                flatMap(
+                  value?.map(e =>
+                    Object.entries(e)?.map(([k, v]) => ({
+                      id: k,
+                      ...v,
+                    })),
+                  ),
                 ),
-              ),
-            );
+              );
           },
         );
 
@@ -78,7 +79,8 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             };
           }[],
         ) => {
-          setEquipmentControl(flatMap(value.map(e => Object.entries(e).map(([k, v]) => ({ id: k, ...v })))));
+          if (value && Array.isArray(value))
+            setEquipmentControl(flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))));
         },
       );
   }, [filters]);
