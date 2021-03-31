@@ -43,7 +43,10 @@ const getBookingsByEC = async (token: string, containerType: string, equipmentSt
 const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   const [user] = useUser();
   const locations = useContext(PickupLocations);
-  const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
+  const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [
+    locations,
+    equipmentControl,
+  ]);
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
   const [bookings, setBookings] = useState<{ bookingId: string }[]>();
   const handleClose = () => {
