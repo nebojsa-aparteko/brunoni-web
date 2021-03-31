@@ -124,6 +124,7 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
   const client = useClientById(booking.ForwAdrId);
   const forwarder = useUserByAlphacomId(booking.ForwPersID);
   const clientInfo = useMemo(() => {
+    console.log(forwarder);
     if (!client) {
       return `${booking.ForwAdrName || ''} ${booking.ForwAdrCity} (${booking.ForwAdrId})`;
     }

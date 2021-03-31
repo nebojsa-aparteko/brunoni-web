@@ -46,7 +46,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           ) => {
             setEquipmentControl(
               flatMap(
-                value.map(e =>
+                value?.map(e =>
                   Object.entries(e)?.map(([k, v]) => ({
                     id: k,
                     ...v,

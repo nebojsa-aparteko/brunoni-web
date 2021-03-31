@@ -92,7 +92,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             return (
               <>
                 <TableCell style={{ fontWeight: 'bold' }}>{get(CountryCodes, countryCode, '-')}</TableCell>
-                <TableCell style={{ fontWeight: 'bold' }}>{city}</TableCell>
+                {/*<TableCell style={{ fontWeight: 'bold' }}>{city}</TableCell>*/}
                 {group?.map((equipment, index) => (
                   <EquipmentControlImportRow equipmentControl={equipment} key={index} />
                 ))}
