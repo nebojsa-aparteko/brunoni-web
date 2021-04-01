@@ -62,7 +62,6 @@ const OnlineBookingContainer = () => {
             <ShippingInfo
               quote={quote}
               schedule={schedule}
-              handlePrevious={handleBack}
               handleNext={handleNext}
               bookingRequest={bookingRequest}
               setBookingRequest={setBookingRequest}

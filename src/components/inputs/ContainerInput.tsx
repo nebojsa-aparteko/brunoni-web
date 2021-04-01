@@ -171,7 +171,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           <>
             <Grid item md={2} xs={12}>
               <DateInput
-                value={value.pickupDate}
+                value={value.pickupDate || null}
                 onChange={handlePickupDateChange}
                 open={dateOpen}
                 onOpen={() => setDateOpen(true)}

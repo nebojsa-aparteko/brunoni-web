@@ -7,6 +7,7 @@ import BookingRequestSummary from './BookingRequestSummary';
 import useUser from '../../hooks/useUser';
 import InfoBoxItem from '../InfoBoxItem';
 import ContainerDetails from '../onlineBooking/ContainerDetails';
+import QuoteItemQuoteDetails from '../quotes/QuoteItemQuoteDetails';
 
 export const remark = {
   special: 'SPECIAL REMARKS',
@@ -45,6 +46,11 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
           </>
         )}
       </Box>
+      {bookingRequest.freightDetails && (
+        <Box marginTop="0em" marginBottom="0em">
+          <QuoteItemQuoteDetails quoteDetails={bookingRequest.freightDetails} />
+        </Box>
+      )}
       <Box id="otherBookingInfoBkg">
         {bookingRequest.additionalInfo && (
           <>

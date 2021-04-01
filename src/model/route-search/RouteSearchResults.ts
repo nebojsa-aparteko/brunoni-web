@@ -27,6 +27,7 @@ export type SearchResultsPort = {
   HarbourName: string;
   Land: string;
   PortName: string;
+  PortAgent: string;
 };
 
 export interface ItineraryItem {

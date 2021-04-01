@@ -1,4 +1,4 @@
-import { Quote } from '../../providers/QuoteGroupsProvider';
+import { Quote, QuoteDetail } from '../../providers/QuoteGroupsProvider';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { BookingRequest } from '../../model/BookingRequest';
 import React, { useContext, useMemo, useState } from 'react';
@@ -11,14 +11,7 @@ import { Button, Checkbox, FormControlLabel, Grid, TextField } from '@material-u
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 
-const ShippingInfo: React.FC<Props> = ({
-  quote,
-  schedule,
-  handlePrevious,
-  handleNext,
-  bookingRequest,
-  setBookingRequest,
-}) => {
+const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
@@ -56,6 +49,15 @@ const ShippingInfo: React.FC<Props> = ({
         quoteNumber: quote ? quote.id : undefined,
         customerReference: customerReference,
         schedule: schedule,
+        freightDetails:
+          quote && quote.quoteDetails
+            ? quote?.quoteDetails.filter(
+                (detail: QuoteDetail) =>
+                  !['VGM manual submission', 'Umbuchungsgebühr', 'Stornierungsgebühr', 'Zertifikat'].includes(
+                    detail.Description,
+                  ),
+              )
+            : undefined,
       }) as BookingRequest,
     );
     handleNext();
@@ -119,9 +121,6 @@ const ShippingInfo: React.FC<Props> = ({
         />
       </Grid>
       <Grid item>
-        <Button variant="text" color="default" onClick={handlePrevious}>
-          Previous
-        </Button>
         <Button
           variant="contained"
           color="primary"
@@ -138,7 +137,6 @@ const ShippingInfo: React.FC<Props> = ({
 interface Props {
   quote?: Quote;
   schedule?: RouteSearchResult;
-  handlePrevious: () => void;
   handleNext: () => void;
   bookingRequest: BookingRequest | undefined;
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
