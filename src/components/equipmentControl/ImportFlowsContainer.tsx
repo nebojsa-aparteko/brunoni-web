@@ -27,10 +27,6 @@ const ImportFlowsContainer: React.FC = () => {
               value={carrier}
             />
           </Box>
-          <VersionFilter
-            value={version}
-            onChange={event => setFilters(prevState => set('version', event.target.value)(prevState))}
-          />
         </Box>
       </Box>
 
