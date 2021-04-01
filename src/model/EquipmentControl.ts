@@ -43,7 +43,6 @@ export enum ImportEquipmentControlStatus {
   Arrived = 'ARRIVED',
   'Gate Out' = 'GATE OUT',
   Total = 'TOTAL',
-  Today = 'RETURNED TODAY',
 }
 
 export enum EquipmentControlContainerTypes {
