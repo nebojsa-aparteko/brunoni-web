@@ -1,17 +1,14 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
-import { BookingVersion } from '../model/Booking';
 import CountryCodes from '../model/CountryCodes';
 
 export interface EquipmentControlFilterContext {
   carrier?: Carrier;
-  version: BookingVersion;
   country: CountryCodes;
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {
-  version: BookingVersion.long,
   country: CountryCodes.CH,
 } as EquipmentControlFilterContext;
 

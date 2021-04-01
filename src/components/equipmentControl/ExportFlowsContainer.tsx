@@ -5,7 +5,6 @@ import { BookingCategory } from '../../model/Booking';
 import ExportFlowsTable from './ExportFlowsTable';
 import CarrierInput from '../inputs/CarrierInput';
 import { set } from 'lodash/fp';
-import VersionFilter from '../VersionFilter';
 import Carriers from '../../contexts/Carriers';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 
@@ -13,7 +12,7 @@ const ExportFlowsContainer: React.FC = () => {
   const summary = useEquipmentSummary(BookingCategory.Export);
   const availableCarriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
-  const { version, carrier } = filters;
+  const { carrier } = filters;
 
   return (
     <Box>

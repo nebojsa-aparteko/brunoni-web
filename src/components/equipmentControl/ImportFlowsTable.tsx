@@ -105,7 +105,8 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
       Object.entries(
         groupBy<EquipmentImportSummary>(s => {
           const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
-          return `${location?.countryCode || '-'}~${location?.city || '-'}`;
+          return `${location?.countryCode || '-'}`;
+          // return `${location?.countryCode || '-'}~${location?.city || '-'}`;
         })(summary),
       ),
     [summary, locations],

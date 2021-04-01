@@ -7,12 +7,11 @@ import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import { set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
-import VersionFilter from '../VersionFilter';
 
 const ImportFlowsContainer: React.FC = () => {
   const availableCarriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
-  const { version, carrier } = filters;
+  const { carrier } = filters;
   const summary = useEquipmentSummary(BookingCategory.Import);
 
   return (

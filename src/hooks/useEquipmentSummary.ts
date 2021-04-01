@@ -33,7 +33,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           return getEquipmentSummary(
             token,
             filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
-            filters.version,
+            BookingVersion.long,
           );
         })
         .then(
@@ -68,7 +68,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
         return getEquipmentSummary(
           token,
           filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
-          filters.version,
+          BookingVersion.long,
         );
       })
       .then(
