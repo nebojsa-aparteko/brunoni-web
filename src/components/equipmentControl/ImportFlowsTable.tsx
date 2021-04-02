@@ -5,7 +5,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
-import { Box, CircularProgress, makeStyles, Theme } from '@material-ui/core';
+import { Box, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
 import { get } from 'lodash';
@@ -37,6 +37,9 @@ export const importFlowsStyles = makeStyles((theme: Theme) => ({
   headerCell: {
     fontSize: theme.typography.caption.fontSize,
     backgroundColor: theme.palette.grey['100'],
+  },
+  cityCell: {
+    fontSize: theme.typography.caption.fontSize,
   },
   borderRight: {
     borderRight: `3px solid ${theme.palette.divider}`,
@@ -103,11 +106,13 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const groupedSummary = useMemo(
     () =>
       Object.entries(
-        groupBy<EquipmentImportSummary>(s => {
-          const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
-          return `${location?.countryCode || '-'}`;
-          // return `${location?.countryCode || '-'}~${location?.city || '-'}`;
-        })(summary),
+        sortByObjectKeys(
+          groupBy<EquipmentImportSummary>(s => {
+            const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
+            // return `${location?.countryCode || '-'}`;
+            return `${location?.countryCode || '-'}~${location?.city || '-'}`;
+          })(summary),
+        ) as { [key: string]: EquipmentImportSummary[] },
       ),
     [summary, locations],
   );
@@ -171,13 +176,15 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                   {group?.map((equipment, index) => (
                     <TableRow key={index} hover className={classes.row}>
                       {index === 0 && (
-                        <TableCell
-                          rowSpan={group.length}
-                          className={classes.borderRight}
-                          style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
-                        >
-                          {city}
-                        </TableCell>
+                        <Tooltip title={city}>
+                          <TableCell
+                            rowSpan={group.length}
+                            className={clsx([classes.borderRight, classes.cityCell])}
+                            style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
+                          >
+                            {truncateString(city, 7)}
+                          </TableCell>
+                        </Tooltip>
                       )}
                       <EquipmentControlImportRow equipmentControl={equipment} key={index} />
                     </TableRow>
@@ -216,3 +223,23 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
 };
 
 export default ImportFlowsTable;
+
+const sortByObjectKeys = (obj: any) => {
+  const ordered = Object.create(null);
+  Object.keys(obj)
+    .sort()
+    .reverse()
+    .forEach(key => {
+      ordered[key] = obj[key];
+    });
+
+  return ordered;
+};
+
+const truncateString = (value: string, length: number) => {
+  if (value.length > length) {
+    return value.substring(0, length) + '...';
+  } else {
+    return value;
+  }
+};
