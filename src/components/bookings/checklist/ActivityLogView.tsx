@@ -19,6 +19,7 @@ import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router-dom';
 import QueryString from 'querystring';
+import { BookingRequest } from '../../../model/BookingRequest';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -28,6 +29,7 @@ interface Props {
   onChange?: () => void;
   booking?: Booking;
   quote?: Quote;
+  bookingRequest?: BookingRequest;
   isAccounting?: boolean;
   pinnedCommentsCount?: number;
 }
@@ -46,6 +48,7 @@ const ActivityLogView: React.FC<Props> = ({
   quoteActivityLog,
   booking,
   quote,
+  bookingRequest,
   isAccounting,
   pinnedCommentsCount,
 }) => {
@@ -100,14 +103,27 @@ const ActivityLogView: React.FC<Props> = ({
           <ActivityLogProvider>
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
-        ) : (
+        ) : booking ? (
           <WriteComment onCommentSave={onCommentSave} booking={booking} isAccounting={isAccounting} />
+        ) : (
+          bookingRequest && <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
         )}
-        {activityLog?.map((activity: ActivityLogItem) => (
-          <Box id={activity.id} key={`act-${activity.id}`}>
-            <ActivityLogItemView activityItem={activity} booking={booking} pinnedCommentsCount={pinnedCommentsCount} />
-          </Box>
-        ))}
+        {booking
+          ? activityLog?.map((activity: ActivityLogItem) => (
+              <Box id={activity.id} key={`act-${activity.id}`}>
+                <ActivityLogItemView
+                  activityItem={activity}
+                  booking={booking}
+                  pinnedCommentsCount={pinnedCommentsCount}
+                />
+              </Box>
+            ))
+          : bookingRequest &&
+            activityLog?.map((activity: ActivityLogItem) => (
+              <Box id={activity.id} key={`act-${activity.id}`}>
+                <ActivityLogItemView activityItem={activity} />
+              </Box>
+            ))}
       </CardContent>
     </Card>
   );

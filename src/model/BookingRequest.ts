@@ -2,6 +2,7 @@ import Port from './Port';
 import Carrier from './Carrier';
 import { RouteSearchResult } from './route-search/RouteSearchResults';
 import { QuoteDetail } from '../providers/QuoteGroupsProvider';
+import { UserRecordMin } from './UserRecord';
 
 export interface BookingRequest {
   id?: string;
@@ -19,6 +20,7 @@ export interface BookingRequest {
   createdBy?: any;
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
+  assignedTo?: UserRecordMin;
 }
 
 export enum BookingRequestStatus {

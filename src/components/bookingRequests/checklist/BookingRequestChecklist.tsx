@@ -1,14 +1,19 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { ActivityLogProvider } from '../../bookings/checklist/ActivityLogContext';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
 import { BookingRequest } from '../../../model/BookingRequest';
 import BookingRequestChecklistContent from './BookingRequestCheclistContent';
+import InternalStorage from '../../bookings/InternalStorage';
+import ActingAs from '../../../contexts/ActingAs';
+import ActivityLogContainer from './ActivityLogContainer';
 
 interface CheckListProps {
   bookingRequest: BookingRequest;
 }
 
 const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) => {
+  const actingAs = useContext(ActingAs)[0];
+
   return (
     <Fragment>
       <ActivityLogProvider>
@@ -25,6 +30,8 @@ const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) =
             <BookingRequestChecklistContent bookingRequest={bookingRequest} />
           </CardContent>
         </Card>
+        {!actingAs && bookingRequest.id && <InternalStorage id={bookingRequest.id} collection={'booking-requests'} />}
+        <ActivityLogContainer bookingRequest={bookingRequest} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>
   );
