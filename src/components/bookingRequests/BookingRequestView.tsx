@@ -1,5 +1,20 @@
 import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
-import { Box, Button, Divider, Grid, IconButton, makeStyles, Menu, MenuItem, Paper, Theme } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Menu,
+  MenuItem,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import PrintIcon from '@material-ui/icons/Print';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
@@ -10,6 +25,17 @@ import allmarineLogo from '../../assets/logo.allmarine.png';
 import { BookingRequest } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
 import BookingRequestCheckList from './checklist/BookingRequestChecklist';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import CloseIcon from '@material-ui/icons/Close';
+import UserInput from '../inputs/UserInput';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import firebase from '../../firebase';
+import pick from 'lodash/fp/pick';
+import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import useUser from '../../hooks/useUser';
+import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
+import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -63,11 +89,111 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginLeft: theme.spacing(1),
     },
   },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogBody: {
+    minWidth: theme.spacing(100),
+    width: 'auto',
+    minHeight: theme.spacing(60),
+  },
+  dialogContent: {
+    paddingBottom: theme.spacing(3),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+  },
 }));
 
-interface Props {
+interface AgentAssignmentDialogProps {
   bookingRequest: BookingRequest;
+  isOpen: boolean;
+  handleClose: () => void;
 }
+
+const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
+  firebase
+    .firestore()
+    .collection('booking-requests')
+    .doc(id)
+    .set(
+      {
+        assignedUser: user ? pick(UserRecordMinProperties)(user) : null,
+      },
+      { merge: true },
+    );
+
+//TODO delete and use the booking activity after we generalize it?
+const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
+  return firebase
+    .firestore()
+    .collection('booking-requests')
+    .doc(bookingId)
+    .collection('activity')
+    .doc()
+    .set(activityLog);
+};
+
+const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRequest, isOpen, handleClose }) => {
+  const classes = useStyles();
+  const userRecord = useUser()[1];
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+
+  const getActivityLogUserData = useCallback(
+    (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
+      ({
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        alphacomClientId: user?.alphacomClientId,
+        alphacomId: user?.alphacomId,
+        emailAddress: user?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const handleChangeAgent = (user: UserRecordMin | null) => {
+    bookingRequest.id &&
+      changeAssignedAgent(bookingRequest.id, user)
+        .then(() =>
+          addActivityItem(
+            bookingRequest.id || '',
+            createActivityObject({
+              changeType: ActivityChangeType.ASSIGNED_AGENT,
+              by: getActivityLogUserData(userRecord),
+              addedUsers: [getActivityLogUserData(user)],
+            }),
+          ),
+        )
+        .then(handleClose);
+  };
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle disableTypography>
+        <Typography variant="h4">Watchers</Typography>
+        <IconButton onClick={handleClose} className={classes.closeModal}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent className={classes.dialogContent}>
+        <Box my={1}>
+          <UserInput
+            value={bookingRequest.assignedUser}
+            label="Assigned Agent"
+            users={assignableUsers || []}
+            onChange={(_, user) => handleChangeAgent(user)}
+          />
+        </Box>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const getBookingRequestTitle = (bookingRequest?: BookingRequest) => {
   return bookingRequest?.carrier?.id?.toUpperCase() || '';
@@ -85,8 +211,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
 
+  const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
+
+  const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
   const onArchiveClick = useCallback(() => {
     // firebase
@@ -125,6 +254,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
+          {isAssignmentDialogOpen ? (
+            <AgentAssignmentDialog
+              bookingRequest={bookingRequest}
+              isOpen={true}
+              handleClose={handleCloseAssignmentDialog}
+            />
+          ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
             <Box display="none" displayPrint="block" mb={2}>
@@ -155,6 +291,15 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
               <Box flex="1" />
               <Box className={classes.actions} displayPrint="none">
+                <IconButton
+                  // color="primary"
+                  size="small"
+                  aria-label="Watch"
+                  component="span"
+                  onClick={() => setIsAssignmentDialogOpen(true)}
+                >
+                  <SupervisedUserCircleIcon />
+                </IconButton>
                 {!actingAs && (
                   <Fragment>
                     <Button
@@ -209,5 +354,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     </Grid>
   );
 };
+
+interface Props {
+  bookingRequest: BookingRequest;
+}
 
 export default BookingRequestView;

@@ -20,7 +20,7 @@ export interface BookingRequest {
   createdBy?: any;
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
-  assignedTo?: UserRecordMin;
+  assignedUser?: UserRecordMin;
 }
 
 export enum BookingRequestStatus {

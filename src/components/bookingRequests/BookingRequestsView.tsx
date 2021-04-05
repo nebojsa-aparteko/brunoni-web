@@ -1,31 +1,17 @@
-import React, { Fragment, useMemo } from 'react';
-import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Divider,
-  makeStyles,
-  Paper,
-  TablePagination,
-  Typography,
-} from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useState } from 'react';
+import { Box, Button, Card, CardContent, CardHeader, Divider, makeStyles, Paper, Typography } from '@material-ui/core';
 import { useBookingRequestsContext } from '../../providers/BookingRequestsProvider';
 import Meta from '../Meta';
-import BookingsFiltersBar from '../searchbar/BookingsFiltersBar';
-import CategoryFilter from '../CategoryFilter';
-import Search from '../searchbar/Search';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
-import BookingsTable from '../bookings/BookingsTable';
-import get from 'lodash/fp/get';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import filter from 'lodash/fp/filter';
-import { Booking } from '../../model/Booking';
-import containsString from '../../utilities/containsString';
-import chunk from 'lodash/fp/chunk';
-import { getContainersString } from '../BookingsView';
 import BookingRequestsTable from './BookingRequestsTable';
+import UserInput from '../inputs/UserInput';
+import ActingAs from '../../contexts/ActingAs';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import theme from '../../theme';
+import firebase from '../../firebase';
+import pick from 'lodash/fp/pick';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -74,8 +60,37 @@ interface Props {
 }
 const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
+  const actingAs = useContext(ActingAs)[0];
+  const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+
+  const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [bookingRequests, isLoading] = useBookingRequestsContext();
-  console.log(bookingRequests);
+
+  const assignAgent = useCallback(
+    event => {
+      event.stopPropagation();
+      selectedRequests.forEach((id: string) => {
+        firebase
+          .firestore()
+          .collection('booking-requests')
+          .doc(id)
+          .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
+          .then(() => {
+            setSelectedRequests([]);
+          });
+      });
+    },
+    [selectedRequests, assignTo],
+  );
+
+  const onSelectRequest = useCallback(
+    (id: string) =>
+      setSelectedRequests(prevState =>
+        prevState.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+      ),
+    [setSelectedRequests],
+  );
 
   return (
     <>
@@ -93,6 +108,29 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
+                    {!actingAs && (
+                      <Box display="flex" flexDirection="row">
+                        <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
+                          <UserInput
+                            label="Assign task to"
+                            users={assignableUsers}
+                            onChange={(event, user) => {
+                              setAssignTo(user || undefined);
+                              event.stopPropagation();
+                            }}
+                            value={assignTo}
+                          />
+                        </Box>
+                        <Button
+                          color="primary"
+                          variant="contained"
+                          onClick={assignAgent}
+                          disabled={selectedRequests && selectedRequests.length === 0}
+                        >
+                          Assign user
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
                 }
               />
@@ -105,7 +143,11 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
             {bookingRequests.length > 0 && (
               <Fragment>
                 <CardContent className={classes.content}>
-                  <BookingRequestsTable bookingRequests={bookingRequests} />
+                  <BookingRequestsTable
+                    bookingRequests={bookingRequests}
+                    selectedRequests={selectedRequests}
+                    onSelectRequest={onSelectRequest}
+                  />
                 </CardContent>
 
                 {/*<CardActions className={classes.actions}>*/}

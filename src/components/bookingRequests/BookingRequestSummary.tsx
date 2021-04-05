@@ -1,4 +1,3 @@
-import UserRecord from '../../model/UserRecord';
 import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
 import React, { Fragment, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
@@ -11,7 +10,7 @@ import { formatDateString } from '../routeSearch/Route';
 
 interface Props {
   bookingRequest: BookingRequest;
-  bookingAgent: UserRecord | null | undefined;
+  // bookingAgent: UserRecord | null | undefined;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -175,7 +174,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
     </TableRow>
   );
 };
-const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }) => {
+const BookingRequestSummary: React.FC<Props> = ({ bookingRequest }) => {
   const classes = useStyles();
   const client = useClientById(bookingRequest.createdBy.alphacomClientId);
   const forwarder = useUserByAlphacomId(bookingRequest.createdBy.alphacomId);
@@ -231,18 +230,22 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, bookingAgent }
                 </Paper>
               </TableCell>
             </TableRow>
-            {/*<TableRow>*/}
-            {/*  <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>*/}
-            {/*  <TableCell className={classes.tableCell}>*/}
-            {/*    <a*/}
-            {/*      href={`mailto:${bookingAgent?.emailAddress || bookingRequest?.BkgAgentContactEml}`}*/}
-            {/*      target="_blank"*/}
-            {/*      rel="noopener noreferrer"*/}
-            {/*    >*/}
-            {/*      {bookingAgent ? `${bookingAgent.firstName} ${bookingAgent.lastName}` : bookingRequest.BkgAgentContactTxt}*/}
-            {/*    </a>*/}
-            {/*  </TableCell>*/}
-            {/*</TableRow>*/}
+            <TableRow>
+              <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
+              <TableCell className={classes.tableCell}>
+                {bookingRequest?.assignedUser && bookingRequest.assignedUser.alphacomId ? (
+                  <a
+                    href={`mailto:${bookingRequest?.assignedUser?.emailAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {bookingRequest?.assignedUser.firstName} {bookingRequest?.assignedUser.lastName}
+                  </a>
+                ) : (
+                  <Typography>Unassigned</Typography>
+                )}
+              </TableCell>
+            </TableRow>
             <TableRow className={classes.tableRow}>
               <TableCell className={classes.tableCellLabel}>Client</TableCell>
               <TableCell className={classes.tableCell}>{clientInfo}</TableCell>

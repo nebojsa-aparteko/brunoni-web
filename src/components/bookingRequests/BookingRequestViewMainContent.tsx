@@ -4,7 +4,6 @@ import Page from '../bookings/Page';
 import { BookingRequest } from '../../model/BookingRequest';
 import { getBookingRequestTitle } from './BookingRequestView';
 import BookingRequestSummary from './BookingRequestSummary';
-import useUser from '../../hooks/useUser';
 import InfoBoxItem from '../InfoBoxItem';
 import ContainerDetails from '../onlineBooking/ContainerDetails';
 import QuoteItemQuoteDetails from '../quotes/QuoteItemQuoteDetails';
@@ -27,14 +26,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Props) => {
-  // const bookingAgent = useUserByAlphacomId(bookingRequest?.BkgAgentContact || undefined);
   const classes = useStyles();
-  const [, userRecord] = useUser();
 
   return (
     <Page title={getBookingRequestTitle(bookingRequest)}>
       <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
-        <BookingRequestSummary bookingRequest={bookingRequest} bookingAgent={userRecord} />
+        <BookingRequestSummary bookingRequest={bookingRequest} />
       </Box>
       <Box marginTop="0em" marginBottom="0em">
         {bookingRequest.containers && (
@@ -48,7 +45,7 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
       </Box>
       {bookingRequest.freightDetails && (
         <Box marginTop="0em" marginBottom="0em">
-          <QuoteItemQuoteDetails quoteDetails={bookingRequest.freightDetails} />
+          <QuoteItemQuoteDetails quoteDetails={bookingRequest.freightDetails} hideRemarks={true} />
         </Box>
       )}
       <Box id="otherBookingInfoBkg">

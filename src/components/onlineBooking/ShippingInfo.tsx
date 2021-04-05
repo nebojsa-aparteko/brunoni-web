@@ -55,7 +55,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
                 (detail: QuoteDetail) =>
                   !['VGM manual submission', 'Umbuchungsgebühr', 'Stornierungsgebühr', 'Zertifikat'].includes(
                     detail.Description,
-                  ),
+                  ) && !detail.Currency.includes('Inkl.'),
               )
             : undefined,
       }) as BookingRequest,

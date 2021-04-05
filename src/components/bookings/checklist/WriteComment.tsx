@@ -104,7 +104,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
       firebase
         .firestore()
         .collection('users')
-        .where('alphacomId', '==', bookingRequest?.assignedTo?.alphacomId || '')
+        .where('alphacomId', '==', bookingRequest?.assignedUser?.alphacomId || '')
         .get()
         .then(doc => {
           if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);

@@ -12,6 +12,7 @@ import Box from '@material-ui/core/Box';
 
 interface Props {
   quoteDetails: QuoteDetail[];
+  hideRemarks?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
+const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails, hideRemarks }) => {
   const classes = useStyles();
 
   return (
@@ -64,7 +65,7 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
                 <TableCell align="right">Currency</TableCell>
                 <TableCell align="right">Cost Value</TableCell>
                 <TableCell>Cost Unit</TableCell>
-                <TableCell>Remark</TableCell>
+                {!hideRemarks && <TableCell>Remark</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -76,18 +77,20 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails }) => {
                   <TableCell align="right">{quoteDetail.Currency}</TableCell>
                   <TableCell align="right">{quoteDetail.CostValue}</TableCell>
                   <TableCell>{quoteDetail.CostUnit}</TableCell>
-                  <TableCell>
-                    <Linkify
-                      componentDecorator={(decoratedHref: string, decoratedText: string, key: number) => (
-                        <Link key={key} href={decoratedHref}>
-                          {decoratedText}
-                        </Link>
-                      )}
-                    >
-                      {quoteDetail.RemarkRef || ''}
-                      {quoteDetail.Remark}
-                    </Linkify>
-                  </TableCell>
+                  {!hideRemarks && (
+                    <TableCell>
+                      <Linkify
+                        componentDecorator={(decoratedHref: string, decoratedText: string, key: number) => (
+                          <Link key={key} href={decoratedHref}>
+                            {decoratedText}
+                          </Link>
+                        )}
+                      >
+                        {quoteDetail.RemarkRef || ''}
+                        {quoteDetail.Remark}
+                      </Linkify>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

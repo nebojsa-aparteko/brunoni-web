@@ -2,6 +2,7 @@ import React, { Fragment, useCallback } from 'react';
 import {
   Box,
   Card,
+  Checkbox,
   Container as MUIContainer,
   createStyles,
   Divider,
@@ -87,15 +88,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface BookingRequestsTableProps {
-  bookingRequests: BookingRequest[] | undefined;
-  isAdmin?: boolean;
-}
-
 interface BookingRequestRowProps {
   bookingRequest: BookingRequest;
   isAdmin?: boolean;
   preventDefaultClick?: boolean;
+  selectedRequests: string[];
+  onSelectRequest: (bookingRequestId: string) => void;
 }
 
 const StyledTableRow = withStyles((theme: Theme) =>
@@ -123,6 +121,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   isAdmin,
   bookingRequest,
   preventDefaultClick,
+  selectedRequests,
+  onSelectRequest,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -137,8 +137,16 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   );
 
   return (
-    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(bookingRequest.id!)}>
-      <Grid container spacing={2} style={{ paddingTop: '10px' }}>
+    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(bookingRequest.id!)} style={{ display: 'flex' }}>
+      <Checkbox
+        checked={bookingRequest.id ? selectedRequests.includes(bookingRequest.id) : false}
+        onClick={event => {
+          event.stopPropagation();
+          bookingRequest.id && onSelectRequest(bookingRequest.id);
+        }}
+        style={{ margin: 'auto' }}
+      />
+      <Grid container item spacing={2} xs={12} style={{ paddingTop: '10px', paddingLeft: '12px' }}>
         <Grid item lg={12} xs={12}>
           {bookingRequest ? (
             <Fragment>
@@ -275,9 +283,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   );
 };
 
-const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({ bookingRequests, isAdmin }) => {
+const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({
+  bookingRequests,
+  isAdmin,
+  selectedRequests,
+  onSelectRequest,
+}) => {
   const classes = useStyles();
-  console.log(bookingRequests);
+
   return (
     <Fragment>
       {!bookingRequests ? (
@@ -289,12 +302,24 @@ const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({ bookingRequ
       ) : (
         bookingRequests.map(bookingRequest => (
           <Card id="bookingSummaryBkgTable" className={classes.card} key={bookingRequest.id}>
-            <BookingRequestRow isAdmin={isAdmin} bookingRequest={bookingRequest} />
+            <BookingRequestRow
+              isAdmin={isAdmin}
+              bookingRequest={bookingRequest}
+              selectedRequests={selectedRequests}
+              onSelectRequest={onSelectRequest}
+            />
           </Card>
         ))
       )}
     </Fragment>
   );
 };
+
+interface BookingRequestsTableProps {
+  bookingRequests: BookingRequest[] | undefined;
+  isAdmin?: boolean;
+  selectedRequests: string[];
+  onSelectRequest: (bookingRequestId: string) => void;
+}
 
 export default BookingRequestsTable;
