@@ -6,6 +6,7 @@ import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
+import get from 'lodash/get';
 import pick from 'lodash/fp/pick';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
@@ -114,6 +115,15 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       query = filters.dateRange
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');
+
+      let watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier', 'assignee'];
+      const nOfAppliedFilters = watchingFilters.filter(curr => filters.hasOwnProperty(curr) && !!get(filters, curr))
+        .length;
+
+      //limit to 100 if less than 3 filters applied
+      if (nOfAppliedFilters <= 3) {
+        query = query.limit(100);
+      }
 
       return query;
     },
