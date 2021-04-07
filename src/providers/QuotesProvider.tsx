@@ -7,6 +7,7 @@ import { Quote } from './QuoteGroupsProvider';
 import { subWeeks } from 'date-fns';
 import Carrier from '../model/Carrier';
 import firebase from '../firebase';
+import { isNumberOfAppliedFiltersLessThan } from '../utilities/isNumberOfAppliedFiltersLessThan';
 interface Props {
   children: React.ReactNode;
 }
@@ -87,6 +88,12 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
           (query || collection)
             .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
             .orderBy('validityPeriod.to', 'desc');
+
+      const watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier'];
+      if (isNumberOfAppliedFiltersLessThan(filters, watchingFilters, 2)) {
+        query = query.limit(100);
+      }
+
       return query;
     },
     [userRecord, filters, actingAs, filtersPreviousVal],
