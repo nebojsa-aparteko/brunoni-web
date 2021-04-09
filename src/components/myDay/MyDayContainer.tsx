@@ -101,10 +101,11 @@ const MyDayContainer = () => {
       filteredTeams
         ?.reduce(async (previousValue, currentValue) => {
           dispatch({ type: 'START_GLOBAL_LOADING' });
+          //TODO check what should be queried if currentValue.checklistItems or currentValue.taskTypes is an empty array
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
-              ? await getOperationsTeamTasks(currentValue.checklistItems || [], formatCarrierId(carrier?.id))
-              : await getAccountingTeamTasks(currentValue.taskTypes || [], formatCarrierId(carrier?.id));
+              ? await getOperationsTeamTasks(currentValue.checklistItems || [''], formatCarrierId(carrier?.id))
+              : await getAccountingTeamTasks(currentValue.taskTypes || [''], formatCarrierId(carrier?.id));
           const p = await previousValue;
 
           const newTuple = [

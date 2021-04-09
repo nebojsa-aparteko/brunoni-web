@@ -72,7 +72,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   ]);
   const [filters] = useEquipmentControlFilterProviderContext();
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
-  const [bookings, setBookings] = useState<{ bookingId: string }[]>();
+  const [bookings, setBookings] = useState<{ bookingId: string; count: number }[]>();
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -158,7 +158,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                 history.push(`/bookings/${bkg.bookingId}`);
               }}
             >
-              <ListItemText primary={bkg.bookingId} />
+              <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
             </ListItem>
           )) || (
             <Box pb={4} width={1} display="flex" alignItems="center" justifyContent="center">
