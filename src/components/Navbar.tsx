@@ -301,27 +301,8 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <div id="otherMenuNav" className={classes.item}>
-                          <Button
-                            endIcon={<KeyboardArrowDownIcon />}
-                            aria-controls="simple-menu"
-                            aria-haspopup="true"
-                            onClick={handleMenuClick}
-                          >
-                            <Typography variant="body1">Other</Typography>
-                          </Button>
-                        </div>
-                        <Menu
-                          id="simple-menu"
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={handleMenuClose}
-                          className={classes.menu}
-                          getContentAnchorEl={null}
-                        >
-                          <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="Equipment Situation" />
-                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
-                        </Menu>
+                        <ButtonMenuItem primary="Equipment Situation" to="/equipment" />
+                        <ButtonMenuItem primary="Side Charges" to="/charges" />
                       </Fragment>
                     )}
 
