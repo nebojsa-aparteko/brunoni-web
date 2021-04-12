@@ -7,9 +7,10 @@ import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
 import { isNil, omitBy } from 'lodash/fp';
-import { Button, Checkbox, FormControlLabel, Grid, TextField } from '@material-ui/core';
+import { Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
+import getTermsForCarrier from '../../utilities/getTermsForCarrier';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
@@ -117,7 +118,15 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
       <Grid container>
         <FormControlLabel
           control={<Checkbox color="primary" value={acceptedTerms} onChange={() => setAcceptedTerms(!acceptedTerms)} />}
-          label="I accept Terms of Service"
+          label={
+            <Typography>
+              I accept the{' '}
+              <Button href={getTermsForCarrier(carrier?.id)} disabled={!carrier} color={'primary'}>
+                Terms and Conditions
+              </Button>
+            </Typography>
+          }
+          disabled={!carrier}
         />
       </Grid>
       <Grid item>
