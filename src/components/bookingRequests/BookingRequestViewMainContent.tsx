@@ -1,4 +1,4 @@
-import { Box, Divider, makeStyles } from '@material-ui/core';
+import { Box, Divider, makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
 import Page from '../bookings/Page';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -7,11 +7,8 @@ import BookingRequestSummary from './BookingRequestSummary';
 import InfoBoxItem from '../InfoBoxItem';
 import ContainerDetails from '../onlineBooking/ContainerDetails';
 import QuoteItemQuoteDetails from '../quotes/QuoteItemQuoteDetails';
-
-export const remark = {
-  special: 'SPECIAL REMARKS',
-  final: 'FINAL REMARKS',
-};
+import BookingRequestClosings from './BookingRequestClosings';
+import BookingRequestPortTerms from './BookingRequestPortTerms';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
@@ -24,7 +21,20 @@ const useStyles = makeStyles(() => ({
       display: 'initial',
     },
   },
+  additionalInfo: {
+    whiteSpace: 'pre-wrap',
+  },
+  remark: {
+    whiteSpace: 'pre-wrap',
+    marginTop: 8,
+  },
 }));
+
+const remark =
+  'FOR FCL BOOKINGS ONLY:WITH RECEIPT OF THIS BOOKING CONFIRMATION, THE SHIPPER OR OTHER CARGO INTERESTED PARTY UNDERTAKES TO SEAL THE CONTAINER(S) WITH HIGH-SECURITY SEAL(S) (MEETING THE SPECIFICATIONS OF ISO/PAS 17712DD. JANUARY 17,2003) IMMEDIATELY AFTER STUFFING IS COMPLETED AND BEFORE IT IS DELIVERED TO US AND,AS PART OF THE SHIPPING INSTRUCTIONS, TO FORWARD THE SEAL NUMBER TOGETHER WITH THE PRECISE CONTENTS OF THE CONTAINER TO THE CARRIER.\n' +
+  '\n' +
+  'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
+
 const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Props) => {
   const classes = useStyles();
 
@@ -43,18 +53,30 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
           </>
         )}
       </Box>
+      <BookingRequestPortTerms bookingRequest={bookingRequest} />
+      {bookingRequest.schedule?.Deadlines && <BookingRequestClosings bookingRequest={bookingRequest} />}
       {bookingRequest.freightDetails && (
-        <Box marginTop="0em" marginBottom="0em">
+        <>
+          <Box marginTop="2em" marginBottom="2em">
+            <Divider />
+          </Box>
           <QuoteItemQuoteDetails quoteDetails={bookingRequest.freightDetails} hideRemarks={true} />
-        </Box>
+          <Typography variant="body2" className={classes.remark}>
+            {remark}
+          </Typography>
+        </>
       )}
-      <Box id="otherBookingInfoBkg">
+      <Box id="otherBookingRequestInfo">
         {bookingRequest.additionalInfo && (
           <>
             <Box marginTop="2em" marginBottom="2em">
               <Divider />
             </Box>
-            <InfoBoxItem title="Additional Info" label1={bookingRequest.additionalInfo} gutterBottom />
+            <InfoBoxItem
+              title="Additional Info"
+              label1={<Typography className={classes.additionalInfo}>{bookingRequest.additionalInfo}</Typography>}
+              gutterBottom
+            />
           </>
         )}
       </Box>
