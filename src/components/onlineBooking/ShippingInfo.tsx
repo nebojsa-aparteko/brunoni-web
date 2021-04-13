@@ -121,7 +121,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           label={
             <Typography>
               I accept the{' '}
-              <Button href={getTermsForCarrier(carrier?.id)} disabled={!carrier} color={'primary'}>
+              <Button target="_blank" href={getTermsForCarrier(carrier?.id)} disabled={!carrier} color={'primary'}>
                 Terms and Conditions
               </Button>
             </Typography>
