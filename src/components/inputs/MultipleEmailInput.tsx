@@ -5,15 +5,15 @@ import { Autocomplete } from '@material-ui/lab';
 interface MultipleEmailInputInterface {
   data: string[];
   label?: string;
-  setSelectedEmails: React.Dispatch<React.SetStateAction<string[]>>;
-  selectedEmails: string[];
+  setSelectedEmails: (emails: string[]) => void;
+  selectedEmails?: string[];
 }
 
 const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
   data,
   label = '',
   setSelectedEmails,
-  selectedEmails,
+  selectedEmails = [],
 }) => {
   return (
     <Autocomplete
