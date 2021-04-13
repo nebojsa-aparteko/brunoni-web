@@ -62,6 +62,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const commodityTypeInput = useRef();
   const locationInput = useRef();
   const [dateOpen, setDateOpen] = useState<boolean>(false);
+  const [unfocused, setUnfocused] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -190,6 +191,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 fullWidth
                 value={value.weight}
                 onChange={event => handleWeightChange(parseInt(event.target.value))}
+                onBlur={() => setUnfocused(true)}
+                error={!value.weight && unfocused}
               />
             </Grid>
             {(value.containerType?.id === '45R1' || value.containerType?.id === '22R1') && (
