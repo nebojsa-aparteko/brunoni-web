@@ -287,10 +287,14 @@ export interface IMCOField {
 export enum CarrierId {
   ALIANCA = 'ALIANCA',
   HAMBURG_SUD = 'Hamburg Süd',
-  HYUNDAI_MERCHANT = 'HMM',
-  MACS = 'MACS',
   ZIM = 'ZIM',
   DEUTSCHE_AFRIKA = 'DAL',
+  MACS = 'MACS',
+  HMM = 'HMM',
+  HSG = 'HSG',
+  SLOM = 'SLOM',
+  STNN = 'STNN',
+  UAL = 'UAL',
 }
 
 export enum AlertType {

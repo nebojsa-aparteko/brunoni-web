@@ -9,7 +9,7 @@ const getFormLink = (carrierId: any): string => {
       return 'https://www.hamburgsud-line.com/liner/en/liner_services/ecommerce/verified_gross_mass_ecommerce/index.html';
     case CarrierId.HAMBURG_SUD:
       return 'https://www.hamburgsud-line.com/liner/de/liner_services/ecommerce/verified_gross_mass_ecommerce/index.html';
-    case CarrierId.HYUNDAI_MERCHANT:
+    case CarrierId.HMM:
       return 'http://www.hmm21.com/cms/business/ebiz/export/vgmWithoutLogin/index.jsp';
     case CarrierId.MACS:
       return 'https://www.macship.com/E-BUSINESS/SolasAccess.aspx';
