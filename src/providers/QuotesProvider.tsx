@@ -4,10 +4,10 @@ import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Quote } from './QuoteGroupsProvider';
-import { subWeeks } from 'date-fns';
 import Carrier from '../model/Carrier';
 import firebase from '../firebase';
 import { isNumberOfAppliedFiltersLessThan } from '../utilities/isNumberOfAppliedFiltersLessThan';
+
 interface Props {
   children: React.ReactNode;
 }
@@ -52,7 +52,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       let query = null;
 
       if (actingAs && userRecord?.alphacomClientId) {
-        query = (query || collection).where('clientId', '==', userRecord!.alphacomClientId);
+        query = collection.where('clientId', '==', userRecord!.alphacomClientId);
       }
 
       if (filters.archived) {
@@ -86,7 +86,8 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
             .orderBy('dateIssued', 'desc')
         : // active quotes, filter the ones that are not archived and validity is still valid
           (query || collection)
-            .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
+            // .where('validityPeriod.to', '>=', subWeeks(new Date(), 1))
+            .orderBy('dateIssued', 'desc')
             .orderBy('validityPeriod.to', 'desc');
 
       const watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier'];
