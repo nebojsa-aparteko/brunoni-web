@@ -6,6 +6,7 @@ import { UserRecordMin } from './UserRecord';
 
 export interface BookingRequest {
   id?: string;
+  blNumber?: string;
   origin?: Port;
   destination?: Port;
   carrier?: Carrier;
@@ -14,6 +15,8 @@ export interface BookingRequest {
   customerReference?: string;
   containers?: any[];
   additionalInfo?: string;
+  specialRemarkId?: string;
+  specialRemarkText?: string;
   imo?: boolean;
   soc?: boolean;
   createdAt?: Date;

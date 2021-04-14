@@ -1,4 +1,4 @@
-import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
+import { Box, Button, Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
 import React, { Fragment, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
@@ -7,11 +7,8 @@ import { BookingRequest } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { isIntermediary } from '../ItineraryItem';
 import { formatDateString } from '../routeSearch/Route';
-
-interface Props {
-  bookingRequest: BookingRequest;
-  // bookingAgent: UserRecord | null | undefined;
-}
+import SchedulePicker from './SchedulePicker';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -160,24 +157,38 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest }) => {
 
 interface TableRowProps {
   label: string;
-  content: string;
+  content: React.ReactElement | string;
   className?: any;
 }
 
-const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
+export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
 
   return (
     <TableRow className={classes.tableRow}>
       <TableCell className={classes.tableCellLabel}>{label}</TableCell>
-      <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content }} />
+      {typeof content === 'string' ? (
+        <TableCell className={classes.tableCell} dangerouslySetInnerHTML={{ __html: content }} />
+      ) : (
+        <TableCell className={classes.tableCell}>{content}</TableCell>
+      )}
     </TableRow>
   );
 };
-const BookingRequestSummary: React.FC<Props> = ({ bookingRequest }) => {
+
+const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequest, editing }) => {
   const classes = useStyles();
   const client = useClientById(bookingRequest.createdBy.alphacomClientId);
   const forwarder = useUserByAlphacomId(bookingRequest.createdBy.alphacomId);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleDialogOpen = () => {
+    setIsDialogOpen(true);
+  };
 
   const clientInfo = useMemo(() => {
     if (!client) {
@@ -192,69 +203,100 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest }) => {
     );
   }, [client, bookingRequest]);
 
+  const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
+    setBookingRequest({ ...bookingRequest, schedule: schedule });
+  };
+
   return (
-    <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
-      <Grid item md={5} xs={12} className={classes.firstColumn}>
-        <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
-          <colgroup>
-            <col style={{ width: '16.6%' }} />
-            <col style={{ width: '83.4%' }} />
-          </colgroup>
-          <TableBody>
-            <TableRowData label={'Carrier'} content={bookingRequest?.carrier?.id?.toUpperCase() || ''} />
+    <Box flexDirection="column">
+      {editing && (
+        <Button color={'primary'} variant="contained" onClick={handleDialogOpen}>
+          Change Schedule
+        </Button>
+      )}
+      <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
+        <SchedulePicker
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          origin={bookingRequest.origin}
+          destination={bookingRequest.destination}
+          handleBookNow={handleChangeSchedule}
+        />
+        <Grid item md={5} xs={12} className={classes.firstColumn}>
+          <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
+            <colgroup>
+              <col style={{ width: '16.6%' }} />
+              <col style={{ width: '83.4%' }} />
+            </colgroup>
+            <TableBody>
+              <TableRowData
+                label={'Carrier'}
+                content={
+                  bookingRequest?.carrier && bookingRequest?.carrier?.id
+                    ? bookingRequest?.carrier?.id?.toUpperCase()
+                    : ''
+                }
+              />
+              <TableRowData
+                label={'Vessel'}
+                content={[
+                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
+                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                ].join(' VOY. ')}
+              />
 
-            <TableRowData
-              label={'Vessel'}
-              content={[
-                bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
-              ].join(' VOY. ')}
-            />
-
-            <ItineraryInfo bookingRequest={bookingRequest} />
-          </TableBody>
-        </Table>
+              <ItineraryInfo bookingRequest={bookingRequest} />
+            </TableBody>
+          </Table>
+        </Grid>
+        <Grid item md={7} xs={12} className={classes.secondColumn}>
+          <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
+            <colgroup>
+              <col style={{ width: '16.6%' }} />
+              <col style={{ width: '83.4%' }} />
+            </colgroup>
+            <TableBody>
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>Status</TableCell>
+                <TableCell className={classes.tableCell}>
+                  <Paper elevation={0} className={classes.statusContainer}>
+                    <Typography className={classes.statusText}>{bookingRequest.status}</Typography>
+                  </Paper>
+                </TableCell>
+              </TableRow>
+              <TableRowData label={'B/L-NO'} content={bookingRequest.blNumber || '[To be assigned]'} />
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {bookingRequest?.assignedUser && bookingRequest.assignedUser.alphacomId ? (
+                    <a
+                      href={`mailto:${bookingRequest?.assignedUser?.emailAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {bookingRequest?.assignedUser.firstName} {bookingRequest?.assignedUser.lastName}
+                    </a>
+                  ) : (
+                    <Typography>Unassigned</Typography>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow className={classes.tableRow}>
+                <TableCell className={classes.tableCellLabel}>Client</TableCell>
+                <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Grid>
       </Grid>
-      <Grid item md={7} xs={12} className={classes.secondColumn}>
-        <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
-          <colgroup>
-            <col style={{ width: '16.6%' }} />
-            <col style={{ width: '83.4%' }} />
-          </colgroup>
-          <TableBody>
-            <TableRow>
-              <TableCell className={classes.tableCellLabel}>Status</TableCell>
-              <TableCell className={classes.tableCell}>
-                <Paper elevation={0} className={classes.statusContainer}>
-                  <Typography className={classes.statusText}>{bookingRequest.status}</Typography>
-                </Paper>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
-              <TableCell className={classes.tableCell}>
-                {bookingRequest?.assignedUser && bookingRequest.assignedUser.alphacomId ? (
-                  <a
-                    href={`mailto:${bookingRequest?.assignedUser?.emailAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {bookingRequest?.assignedUser.firstName} {bookingRequest?.assignedUser.lastName}
-                  </a>
-                ) : (
-                  <Typography>Unassigned</Typography>
-                )}
-              </TableCell>
-            </TableRow>
-            <TableRow className={classes.tableRow}>
-              <TableCell className={classes.tableCellLabel}>Client</TableCell>
-              <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Grid>
-    </Grid>
+    </Box>
   );
 };
+
+interface Props {
+  bookingRequest: BookingRequest;
+  setBookingRequest: (bookingRequest: BookingRequest) => void;
+  editing?: boolean;
+}
 
 export default BookingRequestSummary;

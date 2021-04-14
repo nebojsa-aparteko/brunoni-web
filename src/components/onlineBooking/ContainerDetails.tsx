@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Divider,
@@ -15,13 +15,15 @@ import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
 import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
 import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
 import theme from '../../theme';
-import { TableRowData } from '../bookingRequests/BookingRequestContainerDetails';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import { BookingRequest } from '../../model/BookingRequest';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import OOG from '../../model/OOG';
 import IMO from '../../model/IMO';
+import { TableRowData } from '../bookingRequests/BookingRequestSummary';
+import ContainerInput from '../inputs/ContainerInput';
+import ListInput from '../inputs/ListInput';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -150,8 +152,9 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               <TableCell className={classes.tableCell}>
                 <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
               </TableCell>
-              <TableCell className={classes.tableCell}>{`${container.quantity} x ${container.containerType
-                ?.description || container.containerType?.name}`}</TableCell>
+              <TableCell className={classes.tableCell}>
+                {`${container.quantity} x ${container.containerType?.description || container.containerType?.name}`}
+              </TableCell>
             </TableRow>
 
             {container.commodityType && container.commodityType?.name && (
@@ -181,19 +184,6 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {container.imo && container.imo.length > 0 && <IMCODetails container={container} />}
 
             {container.oog && container.oog.length > 0 && <OverdimensionDetails container={container} />}
-
-            {/*  {detail.Equipment && detail.Equipment[0] ? (*/}
-            {/*    <EquipmentData equipment={detail.Equipment} bookingCategory={category} />*/}
-            {/*  ) : null}*/}
-
-            {/*  {isLongVersion(version) && tariffDetails && detail.Equipment && detail.Equipment[0] ? (*/}
-            {/*    <CtrTariffDetails*/}
-            {/*      key={`tariff-${index}`}*/}
-            {/*      tariffDetails={tariffDetails}*/}
-            {/*      ctrTariffs={detail.Equipment[0].CtrTariffs}*/}
-            {/*      detail={detail}*/}
-            {/*    />*/}
-            {/*  ) : null}*/}
           </TableBody>
         </Table>
       </Grid>
@@ -204,14 +194,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             <col style={{ width: '80%' }} />
           </colgroup>
           <TableBody>
-            {/*{isImport(category) ? <AdditionalCargoData detail={detail} /> : null}*/}
-
-            {/*{detail.LocRefs.map((ref: LocRefItem, index: number) => {*/}
-            {/*  if (ref.LocType === 'PICK UP' && ref.LocDate) {*/}
-            {/*    return (*/}
-            {container.pickupReference && (
-              <TableRowData label={'Pick Up Reference'} content={container.pickupReference} />
-            )}
+            <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be assigned]'} />
             {container.pickupDate && (
               <TableRowData
                 label={'Pick Up Date'}
@@ -221,32 +204,13 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {pickupLocation && pickupLocation.name && (
               <TableRowData label={'Pick Up Location'} content={pickupLocation.name} />
             )}
+            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be assigned]'} />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
               <TableRowData label={'Delivery Address'} content={bookingRequest.schedule.OriginInfo.Port.PortName} />
             )}
 
-            {/*  );*/}
-            {/*}*/}
-
-            {/*if (ref.LocType === 'DELIVERY') {*/}
-            {/*  return (*/}
-            {/*    <Fragment key={`booking-loc-type-${index}`}>*/}
-            {/*      <TableRowData label={'Delivery Reference'} content={ref.LocRef} />*/}
-            {/*      <TableRowData label={'Delivery Address'} content={ref.LocDet} />*/}
-            {/*    </Fragment>*/}
-            {/*  );*/}
-            {/*}*/}
-            {/*})}*/}
-            {/*{detail['VGM-PIN'] && (*/}
-            {/*  <TableRowData label={'VGM Pin'} content={detail['VGM-PIN']} key={`booking-vgm-pin-type-${index}`} />*/}
-            {/*)}*/}
+            <TableRowData label={'VGM Pin'} content={container.vgmPin || '[To be assigned]'} />
             {container.oog && <TableRowData label={'Remarks'} content={container.oog ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />}
-            {/*{arrivalItemRemark && (*/}
-            {/*  <TableRowData*/}
-            {/*    label={'Arrival Items Remark'}*/}
-            {/*    content={detectAndInsertLink(arrivalItemRemark.RemarkTxt)}*/}
-            {/*  />*/}
-            {/*)}*/}
           </TableBody>
         </Table>
       </Grid>
@@ -254,10 +218,31 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
   );
 };
 
-const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest }) => {
+const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBookingRequest, editing }) => {
+  const addButton = useRef<HTMLButtonElement>();
+  const listInput = useRef<unknown>();
+
+  const handleChange = (value: any[] | undefined) => {
+    setBookingRequest && setBookingRequest({ ...bookingRequest, containers: value } as BookingRequest);
+  };
+
   return (
     <Grid container spacing={4}>
-      {containers &&
+      {editing ? (
+        <Box p={1}>
+          <ListInput
+            listRef={listInput}
+            addButtonRef={addButton}
+            ItemInput={ContainerInput}
+            ItemInputProps={{ showLocations: true, isDetailedInput: true }}
+            addText="Add Container"
+            defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
+            value={containers || []}
+            onChange={handleChange}
+          />
+        </Box>
+      ) : (
+        containers &&
         containers.map((container, index) => (
           <React.Fragment>
             <ContainerDetail container={container} index={index} bookingRequest={bookingRequest} />
@@ -265,7 +250,8 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest }) => {
               <Divider />
             </Grid>
           </React.Fragment>
-        ))}
+        ))
+      )}
     </Grid>
   );
 };
@@ -273,6 +259,8 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest }) => {
 interface Props {
   containers?: any[];
   bookingRequest?: BookingRequest;
+  setBookingRequest?: (bookingRequest: BookingRequest) => void;
+  editing?: boolean;
 }
 
 export default ContainerDetails;

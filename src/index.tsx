@@ -31,6 +31,7 @@ import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
+import SpecialRemarks from './contexts/SpecialRemarks';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -211,15 +212,17 @@ const render = (user: firebase.User | null) => {
                       <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                         <FirestoreCollectionProvider name="ports" context={PortsContext}>
                           <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                            <SpecialOffersProvider>
-                              <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                                <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
-                                  <ActingAsProvider>
-                                    <UserApp />
-                                  </ActingAsProvider>
+                            <FirestoreCollectionProvider name="special-remarks" context={SpecialRemarks}>
+                              <SpecialOffersProvider>
+                                <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                                  <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                                    <ActingAsProvider>
+                                      <UserApp />
+                                    </ActingAsProvider>
+                                  </FirestoreCollectionProvider>
                                 </FirestoreCollectionProvider>
-                              </FirestoreCollectionProvider>
-                            </SpecialOffersProvider>
+                              </SpecialOffersProvider>
+                            </FirestoreCollectionProvider>
                           </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>

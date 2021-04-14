@@ -12,4 +12,7 @@ export default interface Container {
   temperature?: number;
   humidity?: string;
   ventilation?: string;
+  pickupReference?: string;
+  deliveryReference?: string;
+  vgmPin?: string;
 }

@@ -33,12 +33,20 @@ const QuantityInput: React.FC<Props> = ({ value, onChange, margin }) => {
           endAdornment: (
             <Fragment>
               <InputAdornment position="end" className={classes.adornment}>
-                <IconButton aria-label="remove" onClick={() => onChange(Math.max(1, value - 1))}>
+                <IconButton
+                  aria-label="remove"
+                  size={margin === 'dense' ? 'small' : undefined}
+                  onClick={() => onChange(Math.max(1, value - 1))}
+                >
                   <RemoveIcon />
                 </IconButton>
               </InputAdornment>
               <InputAdornment position="end" className={classes.adornment}>
-                <IconButton aria-label="add" onClick={() => onChange(value + 1)}>
+                <IconButton
+                  aria-label="add"
+                  size={margin === 'dense' ? 'small' : undefined}
+                  onClick={() => onChange(value + 1)}
+                >
                   <AddIcon />
                 </IconButton>
               </InputAdornment>

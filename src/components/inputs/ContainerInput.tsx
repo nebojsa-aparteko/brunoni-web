@@ -1,4 +1,12 @@
-import React, { forwardRef, ForwardRefRenderFunction, Fragment, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  Fragment,
+  useContext,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import set from 'lodash/fp/set';
 import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
@@ -23,6 +31,7 @@ import OOG from '../../model/OOG';
 import ContainerDetails from '../../model/ContainerDetails';
 import FormControl from '@material-ui/core/FormControl';
 import DateInput from './DateInput';
+import ActingAs from '../../contexts/ActingAs';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -61,6 +70,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
   const locationInput = useRef();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
   const [dateOpen, setDateOpen] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
@@ -133,6 +144,18 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
 
   const handleVentilationChange = (v: string | null) => {
     onChange(set('ventilation', v)(value));
+  };
+
+  const handlePickupReferenceChange = (v: string | null) => {
+    onChange(set('pickupReference', v)(value));
+  };
+
+  const handleDeliveryReferenceChange = (v: string | null) => {
+    onChange(set('deliveryReference', v)(value));
+  };
+
+  const handleVGMPinChange = (v: string | null) => {
+    onChange(set('vgmPin', v)(value));
   };
 
   return (
@@ -224,6 +247,40 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     fullWidth
                     value={value.ventilation}
                     onChange={event => handleVentilationChange(event.target.value)}
+                  />
+                </Grid>
+              </React.Fragment>
+            )}
+            {isAdmin && (
+              <React.Fragment>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    label="Pickup Reference"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.pickupReference}
+                    onChange={event => handlePickupReferenceChange(event.target.value)}
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <TextField
+                    label="Delivery Reference"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.deliveryReference}
+                    onChange={event => handleDeliveryReferenceChange(event.target.value)}
+                  />
+                </Grid>
+                <Grid item md={2} xs={12}>
+                  <TextField
+                    label="VGM Pin"
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={value.vgmPin}
+                    onChange={event => handleVGMPinChange(event.target.value)}
                   />
                 </Grid>
               </React.Fragment>
