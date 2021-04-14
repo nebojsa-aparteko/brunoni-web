@@ -16,8 +16,9 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import TeamPaymentConfirmationRow from './TeamPaymentConfirmationRow';
 import { useSnackbar } from 'notistack';
 import TeamsPaymentConfirmationAddDialog from './TeamsPaymentConfirmationAddDialog';
+import { PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     tableContainer: {
       flex: 1,
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const TeamsPaymentConfirmationTable = () => {
   const classes = useStyles();
 
-  const paymentConfirmations = usePaymentConfirmation();
+  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.PAYMENT_CONFIRMATION);
   const [selectedPaymentConfirmations, setSelectedPaymentConfirmations] = useState<string[]>([]);
   const [isPaymentConfirmationDialogOpen, setIsPaymentConfirmationDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
@@ -152,7 +153,7 @@ const TeamsPaymentConfirmationTable = () => {
         label={'Please confirm deletion'}
         handleConfirm={handleDeletePaymentConfirmations}
         handleClose={() => setIsConfirmationDialogOpen(false)}
-        description={`Are you sure you want remove this selected 
+        description={`Are you sure you want remove this selected
           payment confirmation${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}
       />
     </>

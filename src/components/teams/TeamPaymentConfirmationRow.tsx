@@ -5,7 +5,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Carriers from '../../contexts/Carriers';
 import Ports from '../../contexts/Ports';
 import Carrier from '../../model/Carrier';
-import PaymentConfirmationRule from '../../model/PaymentConfirmationRule';
+import { PaymentConfirmationRule } from '../../model/PaymentConfirmationRule';
 import Port from '../../model/Port';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';

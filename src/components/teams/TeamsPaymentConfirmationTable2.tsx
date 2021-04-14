@@ -16,6 +16,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import TeamPaymentConfirmationRow from './TeamPaymentConfirmationRow';
 import { useSnackbar } from 'notistack';
 import TeamsPaymentConfirmationAddDialog from './TeamsPaymentConfirmationAddDialog';
+import { PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const TeamsPaymentConfirmationTable2 = () => {
   const classes = useStyles();
 
-  const paymentConfirmations = usePaymentConfirmation();
+  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CLIENT_STATISTICS);
   const [selectedPaymentConfirmations, setSelectedPaymentConfirmations] = useState<string[]>([]);
   const [isPaymentConfirmationDialogOpen, setIsPaymentConfirmationDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
@@ -85,76 +86,77 @@ const TeamsPaymentConfirmationTable2 = () => {
 
   return (
     <>
-      {!paymentConfirmations ? (
-        <ChartsCircularProgress />
-      ) : (
-        <TableContainer component={Paper} className={classes.tableContainer}>
-          <EnhancedTableToolbar
-            numSelected={selectedPaymentConfirmations.length}
-            handleAdd={() => setIsPaymentConfirmationDialogOpen(true)}
-            handleDelete={() => setIsConfirmationDialogOpen(true)}
-            labelWhenSelected={
-              selectedPaymentConfirmations.length === 1
-                ? `${selectedPaymentConfirmations.length} payment confirmation selected`
-                : `${selectedPaymentConfirmations.length} payment confirmations selected`
-            }
-            labelWhenNotSelected={''}
-          />
-          <Table aria-label="a dense table">
-            <colgroup>
-              <col style={{ width: '2.5%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '10%' }} />
-              <col style={{ width: '7.5%' }} />
-            </colgroup>
-            <TableHead>
-              <TableRow>
-                <TableCell align="left" style={{ paddingLeft: 4 }}>
-                  <Checkbox
-                    checked={selectedPaymentConfirmations.length === paymentConfirmations.length}
-                    onClick={handleSelectDeselectAll}
-                    onFocus={event => event.stopPropagation()}
-                    color="primary"
-                  />
-                </TableCell>
-                <TableCell align="left">Carrier</TableCell>
-                <TableCell align="left">Contact To</TableCell>
-                <TableCell align="left">Contact CC</TableCell>
-                <TableCell align="left">Port of discharge</TableCell>
-                <TableCell align="left">Send message</TableCell>
-                <TableCell align="left" />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paymentConfirmations.map((paymentConfirmation, index) => (
-                <TeamPaymentConfirmationRow
-                  paymentConfirmation={paymentConfirmation}
-                  key={`payment-confirmation-${paymentConfirmation.id}-${index}`}
-                  selected={
-                    paymentConfirmation.id ? selectedPaymentConfirmations.includes(paymentConfirmation.id) : false
-                  }
-                  onSelectRow={event => paymentConfirmation.id && onSelectRow(event, paymentConfirmation.id)}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      <TeamsPaymentConfirmationAddDialog
-        isOpen={isPaymentConfirmationDialogOpen}
-        handleClose={() => setIsPaymentConfirmationDialogOpen(false)}
-      />
-      <ConfirmationDialog
-        isOpen={isConfirmationDialogOpen}
-        label={'Please confirm deletion'}
-        handleConfirm={handleDeletePaymentConfirmations}
-        handleClose={() => setIsConfirmationDialogOpen(false)}
-        description={`Are you sure you want remove this selected 
-          payment confirmation${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}
-      />
+      <div />
+      {/*{!paymentConfirmations ? (*/}
+      {/*  <ChartsCircularProgress />*/}
+      {/*) : (*/}
+      {/*  <TableContainer component={Paper} className={classes.tableContainer}>*/}
+      {/*    <EnhancedTableToolbar*/}
+      {/*      numSelected={selectedPaymentConfirmations.length}*/}
+      {/*      handleAdd={() => setIsPaymentConfirmationDialogOpen(true)}*/}
+      {/*      handleDelete={() => setIsConfirmationDialogOpen(true)}*/}
+      {/*      labelWhenSelected={*/}
+      {/*        selectedPaymentConfirmations.length === 1*/}
+      {/*          ? `${selectedPaymentConfirmations.length} payment confirmation selected`*/}
+      {/*          : `${selectedPaymentConfirmations.length} payment confirmations selected`*/}
+      {/*      }*/}
+      {/*      labelWhenNotSelected={''}*/}
+      {/*    />*/}
+      {/*    <Table aria-label="a dense table">*/}
+      {/*      <colgroup>*/}
+      {/*        <col style={{ width: '2.5%' }} />*/}
+      {/*        <col style={{ width: '20%' }} />*/}
+      {/*        <col style={{ width: '20%' }} />*/}
+      {/*        <col style={{ width: '20%' }} />*/}
+      {/*        <col style={{ width: '20%' }} />*/}
+      {/*        <col style={{ width: '10%' }} />*/}
+      {/*        <col style={{ width: '7.5%' }} />*/}
+      {/*      </colgroup>*/}
+      {/*      <TableHead>*/}
+      {/*        <TableRow>*/}
+      {/*          <TableCell align="left" style={{ paddingLeft: 4 }}>*/}
+      {/*            <Checkbox*/}
+      {/*              checked={selectedPaymentConfirmations.length === paymentConfirmations.length}*/}
+      {/*              onClick={handleSelectDeselectAll}*/}
+      {/*              onFocus={event => event.stopPropagation()}*/}
+      {/*              color="primary"*/}
+      {/*            />*/}
+      {/*          </TableCell>*/}
+      {/*          <TableCell align="left">Carrier</TableCell>*/}
+      {/*          <TableCell align="left">Contact To</TableCell>*/}
+      {/*          <TableCell align="left">Contact CC</TableCell>*/}
+      {/*          <TableCell align="left">Port of discharge</TableCell>*/}
+      {/*          <TableCell align="left">Send message</TableCell>*/}
+      {/*          <TableCell align="left" />*/}
+      {/*        </TableRow>*/}
+      {/*      </TableHead>*/}
+      {/*      <TableBody>*/}
+      {/*        {paymentConfirmations.map((paymentConfirmation, index) => (*/}
+      {/*          <TeamPaymentConfirmationRow*/}
+      {/*            paymentConfirmation={paymentConfirmation}*/}
+      {/*            key={`payment-confirmation-${paymentConfirmation.id}-${index}`}*/}
+      {/*            selected={*/}
+      {/*              paymentConfirmation.id ? selectedPaymentConfirmations.includes(paymentConfirmation.id) : false*/}
+      {/*            }*/}
+      {/*            onSelectRow={event => paymentConfirmation.id && onSelectRow(event, paymentConfirmation.id)}*/}
+      {/*          />*/}
+      {/*        ))}*/}
+      {/*      </TableBody>*/}
+      {/*    </Table>*/}
+      {/*  </TableContainer>*/}
+      {/*)}*/}
+      {/*<TeamsPaymentConfirmationAddDialog*/}
+      {/*  isOpen={isPaymentConfirmationDialogOpen}*/}
+      {/*  handleClose={() => setIsPaymentConfirmationDialogOpen(false)}*/}
+      {/*/>*/}
+      {/*<ConfirmationDialog*/}
+      {/*  isOpen={isConfirmationDialogOpen}*/}
+      {/*  label={'Please confirm deletion'}*/}
+      {/*  handleConfirm={handleDeletePaymentConfirmations}*/}
+      {/*  handleClose={() => setIsConfirmationDialogOpen(false)}*/}
+      {/*  description={`Are you sure you want remove this selected */}
+      {/*    payment confirmation${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}*/}
+      {/*/>*/}
     </>
   );
 };

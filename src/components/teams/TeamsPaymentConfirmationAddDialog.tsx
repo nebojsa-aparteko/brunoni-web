@@ -20,7 +20,7 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import firebase from '../../firebase';
-import PaymentConfirmationRule from '../../model/PaymentConfirmationRule';
+import { PaymentConfirmationRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -76,6 +76,7 @@ const TeamsPaymentConfirmationAddDialog: React.FC<Props> = ({ isOpen, handleClos
       contactTo: selectedContactTo,
       contactCC: selectedContactCC,
       automaticMessage: true,
+      type: PaymentConfirmationType.PAYMENT_CONFIRMATION,
     };
 
     //console.log(data);
