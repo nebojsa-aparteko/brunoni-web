@@ -13,18 +13,6 @@ const useStyles = makeStyles({
   expansionPanel: {
     marginBottom: 8,
   },
-  closeModal: {
-    position: 'absolute',
-    top: '5px',
-    right: '12px',
-    width: '47px',
-    height: '47px',
-  },
-  dialogActions: {
-    display: 'flex',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
   expansionPanelSummary: {
     display: 'flex',
   },

@@ -13,20 +13,25 @@ import CarrierInput from '../inputs/CarrierInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import PortInput from '../inputs/PortInput';
 
-interface PropsI {
+interface Props {
   paymentConfirmation: PaymentConfirmationRule;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const TeamPaymentConfirmationRow: React.FC<PropsI> = ({ paymentConfirmation, selected, onSelectRow, ...other }) => {
+const TeamPaymentConfirmationRow: React.FC<Props> = ({ paymentConfirmation, selected, onSelectRow, ...other }) => {
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
   const [, dispatch] = useContext(GlobalContext);
   const [paymentConfirmationState, setPaymentConfirmationState] = useState<PaymentConfirmationState>(
     paymentConfirmation,
   );
+
+  console.log('state', paymentConfirmationState);
+  console.log('normal', paymentConfirmation);
+
   const { carrier, port, contactCC, contactTo } = paymentConfirmationState;
+
   const changed = useMemo(() => !isEqual(paymentConfirmation)(paymentConfirmationState), [
     paymentConfirmationState,
     paymentConfirmation,
@@ -41,13 +46,13 @@ const TeamPaymentConfirmationRow: React.FC<PropsI> = ({ paymentConfirmation, sel
         .firestore()
         .collection('payment-confirmation-config')
         .doc(paymentConfirmation.id)
-        .set(paymentConfirmation, { merge: true });
+        .set(paymentConfirmationState, { merge: true });
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
     }
-  }, [paymentConfirmationState, paymentConfirmation.id, dispatch]);
+  }, [carrier, port, dispatch, paymentConfirmation.id, paymentConfirmationState]);
 
   const changeData = useCallback((path: string, value?: Carrier | Port | string[] | null) => {
     setPaymentConfirmationState(prevState => set(path, value)(prevState));

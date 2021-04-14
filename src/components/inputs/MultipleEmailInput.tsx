@@ -8,7 +8,7 @@ interface MultipleEmailInputInterface {
   setSelectedEmails: (emails: string[]) => void;
   selectedEmails?: string[];
 }
-
+// TODO - Add email validation
 const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
   data,
   label = '',
@@ -17,6 +17,7 @@ const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
 }) => {
   return (
     <Autocomplete
+      style={{ maxWidth: 300 }}
       multiple
       freeSolo
       options={data}
