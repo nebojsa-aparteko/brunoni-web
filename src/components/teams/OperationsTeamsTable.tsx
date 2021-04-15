@@ -86,6 +86,8 @@ const OperationsTeamsTable = ({ teams, onAdd }: Props) => {
             ? `${selectedTeams.length} admin selected`
             : `${selectedTeams.length} admins selected`
         }
+        addButtonLabel={'Add admin'}
+        deleteButtonLabel={selectedTeams.length === 1 ? `Delete admin` : `Delete admins`}
         labelWhenNotSelected={''}
       />
       <Table className={classes.table} aria-label="a dense table">

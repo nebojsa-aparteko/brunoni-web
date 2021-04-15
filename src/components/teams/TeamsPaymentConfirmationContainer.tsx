@@ -2,7 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import TeamsPaymentConfirmationTable from './TeamsPaymentConfirmationTable';
+import TeamsPaymentConfirmationCarrierSettingsTable from './TeamsPaymentConfirmationCarrierSettingsTable';
+import TeamsPaymentConfirmationCustomerSettingsTable from './TeamsPaymentConfirmationCustomerSettingsTable';
 
 const useStyles = makeStyles({
   expansionPanel: {
@@ -22,23 +23,25 @@ const TeamsPaymentConfirmationContainer: React.FC = () => {
 
   return (
     <Box flex={1} display="flex" flexDirection="column" m={1}>
-      <ExpansionPanel defaultExpanded={true} className={classes.expansionPanel}>
+      <ExpansionPanel className={classes.expansionPanel}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
           <Typography variant="h5" className={classes.expansionPanelTitle}>
-            Payment confirmation 1
+            Carrier Settings
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <TeamsPaymentConfirmationTable />
+          <TeamsPaymentConfirmationCarrierSettingsTable />
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
           <Typography variant="h5" className={classes.expansionPanelTitle}>
-            Payment confirmation 2
+            Customer Settings
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>todo</ExpansionPanelDetails>
+        <ExpansionPanelDetails>
+          <TeamsPaymentConfirmationCustomerSettingsTable />
+        </ExpansionPanelDetails>
       </ExpansionPanel>
     </Box>
   );

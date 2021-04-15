@@ -20,7 +20,8 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import firebase from '../../firebase';
-import { PaymentConfirmationRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { CarrierSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,19 +48,22 @@ interface Props {
   handleClose: () => void;
 }
 
-const TeamsPaymentConfirmationAddDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
+const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
   const [, dispatch] = useContext(GlobalContext);
+  const { enqueueSnackbar } = useSnackbar();
 
+  // TODO CLEAR STATE AFTER CLOSING DIALOG???
+  // TODO REFACTOR AND CREATE MORE REUSABLE COMPONENTS ???
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
   const [selectedPort, setSelectedPort] = useState<Port | undefined>(undefined);
   const [selectedContactTo, setSelectedContactTo] = useState<string[]>([]);
   const [selectedContactCC, setSelectedContactCC] = useState<string[]>([]);
 
-  const handleAddPaymentConfirmation = useCallback(async () => {
-    //todo form validation?
+  const handleAddCarrierSetting = useCallback(async () => {
+    //TODO FORM VALIDATION
     if (!selectedCarrier || !selectedPort) return;
 
     dispatch({ type: 'START_GLOBAL_LOADING' });
@@ -69,32 +73,38 @@ const TeamsPaymentConfirmationAddDialog: React.FC<Props> = ({ isOpen, handleClos
       .collection('payment-confirmation-config')
       .doc();
 
-    const data: PaymentConfirmationRule = {
+    const data: CarrierSettingsRule = {
       id: ref.id,
       carrier: selectedCarrier,
       port: selectedPort,
       contactTo: selectedContactTo,
       contactCC: selectedContactCC,
       automaticMessage: true,
-      type: PaymentConfirmationType.PAYMENT_CONFIRMATION,
+      type: PaymentConfirmationType.CARRIER_SETTINGS,
     };
 
-    //console.log(data);
-    dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       await ref.set(data);
       handleClose();
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+        variant: 'success',
+        autoHideDuration: 2000,
+      });
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
     }
-  }, [dispatch, selectedCarrier, selectedPort, selectedContactTo, selectedContactCC, handleClose]);
+  }, [selectedCarrier, selectedPort, dispatch, selectedContactTo, selectedContactCC, handleClose, enqueueSnackbar]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="ReassignmentRulesDialogTitle" maxWidth="lg">
-      <DialogTitle disableTypography id="ReassignmentRulesDialogTitle">
-        <Typography variant="h4">Add new payment confirmation</Typography>
+    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="PaymentConfirmationDialogTitle" maxWidth="lg">
+      <DialogTitle disableTypography id="PaymentConfirmationDialogTitle">
+        <Typography variant="h4">Add new carrier setting</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -134,12 +144,12 @@ const TeamsPaymentConfirmationAddDialog: React.FC<Props> = ({ isOpen, handleClos
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" variant="contained" onClick={handleAddPaymentConfirmation} style={{ minWidth: 80 }}>
-          Add payment confirmation
+        <Button color="primary" variant="contained" onClick={handleAddCarrierSetting} style={{ minWidth: 80 }}>
+          Add carrier setting
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default TeamsPaymentConfirmationAddDialog;
+export default TeamsPaymentConfirmationCarrierSettingsAddDialog;

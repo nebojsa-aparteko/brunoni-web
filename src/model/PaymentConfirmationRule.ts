@@ -1,29 +1,27 @@
 import Carrier from './Carrier';
+import Client from './Client';
 import Port from './Port';
-import { BookingCategory } from './Booking';
-
 interface PaymentConfirmation {
   type: PaymentConfirmationType;
   id: string;
   carrier: Carrier;
   automaticMessage: boolean;
 }
-export interface PaymentConfirmationRule extends PaymentConfirmation {
+export interface CarrierSettingsRule extends PaymentConfirmation {
   contactTo: string[];
   contactCC: string[];
   port: Port;
-  type: PaymentConfirmationType.PAYMENT_CONFIRMATION;
+  type: PaymentConfirmationType.CARRIER_SETTINGS;
 }
-
-export interface ClientStatisticsRule extends PaymentConfirmation {
+export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: BookingCategory;
-  clients: any;
-  clientStatistics: any;
-  type: PaymentConfirmationType.CLIENT_STATISTICS;
+  category: string;
+  client: Client;
+  statisticClient: Client;
+  type: PaymentConfirmationType.CUSTOMER_SETTINGS;
 }
 
 export enum PaymentConfirmationType {
-  PAYMENT_CONFIRMATION = 'PAYMENT_CONFIRMATION',
-  CLIENT_STATISTICS = 'CLIENT_STATISTICS',
+  CARRIER_SETTINGS = 'CARRIER_SETTINGS',
+  CUSTOMER_SETTINGS = 'CUSTOMER_SETTINGS',
 }

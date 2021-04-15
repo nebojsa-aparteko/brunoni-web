@@ -1,41 +1,44 @@
-import { Button, Checkbox, TableCell, TableRow } from '@material-ui/core';
+import { Button, Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
 import firebase from 'firebase';
 import { isEqual, set } from 'lodash/fp';
+import { useSnackbar } from 'notistack';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import Carriers from '../../contexts/Carriers';
 import Ports from '../../contexts/Ports';
 import Carrier from '../../model/Carrier';
-import { PaymentConfirmationRule } from '../../model/PaymentConfirmationRule';
+import { CarrierSettingsRule } from '../../model/PaymentConfirmationRule';
 import Port from '../../model/Port';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
 import CarrierInput from '../inputs/CarrierInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import PortInput from '../inputs/PortInput';
+import { omitAutomaticMessage } from './TeamsPaymentConfirmationCustomerSettingsRow';
 
 interface Props {
-  paymentConfirmation: PaymentConfirmationRule;
+  paymentConfirmation: CarrierSettingsRule;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const TeamPaymentConfirmationRow: React.FC<Props> = ({ paymentConfirmation, selected, onSelectRow, ...other }) => {
+const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
+  paymentConfirmation,
+  selected,
+  onSelectRow,
+  ...other
+}) => {
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
   const [, dispatch] = useContext(GlobalContext);
-  const [paymentConfirmationState, setPaymentConfirmationState] = useState<PaymentConfirmationState>(
-    paymentConfirmation,
-  );
-
-  console.log('state', paymentConfirmationState);
-  console.log('normal', paymentConfirmation);
+  const [paymentConfirmationState, setPaymentConfirmationState] = useState<CarrierSettingsRule>(paymentConfirmation);
+  const { enqueueSnackbar } = useSnackbar();
 
   const { carrier, port, contactCC, contactTo } = paymentConfirmationState;
 
-  const changed = useMemo(() => !isEqual(paymentConfirmation)(paymentConfirmationState), [
-    paymentConfirmationState,
-    paymentConfirmation,
-  ]);
+  const changed = useMemo(
+    () => !isEqual(omitAutomaticMessage(paymentConfirmation))(omitAutomaticMessage(paymentConfirmationState)),
+    [paymentConfirmationState, paymentConfirmation],
+  );
 
   const handleEditPaymentConfirmation = useCallback(async () => {
     if (!carrier || !port) return;
@@ -48,11 +51,19 @@ const TeamPaymentConfirmationRow: React.FC<Props> = ({ paymentConfirmation, sele
         .doc(paymentConfirmation.id)
         .set(paymentConfirmationState, { merge: true });
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+        variant: 'success',
+        autoHideDuration: 2000,
+      });
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
     }
-  }, [carrier, port, dispatch, paymentConfirmation.id, paymentConfirmationState]);
+  }, [carrier, port, dispatch, paymentConfirmation.id, paymentConfirmationState, enqueueSnackbar]);
 
   const changeData = useCallback((path: string, value?: Carrier | Port | string[] | null) => {
     setPaymentConfirmationState(prevState => set(path, value)(prevState));
@@ -105,12 +116,4 @@ const TeamPaymentConfirmationRow: React.FC<Props> = ({ paymentConfirmation, sele
   );
 };
 
-export default TeamPaymentConfirmationRow;
-
-interface PaymentConfirmationState {
-  carrier?: Carrier;
-  port?: Port;
-  contactTo?: string[];
-  contactCC?: string[];
-  automaticMessage?: boolean;
-}
+export default TeamPaymentConfirmationCarrierSettingsRow;

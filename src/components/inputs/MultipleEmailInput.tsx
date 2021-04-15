@@ -23,7 +23,6 @@ const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
       options={data}
       value={selectedEmails}
       onChange={(_, newValue) => {
-        //console.log(newValue);
         //todo email validation
         setSelectedEmails(newValue);
       }}

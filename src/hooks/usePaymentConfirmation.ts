@@ -1,15 +1,11 @@
-import {
-  ClientStatisticsRule,
-  PaymentConfirmationRule,
-  PaymentConfirmationType,
-} from '../model/PaymentConfirmationRule';
+import { CarrierSettingsRule, CustomerSettingsRule, PaymentConfirmationType } from '../model/PaymentConfirmationRule';
 import useFirestoreCollection from './useFirestoreCollection';
 import { useMemo } from 'react';
 import firebase from 'firebase';
 
 const usePaymentConfirmation = <T extends PaymentConfirmationType>(
   type: T,
-): T extends PaymentConfirmationType.PAYMENT_CONFIRMATION ? PaymentConfirmationRule[] : ClientStatisticsRule[] => {
+): T extends PaymentConfirmationType.CARRIER_SETTINGS ? CarrierSettingsRule[] : CustomerSettingsRule[] => {
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('type', '==', type);
@@ -18,17 +14,10 @@ const usePaymentConfirmation = <T extends PaymentConfirmationType>(
     [type],
   );
   const paymentConfirmationDocs = useFirestoreCollection('payment-confirmation-config', query);
-  if (type === PaymentConfirmationType.PAYMENT_CONFIRMATION) {
-    return paymentConfirmationDocs?.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as any;
-  } else {
-    return paymentConfirmationDocs?.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as any;
-  }
+  return paymentConfirmationDocs?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as any;
 };
 
 export default usePaymentConfirmation;

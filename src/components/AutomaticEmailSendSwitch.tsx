@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useCallback, useContext } from 'react';
-import { FormControl, Switch } from '@material-ui/core';
+import { FormControl, Switch, Typography } from '@material-ui/core';
 import firebase from '../firebase';
 import { GlobalContext } from '../store/GlobalStore';
+import { useSnackbar } from 'notistack';
 
 interface Props {
   paymentConfirmationId: string;
@@ -10,6 +11,7 @@ interface Props {
 
 const AutomaticEmailSendSwitch: React.FC<Props> = ({ automaticMessage, paymentConfirmationId }) => {
   const [, dispatch] = useContext(GlobalContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const saveChanges = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -27,12 +29,20 @@ const AutomaticEmailSendSwitch: React.FC<Props> = ({ automaticMessage, paymentCo
           .doc(paymentConfirmationId)
           .set(data, { merge: true });
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
       } catch (error) {
         console.error(error);
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
       }
     },
-    [dispatch, paymentConfirmationId],
+    [dispatch, enqueueSnackbar, paymentConfirmationId],
   );
 
   return (

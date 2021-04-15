@@ -13,12 +13,12 @@ import { GlobalContext } from '../../store/GlobalStore';
 import firebase from '../../firebase';
 import usePaymentConfirmation from '../../hooks/usePaymentConfirmation';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import TeamPaymentConfirmationRow from './TeamPaymentConfirmationRow';
 import { useSnackbar } from 'notistack';
-import TeamsPaymentConfirmationAddDialog from './TeamsPaymentConfirmationAddDialog';
 import { PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import TeamsPaymentConfirmationCustomerSettingsAddDialog from './TeamsPaymentConfirmationCustomerSettingsAddDialog';
+import TeamPaymentConfirmationCustomerSettingsRow from './TeamsPaymentConfirmationCustomerSettingsRow';
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     tableContainer: {
       flex: 1,
@@ -26,10 +26,10 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const TeamsPaymentConfirmationTable = () => {
+const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
   const classes = useStyles();
 
-  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.PAYMENT_CONFIRMATION);
+  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CUSTOMER_SETTINGS);
   const [selectedPaymentConfirmations, setSelectedPaymentConfirmations] = useState<string[]>([]);
   const [isPaymentConfirmationDialogOpen, setIsPaymentConfirmationDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
@@ -67,16 +67,16 @@ const TeamsPaymentConfirmationTable = () => {
     try {
       selectedPaymentConfirmations.map(paymentConfirmationId => deletePaymentConfirmation(paymentConfirmationId));
 
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       setIsConfirmationDialogOpen(false);
       setSelectedPaymentConfirmations([]);
       enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
         variant: 'success',
         autoHideDuration: 2000,
       });
-
-      dispatch({ type: 'STOP_GLOBAL_LOADING' });
     } catch (error) {
       console.error(error);
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
@@ -96,18 +96,23 @@ const TeamsPaymentConfirmationTable = () => {
             handleDelete={() => setIsConfirmationDialogOpen(true)}
             labelWhenSelected={
               selectedPaymentConfirmations.length === 1
-                ? `${selectedPaymentConfirmations.length} payment confirmation selected`
-                : `${selectedPaymentConfirmations.length} payment confirmations selected`
+                ? `${selectedPaymentConfirmations.length} customer setting selected`
+                : `${selectedPaymentConfirmations.length} customer settings selected`
+            }
+            addButtonLabel={'Add customer setting'}
+            deleteButtonLabel={
+              selectedPaymentConfirmations.length === 1 ? `Delete customer setting` : `Delete customer settings`
             }
             labelWhenNotSelected={''}
           />
           <Table aria-label="a dense table">
             <colgroup>
               <col style={{ width: '2.5%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
               <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '20%' }} />
+              <col style={{ width: '15%' }} />
               <col style={{ width: '10%' }} />
               <col style={{ width: '7.5%' }} />
             </colgroup>
@@ -122,16 +127,17 @@ const TeamsPaymentConfirmationTable = () => {
                   />
                 </TableCell>
                 <TableCell align="left">Carrier</TableCell>
-                <TableCell align="left">Contact To</TableCell>
-                <TableCell align="left">Contact CC</TableCell>
-                <TableCell align="left">Port of discharge</TableCell>
+                <TableCell align="left">Direction</TableCell>
+                <TableCell align="left">Client</TableCell>
+                <TableCell align="left">Contact</TableCell>
+                <TableCell align="left">Statistic client</TableCell>
                 <TableCell align="left">Send message</TableCell>
                 <TableCell align="left" />
               </TableRow>
             </TableHead>
             <TableBody>
               {paymentConfirmations.map((paymentConfirmation, index) => (
-                <TeamPaymentConfirmationRow
+                <TeamPaymentConfirmationCustomerSettingsRow
                   paymentConfirmation={paymentConfirmation}
                   key={`payment-confirmation-${paymentConfirmation.id}-${index}`}
                   selected={
@@ -144,7 +150,7 @@ const TeamsPaymentConfirmationTable = () => {
           </Table>
         </TableContainer>
       )}
-      <TeamsPaymentConfirmationAddDialog
+      <TeamsPaymentConfirmationCustomerSettingsAddDialog
         isOpen={isPaymentConfirmationDialogOpen}
         handleClose={() => setIsPaymentConfirmationDialogOpen(false)}
       />
@@ -154,10 +160,10 @@ const TeamsPaymentConfirmationTable = () => {
         handleConfirm={handleDeletePaymentConfirmations}
         handleClose={() => setIsConfirmationDialogOpen(false)}
         description={`Are you sure you want remove this selected
-          payment confirmation${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}
+          customer setting${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}
       />
     </>
   );
 };
 
-export default TeamsPaymentConfirmationTable;
+export default TeamsPaymentConfirmationCustomerSettingsTable;
