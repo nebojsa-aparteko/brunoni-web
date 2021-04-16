@@ -79,7 +79,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           trigger();
         });
     });
-  }, [selectedTasks, assignTo]);
+  }, [selectedTasks, assignTo, setSelectedTasks, trigger]);
 
   return (
     <Toolbar

@@ -222,7 +222,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           });
         });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar, updateComponent],
   );
 
   const handleChangePaymentStatus = useCallback(

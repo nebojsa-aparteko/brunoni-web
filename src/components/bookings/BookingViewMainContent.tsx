@@ -19,14 +19,15 @@ export const remark = {
   final: 'FINAL REMARKS',
 };
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(() => ({
   hidePrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
   showPrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'initial',
     },
   },

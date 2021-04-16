@@ -53,7 +53,7 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange, tasks }) =>
         );
       }
     },
-    [onTabChange, setTabValue, setTabValue, user.uid],
+    [onTabChange, user.uid, userRecord.lastOpenedChecklistTab],
   );
 
   return (

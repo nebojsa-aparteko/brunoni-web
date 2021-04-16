@@ -3,6 +3,7 @@ import { Box, createStyles, makeStyles, Table, TableCell, TableHead, TableRow, T
 import TableBody from '@material-ui/core/TableBody';
 import { PortTerms } from '../../model/Booking';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -39,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tableRow: {
       verticalAlign: 'top',
-      ['@media print']: {
+      [mediaPrint]: {
         '& td': {
           padding: theme.spacing(0),
         },

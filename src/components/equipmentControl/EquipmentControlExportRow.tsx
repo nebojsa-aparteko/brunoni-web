@@ -12,7 +12,7 @@ const containerTypes = ['22G1', '42G1', '45G1', '22R1', '45R1', '22U1', '42U1', 
 
 const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ locId, equipmentControl }) => {
   const locations = useContext(PickupLocations);
-  const location = useMemo(() => locations?.find(loc => loc.id === locId), [locations]);
+  const location = useMemo(() => locations?.find(loc => loc.id === locId), [locId, locations]);
   const totalByContainers = useMemo(
     () =>
       equipmentControl

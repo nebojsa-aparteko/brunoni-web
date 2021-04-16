@@ -9,7 +9,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
 ): T extends BookingCategory.Export ? EquipmentExportSummary[] : EquipmentImportSummary[] {
   const [filters] = useEquipmentControlFilterProviderContext();
-  const [user, userAuth] = useUser();
+  const [user] = useUser();
   const [equipmentControl, setEquipmentControl] = useState<any[]>([]);
   // const query = useMemo(
   //   () => (collection: firebase.firestore.Query) => {
@@ -60,7 +60,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
 
       return () => clearInterval(unsubscribe);
     }, 600000);
-  }, [filters]);
+  }, [filters, user]);
   useEffect(() => {
     user
       .getIdToken()
@@ -83,7 +83,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             setEquipmentControl(flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))));
         },
       );
-  }, [filters]);
+  }, [filters, user]);
 
   // const equipmentSummary = useFirestoreCollection(
   //   'sum-equipment-control',

@@ -49,6 +49,7 @@ import { quoteShepherdTour } from './guides/QuoteGuide';
 import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
 import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     height: 100,
@@ -56,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
     background: theme.palette.background.paper,
 
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
@@ -242,6 +243,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setGuide(getPageGuide());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [window.location.pathname]);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
