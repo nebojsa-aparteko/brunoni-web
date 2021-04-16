@@ -38,18 +38,18 @@ const TeamManagementPage: React.FC = () => {
   // todo Check if we need this here
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
-    switch (newValue) {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      case 3:
-        break;
-      default:
-        break;
-    }
+    // switch (newValue) {
+    //   case 0:
+    //     break;
+    //   case 1:
+    //     break;
+    //   case 2:
+    //     break;
+    //   case 3:
+    //     break;
+    //   default:
+    //     break;
+    // }
   };
 
   return (

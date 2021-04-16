@@ -26,7 +26,7 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const TeamsPaymentConfirmationCarrierSettingsTable = () => {
+const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
   const classes = useStyles();
 
   const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CARRIER_SETTINGS);

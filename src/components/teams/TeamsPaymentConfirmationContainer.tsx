@@ -23,7 +23,7 @@ const TeamsPaymentConfirmationContainer: React.FC = () => {
 
   return (
     <Box flex={1} display="flex" flexDirection="column" m={1}>
-      <ExpansionPanel className={classes.expansionPanel}>
+      <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Carrier Settings
@@ -33,7 +33,7 @@ const TeamsPaymentConfirmationContainer: React.FC = () => {
           <TeamsPaymentConfirmationCarrierSettingsTable />
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      <ExpansionPanel className={classes.expansionPanel}>
+      <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Customer Settings
