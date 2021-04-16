@@ -23,6 +23,7 @@ export default interface Task {
   selected?: boolean;
   paymentReference?: string;
   payDate?: Date;
+  invoiceReferences?: string[];
 }
 
 export enum ManualResolveType {

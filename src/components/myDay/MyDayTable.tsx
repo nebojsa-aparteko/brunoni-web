@@ -162,6 +162,11 @@ const MyDayTable: React.FC<Props> = ({
                   <TableCell align="center">Task</TableCell>
                   <TableCell align="center">B/L Number</TableCell>
                   {taskCategory === TaskCategory.ACCOUNTING && <TableCell align="center">Reference</TableCell>}
+                  {taskCategory === TaskCategory.ACCOUNTING && (
+                    <TableCell style={{ width: '15%' }} align="center">
+                      Invoices
+                    </TableCell>
+                  )}
                   <TableCell align="center">File No.</TableCell>
                   <TableCell align="center">Assigned To</TableCell>
                   <TableCell align="center">Due Date</TableCell>

@@ -6,6 +6,7 @@ import ActingAs from '../../contexts/ActingAs';
 import TaskStatusChip from '../TaskStatusChip';
 import TaskAdditionalInfoView from '../TaskAdditionalInfoView';
 import { TaskManualResolveAction } from '../tasks/BookingTaskTableRow';
+import TaskInvoices from './TaskInvoices';
 
 const MyDayAccountingTableRow: React.FC<Props> = ({
   task,
@@ -35,8 +36,11 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
         <TableCell id="taskDescriptionMyDay" align="left">
           {label || '-'}
         </TableCell>
-        <TableCell align="center">{task.blNumber || '-'}</TableCell>
+        <TableCell align="left">{task.blNumber || '-'}</TableCell>
         <TableCell align="center">{task.paymentReference || '-'}</TableCell>
+        <TableCell align="center">
+          {task.invoiceReferences ? <TaskInvoices invoices={task.invoiceReferences} /> : '-'}
+        </TableCell>
         <TableCell align="center">
           <Link target="_blank" href={`/bookings/${task.bookingId}`}>
             {task.bookingId}
