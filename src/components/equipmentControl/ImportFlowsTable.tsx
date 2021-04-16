@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -160,10 +160,10 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
 
         <TableBody className={classes.table}>
           {(groupedSummary.length !== 0 &&
-            groupedSummary.map(([id, group]) => {
+            groupedSummary.map(([id, group], index) => {
               const [countryCode, city] = id.split('~');
               return (
-                <>
+                <Fragment key={index}>
                   <TableRow>
                     <TableCell
                       style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
@@ -186,10 +186,10 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                           </TableCell>
                         </Tooltip>
                       )}
-                      <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+                      <EquipmentControlImportRow equipmentControl={equipment} />
                     </TableRow>
                   ))}
-                </>
+                </Fragment>
               );
             })) || (
             <TableRow>
