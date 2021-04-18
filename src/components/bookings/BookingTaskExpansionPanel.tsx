@@ -46,7 +46,7 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent, se
           });
       });
     },
-    [selectedTasks, assignTo],
+    [selectedTasks, assignTo, updateComponent],
   );
   const onSelectTask = useCallback(
     (id: string) =>

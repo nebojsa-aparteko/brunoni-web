@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -13,6 +13,8 @@ import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import CountryCodes from '../../model/CountryCodes';
 import clsx from 'clsx';
+import truncateString from '../../utilities/truncateString';
+import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 
 export const importFlowsStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -160,10 +162,10 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
 
         <TableBody className={classes.table}>
           {(groupedSummary.length !== 0 &&
-            groupedSummary.map(([id, group]) => {
+            groupedSummary.map(([id, group], index) => {
               const [countryCode, city] = id.split('~');
               return (
-                <>
+                <Fragment key={id}>
                   <TableRow>
                     <TableCell
                       style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
@@ -174,7 +176,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                     </TableCell>
                   </TableRow>
                   {group?.map((equipment, index) => (
-                    <TableRow key={index} hover className={classes.row}>
+                    <TableRow key={equipment.id} hover className={classes.row}>
                       {index === 0 && (
                         <Tooltip title={city}>
                           <TableCell
@@ -186,10 +188,10 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                           </TableCell>
                         </Tooltip>
                       )}
-                      <EquipmentControlImportRow equipmentControl={equipment} key={index} />
+                      <EquipmentControlImportRow equipmentControl={equipment} />
                     </TableRow>
                   ))}
-                </>
+                </Fragment>
               );
             })) || (
             <TableRow>
@@ -223,23 +225,3 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
 };
 
 export default ImportFlowsTable;
-
-const sortByObjectKeys = (obj: any) => {
-  const ordered = Object.create(null);
-  Object.keys(obj)
-    .sort()
-    .reverse()
-    .forEach(key => {
-      ordered[key] = obj[key];
-    });
-
-  return ordered;
-};
-
-const truncateString = (value: string, length: number) => {
-  if (value.length > length) {
-    return value.substring(0, length) + '...';
-  } else {
-    return value;
-  }
-};

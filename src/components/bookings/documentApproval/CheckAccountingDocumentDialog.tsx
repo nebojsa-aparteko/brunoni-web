@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,7 +28,7 @@ import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { MentionItem } from 'react-mentions';
 import { addActivityItem } from '../checklist/ActivityLogContainer';
-import { flow, isNil, omitBy } from 'lodash/fp';
+import { isNil, omitBy } from 'lodash/fp';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
 import { shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import ActingAs from '../../../contexts/ActingAs';

@@ -47,7 +47,7 @@ import {
   NotificationStatusAction,
 } from './components/notifications/NotificationItemView';
 import EquipmentControlPage from './pages/EquipmentControlPage';
-import OnlineBookingPage from './pages/OnlineBookingPage';
+//import OnlineBookingPage from './pages/OnlineBookingPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -184,7 +184,7 @@ const App: React.FC = () => {
         );
       }
     }
-  }, [history]);
+  }, [history, user.uid, userRecord]);
   return (
     <Fragment>
       <QuoteFilterListProvider>

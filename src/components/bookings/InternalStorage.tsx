@@ -157,6 +157,31 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
     [storageBasePath, enqueueSnackbar],
   );
 
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const createActivity = useCallback(
+    (documents: ChecklistItemValueDocument[], activityType: ActivityChangeType) =>
+      ({
+        at: new Date(),
+        by: getActivityLogUserData(),
+        type: ActivityType.ACTIVITY,
+        isInternal: true,
+        documents: documents,
+        changeType: activityType,
+      } as ActivityLogItem),
+    [getActivityLogUserData],
+  );
+
   const onDeleteFile = useCallback(
     (item: ChecklistItemValueDocument, setRemovalInProgress: any) => {
       setRemovalInProgress(true);
@@ -198,33 +223,9 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
         });
       }
     },
-    [storageBasePath, collection, id],
+    [storageBasePath, collection, id, createActivity, enqueueSnackbar],
   );
 
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
-
-  const createActivity = useCallback(
-    (documents: ChecklistItemValueDocument[], activityType: ActivityChangeType) =>
-      ({
-        at: new Date(),
-        by: getActivityLogUserData(),
-        type: ActivityType.ACTIVITY,
-        isInternal: true,
-        documents: documents,
-        changeType: activityType,
-      } as ActivityLogItem),
-    [getActivityLogUserData, userRecord],
-  );
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       saveFiles(acceptedFiles)
@@ -247,7 +248,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
           console.error(`Error while storing files ${JSON.stringify(id, null, 2)}`, err);
         });
     },
-    [saveFiles, id, collection, getActivityLogUserData],
+    [saveFiles, getActivityLogUserData, collection, id, createActivity],
   );
   const onMentionFile = (item: ChecklistItemValueDocument) =>
     activityLogContext.setState({ documentReference: item, internal: true });

@@ -230,6 +230,8 @@ const ReassignUsersContainer: React.FC = () => {
                 ? `${selectedRules.length} rule selected`
                 : `${selectedRules.length} rules selected`
             }
+            addButtonLabel={'Add rule'}
+            deleteButtonLabel={selectedRules.length === 1 ? `Delete rule` : `Delete rules`}
             labelWhenNotSelected={'Reassignment rules'}
           />
           <TableContainer>

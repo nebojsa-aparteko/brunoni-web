@@ -17,9 +17,7 @@ const copyToClipboard = (
 ): boolean => {
   const clipboardCopyFunction = (evt: any) => {
     evt.preventDefault();
-    data.map(clipboardData => {
-      evt.clipboardData.setData(clipboardData.format, clipboardData.body);
-    });
+    data.map(clipboardData => evt.clipboardData.setData(clipboardData.format, clipboardData.body));
   };
 
   window.addEventListener('copy', clipboardCopyFunction);

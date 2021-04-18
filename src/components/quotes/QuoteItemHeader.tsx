@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, Fragment } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
@@ -7,7 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
-import UserRecords from '../../contexts/UserRecordsContext';
+//import UserRecords from '../../contexts/UserRecordsContext';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
 
@@ -17,6 +17,8 @@ interface Props {
   showCompanyInfo?: boolean;
 }
 
+const mediaNotPrint = '@media not print';
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
     paddingLeft: 0,
@@ -24,7 +26,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
   },
   tableRow: {
-    ['@media not print']: {
+    [mediaNotPrint]: {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
         marginTop: theme.spacing(1),
@@ -36,7 +38,7 @@ const useStyles = makeStyles(theme => ({
         },
       },
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },
@@ -46,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     border: 'none',
   },
   tableCellQuoteUserData: {
-    ['@media not print']: {
+    [mediaNotPrint]: {
       display: 'none',
     },
   },
@@ -70,7 +72,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content, className, show
 };
 
 const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) => {
-  const users = useContext(UserRecords);
+  //const users = useContext(UserRecords);
   const requestedBy = useUserByAlphacomId(quote.userId);
 
   const client = useClientById(quote.clientId);
@@ -99,7 +101,7 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
         <TableRowData label="" content="" />
       </Fragment>
     );
-  }, [showCompanyInfo, users, quote, client]);
+  }, [showCompanyInfo, client, quote.clientId, quote.userId, quote.userNameString, requestedBy]);
 
   return (
     <Table size="small" aria-label="a dense table">

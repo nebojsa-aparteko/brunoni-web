@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, Fragment } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
@@ -23,7 +23,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Avatar,
   colors,
   Tooltip,
   CircularProgress,
@@ -176,7 +175,9 @@ const EquipmentSituation: React.FC = () => {
         </Box>
 
         <Box mt={3}>
-          <Typography variant="body2">Last Update: {data ? 'Today' : <CircularProgress size={13} />}</Typography>
+          <Typography component={'span'} variant="body2">
+            Last Update: {data ? 'Today' : <CircularProgress size={13} />}
+          </Typography>
         </Box>
       </Box>
       <Box my={3}>

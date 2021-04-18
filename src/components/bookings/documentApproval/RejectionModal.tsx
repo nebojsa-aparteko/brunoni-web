@@ -9,7 +9,7 @@ import {
   ChecklistItemValueDocumentStatusType,
   DocumentValueStatus,
 } from '../checklist/ChecklistItemModel';
-import { flow, isNil, omitBy } from 'lodash/fp';
+import { isNil, omitBy } from 'lodash/fp';
 import { ActivityLogItem, ActivityType } from '../checklist/ActivityModel';
 import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
 import UserRecordContext from '../../../contexts/UserRecordContext';

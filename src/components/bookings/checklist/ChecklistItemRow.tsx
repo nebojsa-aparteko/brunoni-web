@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import {
   Box,
@@ -44,6 +45,7 @@ import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 import { MentionItem } from 'react-mentions';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -57,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
         whiteSpace: 'nowrap',
         padding: '6px 6px',
       },
-      ['@media print']: {
+      [mediaPrint]: {
         '& td': {
           padding: theme.spacing(0),
           width: '10%',
@@ -66,12 +68,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     itemLabel: {
       whiteSpace: 'normal',
-      ['@media print']: {
+      [mediaPrint]: {
         whiteSpace: 'nowrap',
       },
     },
     hidePrint: {
-      ['@media print']: {
+      [mediaPrint]: {
         display: 'none',
       },
     },
@@ -615,7 +617,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
         <Box display="flex" flexDirection="row">
           <Box flexDirection="row" alignContent="center">
-            <a id={checklistItem.id} />
+            <button id={checklistItem.id} />
             {isAdmin ? (
               <Checkbox
                 checked={checklistItem.checked}

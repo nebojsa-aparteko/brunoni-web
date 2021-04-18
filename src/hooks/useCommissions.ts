@@ -34,7 +34,7 @@ export default (bookingId?: string) => {
       }
       return query;
     },
-    [dateRange, carriers, bookingId],
+    [bookingId, filters.dateRange, carriers, dateRange],
   );
 
   const paymentCollection = useFirestoreCollection('commission', query);

@@ -20,7 +20,7 @@ const DOCXViewer: React.FC<{ url: string; containerId: string }> = ({ url, conta
       .catch(error => {
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `${error}` });
       });
-  }, [dispatch, url]);
+  }, [containerId, dispatch, url]);
   return <div id={containerId} />;
 };
 

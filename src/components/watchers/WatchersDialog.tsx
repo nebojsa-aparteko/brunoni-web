@@ -132,7 +132,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
         alphacomId: user?.alphacomId,
         emailAddress: user?.emailAddress,
       } as ActivityLogUserData),
-    [userRecord],
+    [],
   );
 
   const handleResponse = useCallback(
@@ -185,7 +185,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
         })
         .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }));
     },
-    [dispatch, currentWatchers],
+    [currentWatchers, dispatch, booking, getActivityLogUserData, userRecord],
   );
   return (
     <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-watchers" maxWidth="md">

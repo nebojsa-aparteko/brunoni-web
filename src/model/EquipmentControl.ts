@@ -61,3 +61,5 @@ export const statusLabels = Object.values(ImportEquipmentControlStatus);
 
 export const containerTypesValues = Object.keys(EquipmentControlContainerTypes);
 export const containerTypesLabels = Object.values(EquipmentControlContainerTypes);
+
+export const weeksColumns = ['Week 1', 'Week 2', 'Week 3', 'Export Total'];
