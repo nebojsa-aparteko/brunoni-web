@@ -51,52 +51,56 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [isHeaderValid, setIsHeaderValid] = useState(true);
 
-  const parseCSV = (input: string | File) =>
-    Papa.parse(input, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: header => {
-        switch (header.trim()) {
-          case 'Container number':
-          case 'container':
-            return 'container';
-          case 'Seal number':
-          case 'sealNum':
-            return 'sealNum';
-          case 'Status':
-          case 'status':
-            return 'status';
-          default:
-            setIsHeaderValid(false);
-            return header;
-        }
-      },
-      complete(results: ParseResult): void {
-        console.log(results.data);
-        const batch = firebase.firestore().batch();
+  const parseCSV = useCallback(
+    (input: string | File) => {
+      return Papa.parse(input, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: header => {
+          switch (header.trim()) {
+            case 'Container number':
+            case 'container':
+              return 'container';
+            case 'Seal number':
+            case 'sealNum':
+              return 'sealNum';
+            case 'Status':
+            case 'status':
+              return 'status';
+            default:
+              setIsHeaderValid(false);
+              return header;
+          }
+        },
+        complete(results: ParseResult): void {
+          console.log(results.data);
+          const batch = firebase.firestore().batch();
 
-        results.data.map(async (c: LoadListContainerModel) => {
-          batch.set(
-            firebase
-              .firestore()
-              .collection('containers')
-              .doc(c.container),
-            c,
-            { merge: true },
-          );
-          console.log(c);
-        });
+          results.data.map(async (c: LoadListContainerModel) => {
+            batch.set(
+              firebase
+                .firestore()
+                .collection('containers')
+                .doc(c.container),
+              c,
+              { merge: true },
+            );
+            console.log(c);
+          });
 
-        batch
-          .commit()
-          .then(_ =>
-            enqueueSnackbar(<Typography color="inherit">Saved load list successfully!</Typography>, {
-              variant: 'success',
-            }),
-          )
-          .catch(err => console.trace(err));
-      },
-    } as ParseConfig);
+          batch
+            .commit()
+            .then(_ =>
+              enqueueSnackbar(<Typography color="inherit">Saved load list successfully!</Typography>, {
+                variant: 'success',
+              }),
+            )
+            .catch(err => console.trace(err));
+        },
+      }) as ParseConfig;
+    },
+    [enqueueSnackbar],
+  );
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {

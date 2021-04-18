@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
-import { capitalCase } from 'change-case';
+//import { capitalCase } from 'change-case';
 import {
   ActivityChangeType,
   ActivityLogUserData,

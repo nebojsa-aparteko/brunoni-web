@@ -26,7 +26,7 @@ import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
-import { useSnackbar } from 'notistack';
+//import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
@@ -49,6 +49,7 @@ import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
     marginTop: theme.spacing(4),
@@ -61,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
@@ -74,14 +75,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
   },
   logo: {
     width: '5em',
-    ['@media print']: {
+    [mediaPrint]: {
       width: '20em',
     },
   },
@@ -92,13 +93,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
-    ['@media print']: {
+    [mediaPrint]: {
       marginBottom: theme.spacing(0),
     },
   },
   tableWrapper: {
     overflowX: 'auto',
-    ['@media print']: {
+    [mediaPrint]: {
       width: '30%',
     },
   },
@@ -108,7 +109,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   hidePrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
@@ -153,7 +154,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
-  const { enqueueSnackbar } = useSnackbar();
+  //const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -191,7 +192,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     return tasks?.filter(task =>
       task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
     );
-  }, [tasks, userRecord]);
+  }, [selectedTab, tasks]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -257,7 +258,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         })
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],
+    [booking, userRecord, dispatch, getActivityLogUserData],
   );
   const [anchorEl, setAnchorEl] = React.useState(null);
 

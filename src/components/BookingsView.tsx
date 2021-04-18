@@ -35,6 +35,7 @@ interface Props {
   showDateRangeFilter?: boolean;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(4),
@@ -46,7 +47,7 @@ const useStyles = makeStyles(theme => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
@@ -140,7 +141,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
     setFilteredResults(result);
 
     return chunk(rowsPerPage)(result);
-  }, [bookings, searchString, page, rowsPerPage]);
+  }, [bookings, searchString, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBookingsContextData &&
@@ -152,7 +153,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
       if (setBookingPaginationContextData)
         setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
     },
-    [setBookingPaginationContextData],
+    [bookingPaginationContextData, setBookingPaginationContextData],
   );
 
   const handleChangeRowsPerPage = useCallback(
@@ -162,7 +163,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
           flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
         );
     },
-    [setBookingPaginationContextData],
+    [bookingPaginationContextData, setBookingPaginationContextData],
   );
 
   const handleSearch = useCallback(
@@ -173,7 +174,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
         );
       }
     },
-    [setBookingPaginationContextData, searchString],
+    [searchString, setBookingPaginationContextData, bookingPaginationContextData],
   );
 
   // if (!bookings) {

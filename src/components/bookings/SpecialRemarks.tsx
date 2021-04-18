@@ -7,6 +7,8 @@ interface Props {
   remarks: Remark[];
 }
 
+const mediaNotPrint = '@media not print';
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
     paddingLeft: 0,
@@ -16,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '8em',
   },
   tableRow: {
-    ['@media not print']: {
+    [mediaNotPrint]: {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
         marginTop: theme.spacing(1),
@@ -28,7 +30,7 @@ const useStyles = makeStyles(theme => ({
         },
       },
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },

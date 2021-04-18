@@ -23,7 +23,7 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
       Object.entries(items)
         .map(i => i[1])
         .flat() as VesselWithVoyage[],
-    [entries],
+    [items],
   );
 
   return (

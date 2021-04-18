@@ -139,7 +139,7 @@ const MyDayContainer = () => {
           setNormalizedTasks(n || []);
         });
     }
-  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name, payDate]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, payDate, dispatch, carrier]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -169,7 +169,7 @@ const MyDayContainer = () => {
         await setLastOpenedChecklistTab(category === TaskCategory.ACCOUNTING ? 'accounting' : 'operations', user.uid);
       }
     },
-    [filters, setFilters],
+    [filters, setFilters, user.uid],
   );
 
   const onPayDateChange = useCallback(

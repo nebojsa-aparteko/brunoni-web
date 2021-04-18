@@ -65,6 +65,7 @@ const getBookingsByEC = async (
 };
 const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   const locations = useContext(PickupLocations);
+
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [
     locations,
     equipmentControl,
@@ -130,7 +131,6 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           </Fragment>
         );
       })}
-
       <Popover
         id={id}
         open={open}

@@ -61,7 +61,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
 
       return () => clearInterval(unsubscribe);
     }, 600000);
-  }, [filters]);
+  }, [filters, user]);
   useEffect(() => {
     user
       .getIdToken()
@@ -85,7 +85,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             setEquipmentControl(flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))));
         },
       );
-  }, [filters]);
+  }, [filters, user]);
 
   // const equipmentSummary = useFirestoreCollection(
   //   'sum-equipment-control',

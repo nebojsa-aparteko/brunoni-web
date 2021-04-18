@@ -20,7 +20,7 @@ const GlobalStore: React.FC = ({ children }) => {
         autoHideDuration: 1000,
       });
     }
-  }, [snackbarMessage, snackbarType]);
+  }, [enqueueSnackbar, snackbarMessage, snackbarType]);
 
   return <GlobalContext.Provider value={[state, dispatch]}>{children}</GlobalContext.Provider>;
 };

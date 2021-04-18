@@ -111,7 +111,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
   return (
     <Card className={classes.card}>
       <div onClick={handleClick} style={{ cursor: 'pointer' }}>
-        <CardMedia className={classes.media} image={imageURL} title="Contemplative Reptile" />
+        <CardMedia className={classes.media} component="div" image={imageURL} title="Contemplative Reptile" />
         <CardContent className={classes.content}>
           <Box display="flex" alignContent="center" className={classes.subtitle}>
             <Typography>{origin.city}</Typography>

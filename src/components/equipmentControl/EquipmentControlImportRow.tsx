@@ -88,11 +88,11 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
       >
         {location?.name || equipmentControl.id}
       </TableCell>
-      {statusLabels.map(s => {
+      {statusLabels.map((s, index) => {
         const status = get(equipmentControl, s, {});
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
-          <Fragment key={`${location?.id}-${s}`}>
+          <Fragment key={index}>
             {containerTypesValues.map((type, index) => {
               const c = get(groupedStatus, type, []);
               return (

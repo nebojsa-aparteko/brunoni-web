@@ -80,7 +80,7 @@ const NotificationsView: React.FC<Props> = ({
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notifications, dispatch, userRecord, handleShow]);
+  }, [dispatch, userRecord, handleShow]);
 
   return (
     <Grid className={classes.root}>

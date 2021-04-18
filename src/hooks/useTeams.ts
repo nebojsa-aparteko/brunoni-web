@@ -1,11 +1,10 @@
-import { useCallback } from 'react';
-
+import { useMemo } from 'react';
+import firebase from 'firebase';
 import useFirestoreCollection from './useFirestoreCollection';
-import { Team } from '../model/Teams';
-import { UserRecordMin } from '../model/UserRecord';
+import { Team, TeamType } from '../model/Teams';
 
-export default function useTeams(user: UserRecordMin | undefined = undefined) {
-  let query = useCallback(q => (user ? q.where('users', 'array-contains', user) : q).orderBy('name', 'asc'), [user]);
+export default function useTeams(type: TeamType | undefined = undefined) {
+  const query = useMemo(() => (q: firebase.firestore.Query) => (type ? q.where('teamType', '==', type) : q), [type]);
 
   const teamsCollection = useFirestoreCollection('teams', query);
 

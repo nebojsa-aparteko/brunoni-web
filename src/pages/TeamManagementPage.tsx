@@ -4,10 +4,12 @@ import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import { TabPanel } from './BookingsPage';
 import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
+import ReceiptIcon from '@material-ui/icons/Receipt';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
 import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
 import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
 import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
+import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -36,16 +38,18 @@ const TeamManagementPage: React.FC = () => {
   // todo Check if we need this here
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
-    switch (newValue) {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      default:
-        break;
-    }
+    // switch (newValue) {
+    //   case 0:
+    //     break;
+    //   case 1:
+    //     break;
+    //   case 2:
+    //     break;
+    //   case 3:
+    //     break;
+    //   default:
+    //     break;
+    // }
   };
 
   return (
@@ -63,6 +67,7 @@ const TeamManagementPage: React.FC = () => {
             <Tab icon={<PeopleIcon />} label="Teams" {...a11yProps(0)} />
             <Tab icon={<PersonIcon />} label="Users" {...a11yProps(1)} />
             <Tab icon={<RecentActorsIcon />} label="Reassign users" {...a11yProps(2)} />
+            <Tab icon={<ReceiptIcon />} label="Payment confirmation" {...a11yProps(3)} />
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
@@ -75,6 +80,10 @@ const TeamManagementPage: React.FC = () => {
 
         <TabPanel value={selectedTab} index={2}>
           <ReassignUsersContainer />
+        </TabPanel>
+
+        <TabPanel value={selectedTab} index={3}>
+          <TeamsPaymentConfirmationContainer />
         </TabPanel>
       </Box>
     </Fragment>
