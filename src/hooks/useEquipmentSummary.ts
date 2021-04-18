@@ -9,7 +9,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
 ): T extends BookingCategory.Export ? EquipmentExportSummary[] : EquipmentImportSummary[] {
   const [filters] = useEquipmentControlFilterProviderContext();
-  const [user, userAuth] = useUser();
+  const [user] = useUser();
   const [equipmentControl, setEquipmentControl] = useState<any[]>([]);
   // const query = useMemo(
   //   () => (collection: firebase.firestore.Query) => {
@@ -34,6 +34,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             token,
             filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
             BookingVersion.long,
+            category,
           );
         })
         .then(
@@ -69,6 +70,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           token,
           filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
           BookingVersion.long,
+          category,
         );
       })
       .then(
@@ -102,28 +104,34 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   // }
 
   return useMemo(() => {
-    console.log(equipmentControl);
     return equipmentControl as any;
   }, [equipmentControl]);
 }
 
-const getEquipmentSummary = async (token: string, carrierId: string, version: BookingVersion) => {
+const getEquipmentSummary = async (
+  token: string,
+  carrierId: string,
+  version: BookingVersion,
+  category: BookingCategory,
+) => {
   try {
-    console.log('Postponing');
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}`,
-      {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+    let url: string;
+    if (category === BookingCategory.Export) {
+      url = `${process.env.REACT_APP_API_URL}/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=14&endWeek=16`;
+    } else {
+      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}`;
+    }
+    const response = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     if (response.ok) {
       const body = await response.json();

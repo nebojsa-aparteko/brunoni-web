@@ -92,7 +92,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         const status = get(equipmentControl, s, {});
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
-          <>
+          <Fragment key={`${location?.id}-${s}`}>
             {containerTypesValues.map((type, index) => {
               const c = get(groupedStatus, type, []);
               return (
@@ -123,7 +123,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                 </TableCell>
               );
             })}
-          </>
+          </Fragment>
         );
       })}
 
@@ -153,6 +153,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         >
           {bookings?.map(bkg => (
             <ListItem
+              key={bkg.bookingId}
               button
               onClick={() => {
                 history.push(`/bookings/${bkg.bookingId}`);
