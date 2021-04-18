@@ -62,6 +62,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
       return () => clearInterval(unsubscribe);
     }, 600000);
   }, [category, filters, user]);
+
   useEffect(() => {
     user
       .getIdToken()
