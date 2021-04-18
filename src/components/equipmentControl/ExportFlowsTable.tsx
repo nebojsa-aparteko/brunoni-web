@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const columns = ['WK1', 'WK2', 'WK3', 'EXPORT TOTAL', 'SHIPPED TODAY'];
 
-const getContainerTypeCells = () => (
-  <>
+const ContainerTypeCells: React.FC = () => (
+  <Fragment>
     {containerTypesLabels.map((containerType, index) => (
       <TableCell
         key={`${containerType}-${index}`}
@@ -36,7 +36,7 @@ const getContainerTypeCells = () => (
         {containerType}
       </TableCell>
     ))}
-  </>
+  </Fragment>
 );
 
 interface ImportFlowsTableProps {
@@ -62,7 +62,9 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
           </TableRow>
           <TableRow>
             <TableCell>Depot Location</TableCell>
-            {columns.map(() => getContainerTypeCells())}
+            {columns.map((_, index) => (
+              <ContainerTypeCells key={index} />
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>

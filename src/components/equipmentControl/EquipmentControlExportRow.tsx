@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import { EquipmentExportSummary } from '../../model/EquipmentControl';
 import TableRow from '@material-ui/core/TableRow';
 import { TableCell } from '@material-ui/core';
@@ -29,18 +29,18 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ locId, 
       {columns.map((s, index) => {
         const containers = get(nth(index)(equipmentControl), 'containers', {});
         return (
-          <>
-            {containerTypes.map(type => {
+          <Fragment key={index}>
+            {containerTypes.map((type, index) => {
               const c = get(containers, type, '-');
-              return <TableCell>{c}</TableCell>;
+              return <TableCell key={index}>{c}</TableCell>;
             })}
-          </>
+          </Fragment>
         );
       })}
       <>
-        {containerTypes.map(type => {
+        {containerTypes.map((type, index) => {
           const c = get(totalByContainers, type, '-');
-          return <TableCell>{c}</TableCell>;
+          return <TableCell key={index}>{c}</TableCell>;
         })}
       </>
     </TableRow>

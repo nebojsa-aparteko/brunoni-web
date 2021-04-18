@@ -243,8 +243,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setGuide(getPageGuide());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [window.location.pathname]);
+  }, []);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
