@@ -20,7 +20,6 @@ import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import useUser from '../../hooks/useUser';
-import { useHistory } from 'react-router';
 import { importFlowsStyles } from './ImportFlowsTable';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 
@@ -76,7 +75,6 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const history = useHistory();
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
@@ -156,7 +154,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
               key={bkg.bookingId}
               button
               onClick={() => {
-                history.push(`/bookings/${bkg.bookingId}`);
+                window.open(`/bookings/${bkg.bookingId}`, '_blank');
               }}
             >
               <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />

@@ -21,7 +21,6 @@ import PickupLocations from '../../contexts/PickupLocations';
 import { groupBy } from 'lodash/fp';
 import clsx from 'clsx';
 import { importFlowsStyles } from './ImportFlowsTable';
-import { useHistory } from 'react-router';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import useUser from '../../hooks/useUser';
 import truncateString from '../../utilities/truncateString';
@@ -71,11 +70,10 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   ]);
   const classes = importFlowsStyles();
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
-  const [bookings, setBookings] = useState<{ bookingId: string; count: number }[]>();
+  const [bookings, setBookings] = useState<{ bookingId: string; count: number; bookingStatus: string }[]>();
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const history = useHistory();
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
   console.log('Eq Control', equipmentControl);
@@ -160,7 +158,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
               key={bkg.bookingId}
               button
               onClick={() => {
-                history.push(`/bookings/${bkg.bookingId}`);
+                window.open(`/bookings/${bkg.bookingId}`, '_blank');
               }}
             >
               <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
