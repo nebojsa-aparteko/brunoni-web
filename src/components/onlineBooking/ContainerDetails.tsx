@@ -202,7 +202,10 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               />
             )}
             {pickupLocation && pickupLocation.name && (
-              <TableRowData label={'Pick Up Location'} content={pickupLocation.name} />
+              <TableRowData
+                label={'Pick Up Location'}
+                content={[pickupLocation.name, pickupLocation.city, pickupLocation.countryCode].join(', ')}
+              />
             )}
             <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be assigned]'} />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
