@@ -1,5 +1,5 @@
 import TableBody from '@material-ui/core/TableBody';
-import { createStyles, makeStyles, Table, Theme } from '@material-ui/core';
+import { createStyles, makeStyles, Table } from '@material-ui/core';
 import React from 'react';
 import { TableRowData } from '../bookings/ContainerDetails';
 import { BookingRequest } from '../../model/BookingRequest';
