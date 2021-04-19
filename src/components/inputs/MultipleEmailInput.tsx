@@ -41,7 +41,7 @@ const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
         //todo email validation
         setSelectedEmails(newValue);
       }}
-      renderInput={params => <TextField {...params} label={label} placeholder="Add email" variant="outlined" />}
+      renderInput={params => <TextField {...params} label={label} placeholder="Add email &#9166;" variant="outlined" />}
     />
   );
 };
