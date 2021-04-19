@@ -15,7 +15,7 @@ export interface CarrierSettingsRule extends PaymentConfirmation {
 }
 export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: string;
+  category: ImpExp;
   client: Client;
   statisticClient: Client;
   type: PaymentConfirmationType.CUSTOMER_SETTINGS;
@@ -24,4 +24,8 @@ export interface CustomerSettingsRule extends PaymentConfirmation {
 export enum PaymentConfirmationType {
   CARRIER_SETTINGS = 'CARRIER_SETTINGS',
   CUSTOMER_SETTINGS = 'CUSTOMER_SETTINGS',
+}
+export interface ImpExp {
+  export: boolean;
+  import: boolean;
 }

@@ -7,10 +7,10 @@ import Carriers from '../../contexts/Carriers';
 import useClients from '../../hooks/useClients';
 import Carrier from '../../model/Carrier';
 import Client from '../../model/Client';
-import { CustomerSettingsRule, CarrierSettingsRule } from '../../model/PaymentConfirmationRule';
+import { CustomerSettingsRule, CarrierSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
-import CategoryFilter from '../CategoryFilter';
+import CategoryMultiSelect from '../CategoryMultiSelect';
 import CarrierInput from '../inputs/CarrierInput';
 import ClientInput from '../inputs/ClientInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
@@ -73,12 +73,12 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
     }
   }, [carrier, client, dispatch, enqueueSnackbar, paymentConfirmation.id, paymentConfirmationState]);
 
-  const changeData = useCallback((path: string, value?: Carrier | Client | string[] | string | null) => {
+  const changeData = useCallback((path: string, value?: Carrier | Client | ImpExp | string[] | null) => {
     setPaymentConfirmationState(prevState => set(path, value)(prevState));
   }, []);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    changeData('category', (event.target as HTMLInputElement).value);
+    changeData('category', { ...category, [event.target.name]: event.target.checked });
   };
 
   return (
@@ -95,7 +95,7 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
       </TableCell>
       <TableCell align="left">
-        <CategoryFilter value={category} onChange={handleImportOrExportChange} />
+        <CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />
       </TableCell>
       <TableCell align="left">
         <ClientInput

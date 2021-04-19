@@ -1,6 +1,20 @@
 import React from 'react';
-import { TextField } from '@material-ui/core';
+import { makeStyles, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+
+const useStyles = makeStyles({
+  customTextField: {
+    '& .MuiAutocomplete-input': {
+      width: '150px',
+    },
+    '& input::placeholder': {
+      fontSize: '15px',
+    },
+  },
+  input: {
+    width: '300px',
+  },
+});
 
 interface MultipleEmailInputInterface {
   data: string[];
@@ -15,9 +29,10 @@ const MultipleEmailInput: React.FC<MultipleEmailInputInterface> = ({
   setSelectedEmails,
   selectedEmails = [],
 }) => {
+  const classes = useStyles();
   return (
     <Autocomplete
-      style={{ maxWidth: 300 }}
+      classes={{ root: classes.customTextField }}
       multiple
       freeSolo
       options={data}

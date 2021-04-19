@@ -163,7 +163,7 @@ const App: React.FC = () => {
       const notificationId = params.readNotification as string;
 
       if (params.checklistTab) {
-        setLastOpenedChecklistTab(`${params.checklistTab as string}`, user.uid)
+        setLastOpenedChecklistTab(`${params.checklistTab as string}`, user?.uid)
           .then(() => delete params.checklistTab)
           .then(() => {
             //read that notification
@@ -184,7 +184,7 @@ const App: React.FC = () => {
         );
       }
     }
-  }, [history, user?.uid, userRecord]);
+  }, [history, user, userRecord]);
   return (
     <Fragment>
       <QuoteFilterListProvider>
