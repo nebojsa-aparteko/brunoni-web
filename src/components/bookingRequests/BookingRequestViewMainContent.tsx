@@ -96,7 +96,7 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
         {editing ? 'Cancel' : 'Edit Booking Request'}
       </Button>
       {editing && (
-        <Button color={'primary'} variant="contained" onClick={handleSave}>
+        <Button color={'primary'} variant="contained" onClick={handleSave} style={{ marginLeft: '1em' }}>
           Save changes
         </Button>
       )}
@@ -107,7 +107,7 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
           editing={editing}
         />
       </Box>
-      <Box marginTop="0em" marginBottom="0em">
+      <Box marginTop="0em" marginBottom={editing ? '2em' : '0em'}>
         {bookingRequestState.containers && (
           <>
             <Box marginTop="2em" marginBottom="2em">
