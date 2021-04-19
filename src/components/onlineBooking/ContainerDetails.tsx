@@ -24,6 +24,7 @@ import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
 import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
+import { compact, flow, pick } from 'lodash/fp';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -202,10 +203,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               />
             )}
             {pickupLocation && pickupLocation.name && (
-              <TableRowData
-                label={'Pick Up Location'}
-                content={[pickupLocation.name, pickupLocation.city, pickupLocation.countryCode].join(', ')}
-              />
+              <TableRowData label={'Pick Up Location'} content={createAddressString(pickupLocation)} />
             )}
             <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be assigned]'} />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
@@ -267,3 +265,6 @@ interface Props {
 }
 
 export default ContainerDetails;
+
+const createAddressString = (object: PickupLocation) =>
+  flow(pick(['name', 'street', 'city', 'countryCode']), Object.values, compact, (obj: any) => obj.join(', '))(object);
