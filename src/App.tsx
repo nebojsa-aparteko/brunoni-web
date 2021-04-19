@@ -184,7 +184,7 @@ const App: React.FC = () => {
         );
       }
     }
-  }, [history, user.uid, userRecord]);
+  }, [history, user?.uid, userRecord]);
   return (
     <Fragment>
       <QuoteFilterListProvider>
