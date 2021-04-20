@@ -63,5 +63,12 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
 export default NotificationsButton;
 
 const getNotificationCount = (unreadNotifications?: number) => {
-  return unreadNotifications ? (unreadNotifications > 0 ? unreadNotifications : 0) : 0;
+  if (unreadNotifications) {
+    if (unreadNotifications > 500) {
+      return '500+';
+    } else if (unreadNotifications > 0 && unreadNotifications < 500) {
+      return unreadNotifications;
+    }
+  }
+  return 0;
 };
