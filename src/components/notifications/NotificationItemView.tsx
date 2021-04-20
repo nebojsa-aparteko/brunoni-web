@@ -119,7 +119,7 @@ export const notificationSeenStatusChange = async (
   if (!notificationId) return;
   return await changeNotificationSeenStatus({
     action: action,
-    notification: notificationId,
+    notificationId,
     userAlphacomId: user.alphacomId,
     userEmail: user.emailAddress,
   });
