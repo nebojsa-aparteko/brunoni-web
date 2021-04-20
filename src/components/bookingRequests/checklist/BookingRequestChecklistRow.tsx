@@ -139,7 +139,7 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
     ) => {
       return firebase
         .firestore()
-        .collection('booking-requests')
+        .collection('bookings-requests')
         .doc(bookingRequest?.id)
         .collection('checklist')
         .doc(checklistItem?.id)

@@ -22,7 +22,7 @@ interface Props {
 export const addActivityItem = (bookingRequestId: string, activityLog: ActivityLogItem) => {
   return firebase
     .firestore()
-    .collection('booking-requests')
+    .collection('bookings-requests')
     .doc(bookingRequestId)
     .collection('activity')
     .doc()
@@ -34,7 +34,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
   const activityLogContext = useActivityLogState();
 
   const activityLogCollection = useFirestoreCollection(
-    'booking-requests',
+    'bookings-requests',
     useCallback(
       query => {
         const queryByItemFilter = showMore
@@ -85,7 +85,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
       } as ActivityLogUserData;
       firebase
         .firestore()
-        .collection('booking-requests')
+        .collection('bookings-requests')
         .doc(bookingRequest.id)
         .collection('activity')
         .add(

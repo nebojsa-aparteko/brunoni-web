@@ -131,7 +131,7 @@ const updateBookingRequest = async (bookingRequest: BookingRequest) => {
 const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
   firebase
     .firestore()
-    .collection('booking-requests')
+    .collection('bookings-requests')
     .doc(id)
     .set(
       {
@@ -144,7 +144,7 @@ const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
 const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
   return firebase
     .firestore()
-    .collection('booking-requests')
+    .collection('bookings-requests')
     .doc(bookingId)
     .collection('activity')
     .doc()
@@ -236,7 +236,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const onArchiveClick = useCallback(() => {
     // firebase
     //   .firestore()
-    //   .collection('booking-requests')
+    //   .collection('bookings-requests')
     //   .doc(bookingRequest?.id)
     //   .update('archived', !bookingRequest?.archived);
     //
@@ -245,7 +245,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // if (bookingRequest.inDispute && !bookingRequest.archived) {
     //   firebase
     //     .firestore()
-    //     .collection('booking-requests')
+    //     .collection('bookings-requests')
     //     .doc(bookingRequest?.id)
     //     .update('inDispute', false);
     // }

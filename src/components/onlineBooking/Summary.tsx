@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const createRequest = (bookingRequest: BookingRequest) =>
   firebase
     .firestore()
-    .collection('booking-requests')
+    .collection('bookings-requests')
     .add(bookingRequest);
 
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest }) => {

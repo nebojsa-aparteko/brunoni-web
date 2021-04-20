@@ -105,7 +105,6 @@ const BookingRequestViewMainContent = ({
 };
 
 interface Props {
-  bookingRequest: BookingRequest;
   isPrintWithCost: boolean;
   editing: boolean;
   bookingRequestState: BookingRequest;

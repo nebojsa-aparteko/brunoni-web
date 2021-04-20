@@ -68,19 +68,17 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
   const classes = useStyles();
   return (
     <React.Fragment>
-      {(container.oog as OOG[]).map((oogItem: OOG) => (
-        <TableRow>
+      {(container.oog as OOG[]).map((oogItem: OOG, index) => (
+        <TableRow key={`${index}:${oogItem.length}-${oogItem.width}-${oogItem.height}-${oogItem.weight}`}>
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
-          <Box display="flex" flexDirection="column">
-            <TableCell className={classes.tableCell}>
-              <Box display="flex" flexDirection="column">
-                {oogItem.width && <Typography>{`OW: ${oogItem.width}`}</Typography>}
-                {oogItem.height && <Typography>{`OH: ${oogItem.height}`}</Typography>}
-                {oogItem.length && <Typography>{`OL: ${oogItem.length}`}</Typography>}
-                {oogItem.weight && <Typography>{`OWt: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
-              </Box>
-            </TableCell>
-          </Box>
+          <TableCell className={classes.tableCell}>
+            <Box display="flex" flexDirection="column">
+              {oogItem.width && <Typography>{`OW: ${oogItem.width}`}</Typography>}
+              {oogItem.height && <Typography>{`OH: ${oogItem.height}`}</Typography>}
+              {oogItem.length && <Typography>{`OL: ${oogItem.length}`}</Typography>}
+              {oogItem.weight && <Typography>{`OWt: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
+            </Box>
+          </TableCell>
         </TableRow>
       ))}
     </React.Fragment>
@@ -95,18 +93,16 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {(container.imo as IMO[]).map(imoItem => (
-        <TableRow>
+      {(container.imo as IMO[]).map((imoItem, index) => (
+        <TableRow key={`${index}:${imoItem.IMOClass}-${imoItem.PGNumber}-${imoItem.UNNumber}`}>
           <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
-          <Box display="flex" flexDirection="column">
-            <TableCell className={classes.tableCell}>
-              <Box display="flex" flexDirection="column">
-                {imoItem.IMOClass && <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>}
-                {imoItem.UNNumber && <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>}
-                {imoItem.PGNumber && <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>}
-              </Box>
-            </TableCell>
-          </Box>
+          <TableCell className={classes.tableCell}>
+            <Box display="flex" flexDirection="column">
+              {imoItem.IMOClass && <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>}
+              {imoItem.UNNumber && <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>}
+              {imoItem.PGNumber && <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>}
+            </Box>
+          </TableCell>
         </TableRow>
       ))}
     </React.Fragment>
@@ -245,7 +241,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
       ) : (
         containers &&
         containers.map((container, index) => (
-          <React.Fragment>
+          <React.Fragment key={container.createdAt + ' - ' + index}>
             <ContainerDetail container={container} index={index} bookingRequest={bookingRequest} />
             <Grid item xs={12}>
               <Divider />

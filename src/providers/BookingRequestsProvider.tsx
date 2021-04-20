@@ -49,7 +49,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
     [userRecord, actingAs],
   );
 
-  const bookingRequestsSnapshot = useFirestoreCollection('booking-requests', query);
+  const bookingRequestsSnapshot = useFirestoreCollection('bookings-requests', query);
   // const bookingsSnapshot = useFirestoreCollection('bookings', userRecord && !actingAs ? query : null);
 
   const bookingRequestsResult = useMemo(() => {

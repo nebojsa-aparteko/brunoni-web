@@ -30,7 +30,7 @@ const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) =
             <BookingRequestChecklistContent bookingRequest={bookingRequest} />
           </CardContent>
         </Card>
-        {!actingAs && bookingRequest.id && <InternalStorage id={bookingRequest.id} collection={'booking-requests'} />}
+        {!actingAs && bookingRequest.id && <InternalStorage id={bookingRequest.id} collection={'bookings-requests'} />}
         <ActivityLogContainer bookingRequest={bookingRequest} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>

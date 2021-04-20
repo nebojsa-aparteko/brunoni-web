@@ -1,4 +1,15 @@
-import { Box, Button, Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Grid,
+  makeStyles,
+  Paper,
+  Table,
+  TableCell,
+  TableRow,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import React, { Fragment, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
@@ -73,6 +84,9 @@ const useStyles = makeStyles(theme => ({
   statusText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  blNumberInput: {
+    margin: 0,
   },
 }));
 
@@ -207,6 +221,10 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
     setBookingRequest({ ...bookingRequest, schedule: schedule });
   };
 
+  const handleChangeBLNumber = (value?: string) => {
+    setBookingRequest({ ...bookingRequest, blNumber: value });
+  };
+
   return (
     <Box flexDirection="column">
       {editing && (
@@ -264,7 +282,24 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
                   </Paper>
                 </TableCell>
               </TableRow>
-              <TableRowData label={'B/L-NO'} content={bookingRequest.blNumber || '[To be assigned]'} />
+              <TableRowData
+                label={'B/L-NO'}
+                content={
+                  editing ? (
+                    <TextField
+                      label=""
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={bookingRequest.blNumber}
+                      onChange={event => handleChangeBLNumber(event.target.value)}
+                      className={classes.blNumberInput}
+                    />
+                  ) : (
+                    bookingRequest.blNumber || '[To be assigned]'
+                  )
+                }
+              />
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
                 <TableCell className={classes.tableCell}>

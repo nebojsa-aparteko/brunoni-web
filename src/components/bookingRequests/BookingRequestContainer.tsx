@@ -20,7 +20,7 @@ const BookingRequestContainer: React.FC<Props> = ({ match }) => {
   const bookingRequestId = match.params.id;
 
   const history = useHistory();
-  const bookingRequestSnapshot = useFirestoreDocument('booking-requests', bookingRequestId);
+  const bookingRequestSnapshot = useFirestoreDocument('bookings-requests', bookingRequestId);
 
   const bookingRequestDoc = bookingRequestSnapshot
     ? ({ id: bookingRequestSnapshot.id, ...bookingRequestSnapshot.data() } as BookingRequest)

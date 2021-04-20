@@ -73,7 +73,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
       selectedRequests.forEach((id: string) => {
         firebase
           .firestore()
-          .collection('booking-requests')
+          .collection('bookings-requests')
           .doc(id)
           .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
           .then(() => {
