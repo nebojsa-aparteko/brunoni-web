@@ -1,5 +1,5 @@
-import { Box, Button, Divider, makeStyles, Typography } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
+import { Box, Divider, makeStyles, Typography } from '@material-ui/core';
+import React from 'react';
 import Page from '../bookings/Page';
 import { BookingRequest } from '../../model/BookingRequest';
 import { getBookingRequestTitle } from './BookingRequestView';
@@ -10,9 +10,6 @@ import QuoteItemQuoteDetails from '../quotes/QuoteItemQuoteDetails';
 import BookingRequestClosings from './BookingRequestClosings';
 import BookingRequestPortTerms from './BookingRequestPortTerms';
 import BookingRequestSpecialRemark from './BookingRequestSpecialRemark';
-import firebase from '../../firebase';
-import { GlobalContext } from '../../store/GlobalStore';
-import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
@@ -34,72 +31,21 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const updateBookingRequest = async (bookingRequest: BookingRequest) => {
-  bookingRequest.id &&
-    (await firebase
-      .firestore()
-      .collection('booking-requests')
-      .doc(bookingRequest.id)
-      .set(bookingRequest, { merge: true }));
-};
-
 const remark =
   'FOR FCL BOOKINGS ONLY:WITH RECEIPT OF THIS BOOKING CONFIRMATION, THE SHIPPER OR OTHER CARGO INTERESTED PARTY UNDERTAKES TO SEAL THE CONTAINER(S) WITH HIGH-SECURITY SEAL(S) (MEETING THE SPECIFICATIONS OF ISO/PAS 17712DD. JANUARY 17,2003) IMMEDIATELY AFTER STUFFING IS COMPLETED AND BEFORE IT IS DELIVERED TO US AND,AS PART OF THE SHIPPING INSTRUCTIONS, TO FORWARD THE SEAL NUMBER TOGETHER WITH THE PRECISE CONTENTS OF THE CONTAINER TO THE CARRIER.\n' +
   '\n' +
   'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
 
-const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Props) => {
-  const [bookingRequestState, setBookingRequestState] = useState<BookingRequest>(bookingRequest);
-  const [editing, setEditing] = useState<boolean>(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const [, dispatch] = useContext(GlobalContext);
+const BookingRequestViewMainContent = ({
+  isPrintWithCost,
+  editing,
+  bookingRequestState,
+  setBookingRequestState,
+}: Props) => {
   const classes = useStyles();
-
-  const handleCancelEditing = () => {
-    setBookingRequestState(bookingRequest);
-    setEditing(false);
-  };
-
-  useEffect(() => {
-    setBookingRequestState(bookingRequest);
-  }, [bookingRequest]);
-
-  const handleSave = () => {
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    updateBookingRequest(bookingRequestState)
-      .then(() => {
-        setEditing(false);
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1500,
-        });
-      })
-      .catch(error => {
-        console.error('error saving booking request', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      })
-      .finally(() => {
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      });
-  };
 
   return (
     <Page title={getBookingRequestTitle(bookingRequestState)}>
-      <Button
-        color={editing ? undefined : 'primary'}
-        variant="contained"
-        onClick={editing ? handleCancelEditing : () => setEditing(true)}
-      >
-        {editing ? 'Cancel' : 'Edit Booking Request'}
-      </Button>
-      {editing && (
-        <Button color={'primary'} variant="contained" onClick={handleSave} style={{ marginLeft: '1em' }}>
-          Save changes
-        </Button>
-      )}
       <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
         <BookingRequestSummary
           bookingRequest={bookingRequestState}
@@ -161,6 +107,9 @@ const BookingRequestViewMainContent = ({ bookingRequest, isPrintWithCost }: Prop
 interface Props {
   bookingRequest: BookingRequest;
   isPrintWithCost: boolean;
+  editing: boolean;
+  bookingRequestState: BookingRequest;
+  setBookingRequestState: (bookingRequest: BookingRequest) => void;
 }
 
 export default BookingRequestViewMainContent;

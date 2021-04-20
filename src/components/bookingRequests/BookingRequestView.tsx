@@ -36,6 +36,9 @@ import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/C
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
+import EditIcon from '@material-ui/icons/Edit';
+import { useSnackbar } from 'notistack';
+import { GlobalContext } from '../../store/GlobalStore';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -115,6 +118,15 @@ interface AgentAssignmentDialogProps {
   isOpen: boolean;
   handleClose: () => void;
 }
+
+const updateBookingRequest = async (bookingRequest: BookingRequest) => {
+  bookingRequest.id &&
+    (await firebase
+      .firestore()
+      .collection('booking-requests')
+      .doc(bookingRequest.id)
+      .set(bookingRequest, { merge: true }));
+};
 
 const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
   firebase
@@ -214,6 +226,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [bookingRequestState, setBookingRequestState] = useState<BookingRequest>(bookingRequest);
+  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useContext(GlobalContext);
 
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
@@ -239,6 +255,33 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleCancelEditing = () => {
+    setBookingRequestState(bookingRequest);
+    setEditing(false);
+  };
+
+  const handleSave = () => {
+    setEditing(false);
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    updateBookingRequest(bookingRequestState)
+      .then(() => {
+        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+          variant: 'success',
+          autoHideDuration: 1500,
+        });
+      })
+      .catch(error => {
+        console.error('error saving booking request', error);
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      })
+      .finally(() => {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      });
   };
 
   const handleClose = () => {
@@ -291,6 +334,21 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
               <Box flex="1" />
               <Box className={classes.actions} displayPrint="none">
+                {editing && (
+                  <>
+                    <Button color="primary" variant="contained" onClick={handleCancelEditing}>
+                      Cancel
+                    </Button>
+                    <Button color={'primary'} variant="contained" onClick={handleSave} style={{ marginLeft: '1em' }}>
+                      Save changes
+                    </Button>
+                  </>
+                )}
+                {!editing && (
+                  <IconButton size="small" aria-label="Edit" component="span" onClick={() => setEditing(true)}>
+                    <EditIcon />
+                  </IconButton>
+                )}
                 <IconButton
                   // color="primary"
                   size="small"
@@ -341,7 +399,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             </Box>
 
             <Grid item xs={12}>
-              <BookingRequestViewMainContent bookingRequest={bookingRequest} isPrintWithCost={isPrintWithCost} />
+              <BookingRequestViewMainContent
+                bookingRequest={bookingRequest}
+                isPrintWithCost={isPrintWithCost}
+                editing={editing}
+                bookingRequestState={bookingRequestState}
+                setBookingRequestState={setBookingRequestState}
+              />
             </Grid>
           </Paper>
         </Page>
