@@ -400,7 +400,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
             <Grid item xs={12}>
               <BookingRequestViewMainContent
-                bookingRequest={bookingRequest}
                 isPrintWithCost={isPrintWithCost}
                 editing={editing}
                 bookingRequestState={bookingRequestState}
