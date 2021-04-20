@@ -123,7 +123,7 @@ const updateBookingRequest = async (bookingRequest: BookingRequest) => {
   bookingRequest.id &&
     (await firebase
       .firestore()
-      .collection('booking-requests')
+      .collection('bookings-requests')
       .doc(bookingRequest.id)
       .set(bookingRequest, { merge: true }));
 };
