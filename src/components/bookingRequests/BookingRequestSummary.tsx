@@ -19,7 +19,7 @@ import { ClientDetails } from '../bookings/BookingSummary';
 import { isIntermediary } from '../ItineraryItem';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
-import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -92,30 +92,78 @@ const useStyles = makeStyles(theme => ({
 
 interface IntermediateInfosProps {
   bookingRequest: BookingRequest;
+  setBookingRequest: (bookingRequest: BookingRequest) => void;
+  editing?: boolean;
 }
 
-const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest }) => {
+const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, setBookingRequest, editing }) => {
   const [isOriginIntermediary] = useState<boolean | undefined>(
     bookingRequest.schedule?.OriginInfo ? !!isIntermediary(bookingRequest.schedule?.OriginInfo) : undefined,
   );
+
+  const handleChangeDepartureDate = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    index: number,
+  ) => {
+    const newIntermediatePortInfos = bookingRequest.schedule?.IntermediatePortInfos.map((info, infoIndex) =>
+      index === infoIndex ? { ...info, DepartureDate: event.target.value } : info,
+    );
+    setBookingRequest({
+      ...bookingRequest,
+      schedule: {
+        ...bookingRequest.schedule,
+        IntermediatePortInfos: newIntermediatePortInfos,
+      } as RouteSearchResult,
+    });
+  };
 
   return (
     <React.Fragment>
       {bookingRequest.schedule?.IntermediatePortInfos.length === 1 ? (
         <TableRowData
           label={isOriginIntermediary ? 'Port of Loading' : 'Port of Discharge'}
-          content={[
-            bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName,
-            formatDateString(bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate),
-          ].join(isOriginIntermediary ? '<br/>ETS: ' : '<br/>ETA: ')}
+          content={
+            editing ? (
+              <Box display="flex" flexDirection="column">
+                {bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName}
+                <TextField
+                  label={isOriginIntermediary ? 'ETS' : 'ETA'}
+                  value={bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate}
+                  onChange={event => handleChangeDepartureDate(event, 0)}
+                  variant="outlined"
+                  margin="dense"
+                />
+              </Box>
+            ) : (
+              [
+                bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName,
+                formatDateString(bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate),
+              ].join(isOriginIntermediary ? '<br/>ETS: ' : '<br/>ETA: ')
+            )
+          }
         />
       ) : (
         bookingRequest.schedule?.IntermediatePortInfos.map((info, index) => (
           <TableRowData
             label={index === 0 ? 'Port of Loading' : 'Port of Discharge'}
-            content={[info.Port.HarbourName, formatDateString(info.DepartureDate)].join(
-              index === 0 ? '<br/>ETS: ' : '<br/>ETA: ',
-            )}
+            content={
+              editing ? (
+                <Box display="flex" flexDirection="column">
+                  {info.Port.HarbourName}
+                  <TextField
+                    label={index === 0 ? 'ETS' : 'ETA'}
+                    value={info.DepartureDate}
+                    onChange={event => handleChangeDepartureDate(event, index)}
+                    variant="outlined"
+                    margin="dense"
+                  />
+                </Box>
+              ) : (
+                [info.Port.HarbourName, formatDateString(info.DepartureDate)].join(
+                  index === 0 ? '<br/>ETS: ' : '<br/>ETA: ',
+                )
+              )
+            }
           />
         ))
       )}
@@ -129,9 +177,36 @@ const isVesselIntermediate = (vessel: string) => {
 
 interface ItineraryInfoProps {
   bookingRequest: BookingRequest;
+  setBookingRequest: (bookingRequest: BookingRequest) => void;
+  editing?: boolean;
 }
 
-const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest }) => {
+const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookingRequest, editing }) => {
+  const handleChangeDepartureDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setBookingRequest({
+      ...bookingRequest,
+      schedule: {
+        ...bookingRequest.schedule,
+        OriginInfo: {
+          ...bookingRequest.schedule?.OriginInfo,
+          DepartureDate: event.target.value,
+        } as RouteSearchResultOriginInfo,
+      } as RouteSearchResult,
+    });
+  };
+  const handleChangeArrivalDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setBookingRequest({
+      ...bookingRequest,
+      schedule: {
+        ...bookingRequest.schedule,
+        DestinationInfo: {
+          ...bookingRequest.schedule?.DestinationInfo,
+          ArrivalDate: event.target.value,
+        } as RouteSearchResultOriginInfo,
+      } as RouteSearchResult,
+    });
+  };
+
   return (
     <React.Fragment>
       {bookingRequest.schedule?.OriginInfo && (
@@ -141,15 +216,30 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest }) => {
               ? 'Place of Receipt'
               : 'Port of Loading'
           }
-          content={[
-            bookingRequest.schedule?.OriginInfo.Port.HarbourName,
-            formatDateString(bookingRequest.schedule?.OriginInfo.DepartureDate),
-          ].join('<br/>ETS: ')}
+          content={
+            editing ? (
+              <Box display="flex" flexDirection="column">
+                {bookingRequest.schedule?.OriginInfo.Port.HarbourName}
+                <TextField
+                  label={'ETS'}
+                  value={bookingRequest.schedule?.OriginInfo.DepartureDate}
+                  onChange={handleChangeDepartureDate}
+                  variant="outlined"
+                  margin="dense"
+                />
+              </Box>
+            ) : (
+              [
+                bookingRequest.schedule?.OriginInfo.Port.HarbourName,
+                formatDateString(bookingRequest.schedule?.OriginInfo.DepartureDate),
+              ].join('<br/>ETS: ')
+            )
+          }
         />
       )}
 
       {bookingRequest.schedule?.IntermediatePortInfos && bookingRequest.schedule?.IntermediatePortInfos.length > 0 && (
-        <IntermediateInfos bookingRequest={bookingRequest} />
+        <IntermediateInfos bookingRequest={bookingRequest} setBookingRequest={setBookingRequest} editing={editing} />
       )}
 
       {bookingRequest.schedule?.DestinationInfo && (
@@ -159,10 +249,25 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest }) => {
               ? 'Place of Delivery'
               : 'Port of Discharge'
           }
-          content={[
-            bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
-            formatDateString(bookingRequest.schedule?.DestinationInfo.ArrivalDate),
-          ].join('<br/>ETA: ')}
+          content={
+            editing ? (
+              <Box display="flex" flexDirection="column">
+                {bookingRequest.schedule?.OriginInfo.Port.HarbourName}
+                <TextField
+                  label={'ETA'}
+                  value={bookingRequest.schedule?.DestinationInfo.ArrivalDate}
+                  onChange={handleChangeArrivalDate}
+                  variant="outlined"
+                  margin="dense"
+                />
+              </Box>
+            ) : (
+              [
+                bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
+                formatDateString(bookingRequest.schedule?.DestinationInfo.ArrivalDate),
+              ].join('<br/>ETA: ')
+            )
+          }
         />
       )}
     </React.Fragment>
@@ -218,7 +323,11 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
   }, [client, bookingRequest]);
 
   const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
-    setBookingRequest({ ...bookingRequest, schedule: schedule });
+    setBookingRequest({
+      ...bookingRequest,
+      schedule: schedule,
+    });
+    handleDialogClose();
   };
 
   const handleChangeBLNumber = (value?: string) => {
@@ -263,7 +372,7 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
                 ].join(' VOY. ')}
               />
 
-              <ItineraryInfo bookingRequest={bookingRequest} />
+              <ItineraryInfo bookingRequest={bookingRequest} setBookingRequest={setBookingRequest} editing={editing} />
             </TableBody>
           </Table>
         </Grid>
@@ -300,6 +409,9 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
                   )
                 }
               />
+              {bookingRequest.quoteNumber && (
+                <TableRowData label={'Quote Reference'} content={bookingRequest.quoteNumber + ''} />
+              )}
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
                 <TableCell className={classes.tableCell}>
