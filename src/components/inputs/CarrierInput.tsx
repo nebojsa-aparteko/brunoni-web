@@ -10,7 +10,7 @@ const getOptionSelected = (option: Carrier, value: Carrier) => option.id === val
 const getOptionLabel = (option: Carrier) => `${option.name} - (${option.id})`;
 
 interface Props {
-  label: string;
+  label?: string;
   carriers: Carrier[] | undefined;
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Carrier | null | undefined;
@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const CarrierInput: React.FC<Props> = ({
-  label,
+  label = '',
   carriers,
   inputRef,
   value,

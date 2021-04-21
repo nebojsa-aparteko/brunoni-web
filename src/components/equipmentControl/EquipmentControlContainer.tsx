@@ -37,7 +37,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box p={3}>{value === index && children}</Box>}
+      {value === index && <Box>{value === index && children}</Box>}
     </div>
   );
 }
@@ -85,15 +85,21 @@ const EquipmentControlContainer = () => {
         </TabPanel>
 
         <TabPanel value={selectedTab} index={2}>
-          <OverviewsContainer />
+          <Box p={3}>
+            <OverviewsContainer />
+          </Box>
         </TabPanel>
 
         <TabPanel value={selectedTab} index={3}>
-          <BookingsVsStockContainer />
+          <Box p={3}>
+            <BookingsVsStockContainer />
+          </Box>
         </TabPanel>
 
         <TabPanel value={selectedTab} index={4}>
-          <EquipmentBookingDetailsContainer />
+          <Box p={3}>
+            <EquipmentBookingDetailsContainer />
+          </Box>
         </TabPanel>
       </Box>
     </Paper>

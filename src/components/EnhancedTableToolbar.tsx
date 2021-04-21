@@ -33,11 +33,21 @@ interface EnhancedTableToolbarProps {
   handleDelete: () => void;
   labelWhenSelected: string;
   labelWhenNotSelected: string;
+  addButtonLabel: string;
+  deleteButtonLabel: string;
 }
 
 export const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const classes = useStyles();
-  const { numSelected, handleAdd, handleDelete, labelWhenSelected, labelWhenNotSelected } = props;
+  const {
+    numSelected,
+    handleAdd,
+    handleDelete,
+    labelWhenSelected,
+    labelWhenNotSelected,
+    addButtonLabel,
+    deleteButtonLabel,
+  } = props;
 
   return (
     <Toolbar
@@ -55,13 +65,13 @@ export const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="Delete admins">
+        <Tooltip title={deleteButtonLabel}>
           <IconButton aria-label="delete" onClick={handleDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Add new admin">
+        <Tooltip title={addButtonLabel}>
           <IconButton aria-label="filter list" onClick={handleAdd}>
             <AddIcon />
           </IconButton>

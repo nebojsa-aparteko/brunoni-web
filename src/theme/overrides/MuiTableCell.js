@@ -10,6 +10,10 @@ export default {
     },
   },
   sizeSmall: {
+    color: '#000', // TODO get this from theme
+    lineHeight: 1,
+    paddingLeft: '1em',
+    paddingRight: '1em',
     '@media print': {
       padding: 0,
     },

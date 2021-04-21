@@ -9,7 +9,7 @@ import match from 'autosuggest-highlight/match';
 const getOptionLabel = (option: Port) => `${option.city} - ${option.country} (${option.id})`;
 
 interface Props {
-  label: string;
+  label?: string;
   ports: Port[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Port;
@@ -26,7 +26,17 @@ const useStyles = makeStyles({
   },
 });
 
-const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, open, onOpen, onClose, margin }) => {
+const PortInput: React.FC<Props> = ({
+  label = '',
+  ports,
+  inputRef,
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  margin,
+}) => {
   const classes = useStyles();
   const loading = open && !ports;
 
@@ -84,7 +94,7 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
 const usePopupStyles = makeStyles((theme: Theme) => ({
   popper: {
     width: theme.breakpoints.values.md / 2,
-    zIndex: 2000,
+    zIndex: 5000,
   },
 }));
 

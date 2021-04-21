@@ -8,13 +8,15 @@ import TableBody from '@material-ui/core/TableBody';
 import TeamTeamRow from './TeamTeamRow';
 import TableContainer from '@material-ui/core/TableContainer';
 import { makeStyles } from '@material-ui/core/styles';
-import { Team } from '../../model/Teams';
+import { TeamType } from '../../model/Teams';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
 import { Checkbox, Typography } from '@material-ui/core';
 import { deleteTeams } from './TeamsTeamsContainer';
 import ConfirmationDialog from '../ConfirmationDialog';
+import useTeams from '../../hooks/useTeams';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -29,8 +31,10 @@ const useStyles = makeStyles({
   },
 });
 
-const AccountingTeamsTable = ({ teams, onAdd }: Props) => {
+const AccountingTeamsTable = ({ onAdd }: Props) => {
   const classes = useStyles();
+
+  const teams = useTeams(TeamType.ACCOUNTING);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [, dispatch] = useContext(GlobalContext);
@@ -77,57 +81,65 @@ const AccountingTeamsTable = ({ teams, onAdd }: Props) => {
   }, [selectedTeams, enqueueSnackbar, dispatch]);
 
   return (
-    <TableContainer component={Paper} className={classes.tableContainer}>
-      <EnhancedTableToolbar
-        numSelected={selectedTeams.length}
-        handleAdd={() => onAdd(true)}
-        handleDelete={() => setIsConfirmationDialogOpen(true)}
-        labelWhenSelected={
-          selectedTeams.length === 1
-            ? `${selectedTeams.length} admin selected`
-            : `${selectedTeams.length} admins selected`
-        }
-        labelWhenNotSelected={''}
-      />
-      <Table className={classes.table} aria-label="a dense table">
-        <colgroup>
-          <col style={{ width: '5%' }} />
-          <col style={{ width: '20%' }} />
-          <col style={{ width: '20%' }} />
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '20%' }} />
-          <col style={{ width: '5%' }} />
-        </colgroup>
-        <TableHead>
-          <TableRow>
-            <TableCell align="left" style={{ paddingLeft: 4 }}>
-              <Checkbox
-                checked={selectedTeams.length === teams.length}
-                onClick={handleSelectDeselectAll}
-                onFocus={event => event.stopPropagation()}
-                color="primary"
-              />
-            </TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell align="center">Members</TableCell>
-            <TableCell align="center">Carriers</TableCell>
-            <TableCell align="center">Categories</TableCell>
-            <TableCell align="center">Task types</TableCell>
-            <TableCell align="right" />
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {teams?.map(team => (
-            <TeamTeamRow
-              team={team}
-              key={`teams-${team.id}`}
-              selected={team.id ? selectedTeams.includes(team.id) : false}
-              onSelectRow={event => team.id && onSelectRow(event, team.id)}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    <>
+      {!teams ? (
+        <ChartsCircularProgress />
+      ) : (
+        <TableContainer component={Paper} className={classes.tableContainer}>
+          <EnhancedTableToolbar
+            numSelected={selectedTeams.length}
+            handleAdd={() => onAdd(true)}
+            handleDelete={() => setIsConfirmationDialogOpen(true)}
+            labelWhenSelected={
+              selectedTeams.length === 1
+                ? `${selectedTeams.length} admin selected`
+                : `${selectedTeams.length} admins selected`
+            }
+            addButtonLabel={'Add admin'}
+            deleteButtonLabel={selectedTeams.length === 1 ? `Delete admin` : `Delete admins`}
+            labelWhenNotSelected={''}
+          />
+          <Table className={classes.table} aria-label="a dense table">
+            <colgroup>
+              <col style={{ width: '5%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '5%' }} />
+            </colgroup>
+            <TableHead>
+              <TableRow>
+                <TableCell align="left" style={{ paddingLeft: 4 }}>
+                  <Checkbox
+                    checked={selectedTeams.length === teams.length}
+                    onClick={handleSelectDeselectAll}
+                    onFocus={event => event.stopPropagation()}
+                    color="primary"
+                  />
+                </TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell align="center">Members</TableCell>
+                <TableCell align="center">Carriers</TableCell>
+                <TableCell align="center">Categories</TableCell>
+                <TableCell align="center">Task types</TableCell>
+                <TableCell align="right" />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {teams.map(team => (
+                <TeamTeamRow
+                  team={team}
+                  key={`teams-${team.id}`}
+                  selected={team.id ? selectedTeams.includes(team.id) : false}
+                  onSelectRow={event => team.id && onSelectRow(event, team.id)}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       <ConfirmationDialog
         isOpen={isConfirmationDialogOpen}
         label={'Please confirm deletion'}
@@ -135,12 +147,11 @@ const AccountingTeamsTable = ({ teams, onAdd }: Props) => {
         handleClose={() => setIsConfirmationDialogOpen(false)}
         description={'Are you sure you want to delete the selected teams?'}
       />
-    </TableContainer>
+    </>
   );
 };
 
 interface Props {
-  teams: Team[];
   onAdd: (isAccounting: boolean) => void;
 }
 

@@ -48,7 +48,6 @@ import {
 } from './components/notifications/NotificationItemView';
 import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
-import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 
 const anonymousRoutes = (
   <Switch>
@@ -72,8 +71,8 @@ const adminRoutes = (
     <Route exact path="/quotes/groups" component={QuoteGroups} />
     <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
-    <Route exact path="/online-booking" component={OnlineBookingPage} />
-    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
+    //todo uncomment when needed
+    {/*<Route exact path="/online-booking" component={OnlineBookingPage} />*/}
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/teams" component={TeamManagementPage} />
@@ -99,8 +98,7 @@ const userRoutes = (
     <Route exact path="/quotes/groups/:id" component={QuoteGroup} />
     <Route exact path="/quotes/get" component={GetQuotes} />
     <Route exact path="/quotes/:id" component={QuotePageContainer} />
-    <Route exact path="/online-booking" component={OnlineBookingPage} />
-    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
+    {/*<Route exact path="/online-booking" component={OnlineBookingPage} />*/}
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/equipment" component={EquipmentSituation} />

@@ -6,10 +6,18 @@ import Notification from '../model/Notification';
 import { invoke, update, flow } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 
-export default function useNotifications(userId?: string, isFilterByUnread?: boolean, limit?: number) {
+export default function useNotifications(
+  userId?: string,
+  userEmail?: string,
+  isFilterByUnread?: boolean,
+  limit?: number,
+) {
   const query = useCallback(
     q => {
       let query = q.where('userAlphacomId', '==', userId);
+      if (userEmail) {
+        query = query.where('userEmail', '==', userEmail);
+      }
       if (isFilterByUnread) {
         query = query.where('seen', '==', false);
       }

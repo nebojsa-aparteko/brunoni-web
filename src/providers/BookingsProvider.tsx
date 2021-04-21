@@ -11,6 +11,7 @@ import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
 import { UserRecordMinProperties } from '../model/UserRecord';
 import { useBookingListFilterContext } from './BookingListFilterProvider';
+import { isNumberOfAppliedFiltersLessThan } from '../utilities/isNumberOfAppliedFiltersLessThan';
 import firebase from '../firebase';
 
 interface Props {
@@ -114,6 +115,11 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
       query = filters.dateRange
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');
+
+      const watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier', 'assignee'];
+      if (isNumberOfAppliedFiltersLessThan(filters, watchingFilters, 3)) {
+        query = query.limit(100);
+      }
 
       return query;
     },
