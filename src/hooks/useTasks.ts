@@ -39,7 +39,6 @@ export default function useTasks() {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
       }
       if (taskType) {
-        console.log(taskType);
         query = query.where('type', '==', taskType);
       }
       return query;

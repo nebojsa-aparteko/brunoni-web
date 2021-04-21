@@ -184,13 +184,16 @@ const MyDayContainer = () => {
     },
     [filters, setFilters],
   );
-  const handleTaskTypeChange = (event: React.ChangeEvent<{}>, value: string | null) => {
-    if (setFilters) {
-      setFilters(
-        set('taskType', Object.entries(TaskDescription).find(([, name]) => value === name)?.[0] || '')(filters),
-      );
-    }
-  };
+  const handleTaskTypeChange = useCallback(
+    (event: React.ChangeEvent<{}>, value: string | null) => {
+      if (setFilters) {
+        setFilters(
+          set('taskType', Object.entries(TaskDescription).find(([, name]) => value === name)?.[0] || '')(filters),
+        );
+      }
+    },
+    [filters, setFilters],
+  );
 
   /*
     Overdue / Future, make array of filter functions, and add that function into filter function of an array
