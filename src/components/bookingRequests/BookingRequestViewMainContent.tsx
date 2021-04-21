@@ -69,7 +69,13 @@ const BookingRequestViewMainContent = ({
         )}
       </Box>
       <BookingRequestPortTerms bookingRequest={bookingRequestState} />
-      {bookingRequestState.schedule?.Deadlines && <BookingRequestClosings bookingRequest={bookingRequestState} />}
+      {bookingRequestState.schedule?.Deadlines && (
+        <BookingRequestClosings
+          bookingRequest={bookingRequestState}
+          setBookingRequest={setBookingRequestState}
+          editing={editing}
+        />
+      )}
       <BookingRequestSpecialRemark
         bookingRequest={bookingRequestState}
         setBookingRequest={setBookingRequestState}
