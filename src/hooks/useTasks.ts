@@ -13,7 +13,7 @@ import { formatCarrierId } from '../components/myDay/MyDayContainer';
 export default function useTasks() {
   const [snapshot, setSnapshot] = useState<Task[] | undefined>();
   const [filters] = useTaskFilterProviderContext();
-  const { assignee, showClientTasks, taskCategory, carrier, payDate } = filters;
+  const { assignee, showClientTasks, taskCategory, carrier, payDate, taskType } = filters;
   const [actingAs] = useContext(ActingAs);
   const userRecord = useContext(UserRecordContext);
 
@@ -38,9 +38,13 @@ export default function useTasks() {
       if (actingAs) {
         query = query.where('assignedUser', '==', pick(UserRecordMinProperties)(userRecord));
       }
+      if (taskType) {
+        console.log(taskType);
+        query = query.where('type', '==', taskType);
+      }
       return query;
     },
-    [assignee, showClientTasks, actingAs, userRecord, taskCategory, carrier, payDate],
+    [assignee, showClientTasks, actingAs, userRecord, taskCategory, carrier, payDate, taskType],
   );
 
   useEffect(() => {

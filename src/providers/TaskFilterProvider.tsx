@@ -2,7 +2,7 @@ import React, { createContext, Dispatch, SetStateAction, useState } from 'react'
 import useUser from '../hooks/useUser';
 import { UserRecordMin } from '../model/UserRecord';
 import { TaskStatus } from '../components/TaskStatusChip';
-import { TaskCategory } from '../model/Task';
+import { TaskCategory, TaskType } from '../model/Task';
 import Carrier from '../model/Carrier';
 
 export interface TaskFilterProviderContextFilters {
@@ -12,6 +12,7 @@ export interface TaskFilterProviderContextFilters {
   taskCategory: TaskCategory;
   carrier?: Carrier;
   payDate?: Date;
+  taskType: TaskType;
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {
