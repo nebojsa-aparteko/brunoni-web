@@ -132,6 +132,7 @@ const updateBookingRequest = (bookingRequest: BookingRequest) => {
       .doc(bookingRequest.id)
       .set(bookingRequest, { merge: true });
   }
+  return Promise.resolve();
 };
 
 const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>

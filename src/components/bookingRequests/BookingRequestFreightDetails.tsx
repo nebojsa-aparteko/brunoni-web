@@ -151,8 +151,8 @@ const findNextPos = (quoteDetails: QuoteDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
   for (let i in quoteDetails) {
-    if (parseInt(quoteDetails[i].Pos) >= pos) pos++;
-    else break;
+    const value = parseInt(quoteDetails[i].Pos);
+    if (value >= pos) pos = value + 1;
   }
   return pos + '';
 };

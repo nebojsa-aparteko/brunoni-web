@@ -341,8 +341,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
     bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, blNumber: value });
   };
 
-  console.log(bookingRequest.assignedUser, 'Assigned user ');
-
   return bookingRequest ? (
     <Box flexDirection="column">
       {editing && (
