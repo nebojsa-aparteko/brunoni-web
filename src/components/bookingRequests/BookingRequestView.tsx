@@ -336,7 +336,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               <Box className={classes.actions} displayPrint="none">
                 {editing && (
                   <>
-                    <Button color="primary" variant="contained" onClick={handleCancelEditing}>
+                    <Button variant="contained" onClick={handleCancelEditing}>
                       Cancel
                     </Button>
                     <Button color={'primary'} variant="contained" onClick={handleSave} style={{ marginLeft: '1em' }}>
