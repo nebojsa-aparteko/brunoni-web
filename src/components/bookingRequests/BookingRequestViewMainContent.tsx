@@ -1,15 +1,15 @@
 import { Box, Divider, makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
 import Page from '../bookings/Page';
-import { BookingRequest } from '../../model/BookingRequest';
 import { getBookingRequestTitle } from './BookingRequestView';
 import BookingRequestSummary from './BookingRequestSummary';
 import InfoBoxItem from '../InfoBoxItem';
 import ContainerDetails from '../onlineBooking/ContainerDetails';
-import QuoteItemQuoteDetails from '../quotes/QuoteItemQuoteDetails';
 import BookingRequestClosings from './BookingRequestClosings';
 import BookingRequestPortTerms from './BookingRequestPortTerms';
 import BookingRequestSpecialRemark from './BookingRequestSpecialRemark';
+import BookingRequestFreightDetails from './BookingRequestFreightDetails';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
@@ -36,22 +36,14 @@ const remark =
   '\n' +
   'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
 
-const BookingRequestViewMainContent = ({
-  isPrintWithCost,
-  editing,
-  bookingRequestState,
-  setBookingRequestState,
-}: Props) => {
+const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
   const classes = useStyles();
+  const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
-  return (
+  return bookingRequestState && setBookingRequestState ? (
     <Page title={getBookingRequestTitle(bookingRequestState)}>
       <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
-        <BookingRequestSummary
-          bookingRequest={bookingRequestState}
-          setBookingRequest={setBookingRequestState}
-          editing={editing}
-        />
+        <BookingRequestSummary editing={editing} />
       </Box>
       <Box marginTop="0em" marginBottom={editing ? '2em' : '0em'}>
         {bookingRequestState.containers && (
@@ -69,24 +61,17 @@ const BookingRequestViewMainContent = ({
         )}
       </Box>
       <BookingRequestPortTerms bookingRequest={bookingRequestState} />
-      {bookingRequestState.schedule?.Deadlines && (
-        <BookingRequestClosings
-          bookingRequest={bookingRequestState}
-          setBookingRequest={setBookingRequestState}
-          editing={editing}
-        />
-      )}
-      <BookingRequestSpecialRemark
-        bookingRequest={bookingRequestState}
-        setBookingRequest={setBookingRequestState}
-        editing={editing}
-      />
+
+      <BookingRequestClosings editing={editing} />
+
+      <BookingRequestSpecialRemark editing={editing} />
       {bookingRequestState.freightDetails && (
         <>
           <Box marginTop="2em" marginBottom="2em">
             <Divider />
           </Box>
-          <QuoteItemQuoteDetails quoteDetails={bookingRequestState.freightDetails} hideRemarks={true} />
+          <BookingRequestFreightDetails quoteDetails={bookingRequestState.freightDetails} />
+          {/*<QuoteItemQuoteDetails quoteDetails={bookingRequestState.freightDetails} hideRemarks={true} />*/}
           <Typography variant="body2" className={classes.remark}>
             {remark}
           </Typography>
@@ -107,14 +92,11 @@ const BookingRequestViewMainContent = ({
         )}
       </Box>
     </Page>
-  );
+  ) : null;
 };
 
 interface Props {
   isPrintWithCost: boolean;
-  editing: boolean;
-  bookingRequestState: BookingRequest;
-  setBookingRequestState: (bookingRequest: BookingRequest) => void;
 }
 
 export default BookingRequestViewMainContent;

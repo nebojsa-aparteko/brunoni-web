@@ -11,8 +11,8 @@ import {
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import React from 'react';
-import { BookingRequest } from '../../model/BookingRequest';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,23 +37,26 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const BookingRequestClosings: React.FC<Props> = ({ bookingRequest, setBookingRequest, editing }) => {
+const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
+  const [bookingRequest, setBookingRequest] = useBookingRequestContext();
 
   const handleChangeClosing = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
-    const newDeadlines = bookingRequest.schedule?.Deadlines.map((deadline, deadlineIndex) =>
+    const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
       index === deadlineIndex ? { ...deadline, Time: event.target.value } : deadline,
     );
-    setBookingRequest({
-      ...bookingRequest,
-      schedule: {
-        ...bookingRequest.schedule,
-        Deadlines: newDeadlines,
-      } as RouteSearchResult,
-    });
+    bookingRequest &&
+      setBookingRequest &&
+      setBookingRequest({
+        ...bookingRequest,
+        schedule: {
+          ...bookingRequest.schedule,
+          Deadlines: newDeadlines,
+        } as RouteSearchResult,
+      });
   };
 
-  return (
+  return bookingRequest && bookingRequest.schedule?.Deadlines && setBookingRequest ? (
     <Box className={classes.tableWrapper} marginTop="1em" marginBottom="1em">
       <Table className={classes.table} size="small">
         <TableHead className={classes.tableHead}>
@@ -63,37 +66,34 @@ const BookingRequestClosings: React.FC<Props> = ({ bookingRequest, setBookingReq
           </TableRow>
         </TableHead>
         <TableBody>
-          {bookingRequest.schedule?.Deadlines &&
-            bookingRequest.schedule?.Deadlines.map((item, index) => {
-              return (
-                <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
-                  <TableCell>{item.Typ}</TableCell>
-                  <TableCell style={{ minWidth: '8em' }}>
-                    {editing ? (
-                      <TextField
-                        label={''}
-                        fullWidth
-                        value={item.Time}
-                        onChange={event => handleChangeClosing(event, index)}
-                        variant="outlined"
-                        margin="dense"
-                      />
-                    ) : (
-                      item.Time
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+          {bookingRequest.schedule?.Deadlines.map((item, index) => {
+            return (
+              <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
+                <TableCell>{item.Typ}</TableCell>
+                <TableCell style={{ minWidth: '8em' }}>
+                  {editing ? (
+                    <TextField
+                      label={''}
+                      fullWidth
+                      value={item.Time}
+                      onChange={event => handleChangeClosing(event, index)}
+                      variant="outlined"
+                      margin="dense"
+                    />
+                  ) : (
+                    item.Time
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </Box>
-  );
+  ) : null;
 };
 
 interface Props {
-  bookingRequest: BookingRequest;
-  setBookingRequest: (bookingRequest: BookingRequest) => void;
   editing?: boolean;
 }
 

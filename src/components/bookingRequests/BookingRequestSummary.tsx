@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
@@ -20,6 +20,7 @@ import { isIntermediary } from '../ItineraryItem';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
 import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -92,7 +93,7 @@ const useStyles = makeStyles(theme => ({
 
 interface IntermediateInfosProps {
   bookingRequest: BookingRequest;
-  setBookingRequest: (bookingRequest: BookingRequest) => void;
+  setBookingRequest: Dispatch<SetStateAction<BookingRequest | undefined>> | undefined;
   editing?: boolean;
 }
 
@@ -108,13 +109,14 @@ const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, s
     const newIntermediatePortInfos = bookingRequest.schedule?.IntermediatePortInfos.map((info, infoIndex) =>
       index === infoIndex ? { ...info, DepartureDate: event.target.value } : info,
     );
-    setBookingRequest({
-      ...bookingRequest,
-      schedule: {
-        ...bookingRequest.schedule,
-        IntermediatePortInfos: newIntermediatePortInfos,
-      } as RouteSearchResult,
-    });
+    setBookingRequest &&
+      setBookingRequest({
+        ...bookingRequest,
+        schedule: {
+          ...bookingRequest.schedule,
+          IntermediatePortInfos: newIntermediatePortInfos,
+        } as RouteSearchResult,
+      });
   };
 
   return (
@@ -177,34 +179,36 @@ const isVesselIntermediate = (vessel: string) => {
 
 interface ItineraryInfoProps {
   bookingRequest: BookingRequest;
-  setBookingRequest: (bookingRequest: BookingRequest) => void;
+  setBookingRequest: Dispatch<SetStateAction<BookingRequest | undefined>> | undefined;
   editing?: boolean;
 }
 
 const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookingRequest, editing }) => {
   const handleChangeDepartureDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingRequest({
-      ...bookingRequest,
-      schedule: {
-        ...bookingRequest.schedule,
-        OriginInfo: {
-          ...bookingRequest.schedule?.OriginInfo,
-          DepartureDate: event.target.value,
-        } as RouteSearchResultOriginInfo,
-      } as RouteSearchResult,
-    });
+    setBookingRequest &&
+      setBookingRequest({
+        ...bookingRequest,
+        schedule: {
+          ...bookingRequest.schedule,
+          OriginInfo: {
+            ...bookingRequest.schedule?.OriginInfo,
+            DepartureDate: event.target.value,
+          } as RouteSearchResultOriginInfo,
+        } as RouteSearchResult,
+      });
   };
   const handleChangeArrivalDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingRequest({
-      ...bookingRequest,
-      schedule: {
-        ...bookingRequest.schedule,
-        DestinationInfo: {
-          ...bookingRequest.schedule?.DestinationInfo,
-          ArrivalDate: event.target.value,
-        } as RouteSearchResultOriginInfo,
-      } as RouteSearchResult,
-    });
+    setBookingRequest &&
+      setBookingRequest({
+        ...bookingRequest,
+        schedule: {
+          ...bookingRequest.schedule,
+          DestinationInfo: {
+            ...bookingRequest.schedule?.DestinationInfo,
+            ArrivalDate: event.target.value,
+          } as RouteSearchResultOriginInfo,
+        } as RouteSearchResult,
+      });
   };
 
   return (
@@ -295,10 +299,11 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequest, editing }) => {
+const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
-  const client = useClientById(bookingRequest.createdBy.alphacomClientId);
-  const forwarder = useUserByAlphacomId(bookingRequest.createdBy.alphacomId);
+  const [bookingRequest, setBookingRequest] = useBookingRequestContext();
+  const client = useClientById(bookingRequest ? bookingRequest.createdBy.alphacomClientId : undefined);
+  const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy.alphacomId : undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const handleDialogClose = () => {
@@ -311,7 +316,7 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
 
   const clientInfo = useMemo(() => {
     if (!client) {
-      return `${bookingRequest.createdBy.firstName || ''}`;
+      return `${(bookingRequest && bookingRequest.createdBy.firstName) || ''}`;
     }
 
     return (
@@ -323,20 +328,22 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
   }, [client, bookingRequest]);
 
   const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
-    setBookingRequest({
-      ...bookingRequest,
-      schedule: schedule,
-    });
+    bookingRequest &&
+      setBookingRequest &&
+      setBookingRequest({
+        ...bookingRequest,
+        schedule: schedule,
+      });
     handleDialogClose();
   };
 
   const handleChangeBLNumber = (value?: string) => {
-    setBookingRequest({ ...bookingRequest, blNumber: value });
+    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, blNumber: value });
   };
 
   console.log(bookingRequest.assignedUser, 'Assigned user ');
 
-  return (
+  return bookingRequest ? (
     <Box flexDirection="column">
       {editing && (
         <Button color={'primary'} variant="contained" onClick={handleDialogOpen}>
@@ -439,12 +446,10 @@ const BookingRequestSummary: React.FC<Props> = ({ bookingRequest, setBookingRequ
         </Grid>
       </Grid>
     </Box>
-  );
+  ) : null;
 };
 
 interface Props {
-  bookingRequest: BookingRequest;
-  setBookingRequest: (bookingRequest: BookingRequest) => void;
   editing?: boolean;
 }
 

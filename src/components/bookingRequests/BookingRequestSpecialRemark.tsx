@@ -1,7 +1,7 @@
 import React from 'react';
 import SpecialRemarkInput from './SpecialRemarkInput';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
-import { BookingRequest } from '../../model/BookingRequest';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
 const useStyles = makeStyles(() => ({
   specialRemarkLabel: {
@@ -12,13 +12,16 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const BookingRequestSpecialRemark: React.FC<Props> = ({ bookingRequest, setBookingRequest, editing }) => {
+const BookingRequestSpecialRemark: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
+  const [bookingRequest, setBookingRequest] = useBookingRequestContext();
   const handleChangeSpecialRemark = (specialRemarkId: string | undefined, specialRemarkText: string | undefined) => {
-    setBookingRequest({ ...bookingRequest, specialRemarkId: specialRemarkId, specialRemarkText: specialRemarkText });
+    bookingRequest &&
+      setBookingRequest &&
+      setBookingRequest({ ...bookingRequest, specialRemarkId: specialRemarkId, specialRemarkText: specialRemarkText });
   };
 
-  return (
+  return bookingRequest && setBookingRequest ? (
     <React.Fragment>
       {editing ? (
         <SpecialRemarkInput
@@ -37,12 +40,10 @@ const BookingRequestSpecialRemark: React.FC<Props> = ({ bookingRequest, setBooki
         </Grid>
       ) : null}
     </React.Fragment>
-  );
+  ) : null;
 };
 
 interface Props {
-  bookingRequest: BookingRequest;
-  setBookingRequest: (bookingRequest: BookingRequest) => void;
   editing?: boolean;
 }
 

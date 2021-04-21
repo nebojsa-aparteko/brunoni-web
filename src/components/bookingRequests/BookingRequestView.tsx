@@ -39,6 +39,7 @@ import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import EditIcon from '@material-ui/icons/Edit';
 import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../../store/GlobalStore';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -231,10 +232,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [bookingRequestState, setBookingRequestState] = useState<BookingRequest>(bookingRequest);
+  const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
+
+  useEffect(() => {
+    setBookingRequestState && setBookingRequestState(bookingRequest);
+  }, [bookingRequest]);
 
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
@@ -255,30 +259,31 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   };
 
   const handleCancelEditing = () => {
-    setBookingRequestState(bookingRequest);
+    setBookingRequestState && setBookingRequestState(bookingRequest);
     setEditing(false);
   };
 
   const handleSave = () => {
     setEditing(false);
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    updateBookingRequest(bookingRequestState)
-      .then(() => {
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1500,
+    bookingRequestState &&
+      updateBookingRequest(bookingRequestState)
+        .then(() => {
+          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+            variant: 'success',
+            autoHideDuration: 1500,
+          });
+        })
+        .catch(error => {
+          console.error('error saving booking request', error);
+          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
+        })
+        .finally(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
         });
-      })
-      .catch(error => {
-        console.error('error saving booking request', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      })
-      .finally(() => {
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      });
   };
 
   const handleClose = () => {
@@ -404,12 +409,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             </Box>
 
             <Grid item xs={12}>
-              <BookingRequestViewMainContent
-                isPrintWithCost={isPrintWithCost}
-                editing={editing}
-                bookingRequestState={bookingRequestState}
-                setBookingRequestState={setBookingRequestState}
-              />
+              <BookingRequestViewMainContent isPrintWithCost={isPrintWithCost} />
             </Grid>
           </Paper>
         </Page>
