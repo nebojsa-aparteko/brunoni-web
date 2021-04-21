@@ -2,7 +2,7 @@ import React, { Fragment, useContext } from 'react';
 import { ActivityLogProvider } from '../../bookings/checklist/ActivityLogContext';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
 import { BookingRequest } from '../../../model/BookingRequest';
-import BookingRequestChecklistContent from './BookingRequestCheclistContent';
+import BookingRequestChecklistContent from './BookingRequestChecklistContent';
 import InternalStorage from '../../bookings/InternalStorage';
 import ActingAs from '../../../contexts/ActingAs';
 import ActivityLogContainer from './ActivityLogContainer';

@@ -57,6 +57,10 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(0),
     },
   },
+  additionalInfo: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+  },
   root: {
     padding: theme.spacing(3),
 
@@ -235,21 +239,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
   const onArchiveClick = useCallback(() => {
-    // firebase
-    //   .firestore()
-    //   .collection('bookings-requests')
-    //   .doc(bookingRequest?.id)
-    //   .update('archived', !bookingRequest?.archived);
-    //
-    // // if the booking was in dispute and action is to archive it
-    // // this is expected to be very rare so leave it as a separate call
-    // if (bookingRequest.inDispute && !bookingRequest.archived) {
-    //   firebase
-    //     .firestore()
-    //     .collection('bookings-requests')
-    //     .doc(bookingRequest?.id)
-    //     .update('inDispute', false);
-    // }
+    firebase
+      .firestore()
+      .collection('bookings-requests')
+      .doc(bookingRequest?.id)
+      .update('archived', !bookingRequest.archived)
+      .then(value => console.log('Archived', value))
+      .catch(err => console.log('Error while archiving booking request', err));
   }, [bookingRequest]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -298,6 +294,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
+          {bookingRequest.additionalInfo && (
+            <Paper className={classes.additionalInfo}>
+              <Typography variant="h4" gutterBottom>
+                Special requests:
+              </Typography>
+              <Typography>{bookingRequest.additionalInfo}</Typography>
+            </Paper>
+          )}
           {isAssignmentDialogOpen ? (
             <AgentAssignmentDialog
               bookingRequest={bookingRequest}
@@ -368,7 +372,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       startIcon={<ArchiveIcon />}
                       onClick={onArchiveClick}
                     >
-                      {'Archive'}
+                      {bookingRequest.archived ? 'Restore' : 'Archive'}
                     </Button>
                   </Fragment>
                 )}

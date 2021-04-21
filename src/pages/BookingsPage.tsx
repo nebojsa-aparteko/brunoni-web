@@ -12,8 +12,10 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
-import BookingRequestsProvider from '../providers/BookingRequestsProvider';
+import BookingRequestsProvider, { useBookingRequestsContext } from '../providers/BookingRequestsProvider';
 import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import InputIcon from '@material-ui/icons/Input';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -73,6 +75,7 @@ const BookingsPageContainer: React.FC = () => {
   const actingAs = useContext(ActingAs)[0];
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
+  const [, , , setFilters] = useBookingRequestsContext();
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const selectedTab = bookingPaginationContextData.activeTab;
 
@@ -133,6 +136,12 @@ const BookingsPageContainer: React.FC = () => {
               set('pendingPayment', undefined),
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
+          case 3:
+            setFilters(prevState => set('archived', false)(prevState));
+            return bookingsContextData;
+          case 4:
+            setFilters(prevState => set('archived', true)(prevState));
+            return bookingsContextData;
           default:
             return bookingsContextData;
         }
@@ -202,7 +211,9 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
             <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
-            <Tab icon={<ArchiveIcon />} label="Requests" {...a11yProps(3)} />
+            {/*<Divider />*/}
+            <Tab icon={<AssessmentIcon />} label="Requests" {...a11yProps(3)} />
+            <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
@@ -219,15 +230,10 @@ const BookingsPageContainer: React.FC = () => {
             />
           </TabPanel>
           <TabPanel value={selectedTab} index={3}>
-            <BookingRequestsProvider>
-              <BookingRequestsView isAdmin={!actingAs} />
-            </BookingRequestsProvider>
-            {/*<BookingsView*/}
-            {/*  bookings={isLoading ? undefined : bookings}*/}
-            {/*  isAdmin={!actingAs}*/}
-            {/*  archived*/}
-            {/*  showDateRangeFilter*/}
-            {/*/>*/}
+            <BookingRequestsView isAdmin={!actingAs} />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={4}>
+            <BookingRequestsView isAdmin={!actingAs} />
           </TabPanel>
         </Box>
       ) : (
@@ -264,7 +270,9 @@ const BookingsPageContainer: React.FC = () => {
 const BookingsPage = () => {
   return (
     <BookingsProvider>
-      <BookingsPageContainer />
+      <BookingRequestsProvider>
+        <BookingsPageContainer />
+      </BookingRequestsProvider>
     </BookingsProvider>
   );
 };

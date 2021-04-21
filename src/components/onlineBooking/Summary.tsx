@@ -1,5 +1,4 @@
 import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
-import firebase from '../../firebase';
 import React, { useCallback } from 'react';
 import useUser from '../../hooks/useUser';
 import { Button, Divider, Grid, makeStyles, Theme } from '@material-ui/core';
@@ -11,6 +10,8 @@ import RouteDeadlines from '../routeSearch/RouteDeaadlines';
 import RouteSummary from '../routeSearch/RouteSummary';
 import ContainersList from './ContainersList';
 import { useHistory } from 'react-router';
+import firebase from 'firebase';
+import { format } from 'date-fns';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -31,11 +32,31 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const createRequest = (bookingRequest: BookingRequest) =>
-  firebase
+const createRequest = async (bookingRequest: BookingRequest) => {
+  const autoIncrementId = await getId();
+  const generatedId = `${autoIncrementId}`.padStart(4, '0');
+  const id = `req-${format(new Date(), 'yyyyMM')}${generatedId}`;
+  await firebase
     .firestore()
     .collection('bookings-requests')
-    .add(bookingRequest);
+    .doc(id)
+    .set(bookingRequest);
+  return id;
+};
+
+const getId = async () => {
+  let counter = 0;
+  const path = format(new Date(), 'yyyy-MM');
+  await firebase
+    .database()
+    .ref(`/booking-request-ids/${path}`)
+    .transaction(value => {
+      counter = value || 1;
+      return +value + 1;
+    });
+
+  return counter;
+};
 
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest }) => {
   const classes = useStyles();
@@ -60,13 +81,14 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       createdAt: new Date(),
       createdBy: getShortUserData(),
       status: BookingRequestStatus.REQUESTED,
+      archived: false,
     };
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);
     try {
       bookingRequest &&
         createRequest(writableRequest)
-          .then(docReference => history.push(`/booking-requests/${docReference.id}`))
+          .then(docReference => history.push(`/booking-requests/${docReference}`))
           .catch(error => console.log(error));
     } catch (error) {
       console.error('useFirestoreCollection threw an error', error);

@@ -1,11 +1,9 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
-import useUser from '../hooks/useUser';
+import React, { createContext, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
-import ActingAs from '../contexts/ActingAs';
 import firebase from '../firebase';
 import { BookingRequest } from '../model/BookingRequest';
 import safeInvoke from '../utilities/safeInvoke';
@@ -20,8 +18,12 @@ export const normalizeBookingRequest = flow(
 );
 
 export const normalizeBookingRequests = map(normalizeBookingRequest);
-
-const BookingRequestsContext = createContext<[BookingRequest[] | undefined, boolean]>([undefined, true]);
+interface BookingRequestFilters {
+  archived?: boolean;
+}
+const BookingRequestsContext = createContext<
+  [BookingRequest[] | undefined, boolean, BookingRequestFilters, Dispatch<SetStateAction<BookingRequestFilters>>]
+>([undefined, true, {}, () => {}]);
 
 export const useBookingRequestsContext = () => {
   const context = React.useContext(BookingRequestsContext);
@@ -32,21 +34,20 @@ export const useBookingRequestsContext = () => {
 };
 
 const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
-  const userRecord = useUser()[1];
-  const actingAs = useContext(ActingAs)[0];
-
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState<BookingRequestFilters>({});
 
   // const filters = useBookingListFilterContext()[0];
-
   const query = useMemo(
-    () => (collection: firebase.firestore.CollectionReference) => {
-      setIsLoading(true);
-      //TODO add filters at some point
-      setIsLoading(false);
-      return collection.orderBy('createdAt', 'desc');
+    () => (collection: firebase.firestore.Query) => {
+      let query = collection;
+      console.log(filters.archived);
+      if (filters.archived) {
+        query = query.where('archived', '==', filters.archived);
+      }
+      return query.orderBy('createdAt', 'desc');
     },
-    [userRecord, actingAs],
+    [filters],
   );
 
   const bookingRequestsSnapshot = useFirestoreCollection('bookings-requests', query);
@@ -60,12 +61,11 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
         ...doc.data(),
       } as BookingRequest;
     }) as BookingRequest[] | undefined;
-    console.log('FOUND BOOKING REQUESTS: ', bookingRequests?.length);
     return normalizeBookingRequests(bookingRequests) as BookingRequest[] | undefined;
   }, [bookingRequestsSnapshot]);
 
   return (
-    <BookingRequestsContext.Provider value={[bookingRequestsResult, isLoading]}>
+    <BookingRequestsContext.Provider value={[bookingRequestsResult, isLoading, filters, setFilters]}>
       {children}
     </BookingRequestsContext.Provider>
   );

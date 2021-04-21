@@ -24,10 +24,12 @@ export interface BookingRequest {
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
+  archived?: boolean;
 }
 
 export enum BookingRequestStatus {
   REQUESTED = 'Requested',
   IN_PROGRESS = 'In Progress',
   CONFIRMED = 'Confirmed',
+  ARCHIVED = 'Archived',
 }
