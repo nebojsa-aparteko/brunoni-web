@@ -119,13 +119,14 @@ interface AgentAssignmentDialogProps {
   handleClose: () => void;
 }
 
-const updateBookingRequest = async (bookingRequest: BookingRequest) => {
-  bookingRequest.id &&
-    (await firebase
+const updateBookingRequest = (bookingRequest: BookingRequest) => {
+  if (bookingRequest.id) {
+    return firebase
       .firestore()
       .collection('bookings-requests')
       .doc(bookingRequest.id)
-      .set(bookingRequest, { merge: true }));
+      .set(bookingRequest, { merge: true });
+  }
 };
 
 const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
