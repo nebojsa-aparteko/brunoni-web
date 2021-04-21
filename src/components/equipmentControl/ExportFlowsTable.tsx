@@ -21,6 +21,7 @@ import truncateString from '../../utilities/truncateString';
 import PickupLocations from '../../contexts/PickupLocations';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 import EquipmentControlExportRow from './EquipmentControlExportRow';
+import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 
 interface ImportFlowsTableProps {
   summary: EquipmentExportSummary[];
@@ -42,7 +43,13 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
       ),
     [summary, locations],
   );
-  return (
+  return !groupedSummary ? (
+    <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+      <CircularProgress />
+    </Box>
+  ) : groupedSummary.length === 0 ? (
+    <BookingsEmptyResults message={'No equipment control found for your filter criteria. Try changing filters.'} />
+  ) : (
     <TableContainer className={classes.container}>
       <Table stickyHeader size="small" aria-label="a dense table" className={classes.root}>
         <TableHead className={classes.table}>
@@ -103,7 +110,6 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                         </Tooltip>
                       )}
                       <EquipmentControlExportRow equipmentControl={equipment} key={equipment.id} />
-                      {/*<EquipmentControlImportRow equipmentControl={equipment} key={index} />*/}
                     </TableRow>
                   ))}
                 </Fragment>

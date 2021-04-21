@@ -48,7 +48,6 @@ const getBookingsByEC = async (
 
     if (response.ok) {
       const body = await response.json();
-      console.log('Body', body);
       return body;
     } else {
       const body = await response.json();
@@ -90,7 +89,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         const status = get(equipmentControl, s, {});
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
-          <Fragment key={index}>
+          <Fragment key={`${location?.id}-${s}`}>
             {containerTypesValues.map((type, index) => {
               const c = get(groupedStatus, type, []);
               return (

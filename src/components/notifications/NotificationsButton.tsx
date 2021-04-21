@@ -36,7 +36,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
         style={{ padding: 8 }}
         {...props}
       >
-        <Badge badgeContent={userRecord?.unreadNotifications || 0} color="secondary">
+        <Badge badgeContent={getNotificationCount(userRecord?.unreadNotifications)} color="secondary">
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
@@ -61,3 +61,14 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
 };
 
 export default NotificationsButton;
+
+const getNotificationCount = (unreadNotifications?: number) => {
+  if (unreadNotifications) {
+    if (unreadNotifications > 500) {
+      return '500+';
+    } else if (unreadNotifications > 0 && unreadNotifications < 500) {
+      return unreadNotifications;
+    }
+  }
+  return 0;
+};

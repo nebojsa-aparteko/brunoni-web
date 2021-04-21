@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { useContext, useMemo, Fragment } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -15,6 +15,7 @@ import CountryCodes from '../../model/CountryCodes';
 import clsx from 'clsx';
 import truncateString from '../../utilities/truncateString';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
+import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 
 export const importFlowsStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -127,8 +128,13 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   //     return sum;
   //   }, {});
   // }, [summary]);
-
-  return (
+  return !groupedSummary ? (
+    <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+      <CircularProgress />
+    </Box>
+  ) : groupedSummary.length === 0 ? (
+    <BookingsEmptyResults message={'No equipment control found for your filter criteria. Try changing filters.'} />
+  ) : (
     <TableContainer className={classes.container}>
       <Table stickyHeader size="small" aria-label="a dense table" className={classes.root}>
         <TableHead className={classes.table}>
@@ -161,8 +167,8 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
         </TableHead>
 
         <TableBody className={classes.table}>
-          {(groupedSummary.length !== 0 &&
-            groupedSummary.map(([id, group], index) => {
+          {groupedSummary.length !== 0 &&
+            groupedSummary.map(([id, group]) => {
               const [countryCode, city] = id.split('~');
               return (
                 <Fragment key={id}>
@@ -188,36 +194,12 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                           </TableCell>
                         </Tooltip>
                       )}
-                      <EquipmentControlImportRow equipmentControl={equipment} />
+                      <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
                     </TableRow>
                   ))}
                 </Fragment>
               );
-            })) || (
-            <TableRow>
-              <TableCell colSpan={10000}>
-                <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
-                  <CircularProgress />
-                </Box>
-              </TableCell>
-            </TableRow>
-          )}
-          {/*{summary?.length > 0 && (*/}
-          {/*  <TableRow hover>*/}
-          {/*    <TableCell>Total</TableCell>*/}
-          {/*    {statusKeys.map(key => {*/}
-          {/*      const status = get(total, `${key}`, {});*/}
-          {/*      return (*/}
-          {/*        <>*/}
-          {/*          {containerTypesValues.map(type => {*/}
-          {/*            const c = get(status, type, '-');*/}
-          {/*            return <TableCell>{c}</TableCell>;*/}
-          {/*          })}*/}
-          {/*        </>*/}
-          {/*      );*/}
-          {/*    })}*/}
-          {/*  </TableRow>*/}
-          {/*)}*/}
+            })}
         </TableBody>
       </Table>
     </TableContainer>

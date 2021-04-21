@@ -50,7 +50,6 @@ const getBookingsByEC = async (
 
     if (response.ok) {
       const body = await response.json();
-      console.log('Body', body);
       return body;
     } else {
       const body = await response.json();
@@ -64,7 +63,6 @@ const getBookingsByEC = async (
 };
 const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   const locations = useContext(PickupLocations);
-
   const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [
     locations,
     equipmentControl,
@@ -77,7 +75,6 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   };
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
-  console.log('Eq Control', equipmentControl);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
   return (
