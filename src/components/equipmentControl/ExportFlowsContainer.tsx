@@ -13,7 +13,6 @@ const ExportFlowsContainer: React.FC = () => {
   const availableCarriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
   const { carrier } = filters;
-  console.log('Summary', summary);
   return (
     <Box>
       <Box p={3}>

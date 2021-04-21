@@ -48,7 +48,6 @@ const getBookingsByEC = async (
 
     if (response.ok) {
       const body = await response.json();
-      console.log('Body', body);
       return body;
     } else {
       const body = await response.json();
