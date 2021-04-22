@@ -28,6 +28,7 @@ import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import { useQuotesContext } from './QuotesProvider';
 import UserRecord from '../model/UserRecord';
+import { FreightDetailGroup } from '../model/Booking';
 
 interface Props {
   children: React.ReactNode;
@@ -111,6 +112,8 @@ export interface QuoteDetail {
   CostUnit?: string;
   Remark?: string;
   RemarkRef?: string;
+  //TODO remove group
+  Group?: FreightDetailGroup;
 }
 
 export interface CostDetailRemark {
