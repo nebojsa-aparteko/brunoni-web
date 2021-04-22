@@ -118,6 +118,8 @@ export enum ActivityText {
   CLEAR_PAYMENT = ' has cleared payment ',
   REVERT_CLEAR_PAYMENT = ' has reverted the clearing of payment ',
   MARK_SOMETHING_WRONG = ' has marked that something is wrong with payment ',
+  ARCHIVED = ' has archived booking request.',
+  UNARCHIVED = ' has unarchived booking request.',
 }
 
 export enum ActivityChangeType {
@@ -145,6 +147,8 @@ export enum ActivityChangeType {
   CLEAR_PAYMENT,
   REVERT_CLEAR_PAYMENT,
   MARK_SOMETHING_WRONG,
+  ARCHIVED,
+  UNARCHIVED,
 }
 
 export enum ChecklistNames {

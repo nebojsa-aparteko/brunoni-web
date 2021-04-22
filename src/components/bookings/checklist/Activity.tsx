@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import { Box, Link, Typography } from '@material-ui/core';
 import Avatar from 'react-avatar';
 import { ActivityLogItem } from './ActivityModel';
-import { capitalCase } from 'change-case';
 import {
   ActivityChangeType,
   ActivityLogUserData,
@@ -85,6 +84,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.REVERT_CLEAR_PAYMENT;
       case ActivityChangeType.MARK_SOMETHING_WRONG:
         return ActivityText.MARK_SOMETHING_WRONG;
+      case ActivityChangeType.ARCHIVED:
+        return ActivityText.ARCHIVED;
+      case ActivityChangeType.UNARCHIVED:
+        return ActivityText.UNARCHIVED;
     }
   };
 

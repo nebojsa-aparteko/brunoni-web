@@ -17,7 +17,6 @@ import { useSnackbar } from 'notistack';
 import firebase from '../../../firebase';
 import DoneIcon from '@material-ui/icons/Done';
 import { BookingRequest } from '../../../model/BookingRequest';
-import { addActivityItem } from '../../bookings/checklist/ActivityLogContainer';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -86,7 +85,15 @@ export const createActivityObject = (data: {
     removedUsers: removedUsers,
   } as ActivityLogItem);
 };
-
+const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
+  return firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingId)
+    .collection('activity')
+    .doc()
+    .set(activityLog);
+};
 const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: BookingRequestChecklistRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
