@@ -18,7 +18,12 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
     setIsNotificationDrawerOpen(prevState => !prevState);
   };
   const userRecord = useContext(UserRecordContext);
-  const notifications = useNotifications(userRecord?.alphacomId, showOnlyUnread, numberToLoad);
+  const notifications = useNotifications(
+    userRecord?.alphacomId,
+    userRecord?.emailAddress,
+    showOnlyUnread,
+    numberToLoad,
+  );
 
   const handleShowMore = () => {
     setNumberToLoad(prevState => prevState + 20);

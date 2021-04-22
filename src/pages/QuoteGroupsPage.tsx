@@ -71,7 +71,7 @@ const QuoteGroups: React.FC = () => {
           flow(set('archived', undefined), set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS))(quoteFilters),
         );
     }
-  }, [actingAs, quoteFilters, setQuoteFilters]);
+  }, [actingAs]);
 
   return (
     <Fragment>
