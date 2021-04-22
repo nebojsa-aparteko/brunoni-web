@@ -1,4 +1,3 @@
-import { QuoteDetail } from '../../providers/QuoteGroupsProvider';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
 import { Checkbox, Grid, Tab, Tabs, TextField, Typography } from '@material-ui/core';
@@ -16,7 +15,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
-import { FreightDetailGroup } from '../../model/Booking';
+import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -49,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface RowProps {
-  quoteDetail: QuoteDetail;
+  freightDetail: FreightDetail;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
@@ -62,43 +61,45 @@ const getUpdatedFreightDetails = (
 ) => {
   return (
     bookingRequest.freightDetails &&
-    bookingRequest.freightDetails.map((detail: QuoteDetail) =>
-      detail.Pos === pos ? set(field, value === '' ? undefined : value)(detail) : detail,
+    bookingRequest.freightDetails.map((detail: FreightDetail) =>
+      detail.SeqNr === pos ? set(field, value === '' ? undefined : value)(detail) : detail,
     )
   );
 };
 
-//inputs use an empty string instead of undefined so we need to compare those values as equal
+//inputs use an empty string instead of undefined so we need to compare those values as equal to avoid warnings
 const compareValues = (value1: string | undefined, value2: string | undefined) =>
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
-const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, selected, onSelectRow }) => {
+const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, selected, onSelectRow }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const [currency, setCurrency] = useState<string | undefined>(quoteDetail.Currency);
-  const [costValue, setCostValue] = useState<string | undefined>(quoteDetail.CostValue);
-  const [costUnit, setCostUnit] = useState<string | undefined>(quoteDetail.CostUnit);
+  const [quantity, setQuantity] = useState<string | undefined>(freightDetail.Anz);
+  const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
+  const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
+  const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
 
   useEffect(() => {
-    setCurrency(quoteDetail.Currency);
-    setCostValue(quoteDetail.CostValue);
-    setCostUnit(quoteDetail.CostUnit);
-  }, [quoteDetail]);
+    setQuantity(freightDetail.Anz || '1.00');
+    setCurrency(freightDetail.Currency);
+    setUnitValue(freightDetail.UnitValue);
+    setCostUnit(freightDetail.Unit);
+  }, [freightDetail]);
 
   const handleChangeFreightDetails = (value: string | undefined, fieldName: string) => {
     bookingRequest &&
       setBookingRequest &&
-      compareValues(value, get(fieldName, quoteDetail)) &&
+      compareValues(value, get(fieldName, freightDetail)) &&
       setBookingRequest(
         set(
           'freightDetails',
-          getUpdatedFreightDetails(bookingRequest, value, quoteDetail.Pos, fieldName),
+          getUpdatedFreightDetails(bookingRequest, value, freightDetail.SeqNr, fieldName),
         )(bookingRequest) as BookingRequest,
       );
   };
 
   return (
-    <TableRow key={quoteDetail.Pos} className={classes.tableRow}>
+    <TableRow key={freightDetail.SeqNr} className={classes.tableRow}>
       {editing && (
         <TableCell padding="checkbox">
           <Checkbox
@@ -112,13 +113,28 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, sele
       <TableCell component="th" scope="row">
         {editing ? (
           <ChargeCodeInput
-            chargeCodeText={quoteDetail.Description}
-            group={quoteDetail.Group}
-            handleChange={code => handleChangeFreightDetails(code?.text, 'Description')}
+            chargeCodeText={freightDetail.Txt}
+            group={freightDetail.Group}
+            handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
             margin="dense"
           />
         ) : (
-          quoteDetail.Description
+          freightDetail.Txt
+        )}
+      </TableCell>
+      <TableCell align="right">
+        {editing ? (
+          <TextField
+            label=""
+            margin="dense"
+            variant="outlined"
+            fullWidth
+            value={quantity}
+            onChange={event => setQuantity(event.target.value)}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
+          />
+        ) : (
+          freightDetail.Anz || '1.00'
         )}
       </TableCell>
       <TableCell align="right">
@@ -133,7 +149,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, sele
             onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
           />
         ) : (
-          quoteDetail.Currency
+          freightDetail.Currency
         )}
       </TableCell>
       <TableCell align="right">
@@ -144,12 +160,12 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, sele
             variant="outlined"
             type="number"
             fullWidth
-            value={costValue || ''}
-            onChange={event => setCostValue(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'CostValue')}
+            value={unitValue || ''}
+            onChange={event => setUnitValue(event.target.value)}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
           />
         ) : (
-          quoteDetail.CostValue
+          freightDetail.UnitValue
         )}
       </TableCell>
       <TableCell>
@@ -161,21 +177,26 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, sele
             fullWidth
             value={costUnit || ''}
             onChange={event => setCostUnit(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'CostUnit')}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'Unit')}
           />
         ) : (
-          quoteDetail.CostUnit
+          freightDetail.Unit
         )}
+      </TableCell>
+      <TableCell>
+        {freightDetail.UnitValue
+          ? ((quantity ? parseFloat(quantity) : 1) * parseFloat(freightDetail.UnitValue)).toFixed(2)
+          : '0.00'}
       </TableCell>
     </TableRow>
   );
 };
 
-const findNextPos = (quoteDetails: QuoteDetail[]) => {
+const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
-  for (let i in quoteDetails) {
-    const value = parseInt(quoteDetails[i].Pos);
+  for (let i in freightDetails) {
+    const value = parseInt(freightDetails[i].SeqNr);
     if (value >= pos) pos = value + 1;
   }
   return pos + '';
@@ -191,10 +212,10 @@ const findNextPos = (quoteDetails: QuoteDetail[]) => {
 // };
 
 //TODO switch from QuoteDetail to FreightDetail and use Group field from there
-const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
+const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
-  const [filteredQuoteDetails, setFilteredQuoteDetails] = useState<QuoteDetail[]>(quoteDetails);
+  const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[]>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -207,17 +228,17 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
   useEffect(() => {
     switch (selectedTab) {
       case 0:
-        setFilteredQuoteDetails(quoteDetails);
+        setFilteredFreightDetails(freightDetails);
         break;
       case 1:
-        setFilteredQuoteDetails(quoteDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
+        setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
         break;
     }
-  }, [selectedTab, quoteDetails, setFilteredQuoteDetails, bookingRequest]);
+  }, [selectedTab, freightDetails, setFilteredFreightDetails, bookingRequest]);
 
   const handleSelectDeselectAll = () => {
-    if (selectedDetails.length !== filteredQuoteDetails.length) {
-      setSelectedDetails(filteredQuoteDetails.map(detail => detail.Pos));
+    if (selectedDetails.length !== filteredFreightDetails.length) {
+      setSelectedDetails(filteredFreightDetails.map(detail => detail.SeqNr));
     } else {
       setSelectedDetails([]);
     }
@@ -239,19 +260,21 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
       setBookingRequest(
         set(
           'freightDetails',
-          quoteDetails.concat({
-            Pos: findNextPos(quoteDetails),
-            Description: (chargeCodes && chargeCodes[0].text) || '',
+          freightDetails.concat({
+            SeqNr: findNextPos(freightDetails),
+            Anz: '1.00',
+            Txt: (chargeCodes && chargeCodes[0].text) || '',
             Currency: 'USD',
-            CostValue: '0.00',
-            CostUnit: '',
+            UnitValue: '0.00',
+            Unit: '',
+            Total: '0.00',
             Group:
               selectedTab === 0
                 ? FreightDetailGroup.EXTERNAL
                 : selectedTab === 1
                 ? FreightDetailGroup.INTERNAL1
                 : FreightDetailGroup.INTERNAL2,
-          } as QuoteDetail),
+          } as FreightDetail),
         )(bookingRequest) as BookingRequest,
       );
   };
@@ -262,7 +285,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
       setBookingRequest(
         set(
           'freightDetails',
-          quoteDetails.filter(detail => !selectedDetails.includes(detail.Pos)),
+          freightDetails.filter(detail => !selectedDetails.includes(detail.SeqNr)),
         )(bookingRequest) as BookingRequest,
       );
     setSelectedDetails([]);
@@ -292,14 +315,14 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
               deleteTooltip={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
             />
           )}
-          {filteredQuoteDetails.length > 0 ? (
+          {filteredFreightDetails.length > 0 ? (
             <Table className={classes.table} size="small">
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
                   {editing && (
                     <TableCell align="left" style={{ paddingLeft: 4 }}>
                       <Checkbox
-                        checked={selectedDetails.length === filteredQuoteDetails.length}
+                        checked={selectedDetails.length === filteredFreightDetails.length}
                         onClick={handleSelectDeselectAll}
                         onFocus={event => event.stopPropagation()}
                         color="primary"
@@ -307,17 +330,19 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
                     </TableCell>
                   )}
                   <TableCell>Description</TableCell>
+                  <TableCell align={editing ? 'left' : 'right'}>Quantity</TableCell>
                   <TableCell align={editing ? 'left' : 'right'}>Currency</TableCell>
                   <TableCell align={editing ? 'left' : 'right'}>Cost Value</TableCell>
                   <TableCell align="left">Cost Unit</TableCell>
+                  <TableCell>Total</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredQuoteDetails.map(quoteDetail => (
+                {filteredFreightDetails.map(freightDetail => (
                   <BookingRequestFreightDetailsRow
-                    quoteDetail={quoteDetail}
-                    selected={quoteDetail.Pos ? selectedDetails.includes(quoteDetail.Pos) : false}
-                    onSelectRow={event => onSelectRow(event, quoteDetail.Pos)}
+                    freightDetail={freightDetail}
+                    selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
+                    onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
                   />
                 ))}
               </TableBody>
@@ -334,7 +359,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
 };
 
 interface Props {
-  quoteDetails: QuoteDetail[];
+  freightDetails: FreightDetail[];
 }
 
 export default BookingRequestFreightDetails;

@@ -112,8 +112,6 @@ export interface QuoteDetail {
   CostUnit?: string;
   Remark?: string;
   RemarkRef?: string;
-  //TODO remove group
-  Group?: FreightDetailGroup;
 }
 
 export interface CostDetailRemark {

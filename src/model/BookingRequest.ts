@@ -1,8 +1,8 @@
 import Port from './Port';
 import Carrier from './Carrier';
 import { RouteSearchResult } from './route-search/RouteSearchResults';
-import { QuoteDetail } from '../providers/QuoteGroupsProvider';
 import { UserRecordMin } from './UserRecord';
+import { FreightDetail } from './Booking';
 
 export interface BookingRequest {
   id?: string;
@@ -11,7 +11,7 @@ export interface BookingRequest {
   destination?: Port;
   carrier?: Carrier;
   quoteNumber?: number;
-  freightDetails?: QuoteDetail[];
+  freightDetails?: FreightDetail[];
   customerReference?: string;
   containers?: any[];
   additionalInfo?: string;

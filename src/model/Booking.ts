@@ -246,12 +246,13 @@ export enum BookingLocType {
 export interface FreightDetail {
   Txt: string;
   Anz: string;
-  UnitValue: string;
-  Total: string;
+  UnitValue?: string;
+  Total?: string;
   Currency: string;
-  Unit: string;
+  Unit?: string;
   Group: FreightDetailGroup;
   Invoice: string;
+  SeqNr: string;
 }
 
 export enum FreightDetailGroup {

@@ -11,6 +11,37 @@ import { Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from 
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
+import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+
+const getRelevantFreightDetails = (quoteDetails: QuoteDetail[]) => {
+  return quoteDetails
+    .filter(
+      (detail: QuoteDetail) =>
+        ![
+          'VGM manual submission',
+          'Umbuchungsgebühr',
+          'Stornierungsgebühr',
+          'Zertifikat',
+          'Rebooking Fee',
+          'Cancellation Fee',
+          'House-Bill of Lading',
+          'Certificate',
+        ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
+    )
+    .map(
+      quoteDetail =>
+        ({
+          Anz: '1.00',
+          SeqNr: quoteDetail.Pos,
+          Txt: quoteDetail.Description,
+          Currency: quoteDetail.Currency,
+          UnitValue: quoteDetail.CostValue,
+          Unit: quoteDetail.CostUnit,
+          Group: FreightDetailGroup.EXTERNAL,
+          Total: quoteDetail.CostValue,
+        } as FreightDetail),
+    );
+};
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
@@ -50,15 +81,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         quoteNumber: quote ? quote.id : undefined,
         customerReference: customerReference,
         schedule: schedule,
-        freightDetails:
-          quote && quote.quoteDetails
-            ? quote?.quoteDetails.filter(
-                (detail: QuoteDetail) =>
-                  !['VGM manual submission', 'Umbuchungsgebühr', 'Stornierungsgebühr', 'Zertifikat'].includes(
-                    detail.Description,
-                  ) && !detail.Currency.includes('Inkl.'),
-              )
-            : undefined,
+        freightDetails: quote && quote.quoteDetails ? getRelevantFreightDetails(quote.quoteDetails) : undefined,
       }) as BookingRequest,
     );
     handleNext();

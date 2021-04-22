@@ -70,8 +70,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
           <Box marginTop="2em" marginBottom="2em">
             <Divider />
           </Box>
-          <BookingRequestFreightDetails quoteDetails={bookingRequestState.freightDetails} />
-          {/*<QuoteItemQuoteDetails quoteDetails={bookingRequestState.freightDetails} hideRemarks={true} />*/}
+          <BookingRequestFreightDetails freightDetails={bookingRequestState.freightDetails} />
           <Typography variant="body2" className={classes.remark}>
             {remark}
           </Typography>
