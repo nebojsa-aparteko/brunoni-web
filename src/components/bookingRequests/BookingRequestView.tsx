@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -22,14 +22,19 @@ import ActingAs from '../../contexts/ActingAs';
 import Page from '../bookings/Page';
 import brunoniLogo from '../../assets/logo.brunoni.svg';
 import allmarineLogo from '../../assets/logo.allmarine.png';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
 import BookingRequestCheckList from './checklist/BookingRequestChecklist';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, {
+  CUSTOMER_FACING_ROLES,
+  isDashboardUser,
+  UserRecordMin,
+  UserRecordMinProperties,
+} from '../../model/UserRecord';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
 import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
@@ -40,6 +45,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -236,24 +242,54 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
-
+  const userRecord = useContext(UserRecordContext);
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
   }, [bookingRequest]);
 
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
-  const onArchiveClick = useCallback(() => {
-    firebase
-      .firestore()
-      .collection('bookings-requests')
-      .doc(bookingRequest?.id)
-      .update('archived', !bookingRequest.archived)
-      .then(value => console.log('Archived', value))
-      .catch(err => console.log('Error while archiving booking request', err));
-  }, [bookingRequest]);
+  const onArchiveClick = useCallback(
+    () =>
+      firebase
+        .firestore()
+        .collection('bookings-requests')
+        .doc(bookingRequest?.id)
+        .update('archived', !bookingRequest.archived),
+    [bookingRequest],
+  );
+
+  const storeActivity = useCallback(
+    (checklistItemActivityHandler: () => Promise<void | any>) => {
+      checklistItemActivityHandler()
+        .then(_ => {
+          console.log('Test', _);
+          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
+            variant: 'success',
+            autoHideDuration: 1000,
+          });
+        })
+        .catch(error => {
+          console.error('error storing activity', error);
+          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+            variant: 'error',
+            autoHideDuration: 3000,
+          });
+        });
+    },
+    [enqueueSnackbar],
+  );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const checkIfUserCanEdit = useCallback(() => {
+    return !(
+      [BookingRequestStatus.ARCHIVED, BookingRequestStatus.CONFIRMED].includes(bookingRequest.status) ||
+      (BookingRequestStatus.REQUESTED !== bookingRequest.status && !isDashboardUser(userRecord))
+    );
+  }, [bookingRequest]);
+
+  const canEdit = useMemo(() => checkIfUserCanEdit(), [checkIfUserCanEdit]);
 
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -267,9 +303,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const handleSave = () => {
     setEditing(false);
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    bookingRequestState &&
+    if (bookingRequestState) {
       updateBookingRequest(bookingRequestState)
-        .then(() => {
+        ?.then(() => {
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',
             autoHideDuration: 1500,
@@ -285,7 +321,30 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         });
+    }
   };
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const archiveHandler = () =>
+    onArchiveClick().then(() =>
+      addActivityItem(
+        bookingRequest.id!,
+        createActivityObject({
+          changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
+          by: getActivityLogUserData(),
+        }),
+      ),
+    );
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -356,7 +415,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                   </>
                 )}
                 {!editing && (
-                  <IconButton size="small" aria-label="Edit" component="span" onClick={() => setEditing(true)}>
+                  <IconButton
+                    size="small"
+                    aria-label="Edit"
+                    component="span"
+                    onClick={() => setEditing(true)}
+                    disabled={!canEdit}
+                  >
                     <EditIcon />
                   </IconButton>
                 )}
@@ -376,7 +441,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       variant="outlined"
                       size="small"
                       startIcon={<ArchiveIcon />}
-                      onClick={onArchiveClick}
+                      onClick={() => storeActivity(archiveHandler)}
                     >
                       {bookingRequest.archived ? 'Restore' : 'Archive'}
                     </Button>

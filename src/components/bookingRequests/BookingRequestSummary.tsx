@@ -21,6 +21,7 @@ import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
 import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -417,7 +418,10 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 }
               />
               {bookingRequest.quoteNumber && (
-                <TableRowData label={'Quote Reference'} content={bookingRequest.quoteNumber + ''} />
+                <TableRowData
+                  label={'Quote Reference'}
+                  content={<Link to={`/quotes/${bookingRequest.quoteNumber}`}>{bookingRequest.quoteNumber}</Link>}
+                />
               )}
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>

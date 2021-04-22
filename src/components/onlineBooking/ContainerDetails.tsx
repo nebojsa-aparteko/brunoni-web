@@ -206,7 +206,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               <TableRowData label={'Delivery Address'} content={bookingRequest.schedule.OriginInfo.Port.PortName} />
             )}
 
-            <TableRowData label={'VGM Pin'} content={container.vgmPin || '[To be assigned]'} />
+            <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be assigned]'} />
             {container.oog && <TableRowData label={'Remarks'} content={container.oog ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />}
           </TableBody>
         </Table>
