@@ -1,10 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { MenuItem, Select } from '@material-ui/core';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
+import { FreightDetailGroup } from '../../model/Booking';
 
-const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, margin }) => {
+const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group, margin }) => {
   const chargeCodes = useContext(ChargeCodes);
+  const filteredChargeCodes = useMemo(
+    () =>
+      chargeCodes?.filter(code => (group && group === FreightDetailGroup.INTERNAL1 ? code.internal1 === 'TRUE' : true)),
+    [chargeCodes],
+  );
+
   const [chargeCode, setChargeCode] = useState<ChargeCode | undefined>(
     chargeCodes ? chargeCodes.find(code => code.text === chargeCodeText) : undefined,
   );
@@ -28,7 +35,7 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, margin
       onChange={event => handleSetSelectedValue(event as React.ChangeEvent<{ value: string }>)}
       style={{ flex: 1, height: 'fit-content' }}
     >
-      {chargeCodes?.map(code => (
+      {filteredChargeCodes?.map(code => (
         <MenuItem key={code.id} value={code.id}>
           {code.text}
         </MenuItem>
@@ -39,6 +46,7 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, margin
 
 interface Props {
   chargeCodeText?: string;
+  group?: FreightDetailGroup;
   handleChange?: (chargeCode: ChargeCode | undefined) => void;
   margin?: any;
 }

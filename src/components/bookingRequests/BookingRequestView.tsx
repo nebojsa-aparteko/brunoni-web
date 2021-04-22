@@ -40,6 +40,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -265,10 +266,12 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   };
 
   const handleSave = () => {
+    const br = { ...bookingRequestState } as BookingRequest;
+    omitEmptyDeep(br);
     setEditing(false);
     dispatch({ type: 'START_GLOBAL_LOADING' });
     bookingRequestState &&
-      updateBookingRequest(bookingRequestState)
+      updateBookingRequest(br)
         .then(() => {
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
             variant: 'success',

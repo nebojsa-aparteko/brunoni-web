@@ -9,7 +9,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
-import { set } from 'lodash/fp';
+import { set, get } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -50,7 +50,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface RowProps {
   quoteDetail: QuoteDetail;
-  index: number;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
@@ -58,28 +57,42 @@ interface RowProps {
 const getUpdatedFreightDetails = (
   bookingRequest: BookingRequest,
   value: any | undefined,
-  index: number,
+  pos: string,
   field: string,
 ) => {
   return (
     bookingRequest.freightDetails &&
-    bookingRequest.freightDetails.map((detail: QuoteDetail, detailIndex: number) =>
-      detailIndex === index ? set(field, value)(detail) : detail,
+    bookingRequest.freightDetails.map((detail: QuoteDetail) =>
+      detail.Pos === pos ? set(field, value === '' ? undefined : value)(detail) : detail,
     )
   );
 };
 
-const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, index, selected, onSelectRow }) => {
+//inputs use an empty string instead of undefined so we need to compare those values as equal
+const compareValues = (value1: string | undefined, value2: string | undefined) =>
+  (value1 ? value1 : '') !== (value2 ? value2 : '');
+
+const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, selected, onSelectRow }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
+  const [currency, setCurrency] = useState<string | undefined>(quoteDetail.Currency);
+  const [costValue, setCostValue] = useState<string | undefined>(quoteDetail.CostValue);
+  const [costUnit, setCostUnit] = useState<string | undefined>(quoteDetail.CostUnit);
+
+  useEffect(() => {
+    setCurrency(quoteDetail.Currency);
+    setCostValue(quoteDetail.CostValue);
+    setCostUnit(quoteDetail.CostUnit);
+  }, [quoteDetail]);
 
   const handleChangeFreightDetails = (value: string | undefined, fieldName: string) => {
     bookingRequest &&
       setBookingRequest &&
+      compareValues(value, get(fieldName, quoteDetail)) &&
       setBookingRequest(
         set(
           'freightDetails',
-          getUpdatedFreightDetails(bookingRequest, value, index, fieldName),
+          getUpdatedFreightDetails(bookingRequest, value, quoteDetail.Pos, fieldName),
         )(bookingRequest) as BookingRequest,
       );
   };
@@ -100,6 +113,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, inde
         {editing ? (
           <ChargeCodeInput
             chargeCodeText={quoteDetail.Description}
+            group={quoteDetail.Group}
             handleChange={code => handleChangeFreightDetails(code?.text, 'Description')}
             margin="dense"
           />
@@ -114,8 +128,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, inde
             margin="dense"
             variant="outlined"
             fullWidth
-            value={quoteDetail.Currency}
-            onChange={event => handleChangeFreightDetails(event.target.value, 'Currency')}
+            value={currency || ''}
+            onChange={event => setCurrency(event.target.value)}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
           />
         ) : (
           quoteDetail.Currency
@@ -127,9 +142,11 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, inde
             label=""
             margin="dense"
             variant="outlined"
+            type="number"
             fullWidth
-            value={quoteDetail.CostValue}
-            onChange={event => handleChangeFreightDetails(event.target.value, 'CostValue')}
+            value={costValue || ''}
+            onChange={event => setCostValue(event.target.value)}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'CostValue')}
           />
         ) : (
           quoteDetail.CostValue
@@ -142,8 +159,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ quoteDetail, inde
             margin="dense"
             variant="outlined"
             fullWidth
-            value={quoteDetail.CostUnit}
-            onChange={event => handleChangeFreightDetails(event.target.value, 'CostUnit')}
+            value={costUnit || ''}
+            onChange={event => setCostUnit(event.target.value)}
+            onBlur={event => handleChangeFreightDetails(event.target.value, 'CostUnit')}
           />
         ) : (
           quoteDetail.CostUnit
@@ -185,8 +203,6 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
     event.stopPropagation();
     setSelectedTab(newValue);
   };
-
-  console.log(JSON.stringify(filteredQuoteDetails));
 
   useEffect(() => {
     switch (selectedTab) {
@@ -297,10 +313,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ quoteDetails }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredQuoteDetails.map((quoteDetail, index) => (
+                {filteredQuoteDetails.map(quoteDetail => (
                   <BookingRequestFreightDetailsRow
                     quoteDetail={quoteDetail}
-                    index={index}
                     selected={quoteDetail.Pos ? selectedDetails.includes(quoteDetail.Pos) : false}
                     onSelectRow={event => onSelectRow(event, quoteDetail.Pos)}
                   />
