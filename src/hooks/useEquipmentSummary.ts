@@ -4,6 +4,7 @@ import { useEquipmentControlFilterProviderContext } from '../providers/Equipment
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
+import { getWeek } from 'date-fns';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -118,7 +119,10 @@ const getEquipmentSummary = async (
   try {
     let url: string;
     if (category === BookingCategory.Export) {
-      url = `${process.env.REACT_APP_API_URL}/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=14&endWeek=16`;
+      const week = getWeek(new Date());
+      url = `${
+        process.env.REACT_APP_API_URL
+      }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week + 2}`;
     } else {
       url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}`;
     }
@@ -136,7 +140,6 @@ const getEquipmentSummary = async (
 
     if (response.ok) {
       const body = await response.json();
-      console.log('Body', body);
       return body;
     } else {
       const body = await response.json();

@@ -1,3 +1,4 @@
+import { BookingCategory } from './Booking';
 import Carrier from './Carrier';
 import Client from './Client';
 import Port from './Port';
@@ -15,7 +16,7 @@ export interface CarrierSettingsRule extends PaymentConfirmation {
 }
 export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: string;
+  category: BookingCategory;
   client: Client;
   statisticClient: Client;
   type: PaymentConfirmationType.CUSTOMER_SETTINGS;

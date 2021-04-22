@@ -60,13 +60,13 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   // TODO CLEAR STATE AFTER CLOSING DIALOG???
   // TODO REFACTOR AND CREATE MORE REUSABLE COMPONENTS ???
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
-  const [selectedCategory, setSelectedCategory] = useState<string>(BookingCategory.Import);
+  const [selectedCategory, setSelectedCategory] = useState<BookingCategory>(BookingCategory.Import);
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>(undefined);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
   const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<Client | undefined | null>(undefined);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedCategory((event.target as HTMLInputElement).value);
+    setSelectedCategory((event.target as HTMLInputElement).value as BookingCategory);
   };
 
   const handleAddCustomerSetting = useCallback(async () => {
