@@ -2,14 +2,17 @@ import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, 
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import CountryCodes from '../model/CountryCodes';
+import { getWeek } from 'date-fns';
 
 export interface EquipmentControlFilterContext {
   carrier?: Carrier;
   country: CountryCodes;
+  week: number;
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {
   country: CountryCodes.CH,
+  week: getWeek(new Date()),
 } as EquipmentControlFilterContext;
 
 const EquipmentControlFilterProviderContext = createContext<
@@ -26,6 +29,10 @@ const EquipmentControlFilterProvider = (props: any) => {
     if (!carriers) return;
     setState(prevState => ({ ...prevState, carrier: carriers[0] }));
   }, [carriers]);
+
+  useEffect(() => {
+    console.log(state);
+  }, [state]);
   return (
     <EquipmentControlFilterProviderContext.Provider value={[state, setState]}>
       {props.children}

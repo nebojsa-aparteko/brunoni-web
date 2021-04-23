@@ -22,6 +22,8 @@ import PickupLocations from '../../contexts/PickupLocations';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 import EquipmentControlExportRow from './EquipmentControlExportRow';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
+import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
+import { endOfWeek, format, getYear, startOfWeek } from 'date-fns';
 
 interface ImportFlowsTableProps {
   summary: EquipmentExportSummary[];
@@ -30,6 +32,7 @@ interface ImportFlowsTableProps {
 const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const classes = importFlowsStyles();
   const locations = useContext(PickupLocations);
+  const [filters] = useEquipmentControlFilterProviderContext();
 
   const groupedSummary = useMemo(
     () =>
@@ -60,7 +63,7 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             <TableCell rowSpan={2} />
             {weeksColumns.map((status, index) => (
               <TableCell key={index} colSpan={8} className={clsx(classes.statusCell, classes.borderRight)}>
-                {status}
+                {status !== 'Export Total' ? ` ${getDateRange(filters.week + index, getYear(new Date()))}` : status}
               </TableCell>
             ))}
           </TableRow>
@@ -210,3 +213,17 @@ const importFlowsStyles = makeStyles((theme: Theme) => ({
     // },
   },
 }));
+
+const getDateOfWeek = (w: number, y: number) => {
+  const d = 1 + w * 7;
+
+  return new Date(y, 0, d);
+};
+
+const getDateRange = (weekNumber: number, year: number) => {
+  const weekDate = getDateOfWeek(weekNumber, year);
+  return `${format(startOfWeek(weekDate, { weekStartsOn: 1 }), 'dd.MM')} - ${format(
+    endOfWeek(weekDate, { weekStartsOn: 1 }),
+    'dd.MM',
+  )}`;
+};
