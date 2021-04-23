@@ -7,7 +7,7 @@ import InfoBoxItem from '../InfoBoxItem';
 import ContainerDetails from '../onlineBooking/ContainerDetails';
 import BookingRequestClosings from './BookingRequestClosings';
 import BookingRequestPortTerms from './BookingRequestPortTerms';
-import BookingRequestSpecialRemark from './BookingRequestSpecialRemark';
+import BookingRequestSpecialRemarks from './BookingRequestSpecialRemarks';
 import BookingRequestFreightDetails from './BookingRequestFreightDetails';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 
@@ -64,7 +64,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
 
       <BookingRequestClosings editing={editing} />
 
-      <BookingRequestSpecialRemark editing={editing} />
+      <BookingRequestSpecialRemarks />
       {bookingRequestState.freightDetails && (
         <>
           <Box marginTop="2em" marginBottom="2em">

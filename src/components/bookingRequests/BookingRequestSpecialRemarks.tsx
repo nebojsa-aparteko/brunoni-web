@@ -1,0 +1,61 @@
+import React, { useEffect } from 'react';
+import SpecialRemarksInput from '../inputs/SpecialRemarksInput';
+import { Grid, makeStyles, Typography } from '@material-ui/core';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import SpecialRemark from '../../model/SpecialRemark';
+import { set } from 'lodash/fp';
+import { BookingRequest } from '../../model/BookingRequest';
+
+const useStyles = makeStyles(() => ({
+  specialRemarkLabel: {
+    fontWeight: 700,
+  },
+  specialRemark: {
+    whiteSpace: 'pre-wrap',
+  },
+}));
+
+const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
+  const classes = useStyles();
+  const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
+  const [specialRemarksState, setSpecialRemarksState] = React.useState<SpecialRemark[] | undefined>(
+    bookingRequest?.specialRemarks,
+  );
+
+  useEffect(() => {
+    setSpecialRemarksState(bookingRequest?.specialRemarks);
+  }, [bookingRequest?.specialRemarks]);
+
+  const handleChangeSpecialRemarks = (specialRemarks: SpecialRemark[]) => {
+    bookingRequest &&
+      setBookingRequest &&
+      setBookingRequest(set('specialRemarks', specialRemarks)(bookingRequest) as BookingRequest);
+  };
+
+  return bookingRequest && setBookingRequest ? (
+    <React.Fragment>
+      {editing ? (
+        <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
+      ) : specialRemarksState && specialRemarksState.length > 0 ? (
+        <Grid container direction="row">
+          <Grid item xs={2}>
+            <Typography className={classes.specialRemarkLabel}>Special Remarks</Typography>
+          </Grid>
+          <Grid item container xs={10}>
+            {specialRemarksState?.map(remark => (
+              <Grid key={remark.id + '_' + remark.text} item xs={12}>
+                <Typography className={classes.specialRemark}>{remark.text}</Typography>
+                <br />
+                <br />
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      ) : null}
+    </React.Fragment>
+  ) : null;
+};
+
+interface Props {}
+
+export default BookingRequestSpecialRemarks;

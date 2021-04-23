@@ -3,6 +3,7 @@ import Carrier from './Carrier';
 import { RouteSearchResult } from './route-search/RouteSearchResults';
 import { UserRecordMin } from './UserRecord';
 import { FreightDetail } from './Booking';
+import SpecialRemark from './SpecialRemark';
 
 export interface BookingRequest {
   id?: string;
@@ -15,8 +16,7 @@ export interface BookingRequest {
   customerReference?: string;
   containers?: any[];
   additionalInfo?: string;
-  specialRemarkId?: string;
-  specialRemarkText?: string;
+  specialRemarks?: SpecialRemark[];
   imo?: boolean;
   soc?: boolean;
   createdAt?: Date;
