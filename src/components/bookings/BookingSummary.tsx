@@ -89,7 +89,6 @@ export const ClientDetails: React.FC<{
   forwarderText?: string | null;
   bkgRef?: string;
 }> = ({ forwarder, bkgRef, forwarderText }) => {
-  console.log(forwarder);
   const forwarderEmail = forwarder ? forwarder?.emailAddress : null;
   const forwarderFullName = forwarder ? `${forwarder?.firstName} ${forwarder?.lastName}` : null;
   return (

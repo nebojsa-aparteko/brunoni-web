@@ -14,6 +14,7 @@ export interface BookingRequest {
   quoteNumber?: number;
   freightDetails?: FreightDetail[];
   customerReference?: string;
+  agreementNo?: string;
   containers?: any[];
   additionalInfo?: string;
   specialRemarks?: SpecialRemark[];

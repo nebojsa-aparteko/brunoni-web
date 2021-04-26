@@ -1,4 +1,13 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent,
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Box,
   Button,
@@ -12,6 +21,7 @@ import {
   Menu,
   MenuItem,
   Paper,
+  TextField,
   Theme,
   Typography,
 } from '@material-ui/core';
@@ -47,6 +57,7 @@ import { GlobalContext } from '../../store/GlobalStore';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import { set } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -122,6 +133,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
     flexDirection: 'column',
+  },
+  agreementInput: {
+    margin: 0,
+    marginLeft: '20px',
   },
 }));
 
@@ -241,12 +256,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
+  const [agreementNumber, setAgreementNumber] = useState<string>(
+    bookingRequestState ? bookingRequestState.agreementNo || '' : bookingRequest.agreementNo || '',
+  );
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const userRecord = useContext(UserRecordContext);
 
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
+    setAgreementNumber(bookingRequest.agreementNo || '');
   }, [bookingRequest]);
 
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
@@ -328,6 +347,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   };
 
+  const handleChangeAgreementNumberText = (event: ChangeEvent<HTMLInputElement>) => {
+    setAgreementNumber(event.target.value);
+  };
+
+  const handleChangeAgreementNumber = (v: string) => {
+    bookingRequestState && setBookingRequestState && setBookingRequestState(set('agreementNo', v)(bookingRequestState));
+  };
+
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -406,15 +433,36 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                   title={`Booking Request - ${getBookingRequestTitle(bookingRequest)}`}
                   subtitle={`File No. ${bookingRequest.id}`}
                 />
+                {editing ? (
+                  <TextField
+                    label="Agreement No."
+                    margin="dense"
+                    variant="outlined"
+                    value={agreementNumber}
+                    onChange={handleChangeAgreementNumberText}
+                    onBlur={event => handleChangeAgreementNumber(event.target.value)}
+                    className={classes.agreementInput}
+                  />
+                ) : (
+                  <Typography variant={'h5'} style={{ paddingLeft: '20px' }}>
+                    {agreementNumber !== '' ? 'Agreement No. ' + agreementNumber : 'Agreement No. [To be assigned]'}
+                  </Typography>
+                )}
               </Box>
               <Box flex="1" />
               <Box className={classes.actions} displayPrint="none">
                 {editing && (
                   <>
-                    <Button variant="contained" onClick={handleCancelEditing}>
+                    <Button variant="contained" onClick={handleCancelEditing} size="small">
                       Cancel
                     </Button>
-                    <Button color={'primary'} variant="contained" onClick={handleSave} style={{ marginLeft: '1em' }}>
+                    <Button
+                      color={'primary'}
+                      variant="contained"
+                      onClick={handleSave}
+                      size="small"
+                      style={{ marginLeft: '1em' }}
+                    >
                       Save changes
                     </Button>
                   </>
