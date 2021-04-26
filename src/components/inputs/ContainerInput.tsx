@@ -3,6 +3,7 @@ import React, {
   ForwardRefRenderFunction,
   Fragment,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -12,7 +13,7 @@ import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
-import { Grid, makeStyles, TextField, Theme } from '@material-ui/core';
+import { Grid, IconButton, makeStyles, TextField, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
@@ -32,6 +33,8 @@ import ContainerDetails from '../../model/ContainerDetails';
 import FormControl from '@material-ui/core/FormControl';
 import DateInput from './DateInput';
 import ActingAs from '../../contexts/ActingAs';
+import LinkIcon from '@material-ui/icons/Link';
+import LinkOffIcon from '@material-ui/icons/LinkOff';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -73,6 +76,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
   const [dateOpen, setDateOpen] = useState<boolean>(false);
+  const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
+  const [container, setContainer] = useState<Container & ContainerDetails>(value);
+
+  useEffect(() => {
+    setContainer(value);
+  }, [value]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -98,74 +107,129 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         set('containerType', v),
         (v || {}).couldBeOversize ? identity : set('oog', [false]),
         (v || {}).description?.endsWith('S.O.') ? unset('location') : identity,
-      )(value) as Container & ContainerDetails,
+      )(container) as Container & ContainerDetails,
     );
     (commodityTypeInput.current! as { focus: () => void }).focus();
   };
 
   const handleCommodityTypeChange = (v: CommodityType | null) => {
-    onChange(set('commodityType', v)(value));
+    onChange(set('commodityType', v)(container));
     if (locationInput.current) {
       (locationInput.current! as { focus: () => void }).focus();
     }
   };
 
   const handleLocationChange = (v: PickupLocation | null) => {
-    onChange(set('pickupLocation', v)(value));
+    onChange(set('pickupLocation', v)(container));
   };
 
   const handleQuantityChange = (v: number | null) => {
-    onChange(set('quantity', v)(value));
+    onChange(set('quantity', v)(container));
   };
 
   const handleIMOChange = (v: [false] | [true, IMO[]]) => {
-    onChange(set('imo', v)(value));
+    onChange(set('imo', v)(container));
   };
 
   const handleOOGChange = (v: [false] | [true, OOG[]]) => {
-    onChange(set('oog', v)(value));
+    onChange(set('oog', v)(container));
   };
 
   const handlePickupDateChange = (v: Date | null) => {
-    onChange(set('pickupDate', v)(value));
+    onChange(set('pickupDate', v)(container));
+  };
+
+  const handleWeightTextChange = (v: number | null) => {
+    setContainer(set('weight', v)(container));
   };
 
   const handleWeightChange = (v: number | null) => {
-    onChange(set('weight', v)(value));
+    onChange(set('weight', v)(container));
   };
 
   const handleTemperatureChange = (v: number | null) => {
-    onChange(set('temperature', v)(value));
+    onChange(set('temperature', v)(container));
   };
 
   const handleHumidityChange = (v: string | null) => {
-    onChange(set('humidity', v)(value));
+    onChange(set('humidity', v)(container));
   };
 
   const handleVentilationChange = (v: string | null) => {
-    onChange(set('ventilation', v)(value));
+    onChange(set('ventilation', v)(container));
+  };
+
+  const handlePickupReferenceTextChange = (v: string | null) => {
+    const newValue = (linkedReferences
+      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
+      : { ...container, pickupReference: v }) as Container & ContainerDetails;
+    setContainer(newValue);
   };
 
   const handlePickupReferenceChange = (v: string | null) => {
-    onChange(set('pickupReference', v)(value));
+    if (v !== container.pickupReference) {
+      const newValue = (linkedReferences
+        ? {
+            ...container,
+            pickupReference: v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, pickupReference: v }) as Container & ContainerDetails;
+      onChange(newValue);
+    }
+  };
+
+  const handleDeliveryReferenceTextChange = (v: string | null) => {
+    const newValue = (linkedReferences
+      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
+      : { ...container, deliveryReference: v }) as Container & ContainerDetails;
+    setContainer(newValue);
   };
 
   const handleDeliveryReferenceChange = (v: string | null) => {
-    onChange(set('deliveryReference', v)(value));
+    if (v !== container.deliveryReference) {
+      const newValue = (linkedReferences
+        ? {
+            ...container,
+            pickupReference: v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, deliveryReference: v }) as Container & ContainerDetails;
+      onChange(newValue);
+    }
+  };
+
+  const handleVGMPinTextChange = (v: string | null) => {
+    const newValue = (linkedReferences
+      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
+      : { ...container, vgmPin: v }) as Container & ContainerDetails;
+    setContainer(newValue);
   };
 
   const handleVGMPinChange = (v: string | null) => {
-    onChange(set('vgmPin', v)(value));
+    if (v !== container.vgmPin) {
+      const newValue = (linkedReferences
+        ? {
+            ...container,
+            pickupReference: v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, vgmPin: v }) as Container & ContainerDetails;
+      onChange(newValue);
+    }
   };
 
   return (
     <Fragment>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid item md={3} xs={12}>
           <ContainerTypeInput
             ref={containerTypeInput}
             margin="dense"
-            value={value.containerType!}
+            value={container.containerType!}
             onChange={handleContainerTypeChange}
           />
         </Grid>
@@ -173,7 +237,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           <CommodityTypeInput
             ref={commodityTypeInput}
             margin="dense"
-            value={value.commodityType!}
+            value={container.commodityType!}
             onChange={handleCommodityTypeChange}
           />
         </Grid>
@@ -182,19 +246,19 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             <LocationInput
               ref={locationInput}
               margin="dense"
-              value={value.pickupLocation!}
+              value={container.pickupLocation!}
               onChange={handleLocationChange}
             />
           </Grid>
         )}
         <Grid item md={2} xs={12}>
-          <QuantityInput value={value.quantity} margin="dense" onChange={handleQuantityChange} />
+          <QuantityInput value={container.quantity} margin="dense" onChange={handleQuantityChange} />
         </Grid>
         {get('isDetailedInput')(rest) && (
           <>
             <Grid item md={2} xs={12}>
               <DateInput
-                value={value.pickupDate || null}
+                value={container.pickupDate || null}
                 onChange={handlePickupDateChange}
                 open={dateOpen}
                 onOpen={() => setDateOpen(true)}
@@ -211,11 +275,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 margin="dense"
                 variant="outlined"
                 fullWidth
-                value={value.weight}
-                onChange={event => handleWeightChange(parseInt(event.target.value))}
+                value={container.weight}
+                onChange={event => handleWeightTextChange(parseInt(event.target.value))}
+                onBlur={event => handleWeightChange(parseInt(event.target.value))}
               />
             </Grid>
-            {(value.containerType?.id === '45R1' || value.containerType?.id === '22R1') && (
+            {(container.containerType?.id === '45R1' || container.containerType?.id === '22R1') && (
               <React.Fragment>
                 <Grid item md={2} xs={12}>
                   <TextField
@@ -224,7 +289,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.temperature}
+                    value={container.temperature}
                     onChange={event => handleTemperatureChange(parseInt(event.target.value))}
                   />
                 </Grid>
@@ -235,7 +300,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.humidity}
+                    value={container.humidity}
                     onChange={event => handleHumidityChange(event.target.value)}
                   />
                 </Grid>
@@ -245,7 +310,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.ventilation}
+                    value={container.ventilation}
                     onChange={event => handleVentilationChange(event.target.value)}
                   />
                 </Grid>
@@ -255,33 +320,39 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
               <React.Fragment>
                 <Grid item md={3} xs={12}>
                   <TextField
-                    label="Pickup Reference"
+                    label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.pickupReference}
-                    onChange={event => handlePickupReferenceChange(event.target.value)}
+                    value={container.pickupReference}
+                    onChange={event => handlePickupReferenceTextChange(event.target.value)}
+                    onBlur={event => handlePickupReferenceChange(event.target.value)}
                   />
                 </Grid>
                 <Grid item md={3} xs={12}>
                   <TextField
-                    label="Delivery Reference"
+                    label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.deliveryReference}
-                    onChange={event => handleDeliveryReferenceChange(event.target.value)}
+                    value={container.deliveryReference}
+                    onChange={event => handleDeliveryReferenceTextChange(event.target.value)}
+                    onBlur={event => handleDeliveryReferenceChange(event.target.value)}
                   />
                 </Grid>
-                <Grid item md={2} xs={12}>
+                <Grid item md={2} xs={12} style={{ display: 'flex' }}>
                   <TextField
-                    label="VGM Pin"
+                    label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={value.vgmPin}
-                    onChange={event => handleVGMPinChange(event.target.value)}
+                    value={container.vgmPin}
+                    onChange={event => handleVGMPinTextChange(event.target.value)}
+                    onBlur={event => handleVGMPinChange(event.target.value)}
                   />
+                  <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
+                    {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
+                  </IconButton>
                 </Grid>
               </React.Fragment>
             )}
@@ -294,29 +365,29 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           ItemInput={IMOListInput}
           defaultItemValue={[]}
           value={
-            value.imo && value.imo.length > 0 && typeof value.imo[0] !== 'boolean'
-              ? value.imo
-                ? value.imo.length > 0
-                  ? [true, (value.imo as unknown) as IMO[]]
+            container.imo && container.imo.length > 0 && typeof container.imo[0] !== 'boolean'
+              ? container.imo
+                ? container.imo.length > 0
+                  ? [true, (container.imo as unknown) as IMO[]]
                   : [false]
                 : [false]
-              : value.imo || [false]
+              : container.imo || [false]
           }
           onChange={handleIMOChange}
         />
-        {(value.containerType || {}).couldBeOversize && (
+        {(container.containerType || {}).couldBeOversize && (
           <OptionalInput
             label="This container is out of gauge"
             ItemInput={OOGListInput}
             defaultItemValue={[]}
             value={
-              value.oog && value.oog.length > 0 && typeof value.oog[0] !== 'boolean'
-                ? value.oog
-                  ? value.oog.length > 0
-                    ? [true, (value.oog as unknown) as OOG[]]
+              container.oog && container.oog.length > 0 && typeof container.oog[0] !== 'boolean'
+                ? container.oog
+                  ? container.oog.length > 0
+                    ? [true, (container.oog as unknown) as OOG[]]
                     : [false]
                   : [false]
-                : value.oog || [false]
+                : container.oog || [false]
             }
             onChange={handleOOGChange}
           />
