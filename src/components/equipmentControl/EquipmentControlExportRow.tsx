@@ -1,10 +1,5 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
-import {
-  containerTypesLabels,
-  containerTypesValues,
-  EquipmentExportSummary,
-  weeksColumns,
-} from '../../model/EquipmentControl';
+import { containerTypesLabels, EquipmentExportSummary, weeksColumns } from '../../model/EquipmentControl';
 import {
   Box,
   CircularProgress,
@@ -92,7 +87,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
           <Fragment key={`${location?.id}-${s}`}>
-            {containerTypesValues.map((type, index) => {
+            {filters.containerTypes.map((type, index) => {
               const c = get(groupedStatus, type, []);
               const data = c.pop();
               return (
