@@ -147,38 +147,44 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
 
         <TableBody className={classes.table}>
           {summary.length !== 0 &&
-            summary.map(([id, group]) => {
-              const [countryCode, city] = id.split('~');
-              return (
-                <Fragment key={id}>
-                  <TableRow>
-                    <TableCell
-                      style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
-                      colSpan={statusLabels.length * filters.containerTypes.length + 2}
-                      className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
-                    >
-                      {get(CountryCodes, countryCode, '-')}
-                    </TableCell>
-                  </TableRow>
-                  {group?.map((equipment, index) => (
-                    <TableRow key={equipment.id} hover className={classes.row}>
-                      {index === 0 && (
-                        <Tooltip title={city}>
-                          <TableCell
-                            rowSpan={group.length}
-                            className={clsx([classes.borderRight, classes.cityCell])}
-                            style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
-                          >
-                            {truncateString(city, 7)}
-                          </TableCell>
-                        </Tooltip>
-                      )}
-                      <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
+            summary
+              .filter(([id]) => {
+                if (filters.country.length === 0) return true;
+                const [countryCode] = id.split('~');
+                return filters.country.includes(countryCode);
+              })
+              .map(([id, group]) => {
+                const [countryCode, city] = id.split('~');
+                return (
+                  <Fragment key={id}>
+                    <TableRow>
+                      <TableCell
+                        style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
+                        colSpan={statusLabels.length * filters.containerTypes.length + 2}
+                        className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
+                      >
+                        {get(CountryCodes, countryCode, '-')}
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </Fragment>
-              );
-            })}
+                    {group?.map((equipment, index) => (
+                      <TableRow key={equipment.id} hover className={classes.row}>
+                        {index === 0 && (
+                          <Tooltip title={city}>
+                            <TableCell
+                              rowSpan={group.length}
+                              className={clsx([classes.borderRight, classes.cityCell])}
+                              style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
+                            >
+                              {truncateString(city, 7)}
+                            </TableCell>
+                          </Tooltip>
+                        )}
+                        <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
+                      </TableRow>
+                    ))}
+                  </Fragment>
+                );
+              })}
         </TableBody>
       </Table>
     </TableContainer>
