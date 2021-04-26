@@ -24,7 +24,6 @@ import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
 import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
-import { compact, flow, pick } from 'lodash/fp';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -263,4 +262,4 @@ interface Props {
 export default ContainerDetails;
 
 const createAddressString = (object: PickupLocation) =>
-  flow(pick(['name', 'street', 'city', 'countryCode']), Object.values, compact, (obj: any) => obj.join(', '))(object);
+  `${object.name}<br/>${object.street}<br/>${object.city}, ${object.countryCode}`;
