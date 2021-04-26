@@ -367,8 +367,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               <TableRowData
                 label={'Carrier'}
                 content={
-                  bookingRequest?.carrier && bookingRequest?.carrier?.id
-                    ? bookingRequest?.carrier?.id?.toUpperCase()
+                  bookingRequest?.carrier && bookingRequest?.carrier?.name
+                    ? bookingRequest?.carrier?.name?.toUpperCase()
                     : ''
                 }
               />
