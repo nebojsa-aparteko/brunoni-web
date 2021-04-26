@@ -257,7 +257,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
           content={
             editing ? (
               <Box display="flex" flexDirection="column">
-                {bookingRequest.schedule?.OriginInfo.Port.HarbourName}
+                {bookingRequest.schedule?.DestinationInfo.Port.HarbourName}
                 <TextField
                   label={'ETA'}
                   value={bookingRequest.schedule?.DestinationInfo.ArrivalDate}
