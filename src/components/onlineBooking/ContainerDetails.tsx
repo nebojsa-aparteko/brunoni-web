@@ -9,6 +9,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  TextField,
   Typography,
 } from '@material-ui/core';
 import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
@@ -24,6 +25,7 @@ import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
 import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
+import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -217,15 +219,56 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
 const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBookingRequest, editing }) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
+  const [deliveryAddress, setDeliveryAddress] = useState<string>(
+    bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '',
+  );
 
+  useEffect(() => {
+    setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '');
+  }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
   const handleChange = (value: any[] | undefined) => {
     setBookingRequest && setBookingRequest({ ...bookingRequest, containers: value } as BookingRequest);
+  };
+
+  const handleAddressTextChange = (v: string | undefined) => {
+    setDeliveryAddress(v || '');
+  };
+
+  const handleAddressChange = (v: string | undefined) => {
+    const newAddress = {
+      ...bookingRequest,
+      schedule: {
+        ...bookingRequest?.schedule,
+        OriginInfo: {
+          ...bookingRequest?.schedule?.OriginInfo,
+          Port: {
+            ...bookingRequest?.schedule?.OriginInfo.Port,
+            PortName: v?.replaceAll('\n', '<br/>'),
+          },
+        },
+      },
+    } as BookingRequest;
+    omitEmptyDeep(newAddress);
+    setBookingRequest && setBookingRequest(newAddress);
   };
 
   return (
     <Grid container spacing={4}>
       {editing ? (
-        <Box p={1}>
+        <Box p={1} display="flex" flexDirection="column">
+          <Box pb={2}>
+            <TextField
+              label="Delivery Address"
+              variant="outlined"
+              margin="dense"
+              rows={5}
+              multiline
+              fullWidth
+              value={deliveryAddress}
+              onChange={event => handleAddressTextChange(event.target.value)}
+              onBlur={event => handleAddressChange(event.target.value)}
+            />
+          </Box>
           <ListInput
             listRef={listInput}
             addButtonRef={addButton}
