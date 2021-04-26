@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { Checkbox, Grid, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import { AppBar, Checkbox, Grid, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -295,11 +295,13 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     <Fragment>
       <Grid item xs={12}>
         <TableContainer component={Paper} className={classes.tableWrapper}>
-          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
-            <Tab label="External" {...a11yProps(0)} />
-            <Tab label="Internal 1" {...a11yProps(1)} />
-            {/*<Tab label="Internal 2" {...a11yProps(2)} />*/}
-          </Tabs>
+          <AppBar position="static">
+            <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
+              <Tab label="External" {...a11yProps(0)} />
+              <Tab label="Internal 1" {...a11yProps(1)} />
+              {/*<Tab label="Internal 2" {...a11yProps(2)} />*/}
+            </Tabs>
+          </AppBar>
           {editing && (
             <EnhancedTableToolbar
               numSelected={selectedDetails.length}
