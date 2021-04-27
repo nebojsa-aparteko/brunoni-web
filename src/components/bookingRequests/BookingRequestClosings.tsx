@@ -61,16 +61,17 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
       <Table className={classes.table} size="small">
         <TableHead className={classes.tableHead}>
           <TableRow className={classes.tableRow}>
-            <TableCell>Closing for</TableCell>
-            <TableCell>Date/Time</TableCell>
+            <TableCell align="left">Closing for</TableCell>
+            <TableCell align="left">Date/Time</TableCell>
+            <TableCell align="left">Remarks</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {bookingRequest.schedule?.Deadlines.map((item, index) => {
             return (
               <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
-                <TableCell>{item.Typ}</TableCell>
-                <TableCell style={{ minWidth: '8em' }}>
+                <TableCell align="left">{item.Typ}</TableCell>
+                <TableCell align="left" style={{ minWidth: '4em' }}>
                   {editing ? (
                     <TextField
                       label={''}
@@ -83,6 +84,10 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
                   ) : (
                     item.Time
                   )}
+                </TableCell>
+                <TableCell align="left">
+                  {/*TODO check if the DELIVERY type is different in other languages*/}
+                  {item.Typ !== 'DELIVERY' ? '(TO BE SUBMITTED BEFORE CONTAINER DELIVERY AT THE TERMINAL)' : ''}
                 </TableCell>
               </TableRow>
             );
