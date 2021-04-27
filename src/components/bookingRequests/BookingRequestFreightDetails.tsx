@@ -78,7 +78,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
-
   useEffect(() => {
     setQuantity(freightDetail.Anz || '1.00');
     setCurrency(freightDetail.Currency);
@@ -152,6 +151,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
           freightDetail.Currency
         )}
       </TableCell>
+      {freightDetail.Txt === 'Seafreight' && console.log(freightDetail)}
       <TableCell align="right">
         {editing ? (
           <TextField
@@ -160,7 +160,8 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
             variant="outlined"
             type="number"
             fullWidth
-            value={unitValue || ''}
+            //todo use some formatting library
+            value={unitValue?.replace(',', '') || ''}
             onChange={event => setUnitValue(event.target.value)}
             onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
           />
@@ -184,8 +185,8 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell>
-        {freightDetail.UnitValue
-          ? ((quantity ? parseFloat(quantity) : 1) * parseFloat(freightDetail.UnitValue)).toFixed(2)
+        {freightDetail.Total
+          ? ((quantity ? parseFloat(quantity) : 1) * parseFloat(freightDetail.Total.replace(',', ''))).toFixed(2)
           : '0.00'}
       </TableCell>
     </TableRow>
