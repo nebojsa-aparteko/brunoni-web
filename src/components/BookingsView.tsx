@@ -93,11 +93,11 @@ export const getContainersString = (booking: Booking) => {
 const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
-  const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
+  const [filters, setFilters] = useBookingListFilterContext();
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
 
-  const { assignee } = bookingsContextData;
+  const { assignee } = filters;
   const { searchString, page, rowsPerPage } = bookingPaginationContextData;
 
   const [filteredResults, setFilteredResults] = useState<Booking[] | undefined | null>([]);
@@ -143,8 +143,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
   }, [bookings, searchString, page, rowsPerPage]);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBookingsContextData &&
-      setBookingsContextData(set('category', (event.target as HTMLInputElement).value)(bookingsContextData));
+    setFilters && setFilters(set('category', (event.target as HTMLInputElement).value)(filters));
   };
 
   const handleChangePage = useCallback(
@@ -190,7 +189,13 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
     <Fragment>
       <Meta title={`Bookings`} />
 
-      <BookingsFiltersBar showClientFilter={isAdmin} showDateRange={showDateRangeFilter} showAssigneeFilter={isAdmin} />
+      <BookingsFiltersBar
+        filters={filters}
+        setFilters={setFilters}
+        showClientFilter={isAdmin}
+        showDateRange={showDateRangeFilter}
+        showAssigneeFilter={isAdmin}
+      />
 
       <div>
         {bookings ? (
@@ -204,7 +209,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <div id="exportImportBkgView">
-                      <CategoryFilter value={bookingsContextData.category} onChange={handleImportOrExportChange} />
+                      <CategoryFilter value={filters.category} onChange={handleImportOrExportChange} />
                     </div>
                     <Box flex={1} />
 

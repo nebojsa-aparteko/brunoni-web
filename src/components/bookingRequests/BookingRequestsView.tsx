@@ -12,6 +12,7 @@ import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '.
 import theme from '../../theme';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
+import BookingsFiltersBar from '../searchbar/BookingsFiltersBar';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -65,7 +66,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
-  const [bookingRequests, isLoading] = useBookingRequestsContext();
+  const [bookingRequests, isLoading, filters, setFilters] = useBookingRequestsContext();
 
   const assignAgent = useCallback(
     event => {
@@ -95,6 +96,8 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   return (
     <>
       <Meta title={`Booking Requests`} />
+
+      <BookingsFiltersBar filters={filters} setFilters={setFilters} />
 
       <div>
         {bookingRequests ? (

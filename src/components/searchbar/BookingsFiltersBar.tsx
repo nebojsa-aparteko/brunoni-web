@@ -13,12 +13,14 @@ import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
-import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
+//import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
 import Carrier from '../../model/Carrier';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 
 interface Props {
+  filters: any;
+  setFilters: any;
   showClientFilter?: boolean;
   showDateRange?: boolean;
   showRefreshButton?: boolean;
@@ -26,6 +28,8 @@ interface Props {
 }
 
 const BookingsFiltersBar: React.FC<Props> = ({
+  filters,
+  setFilters,
   showClientFilter,
   showDateRange,
   showRefreshButton,
@@ -35,7 +39,6 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const users = useAdminUsers();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
-  const [filters, setFilters] = useBookingListFilterContext();
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 
@@ -88,7 +91,6 @@ const BookingsFiltersBar: React.FC<Props> = ({
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
 
-        {!showClientFilter && <Grid item sm={3} xs={12} style={{ paddingTop: 4 }} />}
         {showDateRange && (
           <Grid item sm={3} xs={12}>
             <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">

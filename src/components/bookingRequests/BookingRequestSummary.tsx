@@ -435,7 +435,11 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               {bookingRequest.quoteNumber && (
                 <TableRowData
                   label={'Quote Reference'}
-                  content={<Link to={`/quotes/${bookingRequest.quoteNumber}`}>{bookingRequest.quoteNumber}</Link>}
+                  content={
+                    <Link to={`/quotes/${bookingRequest.quoteNumber}`} target="_blank">
+                      {bookingRequest.quoteNumber}
+                    </Link>
+                  }
                 />
               )}
               <TableRow>
