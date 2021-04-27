@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -9,13 +9,11 @@ import { Box, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/
 import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
 import { get } from 'lodash';
-import PickupLocations from '../../contexts/PickupLocations';
-import { groupBy } from 'lodash/fp';
 import CountryCodes from '../../model/CountryCodes';
 import clsx from 'clsx';
 import truncateString from '../../utilities/truncateString';
-import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
+import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 
 export const importFlowsStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -98,41 +96,18 @@ export const importFlowsStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface ImportFlowsTableProps {
-  summary: EquipmentImportSummary[];
+  summary: [string, EquipmentImportSummary[]][];
 }
 
 const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const classes = importFlowsStyles();
-  const locations = useContext(PickupLocations);
-  // const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [locations]);
+  const [filters] = useEquipmentControlFilterProviderContext();
 
-  const groupedSummary = useMemo(
-    () =>
-      Object.entries(
-        sortByObjectKeys(
-          groupBy<EquipmentImportSummary>(s => {
-            const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
-            // return `${location?.countryCode || '-'}`;
-            return `${location?.countryCode || '-'}~${location?.city || '-'}`;
-          })(summary),
-        ) as { [key: string]: EquipmentImportSummary[] },
-      ),
-    [summary, locations],
-  );
-  // const total = useMemo(() => {
-  //   return summary?.reduce((previousValue, currentValue) => {
-  //     const sum = {};
-  //     statusKeys.forEach(key => {
-  //       set(sum, key, mergeAndSumObjects(get(previousValue, key), get(currentValue, key)));
-  //     });
-  //     return sum;
-  //   }, {});
-  // }, [summary]);
-  return !groupedSummary ? (
+  return !summary ? (
     <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
       <CircularProgress />
     </Box>
-  ) : groupedSummary.length === 0 ? (
+  ) : summary.length === 0 ? (
     <BookingsEmptyResults message={'No equipment control found for your filter criteria. Try changing filters.'} />
   ) : (
     <TableContainer className={classes.container}>
@@ -144,14 +119,18 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
               Depot Location
             </TableCell>
             {statusLabels.map((status, index) => (
-              <TableCell key={index} colSpan={8} className={clsx(classes.statusCell, classes.borderRight)}>
+              <TableCell
+                key={index}
+                colSpan={filters.containerTypes.length}
+                className={clsx(classes.statusCell, classes.borderRight)}
+              >
                 {status}
               </TableCell>
             ))}
           </TableRow>
           <TableRow>
             {statusLabels.map(() =>
-              containerTypesLabels.map((label, index) => (
+              filters.containerTypes.map((label, index) => (
                 <TableCell
                   key={index}
                   size="small"
@@ -167,39 +146,45 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
         </TableHead>
 
         <TableBody className={classes.table}>
-          {groupedSummary.length !== 0 &&
-            groupedSummary.map(([id, group]) => {
-              const [countryCode, city] = id.split('~');
-              return (
-                <Fragment key={id}>
-                  <TableRow>
-                    <TableCell
-                      style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
-                      colSpan={statusLabels.length * containerTypesLabels.length + 2}
-                      className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
-                    >
-                      {get(CountryCodes, countryCode, '-')}
-                    </TableCell>
-                  </TableRow>
-                  {group?.map((equipment, index) => (
-                    <TableRow key={equipment.id} hover className={classes.row}>
-                      {index === 0 && (
-                        <Tooltip title={city}>
-                          <TableCell
-                            rowSpan={group.length}
-                            className={clsx([classes.borderRight, classes.cityCell])}
-                            style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
-                          >
-                            {truncateString(city, 7)}
-                          </TableCell>
-                        </Tooltip>
-                      )}
-                      <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
+          {summary.length !== 0 &&
+            summary
+              .filter(([id]) => {
+                if (filters.country.length === 0) return true;
+                const [countryCode] = id.split('~');
+                return filters.country.includes(countryCode);
+              })
+              .map(([id, group]) => {
+                const [countryCode, city] = id.split('~');
+                return (
+                  <Fragment key={id}>
+                    <TableRow>
+                      <TableCell
+                        style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
+                        colSpan={statusLabels.length * filters.containerTypes.length + 2}
+                        className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
+                      >
+                        {get(CountryCodes, countryCode, '-')}
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </Fragment>
-              );
-            })}
+                    {group?.map((equipment, index) => (
+                      <TableRow key={equipment.id} hover className={classes.row}>
+                        {index === 0 && (
+                          <Tooltip title={city}>
+                            <TableCell
+                              rowSpan={group.length}
+                              className={clsx([classes.borderRight, classes.cityCell])}
+                              style={{ borderRightWidth: 1, whiteSpace: 'nowrap' }}
+                            >
+                              {truncateString(city, 7)}
+                            </TableCell>
+                          </Tooltip>
+                        )}
+                        <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
+                      </TableRow>
+                    ))}
+                  </Fragment>
+                );
+              })}
         </TableBody>
       </Table>
     </TableContainer>

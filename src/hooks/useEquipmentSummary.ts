@@ -4,7 +4,6 @@ import { useEquipmentControlFilterProviderContext } from '../providers/Equipment
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
-import { getWeek } from 'date-fns';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -36,6 +35,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
             BookingVersion.long,
             category,
+            filters.week,
           );
         })
         .then(
@@ -73,6 +73,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
           BookingVersion.long,
           category,
+          filters.week,
         );
       })
       .then(
@@ -115,11 +116,11 @@ const getEquipmentSummary = async (
   carrierId: string,
   version: BookingVersion,
   category: BookingCategory,
+  week: number,
 ) => {
   try {
     let url: string;
     if (category === BookingCategory.Export) {
-      const week = getWeek(new Date());
       url = `${
         process.env.REACT_APP_API_URL
       }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week + 2}`;

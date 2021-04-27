@@ -1,11 +1,6 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import {
-  containerTypesLabels,
-  containerTypesValues,
-  EquipmentImportSummary,
-  statusLabels,
-} from '../../model/EquipmentControl';
+import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
 import {
   Box,
   CircularProgress,
@@ -90,7 +85,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
         return (
           <Fragment key={`${location?.id}-${s}`}>
-            {containerTypesValues.map((type, index) => {
+            {filters.containerTypes.map((type, index) => {
               const c = get(groupedStatus, type, []);
               return (
                 <TableCell
