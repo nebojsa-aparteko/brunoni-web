@@ -13,12 +13,14 @@ import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
-import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
+//import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
 import Carrier from '../../model/Carrier';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 
 interface Props {
+  filters: any;
+  setFilters: any;
   showClientFilter?: boolean;
   showDateRange?: boolean;
   showRefreshButton?: boolean;
@@ -26,6 +28,8 @@ interface Props {
 }
 
 const BookingsFiltersBar: React.FC<Props> = ({
+  filters,
+  setFilters,
   showClientFilter,
   showDateRange,
   showRefreshButton,
@@ -35,7 +39,6 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const users = useAdminUsers();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
-  const [filters, setFilters] = useBookingListFilterContext();
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 
