@@ -12,6 +12,7 @@ import ContainersList from './ContainersList';
 import { useHistory } from 'react-router';
 import firebase from 'firebase';
 import { format } from 'date-fns';
+import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -62,6 +63,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const classes = useStyles();
   const history = useHistory();
   const [, userRecord] = useUser();
+  const client = useClientById(userRecord?.alphacomClientId);
 
   const getShortUserData = useCallback(
     (): ActivityLogUserData =>
@@ -81,6 +83,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       createdAt: new Date(),
       createdBy: getShortUserData(),
       status: BookingRequestStatus.REQUESTED,
+      vgmSubmittedBy: client ? client.name + (client.name && client.city && ', ') + client.city : undefined,
       archived: false,
     };
     omitEmptyDeep(writableRequest);

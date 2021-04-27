@@ -22,6 +22,7 @@ import SchedulePicker from './SchedulePicker';
 import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { Link } from 'react-router-dom';
+import { UserRecordMin } from '../../model/UserRecord';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -300,6 +301,20 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
+export const userRepresentation = (user: UserRecordMin | undefined) => {
+  return (
+    <React.Fragment>
+      {user && user.alphacomId ? (
+        <a href={`mailto:${user.emailAddress}`} target="_blank" rel="noopener noreferrer">
+          {user.firstName} {user.lastName}
+        </a>
+      ) : (
+        <Typography>Unassigned</Typography>
+      )}
+    </React.Fragment>
+  );
+};
+
 const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
@@ -425,19 +440,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               )}
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
-                <TableCell className={classes.tableCell}>
-                  {bookingRequest?.assignedUser && bookingRequest.assignedUser.alphacomId ? (
-                    <a
-                      href={`mailto:${bookingRequest?.assignedUser?.emailAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {bookingRequest?.assignedUser.firstName} {bookingRequest?.assignedUser.lastName}
-                    </a>
-                  ) : (
-                    <Typography>Unassigned</Typography>
-                  )}
-                </TableCell>
+                <TableCell className={classes.tableCell}>{userRepresentation(bookingRequest?.assignedUser)}</TableCell>
               </TableRow>
               <TableRow className={classes.tableRow}>
                 <TableCell className={classes.tableCellLabel}>Client</TableCell>

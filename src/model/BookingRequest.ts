@@ -25,6 +25,7 @@ export interface BookingRequest {
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
+  vgmSubmittedBy?: string | UserRecordMin;
   archived?: boolean;
 }
 

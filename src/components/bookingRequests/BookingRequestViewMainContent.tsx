@@ -60,7 +60,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
           </>
         )}
       </Box>
-      <BookingRequestPortTerms bookingRequest={bookingRequestState} />
+      <BookingRequestPortTerms />
 
       <BookingRequestClosings editing={editing} />
 
