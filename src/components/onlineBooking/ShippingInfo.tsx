@@ -68,6 +68,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const [carrier, setCarrier] = useState<Carrier | undefined>(
     scheduleCarrier ? scheduleCarrier : quote ? quote.carrier : undefined,
   );
+  const [quoteNumber, setQuoteNumber] = useState<string | undefined>(quote ? quote.id : '');
   const [customerReference, setCustomerReference] = useState<string | undefined>();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -78,7 +79,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         origin: originPort,
         destination: destinationPort,
         carrier: carrier,
-        quoteNumber: quote ? quote.id : undefined,
+        quoteNumber: quoteNumber !== '' ? quoteNumber : undefined,
         customerReference: customerReference,
         schedule: schedule,
         freightDetails: quote && quote.quoteDetails ? getRelevantFreightDetails(quote.quoteDetails) : undefined,
@@ -116,18 +117,17 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           margin="dense"
         />
       </Grid>
-      {quote && (
-        <Grid item sm={2} xs={12}>
-          <TextField
-            label="Quote Number"
-            defaultValue={quote?.id}
-            fullWidth
-            type="number"
-            variant="outlined"
-            margin="dense"
-          />
-        </Grid>
-      )}
+      <Grid item sm={2} xs={12}>
+        <TextField
+          label="Quote Number"
+          fullWidth
+          type="number"
+          variant="outlined"
+          margin="dense"
+          value={quoteNumber}
+          onChange={event => setQuoteNumber(event.target.value)}
+        />
+      </Grid>
       <Grid item sm={3} xs={12}>
         <TextField
           label="Customer reference (optional)"
