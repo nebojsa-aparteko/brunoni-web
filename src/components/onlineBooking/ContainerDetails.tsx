@@ -227,7 +227,15 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '');
   }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
   const handleChange = (value: any[] | undefined) => {
-    setBookingRequest && setBookingRequest({ ...bookingRequest, containers: value } as BookingRequest);
+    const writableContainers = value?.map(container => {
+      return {
+        ...container,
+        imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
+        oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
+        pickupDate: container.pickupDate ? container.pickupDate : new Date(),
+      };
+    });
+    setBookingRequest && setBookingRequest({ ...bookingRequest, containers: writableContainers } as BookingRequest);
   };
 
   const handleAddressTextChange = (v: string | undefined) => {

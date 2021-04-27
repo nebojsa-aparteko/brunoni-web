@@ -68,6 +68,19 @@ const IMOListInput = forwardRef((props: OptionalInputProps<IMO[]>, ref) => (
   />
 ));
 
+const defaultIMOItem: IMO = {
+  IMOClass: '',
+  UNNumber: '',
+  PGNumber: '',
+};
+
+const defaultOOGItem: OOG = {
+  width: '',
+  height: '',
+  length: '',
+  weight: '',
+};
+
 const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
@@ -128,11 +141,11 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handleIMOChange = (v: [false] | [true, IMO[]]) => {
-    onChange(set('imo', v)(container));
+    onChange(set('imo', v[0] ? v : undefined)(container));
   };
 
   const handleOOGChange = (v: [false] | [true, OOG[]]) => {
-    onChange(set('oog', v)(container));
+    onChange(set('oog', v[0] ? v : undefined)(container));
   };
 
   const handlePickupDateChange = (v: Date | null) => {
@@ -363,7 +376,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         <OptionalInput
           label="This container contains IMO"
           ItemInput={IMOListInput}
-          defaultItemValue={[]}
+          defaultItemValue={[defaultIMOItem]}
           value={
             container.imo && container.imo.length > 0 && typeof container.imo[0] !== 'boolean'
               ? container.imo
@@ -379,7 +392,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           <OptionalInput
             label="This container is out of gauge"
             ItemInput={OOGListInput}
-            defaultItemValue={[]}
+            defaultItemValue={[defaultOOGItem]}
             value={
               container.oog && container.oog.length > 0 && typeof container.oog[0] !== 'boolean'
                 ? container.oog
