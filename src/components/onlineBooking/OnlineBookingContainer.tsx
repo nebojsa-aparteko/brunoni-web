@@ -8,6 +8,7 @@ import ShippingInfo from './ShippingInfo';
 import CargoInfo from './CargoInfo';
 import AdditionalInfo from './AdditionalInfo';
 import Summary from './Summary';
+import { FormProvider, useForm } from 'react-hook-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -28,6 +29,7 @@ const getSteps = () => ['General Information', 'Cargo Details', 'Additional Info
 const OnlineBookingContainer = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
+  const methods = useForm();
 
   const quoteJson = localStorage.getItem('quote');
   const [quote] = React.useState(quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined);
@@ -48,53 +50,55 @@ const OnlineBookingContainer = () => {
   };
 
   return (
-    <ContainerView className={classes.root}>
-      <Paper>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map(label => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <Box p={3} className={classes.content}>
-          <TabPanel value={activeStep} index={0}>
-            <ShippingInfo
-              quote={quote}
-              schedule={schedule}
-              handleNext={handleNext}
-              bookingRequest={bookingRequest}
-              setBookingRequest={setBookingRequest}
-            />
-          </TabPanel>
-          <TabPanel value={activeStep} index={1}>
-            <CargoInfo
-              quote={quote}
-              handlePrevious={handleBack}
-              handleNext={handleNext}
-              bookingRequest={bookingRequest}
-              setBookingRequest={setBookingRequest}
-            />
-          </TabPanel>
-          <TabPanel value={activeStep} index={2}>
-            <AdditionalInfo
-              handlePrevious={handleBack}
-              handleNext={handleNext}
-              bookingRequest={bookingRequest}
-              setBookingRequest={setBookingRequest}
-            />
-          </TabPanel>
-          <TabPanel value={activeStep} index={3}>
-            <Summary
-              handlePrevious={handleBack}
-              handleNext={handleNext}
-              bookingRequest={bookingRequest}
-              setBookingRequest={setBookingRequest}
-            />
-          </TabPanel>
-        </Box>
-      </Paper>
-    </ContainerView>
+    <FormProvider {...methods}>
+      <ContainerView className={classes.root}>
+        <Paper>
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map(label => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <Box p={3} className={classes.content}>
+            <TabPanel value={activeStep} index={0}>
+              <ShippingInfo
+                quote={quote}
+                schedule={schedule}
+                handleNext={handleNext}
+                bookingRequest={bookingRequest}
+                setBookingRequest={setBookingRequest}
+              />
+            </TabPanel>
+            <TabPanel value={activeStep} index={1}>
+              <CargoInfo
+                quote={quote}
+                handlePrevious={handleBack}
+                handleNext={handleNext}
+                bookingRequest={bookingRequest}
+                setBookingRequest={setBookingRequest}
+              />
+            </TabPanel>
+            <TabPanel value={activeStep} index={2}>
+              <AdditionalInfo
+                handlePrevious={handleBack}
+                handleNext={handleNext}
+                bookingRequest={bookingRequest}
+                setBookingRequest={setBookingRequest}
+              />
+            </TabPanel>
+            <TabPanel value={activeStep} index={3}>
+              <Summary
+                handlePrevious={handleBack}
+                handleNext={handleNext}
+                bookingRequest={bookingRequest}
+                setBookingRequest={setBookingRequest}
+              />
+            </TabPanel>
+          </Box>
+        </Paper>
+      </ContainerView>
+    </FormProvider>
   );
 };
 
