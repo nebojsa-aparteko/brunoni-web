@@ -337,7 +337,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={container.pickupReference}
+                    value={container.pickupReference || ''}
                     onChange={event => handlePickupReferenceTextChange(event.target.value)}
                     onBlur={event => handlePickupReferenceChange(event.target.value)}
                   />
@@ -348,7 +348,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={container.deliveryReference}
+                    value={container.deliveryReference || ''}
                     onChange={event => handleDeliveryReferenceTextChange(event.target.value)}
                     onBlur={event => handleDeliveryReferenceChange(event.target.value)}
                   />
@@ -359,7 +359,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={container.vgmPin}
+                    value={container.vgmPin || ''}
                     onChange={event => handleVGMPinTextChange(event.target.value)}
                     onBlur={event => handleVGMPinChange(event.target.value)}
                   />
