@@ -211,7 +211,7 @@ const importFlowsStyles = makeStyles((theme: Theme) => ({
 }));
 
 const getDateOfWeek = (w: number, y: number) => {
-  const d = 1 + (w - 1) * 7;
+  const d = 1 + w * 7;
 
   return new Date(y, 0, d);
 };
