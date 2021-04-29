@@ -7,9 +7,11 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
+  Paper,
   Popover,
   TableCell,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
@@ -45,6 +47,7 @@ const getBookingsByEC = async (
 
     if (response.ok) {
       const body = await response.json();
+      console.log(body);
       return body;
     } else {
       const body = await response.json();
@@ -68,6 +71,13 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const groupedBookingsByStatus = useMemo(
+    () =>
+      Object.entries(
+        groupBy<{ bookingId: string; count: number; bookingStatus: string }>(doc => doc.bookingStatus)(bookings),
+      ),
+    [bookings],
+  );
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
   const open = Boolean(anchorEl);
@@ -136,32 +146,46 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           horizontal: 'center',
         }}
       >
-        <List
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader" disableSticky>
+        <Paper>
+          <Box py={1}>
+            <Typography align="center" variant="h5">
               Bookings
-            </ListSubheader>
-          }
-          className={classes.list}
-        >
-          {bookings?.map(bkg => (
-            <ListItem
-              key={bkg.bookingId}
-              button
-              onClick={() => {
-                window.open(`/bookings/${bkg.bookingId}`, '_blank');
-              }}
-            >
-              <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
-            </ListItem>
-          )) || (
-            <Box pb={4} width={1} display="flex" alignItems="center" justifyContent="center">
-              <CircularProgress />
-            </Box>
-          )}
-        </List>
+            </Typography>
+          </Box>
+          <Box display="flex" flexDirection="row">
+            {groupedBookingsByStatus.length > 0 ? (
+              groupedBookingsByStatus.map(([status, bookingsList]) => (
+                <List
+                  key={status}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader" disableSticky>
+                      {status}
+                    </ListSubheader>
+                  }
+                  className={classes.list}
+                >
+                  {bookingsList?.map(bkg => (
+                    <ListItem
+                      key={bkg.bookingId}
+                      button
+                      onClick={() => {
+                        window.open(`/bookings/${bkg.bookingId}`, '_blank');
+                      }}
+                    >
+                      <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
+                    </ListItem>
+                  ))}
+                </List>
+              ))
+            ) : (
+              <Box p={4} width={1} display="flex" alignItems="center" justifyContent="center">
+                <CircularProgress />
+              </Box>
+            )}
+          </Box>
+        </Paper>
       </Popover>
     </Fragment>
   );
