@@ -1,4 +1,4 @@
-import { Button, Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
+import { Button, Checkbox, IconButton, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
 import firebase from 'firebase';
 import { isEqual, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
@@ -14,17 +14,20 @@ import CarrierInput from '../inputs/CarrierInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import PortInput from '../inputs/PortInput';
 import { omitAutomaticMessage } from './TeamsPaymentConfirmationCustomerSettingsRow';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 interface Props {
   paymentConfirmation: CarrierSettingsRule;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
+  onCopy: (id: string) => Promise<void>;
 }
 
 const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
   paymentConfirmation,
   selected,
   onSelectRow,
+  onCopy,
   ...other
 }) => {
   const carriers = useContext(Carriers);
@@ -106,10 +109,16 @@ const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
         />
       </TableCell>
       <TableCell align="right">
-        {changed && (
+        {changed ? (
           <Button onClick={handleEditPaymentConfirmation} size="small" color="primary" variant="contained">
             Save
           </Button>
+        ) : (
+          <Tooltip title="Copy">
+            <IconButton onClick={() => onCopy(paymentConfirmation.id)} aria-label="copy" color="primary">
+              <FileCopyIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </TableCell>
     </TableRow>

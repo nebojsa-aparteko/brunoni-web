@@ -17,12 +17,13 @@ import Carriers from '../../contexts/Carriers';
 import { GlobalContext } from '../../store/GlobalStore';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import firebase from '../../firebase';
-import { CustomerSettingsRule, ImpExp, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { BookingCategory } from '../../model/Booking';
+import CategoryFilter from '../CategoryFilter';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
 import { useSnackbar } from 'notistack';
-import CategoryMultiSelect from '../CategoryMultiSelect';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,13 +60,13 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   // TODO CLEAR STATE AFTER CLOSING DIALOG???
   // TODO REFACTOR AND CREATE MORE REUSABLE COMPONENTS ???
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
-  const [selectedCategory, setSelectedCategory] = useState<ImpExp>({ export: false, import: false });
+  const [selectedCategory, setSelectedCategory] = useState<BookingCategory>(BookingCategory.Import);
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>(undefined);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
   const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<Client | undefined | null>(undefined);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedCategory({ ...selectedCategory, [event.target.name]: event.target.checked });
+    setSelectedCategory((event.target as HTMLInputElement).value as BookingCategory);
   };
 
   const handleAddCustomerSetting = useCallback(async () => {
@@ -88,6 +89,7 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
       statisticClient: selectedStatisticsClient,
       automaticMessage: true,
       type: PaymentConfirmationType.CUSTOMER_SETTINGS,
+      createdAt: firebase.firestore.Timestamp.now(),
     };
 
     try {
@@ -135,7 +137,7 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
           />
         </Box>
         <Box maxWidth={250}>
-          <CategoryMultiSelect value={selectedCategory} onChange={handleImportOrExportChange} />
+          <CategoryFilter value={selectedCategory} onChange={handleImportOrExportChange} />
         </Box>
         <Box minWidth={250} maxWidth={300} margin={2}>
           <ClientInput

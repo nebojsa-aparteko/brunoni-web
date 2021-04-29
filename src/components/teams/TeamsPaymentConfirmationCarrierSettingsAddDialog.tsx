@@ -81,6 +81,7 @@ const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isO
       contactCC: selectedContactCC,
       automaticMessage: true,
       type: PaymentConfirmationType.CARRIER_SETTINGS,
+      createdAt: firebase.firestore.Timestamp.now(),
     };
 
     try {

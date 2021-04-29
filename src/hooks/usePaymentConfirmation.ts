@@ -9,6 +9,7 @@ const usePaymentConfirmation = <T extends PaymentConfirmationType>(
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('type', '==', type);
+      query = query.orderBy('createdAt', 'desc');
       return query;
     },
     [type],
