@@ -15,6 +15,7 @@ import {
   Theme,
   Toolbar,
   Typography,
+  Badge,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -119,6 +120,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   menu: {
     textTransform: 'uppercase',
+  },
+  badge: {
+    top: theme.spacing(0.5),
+    right: theme.spacing(1),
   },
 }));
 
@@ -294,7 +299,9 @@ const Navbar: React.FC = () => {
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
                     <ButtonMenuItem primary="Online Booking" to="/online-booking" />
-                    <ButtonMenuItem primary="Bookings" to="/bookings" />
+                    <Badge badgeContent={4} color="primary" classes={{ anchorOriginTopRightRectangle: classes.badge }}>
+                      <ButtonMenuItem primary="Bookings" to="/bookings" />
+                    </Badge>
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
                     )}
