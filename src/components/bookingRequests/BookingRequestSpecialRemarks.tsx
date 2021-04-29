@@ -34,7 +34,7 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
 
   return bookingRequest && setBookingRequest ? (
     <React.Fragment>
-      {editing ? (
+      {!editing ? (
         <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
       ) : specialRemarksState && specialRemarksState.length > 0 ? (
         <Grid container direction="row" style={{ border: '1px solid lightgray', borderRadius: 5, padding: 4 }}>
