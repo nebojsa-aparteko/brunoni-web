@@ -57,7 +57,8 @@ import { GlobalContext } from '../../store/GlobalStore';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { set } from 'lodash/fp';
+import { flow, set } from 'lodash/fp';
+import { BookingCategory } from '../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -347,6 +348,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   };
 
+  const bookNow = useCallback(() => {}, [bookingRequestState]);
+
   const handleChangeAgreementNumberText = (event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
   };
@@ -450,6 +453,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
+              {!editing && (
+                <Button
+                  color={'primary'}
+                  variant="contained"
+                  onClick={bookNow}
+                  size="small"
+                  style={{ marginLeft: '1em' }}
+                >
+                  Book now
+                </Button>
+              )}
               <Box className={classes.actions} displayPrint="none">
                 {editing && (
                   <>
@@ -546,3 +560,25 @@ interface Props {
 }
 
 export default BookingRequestView;
+
+const createAlphacomReq = (request: BookingRequest) =>
+  flow(
+    set('Agreement', request.agreementNo),
+    set('BL-No', request.blNumber),
+    set('BkgAgentContact', request.assignedUser?.alphacomId),
+    set('BkgAgentContactEml', request.assignedUser?.emailAddress),
+    set('BkgAgentContactTxt', `${request.assignedUser?.firstName} ${request.assignedUser?.lastName}`),
+    set('BkgCreateTimeStamp', new Date()),
+    set('BkgTouchTimeStamp', new Date()),
+    set('CarrierID', request.carrier?.name),
+    set('category', BookingCategory.Export),
+    set('FreightDetails', request.freightDetails),
+    set('ForwAdrCity', request.createdBy?.company?.city),
+    set('ForwAdrId', request.createdBy?.company?.id),
+    set('ForwAdrName', request.createdBy?.company?.name),
+    set('ForwPersID', request.createdBy?.alphacomId),
+    set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
+    set('FreightDetails', request.freightDetails),
+    set('Vessel', request.schedule?.OriginInfo.VoyageInfo.VesselName),
+    set('Voyage', request.schedule?.OriginInfo.VoyageInfo.VoyageNr),
+  )({});
