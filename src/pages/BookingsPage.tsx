@@ -1,7 +1,7 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
 import React, { CSSProperties, Fragment, useCallback, useContext, useEffect } from 'react';
 import BookingsView from '../components/BookingsView';
-import { Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
+import { Badge, Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import Meta from '../components/Meta';
@@ -213,7 +213,15 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
             {/*<Divider />*/}
             <Tab icon={<AssessmentIcon />} label="Requests" {...a11yProps(3)} />
-            <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
+            <Tab
+              icon={
+                <Badge badgeContent={4} color="primary">
+                  <InputIcon />
+                </Badge>
+              }
+              label="Archived Requests"
+              {...a11yProps(4)}
+            />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />

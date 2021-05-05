@@ -272,6 +272,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
               rows={5}
               multiline
               fullWidth
+              InputLabelProps={{ shrink: true }}
               value={deliveryAddress}
               onChange={event => handleAddressTextChange(event.target.value)}
               onBlur={event => handleAddressChange(event.target.value)}

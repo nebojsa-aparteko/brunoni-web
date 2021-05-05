@@ -29,7 +29,7 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
                   { resolved: false, createAt: null, show: false, dueDate: null },
                   { merge: true },
                 )
-              : new Promise(resolve => resolve()),
+              : new Promise<void>(resolve => resolve()),
           )
           .then(() => (updateComponent ? updateComponent() : null));
       }}
@@ -50,7 +50,7 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
                   { resolved: false, createAt: new Date(), show: true, dueDate: endOfDay(new Date()) },
                   { merge: true },
                 )
-              : new Promise(resolve => resolve()),
+              : new Promise<void>(resolve => resolve()),
           )
           .then(() => (updateComponent ? updateComponent() : null));
       }}

@@ -16,6 +16,7 @@ import SpecialRemark from '../../model/SpecialRemark';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import AddIcon from '@material-ui/icons/Add';
 import palette from '../../theme/palette';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -26,6 +27,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   actionSection: {
     backgroundColor: theme.palette.grey['50'],
+  },
+  menuItem: {
+    maxWidth: '40em',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  },
+  menuItemPrimaryText: {
+    fontWeight: 500,
+  },
+  menuItemSecondaryText: {
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    marginLeft: theme.spacing(1),
   },
 }));
 
@@ -42,6 +57,7 @@ interface SingleInputProps {
 }
 
 const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, margin, handleChange }) => {
+  const classes = useStyles();
   const specialRemarks = useContext(SpecialRemarks);
   const [selectedValue, setSelectedValue] = React.useState<string>(specialRemark?.id || emptyValue.id);
   const [specialRemarkValue, setSpecialRemarkValue] = useState<string>(specialRemark?.text || emptyValue.text || '');
@@ -81,12 +97,25 @@ const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, m
           margin={margin}
           onChange={event => handleSelectNewRemarkId(event as React.ChangeEvent<{ value: string }>)}
           style={{ flex: 1, height: 'fit-content' }}
+          renderValue={value => `${value}`}
         >
-          {specialRemarks?.map(specialRemark => (
-            <MenuItem key={specialRemark.id} value={specialRemark.id}>
-              {specialRemark.id}
-            </MenuItem>
-          ))}
+          {specialRemarks?.map(specialRemark => {
+            const specialRemarkNoHTML = specialRemark.text?.replace(/(<([^>]+)>)/gi, '');
+
+            return (
+              <MenuItem key={specialRemark.id} value={specialRemark.id} className={classes.menuItem}>
+                <Typography className={classes.menuItemPrimaryText}>{specialRemark.id}</Typography>
+                <Typography
+                  className={classes.menuItemSecondaryText}
+                  variant="body2"
+                  color="textSecondary"
+                  title={specialRemarkNoHTML}
+                >
+                  {specialRemarkNoHTML}
+                </Typography>
+              </MenuItem>
+            );
+          })}
         </Select>
       </Grid>
       <Grid item md={12} xs={12}>

@@ -1,7 +1,7 @@
 import Port from './Port';
 import Carrier from './Carrier';
 import { RouteSearchResult } from './route-search/RouteSearchResults';
-import { UserRecordMin } from './UserRecord';
+import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetail } from './Booking';
 import SpecialRemark from './SpecialRemark';
 
@@ -20,8 +20,8 @@ export interface BookingRequest {
   specialRemarks?: SpecialRemark[];
   imo?: boolean;
   soc?: boolean;
-  createdAt?: Date;
-  createdBy?: any;
+  createdAt: Date;
+  createdBy: UserRecord;
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;

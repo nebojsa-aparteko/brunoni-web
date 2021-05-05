@@ -7,6 +7,7 @@ import { isNil, omitBy } from 'lodash/fp';
 import { Button, Grid } from '@material-ui/core';
 import ListInput from '../inputs/ListInput';
 import ContainerInput from '../inputs/ContainerInput';
+import { useFormContext } from 'react-hook-form';
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers && containers.some((container: Container & ContainerDetails) => container.imo && container.imo[0]);
@@ -23,6 +24,10 @@ const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undef
 const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, bookingRequest, setBookingRequest }) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
+  const {
+    register,
+    formState: { isDirty },
+  } = useFormContext();
 
   //TODO set conainers in ContainerInput even if no change happened
   const [containers, setContainers] = useState<(Container & ContainerDetails)[]>(
