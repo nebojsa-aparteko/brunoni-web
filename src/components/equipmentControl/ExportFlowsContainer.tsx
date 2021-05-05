@@ -23,6 +23,7 @@ import { useEquipmentControlFilterProviderContext } from '../../providers/Equipm
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import {
+  containerTypesValues,
   EquipmentControlContainerTypes,
   EquipmentExportSummary,
   EquipmentImportSummary,
@@ -116,7 +117,14 @@ const ExportFlowsContainer: React.FC = () => {
                 id="status-select-checkbox"
                 multiple
                 value={filters.containerTypes}
-                onChange={event => setFilters(prevState => set('containerTypes', event.target.value)(prevState))}
+                onChange={event =>
+                  setFilters(prevState =>
+                    set(
+                      'containerTypes',
+                      containerTypesValues.filter(type => (event.target.value as string[])?.includes(type)),
+                    )(prevState),
+                  )
+                }
                 input={<Input />}
                 renderValue={selected =>
                   (selected as any[]).map(s => get(EquipmentControlContainerTypes, s, '-')).join(', ')

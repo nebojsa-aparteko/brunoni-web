@@ -21,7 +21,11 @@ export default function useEquipmentSummary<T extends BookingCategory>(
         .then(token => {
           return getEquipmentSummary(
             token,
-            filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+            filters.carrier?.id === 'HSG'
+              ? 'Hamburg Süd'
+              : filters.carrier?.id === 'STNN'
+              ? 'HUGO STINNES'
+              : filters.carrier?.id!,
             BookingVersion.long,
             category,
             filters.week,
@@ -59,7 +63,11 @@ export default function useEquipmentSummary<T extends BookingCategory>(
       .then(token => {
         return getEquipmentSummary(
           token,
-          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+          filters.carrier?.id === 'HSG'
+            ? 'Hamburg Süd'
+            : filters.carrier?.id === 'STNN'
+            ? 'HUGO STINNES'
+            : filters.carrier?.id!,
           BookingVersion.long,
           category,
           filters.week,

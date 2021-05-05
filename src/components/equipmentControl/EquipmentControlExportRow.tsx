@@ -21,6 +21,7 @@ import { importFlowsStyles } from './ImportFlowsTable';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import useUser from '../../hooks/useUser';
 import truncateString from '../../utilities/truncateString';
+import { getDateRange } from './ExportFlowsTable';
 
 const getBookingsByEC = async (
   token: string,
@@ -68,6 +69,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const classes = importFlowsStyles();
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
   const [bookings, setBookings] = useState<{ bookingId: string; count: number; bookingStatus: string }[]>();
+  const [weekAndYear, setWeekAndYear] = useState<[number, number]>();
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -106,8 +108,10 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                   key={`${type}-${s}`}
                   className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
                   onClick={event => {
+                    if (s === 'Export Total') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
+                    setWeekAndYear([get(data, 'week', '-1'), get(data, 'year', '-1')]);
                     user
                       .getIdToken()
                       .then(token =>
@@ -149,7 +153,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
         <Paper>
           <Box py={1}>
             <Typography align="center" variant="h5">
-              Bookings
+              Bookings {weekAndYear && getDateRange(weekAndYear[0], weekAndYear[1])}
             </Typography>
           </Box>
           <Box display="flex" flexDirection="row">

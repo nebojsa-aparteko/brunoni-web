@@ -19,7 +19,11 @@ import { useEquipmentControlFilterProviderContext } from '../../providers/Equipm
 import { groupBy, set, uniq } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
 import { get } from 'lodash';
-import { EquipmentControlContainerTypes, EquipmentImportSummary } from '../../model/EquipmentControl';
+import {
+  containerTypesValues,
+  EquipmentControlContainerTypes,
+  EquipmentImportSummary,
+} from '../../model/EquipmentControl';
 import CountryInput from '../inputs/CountryInput';
 import PickupLocations from '../../contexts/PickupLocations';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
@@ -90,7 +94,14 @@ const ImportFlowsContainer: React.FC = () => {
                 id="status-select-checkbox"
                 multiple
                 value={filters.containerTypes}
-                onChange={event => setFilters(prevState => set('containerTypes', event.target.value)(prevState))}
+                onChange={event =>
+                  setFilters(prevState =>
+                    set(
+                      'containerTypes',
+                      containerTypesValues.filter(type => (event.target.value as string[])?.includes(type)),
+                    )(prevState),
+                  )
+                }
                 input={<Input />}
                 renderValue={selected =>
                   (selected as any[]).map(s => get(EquipmentControlContainerTypes, s, '-')).join(', ')

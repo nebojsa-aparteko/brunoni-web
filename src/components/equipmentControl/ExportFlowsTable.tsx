@@ -216,7 +216,7 @@ const getDateOfWeek = (w: number, y: number) => {
   return new Date(y, 0, d);
 };
 
-const getDateRange = (weekNumber: number, year: number) => {
+export const getDateRange = (weekNumber: number, year: number) => {
   const weekDate = getDateOfWeek(weekNumber, year);
   return `${format(startOfISOWeek(weekDate), 'dd.MM')} - ${format(endOfISOWeek(weekDate), 'dd.MM')}`;
 };
