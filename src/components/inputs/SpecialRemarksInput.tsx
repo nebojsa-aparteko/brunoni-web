@@ -62,8 +62,6 @@ const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, m
   const [selectedValue, setSelectedValue] = React.useState<string>(specialRemark?.id || emptyValue.id);
   const [specialRemarkValue, setSpecialRemarkValue] = useState<string>(specialRemark?.text || emptyValue.text || '');
 
-  console.log(specialRemarks);
-
   useEffect(() => {
     setSelectedValue(specialRemark?.id || emptyValue.id);
     setSpecialRemarkValue(specialRemark?.text || emptyValue.text || '');
@@ -99,6 +97,7 @@ const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, m
           margin={margin}
           onChange={event => handleSelectNewRemarkId(event as React.ChangeEvent<{ value: string }>)}
           style={{ flex: 1, height: 'fit-content' }}
+          renderValue={value => `${value}`}
         >
           {specialRemarks?.map(specialRemark => {
             const specialRemarkNoHTML = specialRemark.text?.replace(/(<([^>]+)>)/gi, '');

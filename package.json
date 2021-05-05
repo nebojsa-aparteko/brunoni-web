@@ -42,7 +42,7 @@
     "fontfaceobserver": "^2.1.0",
     "isomorphic-fetch": "^2.2.1",
     "js-cookie": "^2.2.1",
-    "material-ui-image": "^3.2.3",
+    "material-ui-image": "^3.3.2",
     "mousetrap": "^1.6.5",
     "notistack": "^0.9.9",
     "papaparse": "^5.2.0",
