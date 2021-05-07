@@ -327,6 +327,9 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
             <Typography display="inline">{checklistItem.label}</Typography>
           </Box>
           <Box flex="1" />
+          {checklistItem.valuesAdmin?.map(doc => (
+            <Box>{doc.name}</Box>
+          ))}
         </Box>
       </Box>
     </Box>

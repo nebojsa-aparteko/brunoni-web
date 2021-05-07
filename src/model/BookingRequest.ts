@@ -4,6 +4,7 @@ import { RouteSearchResult } from './route-search/RouteSearchResults';
 import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetail } from './Booking';
 import SpecialRemark from './SpecialRemark';
+import Client from './Client';
 
 export interface BookingRequest {
   id?: string;
@@ -25,6 +26,7 @@ export interface BookingRequest {
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
+  statClient?: Client | null;
   vgmSubmittedBy?: string | UserRecordMin;
   archived?: boolean;
 }
