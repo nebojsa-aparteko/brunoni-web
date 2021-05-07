@@ -426,6 +426,8 @@ export const formatCarrierId = (carrierId: string | undefined) => {
       ? 'Hamburg Süd'
       : carrierId === 'SLOM'
       ? 'SLOMAN NEPTUN'
+      : carrierId === 'STNN'
+      ? 'HUGO STINNES'
       : carrierId
     : undefined;
 };

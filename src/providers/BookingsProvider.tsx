@@ -96,6 +96,8 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
             ? 'Hamburg Süd'
             : filters.carrier.id === 'SLOM'
             ? 'SLOMAN NEPTUN'
+            : filters.carrier?.id === 'STNN'
+            ? 'HUGO STINNES'
             : filters.carrier.id,
         );
       }
