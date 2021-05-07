@@ -7,6 +7,7 @@ import {
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
+import { pick, flow, omitBy, isNil } from 'lodash/fp';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -105,11 +106,11 @@ const getEquipmentSummary = async (
       url = `${
         process.env.REACT_APP_API_URL
       }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week +
-        2}&containerTypes=${filters.containerTypes.join(',')}`;
+        2}&${query(flow(omitBy(isNil), pick(['containerTypes']))(filters))}`;
     } else {
-      url = `${
-        process.env.REACT_APP_API_URL
-      }/equipmentControl?carrierId=${carrierId}&version=${version}&containerTypes=${filters.containerTypes.join(',')}`;
+      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
+        flow(omitBy(isNil), pick(['containerTypes']))(filters),
+      )}`;
     }
     const response = await fetch(url, {
       method: 'GET',
@@ -136,3 +137,10 @@ const getEquipmentSummary = async (
   } finally {
   }
 };
+
+const query = (params: any) =>
+  Object.keys(params)
+    .map(k => k + '=' + typeCheck(params[k]))
+    .join('&');
+
+const typeCheck = (doc: any) => (Array.isArray(doc) ? doc.join(',') : doc);

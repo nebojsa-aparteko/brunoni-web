@@ -7,6 +7,7 @@ import { containerTypesValues } from '../model/EquipmentControl';
 export interface EquipmentControlFilterContext {
   carrier?: Carrier;
   country: string[];
+  location?: string;
   week: number;
   containerTypes: string[];
 }

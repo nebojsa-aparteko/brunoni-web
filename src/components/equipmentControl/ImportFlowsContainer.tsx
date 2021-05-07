@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import {
   Box,
   Checkbox,
@@ -27,6 +27,7 @@ import {
 import CountryInput from '../inputs/CountryInput';
 import PickupLocations from '../../contexts/PickupLocations';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
+import PickupLocationInput from '../inputs/PickupLocationInput';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -48,6 +49,11 @@ const ImportFlowsContainer: React.FC = () => {
   const summary = useEquipmentSummary(BookingCategory.Import);
   const classes = useStyles();
   const locations = useContext(PickupLocations);
+  const findLocationById = useCallback((id: string) => locations?.find(loc => loc.id === id), [locations]);
+  const selectableLocations = useMemo(() => {
+    const ids = summary.map(v => v.id);
+    return locations?.filter(l => ids.includes(l.id));
+  }, [summary, locations]);
 
   const groupedSummary = useMemo(
     () =>
@@ -55,12 +61,11 @@ const ImportFlowsContainer: React.FC = () => {
         sortByObjectKeys(
           groupBy<EquipmentImportSummary>(s => {
             const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
-            // return `${location?.countryCode || '-'}`;
             return `${location?.countryCode || '-'}~${location?.city || '-'}`;
-          })(summary),
+          })(summary.filter(s => (filters.location ? s.id === filters.location : true))),
         ) as { [key: string]: EquipmentImportSummary[] },
       ),
-    [summary, locations],
+    [summary, locations, filters],
   );
   const countries = useMemo(() => uniq(groupedSummary.map(([country]) => country.split('~')[0])), [groupedSummary]);
   return (
@@ -84,6 +89,15 @@ const ImportFlowsContainer: React.FC = () => {
               onChange={carrier => setFilters(prevState => set('country', carrier)(prevState))}
               // carriers={availableCarriers}
               // value={carrier}
+            />
+          </Box>
+          <Box>
+            <PickupLocationInput
+              selectedLocation={filters.location}
+              selectableValues={selectableLocations}
+              onChange={location =>
+                setFilters(prevState => set('location', findLocationById(location)?.id || '')(prevState))
+              }
             />
           </Box>
           <Box flexDirection="row" display="flex" alignItems="center">
