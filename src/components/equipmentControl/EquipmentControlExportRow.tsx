@@ -120,7 +120,11 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                           type,
                           get(data, 'week', '-1'),
                           equipmentControl.id || '-',
-                          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+                          filters.carrier?.id === 'HSG'
+                            ? 'Hamburg Süd'
+                            : filters.carrier?.id === 'STNN'
+                            ? 'HUGO STINNES'
+                            : filters.carrier?.id!,
                         ),
                       )
                       .then(response => {
