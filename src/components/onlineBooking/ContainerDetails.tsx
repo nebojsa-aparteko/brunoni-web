@@ -26,6 +26,8 @@ import { TableRowData } from '../bookingRequests/BookingRequestSummary';
 import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
+import PortTermsInput from '../inputs/PortTermsInput';
+import PortTerms from '../../contexts/PortTerms';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -219,6 +221,18 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
 const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBookingRequest, editing }) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
+  const terms = useContext(PortTerms);
+  //TODO change the matching to ID once Norbert added that to the schedule data
+  const [selectedPortTerm, setSelectedPortTerm] = useState(
+    terms ? terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : undefined,
+  );
+
+  useEffect(() => {
+    setSelectedPortTerm(
+      terms ? terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : undefined,
+    );
+  }, [bookingRequest?.schedule?.OriginInfo.Port.ID]);
+
   const [deliveryAddress, setDeliveryAddress] = useState<string>(
     bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '',
   );
@@ -226,6 +240,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   useEffect(() => {
     setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '');
   }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
+
   const handleChange = (value: any[] | undefined) => {
     const writableContainers = value?.map(container => {
       return {
@@ -264,20 +279,30 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     <Grid container spacing={4}>
       {editing ? (
         <Box p={1} display="flex" flexDirection="column">
-          <Box pb={2}>
-            <TextField
-              label="Delivery Address"
-              variant="outlined"
-              margin="dense"
-              rows={5}
-              multiline
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={deliveryAddress}
-              onChange={event => handleAddressTextChange(event.target.value)}
-              onBlur={event => handleAddressChange(event.target.value)}
-            />
-          </Box>
+          <Grid container direction="column" spacing={1}>
+            <Grid item md={3} xs={12}>
+              <PortTermsInput
+                value={selectedPortTerm}
+                onChange={term => {
+                  handleAddressChange(term.address);
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Delivery Address"
+                variant="outlined"
+                margin="dense"
+                rows={5}
+                multiline
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                value={deliveryAddress}
+                onChange={event => handleAddressTextChange(event.target.value)}
+                onBlur={event => handleAddressChange(event.target.value)}
+              />
+            </Grid>
+          </Grid>
           <ListInput
             listRef={listInput}
             addButtonRef={addButton}
@@ -314,4 +339,8 @@ interface Props {
 export default ContainerDetails;
 
 const createAddressString = (object: PickupLocation) =>
-  `${object.name}<br/>${object.street}<br/>${object.city}, ${object.countryCode}`;
+  object.name +
+  (object.street ? `<br/>${object.street}` : '') +
+  (object.city ? `<br/>${object.city}` : '') +
+  (object.city && object.countryCode ? ', ' : '') +
+  `${object.countryCode || ''}`;
