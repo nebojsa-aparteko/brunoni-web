@@ -601,4 +601,5 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('FreightDetails', request.freightDetails),
     set('Vessel', request.schedule?.OriginInfo.VoyageInfo.VesselName),
     set('Voyage', request.schedule?.OriginInfo.VoyageInfo.VoyageNr),
+    set('leadingCurrency', request.leadingCurrency),
   )({});

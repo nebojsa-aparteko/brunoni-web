@@ -2,18 +2,14 @@ import React from 'react';
 import { Typography, Grid, Box, Button, Container } from '@material-ui/core';
 import Link from '../components/Link';
 import Image from 'material-ui-image/lib/components/Image/Image';
+import notFound from '../assets/state.notfound.svg';
 
 const NotFound: React.FC = () => (
   <Container>
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
         <Box p={6} textAlign="center">
-          <Image
-            src={require(`../assets/state.notfound.svg`)}
-            aspectRatio={16 / 9}
-            color="transparent"
-            disableSpinner
-          />
+          <Image src={notFound} aspectRatio={16 / 9} color="transparent" disableSpinner />
           <Typography variant="h5" gutterBottom>
             <Box fontWeight="fontWeightBold">404 Page Not Found</Box>
           </Typography>

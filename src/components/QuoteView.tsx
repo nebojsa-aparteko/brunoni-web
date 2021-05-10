@@ -51,6 +51,7 @@ import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import { useHistory } from 'react-router';
+import { getLogo } from './Navbar';
 
 interface Props {
   quote?: Quote;
@@ -293,7 +294,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               <Box display="none" displayPrint="block" mb={2}>
                 <Box mb={2}>
                   <img
-                    src={require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`)}
+                    src={getLogo()}
                     alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
                     className={classes.logo}
                   />
