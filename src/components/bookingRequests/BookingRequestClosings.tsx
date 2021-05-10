@@ -10,9 +10,11 @@ import {
   Theme,
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
-import React from 'react';
+import React, { useContext } from 'react';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import { isDashboardUser } from '../../model/UserRecord';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
-
+  const userRecord = useContext(UserRecordContext);
   const handleChangeClosing = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
     const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
       index === deadlineIndex ? { ...deadline, Time: event.target.value } : deadline,
@@ -72,7 +74,7 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
               <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
                 <TableCell align="left">{item.Typ}</TableCell>
                 <TableCell align="left" style={{ minWidth: '4em' }}>
-                  {editing ? (
+                  {editing && isDashboardUser(userRecord) ? (
                     <TextField
                       label={''}
                       fullWidth

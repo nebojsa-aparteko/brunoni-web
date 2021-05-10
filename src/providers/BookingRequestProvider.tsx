@@ -4,14 +4,14 @@ import { BookingRequest } from '../model/BookingRequest';
 const BookingRequestContext = createContext<
   [
     BookingRequest | undefined,
-    Dispatch<SetStateAction<BookingRequest | undefined>> | undefined,
+    Dispatch<SetStateAction<BookingRequest | undefined>>,
     boolean | undefined,
     Dispatch<SetStateAction<boolean | undefined>>,
   ]
->([undefined, undefined, false, () => {}]);
+>([undefined, () => {}, false, () => {}]);
 
 const BookingRequestProvider = (props: any) => {
-  const [state, setState] = useState<BookingRequest | undefined>();
+  const [state, setState] = useState<BookingRequest>();
   const [editing, setEditing] = useState<boolean | undefined>();
 
   return (

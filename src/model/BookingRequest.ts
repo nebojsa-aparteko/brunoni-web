@@ -6,6 +6,8 @@ import { FreightDetail } from './Booking';
 import SpecialRemark from './SpecialRemark';
 import Container from './Container';
 import ContainerDetails from './ContainerDetails';
+import Client from './Client';
+import { Currency } from './Payment';
 
 export interface BookingRequest {
   id?: string;
@@ -27,8 +29,10 @@ export interface BookingRequest {
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
+  statClient?: Client | null;
   vgmSubmittedBy?: string | UserRecordMin;
   archived?: boolean;
+  leadingCurrency?: Currency;
 }
 
 export enum BookingRequestStatus {

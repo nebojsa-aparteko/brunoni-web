@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import SpecialRemarksInput from '../inputs/SpecialRemarksInput';
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import SpecialRemark from '../../model/SpecialRemark';
 import { set } from 'lodash/fp';
 import { BookingRequest } from '../../model/BookingRequest';
+import { isDashboardUser } from '../../model/UserRecord';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(() => ({
   specialRemarkLabel: {
@@ -21,7 +23,7 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
   const [specialRemarksState, setSpecialRemarksState] = React.useState<SpecialRemark[] | undefined>(
     bookingRequest?.specialRemarks,
   );
-
+  const userRecord = useContext(UserRecordContext);
   useEffect(() => {
     setSpecialRemarksState(bookingRequest?.specialRemarks);
   }, [bookingRequest?.specialRemarks]);
@@ -34,7 +36,7 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
 
   return bookingRequest && setBookingRequest ? (
     <React.Fragment>
-      {editing ? (
+      {editing && isDashboardUser(userRecord) ? (
         <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
       ) : specialRemarksState && specialRemarksState.length > 0 ? (
         <Grid container direction="row" style={{ border: '1px solid lightgray', borderRadius: 5, padding: 4 }}>

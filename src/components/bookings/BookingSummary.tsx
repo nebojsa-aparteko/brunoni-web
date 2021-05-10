@@ -104,7 +104,7 @@ export const ClientDetails: React.FC<{
       ) : (
         forwarderText && <span>{forwarderText}</span>
       )}
-      {bkgRef && <span>{'REF. ' + bkgRef}</span>}
+      {bkgRef && <span>({'REF. ' + bkgRef})</span>}
     </Typography>
   );
 };
