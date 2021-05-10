@@ -59,6 +59,8 @@ import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import { flow, set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
+import useModal from '../../hooks/useModal';
+import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -263,7 +265,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const userRecord = useContext(UserRecordContext);
-
+  const { open, closeModal, openModal } = useModal();
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
     setAgreementNumber(bookingRequest.agreementNo || '');
@@ -348,7 +350,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   };
 
-  const bookNow = useCallback(() => {}, [bookingRequestState]);
+  const bookNow = useCallback(() => {
+    // if freight has ocean freight create leading currency
+    // if not choose between eur and usd
+    const freight = bookingRequest.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
+
+    if (freight && freight.length > 0) {
+      const f = freight?.pop();
+      if (!f?.Currency) return openModal();
+      setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+    }
+  }, [bookingRequest]);
 
   const handleChangeAgreementNumberText = (event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
@@ -436,7 +448,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                   title={`Booking Request - ${getBookingRequestTitle(bookingRequest)}`}
                   subtitle={`File No. ${bookingRequest.id}`}
                 />
-                {editing ? (
+                {editing && isDashboardUser(userRecord) ? (
                   <TextField
                     label="Agreement No."
                     margin="dense"
@@ -453,7 +465,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              {!editing && (
+              {!editing && isDashboardUser(userRecord) && (
                 <Button
                   color={'primary'}
                   variant="contained"
@@ -551,6 +563,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           <BookingRequestCheckList bookingRequest={bookingRequest} />
         </Box>
       </Grid>
+      <ConfirmLeadingCurrencyDialog
+        isOpen={open}
+        handleConfirm={currency => {
+          setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
+          closeModal();
+        }}
+        handleClose={handleClose}
+      />
     </Grid>
   );
 };

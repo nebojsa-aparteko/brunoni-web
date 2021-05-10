@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import isString from '../utilities/isString';
 
 const useStyles = makeStyles((theme: Theme) => ({
   closeModal: {
@@ -32,12 +33,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface ConfirmationDialogProps {
+export interface ConfirmationDialogProps {
   isOpen: boolean;
   label: string;
   handleConfirm: () => void;
   handleClose: () => void;
-  description: string;
+  description: string | ReactNode;
+  confirmLabel?: string;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -46,6 +48,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   description,
   handleConfirm,
   handleClose,
+  confirmLabel = 'Confirm',
 }) => {
   const classes = useStyles();
 
@@ -59,7 +62,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Typography className={classes.content}>{description}</Typography>
+          {isString(description) ? <Typography className={classes.content}>{description}</Typography> : description}
         </DialogContent>
         <Divider />
 
@@ -68,7 +71,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             Cancel
           </Button>
           <Button onClick={handleConfirm} color="primary" variant="contained">
-            Confirm
+            {confirmLabel}
           </Button>
         </DialogActions>
       </Box>

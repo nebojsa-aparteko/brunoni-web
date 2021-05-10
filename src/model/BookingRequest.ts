@@ -5,6 +5,7 @@ import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetail } from './Booking';
 import SpecialRemark from './SpecialRemark';
 import Client from './Client';
+import { Currency } from './Payment';
 
 export interface BookingRequest {
   id?: string;
@@ -29,6 +30,7 @@ export interface BookingRequest {
   statClient?: Client | null;
   vgmSubmittedBy?: string | UserRecordMin;
   archived?: boolean;
+  leadingCurrency?: Currency;
 }
 
 export enum BookingRequestStatus {

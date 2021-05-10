@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Dispatch, Fragment, SetStateAction, useMemo, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useContext, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
@@ -22,10 +22,11 @@ import SchedulePicker from './SchedulePicker';
 import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { Link } from 'react-router-dom';
-import { UserRecordMin } from '../../model/UserRecord';
+import { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { set } from 'lodash/fp';
+import UserRecord from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -325,6 +326,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy.alphacomId : undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const clients = useClients();
+  const userRecord = useContext(UserRecord);
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
@@ -424,7 +426,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               <TableRowData
                 label={'B/L-NO'}
                 content={
-                  editing ? (
+                  editing && isDashboardUser(userRecord) ? (
                     <TextField
                       label=""
                       margin="dense"
