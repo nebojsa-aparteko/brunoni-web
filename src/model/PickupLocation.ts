@@ -6,5 +6,5 @@ export default interface PickupLocation {
   nameSup?: string;
   poBox?: string;
   street: string;
-  zip?: string;
+  zip: string;
 }

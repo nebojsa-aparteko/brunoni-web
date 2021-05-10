@@ -4,6 +4,8 @@ import { RouteSearchResult } from './route-search/RouteSearchResults';
 import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetail } from './Booking';
 import SpecialRemark from './SpecialRemark';
+import Container from './Container';
+import ContainerDetails from './ContainerDetails';
 
 export interface BookingRequest {
   id?: string;
@@ -15,7 +17,7 @@ export interface BookingRequest {
   freightDetails?: FreightDetail[];
   customerReference?: string;
   agreementNo?: string;
-  containers?: any[];
+  containers?: (Container & ContainerDetails)[];
   additionalInfo?: string;
   specialRemarks?: SpecialRemark[];
   imo?: boolean;

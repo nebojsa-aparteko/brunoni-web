@@ -33,8 +33,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const createRequest = async (bookingRequest: BookingRequest) => {
-  const autoIncrementId = await getId();
+export const createRequest = async (bookingRequest: BookingRequest) => {
+  const autoIncrementId = await getBookingRequestId();
   const generatedId = `${autoIncrementId}`.padStart(4, '0');
   const id = `req-${format(new Date(), 'yyyyMM')}${generatedId}`;
   await firebase
@@ -45,7 +45,7 @@ const createRequest = async (bookingRequest: BookingRequest) => {
   return id;
 };
 
-const getId = async () => {
+export const getBookingRequestId = async () => {
   let counter = 0;
   const path = format(new Date(), 'yyyy-MM');
   await firebase
@@ -90,7 +90,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     setBookingRequest(writableRequest);
     try {
       bookingRequest &&
-        createRequest(writableRequest)
+        createRequest(bookingRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
           .catch(error => console.log(error));
     } catch (error) {
