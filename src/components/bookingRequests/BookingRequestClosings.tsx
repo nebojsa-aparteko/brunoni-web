@@ -72,7 +72,7 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
           {bookingRequest.schedule?.Deadlines.map((item, index) => {
             return (
               <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
-                <TableCell align="left">{item.Typ}</TableCell>
+                <TableCell align="left">{item.Typ === 'FCL' ? 'DELIVERY' : item.Typ}</TableCell>
                 <TableCell align="left" style={{ minWidth: '4em' }}>
                   {editing && isDashboardUser(userRecord) ? (
                     <TextField
@@ -89,7 +89,9 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
                 </TableCell>
                 <TableCell align="left">
                   {/*TODO check if the DELIVERY type is different in other languages*/}
-                  {item.Typ !== 'DELIVERY' ? '(TO BE SUBMITTED BEFORE CONTAINER DELIVERY AT THE TERMINAL)' : ''}
+                  {['DELIVERY', 'FCL'].includes(item.Typ)
+                    ? ''
+                    : '(TO BE SUBMITTED BEFORE CONTAINER DELIVERY AT THE TERMINAL)'}
                 </TableCell>
               </TableRow>
             );
