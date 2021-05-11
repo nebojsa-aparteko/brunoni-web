@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   createStyles,
   Dialog,
   DialogContent,
@@ -34,7 +35,11 @@ import PickupLocation from '../../model/PickupLocation';
 
 import string_similarity from 'string-similarity';
 import { isNil, omitBy } from 'lodash/fp';
-import history from '../../providers/history';
+import { useHistory } from 'react-router';
+import useRequest from '../../hooks/useRequest';
+import querySting from 'querystring';
+import formatDate from 'date-fns/format';
+import RouteSearchParams from '../../model/route-search/RouteSearchParams';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -104,11 +109,8 @@ const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object:
   return commodityType;
 };
 // todo. date always in this format <2021-06-16 09:00> ?
-const matchPickupDate = (container: HtmlBookingContainer) => {
-  const pickupDate = container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE
-    ? new Date(container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE as string)
-    : undefined;
-  return pickupDate;
+const matchDate = (date: string | undefined) => {
+  return date ? new Date(date) : undefined;
 };
 
 const getContainers = (
@@ -120,7 +122,7 @@ const getContainers = (
   const containers = object.CONTAINERS.map(container => {
     const containerType = matchContainerType(containerTypes, container);
     const commodityType = matchCommodityType(containerTypes, object);
-    const pickupDate = matchPickupDate(container);
+    const pickupDate = matchDate(container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE);
     const pickupLocation = container.EMPTY_CONTAINER_PICK_UP_LOCATION
       ? matchLocation(pickupLocations, container)
       : undefined;
@@ -136,6 +138,8 @@ const getContainers = (
   return containers;
 };
 
+const matchDepartureDate = () => {};
+
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
   user: UserRecord,
@@ -150,6 +154,15 @@ const mapIntoBookingRequestModel = async (
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
 
+  const departureDate = object.SAIL_DATE;
+
+  const scheduleSearchParams = {
+    originPort: origin,
+    destinationPort: destination,
+    carrier: carrier,
+    //date:
+  } as RouteSearchParams;
+
   const bookingRequest = omitBy(isNil)({
     archived: false,
     carrier,
@@ -157,7 +170,6 @@ const mapIntoBookingRequestModel = async (
     createdAt: new Date(),
     createdBy: user,
     destination,
-    // id ? (on top)
     origin,
     // quoteNumber ?
     status: BookingRequestStatus.REQUESTED,
@@ -193,15 +205,7 @@ export const readAndParseFile = (
     )) as BookingRequest;
 
     console.log(bookingRequest);
-    // todo create id
-    // try {
-    //   createRequest(bookingRequest)
-    //     .then(docReference => history.push(`/booking-requests/${docReference}`))
-    //     .catch(error => console.log(error));
-    // }catch (e) {
-    //   console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
-    //   return null;
-    // }
+    setBookingRequest(bookingRequest);
   };
 };
 
@@ -209,6 +213,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   const [_, userRecord] = useUser();
   const ports = useContext(Ports);
@@ -216,6 +221,18 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
+
+  const [busy, error, result, search] = useRequest(() => {
+    const search = querySting.stringify({
+      // origin: params.originPort?.id,
+      // destination: params.destinationPort?.id,
+      // date: formatDate(params.date, 'yyyy-MM-dd'),
+      // weeks: params.weeks.toString(),
+      // carrier: carrierFilter,
+    });
+
+    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
+  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -252,6 +269,16 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
 
   const handleBookingSave = () => {
     console.log('saved');
+    // todo add uploaded files view
+    try {
+      bookingRequest &&
+        createRequest(bookingRequest)
+          .then(docReference => history.push(`/booking-requests/${docReference}`))
+          .catch(error => console.log(error));
+    } catch (e) {
+      console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
+      return null;
+    }
   };
 
   return (
