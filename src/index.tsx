@@ -31,8 +31,6 @@ import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
-import SpecialRemarks from './contexts/SpecialRemarks';
-import ChargeCodes from './contexts/ChargeCodes';
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -213,22 +211,15 @@ const render = (user: firebase.User | null) => {
                       <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                         <FirestoreCollectionProvider name="ports" context={PortsContext}>
                           <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
-                            <FirestoreCollectionProvider name="special-remarks" context={SpecialRemarks}>
-                              <FirestoreCollectionProvider name="charge-codes" context={ChargeCodes}>
-                                <SpecialOffersProvider>
-                                  <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                                    <FirestoreCollectionProvider
-                                      name="pickup-locations"
-                                      context={PickupLocationsContext}
-                                    >
-                                      <ActingAsProvider>
-                                        <UserApp />
-                                      </ActingAsProvider>
-                                    </FirestoreCollectionProvider>
-                                  </FirestoreCollectionProvider>
-                                </SpecialOffersProvider>
+                            <SpecialOffersProvider>
+                              <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
+                                <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                                  <ActingAsProvider>
+                                    <UserApp />
+                                  </ActingAsProvider>
+                                </FirestoreCollectionProvider>
                               </FirestoreCollectionProvider>
-                            </FirestoreCollectionProvider>
+                            </SpecialOffersProvider>
                           </FirestoreCollectionProvider>
                         </FirestoreCollectionProvider>
                       </FirestoreCollectionProvider>

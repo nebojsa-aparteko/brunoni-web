@@ -11,8 +11,13 @@ export default interface Container {
   weight?: number;
   temperature?: number;
   humidity?: string;
-  ventilation?: string;
+  ventilation?: Ventilation;
   pickupReference?: string;
   deliveryReference?: string;
   vgmPin?: string;
+}
+
+export enum Ventilation {
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
 }

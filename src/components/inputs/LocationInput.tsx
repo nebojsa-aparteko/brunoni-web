@@ -23,6 +23,7 @@ import { adrNameToFilterOut, doNotShowCities } from '../../utilities/pickupDropO
 
 interface Props extends InputProps<PickupLocation> {
   margin?: any;
+  shouldShowAllDepots?: boolean;
 }
 
 const filterFlow = (parts: string[], options: PickupLocation[], findIntersection: boolean = false) => {
@@ -53,7 +54,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
+const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin, shouldShowAllDepots }, ref) => {
   const input = useRef();
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);
@@ -66,7 +67,7 @@ const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       )(
         filter((location: PickupLocation) => {
           const adrNameFiltered = includes(location.name.toLowerCase())(adrNameToFilterOut);
-          const shouldNotBeShown = includes(location.city.toLowerCase())(doNotShowCities);
+          const shouldNotBeShown = shouldShowAllDepots ? false : includes(location.city.toLowerCase())(doNotShowCities);
           return !(adrNameFiltered || shouldNotBeShown); // || !portOnlyLocation;
         })(locations),
       ),

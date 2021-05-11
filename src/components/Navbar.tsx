@@ -2,6 +2,7 @@ import React, { Fragment, MouseEventHandler, useCallback, useContext, useEffect,
 import * as changeCase from 'change-case';
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   Container,
@@ -15,7 +16,6 @@ import {
   Theme,
   Toolbar,
   Typography,
-  Badge,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
@@ -49,6 +49,8 @@ import { bookingShepherdTour } from './guides/BookingGuide';
 import { quoteShepherdTour } from './guides/QuoteGuide';
 import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
 import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
+import brunoniLogo from '../assets/logo.brunoni.svg';
+import allmarineLogo from '../assets/logo.allmarine.png';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -139,10 +141,8 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
   },
 }));
 
-const getLogo = () => {
-  return process.env.REACT_APP_BRAND === 'brunoni'
-    ? require(`../assets/logo.${process.env.REACT_APP_BRAND}.svg`)
-    : require(`../assets/logo.${process.env.REACT_APP_BRAND}.png`);
+export const getLogo = () => {
+  return process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
 };
 
 const getPageGuide = () => {

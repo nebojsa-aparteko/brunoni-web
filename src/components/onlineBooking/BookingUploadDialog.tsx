@@ -14,7 +14,6 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { useDropzone } from 'react-dropzone';
-import { useSnackbar } from 'notistack';
 import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
@@ -40,6 +39,7 @@ import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
 import RouteSearchResults from '../../model/route-search/RouteSearchResults';
+import useGlobalAppState from '../../hooks/useGlobalAppState';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -235,7 +235,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
   const [loading, setLoading] = useState<boolean>(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [, dispatch] = useGlobalAppState();
   const history = useHistory();
 
   const [_, userRecord] = useUser();
@@ -248,9 +248,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (!acceptedFiles.every(file => ['html'].includes(file.name.split('.').pop() || ''))) {
-        return enqueueSnackbar(<Typography color="inherit">File(s) must be .html format</Typography>, {
-          variant: 'error',
-        });
+        return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'File(s) must be .html format' });
       }
       acceptedFiles.forEach(file =>
         readAndParseFile(
@@ -266,7 +264,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         ),
       );
     },
-    [carriers, commodityTypes, containerTypes, enqueueSnackbar, pickupLocations, ports, userRecord],
+    [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
@@ -282,11 +280,13 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const handleBookingSave = () => {
     console.log('saved');
     // todo add uploaded files view
+    dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
         createRequest(bookingRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
-          .catch(error => console.log(error));
+          .catch(error => console.log(error))
+          .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
     } catch (e) {
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
       return null;

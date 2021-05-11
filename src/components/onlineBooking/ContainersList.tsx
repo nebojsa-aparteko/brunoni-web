@@ -19,11 +19,26 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
             }
             label1={
               <>
-                {(container.pickupLocation || container.pickupDate) && ` (`}
+                {(container.pickupLocation ||
+                  container.pickupDate ||
+                  container.temperature ||
+                  container.humidity ||
+                  container.ventilation) &&
+                  ` (`}
                 {container.pickupLocation &&
                   `${container.pickupLocation?.name}, ${container.pickupLocation?.city}, ${container.pickupLocation?.countryCode}`}
                 {container.pickupDate && ` - ${formatDateSafe(container.pickupDate as Date, DateFormats.LONG)}`}
-                {(container.pickupLocation || container.pickupDate) && `)`}
+                {container.temperature && `, Temp: ${container.temperature} °C`}
+                {container.temperature && (container.humidity || container.ventilation) ? ', ' : null}
+                {container.humidity && `Humidity: ${container.humidity}%`}
+                {(container.temperature || container.humidity) && container.ventilation ? ', ' : null}
+                {container.ventilation && `Ventilation: ${container.ventilation}`}
+                {(container.pickupLocation ||
+                  container.pickupDate ||
+                  container.temperature ||
+                  container.humidity ||
+                  container.ventilation) &&
+                  `)`}
               </>
             }
             label2={

@@ -7,6 +7,10 @@ import { BookingRequest } from '../../model/BookingRequest';
 import BookingRequestView from './BookingRequestView';
 import { normalizeBookingRequest } from '../../providers/BookingRequestsProvider';
 import BookingRequestProvider, { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import SpecialRemarks from '../../contexts/SpecialRemarks';
+import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import PortTerms from '../../contexts/PortTerms';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -33,7 +37,13 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
     </Container>
   ) : (
     <BookingRequestProvider>
-      <BookingRequestView bookingRequest={bookingRequestState} />
+      <FirestoreCollectionProvider name="special-remarks" context={SpecialRemarks}>
+        <FirestoreCollectionProvider name="charge-codes" context={ChargeCodes}>
+          <FirestoreCollectionProvider name="port-terms" context={PortTerms}>
+            <BookingRequestView bookingRequest={bookingRequestState} />
+          </FirestoreCollectionProvider>
+        </FirestoreCollectionProvider>
+      </FirestoreCollectionProvider>
     </BookingRequestProvider>
   );
 };

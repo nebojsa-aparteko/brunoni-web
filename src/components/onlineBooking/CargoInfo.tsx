@@ -1,6 +1,6 @@
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { BookingRequest } from '../../model/BookingRequest';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Container from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import { isNil, omitBy } from 'lodash/fp';
@@ -8,6 +8,8 @@ import { Button, Grid } from '@material-ui/core';
 import ListInput from '../inputs/ListInput';
 import ContainerInput from '../inputs/ContainerInput';
 import { useFormContext } from 'react-hook-form';
+import { isDashboardUser } from '../../model/UserRecord';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers && containers.some((container: Container & ContainerDetails) => container.imo && container.imo[0]);
@@ -28,6 +30,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
     register,
     formState: { isDirty },
   } = useFormContext();
+  const userRecord = useContext(UserRecordContext);
 
   //TODO set conainers in ContainerInput even if no change happened
   const [containers, setContainers] = useState<(Container & ContainerDetails)[]>(
@@ -99,7 +102,11 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         listRef={listInput}
         addButtonRef={addButton}
         ItemInput={ContainerInput}
-        ItemInputProps={{ showLocations: true, isDetailedInput: true }}
+        ItemInputProps={{
+          showLocations: true,
+          isDetailedInput: true,
+          shouldShowAllDepots: isDashboardUser(userRecord),
+        }}
         addText="Add Container"
         defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
         value={containers || []}

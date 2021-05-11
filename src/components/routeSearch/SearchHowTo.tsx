@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Grid } from '@material-ui/core';
 import Image from 'material-ui-image';
 import Typography from '@material-ui/core/Typography';
+import empty from '../../assets/state.server.overload.svg';
 
 import Container from '../Container';
 
@@ -10,12 +11,7 @@ export default () => (
     <Grid container justify="center" alignItems="center">
       <Grid item md={6}>
         <Box p={6} textAlign="center">
-          <Image
-            src={require(`../../assets/state.server.overload.svg`)}
-            aspectRatio={16 / 9}
-            color="transparent"
-            disableSpinner
-          />
+          <Image src={empty} aspectRatio={16 / 9} color="transparent" disableSpinner />
           <Typography variant="h5" gutterBottom>
             <Box fontWeight="fontWeightBold">Search Voyages</Box>
           </Typography>

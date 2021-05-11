@@ -15,7 +15,7 @@ import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
 import { Grid, IconButton, makeStyles, TextField, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
-import Container from '../../model/Container';
+import Container, { Ventilation } from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
 import CommodityTypeInput from './CommodityTypeInput';
 import QuantityInput from './QuantityInput';
@@ -35,6 +35,7 @@ import DateInput from './DateInput';
 import ActingAs from '../../contexts/ActingAs';
 import LinkIcon from '@material-ui/icons/Link';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
+import VentilationInput from './VentilationInput';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -45,6 +46,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   inlineForm: {
     display: 'flex',
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
+    minWidth: 120,
+  },
+  menuItem: {
+    maxWidth: '40em',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
   },
 }));
 
@@ -168,7 +181,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange(set('humidity', v)(container));
   };
 
-  const handleVentilationChange = (v: string | null) => {
+  const handleVentilationChange = (v: Ventilation | null) => {
     onChange(set('ventilation', v)(container));
   };
 
@@ -261,6 +274,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
               margin="dense"
               value={container.pickupLocation!}
               onChange={handleLocationChange}
+              shouldShowAllDepots={!!get('shouldShowAllDepots')(rest)}
             />
           </Grid>
         )}
@@ -318,14 +332,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                   />
                 </Grid>
                 <Grid item md={2} xs={12}>
-                  <TextField
-                    label="Ventilation"
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.ventilation}
-                    onChange={event => handleVentilationChange(event.target.value)}
-                  />
+                  <VentilationInput value={container.ventilation} onChange={handleVentilationChange} />
                 </Grid>
               </React.Fragment>
             )}
