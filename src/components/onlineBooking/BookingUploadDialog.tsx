@@ -34,12 +34,12 @@ import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 
 import string_similarity from 'string-similarity';
-import { isNil, omitBy } from 'lodash/fp';
+import { isNil, omitBy, omit } from 'lodash/fp';
 import { useHistory } from 'react-router';
-import useRequest from '../../hooks/useRequest';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
+import RouteSearchResults from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -64,6 +64,9 @@ const useStyles = makeStyles(theme =>
     },
     addBtn: {
       margin: theme.spacing(1),
+    },
+    progress: {
+      position: 'absolute',
     },
   }),
 );
@@ -109,7 +112,7 @@ const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object:
   return commodityType;
 };
 // todo. date always in this format <2021-06-16 09:00> ?
-const matchDate = (date: string | undefined) => {
+const matchDate = (date?: string) => {
   return date ? new Date(date) : undefined;
 };
 
@@ -138,7 +141,21 @@ const getContainers = (
   return containers;
 };
 
-const matchDepartureDate = () => {};
+const matchAndFetchSchedule = async (scheduleSearchParams: RouteSearchParams): Promise<RouteSearchResults> => {
+  const date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
+  const search = querySting.stringify({
+    origin: scheduleSearchParams?.originPort?.id,
+    destination: scheduleSearchParams?.destinationPort?.id,
+    date,
+    weeks: scheduleSearchParams?.weeks.toString(),
+    carrier: scheduleSearchParams?.carrier,
+  });
+
+  const url = `${process.env.REACT_APP_API_URL}/routes?${search}`;
+  const res = await fetch(url);
+  const data = (await res.json()) as RouteSearchResults;
+  return data;
+};
 
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
@@ -154,14 +171,17 @@ const mapIntoBookingRequestModel = async (
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
 
-  const departureDate = object.SAIL_DATE;
+  const departureDate = matchDate(object.SAIL_DATE);
 
   const scheduleSearchParams = {
     originPort: origin,
     destinationPort: destination,
     carrier: carrier,
-    //date:
+    date: departureDate,
+    weeks: 3,
   } as RouteSearchParams;
+
+  const schedule = await matchAndFetchSchedule(scheduleSearchParams);
 
   const bookingRequest = omitBy(isNil)({
     archived: false,
@@ -171,7 +191,6 @@ const mapIntoBookingRequestModel = async (
     createdBy: user,
     destination,
     origin,
-    // quoteNumber ?
     status: BookingRequestStatus.REQUESTED,
   }) as BookingRequest;
 
@@ -181,6 +200,7 @@ const mapIntoBookingRequestModel = async (
 export const readAndParseFile = (
   file: File,
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   user: UserRecord,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
@@ -191,6 +211,7 @@ export const readAndParseFile = (
   const reader = new FileReader();
   reader.readAsText(file, 'utf-8');
   reader.onload = async () => {
+    setLoading(true);
     // Parse HTML
     const object = Parse(reader.result as string) as HtmlBookingRequest;
     // Create booking request
@@ -204,7 +225,8 @@ export const readAndParseFile = (
       pickupLocations,
     )) as BookingRequest;
 
-    console.log(bookingRequest);
+    setLoading(false);
+
     setBookingRequest(bookingRequest);
   };
 };
@@ -212,6 +234,7 @@ export const readAndParseFile = (
 const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
+  const [loading, setLoading] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
 
@@ -221,18 +244,6 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
-
-  const [busy, error, result, search] = useRequest(() => {
-    const search = querySting.stringify({
-      // origin: params.originPort?.id,
-      // destination: params.destinationPort?.id,
-      // date: formatDate(params.date, 'yyyy-MM-dd'),
-      // weeks: params.weeks.toString(),
-      // carrier: carrierFilter,
-    });
-
-    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
-  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -245,6 +256,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         readAndParseFile(
           file,
           setBookingRequest,
+          setLoading,
           userRecord,
           ports,
           carriers,
@@ -313,9 +325,15 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <Typography variant="caption">Hint: You can drag & drop HTML bookings files over input.</Typography>
             <Box display="flex">
               <Button onClick={handleBookingSave} variant="contained" color="primary" className={classes.addBtn}>
-                Save Booking
+                <CircularProgress
+                  size={16}
+                  color="inherit"
+                  className={classes.progress}
+                  style={{ visibility: loading ? 'visible' : 'hidden' }}
+                />
+                <span style={{ visibility: loading ? 'hidden' : 'visible' }}>Save Booking</span>
               </Button>
-              <Button onClick={open} variant="contained" color="default" className={classes.addBtn}>
+              <Button onClick={open} variant="contained" color="default" className={classes.addBtn} disabled={loading}>
                 Attach File
               </Button>
             </Box>
