@@ -61,6 +61,7 @@ import { flow, set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
+import useCodebook from '../../hooks/useCodebook';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -305,7 +306,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
-
+  const b = useCodebook({ depotLocation: '005737', category: BookingCategory.Import });
+  console.log(b);
   const checkIfUserCanEdit = useCallback(() => {
     return !(
       [BookingRequestStatus.ARCHIVED, BookingRequestStatus.CONFIRMED].includes(bookingRequest.status) ||
@@ -601,4 +603,5 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('FreightDetails', request.freightDetails),
     set('Vessel', request.schedule?.OriginInfo.VoyageInfo.VesselName),
     set('Voyage', request.schedule?.OriginInfo.VoyageInfo.VoyageNr),
+    set('leadingCurrency', request.leadingCurrency),
   )({});

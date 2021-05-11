@@ -41,7 +41,10 @@ export const createRequest = async (bookingRequest: BookingRequest) => {
     .firestore()
     .collection('bookings-requests')
     .doc(id)
-    .set(bookingRequest);
+    .set({
+      id,
+      ...bookingRequest,
+    });
   return id;
 };
 

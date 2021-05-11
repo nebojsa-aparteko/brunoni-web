@@ -123,18 +123,18 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
   const pickupLocations = useContext(PickupLocations);
 
   const [pickupLocation, setPickupLocation] = useState<PickupLocation | undefined>(
-    pickupLocations && container.pickupLocation.id
+    pickupLocations && container.pickupLocation?.id
       ? pickupLocations.find(location => location.id === container.pickupLocation.id)
       : undefined,
   );
 
   useEffect(() => {
     setPickupLocation(
-      pickupLocations && container.pickupLocation.id
+      pickupLocations && container.pickupLocation?.id
         ? pickupLocations.find(location => location.id === container.pickupLocation.id)
         : undefined,
     );
-  }, [container.pickupLocation.id, pickupLocations]);
+  }, [container.pickupLocation?.id, pickupLocations]);
 
   return (
     <Grid container item spacing={2} style={{ paddingTop: '10px' }}>
