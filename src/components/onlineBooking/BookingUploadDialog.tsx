@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,11 +12,29 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-
 import { useDropzone } from 'react-dropzone';
 import { useSnackbar } from 'notistack';
+import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import UserRecord from '../../model/UserRecord';
 
-import { readAndParseFile } from '../../utilities/bookingRequestHtmlParser';
+import { Parse, HtmlBookingRequest, HtmlBookingContainer } from '../../utilities/bookingRequestHtmlParser';
+import useUser from '../../hooks/useUser';
+import Ports from '../../contexts/Ports';
+import Carriers from '../../contexts/Carriers';
+import Port from '../../model/Port';
+import Carrier from '../../model/Carrier';
+import Container from '../../model/Container';
+import { createRequest } from './Summary';
+import ContainerTypes from '../../contexts/ContainerTypes';
+import CommodityTypes from '../../contexts/CommodityTypes';
+import CommodityType from '../../model/CommodityType';
+import ContainerType from '../../model/ContainerType';
+import PickupLocations from '../../contexts/PickupLocations';
+import PickupLocation from '../../model/PickupLocation';
+
+import string_similarity from 'string-similarity';
+import { isNil, omitBy } from 'lodash/fp';
+import history from '../../providers/history';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -45,10 +63,159 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
+const matchLocation = (
+  pickupLocations: PickupLocation[] | undefined,
+  container: HtmlBookingContainer,
+): PickupLocation | undefined => {
+  let locations = pickupLocations?.filter(location =>
+    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE.includes(location?.zip),
+  );
+  locations = locations?.filter(location =>
+    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.COUNTRY_CODE.includes(location.countryCode),
+  );
+
+  const concatenatedAddresses = locations?.map(addr => {
+    const address = addr.name + ' ' + addr.street + ' ' + addr.poBox + ' ' + addr.city;
+    return address.toLowerCase();
+  });
+  const htmlAddress = container.EMPTY_CONTAINER_PICK_UP_LOCATION?.ADDRESS.join(' ').toLowerCase();
+  const match = string_similarity.findBestMatch(htmlAddress as string, concatenatedAddresses as string[]);
+  // console.log(container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE)
+  // console.log(htmlAddress)
+  // console.log(match)
+  const location = locations?.[match.bestMatchIndex];
+
+  return location;
+};
+// todo better. types missing
+const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
+  const containerType = containerTypes?.find(
+    containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
+  );
+  // console.log(container.TYPE, container.SIZE)
+  // console.log(containerType)
+  return containerType;
+};
+// todo better. types missing
+const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
+  const commodityType = commodityTypes?.find(type => object.CARGO_DESCRIPTION.includes(type.name));
+  // console.log(object.CARGO_DESCRIPTION)
+  // console.log(commodityType)
+  return commodityType;
+};
+// todo. date always in this format <2021-06-16 09:00> ?
+const matchPickupDate = (container: HtmlBookingContainer) => {
+  const pickupDate = container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE
+    ? new Date(container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE as string)
+    : undefined;
+  return pickupDate;
+};
+
+const getContainers = (
+  object: HtmlBookingRequest,
+  containerTypes: ContainerType[] | undefined,
+  commodityTypes: CommodityType[] | undefined,
+  pickupLocations: PickupLocation[] | undefined,
+): Container[] => {
+  const containers = object.CONTAINERS.map(container => {
+    const containerType = matchContainerType(containerTypes, container);
+    const commodityType = matchCommodityType(containerTypes, object);
+    const pickupDate = matchPickupDate(container);
+    const pickupLocation = container.EMPTY_CONTAINER_PICK_UP_LOCATION
+      ? matchLocation(pickupLocations, container)
+      : undefined;
+
+    return omitBy(isNil)({
+      commodityType,
+      containerType,
+      pickupDate,
+      pickupLocation,
+      quantity: Number(container.QUANTITY),
+    }) as Container;
+  });
+  return containers;
+};
+
+const mapIntoBookingRequestModel = async (
+  object: HtmlBookingRequest,
+  user: UserRecord,
+  ports: Port[] | undefined,
+  carriers: Carrier[] | undefined,
+  containerTypes: ContainerType[] | undefined,
+  commodityTypes: CommodityType[] | undefined,
+  pickupLocations: PickupLocation[] | undefined,
+): Promise<BookingRequest> => {
+  const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
+  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
+  const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
+  const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
+
+  const bookingRequest = omitBy(isNil)({
+    archived: false,
+    carrier,
+    containers,
+    createdAt: new Date(),
+    createdBy: user,
+    destination,
+    // id ? (on top)
+    origin,
+    // quoteNumber ?
+    status: BookingRequestStatus.REQUESTED,
+  }) as BookingRequest;
+
+  return bookingRequest;
+};
+
+export const readAndParseFile = (
+  file: File,
+  setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
+  user: UserRecord,
+  ports: Port[] | undefined,
+  carriers: Carrier[] | undefined,
+  containerTypes: ContainerType[] | undefined,
+  commodityTypes: CommodityType[] | undefined,
+  pickupLocations: PickupLocation[] | undefined,
+) => {
+  const reader = new FileReader();
+  reader.readAsText(file, 'utf-8');
+  reader.onload = async () => {
+    // Parse HTML
+    const object = Parse(reader.result as string) as HtmlBookingRequest;
+    // Create booking request
+    const bookingRequest = (await mapIntoBookingRequestModel(
+      object,
+      user,
+      ports,
+      carriers,
+      containerTypes,
+      commodityTypes,
+      pickupLocations,
+    )) as BookingRequest;
+
+    console.log(bookingRequest);
+    // todo create id
+    // try {
+    //   createRequest(bookingRequest)
+    //     .then(docReference => history.push(`/booking-requests/${docReference}`))
+    //     .catch(error => console.log(error));
+    // }catch (e) {
+    //   console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
+    //   return null;
+    // }
+  };
+};
+
 const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
-  // const [bookingInput, setBookingInput] = useState('');
+  const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
   const { enqueueSnackbar } = useSnackbar();
+
+  const [_, userRecord] = useUser();
+  const ports = useContext(Ports);
+  const carriers = useContext(Carriers);
+  const containerTypes = useContext(ContainerTypes);
+  const commodityTypes = useContext(CommodityTypes);
+  const pickupLocations = useContext(PickupLocations);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -57,9 +224,20 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           variant: 'error',
         });
       }
-      acceptedFiles.forEach(file => readAndParseFile(file));
+      acceptedFiles.forEach(file =>
+        readAndParseFile(
+          file,
+          setBookingRequest,
+          userRecord,
+          ports,
+          carriers,
+          containerTypes,
+          commodityTypes,
+          pickupLocations,
+        ),
+      );
     },
-    [enqueueSnackbar],
+    [carriers, commodityTypes, containerTypes, enqueueSnackbar, pickupLocations, ports, userRecord],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
