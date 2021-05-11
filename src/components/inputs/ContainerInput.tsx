@@ -274,6 +274,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
               margin="dense"
               value={container.pickupLocation!}
               onChange={handleLocationChange}
+              shouldShowAllDepots={!!get('shouldShowAllDepots')(rest)}
             />
           </Grid>
         )}

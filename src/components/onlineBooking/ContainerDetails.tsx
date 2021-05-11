@@ -26,6 +26,8 @@ import { TableRowData } from '../bookingRequests/BookingRequestSummary';
 import ContainerInput from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
+import UserRecordContext from '../../contexts/UserRecordContext';
+import { isDashboardUser } from '../../model/UserRecord';
 import PortTermsInput from '../inputs/PortTermsInput';
 import PortTerms from '../../contexts/PortTerms';
 
@@ -237,6 +239,8 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '',
   );
 
+  const userRecord = useContext(UserRecordContext);
+
   useEffect(() => {
     setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '');
   }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
@@ -307,7 +311,11 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
             listRef={listInput}
             addButtonRef={addButton}
             ItemInput={ContainerInput}
-            ItemInputProps={{ showLocations: true, isDetailedInput: true }}
+            ItemInputProps={{
+              showLocations: true,
+              isDetailedInput: true,
+              shouldShowAllDepots: isDashboardUser(userRecord),
+            }}
             addText="Add Container"
             defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
             value={containers || []}
