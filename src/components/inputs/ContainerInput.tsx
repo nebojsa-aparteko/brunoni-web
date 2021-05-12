@@ -13,7 +13,7 @@ import unset from 'lodash/fp/unset';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
-import { Grid, IconButton, makeStyles, TextField, Theme } from '@material-ui/core';
+import { Grid, IconButton, InputAdornment, makeStyles, TextField, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import Container, { Ventilation } from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
@@ -35,6 +35,8 @@ import DateInput from './DateInput';
 import ActingAs from '../../contexts/ActingAs';
 import LinkIcon from '@material-ui/icons/Link';
 import LinkOffIcon from '@material-ui/icons/LinkOff';
+import AcUnitIcon from '@material-ui/icons/AcUnit';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import VentilationInput from './VentilationInput';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
@@ -104,6 +106,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [dateOpen, setDateOpen] = useState<boolean>(false);
   const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
   const [container, setContainer] = useState<Container & ContainerDetails>(value);
+  const [temperatureFocused, setTemperatureFocused] = useState<boolean>(false);
 
   useEffect(() => {
     setContainer(value);
@@ -318,6 +321,26 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     fullWidth
                     value={container.temperature}
                     onChange={event => handleTemperatureChange(parseInt(event.target.value))}
+                    onFocus={() => setTemperatureFocused(true)}
+                    onBlur={() => setTemperatureFocused(false)}
+                    helperText={
+                      !temperatureFocused && container.temperature && container.temperature < 0
+                        ? 'Below zero °C'
+                        : undefined
+                    }
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="start">
+                          {container.temperature ? (
+                            container.temperature < 0 ? (
+                              <AcUnitIcon htmlColor={'#8bddff'} />
+                            ) : (
+                              <WbSunnyIcon htmlColor={'#ffd904'} />
+                            )
+                          ) : null}
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item md={2} xs={12}>

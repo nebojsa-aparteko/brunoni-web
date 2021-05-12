@@ -31,6 +31,8 @@ import { isDashboardUser } from '../../model/UserRecord';
 import PortTermsInput from '../inputs/PortTermsInput';
 import PortTerms from '../../contexts/PortTerms';
 import PortTerm from '../../model/PortTerm';
+import AcUnitIcon from '@material-ui/icons/AcUnit';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -63,6 +65,9 @@ const useStyles = makeStyles(theme => ({
   tableCell: {
     verticalAlign: 'top',
     border: 'none',
+  },
+  tempIcon: {
+    marginLeft: theme.spacing(1),
   },
 }));
 
@@ -178,7 +183,22 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               </TableRow>
             )}
 
-            {container.temperature && <TableRowData label={'Temperature'} content={container.temperature + ' °C'} />}
+            {container.temperature !== undefined && (
+              <TableRowData
+                label={'Temperature'}
+                content={
+                  <Box display="flex" flexDirection="row">
+                    <Typography>{container.temperature.toString() + ' °C'}</Typography>
+                    {container.temperature !== undefined &&
+                      (container.temperature < 0 ? (
+                        <AcUnitIcon htmlColor={'#8bddff'} className={classes.tempIcon} />
+                      ) : (
+                        <WbSunnyIcon htmlColor={'#ffd904'} className={classes.tempIcon} />
+                      ))}
+                  </Box>
+                }
+              />
+            )}
 
             {container.humidity && <TableRowData label={'Humidity'} content={container.humidity + ' %'} />}
 
