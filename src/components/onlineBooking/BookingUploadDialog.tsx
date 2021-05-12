@@ -30,15 +30,16 @@ import CommodityType from '../../model/CommodityType';
 import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
-
 import string_similarity from 'string-similarity';
 import { isNil, omitBy } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
-import RouteSearchResults from '../../model/route-search/RouteSearchResults';
+import RouteSearchResults, { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
+
+import { subDays } from 'date-fns';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -90,18 +91,25 @@ const matchLocation = (
 
   return locations?.[match.bestMatchIndex];
 };
-// todo better. types missing
+// todo better ?
 const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
-  const containerType = containerTypes?.find(
+  let containerType = containerTypes?.find(
     containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
   );
-
+  // console.log(containerType)
   return containerType;
 };
-// todo better. types missing
+// todo better ?
 const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
-  const commodityType = commodityTypes?.find(type => object.CARGO_DESCRIPTION.includes(type.name));
+  const commodityTypeNames = commodityTypes?.map(type => type.name);
+  const match = string_similarity.findBestMatch(object.CARGO_DESCRIPTION, commodityTypeNames as string[]);
 
+  // console.log(object.CARGO_DESCRIPTION)
+  // console.log('match')
+  // console.log(match)
+
+  const commodityType = match.bestMatch.rating > 0.5 ? commodityTypes?.[match.bestMatchIndex] : undefined;
+  //console.log(commodityType)
   return commodityType;
 };
 // todo. date always in this format <2021-06-16 09:00> ?
@@ -117,7 +125,7 @@ const getContainers = (
 ): Container[] => {
   const containers = object.CONTAINERS.map(container => {
     const containerType = matchContainerType(containerTypes, container);
-    const commodityType = matchCommodityType(containerTypes, object);
+    const commodityType = matchCommodityType(commodityTypes, object);
     const pickupDate = matchDate(container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE);
     const pickupLocation = container.EMPTY_CONTAINER_PICK_UP_LOCATION
       ? matchLocation(pickupLocations, container)
@@ -134,20 +142,40 @@ const getContainers = (
   return containers;
 };
 
-const matchAndFetchSchedule = async (scheduleSearchParams: RouteSearchParams): Promise<RouteSearchResults> => {
-  const date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
-  const query = querySting.stringify({
+const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: string): Promise<RouteSearchResults> => {
+  const queryObject = {
     origin: scheduleSearchParams?.originPort?.id,
     destination: scheduleSearchParams?.destinationPort?.id,
-    date,
     weeks: scheduleSearchParams?.weeks.toString(),
     carrier: scheduleSearchParams?.carrier,
+  };
+  let query = querySting.stringify({
+    ...queryObject,
+    date,
   });
-
   const url = `${process.env.REACT_APP_API_URL}/routes?${query}`;
   const res = await fetch(url);
   const data = (await res.json()) as RouteSearchResults;
   return data;
+};
+
+const matchAndFetchSchedule = async (
+  scheduleSearchParams: RouteSearchParams,
+  object: HtmlBookingRequest,
+): Promise<RouteSearchResult[]> => {
+  let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
+  let data = await fetchSchedule(scheduleSearchParams, date);
+  let schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
+  schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+
+  //if no match try again 3 days before departure date
+  if (schedules.length === 0) {
+    date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
+    data = await fetchSchedule(scheduleSearchParams, date);
+    schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
+    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+  }
+  return schedules;
 };
 
 const mapIntoBookingRequestModel = async (
@@ -170,14 +198,14 @@ const mapIntoBookingRequestModel = async (
     destinationPort: destination,
     carrier: carrier,
     date: departureDate,
-    weeks: 1,
+    weeks: 4,
   } as RouteSearchParams;
 
-  console.log(scheduleSearchParams);
+  const schedules = await matchAndFetchSchedule(scheduleSearchParams, object);
 
-  const schedules = await matchAndFetchSchedule(scheduleSearchParams);
+  //console.log(schedules)
 
-  console.log(schedules);
+  const schedule = schedules.length === 1 ? schedules[0] : undefined;
 
   const bookingRequest = omitBy(isNil)({
     archived: false,
@@ -187,6 +215,7 @@ const mapIntoBookingRequestModel = async (
     createdBy: user,
     destination,
     origin,
+    schedule,
     status: BookingRequestStatus.REQUESTED,
   }) as BookingRequest;
 
@@ -269,7 +298,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       bookingRequest &&
         createRequest(bookingRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
-          .catch(error => console.log(error))
+          .catch(error => console.error(error))
           .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
     } catch (e) {
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
@@ -287,7 +316,6 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
-          {/*<input {...getInputProps()} />*/}
           <Box>
             <DropzoneArea
               showPreviews={true}
@@ -307,7 +335,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                 variant="contained"
                 color="primary"
                 className={classes.addBtn}
-                disabled={!bookingRequest}
+                disabled={!bookingRequest || loading}
               >
                 <CircularProgress
                   size={16}
