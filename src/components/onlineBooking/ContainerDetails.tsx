@@ -30,6 +30,7 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import { isDashboardUser } from '../../model/UserRecord';
 import PortTermsInput from '../inputs/PortTermsInput';
 import PortTerms from '../../contexts/PortTerms';
+import PortTerm from '../../model/PortTerm';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -224,16 +225,31 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
   const terms = useContext(PortTerms);
-  //TODO change the matching to ID once Norbert added that to the schedule data
+  const [filteredTerms, setFilteredTerms] = useState<PortTerm[]>(
+    terms ? terms.filter(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : [],
+  );
+
+  useEffect(() => {
+    setFilteredTerms(terms ? terms.filter(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : []);
+  }, [bookingRequest?.schedule?.OriginInfo.Port.ID, terms]);
+
   const [selectedPortTerm, setSelectedPortTerm] = useState(
-    terms ? terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : undefined,
+    terms
+      ? bookingRequest?.schedule?.OriginInfo.Port.TerminalID
+        ? terms.find(term => term.id === bookingRequest?.schedule?.OriginInfo.Port.TerminalID)
+        : terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID)
+      : undefined,
   );
 
   useEffect(() => {
     setSelectedPortTerm(
-      terms ? terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : undefined,
+      terms
+        ? bookingRequest?.schedule?.OriginInfo.Port.TerminalID
+          ? terms.find(term => term.id === bookingRequest?.schedule?.OriginInfo.Port.TerminalID)
+          : terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID)
+        : undefined,
     );
-  }, [bookingRequest?.schedule?.OriginInfo.Port.ID]);
+  }, [bookingRequest?.schedule?.OriginInfo.Port.ID, bookingRequest?.schedule?.OriginInfo.Port.TerminalID, terms]);
 
   const [deliveryAddress, setDeliveryAddress] = useState<string>(
     bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '',
@@ -262,7 +278,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   };
 
   const handleAddressChange = (v: string | undefined) => {
-    const newAddress = {
+    const brAfterAddressChange = {
       ...bookingRequest,
       schedule: {
         ...bookingRequest?.schedule,
@@ -275,8 +291,27 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
         },
       },
     } as BookingRequest;
-    omitEmptyDeep(newAddress);
-    setBookingRequest && setBookingRequest(newAddress);
+    omitEmptyDeep(brAfterAddressChange);
+    setBookingRequest && setBookingRequest(brAfterAddressChange);
+  };
+
+  const handleTermChange = (portTerm: PortTerm | undefined) => {
+    const brAfterTermChange = {
+      ...bookingRequest,
+      schedule: {
+        ...bookingRequest?.schedule,
+        OriginInfo: {
+          ...bookingRequest?.schedule?.OriginInfo,
+          Port: {
+            ...bookingRequest?.schedule?.OriginInfo.Port,
+            TerminalID: portTerm?.id,
+            PortName: portTerm?.address?.replaceAll('\n', '<br/>'),
+          },
+        },
+      },
+    } as BookingRequest;
+    omitEmptyDeep(brAfterTermChange);
+    setBookingRequest && setBookingRequest(brAfterTermChange);
   };
 
   return (
@@ -288,8 +323,9 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
               <PortTermsInput
                 value={selectedPortTerm}
                 onChange={term => {
-                  handleAddressChange(term.address);
+                  handleTermChange(term);
                 }}
+                terms={filteredTerms}
               />
             </Grid>
             <Grid item xs={12}>

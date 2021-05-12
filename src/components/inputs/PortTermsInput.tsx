@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles, MenuItem, Select, Theme } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import PortTerm from '../../model/PortTerm';
-import PortTerms from '../../contexts/PortTerms';
 
 const useStyles = makeStyles((theme: Theme) => ({
   menuItem: {
@@ -21,18 +20,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const PortTermsInput: React.FC<Props> = ({ value, onChange }) => {
+const PortTermsInput: React.FC<Props> = ({ value, onChange, terms }) => {
   const classes = useStyles();
-  const terms = useContext(PortTerms);
 
   return (
     <Select
-      defaultValue={value?.id || ''}
+      value={value?.id || ''}
       onChange={event => onChange(terms?.find(t => t.id === event.target.value)!)}
       style={{ flex: 1, height: 'fit-content' }}
       renderValue={value => `${value && terms?.find(term => term.id === value)?.port}`}
     >
-      {terms?.map(term => {
+      {terms.map(term => {
         const termNoHTML = term.address?.replace(/(<([^>]+)>)/gi, '');
 
         return (
@@ -56,6 +54,7 @@ const PortTermsInput: React.FC<Props> = ({ value, onChange }) => {
 interface Props {
   value?: PortTerm;
   onChange: (term: PortTerm) => void;
+  terms: PortTerm[];
 }
 
 export default PortTermsInput;

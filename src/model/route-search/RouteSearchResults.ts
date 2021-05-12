@@ -28,6 +28,7 @@ export type SearchResultsPort = {
   Land: string;
   PortName: string;
   PortAgent: string;
+  TerminalID?: string;
 };
 
 export interface ItineraryItem {
