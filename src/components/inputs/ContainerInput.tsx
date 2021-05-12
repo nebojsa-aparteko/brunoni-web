@@ -96,6 +96,11 @@ const defaultOOGItem: OOG = {
   weight: '',
 };
 
+export const isContainerSO = (container: Container & ContainerDetails) =>
+  container.containerType &&
+  container.containerType?.description &&
+  container.containerType?.description.includes('S.O.');
+
 const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
@@ -131,11 +136,15 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   }));
 
   const handleContainerTypeChange = (v: ContainerType | null) => {
+    const isSO = (v || {}).description?.endsWith('S.O.');
     onChange(
       flow(
         set('containerType', v),
         (v || {}).couldBeOversize ? identity : set('oog', [false]),
-        (v || {}).description?.endsWith('S.O.') ? unset('location') : identity,
+        isSO ? unset('location') : identity,
+        isSO ? unset('pickupLocation') : identity,
+        isSO ? unset('pickupReference') : identity,
+        isSO ? unset('pickupDate') : identity,
       )(container) as Container & ContainerDetails,
     );
     (commodityTypeInput.current! as { focus: () => void }).focus();
@@ -149,7 +158,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handleLocationChange = (v: PickupLocation | null) => {
-    onChange(set('pickupLocation', v)(container));
+    onChange(set('pickupLocation', isContainerSO(container) ? undefined : v)(container));
   };
 
   const handleQuantityChange = (v: number | null) => {
@@ -165,7 +174,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handlePickupDateChange = (v: Date | null) => {
-    onChange(set('pickupDate', v)(container));
+    onChange(set('pickupDate', isContainerSO(container) ? undefined : v)(container));
   };
 
   const handleWeightTextChange = (v: number | null) => {
@@ -190,65 +199,59 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
 
   const handlePickupReferenceTextChange = (v: string | null) => {
     const newValue = (linkedReferences
-      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
-      : { ...container, pickupReference: v }) as Container & ContainerDetails;
+      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
+      : { ...container, pickupReference: isContainerSO(container) ? undefined : v }) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handlePickupReferenceChange = (v: string | null) => {
-    if (v !== container.pickupReference) {
-      const newValue = (linkedReferences
-        ? {
-            ...container,
-            pickupReference: v,
-            deliveryReference: v,
-            vgmPin: v,
-          }
-        : { ...container, pickupReference: v }) as Container & ContainerDetails;
-      onChange(newValue);
-    }
+    const newValue = (linkedReferences
+      ? {
+          ...container,
+          pickupReference: isContainerSO(container) ? undefined : v,
+          deliveryReference: v,
+          vgmPin: v,
+        }
+      : { ...container, pickupReference: isContainerSO(container) ? undefined : v }) as Container & ContainerDetails;
+    onChange(newValue);
   };
 
   const handleDeliveryReferenceTextChange = (v: string | null) => {
     const newValue = (linkedReferences
-      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
+      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
       : { ...container, deliveryReference: v }) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handleDeliveryReferenceChange = (v: string | null) => {
-    if (v !== container.deliveryReference) {
-      const newValue = (linkedReferences
-        ? {
-            ...container,
-            pickupReference: v,
-            deliveryReference: v,
-            vgmPin: v,
-          }
-        : { ...container, deliveryReference: v }) as Container & ContainerDetails;
-      onChange(newValue);
-    }
+    const newValue = (linkedReferences
+      ? {
+          ...container,
+          pickupReference: isContainerSO(container) ? undefined : v,
+          deliveryReference: v,
+          vgmPin: v,
+        }
+      : { ...container, deliveryReference: v }) as Container & ContainerDetails;
+    onChange(newValue);
   };
 
   const handleVGMPinTextChange = (v: string | null) => {
     const newValue = (linkedReferences
-      ? { ...container, pickupReference: v, deliveryReference: v, vgmPin: v }
+      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
       : { ...container, vgmPin: v }) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handleVGMPinChange = (v: string | null) => {
-    if (v !== container.vgmPin) {
-      const newValue = (linkedReferences
-        ? {
-            ...container,
-            pickupReference: v,
-            deliveryReference: v,
-            vgmPin: v,
-          }
-        : { ...container, vgmPin: v }) as Container & ContainerDetails;
-      onChange(newValue);
-    }
+    const newValue = (linkedReferences
+      ? {
+          ...container,
+          pickupReference: isContainerSO(container) ? undefined : v,
+          deliveryReference: v,
+          vgmPin: v,
+        }
+      : { ...container, vgmPin: v }) as Container & ContainerDetails;
+    onChange(newValue);
   };
 
   return (
@@ -286,18 +289,20 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         </Grid>
         {get('isDetailedInput')(rest) && (
           <>
-            <Grid item md={2} xs={12}>
-              <DateInput
-                value={container.pickupDate || null}
-                onChange={handlePickupDateChange}
-                open={dateOpen}
-                onOpen={() => setDateOpen(true)}
-                onClose={() => setDateOpen(false)}
-                label="Pickup Date"
-                margin="dense"
-                fullWidth
-              />
-            </Grid>
+            {!isContainerSO(container) && (
+              <Grid item md={2} xs={12}>
+                <DateInput
+                  value={container.pickupDate || null}
+                  onChange={handlePickupDateChange}
+                  open={dateOpen}
+                  onOpen={() => setDateOpen(true)}
+                  onClose={() => setDateOpen(false)}
+                  label="Pickup Date"
+                  margin="dense"
+                  fullWidth
+                />
+              </Grid>
+            )}
             <Grid item md={2} xs={12}>
               <TextField
                 label="Weight (Kg)"
@@ -361,17 +366,19 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             )}
             {isAdmin && (
               <React.Fragment>
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.pickupReference || ''}
-                    onChange={event => handlePickupReferenceTextChange(event.target.value)}
-                    onBlur={event => handlePickupReferenceChange(event.target.value)}
-                  />
-                </Grid>
+                {!isContainerSO(container) && (
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.pickupReference || ''}
+                      onChange={event => handlePickupReferenceTextChange(event.target.value)}
+                      onBlur={event => handlePickupReferenceChange(event.target.value)}
+                    />
+                  </Grid>
+                )}
                 <Grid item md={3} xs={12}>
                   <TextField
                     label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
@@ -383,7 +390,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     onBlur={event => handleDeliveryReferenceChange(event.target.value)}
                   />
                 </Grid>
-                <Grid item md={2} xs={12} style={{ display: 'flex' }}>
+                <Grid item md={3} xs={12} style={{ display: 'flex' }}>
                   <TextField
                     label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
                     margin="dense"

@@ -23,7 +23,7 @@ import PickupLocation from '../../model/PickupLocation';
 import OOG from '../../model/OOG';
 import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
-import ContainerInput from '../inputs/ContainerInput';
+import ContainerInput, { isContainerSO } from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
@@ -217,7 +217,9 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             <col style={{ width: '80%' }} />
           </colgroup>
           <TableBody>
-            <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be assigned]'} />
+            {!isContainerSO(container) && (
+              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be assigned]'} />
+            )}
             {container.pickupDate && (
               <TableRowData
                 label={'Pick Up Date'}
@@ -287,7 +289,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
         ...container,
         imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
         oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
-        pickupDate: container.pickupDate ? container.pickupDate : new Date(),
+        pickupDate: isContainerSO(container) ? undefined : container.pickupDate ? container.pickupDate : new Date(),
       };
     });
     setBookingRequest && setBookingRequest({ ...bookingRequest, containers: writableContainers } as BookingRequest);
