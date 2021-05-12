@@ -2,17 +2,17 @@ import React, { useCallback, useContext, useState } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   createStyles,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
   makeStyles,
-  TextField,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { useDropzone } from 'react-dropzone';
+import { DropzoneArea } from 'material-ui-dropzone';
 import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
@@ -34,9 +34,10 @@ import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
 import { isNil, omitBy } from 'lodash/fp';
 import { useHistory } from 'react-router';
-import useRequest from '../../hooks/useRequest';
 import querySting from 'querystring';
+import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
+import RouteSearchResults from '../../model/route-search/RouteSearchResults';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 
 const useStyles = makeStyles(theme =>
@@ -63,6 +64,9 @@ const useStyles = makeStyles(theme =>
     addBtn: {
       margin: theme.spacing(1),
     },
+    progress: {
+      position: 'absolute',
+    },
   }),
 );
 
@@ -83,31 +87,25 @@ const matchLocation = (
   });
   const htmlAddress = container.EMPTY_CONTAINER_PICK_UP_LOCATION?.ADDRESS.join(' ').toLowerCase();
   const match = string_similarity.findBestMatch(htmlAddress as string, concatenatedAddresses as string[]);
-  // console.log(container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE)
-  // console.log(htmlAddress)
-  // console.log(match)
-  const location = locations?.[match.bestMatchIndex];
 
-  return location;
+  return locations?.[match.bestMatchIndex];
 };
 // todo better. types missing
 const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
   const containerType = containerTypes?.find(
     containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
   );
-  // console.log(container.TYPE, container.SIZE)
-  // console.log(containerType)
+
   return containerType;
 };
 // todo better. types missing
 const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
   const commodityType = commodityTypes?.find(type => object.CARGO_DESCRIPTION.includes(type.name));
-  // console.log(object.CARGO_DESCRIPTION)
-  // console.log(commodityType)
+
   return commodityType;
 };
 // todo. date always in this format <2021-06-16 09:00> ?
-const matchDate = (date: string | undefined) => {
+const matchDate = (date?: string) => {
   return date ? new Date(date) : undefined;
 };
 
@@ -136,7 +134,21 @@ const getContainers = (
   return containers;
 };
 
-const matchDepartureDate = () => {};
+const matchAndFetchSchedule = async (scheduleSearchParams: RouteSearchParams): Promise<RouteSearchResults> => {
+  const date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
+  const query = querySting.stringify({
+    origin: scheduleSearchParams?.originPort?.id,
+    destination: scheduleSearchParams?.destinationPort?.id,
+    date,
+    weeks: scheduleSearchParams?.weeks.toString(),
+    carrier: scheduleSearchParams?.carrier,
+  });
+
+  const url = `${process.env.REACT_APP_API_URL}/routes?${query}`;
+  const res = await fetch(url);
+  const data = (await res.json()) as RouteSearchResults;
+  return data;
+};
 
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
@@ -152,14 +164,20 @@ const mapIntoBookingRequestModel = async (
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
 
-  const departureDate = object.SAIL_DATE;
-
+  const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
     originPort: origin,
     destinationPort: destination,
     carrier: carrier,
-    //date:
+    date: departureDate,
+    weeks: 1,
   } as RouteSearchParams;
+
+  console.log(scheduleSearchParams);
+
+  const schedules = await matchAndFetchSchedule(scheduleSearchParams);
+
+  console.log(schedules);
 
   const bookingRequest = omitBy(isNil)({
     archived: false,
@@ -169,7 +187,6 @@ const mapIntoBookingRequestModel = async (
     createdBy: user,
     destination,
     origin,
-    // quoteNumber ?
     status: BookingRequestStatus.REQUESTED,
   }) as BookingRequest;
 
@@ -179,6 +196,7 @@ const mapIntoBookingRequestModel = async (
 export const readAndParseFile = (
   file: File,
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   user: UserRecord,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
@@ -189,6 +207,7 @@ export const readAndParseFile = (
   const reader = new FileReader();
   reader.readAsText(file, 'utf-8');
   reader.onload = async () => {
+    setLoading(true);
     // Parse HTML
     const object = Parse(reader.result as string) as HtmlBookingRequest;
     // Create booking request
@@ -202,7 +221,8 @@ export const readAndParseFile = (
       pickupLocations,
     )) as BookingRequest;
 
-    console.log(bookingRequest);
+    setLoading(false);
+
     setBookingRequest(bookingRequest);
   };
 };
@@ -210,27 +230,16 @@ export const readAndParseFile = (
 const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
+  const [loading, setLoading] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
   const history = useHistory();
 
-  const [_, userRecord] = useUser();
+  const [, userRecord] = useUser();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
-
-  const [busy, error, result, search] = useRequest(() => {
-    const search = querySting.stringify({
-      // origin: params.originPort?.id,
-      // destination: params.destinationPort?.id,
-      // date: formatDate(params.date, 'yyyy-MM-dd'),
-      // weeks: params.weeks.toString(),
-      // carrier: carrierFilter,
-    });
-
-    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
-  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -241,6 +250,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         readAndParseFile(
           file,
           setBookingRequest,
+          setLoading,
           userRecord,
           ports,
           carriers,
@@ -253,19 +263,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
   );
 
-  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
-    onDrop,
-    noClick: true,
-  });
-
-  const handleBookingPaste = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-    console.log('here');
-  };
-
   const handleBookingSave = () => {
-    console.log('saved');
-    // todo add uploaded files view
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
@@ -288,33 +286,36 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent className={classes.dialogContent} {...getRootProps()}>
-          <input {...getInputProps()} />
+        <DialogContent className={classes.dialogContent}>
+          {/*<input {...getInputProps()} />*/}
           <Box>
-            <TextField
-              className={isDragActive ? classes.dropZone : classes.dropZoneDefault}
-              id="booking-upload-dialog"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              onClick={open}
-              inputProps={{ style: { textAlign: 'center' } }}
-              label={`Upload HTML Booking file inside this box`}
-              variant="outlined"
-              placeholder={`Please paste load HTML Booking files here`}
-              multiline
-              rows={10}
-              onChange={handleBookingPaste}
-              style={{ width: '100%' }}
-              disabled={true}
+            <DropzoneArea
+              showPreviews={true}
+              showPreviewsInDropzone={false}
+              useChipsForPreview
+              filesLimit={1}
+              previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
+              previewText="Selected files"
+              alertSnackbarProps={{ autoHideDuration: 3000 }}
+              onDrop={onDrop}
+              onDelete={() => setBookingRequest(undefined)}
             />
-            <Typography variant="caption">Hint: You can drag & drop HTML bookings files over input.</Typography>
+            <Typography variant="caption">Hint: You can drag & drop HTML bookings file over input.</Typography>
             <Box display="flex">
-              <Button onClick={handleBookingSave} variant="contained" color="primary" className={classes.addBtn}>
-                Save Booking
-              </Button>
-              <Button onClick={open} variant="contained" color="default" className={classes.addBtn}>
-                Attach File
+              <Button
+                onClick={handleBookingSave}
+                variant="contained"
+                color="primary"
+                className={classes.addBtn}
+                disabled={!bookingRequest}
+              >
+                <CircularProgress
+                  size={16}
+                  color="inherit"
+                  className={classes.progress}
+                  style={{ visibility: loading ? 'visible' : 'hidden' }}
+                />
+                <span style={{ visibility: loading ? 'hidden' : 'visible' }}>Save Booking</span>
               </Button>
             </Box>
           </Box>
