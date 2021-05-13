@@ -387,7 +387,7 @@ const getContainerLocation = (array: string[]) => {
   const ADDRESS: string[] | undefined = [];
   let POSTAL_CODE: string | undefined;
   let COUNTRY_CODE: string | undefined;
-  array.each((el, index) => {
+  array.map((el, index) => {
     if (el.includes(NeededData.POSTAL_CODE)) {
       POSTAL_CODE = el.split(':')[1].trim();
     } else if (el.includes(NeededData.COUNTRY_CODE)) {

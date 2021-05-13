@@ -61,7 +61,7 @@ import { flow, set } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
-import useCodebook from '../../hooks/useCodebook';
+import Mousetrap from 'mousetrap';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -272,6 +272,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setAgreementNumber(bookingRequest.agreementNo || '');
   }, [bookingRequest]);
 
+  useEffect(() => {
+    Mousetrap.bind(['command+shift+e', 'ctrl+shift+e'], () => setEditing(prevState => !prevState));
+    return () => {
+      Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
+    };
+  }, [setEditing]);
+
   const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
   const onArchiveClick = useCallback(
@@ -306,8 +313,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const b = useCodebook({ depotLocation: '005737', category: BookingCategory.Import });
-  console.log(b);
+
   const checkIfUserCanEdit = useCallback(() => {
     return !(
       [BookingRequestStatus.ARCHIVED, BookingRequestStatus.CONFIRMED].includes(bookingRequest.status) ||
@@ -351,6 +357,15 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         });
     }
   };
+
+  useEffect(() => {
+    editing && Mousetrap.bind(['command+shift+s', 'ctrl+shift+s'], () => handleSave());
+    Mousetrap.stopCallback = () => false;
+
+    return () => {
+      Mousetrap.unbind(['command+shift+s', 'ctrl+shift+s']);
+    };
+  }, [editing, handleSave]);
 
   const bookNow = useCallback(() => {
     // if freight has ocean freight create leading currency
@@ -603,5 +618,6 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('FreightDetails', request.freightDetails),
     set('Vessel', request.schedule?.OriginInfo.VoyageInfo.VesselName),
     set('Voyage', request.schedule?.OriginInfo.VoyageInfo.VoyageNr),
+    // set('PortTerms',),
     set('leadingCurrency', request.leadingCurrency),
   )({});

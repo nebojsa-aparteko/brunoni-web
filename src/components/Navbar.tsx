@@ -2,7 +2,6 @@ import React, { Fragment, MouseEventHandler, useCallback, useContext, useEffect,
 import * as changeCase from 'change-case';
 import {
   AppBar,
-  Badge,
   Box,
   Button,
   Container,
@@ -122,10 +121,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   menu: {
     textTransform: 'uppercase',
-  },
-  badge: {
-    top: theme.spacing(0.5),
-    right: theme.spacing(1),
   },
 }));
 
@@ -299,9 +294,7 @@ const Navbar: React.FC = () => {
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
                     <ButtonMenuItem primary="Online Booking" to="/online-booking" />
-                    <Badge badgeContent={4} color="primary" classes={{ anchorOriginTopRightRectangle: classes.badge }}>
-                      <ButtonMenuItem primary="Bookings" to="/bookings" />
-                    </Badge>
+                    <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
                     )}
