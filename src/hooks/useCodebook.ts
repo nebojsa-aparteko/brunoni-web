@@ -6,18 +6,36 @@ import { flow, update } from 'lodash/fp';
 import safeInvoke from '../utilities/safeInvoke';
 import BrunoniCodes, { BrunoniCodesType } from '../model/BrunoniCodes';
 
-export default function useCodebook({ depotLocation, category }: { category: BookingCategory; depotLocation: string }) {
+export default function useCodebook({
+  depotLocation,
+  category,
+  carrier,
+  equipment,
+  port,
+}: {
+  category: BookingCategory;
+  depotLocation: string;
+  carrier: string;
+  port: string;
+  equipment: string;
+}) {
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let q = collection.where('depotLocations', 'array-contains', depotLocation);
       q = q.where('category', '==', category);
+      q = q.where('carrierId', '==', carrier);
       return q;
     },
-    [depotLocation, category],
+    [depotLocation, category, carrier],
   );
   const codeBookCollection = useFirestoreCollection('brunoni-codes', query);
   return codeBookCollection?.docs
     .map(d => normalizeCodebook(d.data()) as BrunoniCodes)
+    .filter(
+      value =>
+        (value.ports ? value.ports.includes(port) : true) &&
+        (value.equipments ? value.equipments.includes(equipment) : true),
+    )
     .reduce(
       (previousValue, currentValue) => {
         if (currentValue.type === BrunoniCodesType.STORAGE) previousValue.storage.push(currentValue);
