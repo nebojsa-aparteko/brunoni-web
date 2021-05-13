@@ -166,14 +166,17 @@ const matchAndFetchSchedule = async (
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
   let schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-  schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
-
+  // only filter more if more than 1
+  if (schedules.length > 1)
+    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
     schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+    // only filter more if more than 1
+    if (schedules.length > 1)
+      schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   }
   return schedules;
 };
