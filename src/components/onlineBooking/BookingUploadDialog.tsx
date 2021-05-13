@@ -298,8 +298,13 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       bookingRequest &&
         createRequest(bookingRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
-          .catch(error => console.error(error))
-          .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
+          .catch(error => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+            console.error(error);
+          })
+          .finally(() => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          });
     } catch (e) {
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
       return null;
@@ -328,7 +333,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               onDrop={onDrop}
               onDelete={() => setBookingRequest(undefined)}
             />
-            <Typography variant="caption">Hint: You can drag & drop HTML bookings file over input.</Typography>
+            <Typography variant="caption">Hint: You can drag & drop HTML booking file over input.</Typography>
             <Box display="flex">
               <Button
                 onClick={handleBookingSave}
