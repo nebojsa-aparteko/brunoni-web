@@ -1,5 +1,5 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { CSSProperties, Fragment, useCallback, useContext, useEffect } from 'react';
+import React, { CSSProperties, Fragment, useCallback, useContext, useEffect, useState } from 'react';
 import BookingsView from '../components/BookingsView';
 import { Badge, Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -16,6 +16,7 @@ import BookingRequestsProvider, { useBookingRequestsContext } from '../providers
 import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import InputIcon from '@material-ui/icons/Input';
+import firebase from 'firebase';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -77,8 +78,14 @@ const BookingsPageContainer: React.FC = () => {
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
   const [, , , setFilters] = useBookingRequestsContext();
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const [bookingRequestCount, setBookingRequestCount] = useState(0);
   const selectedTab = bookingPaginationContextData.activeTab;
-
+  useEffect(() => {
+    firebase
+      .database()
+      .ref('/booking-requests-count')
+      .on('value', a => setBookingRequestCount(+a.val()));
+  }, []);
   const [bookings, isLoading] = useBookingsContext();
 
   // Remember scroll position
@@ -212,16 +219,16 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<PaymentIcon />} label="Pending Payment" {...a11yProps(1)} />
             <Tab icon={<ArchiveIcon />} label="Archived" {...a11yProps(2)} />
             {/*<Divider />*/}
-            <Tab icon={<AssessmentIcon />} label="Requests" {...a11yProps(3)} />
             <Tab
               icon={
-                <Badge badgeContent={4} color="primary">
-                  <InputIcon />
+                <Badge badgeContent={bookingRequestCount} color="primary">
+                  <AssessmentIcon />
                 </Badge>
               }
-              label="Archived Requests"
-              {...a11yProps(4)}
+              label="Requests"
+              {...a11yProps(3)}
             />
+            <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
             <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
