@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const saveFilesToFirestore = (collection: string, id: string, files: ChecklistItemValueDocument) =>
+export const saveFilesToFirestore = (collection: string, id: string, files: ChecklistItemValueDocument) =>
   firebase
     .firestore()
     .collection(collection)

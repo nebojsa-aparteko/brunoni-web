@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -40,6 +40,10 @@ import RouteSearchResults, { RouteSearchResult } from '../../model/route-search/
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 
 import { subDays } from 'date-fns';
+import { saveFilesToFirestore } from '../bookings/InternalStorage';
+import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
+import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
+import firebase from '../../firebase';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -76,7 +80,7 @@ const matchLocation = (
   container: HtmlBookingContainer,
 ): PickupLocation | undefined => {
   let locations = pickupLocations?.filter(location =>
-    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE.includes(location?.zip),
+    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE.includes(location.zip),
   );
   locations = locations?.filter(location =>
     container.EMPTY_CONTAINER_PICK_UP_LOCATION?.COUNTRY_CODE.includes(location.countryCode),
@@ -229,6 +233,7 @@ export const readAndParseFile = (
   file: File,
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>,
   user: UserRecord,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
@@ -237,6 +242,7 @@ export const readAndParseFile = (
   pickupLocations: PickupLocation[] | undefined,
 ) => {
   const reader = new FileReader();
+  // accepting only single booking 4 now...
   reader.readAsText(file, 'utf-8');
   reader.onload = async () => {
     setLoading(true);
@@ -253,15 +259,16 @@ export const readAndParseFile = (
       pickupLocations,
     )) as BookingRequest;
 
-    setLoading(false);
-
+    setFiles([file]);
     setBookingRequest(bookingRequest);
+    setLoading(false);
   };
 };
 
 const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useState<BookingRequest>();
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
   const history = useHistory();
@@ -278,21 +285,71 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       if (!acceptedFiles.every(file => ['html'].includes(file.name.split('.').pop() || ''))) {
         return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'File(s) must be .html format' });
       }
-      acceptedFiles.forEach(file =>
+      acceptedFiles.forEach(file => {
         readAndParseFile(
           file,
           setBookingRequest,
           setLoading,
+          setFiles,
           userRecord,
           ports,
           carriers,
           containerTypes,
           commodityTypes,
           pickupLocations,
-        ),
-      );
+        );
+      });
     },
     [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
+  );
+
+  const storageBasePath = useMemo((): string => {
+    return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
+  }, [bookingRequest?.id]);
+
+  const saveFiles = useCallback(
+    async (files: File[]): Promise<any> => {
+      const uploadFile = async (file: File): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          const fileWithExtension = fileWithExt(file.name);
+          const storedFileName = `${fileWithExtension.name}_${new Date().getTime()}.${fileWithExtension.ext}`;
+          let path = [storageBasePath, storedFileName].join('/');
+
+          let storageRef = firebase.storage().ref(encodeURI(path));
+          let uploadTask = storageRef.put(file);
+
+          uploadTask.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            snapshot => {
+              console.log('progress: ', (snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            },
+            error => {
+              reject(error);
+              console.error(error);
+              dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
+            },
+            () => {
+              // success
+              storageRef.updateMetadata({
+                contentDisposition: `attachment; filename=${file.name}`,
+              });
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
+                resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
+              });
+            },
+          );
+        });
+      };
+
+      const requests = files.map((file: File) => {
+        return uploadFile(file).then(storedItem => {
+          return storedItem;
+        });
+      });
+
+      return Promise.all(requests);
+    },
+    [dispatch, storageBasePath],
   );
 
   const handleBookingSave = () => {
@@ -300,7 +357,27 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     try {
       bookingRequest &&
         createRequest(bookingRequest)
-          .then(docReference => history.push(`/booking-requests/${docReference}`))
+          .then(async docReference => {
+            // Save HTML file to storage
+            try {
+              const documents = (await saveFiles(files)) as ChecklistItemValueDocument[];
+              const values = documents.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                  } as ChecklistItemValueDocument),
+              );
+              values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
+            } catch (e) {
+              return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
+            } finally {
+              history.push(`/booking-requests/${docReference}`);
+            }
+          })
           .catch(error => {
             dispatch({ type: 'STOP_GLOBAL_LOADING' });
             console.error(error);
@@ -326,13 +403,16 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         <DialogContent className={classes.dialogContent}>
           <Box>
             <DropzoneArea
+              disableRejectionFeedback={true}
+              acceptedFiles={['.html']}
               showPreviews={true}
               showPreviewsInDropzone={false}
               useChipsForPreview
               filesLimit={1}
+              previewChipProps={{ disabled: !bookingRequest || loading }}
               previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
               previewText="Selected files"
-              alertSnackbarProps={{ autoHideDuration: 3000 }}
+              alertSnackbarProps={{ autoHideDuration: 4000 }}
               onDrop={onDrop}
               onDelete={() => setBookingRequest(undefined)}
             />
