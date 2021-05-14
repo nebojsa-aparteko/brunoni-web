@@ -166,14 +166,17 @@ const matchAndFetchSchedule = async (
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
   let schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-  schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
-
+  // only filter more if more than 1
+  if (schedules.length > 1)
+    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
     schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+    // only filter more if more than 1
+    if (schedules.length > 1)
+      schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   }
   return schedules;
 };
@@ -298,8 +301,13 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       bookingRequest &&
         createRequest(bookingRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
-          .catch(error => console.error(error))
-          .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
+          .catch(error => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+            console.error(error);
+          })
+          .finally(() => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          });
     } catch (e) {
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
       return null;
@@ -328,7 +336,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               onDrop={onDrop}
               onDelete={() => setBookingRequest(undefined)}
             />
-            <Typography variant="caption">Hint: You can drag & drop HTML bookings file over input.</Typography>
+            <Typography variant="caption">Hint: You can drag & drop HTML booking file over input.</Typography>
             <Box display="flex">
               <Button
                 onClick={handleBookingSave}

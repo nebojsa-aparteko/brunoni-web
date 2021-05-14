@@ -520,27 +520,44 @@ const extractDataNormalTable = (object: DataNormalTable) => {
   return DATA;
 };
 
+const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number => {
+  let oddDataTableIndex = 0;
+  let currTableIndex = 0;
+  const nDataTables = dataTables.length;
+
+  while (currTableIndex < nDataTables) {
+    const tableElement = dataTables.get(currTableIndex);
+    const table = $(tableElement);
+    const title = $(table)
+      .find('strong')
+      .text();
+
+    if (title.includes(Titles.BOOKER)) {
+      oddDataTableIndex = currTableIndex;
+      break;
+    }
+    currTableIndex++;
+  }
+  return oddDataTableIndex;
+};
+
 export const Parse = (html: string): HtmlBookingRequest => {
   const $ = cheerio.load(html);
 
-  let oddDataTable = 0;
-  // Selector to check Odd table index (0 if no CUSTOMER_COMMENTS. Otherwise 1)
-  const title = $('body > table:nth-child(2) > tbody > tr:nth-child(1) > td > strong').text();
-  if (title === Titles.CUSTOMER_COMMENTS) {
-    oddDataTable = 1;
-  }
-
   const dataTables = $('table[class=blBody]');
   const nDataTables = dataTables.length;
+
+  const oddDataTableIndex = findOddTableIndex($, dataTables);
 
   let oddTable: DataOddTable = {};
   let normalTable: DataNormalTable = {};
 
   let nCurrTable = 0;
+
   while (nCurrTable < nDataTables) {
     const tableElement = dataTables.get(nCurrTable);
     const table = $(tableElement);
-    if (nCurrTable === oddDataTable) {
+    if (nCurrTable === oddDataTableIndex) {
       oddTable = parseOddTable($, table);
     } else {
       // Destructuring because there are several normal tables, so it combines into 1
