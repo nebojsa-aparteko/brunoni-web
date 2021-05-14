@@ -212,11 +212,10 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
 //   }
 // };
 
-//TODO switch from QuoteDetail to FreightDetail and use Group field from there
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
-  const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[]>(freightDetails);
+  const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -229,19 +228,22 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   useEffect(() => {
     switch (selectedTab) {
       case 0:
-        setFilteredFreightDetails(freightDetails);
+        freightDetails && setFilteredFreightDetails(freightDetails);
         break;
       case 1:
-        setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
+        freightDetails &&
+          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
         break;
     }
   }, [selectedTab, freightDetails, setFilteredFreightDetails, bookingRequest]);
 
   const handleSelectDeselectAll = () => {
-    if (selectedDetails.length !== filteredFreightDetails.length) {
-      setSelectedDetails(filteredFreightDetails.map(detail => detail.SeqNr));
-    } else {
-      setSelectedDetails([]);
+    if (filteredFreightDetails) {
+      if (selectedDetails.length !== filteredFreightDetails.length) {
+        setSelectedDetails(filteredFreightDetails.map(detail => detail.SeqNr));
+      } else {
+        setSelectedDetails([]);
+      }
     }
   };
 
@@ -261,8 +263,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
       setBookingRequest(
         set(
           'freightDetails',
-          freightDetails.concat({
-            SeqNr: findNextPos(freightDetails),
+          (freightDetails || []).concat({
+            SeqNr: freightDetails ? findNextPos(freightDetails) : '0',
             Anz: '1.00',
             Txt: (chargeCodes && chargeCodes[0].text) || '',
             Currency: 'USD',
@@ -283,6 +285,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const onDelete = () => {
     bookingRequest &&
       setBookingRequest &&
+      freightDetails &&
       setBookingRequest(
         set(
           'freightDetails',
@@ -318,7 +321,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
               deleteTooltip={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
             />
           )}
-          {filteredFreightDetails.length > 0 ? (
+          {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
             <Table className={classes.table} size="small">
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
@@ -362,7 +365,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
 };
 
 interface Props {
-  freightDetails: FreightDetail[];
+  freightDetails?: FreightDetail[];
 }
 
 export default BookingRequestFreightDetails;

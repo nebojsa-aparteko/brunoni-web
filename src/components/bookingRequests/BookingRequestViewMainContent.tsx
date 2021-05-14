@@ -65,17 +65,15 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
       <BookingRequestClosings editing={editing} />
 
       <BookingRequestSpecialRemarks />
-      {bookingRequestState.freightDetails && (
-        <>
-          <Box marginTop="2em" marginBottom="2em">
-            <Divider />
-          </Box>
-          <BookingRequestFreightDetails freightDetails={bookingRequestState.freightDetails} />
-          <Typography variant="body2" className={classes.remark}>
-            {remark}
-          </Typography>
-        </>
-      )}
+
+      <Box marginTop="2em" marginBottom="2em">
+        <Divider />
+      </Box>
+      <BookingRequestFreightDetails freightDetails={bookingRequestState.freightDetails} />
+      <Typography variant="body2" className={classes.remark}>
+        {remark}
+      </Typography>
+
       <Box id="otherBookingRequestInfo">
         {bookingRequestState.additionalInfo && (
           <>
