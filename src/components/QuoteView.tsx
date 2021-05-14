@@ -353,7 +353,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 <Page title={quoteTitle}>
                   <Grid container spacing={2}>
                     <Grid item md={6} xs={12} className={classes.hidePrint}>
-                      <QuoteItemHeader quote={quote} userData={userData} showCompanyInfo={showCompanyInfo} />
+                      <QuoteItemHeader quote={quote} showCompanyInfo={showCompanyInfo} />
                     </Grid>
                     <Grid item md={6} xs={12} className={classes.hidePrint}>
                       <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
@@ -363,7 +363,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                       <Box display="none" displayPrint="block" width="100%">
                         <Grid container spacing={2}>
                           <Grid item xs={6}>
-                            <QuoteItemHeader quote={quote} userData={userData} />
+                            <QuoteItemHeader quote={quote} />
                           </Grid>
                           <Grid item xs={6}>
                             <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
