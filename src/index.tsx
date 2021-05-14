@@ -198,7 +198,7 @@ const render = (user: firebase.User | null) => {
     <Router>
       <CrispChatRouteUpdater />
       <ThemeProvider theme={theme}>
-        <SnackbarProvider>
+        <SnackbarProvider maxSnack={3}>
           <GlobalStore>
             <LoginDialogProvider>
               <ScrollToTop />

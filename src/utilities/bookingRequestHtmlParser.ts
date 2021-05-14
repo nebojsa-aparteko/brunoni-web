@@ -1,5 +1,10 @@
 import cheerio from 'cheerio';
 
+enum Types {
+  CANCELED = 'Cancelled',
+  REQUESTED = 'Requested',
+}
+
 enum Titles {
   // Odd table
   BOOKER = 'BOOKER',
@@ -124,6 +129,7 @@ export interface HtmlBookingRequest {
   PAYMENT_TERM?: string;
   FREIGHT_PAYER?: string;
   PAYMENT_LOCATION?: string;
+  BOOKING_TYPE?: string;
 }
 
 interface DataOddTable {
@@ -541,8 +547,13 @@ const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number
   return oddDataTableIndex;
 };
 
-export const Parse = (html: string): HtmlBookingRequest => {
+export const Parse = (html: string): HtmlBookingRequest | undefined => {
   const $ = cheerio.load(html);
+
+  const bookingType = $('span[class=h]').text();
+
+  // If type not requested, return undefined
+  if (!bookingType.includes(Types.REQUESTED)) return;
 
   const dataTables = $('table[class=blBody]');
   const nDataTables = dataTables.length;

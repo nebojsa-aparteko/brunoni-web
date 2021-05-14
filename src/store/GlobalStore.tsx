@@ -10,17 +10,17 @@ export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActio
 
 const GlobalStore: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(globalReducer, defaultState);
-  const { snackbarMessage, snackbarType } = state;
+  const { snackbarMessage, snackbarType, snackbarDuration } = state;
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (snackbarMessage && snackbarType) {
       enqueueSnackbar(snackbarMessage, {
         variant: snackbarType,
-        autoHideDuration: 1000,
+        autoHideDuration: snackbarDuration || 1000,
       });
     }
-  }, [snackbarMessage, snackbarType]);
+  });
 
   return <GlobalContext.Provider value={[state, dispatch]}>{children}</GlobalContext.Provider>;
 };

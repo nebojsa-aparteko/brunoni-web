@@ -14,19 +14,23 @@ export interface StopGlobalLoadingAction {
 export interface ShowSuccessSnackbarAction {
   type: typeof SHOW_SUCCESS_SNACKBAR;
   message: string;
+  duration?: number;
 }
 export interface ShowErrorSnackbarAction {
   type: typeof SHOW_ERROR_SNACKBAR;
   message: string;
+  duration?: number;
 }
 export interface ShowInfoSnackbarAction {
   type: typeof SHOW_INFO_SNACKBAR;
   message: string;
+  duration?: number;
 }
 
 export interface GlobalAppState {
   isGlobalLoadingInProgress: boolean;
   snackbarMessage?: string;
+  snackbarDuration?: number;
   snackbarType?: 'error' | 'success' | 'info';
 }
 

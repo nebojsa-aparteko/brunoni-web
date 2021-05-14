@@ -44,6 +44,7 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
 import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
 import firebase from '../../firebase';
+import { globalActions } from '../../store/types/globalAppState';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -100,7 +101,7 @@ const matchContainerType = (containerTypes: ContainerType[] | undefined, contain
   let containerType = containerTypes?.find(
     containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
   );
-  // console.log(containerType)
+
   return containerType;
 };
 // todo better ?
@@ -108,12 +109,8 @@ const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object:
   const commodityTypeNames = commodityTypes?.map(type => type.name);
   const match = string_similarity.findBestMatch(object.CARGO_DESCRIPTION, commodityTypeNames as string[]);
 
-  // console.log(object.CARGO_DESCRIPTION)
-  // console.log('match')
-  // console.log(match)
-
   const commodityType = match.bestMatch.rating > 0.5 ? commodityTypes?.[match.bestMatchIndex] : undefined;
-  //console.log(commodityType)
+
   return commodityType;
 };
 // todo. date always in this format <2021-06-16 09:00> ?
@@ -194,6 +191,7 @@ const mapIntoBookingRequestModel = async (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
 ): Promise<BookingRequest> => {
+  const inttraId = Number(object.BOOKER_INTTRA_ID);
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
@@ -210,8 +208,6 @@ const mapIntoBookingRequestModel = async (
 
   const schedules = await matchAndFetchSchedule(scheduleSearchParams, object);
 
-  //console.log(schedules)
-
   const schedule = schedules.length === 1 ? schedules[0] : undefined;
 
   const bookingRequest = omitBy(isNil)({
@@ -221,6 +217,7 @@ const mapIntoBookingRequestModel = async (
     createdAt: new Date(),
     createdBy: user,
     destination,
+    inttraId,
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,
@@ -231,6 +228,7 @@ const mapIntoBookingRequestModel = async (
 
 export const readAndParseFile = (
   file: File,
+  dispatch: React.Dispatch<globalActions>,
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
@@ -246,22 +244,36 @@ export const readAndParseFile = (
   reader.readAsText(file, 'utf-8');
   reader.onload = async () => {
     setLoading(true);
-    // Parse HTML
-    const object = Parse(reader.result as string) as HtmlBookingRequest;
-    // Create booking request
-    const bookingRequest = (await mapIntoBookingRequestModel(
-      object,
-      user,
-      ports,
-      carriers,
-      containerTypes,
-      commodityTypes,
-      pickupLocations,
-    )) as BookingRequest;
+    try {
+      // Parse HTML
+      const object = Parse(reader.result as string) as HtmlBookingRequest;
+      // throw error of no object
+      if (!object) {
+        setLoading(false);
+        return dispatch({
+          type: 'SHOW_ERROR_SNACKBAR',
+          message: 'File must be of type: Booking - Requested',
+          duration: 4000,
+        });
+      }
+      // Create booking request
+      const bookingRequest = (await mapIntoBookingRequestModel(
+        object,
+        user,
+        ports,
+        carriers,
+        containerTypes,
+        commodityTypes,
+        pickupLocations,
+      )) as BookingRequest;
 
-    setFiles([file]);
-    setBookingRequest(bookingRequest);
-    setLoading(false);
+      setFiles([file]);
+      setBookingRequest(bookingRequest);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message, duration: 4000 });
+    }
   };
 };
 
@@ -288,6 +300,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       acceptedFiles.forEach(file => {
         readAndParseFile(
           file,
+          dispatch,
           setBookingRequest,
           setLoading,
           setFiles,
@@ -405,14 +418,14 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropzoneArea
               disableRejectionFeedback={true}
               acceptedFiles={['.html']}
-              showPreviews={true}
+              showPreviews={!!bookingRequest}
               showPreviewsInDropzone={false}
               useChipsForPreview
               filesLimit={1}
+              alertSnackbarProps={{ autoHideDuration: 0 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
               previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
               previewText="Selected files"
-              alertSnackbarProps={{ autoHideDuration: 4000 }}
               onDrop={onDrop}
               onDelete={() => setBookingRequest(undefined)}
             />

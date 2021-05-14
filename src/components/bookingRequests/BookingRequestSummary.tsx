@@ -441,6 +441,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   )
                 }
               />
+              {bookingRequest.inttraId && <TableRowData label={'Inttra Id'} content={bookingRequest.inttraId} />}
               {editing && (
                 <TableRowData
                   label={'Customer ref.'}

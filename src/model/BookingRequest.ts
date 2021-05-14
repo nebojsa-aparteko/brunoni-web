@@ -12,6 +12,7 @@ import { Currency } from './Payment';
 export interface BookingRequest {
   id?: string;
   blNumber?: string;
+  inttraId?: string;
   origin?: Port;
   destination?: Port;
   carrier?: Carrier;

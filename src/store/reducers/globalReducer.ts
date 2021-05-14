@@ -17,11 +17,21 @@ const globalReducer: Reducer<GlobalAppState, globalActions> = (prevState = defau
     case STOP_GLOBAL_LOADING:
       return { ...prevState, isGlobalLoadingInProgress: false };
     case SHOW_SUCCESS_SNACKBAR:
-      return { ...prevState, snackbarMessage: action.message, snackbarType: 'success' };
+      return {
+        ...prevState,
+        snackbarMessage: action.message,
+        snackbarType: 'success',
+        snackbarDuration: action.duration,
+      };
     case SHOW_ERROR_SNACKBAR:
-      return { ...prevState, snackbarMessage: action.message, snackbarType: 'error' };
+      return {
+        ...prevState,
+        snackbarMessage: action.message,
+        snackbarType: 'error',
+        snackbarDuration: action.duration,
+      };
     case SHOW_INFO_SNACKBAR:
-      return { ...prevState, snackbarMessage: action.message, snackbarType: 'info' };
+      return { ...prevState, snackbarMessage: action.message, snackbarType: 'info', snackbarDuration: action.duration };
     default:
       return prevState;
   }
