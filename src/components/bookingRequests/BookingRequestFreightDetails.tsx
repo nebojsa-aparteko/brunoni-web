@@ -151,7 +151,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
           freightDetail.Currency
         )}
       </TableCell>
-      {freightDetail.Txt === 'Seafreight' && console.log(freightDetail)}
+      {freightDetail.Txt === 'Seafreight'}
       <TableCell align="right">
         {editing ? (
           <TextField

@@ -84,10 +84,16 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
           <TableCell className={classes.tableCell}>
             <Box display="flex" flexDirection="column">
-              {oogItem.width && <Typography>{`OW: ${oogItem.width}`}</Typography>}
-              {oogItem.height && <Typography>{`OH: ${oogItem.height}`}</Typography>}
-              {oogItem.length && <Typography>{`OL: ${oogItem.length}`}</Typography>}
-              {oogItem.weight && <Typography>{`OWt: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
+              {oogItem.width && <Typography>{`Max Width: ${oogItem.width} cm`}</Typography>}
+              {oogItem.diffWidth && <Typography variant="body2">{`OW: ${oogItem.diffWidth} cm`}</Typography>}
+              {oogItem.height && <Typography>{`Max Height: ${oogItem.height} cm`}</Typography>}
+              {oogItem.diffHeight && <Typography variant="body2">{`OH: ${oogItem.diffHeight} cm`}</Typography>}
+              {oogItem.length && <Typography>{`Max Length: ${oogItem.length} cm`}</Typography>}
+              {oogItem.diffLength && <Typography variant="body2">{`OL: ${oogItem.diffLength} cm`}</Typography>}
+              {oogItem.weight && <Typography>{`Max Weight: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
+              {oogItem.diffWeight && (
+                <Typography variant="body2">{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
+              )}
             </Box>
           </TableCell>
         </TableRow>

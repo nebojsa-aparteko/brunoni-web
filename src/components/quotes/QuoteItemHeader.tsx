@@ -1,21 +1,14 @@
-import React, { useContext, useMemo, Fragment } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import formatDate from 'date-fns/format';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
-import { Table, TableCell, TableRow, makeStyles } from '@material-ui/core';
+import { makeStyles, Table, TableCell, TableRow } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
-import UserRecord from '../../model/UserRecord';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
 import UserRecords from '../../contexts/UserRecordsContext';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
-
-interface Props {
-  quote: Quote;
-  userData: UserRecord;
-  showCompanyInfo?: boolean;
-}
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -55,11 +48,11 @@ const useStyles = makeStyles(theme => ({
 interface TableRowProps {
   label: string;
   content: string;
-  className?: any;
-  showCompanyInfo?: boolean;
+  // className?: any;
+  // showCompanyInfo?: boolean;
 }
 
-const TableRowData: React.FC<TableRowProps> = ({ label, content, className, showCompanyInfo }) => {
+const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   const classes = useStyles();
   return (
     <TableRow className={classes.tableRow}>
@@ -69,7 +62,7 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content, className, show
   );
 };
 
-const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) => {
+const QuoteItemHeader: React.FC<Props> = ({ quote, showCompanyInfo }) => {
   const users = useContext(UserRecords);
   const requestedBy = useUserByAlphacomId(quote.userId);
 
@@ -138,5 +131,11 @@ const QuoteItemHeader: React.FC<Props> = ({ quote, userData, showCompanyInfo }) 
     </Table>
   );
 };
+
+interface Props {
+  quote: Quote;
+  // userData: UserRecord;
+  showCompanyInfo?: boolean;
+}
 
 export default QuoteItemHeader;

@@ -3,4 +3,8 @@ export default interface OOG {
   height: string;
   length: string;
   weight: string;
+  diffWidth?: string;
+  diffLength?: string;
+  diffHeight?: string;
+  diffWeight?: string;
 }
