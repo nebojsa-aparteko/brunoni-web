@@ -96,6 +96,8 @@ const defaultOOGItem: OOG = {
   weight: '',
 };
 
+export const isReefer = (containerType: ContainerType) => containerType?.id === '45R1' || containerType?.id === '22R1';
+
 export const isContainerSO = (container: Container & ContainerDetails) =>
   container.containerType &&
   container.containerType?.description &&
@@ -140,6 +142,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange(
       flow(
         set('containerType', v),
+        set('ventilation', v && isReefer(v) ? Ventilation.CLOSED : undefined),
         (v || {}).couldBeOversize ? identity : set('oog', [false]),
         isSO ? unset('location') : identity,
         isSO ? unset('pickupLocation') : identity,
@@ -315,7 +318,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 onBlur={event => handleWeightChange(parseInt(event.target.value))}
               />
             </Grid>
-            {(container.containerType?.id === '45R1' || container.containerType?.id === '22R1') && (
+            {container.containerType && isReefer(container.containerType) && (
               <React.Fragment>
                 <Grid item md={2} xs={12}>
                   <TextField
