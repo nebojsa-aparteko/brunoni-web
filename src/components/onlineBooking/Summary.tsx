@@ -93,7 +93,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     setBookingRequest(writableRequest);
     try {
       bookingRequest &&
-        createRequest(bookingRequest)
+        createRequest(writableRequest)
           .then(docReference => history.push(`/booking-requests/${docReference}`))
           .catch(error => console.log(error));
     } catch (error) {
