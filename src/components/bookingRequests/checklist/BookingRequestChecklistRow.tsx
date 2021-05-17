@@ -21,6 +21,8 @@ import { useDropzone } from 'react-dropzone';
 import { StoredDocument } from '../../../model/Booking';
 import { makeContentDispositionFileName } from '../../DropZone';
 import { fileWithExt } from '../../bookings/checklist/ChecklistItemRow';
+import useGlobalAppState from '../../../hooks/useGlobalAppState';
+import { SAVED_ACTION_SNACKBAR } from '../../../store/types/globalAppState';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -113,7 +115,7 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
-
+  const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -180,9 +182,9 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
 
   const handleCheckboxChange = useCallback(
     (value: boolean) => {
-      storeActivity(() => checklistItemCheckedHandler(value));
+      dispatch({ type: SAVED_ACTION_SNACKBAR, storeToFirebase: () => checklistItemCheckedHandler(value) });
     },
-    [checklistItemCheckedHandler, storeActivity],
+    [checklistItemCheckedHandler, dispatch],
   );
 
   const checklistItemFileAddedHandler = useCallback(

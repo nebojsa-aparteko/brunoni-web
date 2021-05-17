@@ -2,6 +2,7 @@ import { Reducer } from 'react';
 import {
   globalActions,
   GlobalAppState,
+  SAVED_ACTION_SNACKBAR,
   SHOW_ERROR_SNACKBAR,
   SHOW_INFO_SNACKBAR,
   SHOW_SUCCESS_SNACKBAR,
@@ -32,6 +33,8 @@ const globalReducer: Reducer<GlobalAppState, globalActions> = (prevState = defau
       };
     case SHOW_INFO_SNACKBAR:
       return { ...prevState, snackbarMessage: action.message, snackbarType: 'info', snackbarDuration: action.duration };
+    case SAVED_ACTION_SNACKBAR:
+      return { ...prevState, promiseActivity: action.storeToFirebase };
     default:
       return prevState;
   }

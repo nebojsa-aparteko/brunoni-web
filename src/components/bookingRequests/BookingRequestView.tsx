@@ -52,8 +52,6 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import EditIcon from '@material-ui/icons/Edit';
-import { useSnackbar } from 'notistack';
-import { GlobalContext } from '../../store/GlobalStore';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
@@ -62,6 +60,7 @@ import { BookingCategory } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
+import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -263,8 +262,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState ? bookingRequestState.agreementNo || '' : bookingRequest.agreementNo || '',
   );
-  const { enqueueSnackbar } = useSnackbar();
-  const [, dispatch] = useContext(GlobalContext);
+  const [, dispatch] = useGlobalAppState();
   const userRecord = useContext(UserRecordContext);
   const { open, closeModal, openModal } = useModal();
   useEffect(() => {
@@ -296,20 +294,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       checklistItemActivityHandler()
         .then(_ => {
           console.log('Test', _);
-          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-            variant: 'success',
-            autoHideDuration: 1000,
-          });
+          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved message!' });
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-            variant: 'error',
-            autoHideDuration: 3000,
-          });
+          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
         });
     },
-    [enqueueSnackbar],
+    [dispatch],
   );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -340,23 +332,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     if (bookingRequestState) {
       updateBookingRequest(br)
         ?.then(() => {
-          enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-            variant: 'success',
-            autoHideDuration: 1500,
-          });
+          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
         })
         .catch(error => {
           console.error('error saving booking request', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
-            variant: 'error',
-            autoHideDuration: 3000,
-          });
+          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
         })
         .finally(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         });
     }
-  }, [bookingRequestState, dispatch, enqueueSnackbar, setEditing]);
+  }, [bookingRequestState, dispatch, setEditing]);
 
   useEffect(() => {
     editing && Mousetrap.bind(['command+shift+s', 'ctrl+shift+s'], () => handleSave());
