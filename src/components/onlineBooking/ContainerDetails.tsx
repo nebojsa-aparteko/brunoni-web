@@ -33,6 +33,7 @@ import PortTerms from '../../contexts/PortTerms';
 import PortTerm from '../../model/PortTerm';
 import AcUnitIcon from '@material-ui/icons/AcUnit';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
+import { Tariff } from '../../model/Container';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -213,6 +214,31 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {container.imo && container.imo.length > 0 && <IMCODetails container={container} />}
 
             {container.oog && container.oog.length > 0 && <OverdimensionDetails container={container} />}
+
+            {container.demDetTariffs && (
+              <TableRowData
+                label={'Dem./Det. tariffs'}
+                content={container.demDetTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
+            {container.storageTariffs && (
+              <TableRowData
+                label={'Storage tariffs'}
+                content={container.storageTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
+            {container.pluginTariffs && (
+              <TableRowData
+                label={'Plug-in tariffs'}
+                content={container.pluginTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
           </TableBody>
         </Table>
       </Grid>

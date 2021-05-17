@@ -15,9 +15,18 @@ export default interface Container {
   pickupReference?: string;
   deliveryReference?: string;
   vgmPin?: string;
+  demDetTariffs?: Tariff[];
+  storageTariffs?: Tariff[];
+  pluginTariffs?: Tariff[];
 }
 
 export enum Ventilation {
   OPEN = 'OPEN',
   CLOSED = 'CLOSED',
+}
+
+export interface Tariff {
+  id: string;
+  days: string;
+  text: string;
 }
