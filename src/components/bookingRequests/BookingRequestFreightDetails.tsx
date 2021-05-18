@@ -16,6 +16,8 @@ import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+import { isDashboardUser } from '../../model/UserRecord';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -93,6 +95,8 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
   const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
+  const userRecord = useContext(UserRecordContext);
+
   useEffect(() => {
     setQuantity(freightDetail.Anz || '1.00');
     setCurrency(freightDetail.Currency);
@@ -115,7 +119,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
 
   return (
     <TableRow key={freightDetail.SeqNr} className={classes.tableRow}>
-      {editing && (
+      {editing && isDashboardUser(userRecord) && (
         <TableCell padding="checkbox">
           <Checkbox
             checked={selected}
@@ -126,7 +130,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         </TableCell>
       )}
       <TableCell component="th" scope="row">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           selectedTab !== 2 ? (
             <ChargeCodeInput
               chargeCodeText={freightDetail.Txt}
@@ -150,7 +154,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -165,7 +169,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -181,7 +185,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
       </TableCell>
       {freightDetail.Txt === 'Seafreight'}
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -198,7 +202,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell>
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -234,6 +238,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
+  const userRecord = useContext(UserRecordContext);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     event.stopPropagation();
@@ -319,14 +324,16 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     <Fragment>
       <Grid item xs={12}>
         <TableContainer component={Paper} className={classes.tableWrapper}>
-          <AppBar position="static">
-            <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
-              <Tab label="External" {...a11yProps(0)} />
-              <Tab label="Internal 1" {...a11yProps(1)} />
-              <Tab label="Internal 2" {...a11yProps(2)} />
-            </Tabs>
-          </AppBar>
-          {editing && (
+          {isDashboardUser(userRecord) && (
+            <AppBar position="static">
+              <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
+                <Tab label="External" {...a11yProps(0)} />
+                <Tab label="Internal 1" {...a11yProps(1)} />
+                <Tab label="Internal 2" {...a11yProps(2)} />
+              </Tabs>
+            </AppBar>
+          )}
+          {editing && isDashboardUser(userRecord) && (
             <EnhancedTableToolbar
               numSelected={selectedDetails.length}
               handleAdd={onAdd}
@@ -345,7 +352,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
             <Table className={classes.table} size="small">
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
-                  {editing && (
+                  {editing && isDashboardUser(userRecord) && (
                     <TableCell align="left" style={{ paddingLeft: 4 }}>
                       <Checkbox
                         checked={selectedDetails.length === filteredFreightDetails.length}
@@ -356,9 +363,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                     </TableCell>
                   )}
                   <TableCell>Description</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Quantity</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Currency</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Cost Value</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Quantity</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Currency</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
                   <TableCell align="left">Cost Unit</TableCell>
                   <TableCell>Total</TableCell>
                 </TableRow>

@@ -27,6 +27,7 @@ import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { set } from 'lodash/fp';
 import UserRecord from '../../contexts/UserRecordContext';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -104,6 +105,7 @@ interface IntermediateInfosProps {
 }
 
 const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, setBookingRequest, editing }) => {
+  const userRecord = useContext(UserRecordContext);
   const [isOriginIntermediary] = useState<boolean | undefined>(
     bookingRequest.schedule?.OriginInfo ? !!isIntermediary(bookingRequest.schedule?.OriginInfo) : undefined,
   );
@@ -131,7 +133,7 @@ const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, s
         <TableRowData
           label={isOriginIntermediary ? 'Port of Loading' : 'Port of Discharge'}
           content={
-            editing ? (
+            editing && isDashboardUser(userRecord) ? (
               <Box display="flex" flexDirection="column">
                 {bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName}
                 <TextField
@@ -155,7 +157,7 @@ const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, s
           <TableRowData
             label={index === 0 ? 'Port of Loading' : 'Port of Discharge'}
             content={
-              editing ? (
+              editing && isDashboardUser(userRecord) ? (
                 <Box display="flex" flexDirection="column">
                   {info.Port.HarbourName}
                   <TextField
@@ -190,6 +192,8 @@ interface ItineraryInfoProps {
 }
 
 const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookingRequest, editing }) => {
+  const userRecord = useContext(UserRecordContext);
+
   const handleChangeDepartureDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setBookingRequest &&
       setBookingRequest({
@@ -227,7 +231,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
               : 'Port of Loading'
           }
           content={
-            editing ? (
+            editing && isDashboardUser(userRecord) ? (
               <Box display="flex" flexDirection="column">
                 {bookingRequest.schedule?.OriginInfo.Port.HarbourName}
                 <TextField
@@ -260,7 +264,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
               : 'Port of Discharge'
           }
           content={
-            editing ? (
+            editing && isDashboardUser(userRecord) ? (
               <Box display="flex" flexDirection="column">
                 {bookingRequest.schedule?.DestinationInfo.Port.HarbourName}
                 <TextField

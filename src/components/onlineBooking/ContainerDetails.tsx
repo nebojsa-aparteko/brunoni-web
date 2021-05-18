@@ -389,31 +389,33 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     <Grid container spacing={4}>
       {editing ? (
         <Box p={1} display="flex" flexDirection="column">
-          <Grid container direction="column" spacing={1}>
-            <Grid item md={3} xs={12}>
-              <PortTermsInput
-                value={selectedPortTerm}
-                onChange={term => {
-                  handleTermChange(term);
-                }}
-                terms={filteredTerms}
-              />
+          {isDashboardUser(userRecord) && (
+            <Grid container direction="column" spacing={1}>
+              <Grid item md={3} xs={12}>
+                <PortTermsInput
+                  value={selectedPortTerm}
+                  onChange={term => {
+                    handleTermChange(term);
+                  }}
+                  terms={filteredTerms}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Delivery Address"
+                  variant="outlined"
+                  margin="dense"
+                  rows={5}
+                  multiline
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={deliveryAddress}
+                  onChange={event => handleAddressTextChange(event.target.value)}
+                  onBlur={event => handleAddressChange(event.target.value)}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Delivery Address"
-                variant="outlined"
-                margin="dense"
-                rows={5}
-                multiline
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={deliveryAddress}
-                onChange={event => handleAddressTextChange(event.target.value)}
-                onBlur={event => handleAddressChange(event.target.value)}
-              />
-            </Grid>
-          </Grid>
+          )}
           <ListInput
             listRef={listInput}
             addButtonRef={addButton}
