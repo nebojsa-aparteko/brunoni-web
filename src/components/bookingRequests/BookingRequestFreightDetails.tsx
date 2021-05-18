@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
-import { set, get } from 'lodash/fp';
+import { flow, get, set } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -16,6 +16,8 @@ import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+import { isDashboardUser } from '../../model/UserRecord';
+import UserRecordContext from '../../contexts/UserRecordContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -51,6 +53,7 @@ interface RowProps {
   freightDetail: FreightDetail;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
+  selectedTab: number;
 }
 
 const getUpdatedFreightDetails = (
@@ -62,7 +65,20 @@ const getUpdatedFreightDetails = (
   return (
     bookingRequest.freightDetails &&
     bookingRequest.freightDetails.map((detail: FreightDetail) =>
-      detail.SeqNr === pos ? set(field, value === '' ? undefined : value)(detail) : detail,
+      detail.SeqNr === pos
+        ? flow(
+            set(field, value === '' ? undefined : value),
+            set(
+              'Total',
+              detail.Anz && detail.UnitValue
+                ? (
+                    (field === 'Anz' ? parseFloat(value) : parseFloat(detail.Anz)) *
+                    (field === 'UnitValue' ? parseFloat(value) : parseFloat(detail.UnitValue))
+                  ).toFixed(2)
+                : '0.00',
+            ),
+          )(detail)
+        : detail,
     )
   );
 };
@@ -71,18 +87,22 @@ const getUpdatedFreightDetails = (
 const compareValues = (value1: string | undefined, value2: string | undefined) =>
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
-const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, selected, onSelectRow }) => {
+const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, selected, onSelectRow, selectedTab }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [quantity, setQuantity] = useState<string | undefined>(freightDetail.Anz);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
+  const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
+  const userRecord = useContext(UserRecordContext);
+
   useEffect(() => {
     setQuantity(freightDetail.Anz || '1.00');
     setCurrency(freightDetail.Currency);
     setUnitValue(freightDetail.UnitValue);
     setCostUnit(freightDetail.Unit);
+    setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
 
   const handleChangeFreightDetails = (value: string | undefined, fieldName: string) => {
@@ -99,7 +119,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
 
   return (
     <TableRow key={freightDetail.SeqNr} className={classes.tableRow}>
-      {editing && (
+      {editing && isDashboardUser(userRecord) && (
         <TableCell padding="checkbox">
           <Checkbox
             checked={selected}
@@ -110,19 +130,31 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         </TableCell>
       )}
       <TableCell component="th" scope="row">
-        {editing ? (
-          <ChargeCodeInput
-            chargeCodeText={freightDetail.Txt}
-            group={freightDetail.Group}
-            handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
-            margin="dense"
-          />
+        {editing && isDashboardUser(userRecord) ? (
+          selectedTab !== 2 ? (
+            <ChargeCodeInput
+              chargeCodeText={freightDetail.Txt}
+              group={freightDetail.Group}
+              handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
+              margin="dense"
+            />
+          ) : (
+            <TextField
+              label=""
+              margin="dense"
+              variant="outlined"
+              fullWidth
+              value={chargeCodeText || ''}
+              onChange={event => setChargeCodeText(event.target.value)}
+              onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
+            />
+          )
         ) : (
           freightDetail.Txt
         )}
       </TableCell>
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -137,7 +169,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -153,7 +185,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
       </TableCell>
       {freightDetail.Txt === 'Seafreight'}
       <TableCell align="right">
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -170,7 +202,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell>
-        {editing ? (
+        {editing && isDashboardUser(userRecord) ? (
           <TextField
             label=""
             margin="dense"
@@ -184,11 +216,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
           freightDetail.Unit
         )}
       </TableCell>
-      <TableCell>
-        {freightDetail.Total
-          ? ((quantity ? parseFloat(quantity) : 1) * parseFloat(freightDetail.Total.replace(',', ''))).toFixed(2)
-          : '0.00'}
-      </TableCell>
+      <TableCell>{freightDetail.Total || '0.00'}</TableCell>
     </TableRow>
   );
 };
@@ -203,15 +231,6 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   return pos + '';
 };
 
-// const getFilteredQuoteDetails = (quoteDetails: QuoteDetail[], selectedTab: number) => {
-//   switch (selectedTab) {
-//     case 0:
-//       return quoteDetails;
-//     case 1:
-//       return quoteDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1);
-//   }
-// };
-
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
@@ -219,6 +238,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
+  const userRecord = useContext(UserRecordContext);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     event.stopPropagation();
@@ -228,11 +248,16 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   useEffect(() => {
     switch (selectedTab) {
       case 0:
-        freightDetails && setFilteredFreightDetails(freightDetails);
+        freightDetails &&
+          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2));
         break;
       case 1:
         freightDetails &&
           setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
+        break;
+      case 2:
+        freightDetails &&
+          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL2));
         break;
     }
   }, [selectedTab, freightDetails, setFilteredFreightDetails, bookingRequest]);
@@ -266,7 +291,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           (freightDetails || []).concat({
             SeqNr: freightDetails ? findNextPos(freightDetails) : '0',
             Anz: '1.00',
-            Txt: (chargeCodes && chargeCodes[0].text) || '',
+            Txt: (selectedTab !== 2 ? chargeCodes && chargeCodes[0].text : '') || '',
             Currency: 'USD',
             UnitValue: '0.00',
             Unit: '',
@@ -299,14 +324,16 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     <Fragment>
       <Grid item xs={12}>
         <TableContainer component={Paper} className={classes.tableWrapper}>
-          <AppBar position="static">
-            <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
-              <Tab label="External" {...a11yProps(0)} />
-              <Tab label="Internal 1" {...a11yProps(1)} />
-              {/*<Tab label="Internal 2" {...a11yProps(2)} />*/}
-            </Tabs>
-          </AppBar>
-          {editing && (
+          {isDashboardUser(userRecord) && (
+            <AppBar position="static">
+              <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
+                <Tab label="External" {...a11yProps(0)} />
+                <Tab label="Internal 1" {...a11yProps(1)} />
+                <Tab label="Internal 2" {...a11yProps(2)} />
+              </Tabs>
+            </AppBar>
+          )}
+          {editing && isDashboardUser(userRecord) && (
             <EnhancedTableToolbar
               numSelected={selectedDetails.length}
               handleAdd={onAdd}
@@ -325,7 +352,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
             <Table className={classes.table} size="small">
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
-                  {editing && (
+                  {editing && isDashboardUser(userRecord) && (
                     <TableCell align="left" style={{ paddingLeft: 4 }}>
                       <Checkbox
                         checked={selectedDetails.length === filteredFreightDetails.length}
@@ -336,9 +363,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                     </TableCell>
                   )}
                   <TableCell>Description</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Quantity</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Currency</TableCell>
-                  <TableCell align={editing ? 'left' : 'right'}>Cost Value</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Quantity</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Currency</TableCell>
+                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
                   <TableCell align="left">Cost Unit</TableCell>
                   <TableCell>Total</TableCell>
                 </TableRow>
@@ -349,6 +376,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                     freightDetail={freightDetail}
                     selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
                     onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
+                    selectedTab={selectedTab}
                   />
                 ))}
               </TableBody>

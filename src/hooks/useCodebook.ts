@@ -13,28 +13,32 @@ export default function useCodebook({
   equipment,
   port,
 }: {
-  category: BookingCategory;
-  depotLocation: string;
-  carrier: string;
-  port: string;
-  equipment: string;
+  category?: BookingCategory;
+  depotLocation?: string;
+  carrier?: string;
+  port?: string;
+  equipment?: string;
 }) {
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let q = collection.where('depotLocations', 'array-contains', depotLocation);
-      q = q.where('category', '==', category);
-      q = q.where('carrierId', '==', carrier);
+      let q = collection.where('depotLocations', 'array-contains', depotLocation || '');
+      q = q.where('category', '==', category || '');
+      q = q.where('carrierId', '==', carrier || '');
       return q;
     },
     [depotLocation, category, carrier],
   );
   const codeBookCollection = useFirestoreCollection('brunoni-codes', query);
+
+  if (!depotLocation)
+    return { storage: [] as BrunoniCodes[], demurrage: [] as BrunoniCodes[], plugin: [] as BrunoniCodes[] };
+
   return codeBookCollection?.docs
     .map(d => normalizeCodebook(d.data()) as BrunoniCodes)
     .filter(
       value =>
-        (value.ports ? value.ports.includes(port) : true) &&
-        (value.equipments ? value.equipments.includes(equipment) : true),
+        (port && value.ports ? value.ports.includes(port) : true) &&
+        (equipment && value.equipments ? value.equipments.includes(equipment) : true),
     )
     .reduce(
       (previousValue, currentValue) => {

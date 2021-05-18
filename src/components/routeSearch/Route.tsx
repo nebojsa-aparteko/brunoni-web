@@ -215,12 +215,21 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
                           open={Boolean(moreAnchorEl)}
                           onClose={handleClose}
                         >
-                          <MenuItem component="a" href={buildMailToLink(route)} target="_blank">
-                            <ListItemIcon>
-                              <DirectionsBoatIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText primary="Book Now" />
-                          </MenuItem>
+                          {handleBookNow ? (
+                            <MenuItem onClick={() => handleBookNow(route)}>
+                              <ListItemIcon>
+                                <DirectionsBoatIcon fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary="Book Now" />
+                            </MenuItem>
+                          ) : (
+                            <MenuItem component="a" href={buildMailToLink(route)} target="_blank">
+                              <ListItemIcon>
+                                <DirectionsBoatIcon fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary="Book Now" />
+                            </MenuItem>
+                          )}
                           <MenuItem component={RouterLink} to={`/quotes/get`}>
                             <ListItemIcon>
                               <ListAltIcon fontSize="small" />

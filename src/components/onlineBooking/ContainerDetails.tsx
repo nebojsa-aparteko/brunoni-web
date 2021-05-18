@@ -23,7 +23,7 @@ import PickupLocation from '../../model/PickupLocation';
 import OOG from '../../model/OOG';
 import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
-import ContainerInput, { isContainerSO } from '../inputs/ContainerInput';
+import ContainerInput, { isContainerSO, isReefer } from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
@@ -33,6 +33,7 @@ import PortTerms from '../../contexts/PortTerms';
 import PortTerm from '../../model/PortTerm';
 import AcUnitIcon from '@material-ui/icons/AcUnit';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
+import { Tariff, Ventilation } from '../../model/Container';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -84,15 +85,24 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
           <TableCell className={classes.tableCell}>
             <Box display="flex" flexDirection="column">
-              {oogItem.width && <Typography>{`Max Width: ${oogItem.width} cm`}</Typography>}
-              {oogItem.diffWidth && <Typography variant="body2">{`OW: ${oogItem.diffWidth} cm`}</Typography>}
-              {oogItem.height && <Typography>{`Max Height: ${oogItem.height} cm`}</Typography>}
-              {oogItem.diffHeight && <Typography variant="body2">{`OH: ${oogItem.diffHeight} cm`}</Typography>}
-              {oogItem.length && <Typography>{`Max Length: ${oogItem.length} cm`}</Typography>}
-              {oogItem.diffLength && <Typography variant="body2">{`OL: ${oogItem.diffLength} cm`}</Typography>}
-              {oogItem.weight && <Typography>{`Max Weight: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
-              {oogItem.diffWeight && (
-                <Typography variant="body2">{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
+              {oogItem.diffLength && parseFloat(oogItem.diffLength) !== 0 && (
+                <Typography>{`OL: ${parseFloat(oogItem.diffLength)} cm`}</Typography>
+              )}
+              {oogItem.diffWidth && parseFloat(oogItem.diffWidth) !== 0 && (
+                <Typography>{`OW: ${parseFloat(oogItem.diffWidth)} cm`}</Typography>
+              )}
+              {oogItem.diffHeight && parseFloat(oogItem.diffHeight) !== 0 && (
+                <Typography>{`OH: ${parseFloat(oogItem.diffHeight)} cm`}</Typography>
+              )}
+              {oogItem.diffWeight && parseFloat(oogItem.diffWeight) !== 0 && (
+                <Typography>{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
+              )}
+              {(oogItem.width || oogItem.height || oogItem.length || oogItem.weight) && (
+                <Typography variant="body2">
+                  {`Max: ${oogItem.length}${oogItem.length && oogItem.width ? 'x' : ''}${oogItem.width}${
+                    (oogItem.length || oogItem.width) && oogItem.height ? 'x' : ''
+                  }${oogItem.height} cm${oogItem.weight && ' - ' + oogItem.weight + ' Kgs'}`}
+                </Typography>
               )}
             </Box>
           </TableCell>
@@ -194,7 +204,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
                 label={'Temperature'}
                 content={
                   <Box display="flex" flexDirection="row">
-                    <Typography>{container.temperature.toString() + ' °C'}</Typography>
+                    <Typography>
+                      {(parseFloat(container.temperature) > 0
+                        ? '+' + container.temperature
+                        : container.temperature
+                      ).toString() + ' °C'}
+                    </Typography>
                     {container.temperature !== undefined &&
                       (container.temperature < 0 ? (
                         <AcUnitIcon htmlColor={'#8bddff'} className={classes.tempIcon} />
@@ -213,6 +228,31 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {container.imo && container.imo.length > 0 && <IMCODetails container={container} />}
 
             {container.oog && container.oog.length > 0 && <OverdimensionDetails container={container} />}
+
+            {container.demDetTariffs && (
+              <TableRowData
+                label={'Dem./Det. tariffs'}
+                content={container.demDetTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
+            {container.storageTariffs && (
+              <TableRowData
+                label={'Storage tariffs'}
+                content={container.storageTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
+            {container.pluginTariffs && (
+              <TableRowData
+                label={'Plug-in tariffs'}
+                content={container.pluginTariffs
+                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .join('<br/><br/>')}
+              />
+            )}
           </TableBody>
         </Table>
       </Grid>
@@ -293,6 +333,9 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     const writableContainers = value?.map(container => {
       return {
         ...container,
+        ventilation: isReefer(container.containerType)
+          ? container.ventilation || Ventilation.CLOSED
+          : container.ventilation,
         imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
         oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
         pickupDate: isContainerSO(container) ? undefined : container.pickupDate ? container.pickupDate : new Date(),
@@ -346,31 +389,33 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     <Grid container spacing={4}>
       {editing ? (
         <Box p={1} display="flex" flexDirection="column">
-          <Grid container direction="column" spacing={1}>
-            <Grid item md={3} xs={12}>
-              <PortTermsInput
-                value={selectedPortTerm}
-                onChange={term => {
-                  handleTermChange(term);
-                }}
-                terms={filteredTerms}
-              />
+          {isDashboardUser(userRecord) && (
+            <Grid container direction="column" spacing={1}>
+              <Grid item md={3} xs={12}>
+                <PortTermsInput
+                  value={selectedPortTerm}
+                  onChange={term => {
+                    handleTermChange(term);
+                  }}
+                  terms={filteredTerms}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Delivery Address"
+                  variant="outlined"
+                  margin="dense"
+                  rows={5}
+                  multiline
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={deliveryAddress}
+                  onChange={event => handleAddressTextChange(event.target.value)}
+                  onBlur={event => handleAddressChange(event.target.value)}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Delivery Address"
-                variant="outlined"
-                margin="dense"
-                rows={5}
-                multiline
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={deliveryAddress}
-                onChange={event => handleAddressTextChange(event.target.value)}
-                onBlur={event => handleAddressChange(event.target.value)}
-              />
-            </Grid>
-          </Grid>
+          )}
           <ListInput
             listRef={listInput}
             addButtonRef={addButton}

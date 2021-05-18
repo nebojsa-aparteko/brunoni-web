@@ -28,7 +28,10 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                 {container.pickupLocation &&
                   `${container.pickupLocation?.name}, ${container.pickupLocation?.city}, ${container.pickupLocation?.countryCode}`}
                 {container.pickupDate && ` - ${formatDateSafe(container.pickupDate as Date, DateFormats.LONG)}`}
-                {container.temperature && `, Temp: ${container.temperature} °C`}
+                {container.temperature &&
+                  `, Temp: ${
+                    parseFloat(container.temperature) > 0 ? '+' + container.temperature : container.temperature
+                  } °C`}
                 {container.temperature && (container.humidity || container.ventilation) ? ', ' : null}
                 {container.humidity && `Humidity: ${container.humidity}%`}
                 {(container.temperature || container.humidity) && container.ventilation ? ', ' : null}

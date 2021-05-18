@@ -15,7 +15,7 @@ import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
 import { Grid, IconButton, InputAdornment, makeStyles, TextField, Theme } from '@material-ui/core';
 import InputProps from '../../model/InputProps';
-import Container, { Ventilation } from '../../model/Container';
+import Container, { Tariff, Ventilation } from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
 import CommodityTypeInput from './CommodityTypeInput';
 import QuantityInput from './QuantityInput';
@@ -38,6 +38,12 @@ import LinkOffIcon from '@material-ui/icons/LinkOff';
 import AcUnitIcon from '@material-ui/icons/AcUnit';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import VentilationInput from './VentilationInput';
+import useCodebook from '../../hooks/useCodebook';
+import { BookingCategory } from '../../model/Booking';
+import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import Typography from '@material-ui/core/Typography';
+import TariffsInput from './TariffInput';
+import BrunoniCodes from '../../model/BrunoniCodes';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -96,6 +102,12 @@ const defaultOOGItem: OOG = {
   weight: '',
 };
 
+export interface Codebook {
+  storage: BrunoniCodes[];
+  demurrage: BrunoniCodes[];
+  plugin: BrunoniCodes[];
+}
+
 export const isReefer = (containerType: ContainerType) => containerType?.id === '45R1' || containerType?.id === '22R1';
 
 export const isContainerSO = (container: Container & ContainerDetails) =>
@@ -114,6 +126,15 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
   const [container, setContainer] = useState<Container & ContainerDetails>(value);
   const [temperatureFocused, setTemperatureFocused] = useState<boolean>(false);
+  const [bookingRequest] = useBookingRequestContext();
+
+  const tariffs = useCodebook({
+    depotLocation: container.pickupLocation?.id,
+    carrier: bookingRequest?.carrier?.id,
+    port: bookingRequest?.schedule?.DestinationInfo.Port.ID,
+    category: BookingCategory.Export,
+    equipment: container.containerType?.id,
+  }) as Codebook;
 
   useEffect(() => {
     setContainer(value);
@@ -255,6 +276,18 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         }
       : { ...container, vgmPin: v }) as Container & ContainerDetails;
     onChange(newValue);
+  };
+
+  const handleChangeDemDetTariffs = (newTariffs: Tariff[]) => {
+    onChange({ ...container, demDetTariffs: newTariffs });
+  };
+
+  const handleChangeStorageTariffs = (newTariffs: Tariff[]) => {
+    onChange({ ...container, storageTariffs: newTariffs });
+  };
+
+  const handleChangePluginTariffs = (newTariffs: Tariff[]) => {
+    onChange({ ...container, pluginTariffs: newTariffs });
   };
 
   return (
@@ -407,6 +440,39 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
                   </IconButton>
                 </Grid>
+                {tariffs && tariffs.demurrage && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeDemDetTariffs}
+                      availableTariffs={tariffs.demurrage}
+                      tariffs={container.demDetTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.storage && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Storage tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeStorageTariffs}
+                      availableTariffs={tariffs.storage}
+                      tariffs={container.storageTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.plugin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Plug-in tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangePluginTariffs}
+                      availableTariffs={tariffs.plugin}
+                      tariffs={container.pluginTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
               </React.Fragment>
             )}
           </>
