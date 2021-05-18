@@ -6,7 +6,7 @@ import ContainerDetails from '../../model/ContainerDetails';
 import { isNil, omitBy } from 'lodash/fp';
 import { Button, Grid } from '@material-ui/core';
 import ListInput from '../inputs/ListInput';
-import ContainerInput, { isReefer } from '../inputs/ContainerInput';
+import ContainerInput, { isContainerSO, isReefer } from '../inputs/ContainerInput';
 import { useFormContext } from 'react-hook-form';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
@@ -56,8 +56,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
       containers.length > 0 &&
       containers.every(
         container =>
-          container.pickupLocation &&
-          container.pickupDate &&
+          (isContainerSO(container) ? true : container.pickupLocation && container.pickupDate) &&
           container.quantity &&
           container.containerType &&
           container.commodityType &&
@@ -72,8 +71,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         containers.length > 0 &&
         containers.every(
           container =>
-            container.pickupLocation &&
-            container.pickupDate &&
+            (isContainerSO(container) ? true : container.pickupLocation && container.pickupDate) &&
             container.quantity &&
             container.containerType &&
             container.commodityType &&
@@ -89,7 +87,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         ...container,
         imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
         oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
-        pickupDate: container.pickupDate ? container.pickupDate : new Date(),
+        pickupDate: isContainerSO(container) ? null : container.pickupDate ? container.pickupDate : new Date(),
       };
     });
 
