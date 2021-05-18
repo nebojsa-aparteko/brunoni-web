@@ -85,15 +85,24 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
           <TableCell className={classes.tableCell}>
             <Box display="flex" flexDirection="column">
-              {oogItem.width && <Typography>{`Max Width: ${oogItem.width} cm`}</Typography>}
-              {oogItem.diffWidth && <Typography variant="body2">{`OW: ${oogItem.diffWidth} cm`}</Typography>}
-              {oogItem.height && <Typography>{`Max Height: ${oogItem.height} cm`}</Typography>}
-              {oogItem.diffHeight && <Typography variant="body2">{`OH: ${oogItem.diffHeight} cm`}</Typography>}
-              {oogItem.length && <Typography>{`Max Length: ${oogItem.length} cm`}</Typography>}
-              {oogItem.diffLength && <Typography variant="body2">{`OL: ${oogItem.diffLength} cm`}</Typography>}
-              {oogItem.weight && <Typography>{`Max Weight: ${parseFloat(oogItem.weight).toFixed(2)} KGS`}</Typography>}
-              {oogItem.diffWeight && (
-                <Typography variant="body2">{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
+              {oogItem.diffLength && parseFloat(oogItem.diffLength) !== 0 && (
+                <Typography>{`OL: ${parseFloat(oogItem.diffLength)} cm`}</Typography>
+              )}
+              {oogItem.diffWidth && parseFloat(oogItem.diffWidth) !== 0 && (
+                <Typography>{`OW: ${parseFloat(oogItem.diffWidth)} cm`}</Typography>
+              )}
+              {oogItem.diffHeight && parseFloat(oogItem.diffHeight) !== 0 && (
+                <Typography>{`OH: ${parseFloat(oogItem.diffHeight)} cm`}</Typography>
+              )}
+              {oogItem.diffWeight && parseFloat(oogItem.diffWeight) !== 0 && (
+                <Typography>{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
+              )}
+              {(oogItem.width || oogItem.height || oogItem.length || oogItem.weight) && (
+                <Typography variant="body2">
+                  {`Max: ${oogItem.length}${oogItem.length && oogItem.width ? 'x' : ''}${oogItem.width}${
+                    (oogItem.length || oogItem.width) && oogItem.height ? 'x' : ''
+                  }${oogItem.height} cm${oogItem.weight && ' - ' + oogItem.weight + ' Kgs'}`}
+                </Typography>
               )}
             </Box>
           </TableCell>
