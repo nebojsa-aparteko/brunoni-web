@@ -23,7 +23,7 @@ import PickupLocation from '../../model/PickupLocation';
 import OOG from '../../model/OOG';
 import IMO from '../../model/IMO';
 import { TableRowData } from '../bookingRequests/BookingRequestSummary';
-import ContainerInput, { isContainerSO } from '../inputs/ContainerInput';
+import ContainerInput, { isContainerSO, isReefer } from '../inputs/ContainerInput';
 import ListInput from '../inputs/ListInput';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
@@ -33,7 +33,7 @@ import PortTerms from '../../contexts/PortTerms';
 import PortTerm from '../../model/PortTerm';
 import AcUnitIcon from '@material-ui/icons/AcUnit';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
-import { Tariff } from '../../model/Container';
+import { Tariff, Ventilation } from '../../model/Container';
 
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
@@ -319,6 +319,9 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
     const writableContainers = value?.map(container => {
       return {
         ...container,
+        ventilation: isReefer(container.containerType)
+          ? container.ventilation || Ventilation.CLOSED
+          : container.ventilation,
         imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
         oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
         pickupDate: isContainerSO(container) ? undefined : container.pickupDate ? container.pickupDate : new Date(),
