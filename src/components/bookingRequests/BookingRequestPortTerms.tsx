@@ -100,7 +100,17 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
                 style={{ display: 'flex', flexDirection: 'row' }}
               >
                 <FormControlLabel value="client" control={<Radio />} label="Client" />
-                <FormControlLabel value="admin" control={<Radio />} label="Admin" />
+                <FormControlLabel
+                  value="admin"
+                  control={<Radio />}
+                  label={
+                    process.env.REACT_APP_BRAND === 'brunoni'
+                      ? 'Brunoni'
+                      : process.env.REACT_APP_BRAND === 'allmarine'
+                      ? 'Allmarine'
+                      : 'Admin'
+                  }
+                />
               </RadioGroup>
             ) : (
               VGMSubmissionValue || 'Undefined'
