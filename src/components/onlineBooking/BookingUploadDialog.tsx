@@ -14,7 +14,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 
 import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
 import useUser from '../../hooks/useUser';
@@ -31,7 +31,7 @@ import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
-import { isNil, omitBy } from 'lodash/fp';
+import { isNil, omitBy, pick } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -45,8 +45,6 @@ import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemM
 import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
 import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
-import { useClientById } from '../../hooks/useClient';
-import Client from '../../model/Client';
 import MissingFields from './MissingFields';
 
 const useStyles = makeStyles(theme =>
@@ -196,7 +194,7 @@ const matchAndFetchSchedule = async (
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
   user: UserRecord,
-  client: Client,
+  client: UserRecordMin,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
@@ -210,7 +208,6 @@ const mapIntoBookingRequestModel = async (
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
   const inttraId = object.BOOKER_INTTRA_ID;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
-  const vgmSubmittedBy = client ? client.name + (client.name && client.city && ', ') + client.city : undefined;
 
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
@@ -237,7 +234,7 @@ const mapIntoBookingRequestModel = async (
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,
-    vgmSubmittedBy,
+    vgmSubmittedBy: client,
   } as BookingRequest;
 
   return bookingRequest;
@@ -250,7 +247,7 @@ export const readAndParseFile = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
   user: UserRecord,
-  client: Client,
+  client: UserRecordMin,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
@@ -307,8 +304,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const history = useHistory();
 
   const [, userRecord] = useUser();
-  //user ? pick(UserRecordMinProperties)(user) : null,
-  const client = useClientById(userRecord.alphacomClientId);
+  const client = pick(UserRecordMinProperties)(userRecord) as UserRecordMin;
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
