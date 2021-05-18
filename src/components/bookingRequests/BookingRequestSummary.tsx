@@ -154,6 +154,7 @@ const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, s
         bookingRequest.schedule?.IntermediatePortInfos.map((info, index) => (
           <TableRowData
             label={index === 0 ? 'Port of Loading' : 'Port of Discharge'}
+            key={index}
             content={
               editing ? (
                 <Box display="flex" flexDirection="column">

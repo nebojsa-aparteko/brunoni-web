@@ -45,6 +45,9 @@ import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemM
 import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
 import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
+import { useClientById } from '../../hooks/useClient';
+import Client from '../../model/Client';
+import MissingFields from './MissingFields';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -143,6 +146,10 @@ const getContainers = (
   return containers;
 };
 
+const validScheduleSearch = (search: RouteSearchParams) => {
+  return search.carrier && search.originPort && search.destinationPort && search.date;
+};
+
 const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: string): Promise<RouteSearchResults> => {
   const queryObject = {
     origin: scheduleSearchParams?.originPort?.id,
@@ -163,9 +170,13 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
 const matchAndFetchSchedule = async (
   scheduleSearchParams: RouteSearchParams,
   object: HtmlBookingRequest,
-): Promise<RouteSearchResult[]> => {
+): Promise<RouteSearchResult[] | undefined> => {
+  // return undefined if params are not valid
+  if (!validScheduleSearch(scheduleSearchParams)) return;
+
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
+
   let schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
   // only filter more if more than 1
   if (schedules.length > 1)
@@ -185,17 +196,21 @@ const matchAndFetchSchedule = async (
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
   user: UserRecord,
+  client: Client,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
 ): Promise<BookingRequest> => {
-  const inttraId = Number(object.BOOKER_INTTRA_ID);
-  const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
-  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
+  const agreementNo = object.CONTRACT_NUMBER;
+  const customerReference = object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS[0];
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
+  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
+  const inttraId = object.BOOKER_INTTRA_ID;
+  const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
+  const vgmSubmittedBy = client ? client.name + (client.name && client.city && ', ') + client.city : undefined;
 
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
@@ -207,21 +222,23 @@ const mapIntoBookingRequestModel = async (
   } as RouteSearchParams;
 
   const schedules = await matchAndFetchSchedule(scheduleSearchParams, object);
+  const schedule = schedules?.length === 1 ? schedules?.[0] : undefined;
 
-  const schedule = schedules.length === 1 ? schedules[0] : undefined;
-
-  const bookingRequest = omitBy(isNil)({
+  const bookingRequest = {
+    agreementNo,
     archived: false,
     carrier,
     containers,
     createdAt: new Date(),
     createdBy: user,
+    customerReference,
     destination,
     inttraId,
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,
-  }) as BookingRequest;
+    vgmSubmittedBy,
+  } as BookingRequest;
 
   return bookingRequest;
 };
@@ -233,6 +250,7 @@ export const readAndParseFile = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
   user: UserRecord,
+  client: Client,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
@@ -249,6 +267,7 @@ export const readAndParseFile = (
       const object = Parse(reader.result as string) as HtmlBookingRequest;
       // throw error of no object
       if (!object) {
+        setBookingRequest(undefined);
         setLoading(false);
         return dispatch({
           type: 'SHOW_ERROR_SNACKBAR',
@@ -257,16 +276,18 @@ export const readAndParseFile = (
         });
       }
       // Create booking request
-      const bookingRequest = (await mapIntoBookingRequestModel(
+      let bookingRequest = await mapIntoBookingRequestModel(
         object,
         user,
+        client,
         ports,
         carriers,
         containerTypes,
         commodityTypes,
         pickupLocations,
-      )) as BookingRequest;
-
+      );
+      // remove undefined fields
+      bookingRequest = omitBy(isNil)(bookingRequest) as BookingRequest;
       setFiles([file]);
       setBookingRequest(bookingRequest);
       setLoading(false);
@@ -286,6 +307,8 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const history = useHistory();
 
   const [, userRecord] = useUser();
+  //user ? pick(UserRecordMinProperties)(user) : null,
+  const client = useClientById(userRecord.alphacomClientId);
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
@@ -295,7 +318,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (!acceptedFiles.every(file => ['html'].includes(file.name.split('.').pop() || ''))) {
-        return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'File(s) must be .html format' });
+        return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'File must be of .html format' });
       }
       acceptedFiles.forEach(file => {
         readAndParseFile(
@@ -305,6 +328,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           setLoading,
           setFiles,
           userRecord,
+          client,
           ports,
           carriers,
           containerTypes,
@@ -313,12 +337,12 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         );
       });
     },
-    [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
+    [carriers, client, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
   );
 
   const storageBasePath = useMemo((): string => {
     return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
-  }, [bookingRequest?.id]);
+  }, [bookingRequest]);
 
   const saveFiles = useCallback(
     async (files: File[]): Promise<any> => {
@@ -420,14 +444,18 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               acceptedFiles={['.html']}
               showPreviews={!!bookingRequest}
               showPreviewsInDropzone={false}
+              showAlerts={['error']}
               useChipsForPreview
               filesLimit={1}
-              alertSnackbarProps={{ autoHideDuration: 0 }}
+              dropzoneProps={{ disabled: loading }}
+              alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
               previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
               previewText="Selected files"
               onDrop={onDrop}
-              onDelete={() => setBookingRequest(undefined)}
+              onDelete={() => {
+                setBookingRequest(undefined);
+              }}
             />
             <Typography variant="caption">Hint: You can drag & drop HTML booking file over input.</Typography>
             <Box display="flex">
@@ -447,6 +475,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                 <span style={{ visibility: loading ? 'hidden' : 'visible' }}>Save Booking</span>
               </Button>
             </Box>
+            {bookingRequest && <MissingFields bookingRequest={bookingRequest} />}
           </Box>
         </DialogContent>
       </Box>

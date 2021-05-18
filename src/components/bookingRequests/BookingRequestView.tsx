@@ -62,6 +62,7 @@ import { BookingCategory } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
+import MissingFields from '../onlineBooking/MissingFields';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -255,7 +256,6 @@ function ScrollToTopOnMount() {
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-
   const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -332,7 +332,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setEditing(false);
   };
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     const br = { ...bookingRequestState } as BookingRequest;
     omitEmptyDeep(br);
     setEditing(false);
@@ -356,7 +356,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         });
     }
-  };
+  }, [bookingRequestState, dispatch, enqueueSnackbar, setEditing]);
 
   useEffect(() => {
     editing && Mousetrap.bind(['command+shift+s', 'ctrl+shift+s'], () => handleSave());
@@ -423,6 +423,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
+          <MissingFields bookingRequest={bookingRequest} />
           {bookingRequest.additionalInfo && (
             <Paper className={classes.additionalInfo}>
               <Typography variant="h4" gutterBottom>
