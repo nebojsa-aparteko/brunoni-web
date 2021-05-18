@@ -195,7 +195,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
                 label={'Temperature'}
                 content={
                   <Box display="flex" flexDirection="row">
-                    <Typography>{container.temperature.toString() + ' °C'}</Typography>
+                    <Typography>
+                      {(parseFloat(container.temperature) > 0
+                        ? '+' + container.temperature
+                        : container.temperature
+                      ).toString() + ' °C'}
+                    </Typography>
                     {container.temperature !== undefined &&
                       (container.temperature < 0 ? (
                         <AcUnitIcon htmlColor={'#8bddff'} className={classes.tempIcon} />
