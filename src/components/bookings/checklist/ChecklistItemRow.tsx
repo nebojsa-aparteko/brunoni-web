@@ -10,8 +10,10 @@ import {
   LinearProgress,
   makeStyles,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
+import EmailIcon from '@material-ui/icons/Email';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import {
@@ -44,6 +46,7 @@ import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 import { MentionItem } from 'react-mentions';
+import SendEmailDialog from './SendEmailDialog';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) =>
@@ -217,6 +220,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -658,6 +662,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
             </IconButton>
+            <Tooltip title="Send email" placement={'top'}>
+              <IconButton size="small" aria-label="send email" onClick={() => setEmailDialogOpen(true)}>
+                <EmailIcon />
+              </IconButton>
+            </Tooltip>
+            <SendEmailDialog booking={booking} setDialogOpen={setEmailDialogOpen} dialogOpen={emailDialogOpen} />
           </Box>
         </Box>
         {!isAdmin &&
