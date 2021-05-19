@@ -20,19 +20,33 @@ const globalReducer: Reducer<GlobalAppState, globalActions> = (prevState = defau
     case SHOW_SUCCESS_SNACKBAR:
       return {
         ...prevState,
-        snackbarMessage: action.message,
-        snackbarType: 'success',
-        snackbarDuration: action.duration,
+        snackbarMessage: {
+          message: action.message,
+          at: new Date(),
+          snackbarDuration: action.duration,
+          snackbarType: 'success',
+        },
       };
     case SHOW_ERROR_SNACKBAR:
       return {
         ...prevState,
-        snackbarMessage: action.message,
-        snackbarType: 'error',
-        snackbarDuration: action.duration,
+        snackbarMessage: {
+          message: action.message,
+          at: new Date(),
+          snackbarDuration: action.duration,
+          snackbarType: 'error',
+        },
       };
     case SHOW_INFO_SNACKBAR:
-      return { ...prevState, snackbarMessage: action.message, snackbarType: 'info', snackbarDuration: action.duration };
+      return {
+        ...prevState,
+        snackbarMessage: {
+          message: action.message,
+          at: new Date(),
+          snackbarDuration: action.duration,
+          snackbarType: 'info',
+        },
+      };
     case SAVED_ACTION_SNACKBAR:
       return { ...prevState, promiseActivity: action.storeToFirebase };
     default:

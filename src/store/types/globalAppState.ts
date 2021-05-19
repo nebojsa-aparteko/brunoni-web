@@ -34,10 +34,15 @@ export interface PromiseAction {
 
 export interface GlobalAppState {
   isGlobalLoadingInProgress: boolean;
-  snackbarMessage?: string;
+  snackbarMessage?: SnackbarMessage;
+  promiseActivity?: () => Promise<any>;
+}
+
+interface SnackbarMessage {
+  message: string;
   snackbarDuration?: number;
   snackbarType?: 'error' | 'success' | 'info';
-  promiseActivity?: () => Promise<any>;
+  at: Date;
 }
 
 export type globalActions =
