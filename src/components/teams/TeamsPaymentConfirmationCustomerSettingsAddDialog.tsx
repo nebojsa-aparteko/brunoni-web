@@ -89,6 +89,7 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
       statisticClient: selectedStatisticsClient,
       automaticMessage: true,
       type: PaymentConfirmationType.CUSTOMER_SETTINGS,
+      createdAt: firebase.firestore.Timestamp.now(),
     };
 
     try {

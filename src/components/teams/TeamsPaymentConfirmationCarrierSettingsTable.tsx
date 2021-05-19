@@ -16,7 +16,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import TeamPaymentConfirmationCarrierSettingsRow from './TeamsPaymentConfirmationCarrierSettingsRow';
 import { useSnackbar } from 'notistack';
 import TeamsPaymentConfirmationCarrierSettingsAddDialog from './TeamsPaymentConfirmationCarrierSettingsAddDialog';
-import { PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { CarrierSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -67,22 +67,47 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
     try {
       selectedPaymentConfirmations.map(paymentConfirmationId => deletePaymentConfirmation(paymentConfirmationId));
 
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       setIsConfirmationDialogOpen(false);
       setSelectedPaymentConfirmations([]);
       enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
         variant: 'success',
         autoHideDuration: 2000,
       });
-
-      dispatch({ type: 'STOP_GLOBAL_LOADING' });
     } catch (error) {
       console.error(error);
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });
     }
   }, [dispatch, enqueueSnackbar, selectedPaymentConfirmations]);
+
+  const handleCopy = useCallback(
+    async (id: string) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      const collectionRef = firebase.firestore().collection('payment-confirmation-config');
+      try {
+        const exitingPaymentConfirmation = await collectionRef.doc(id).get();
+        const dataCopy = exitingPaymentConfirmation.data() as CarrierSettingsRule;
+        if (exitingPaymentConfirmation) {
+          const ref = collectionRef.doc();
+          const createdAt = firebase.firestore.Timestamp.now();
+          await ref.set({ ...dataCopy, id: ref.id, createdAt });
+        }
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      } catch (error) {
+        console.error(error);
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
 
   return (
     <>
@@ -96,14 +121,12 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
             handleDelete={() => setIsConfirmationDialogOpen(true)}
             labelWhenSelected={
               selectedPaymentConfirmations.length === 1
-                ? `${selectedPaymentConfirmations.length} carrier setting selected`
-                : `${selectedPaymentConfirmations.length} carrier settings selected`
+                ? `${selectedPaymentConfirmations.length} setting selected`
+                : `${selectedPaymentConfirmations.length} settings selected`
             }
             labelWhenNotSelected={''}
             addButtonLabel={'Add carrier setting'}
-            deleteButtonLabel={
-              selectedPaymentConfirmations.length === 1 ? `Delete carrier setting` : `Delete carrier settings`
-            }
+            deleteButtonLabel={selectedPaymentConfirmations.length === 1 ? `Delete setting` : `Delete settings`}
           />
           <Table aria-label="a dense table">
             <colgroup>
@@ -142,6 +165,7 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
                     paymentConfirmation.id ? selectedPaymentConfirmations.includes(paymentConfirmation.id) : false
                   }
                   onSelectRow={event => paymentConfirmation.id && onSelectRow(event, paymentConfirmation.id)}
+                  onCopy={handleCopy}
                 />
               ))}
             </TableBody>
@@ -157,8 +181,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
         label={'Please confirm deletion'}
         handleConfirm={handleDeletePaymentConfirmations}
         handleClose={() => setIsConfirmationDialogOpen(false)}
-        description={`Are you sure you want remove this selected
-          carrier setting${selectedPaymentConfirmations.length > 1 ? 's' : ''}?`}
+        description={`Are you sure you want remove this selected setting${
+          selectedPaymentConfirmations.length > 1 ? 's' : ''
+        }?`}
       />
     </>
   );
