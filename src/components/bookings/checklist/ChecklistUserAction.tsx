@@ -13,6 +13,8 @@ const getFormLink = (carrierId: any): string => {
       return 'http://www.hmm21.com/cms/business/ebiz/export/vgmWithoutLogin/index.jsp';
     case CarrierId.MACS:
       return 'https://www.macship.com/E-BUSINESS/SolasAccess.aspx';
+    case CarrierId.HUGO_STINNES:
+      return 'https://www.macship.com/E-BUSINESS/SolasAccess.aspx';
     case CarrierId.ZIM:
       return 'https://www.zim.com/tools/solas-vgm';
     case CarrierId.DEUTSCHE_AFRIKA:

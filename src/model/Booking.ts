@@ -291,6 +291,7 @@ export enum CarrierId {
   MACS = 'MACS',
   ZIM = 'ZIM',
   DEUTSCHE_AFRIKA = 'DAL',
+  HUGO_STINNES = 'HUGO STINNES',
 }
 
 export enum AlertType {
