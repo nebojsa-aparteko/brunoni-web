@@ -660,12 +660,16 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
             </IconButton>
-            <Tooltip title="Send email" placement={'top'}>
-              <IconButton size="small" aria-label="send email" onClick={() => setEmailDialogOpen(true)}>
-                <EmailIcon />
-              </IconButton>
-            </Tooltip>
-            <SendEmailDialog booking={booking} setDialogOpen={setEmailDialogOpen} dialogOpen={emailDialogOpen} />
+            {checklistItem.id === 'FREIGHT COLLECTION' && (
+              <Tooltip title="Send email" placement={'top'}>
+                <IconButton size="small" aria-label="send email" onClick={() => setEmailDialogOpen(true)}>
+                  <EmailIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {emailDialogOpen && (
+              <SendEmailDialog booking={booking} setDialogOpen={setEmailDialogOpen} dialogOpen={emailDialogOpen} />
+            )}
           </Box>
         </Box>
         {!isAdmin &&
