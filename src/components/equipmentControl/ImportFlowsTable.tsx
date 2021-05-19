@@ -4,7 +4,12 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
+import {
+  containerTypesLabels,
+  EquipmentControlContainerTypes,
+  EquipmentImportSummary,
+  statusLabels,
+} from '../../model/EquipmentControl';
 import { Box, CircularProgress, makeStyles, Theme, Tooltip } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import EquipmentControlImportRow from './EquipmentControlImportRow';
@@ -138,7 +143,7 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                     [classes.borderRight]: containerTypesLabels.length === index + 1,
                   })}
                 >
-                  {label}
+                  {get(EquipmentControlContainerTypes, label, '-')}
                 </TableCell>
               )),
             )}

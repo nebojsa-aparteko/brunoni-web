@@ -20,7 +20,7 @@ import truncateString from '../../utilities/truncateString';
 import EquipmentControlExportRow from './EquipmentControlExportRow';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
-import { endOfWeek, format, getYear, startOfWeek } from 'date-fns';
+import { endOfISOWeek, format, getYear, startOfISOWeek } from 'date-fns';
 
 interface ImportFlowsTableProps {
   summary: [string, EquipmentExportSummary[]][];
@@ -216,19 +216,13 @@ const getDateOfWeek = (w: number, y: number) => {
   return new Date(y, 0, d);
 };
 
-const getDateRange = (weekNumber: number, year: number) => {
+export const getDateRange = (weekNumber: number, year: number) => {
   const weekDate = getDateOfWeek(weekNumber, year);
-  return `${format(startOfWeek(weekDate, { weekStartsOn: 1 }), 'dd.MM')} - ${format(
-    endOfWeek(weekDate, { weekStartsOn: 1 }),
-    'dd.MM',
-  )}`;
+  return `${format(startOfISOWeek(weekDate), 'dd.MM')} - ${format(endOfISOWeek(weekDate), 'dd.MM')}`;
 };
 
 export const getMultipleWeekDateRange = (startWeekNumber: number, endWeekNumber: number, year: number) => {
   const startWeekDate = getDateOfWeek(startWeekNumber, year);
   const endWeekDate = getDateOfWeek(endWeekNumber, year);
-  return `${format(startOfWeek(startWeekDate, { weekStartsOn: 1 }), 'dd.MM')} - ${format(
-    endOfWeek(endWeekDate, { weekStartsOn: 1 }),
-    'dd.MM',
-  )}`;
+  return `${format(startOfISOWeek(startWeekDate), 'dd.MM')} - ${format(endOfISOWeek(endWeekDate), 'dd.MM')}`;
 };

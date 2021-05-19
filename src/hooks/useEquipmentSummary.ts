@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EquipmentExportSummary, EquipmentImportSummary } from '../model/EquipmentControl';
-import { useEquipmentControlFilterProviderContext } from '../providers/EquipmentControlFilterProvider';
+import {
+  EquipmentControlFilterContext,
+  useEquipmentControlFilterProviderContext,
+} from '../providers/EquipmentControlFilterProvider';
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
+import { pick, flow, omitBy, isNil } from 'lodash/fp';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -11,20 +15,6 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
   const [equipmentControl, setEquipmentControl] = useState<any[]>([]);
-  // const query = useMemo(
-  //   () => (collection: firebase.firestore.Query) => {
-  //     let query = collection;
-  //     // query = query.where(firebase.firestore.FieldPath.documentId(), '!=', '0');
-  //     if (category === BookingCategory.Export) {
-  //       query = query.where('year', '==', getYear(new Date()));
-  //       query = query.where('week', '>=', getWeek(new Date(), { weekStartsOn: 1 }));
-  //       query = query.where('week', '<=', getWeek(addWeeks(new Date(), 3), { weekStartsOn: 1 }));
-  //       query = query.orderBy('week', 'asc');
-  //     }
-  //     return query;
-  //   },
-  //   [category],
-  // );
   useEffect(() => {
     const unsubscribe = setInterval(() => {
       user
@@ -32,10 +22,15 @@ export default function useEquipmentSummary<T extends BookingCategory>(
         .then(token => {
           return getEquipmentSummary(
             token,
-            filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+            filters.carrier?.id === 'HSG'
+              ? 'Hamburg Süd'
+              : filters.carrier?.id === 'STNN'
+              ? 'HUGO STINNES'
+              : filters.carrier?.id!,
             BookingVersion.long,
             category,
             filters.week,
+            filters,
           );
         })
         .then(
@@ -70,10 +65,15 @@ export default function useEquipmentSummary<T extends BookingCategory>(
       .then(token => {
         return getEquipmentSummary(
           token,
-          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+          filters.carrier?.id === 'HSG'
+            ? 'Hamburg Süd'
+            : filters.carrier?.id === 'STNN'
+            ? 'HUGO STINNES'
+            : filters.carrier?.id!,
           BookingVersion.long,
           category,
           filters.week,
+          filters,
         );
       })
       .then(
@@ -90,25 +90,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
       );
   }, [category, filters, user]);
 
-  // const equipmentSummary = useFirestoreCollection(
-  //   'sum-equipment-control',
-  //   query,
-  //   `${filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id}-${category}-${filters.version}`,
-  //   'summary',
-  // );
-  // if (category === BookingCategory.Export) {
-  //   return equipmentSummary?.docs.map(doc => {
-  //     return { ...doc.data(), id: doc.id } as EquipmentExportSummary;
-  //   }) as any;
-  // } else {
-  //   return equipmentSummary?.docs.map(doc => {
-  //     return { ...doc.data(), id: doc.id } as EquipmentImportSummary;
-  //   }) as any;
-  // }
-
-  return useMemo(() => {
-    return equipmentControl as any;
-  }, [equipmentControl]);
+  return useMemo(() => equipmentControl as any, [equipmentControl]);
 }
 
 const getEquipmentSummary = async (
@@ -117,15 +99,19 @@ const getEquipmentSummary = async (
   version: BookingVersion,
   category: BookingCategory,
   week: number,
+  filters: EquipmentControlFilterContext,
 ) => {
   try {
     let url: string;
     if (category === BookingCategory.Export) {
       url = `${
         process.env.REACT_APP_API_URL
-      }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week + 2}`;
+      }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week +
+        2}&${query(flow(omitBy(isNil), pick(['containerTypes']))(filters))}`;
     } else {
-      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}`;
+      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
+        flow(omitBy(isNil), pick(['containerTypes']))(filters),
+      )}`;
     }
     const response = await fetch(url, {
       method: 'GET',
@@ -152,3 +138,10 @@ const getEquipmentSummary = async (
   } finally {
   }
 };
+
+const query = (params: any) =>
+  Object.keys(params)
+    .map(k => k + '=' + typeCheck(params[k]))
+    .join('&');
+
+const typeCheck = (doc: any) => (Array.isArray(doc) ? doc.join(',') : doc);

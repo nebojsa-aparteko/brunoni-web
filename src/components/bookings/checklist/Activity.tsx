@@ -28,6 +28,17 @@ const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   });
 };
 
+const createEmailRepresentation = (paymentConfirmationEmails: string[]) => {
+  return paymentConfirmationEmails.map((email, index) => {
+    return (
+      <Fragment key={index}>
+        <Link href={`mailto:${email}`}>{email}</Link>
+        {index === paymentConfirmationEmails.length - 1 ? '.' : ', '}
+      </Fragment>
+    );
+  });
+};
+
 export const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
     activity.documents && index !== activity.documents?.length - 1 ? ', ' : ' ';
@@ -85,6 +96,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.REVERT_CLEAR_PAYMENT;
       case ActivityChangeType.MARK_SOMETHING_WRONG:
         return ActivityText.MARK_SOMETHING_WRONG;
+      case ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL:
+        return ActivityText.SENT_PAYMENT_CONFIRMATION_EMAIL;
     }
   };
 
@@ -185,6 +198,11 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
           )}
         </Fragment>
       )}
+      {activity.changeType === ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL
+        ? activity.paymentConfirmationEmails
+          ? createEmailRepresentation(activity.paymentConfirmationEmails)
+          : null
+        : null}
     </Typography>
   );
 };

@@ -7,9 +7,11 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
+  Paper,
   Popover,
   TableCell,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import { get } from 'lodash';
 import PickupLocations from '../../contexts/PickupLocations';
@@ -19,6 +21,7 @@ import { importFlowsStyles } from './ImportFlowsTable';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
 import useUser from '../../hooks/useUser';
 import truncateString from '../../utilities/truncateString';
+import { getDateRange } from './ExportFlowsTable';
 
 const getBookingsByEC = async (
   token: string,
@@ -45,6 +48,7 @@ const getBookingsByEC = async (
 
     if (response.ok) {
       const body = await response.json();
+      console.log(body);
       return body;
     } else {
       const body = await response.json();
@@ -65,9 +69,17 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const classes = importFlowsStyles();
   const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
   const [bookings, setBookings] = useState<{ bookingId: string; count: number; bookingStatus: string }[]>();
+  const [weekAndYear, setWeekAndYear] = useState<[number, number]>();
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const groupedBookingsByStatus = useMemo(
+    () =>
+      Object.entries(
+        groupBy<{ bookingId: string; count: number; bookingStatus: string }>(doc => doc.bookingStatus)(bookings),
+      ),
+    [bookings],
+  );
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
   const open = Boolean(anchorEl);
@@ -96,8 +108,10 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                   key={`${type}-${s}`}
                   className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
                   onClick={event => {
+                    if (s === 'Export Total') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
+                    setWeekAndYear([get(data, 'week', '-1'), get(data, 'year', '-1')]);
                     user
                       .getIdToken()
                       .then(token =>
@@ -106,7 +120,11 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                           type,
                           get(data, 'week', '-1'),
                           equipmentControl.id || '-',
-                          filters.carrier?.id === 'HSG' ? 'Hamburg Süd' : filters.carrier?.id!,
+                          filters.carrier?.id === 'HSG'
+                            ? 'Hamburg Süd'
+                            : filters.carrier?.id === 'STNN'
+                            ? 'HUGO STINNES'
+                            : filters.carrier?.id!,
                         ),
                       )
                       .then(response => {
@@ -135,32 +153,46 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           horizontal: 'center',
         }}
       >
-        <List
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader" disableSticky>
-              Bookings
-            </ListSubheader>
-          }
-          className={classes.list}
-        >
-          {bookings?.map(bkg => (
-            <ListItem
-              key={bkg.bookingId}
-              button
-              onClick={() => {
-                window.open(`/bookings/${bkg.bookingId}`, '_blank');
-              }}
-            >
-              <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
-            </ListItem>
-          )) || (
-            <Box pb={4} width={1} display="flex" alignItems="center" justifyContent="center">
-              <CircularProgress />
-            </Box>
-          )}
-        </List>
+        <Paper>
+          <Box py={1}>
+            <Typography align="center" variant="h5">
+              Bookings {weekAndYear && getDateRange(weekAndYear[0], weekAndYear[1])}
+            </Typography>
+          </Box>
+          <Box display="flex" flexDirection="row">
+            {groupedBookingsByStatus.length > 0 ? (
+              groupedBookingsByStatus.map(([status, bookingsList]) => (
+                <List
+                  key={status}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader" disableSticky>
+                      {status}
+                    </ListSubheader>
+                  }
+                  className={classes.list}
+                >
+                  {bookingsList?.map(bkg => (
+                    <ListItem
+                      key={bkg.bookingId}
+                      button
+                      onClick={() => {
+                        window.open(`/bookings/${bkg.bookingId}`, '_blank');
+                      }}
+                    >
+                      <ListItemText primary={`${bkg.bookingId} (${bkg.count || 0})`} />
+                    </ListItem>
+                  ))}
+                </List>
+              ))
+            ) : (
+              <Box p={4} width={1} display="flex" alignItems="center" justifyContent="center">
+                <CircularProgress />
+              </Box>
+            )}
+          </Box>
+        </Paper>
       </Popover>
     </Fragment>
   );

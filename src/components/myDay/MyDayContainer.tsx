@@ -123,7 +123,7 @@ const MyDayContainer = () => {
               .filter(
                 task =>
                   currentValue.carriers
-                    ?.map(carrier => getId(carrier.name) || carrier.name)
+                    ?.map(carrier => getCarrierId(carrier.name) || carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
                   currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
                   (payDate && task.payDate
@@ -426,17 +426,19 @@ export const formatCarrierId = (carrierId: string | undefined) => {
       ? 'Hamburg Süd'
       : carrierId === 'SLOM'
       ? 'SLOMAN NEPTUN'
+      : carrierId === 'STNN'
+      ? 'HUGO STINNES'
       : carrierId
     : undefined;
 };
 
-const getId = (carrierName: string) => {
-  return carrierIds[carrierName.toLowerCase()];
+export const getCarrierId = (carrierName?: string) => {
+  return carrierName ? carrierIds[carrierName.toLowerCase()] : '';
 };
 const carrierIds = {
   ['Hamburg Süd'.toLowerCase()]: 'Hamburg Süd'.toUpperCase(),
   ['HMM'.toLowerCase()]: 'HMM',
-  ['Hugo Stinnes'.toLowerCase()]: 'STNN',
+  ['Hugo Stinnes'.toLowerCase()]: 'HUGO STINNES',
   ['MACS'.toLowerCase()]: 'MACS',
   ['Sloman Neptun'.toLowerCase()]: 'SLOM',
   ['UAL'.toLowerCase()]: 'UAL',

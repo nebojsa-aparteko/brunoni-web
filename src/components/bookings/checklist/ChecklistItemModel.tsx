@@ -117,6 +117,7 @@ export enum ActivityText {
   CLEAR_PAYMENT = ' has cleared payment ',
   REVERT_CLEAR_PAYMENT = ' has reverted the clearing of payment ',
   MARK_SOMETHING_WRONG = ' has marked that something is wrong with payment ',
+  SENT_PAYMENT_CONFIRMATION_EMAIL = ' has sent payment confirmation to this emails: ',
 }
 
 export enum ActivityChangeType {
@@ -144,6 +145,7 @@ export enum ActivityChangeType {
   CLEAR_PAYMENT,
   REVERT_CLEAR_PAYMENT,
   MARK_SOMETHING_WRONG,
+  SENT_PAYMENT_CONFIRMATION_EMAIL,
 }
 
 export enum ChecklistNames {

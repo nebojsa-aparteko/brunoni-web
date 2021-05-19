@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import {
   Box,
   Checkbox,
@@ -19,10 +19,15 @@ import { useEquipmentControlFilterProviderContext } from '../../providers/Equipm
 import { groupBy, set, uniq } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
 import { get } from 'lodash';
-import { EquipmentControlContainerTypes, EquipmentImportSummary } from '../../model/EquipmentControl';
+import {
+  containerTypesValues,
+  EquipmentControlContainerTypes,
+  EquipmentImportSummary,
+} from '../../model/EquipmentControl';
 import CountryInput from '../inputs/CountryInput';
 import PickupLocations from '../../contexts/PickupLocations';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
+import PickupLocationInput from '../inputs/PickupLocationInput';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -44,6 +49,11 @@ const ImportFlowsContainer: React.FC = () => {
   const summary = useEquipmentSummary(BookingCategory.Import);
   const classes = useStyles();
   const locations = useContext(PickupLocations);
+  const findLocationById = useCallback((id: string) => locations?.find(loc => loc.id === id), [locations]);
+  const selectableLocations = useMemo(() => {
+    const ids = summary.map(v => v.id);
+    return locations?.filter(l => ids.includes(l.id));
+  }, [summary, locations]);
 
   const groupedSummary = useMemo(
     () =>
@@ -51,12 +61,11 @@ const ImportFlowsContainer: React.FC = () => {
         sortByObjectKeys(
           groupBy<EquipmentImportSummary>(s => {
             const location = locations?.find(loc => loc.id === get(s, 'id', '-'));
-            // return `${location?.countryCode || '-'}`;
             return `${location?.countryCode || '-'}~${location?.city || '-'}`;
-          })(summary),
+          })(summary.filter(s => (filters.location ? s.id === filters.location : true))),
         ) as { [key: string]: EquipmentImportSummary[] },
       ),
-    [summary, locations],
+    [summary, locations, filters],
   );
   const countries = useMemo(() => uniq(groupedSummary.map(([country]) => country.split('~')[0])), [groupedSummary]);
   return (
@@ -82,6 +91,15 @@ const ImportFlowsContainer: React.FC = () => {
               // value={carrier}
             />
           </Box>
+          <Box>
+            <PickupLocationInput
+              selectedLocation={filters.location}
+              selectableValues={selectableLocations}
+              onChange={location =>
+                setFilters(prevState => set('location', findLocationById(location)?.id || '')(prevState))
+              }
+            />
+          </Box>
           <Box flexDirection="row" display="flex" alignItems="center">
             <FormControl className={classes.formControl}>
               <InputLabel id="status-select">Equipment type</InputLabel>
@@ -90,7 +108,14 @@ const ImportFlowsContainer: React.FC = () => {
                 id="status-select-checkbox"
                 multiple
                 value={filters.containerTypes}
-                onChange={event => setFilters(prevState => set('containerTypes', event.target.value)(prevState))}
+                onChange={event =>
+                  setFilters(prevState =>
+                    set(
+                      'containerTypes',
+                      containerTypesValues.filter(type => (event.target.value as string[])?.includes(type)),
+                    )(prevState),
+                  )
+                }
                 input={<Input />}
                 renderValue={selected =>
                   (selected as any[]).map(s => get(EquipmentControlContainerTypes, s, '-')).join(', ')
