@@ -145,22 +145,7 @@ const checkStageDependency = (stages: Stage[], stageId: string) => {
   } else return stages[index - 1].checked;
 };
 
-export const createActivityObject = (data: {
-  changeType: ActivityChangeType;
-  by: ActivityLogUserData;
-  checklistItem?: ChecklistItem;
-  documents?: ChecklistItemValueDocument[];
-  stage?: Stage;
-  internal?: boolean;
-  isAccountingActivity?: boolean;
-  paymentReference?: string;
-  paymentActivityData?: PaymentActivityData;
-  type?: ActivityType;
-  comment?: string;
-  mentions?: MentionItem[];
-  addedUsers?: ActivityLogUserData[];
-  removedUsers?: ActivityLogUserData[];
-}): ActivityLogItem => {
+export const createActivityObject = (data: ActivityCreationProps): ActivityLogItem => {
   const {
     by,
     changeType,
@@ -201,6 +186,23 @@ export const createActivityObject = (data: {
     removedUsers: removedUsers,
   } as ActivityLogItem);
 };
+
+export interface ActivityCreationProps {
+  changeType: ActivityChangeType;
+  by: ActivityLogUserData;
+  checklistItem?: ChecklistItem;
+  documents?: ChecklistItemValueDocument[];
+  stage?: Stage;
+  internal?: boolean;
+  isAccountingActivity?: boolean;
+  paymentReference?: string;
+  paymentActivityData?: PaymentActivityData;
+  type?: ActivityType;
+  comment?: string;
+  mentions?: MentionItem[];
+  addedUsers?: ActivityLogUserData[];
+  removedUsers?: ActivityLogUserData[];
+}
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
   const classes = useStyles();
@@ -378,7 +380,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   const handleUncompleted = () => {
     const action = omit(['by', 'at'])(checklistItem.customerAction) as CustomerAction;
-    console.log('ACtion', action);
     storeActivity(() => checklistItemMarkCompletedHandler(action, ActivityChangeType.UNDO_COMPLETED_CUSTOMER));
   };
 

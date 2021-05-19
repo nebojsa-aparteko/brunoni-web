@@ -1,7 +1,7 @@
 import { ChecklistItem, ChecklistItemValueDocument, DocumentValue } from './ChecklistItemModel';
 import React, { createContext, useContext, useState } from 'react';
 
-type State = {
+export type ActivityLogContextProps = {
   checklistReference?: ChecklistItem;
   documentReference?: ChecklistItemValueDocument | DocumentValue;
   rejected?: boolean;
@@ -10,7 +10,8 @@ type State = {
 };
 
 const ActivityLogStateContext = createContext<
-  { state: State | undefined; setState: (state: State | undefined) => void } | undefined
+  | { state: ActivityLogContextProps | undefined; setState: (state: ActivityLogContextProps | undefined) => void }
+  | undefined
 >(undefined);
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
 }
 
 export const ActivityLogProvider: React.FC<Props> = ({ children }) => {
-  const [state, setState] = useState<State>();
+  const [state, setState] = useState<ActivityLogContextProps>();
 
   return (
     <ActivityLogStateContext.Provider value={{ state: state, setState: setState }}>

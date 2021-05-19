@@ -13,6 +13,7 @@ import { MentionItem } from 'react-mentions';
 import { ActivityLogUserData } from '../../bookings/checklist/ChecklistItemModel';
 import ActivityLogView from '../../bookings/checklist/ActivityLogView';
 import { BookingRequest } from '../../../model/BookingRequest';
+import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
 
 interface Props {
   bookingRequest: BookingRequest;
@@ -96,6 +97,8 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
             by: userActivityLogData,
             isInternal: internal,
             mentions: mentions,
+            checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
+            documents: shortenedDocumentValue(activityLogContext.state?.documentReference),
           } as ActivityLogItem),
         )
         .then(_ => {

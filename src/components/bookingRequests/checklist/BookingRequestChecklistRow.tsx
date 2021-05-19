@@ -23,6 +23,7 @@ import { makeContentDispositionFileName } from '../../DropZone';
 import { fileWithExt } from '../../bookings/checklist/ChecklistItemRow';
 import useGlobalAppState from '../../../hooks/useGlobalAppState';
 import { SAVED_ACTION_SNACKBAR } from '../../../store/types/globalAppState';
+import BookingRequestDocumentList from '../BookingRequestDocumentList';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -111,6 +112,14 @@ const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
     .doc()
     .set(activityLog);
 };
+
+const checklistDocumentsRef = (path: string) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(path)
+    .collection('documents');
+
 const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: BookingRequestChecklistRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
@@ -189,8 +198,12 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
 
   const checklistItemFileAddedHandler = useCallback(
     (addedFiles: ChecklistItemValueDocument[]) => {
-      const newDocuments = (checklistItem.valuesAdmin || []).concat(addedFiles);
-      return saveChecklistChanges('valuesAdmin', newDocuments)
+      const batch = firebase.firestore().batch();
+      addedFiles.forEach(doc =>
+        batch.set(checklistDocumentsRef(`/${bookingRequest.id}/checklist/${checklistItem.id}`).doc(), doc),
+      );
+      return batch
+        .commit()
         .then(_ =>
           addActivityItem(
             bookingRequest!.id!,
@@ -207,7 +220,7 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
     [bookingRequest, checklistItem, getActivityLogUserData, saveChecklistChanges],
   );
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents', 'clients', '/', 'bookings', '', checklistItem.id].join('/');
+    return ['bookings-requests', bookingRequest.id, 'checklist', checklistItem.id].join('/');
   }, [bookingRequest, checklistItem]);
 
   // status indicators
@@ -273,7 +286,6 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
     (acceptedFiles: File[]) => {
       saveFiles(acceptedFiles)
         .then((documents: StoredDocument[]) => {
-          console.log(documents, 'DOCUMENTS');
           const values = documents.map(item => {
             return {
               uploadedBy: getActivityLogUserData(),
@@ -329,10 +341,14 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
             <Typography display="inline">{checklistItem.label}</Typography>
           </Box>
           <Box flex="1" />
-          {checklistItem.valuesAdmin?.map(doc => (
-            <Box>{doc.name}</Box>
-          ))}
         </Box>
+        <BookingRequestDocumentList
+          collectionPath={`bookings-requests/${bookingRequest.id}/checklist/${checklistItem.id}/documents`}
+          storageBasePath={storageBasePath}
+          activityPath={`bookings-requests/${bookingRequest.id}/activity`}
+          additionalActivityFields={{ checklistItem: checklistItem }}
+          additionalMentionFields={{ checklistReference: checklistItem }}
+        />
       </Box>
     </Box>
   );
