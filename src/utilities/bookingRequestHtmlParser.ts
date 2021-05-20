@@ -39,8 +39,8 @@ enum Titles {
   NET_VOLUME = 'NET VOLUME',
   CONTAINER = 'CONTAINER',
   REEFER_SETTINGS = 'REEFER SETTINGS',
-  EMPTY_CONTAINER_PICK_UP_LOCATION = 'EMPTY CONTAINER PICK-UP LOCATION',
-  EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE = 'EMPTY CONTAINER REQUESTED PICK-UP DATE',
+  EMPTY_CONTAINER_PICK_UP_LOCATION = 'PICK-UP LOCATION',
+  EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE = 'PICK-UP DATE',
   PAYMENT_TERM = 'PAYMENT TERM',
   FREIGHT_PAYER = 'FREIGHT PAYER',
   PAYMENT_LOCATION = 'PAYMENT LOCATION',
@@ -58,7 +58,8 @@ enum NeededData {
   VESSEL = 'Vessel',
   VOYAGE = 'Voyage',
   QUANTITY = 'Quantity',
-  SIZE_TYPE_CODE = 'Size/Type Code',
+  CONTAINER_NUMBER = 'Container Number',
+  SIZE_TYPE_CODE = 'Size/Type',
   NET_WEIGHT = 'Net Weight',
   NET_VOLUME = 'Net Volume',
   EQUIPMENT_SUPPLIER = 'Equipment Supplier',
@@ -228,7 +229,9 @@ const extractDataOddTable = (object: DataOddTable) => {
   const INTTRA_REFERENCE_NUMBER = findDataOddTable(object, Titles.INTTRA_REFERENCE_NUMBER);
   const CUSTOMER_SHIPMENT_ID = findDataOddTable(object, Titles.CUSTOMER_SHIPMENT_ID);
   const BOOKING_OFFICE = findDataOddTable(object, Titles.BOOKING_OFFICE);
+  console.log(object);
   const CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER);
+  console.log(CONTRACT_NUMBER);
   const FREIGHT_FORWARDERS_REFERENCE_NUMBERS = findDataOddTable(
     object,
     Titles.FREIGHT_FORWARDERS_REFERENCE_NUMBERS,
@@ -303,8 +306,8 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
         .replace(/\s+/g, ' ')
         .trim();
       // ignore 'NET WEIGHT' & 'NET VOLUME' because it's already under CONTAINER info
-      if (title.includes(Titles.NET_WEIGHT)) return;
-      if (title.includes(Titles.NET_VOLUME)) return;
+      if (title?.includes(Titles.NET_WEIGHT)) return;
+      if (title?.includes(Titles.NET_VOLUME)) return;
       // iterate over column children with data
       $(column)
         .children()
@@ -320,7 +323,7 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
               .replace(/\s+/g, ' ')
               .trim();
             // ignore '--------------------'
-            if (insideTitle.includes('-----')) return;
+            if (insideTitle?.includes('-----')) return;
             dataArray.push(insideTitle);
           }
           // data
@@ -363,6 +366,11 @@ const getNeededData = (array: string[], neededData: NeededData) => {
 const getContainerData = (array: string[]) => {
   const QUANTITY = getNeededData(array, NeededData.QUANTITY);
   const SIZE_TYPE_CODE = getNeededData(array, NeededData.SIZE_TYPE_CODE);
+  //todo. different naming (HAMBURG SUED?)
+  //todo. TRANSPORT PLAN DETAILS missing
+  //todo. date reversed
+  //todo. reversed in INTTRA_BKG_1_176427567?
+  //console.log(SIZE_TYPE_CODE)
   const TYPE = SIZE_TYPE_CODE?.substring(0, SIZE_TYPE_CODE?.indexOf(' '));
   const SIZE = SIZE_TYPE_CODE?.substring(SIZE_TYPE_CODE?.indexOf(' ') + 1).slice(1, -1);
   const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT);
@@ -393,7 +401,7 @@ const getContainerLocation = (array: string[]) => {
   const ADDRESS: string[] | undefined = [];
   let POSTAL_CODE: string | undefined;
   let COUNTRY_CODE: string | undefined;
-  array.map((el, index) => {
+  array.forEach(el => {
     if (el.includes(NeededData.POSTAL_CODE)) {
       POSTAL_CODE = el.split(':')[1].trim();
     } else if (el.includes(NeededData.COUNTRY_CODE)) {
@@ -411,12 +419,14 @@ const getContainerLocation = (array: string[]) => {
 };
 
 const getContainerMainData = (container: string[][]) => {
-  const data = container.find(data => data[0].includes(NeededData.QUANTITY));
+  const data = container.find(
+    data => data[0]?.includes(NeededData.QUANTITY) || data[0]?.includes(NeededData.CONTAINER_NUMBER),
+  );
   if (data) return getContainerData(data);
 };
 
 const getContainerTitleData = (container: string[][], title: Titles) => {
-  const index = container.findIndex(data => data[0].includes(title));
+  const index = container.findIndex(data => data[0]?.includes(title));
   if (index === -1) return;
   // Data is always after title
   const next = container[index + 1];
@@ -438,7 +448,7 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
     // indexes where new container data start
     const startIndexes: number[] = [];
     data.forEach((el, index) => {
-      if (el[0].includes(NeededData.QUANTITY)) {
+      if (el[0]?.includes(NeededData.QUANTITY) || el[0]?.includes(NeededData.CONTAINER_NUMBER)) {
         startIndexes.push(index);
       }
     });

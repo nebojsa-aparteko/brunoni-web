@@ -82,17 +82,22 @@ const matchLocation = (
   container: HtmlBookingContainer,
 ): PickupLocation | undefined => {
   let locations = pickupLocations?.filter(location =>
-    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE.includes(location.zip),
+    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.COUNTRY_CODE?.includes(location.countryCode),
   );
+  // todo. Keep it?
   locations = locations?.filter(location =>
-    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.COUNTRY_CODE.includes(location.countryCode),
+    container.EMPTY_CONTAINER_PICK_UP_LOCATION?.POSTAL_CODE?.includes(location.zip),
   );
 
   const concatenatedAddresses = locations?.map(addr => {
     const address = addr.name + ' ' + addr.street + ' ' + addr.poBox + ' ' + addr.city;
     return address.toLowerCase();
   });
+
+  if (concatenatedAddresses?.length === 0) return undefined;
+
   const htmlAddress = container.EMPTY_CONTAINER_PICK_UP_LOCATION?.ADDRESS.join(' ').toLowerCase();
+
   const match = string_similarity.findBestMatch(htmlAddress as string, concatenatedAddresses as string[]);
 
   return locations?.[match.bestMatchIndex];
@@ -207,8 +212,8 @@ const mapIntoBookingRequestModel = async (
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
   const inttraId = object.BOOKER_INTTRA_ID;
+  const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
-
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
     originPort: origin,
@@ -231,11 +236,14 @@ const mapIntoBookingRequestModel = async (
     customerReference,
     destination,
     inttraId,
+    inttraRefNumber,
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,
     vgmSubmittedBy: client,
   } as BookingRequest;
+
+  console.log(bookingRequest);
 
   return bookingRequest;
 };
@@ -272,6 +280,7 @@ export const readAndParseFile = (
           duration: 4000,
         });
       }
+      console.log(object);
       // Create booking request
       let bookingRequest = await mapIntoBookingRequestModel(
         object,
@@ -283,6 +292,7 @@ export const readAndParseFile = (
         commodityTypes,
         pickupLocations,
       );
+
       // remove undefined fields
       bookingRequest = omitBy(isNil)(bookingRequest) as BookingRequest;
       setFiles([file]);
@@ -290,6 +300,7 @@ export const readAndParseFile = (
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      console.error(error);
       dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message, duration: 4000 });
     }
   };
@@ -442,7 +453,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               showPreviewsInDropzone={false}
               showAlerts={['error']}
               useChipsForPreview
-              filesLimit={1}
+              filesLimit={100}
               dropzoneProps={{ disabled: loading }}
               alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}

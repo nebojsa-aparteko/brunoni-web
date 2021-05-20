@@ -41,7 +41,6 @@ const MissingFields: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const [missingFields, setMissingFields] = useState(false);
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
 
@@ -65,16 +64,8 @@ const MissingFields: React.FC<Props> = ({
     setContainersNonMatchingFields(findContainerNonMatchingFields());
   }, [findContainerNonMatchingFields, findNonMatchingFields]);
 
-  useEffect(() => {
-    if (
-      (nonMatchingFields && nonMatchingFields.length > 0) ||
-      (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty))
-    ) {
-      setMissingFields(true);
-    }
-  }, [containersNonMatchingFields, nonMatchingFields, setMissingFields]);
-
-  return !missingFields ? null : (
+  return (nonMatchingFields && nonMatchingFields.length > 0) ||
+    (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
     <Paper className={classes.additionalInfo}>
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true} TransitionProps={{ unmountOnExit: true }}>
@@ -126,7 +117,7 @@ const MissingFields: React.FC<Props> = ({
         </ExpansionPanel>
       </Box>
     </Paper>
-  );
+  ) : null;
 };
 
 export default MissingFields;
