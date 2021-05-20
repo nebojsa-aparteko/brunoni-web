@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -19,8 +19,12 @@ import Port from '../../../model/Port';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { Booking } from '../../../model/Booking';
 import useCarrierSettings from '../../../hooks/useCarrierSettings';
-import { GlobalContext } from '../../../store/GlobalStore';
 import useUser from '../../../hooks/useUser';
+import useGlobalAppState from '../../../hooks/useGlobalAppState';
+import { addActivityItem } from './ActivityLogContainer';
+import { createActivityObject } from './ChecklistItemRow';
+import { ActivityChangeType, ActivityLogUserData } from './ChecklistItemModel';
+import { ActivityType } from './ActivityModel';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -102,26 +106,33 @@ const SendEmailContent = ({
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const classes = useStyles();
-  const [, dispatch] = useContext(GlobalContext);
+  const [state, dispatch] = useGlobalAppState();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState({
-    errorMessage: '',
-    error: false,
-  });
+  const [error, setError] = useState('');
 
-  const [additionalInfo, setAdditionalInfo] = useState<string>('');
+  const [additionalInfo, setAdditionalInfo] = useState<string>();
   const [selectedContactTo, setSelectedContactTo] = useState<string[]>(carrierSetting?.contactTo || []);
   const [selectedContactCC, setSelectedContactCC] = useState<string[]>(
     defaultCCEmails.concat(carrierSetting?.contactCC || []),
   );
-  const [user] = useUser();
+  const [user, userRecord] = useUser();
   const [selectedContactBCC, setSelectedContactBCC] = useState<string[]>([]);
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
 
   const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAdditionalInfo(event.target.value);
   };
-  const handleSendEmail = async (token: string) => {
+  const handleSendEmail = async (token: string, addActivity: (emails: string[]) => Promise<any>) => {
     try {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
@@ -144,20 +155,20 @@ const SendEmailContent = ({
         }),
       });
       if (response.ok) {
+        const resp = await response.json();
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        setLoading(false);
-        setDialogOpen(false);
-        dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' });
+        if (resp.success) {
+          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: resp.success });
+          setDialogOpen(false);
+          await addActivity(resp.emails);
+        } else {
+          setError(resp.error);
+        }
       } else {
-        setError({
-          error: true,
-          errorMessage: 'Error sending email. Please try again.',
-        });
-        setLoading(false);
+        setError('Error sending email. Please try again.');
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
       }
     } catch (e) {
-      setLoading(false);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
     }
   };
@@ -203,14 +214,29 @@ const SendEmailContent = ({
       <Button
         color="primary"
         variant="contained"
-        onClick={() => user.getIdToken().then(token => handleSendEmail(token))}
+        onClick={() =>
+          user.getIdToken().then(token =>
+            handleSendEmail(token, (emails: string[]) =>
+              addActivityItem(
+                bookingId,
+                createActivityObject({
+                  changeType: ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL,
+                  by: getActivityLogUserData(),
+                  type: ActivityType.ACTIVITY,
+                  paymentConfirmationEmails: emails,
+                  internal: true,
+                }),
+              ),
+            ),
+          )
+        }
         startIcon={<EmailIcon />}
         style={{ minWidth: 80, minHeight: 50 }}
-        disabled={loading}
+        disabled={state.isGlobalLoadingInProgress}
       >
         Send email
       </Button>
-      {error.error ? <Typography color="error">{error.errorMessage}</Typography> : null}
+      {error ? <Typography color="error">{error}</Typography> : null}
     </Paper>
   );
 };
