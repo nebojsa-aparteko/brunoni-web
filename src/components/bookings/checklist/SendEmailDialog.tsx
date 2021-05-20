@@ -19,6 +19,7 @@ import Port from '../../../model/Port';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { Booking } from '../../../model/Booking';
 import useCarrierSettings from '../../../hooks/useCarrierSettings';
+import useUser from '../../../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,6 +101,7 @@ const SendEmailContent = ({
   const [selectedContactCC, setSelectedContactCC] = useState<string[]>(
     defaultCCEmails.concat(carrierSetting?.contactCC || []),
   );
+  const [user] = useUser();
   const [selectedContactBCC, setSelectedContactBCC] = useState<string[]>([]);
 
   useEffect(() => {
@@ -109,7 +111,7 @@ const SendEmailContent = ({
   const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAdditionalInfo(event.target.value);
   };
-  const handleSendEmail = async () => {
+  const handleSendEmail = async (token: string) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
       method: 'POST',
       mode: 'cors',
@@ -118,6 +120,7 @@ const SendEmailContent = ({
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         bcc: [],
@@ -128,6 +131,9 @@ const SendEmailContent = ({
         bookingId: bookingId,
       }),
     });
+    if (response.ok) {
+      console.log(await response.json());
+    }
   };
 
   return (
@@ -171,7 +177,7 @@ const SendEmailContent = ({
       <Button
         color="primary"
         variant="contained"
-        onClick={handleSendEmail}
+        onClick={() => user.getIdToken().then(token => handleSendEmail(token))}
         startIcon={<EmailIcon />}
         style={{ minWidth: 80, minHeight: 50 }}
       >
