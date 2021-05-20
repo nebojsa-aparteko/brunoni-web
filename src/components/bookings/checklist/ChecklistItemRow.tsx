@@ -618,8 +618,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         )}
 
         <Box display="flex" flexDirection="row">
-          <Box flexDirection="row" alignContent="center">
-            <a id={checklistItem.id} />
+          <Box flexDirection="row" alignContent="center" id={checklistItem.id}>
             {isAdmin ? (
               <Checkbox
                 checked={checklistItem.checked}
@@ -653,9 +652,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           <Box flex="1" />
           <Box display="flex">
             <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-              {/*<Badge badgeContent={checklistItem.mentionCount || 0} color="primary">*/}
               <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-              {/*</Badge>*/}
             </IconButton>
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
