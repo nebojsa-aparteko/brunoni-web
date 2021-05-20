@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -15,7 +15,6 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MultipleEmailInput from '../../inputs/MultipleEmailInput';
 import PortInput from '../../inputs/PortInput';
 import EmailIcon from '@material-ui/icons/Email';
-import Port from '../../../model/Port';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { Booking } from '../../../model/Booking';
 import useCarrierSettings from '../../../hooks/useCarrierSettings';
@@ -53,11 +52,7 @@ const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }
   const carrierSettings = useCarrierSettings(booking.CarrierID.toUpperCase(), PaymentConfirmationType.CARRIER_SETTINGS);
   const ports = useMemo(() => carrierSettings?.map(s => s.port), [carrierSettings]);
 
-  const [selectedPort, setSelectedPort] = useState<Port>();
-  const selectedCarrierSettings = useMemo(() => carrierSettings?.find(c => c.port.id === selectedPort?.id), [
-    carrierSettings,
-    selectedPort,
-  ]);
+  const [selectedCarrierSettings, setSelectedCarrierSettings] = useState<CarrierSettingsRule>();
 
   return (
     <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} aria-labelledby="send-email-dialog" maxWidth="lg">
@@ -72,8 +67,8 @@ const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }
           <PortInput
             label="Destination port agent"
             ports={ports || []}
-            onChange={port => setSelectedPort(port || undefined)}
-            value={selectedPort}
+            onChange={port => setSelectedCarrierSettings(carrierSettings?.find(c => c.port.id === port?.id))}
+            value={selectedCarrierSettings?.port}
           />
         </Box>
         {selectedCarrierSettings && (
@@ -111,12 +106,16 @@ const SendEmailContent = ({
   const [error, setError] = useState('');
 
   const [additionalInfo, setAdditionalInfo] = useState<string>();
-  const [selectedContactTo, setSelectedContactTo] = useState<string[]>(carrierSetting?.contactTo || []);
-  const [selectedContactCC, setSelectedContactCC] = useState<string[]>(
-    defaultCCEmails.concat(carrierSetting?.contactCC || []),
-  );
+  const [selectedContactTo, setSelectedContactTo] = useState<string[]>();
+  const [selectedContactCC, setSelectedContactCC] = useState<string[]>();
   const [user, userRecord] = useUser();
   const [selectedContactBCC, setSelectedContactBCC] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSelectedContactTo(carrierSetting?.contactTo || []);
+    setSelectedContactCC(defaultCCEmails.concat(carrierSetting?.contactCC || []));
+  }, [carrierSetting]);
+
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
