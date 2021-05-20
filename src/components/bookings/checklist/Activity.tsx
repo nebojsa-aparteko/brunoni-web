@@ -176,6 +176,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
             : null}
           .
         </Fragment>
+      ) : activity.changeType === ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL &&
+        activity.paymentConfirmationEmails ? (
+        createEmailRepresentation(activity.paymentConfirmationEmails)
       ) : (
         <Fragment>
           {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
