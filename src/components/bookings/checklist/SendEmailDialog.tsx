@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -19,6 +19,7 @@ import Port from '../../../model/Port';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { Booking } from '../../../model/Booking';
 import useCarrierSettings from '../../../hooks/useCarrierSettings';
+import { GlobalContext } from '../../../store/GlobalStore';
 import useUser from '../../../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -72,7 +73,11 @@ const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }
           />
         </Box>
         {selectedCarrierSettings && (
-          <SendEmailContent carrierSetting={selectedCarrierSettings} bookingId={booking.id} />
+          <SendEmailContent
+            carrierSetting={selectedCarrierSettings}
+            bookingId={booking.id}
+            setDialogOpen={setDialogOpen}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -90,13 +95,22 @@ interface Props {
 const SendEmailContent = ({
   carrierSetting,
   bookingId,
+  setDialogOpen,
 }: {
   carrierSetting: CarrierSettingsRule;
   bookingId: string;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const classes = useStyles();
-  const [additionalInfo, setAdditionalInfo] = useState<string>('');
+  const [, dispatch] = useContext(GlobalContext);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({
+    errorMessage: '',
+    error: false,
+  });
+
+  const [additionalInfo, setAdditionalInfo] = useState<string>('');
   const [selectedContactTo, setSelectedContactTo] = useState<string[]>(carrierSetting?.contactTo || []);
   const [selectedContactCC, setSelectedContactCC] = useState<string[]>(
     defaultCCEmails.concat(carrierSetting?.contactCC || []),
@@ -104,35 +118,47 @@ const SendEmailContent = ({
   const [user] = useUser();
   const [selectedContactBCC, setSelectedContactBCC] = useState<string[]>([]);
 
-  useEffect(() => {
-    setSelectedContactCC(defaultCCEmails.concat(carrierSetting?.contactCC || []));
-    setSelectedContactTo(carrierSetting?.contactTo || []);
-  }, [carrierSetting]);
   const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAdditionalInfo(event.target.value);
   };
   const handleSendEmail = async (token: string) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        bcc: [],
-        cc: carrierSetting?.contactCC || [],
-        contactTo: carrierSetting?.contactTo || [],
-        portId: carrierSetting.port?.id,
-        freeText: additionalInfo,
-        bookingId: bookingId,
-      }),
-    });
-    if (response.ok) {
-      console.log(await response.json());
+    try {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bcc: [],
+          cc: carrierSetting?.contactCC || [],
+          contactTo: carrierSetting?.contactTo || [],
+          portId: carrierSetting.port?.id,
+          freeText: additionalInfo,
+          bookingId: bookingId,
+        }),
+      });
+      if (response.ok) {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        setLoading(false);
+        setDialogOpen(false);
+        dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' });
+      } else {
+        setError({
+          error: true,
+          errorMessage: 'Error sending email. Please try again.',
+        });
+        setLoading(false);
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    } catch (e) {
+      setLoading(false);
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
     }
   };
 
@@ -180,9 +206,11 @@ const SendEmailContent = ({
         onClick={() => user.getIdToken().then(token => handleSendEmail(token))}
         startIcon={<EmailIcon />}
         style={{ minWidth: 80, minHeight: 50 }}
+        disabled={loading}
       >
         Send email
       </Button>
+      {error.error ? <Typography color="error">{error.errorMessage}</Typography> : null}
     </Paper>
   );
 };
