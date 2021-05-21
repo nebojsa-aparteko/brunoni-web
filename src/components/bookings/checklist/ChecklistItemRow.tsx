@@ -662,7 +662,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             </IconButton>
             {checklistItem.id === 'FREIGHT COLLECTION' && (
               <Tooltip title="Send email" placement={'top'}>
-                <IconButton size="small" aria-label="send email" onClick={() => setEmailDialogOpen(true)}>
+                <IconButton
+                  size="small"
+                  aria-label="send email"
+                  onClick={() => setEmailDialogOpen(true)}
+                  disabled={checklistItem.checked}
+                >
                   <EmailIcon />
                 </IconButton>
               </Tooltip>
