@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Grid,
+  IconButton,
   makeStyles,
   Paper,
   Table,
@@ -10,24 +11,35 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Dispatch, Fragment, SetStateAction, useContext, useMemo, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
-import { isIntermediary } from '../ItineraryItem';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
-import { RouteSearchResult, RouteSearchResultOriginInfo } from '../../model/route-search/RouteSearchResults';
+import {
+  RouteSearchResult,
+  RouteSearchResultDestinationInfo,
+  RouteSearchResultOriginInfo,
+  RouteSearchResultVoyageInfo,
+  SearchResultsPort,
+} from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { Link } from 'react-router-dom';
 import { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import { set } from 'lodash/fp';
+import { set, get, unset } from 'lodash/fp';
 import UserRecord from '../../contexts/UserRecordContext';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import palette from '../../theme/palette';
+import Ports from '../../contexts/Ports';
+import Port from '../../model/Port';
+import PortInput from '../inputs/PortInput';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -96,95 +108,123 @@ const useStyles = makeStyles(theme => ({
   blNumberInput: {
     margin: 0,
   },
+  paper: {
+    marginBottom: theme.spacing(1),
+    '&:hover': {
+      backgroundColor: palette.background.hover,
+    },
+  },
+  actionSection: {
+    backgroundColor: theme.palette.grey['50'],
+  },
 }));
 
-interface IntermediateInfosProps {
-  bookingRequest: BookingRequest;
-  setBookingRequest: Dispatch<SetStateAction<BookingRequest | undefined>> | undefined;
-  editing?: boolean;
-}
+const emptySearchResultPort = {
+  ID: '',
+  Land: '',
+  HarbourName: '',
+  PortName: '',
+  PortAgent: '',
+  TerminalID: '',
+} as SearchResultsPort;
 
-const IntermediateInfos: React.FC<IntermediateInfosProps> = ({ bookingRequest, setBookingRequest, editing }) => {
-  const userRecord = useContext(UserRecordContext);
-  const [isOriginIntermediary] = useState<boolean | undefined>(
-    bookingRequest.schedule?.OriginInfo ? !!isIntermediary(bookingRequest.schedule?.OriginInfo) : undefined,
-  );
+const emptyPlaceOfReceipt = {
+  ID: '',
+  Port: emptySearchResultPort,
+  DepartureDate: '',
+  VoyageInfo: {
+    VesselName: '',
+    VoyageNr: '',
+    Carrier: '',
+  } as RouteSearchResultVoyageInfo,
+  ArrivalDate: undefined,
+} as RouteSearchResultOriginInfo;
 
-  const handleChangeDepartureDate = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-    index: number,
-  ) => {
-    const newIntermediatePortInfos = bookingRequest.schedule?.IntermediatePortInfos.map((info, infoIndex) =>
-      index === infoIndex ? { ...info, DepartureDate: event.target.value } : info,
-    );
-    setBookingRequest &&
-      setBookingRequest({
-        ...bookingRequest,
-        schedule: {
-          ...bookingRequest.schedule,
-          IntermediatePortInfos: newIntermediatePortInfos,
-        } as RouteSearchResult,
-      });
-  };
+const emptyPlaceOfDelivery = {
+  ID: '',
+  Port: emptySearchResultPort,
+  DepartureDate: undefined,
+  VoyageInfo: {
+    VesselName: '',
+    VoyageNr: '',
+    Carrier: '',
+  } as RouteSearchResultVoyageInfo,
+  ArrivalDate: '',
+} as RouteSearchResultDestinationInfo;
 
-  return (
-    <React.Fragment>
-      {bookingRequest.schedule?.IntermediatePortInfos.length === 1 ? (
-        <TableRowData
-          label={isOriginIntermediary ? 'Port of Loading' : 'Port of Discharge'}
-          content={
-            editing && isDashboardUser(userRecord) ? (
-              <Box display="flex" flexDirection="column">
-                {bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName}
-                <TextField
-                  label={isOriginIntermediary ? 'ETS' : 'ETA'}
-                  value={bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate}
-                  onChange={event => handleChangeDepartureDate(event, 0)}
-                  variant="outlined"
-                  margin="dense"
-                />
-              </Box>
-            ) : (
-              [
-                bookingRequest.schedule?.IntermediatePortInfos[0].Port.HarbourName,
-                formatDateString(bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate),
-              ].join(isOriginIntermediary ? '<br/>ETS: ' : '<br/>ETA: ')
-            )
-          }
-        />
-      ) : (
-        bookingRequest.schedule?.IntermediatePortInfos.map((info, index) => (
-          <TableRowData
-            label={index === 0 ? 'Port of Loading' : 'Port of Discharge'}
-            key={index}
-            content={
-              editing && isDashboardUser(userRecord) ? (
-                <Box display="flex" flexDirection="column">
-                  {info.Port.HarbourName}
-                  <TextField
-                    label={index === 0 ? 'ETS' : 'ETA'}
-                    value={info.DepartureDate}
-                    onChange={event => handleChangeDepartureDate(event, index)}
-                    variant="outlined"
-                    margin="dense"
-                  />
-                </Box>
-              ) : (
-                [info.Port.HarbourName, formatDateString(info.DepartureDate)].join(
-                  index === 0 ? '<br/>ETS: ' : '<br/>ETA: ',
-                )
-              )
-            }
-          />
-        ))
-      )}
-    </React.Fragment>
-  );
+const getInputValueFromPort = (value: SearchResultsPort | null) => {
+  return value ? ({ id: value.ID, city: value.HarbourName, country: value.Land } as Port) : undefined;
+};
+const getPortFromInputValue = (value: Port | null) => {
+  return value
+    ? value.city || value.country
+      ? {
+          ID: value?.id,
+          HarbourName: value?.city || value.id || '',
+          PortAgent: '',
+          PortName: value?.id,
+          Land: value.country || '',
+        }
+      : ({ ID: value?.id, HarbourName: value?.id, PortAgent: '', PortName: value?.id, Land: '' } as SearchResultsPort)
+    : undefined;
 };
 
+const intermediateVessels = ['TRUCK', 'BARGE', 'RAIL', 'FEEDER', 'RAIL/TRUCK', 'BARGE/TRUCK'];
 const isVesselIntermediate = (vessel: string) => {
-  return ['TRUCK', 'BARGE', 'RAIL', 'FEEDER', 'RAIL/TRUCK', 'BARGE/TRUCK'].includes(vessel);
+  return intermediateVessels.includes(vessel);
 };
+
+const hasPlaceOfReceipt = (bookingRequest: BookingRequest) => {
+  return (
+    bookingRequest.schedule?.IntermediatePortInfos.length === 2 ||
+    (bookingRequest.schedule?.IntermediatePortInfos.length === 1 &&
+      isVesselIntermediate(bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName))
+  );
+};
+
+const hasPlaceOfDelivery = (bookingRequest: BookingRequest) => {
+  return (
+    bookingRequest.schedule?.IntermediatePortInfos.length === 2 ||
+    (bookingRequest.schedule?.IntermediatePortInfos.length === 1 &&
+      (isVesselIntermediate(bookingRequest.schedule?.DestinationInfo.VoyageInfo.VesselName) ||
+        !hasPlaceOfReceipt(bookingRequest)))
+  );
+};
+
+const getPortOfLoading = (bookingRequest: BookingRequest) => {
+  return bookingRequest.schedule?.IntermediatePortInfos.length === 2
+    ? bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate >
+      bookingRequest.schedule?.IntermediatePortInfos[1].DepartureDate
+      ? bookingRequest.schedule?.IntermediatePortInfos[1]
+      : bookingRequest.schedule?.IntermediatePortInfos[0]
+    : bookingRequest.schedule?.IntermediatePortInfos.length === 1
+    ? bookingRequest.schedule?.IntermediatePortInfos[0]
+    : undefined; //This should never happen
+};
+
+const getPortOfDischarge = (bookingRequest: BookingRequest) => {
+  return bookingRequest.schedule?.IntermediatePortInfos.length === 2
+    ? bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate >
+      bookingRequest.schedule?.IntermediatePortInfos[1].DepartureDate
+      ? bookingRequest.schedule?.IntermediatePortInfos[0]
+      : bookingRequest.schedule?.IntermediatePortInfos[1]
+    : bookingRequest.schedule?.IntermediatePortInfos.length === 1
+    ? bookingRequest.schedule?.IntermediatePortInfos[0]
+    : undefined; //This should never happen
+};
+
+// const getFieldToUpdate = (newItinerary, itineraryItemName) => {
+//   switch (itineraryItemName) {
+//     case 'placeOfReceipt':
+//       return 'OriginInfo';
+//     case 'placeOfDelivery':
+//       return 'DestinationInfo';
+//     case 'portOfLoading':
+//       return newItinerary.placeOfReceipt ? 'IntermediateInfo' : 'OriginInfo';
+//     case 'portOfDischarge':
+//       return newItinerary.placeOfDelivery ? 'IntermediateInfo' : "DestinationInfo";
+//   };
+// };
 
 interface ItineraryInfoProps {
   bookingRequest: BookingRequest;
@@ -193,97 +233,264 @@ interface ItineraryInfoProps {
 }
 
 const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookingRequest, editing }) => {
+  const classes = useStyles();
+  const ports = useContext(Ports);
   const userRecord = useContext(UserRecordContext);
+  const [isPlaceOfReceiptDefined, setIsPlaceOfReceiptDefined] = useState(hasPlaceOfReceipt(bookingRequest));
+  const [isPlaceOfDeliveryDefined, setIsPlaceOfDeliveryDefined] = useState(hasPlaceOfDelivery(bookingRequest));
 
-  const handleChangeDepartureDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingRequest &&
-      setBookingRequest({
-        ...bookingRequest,
-        schedule: {
-          ...bookingRequest.schedule,
-          OriginInfo: {
-            ...bookingRequest.schedule?.OriginInfo,
-            DepartureDate: event.target.value,
-          } as RouteSearchResultOriginInfo,
-        } as RouteSearchResult,
-      });
+  const [itinerary, setItinerary] = useState({
+    placeOfReceipt: isPlaceOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
+    portOfLoading: isPlaceOfReceiptDefined ? getPortOfLoading(bookingRequest) : bookingRequest.schedule?.OriginInfo,
+    portOfDischarge: isPlaceOfDeliveryDefined
+      ? getPortOfDischarge(bookingRequest)
+      : bookingRequest.schedule?.DestinationInfo,
+    placeOfDelivery: isPlaceOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
+  });
+
+  useEffect(() => {
+    setIsPlaceOfReceiptDefined(hasPlaceOfReceipt(bookingRequest));
+    setIsPlaceOfDeliveryDefined(hasPlaceOfDelivery(bookingRequest));
+    setItinerary({
+      placeOfReceipt: isPlaceOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
+      portOfLoading: isPlaceOfReceiptDefined ? getPortOfLoading(bookingRequest) : bookingRequest.schedule?.OriginInfo,
+      portOfDischarge: isPlaceOfDeliveryDefined
+        ? getPortOfDischarge(bookingRequest)
+        : bookingRequest.schedule?.DestinationInfo,
+      placeOfDelivery: isPlaceOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
+    });
+  }, [bookingRequest]);
+
+  console.log(JSON.stringify(itinerary));
+
+  const handleChangeItinerary = (itineraryItemName: string, fieldName: string, value: any) => {
+    setItinerary(set(itineraryItemName, set(fieldName, value)(get(itineraryItemName)(itinerary)))(itinerary));
   };
-  const handleChangeArrivalDate = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setBookingRequest &&
-      setBookingRequest({
-        ...bookingRequest,
-        schedule: {
-          ...bookingRequest.schedule,
-          DestinationInfo: {
-            ...bookingRequest.schedule?.DestinationInfo,
-            ArrivalDate: event.target.value,
-          } as RouteSearchResultOriginInfo,
-        } as RouteSearchResult,
-      });
+
+  const handleAddPlaceOfReceipt = () => {
+    setItinerary(set('placeOfReceipt', emptyPlaceOfReceipt)(itinerary));
+  };
+  const handleAddPlaceOfDelivery = () => {
+    setItinerary(set('placeOfDelivery', emptyPlaceOfDelivery)(itinerary));
+  };
+
+  const handleDeleteItineraryItem = (fieldName: string) => {
+    setItinerary(unset(fieldName)(itinerary));
   };
 
   return (
     <React.Fragment>
-      {bookingRequest.schedule?.OriginInfo && (
+      {itinerary.placeOfReceipt ? (
         <TableRowData
-          label={
-            isVesselIntermediate(bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName)
-              ? 'Place of Receipt'
-              : 'Port of Loading'
+          label={'Place of Receipt'}
+          content={
+            editing && isDashboardUser(userRecord) ? (
+              <Paper className={classes.paper}>
+                <Box display="flex">
+                  <Box display="flex" flexDirection="column" flex="1" p={1}>
+                    {/*{itinerary.placeOfReceipt?.Port.HarbourName}*/}
+                    <PortInput
+                      label={''}
+                      value={getInputValueFromPort(itinerary.placeOfReceipt?.Port)}
+                      ports={ports || []}
+                      margin={'dense'}
+                      onChange={value => handleChangeItinerary('placeOfReceipt', 'Port', getPortFromInputValue(value))}
+                      freeSolo
+                    />
+                    <TextField
+                      label={'ETS'}
+                      value={itinerary.placeOfReceipt?.DepartureDate}
+                      onChange={event => handleChangeItinerary('placeOfReceipt', 'DepartureDate', event.target.value)}
+                      variant="outlined"
+                      margin="dense"
+                    />
+                  </Box>
+                  <Box
+                    py={2}
+                    px={1}
+                    display="flex"
+                    alignContent="center"
+                    alignItems="center"
+                    className={classes.actionSection}
+                  >
+                    <IconButton
+                      onClick={() => handleDeleteItineraryItem('placeOfReceipt')}
+                      aria-label="delete"
+                      size="small"
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Paper>
+            ) : (
+              <React.Fragment>
+                {itinerary.placeOfReceipt?.Port.HarbourName}
+                {itinerary.placeOfReceipt?.DepartureDate && (
+                  <>
+                    <br />
+                    {`ETS: ${formatDateString(itinerary.placeOfReceipt?.DepartureDate)}`}
+                  </>
+                )}
+              </React.Fragment>
+            )
           }
+        />
+      ) : (
+        editing &&
+        isDashboardUser(userRecord) && (
+          <TableRow className={classes.tableRow}>
+            <TableCell colSpan={2} className={classes.tableCell}>
+              <Button
+                color="primary"
+                aria-label="Add place of receipt"
+                size="small"
+                onClick={handleAddPlaceOfReceipt}
+                fullWidth
+                style={{ flex: 1 }}
+              >
+                <AddIcon />
+                Add Place of Receipt
+              </Button>
+            </TableCell>
+          </TableRow>
+        )
+      )}
+
+      {itinerary.portOfLoading && (
+        <TableRowData
+          label={'Port Of Loading'}
           content={
             editing && isDashboardUser(userRecord) ? (
               <Box display="flex" flexDirection="column">
-                {bookingRequest.schedule?.OriginInfo.Port.HarbourName}
+                {itinerary.portOfLoading?.Port.HarbourName}
                 <TextField
                   label={'ETS'}
-                  value={bookingRequest.schedule?.OriginInfo.DepartureDate}
-                  onChange={handleChangeDepartureDate}
+                  value={itinerary.portOfLoading?.DepartureDate}
+                  onChange={event => handleChangeItinerary('portOfLoading', 'DepartureDate', event.target.value)}
                   variant="outlined"
                   margin="dense"
                 />
               </Box>
             ) : (
-              [
-                bookingRequest.schedule?.OriginInfo.Port.HarbourName,
-                formatDateString(bookingRequest.schedule?.OriginInfo.DepartureDate),
-              ].join('<br/>ETS: ')
+              <React.Fragment>
+                {itinerary.portOfLoading?.Port.HarbourName}
+                {itinerary.portOfLoading?.DepartureDate && (
+                  <>
+                    <br />
+                    {`ETS: ${formatDateString(itinerary.portOfLoading?.DepartureDate)}`}
+                  </>
+                )}
+              </React.Fragment>
             )
           }
         />
       )}
 
-      {bookingRequest.schedule?.IntermediatePortInfos && bookingRequest.schedule?.IntermediatePortInfos.length > 0 && (
-        <IntermediateInfos bookingRequest={bookingRequest} setBookingRequest={setBookingRequest} editing={editing} />
-      )}
-
-      {bookingRequest.schedule?.DestinationInfo && (
+      {itinerary.portOfDischarge && (
         <TableRowData
-          label={
-            isVesselIntermediate(bookingRequest.schedule?.DestinationInfo.VoyageInfo.VesselName)
-              ? 'Place of Delivery'
-              : 'Port of Discharge'
-          }
+          label={'Port of Discharge'}
           content={
             editing && isDashboardUser(userRecord) ? (
               <Box display="flex" flexDirection="column">
-                {bookingRequest.schedule?.DestinationInfo.Port.HarbourName}
+                {itinerary.portOfDischarge?.Port.HarbourName}
                 <TextField
                   label={'ETA'}
-                  value={bookingRequest.schedule?.DestinationInfo.ArrivalDate}
-                  onChange={handleChangeArrivalDate}
+                  value={itinerary.portOfDischarge?.ArrivalDate}
+                  onChange={event => handleChangeItinerary('portOfDischarge', 'ArrivalDate', event.target.value)}
                   variant="outlined"
                   margin="dense"
                 />
               </Box>
             ) : (
-              [
-                bookingRequest.schedule?.DestinationInfo.Port.HarbourName,
-                formatDateString(bookingRequest.schedule?.DestinationInfo.ArrivalDate),
-              ].join('<br/>ETA: ')
+              <React.Fragment>
+                {itinerary.portOfDischarge?.Port.HarbourName}
+                {itinerary.portOfDischarge?.ArrivalDate && (
+                  <>
+                    <br />
+                    {`ETA: ${formatDateString(itinerary.portOfDischarge?.ArrivalDate)}`}
+                  </>
+                )}
+              </React.Fragment>
             )
           }
         />
+      )}
+
+      {itinerary.placeOfDelivery ? (
+        <TableRowData
+          label={'Place of Delivery'}
+          content={
+            editing && isDashboardUser(userRecord) ? (
+              <Paper className={classes.paper}>
+                <Box display="flex">
+                  <Box display="flex" flexDirection="column" flex="1" p={1}>
+                    <PortInput
+                      label={''}
+                      value={getInputValueFromPort(itinerary.placeOfDelivery?.Port)}
+                      ports={ports || []}
+                      margin={'dense'}
+                      onChange={value => handleChangeItinerary('placeOfDelivery', 'Port', getPortFromInputValue(value))}
+                      freeSolo
+                    />
+                    <TextField
+                      label={'ETA'}
+                      value={itinerary.placeOfDelivery?.ArrivalDate}
+                      onChange={event => handleChangeItinerary('placeOfDelivery', 'ArrivalDate', event.target.value)}
+                      variant="outlined"
+                      margin="dense"
+                    />
+                  </Box>
+                  <Box
+                    py={2}
+                    px={1}
+                    display="flex"
+                    alignContent="center"
+                    alignItems="center"
+                    className={classes.actionSection}
+                  >
+                    <IconButton
+                      onClick={() => handleDeleteItineraryItem('placeOfDelivery')}
+                      aria-label="delete"
+                      size="small"
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Paper>
+            ) : (
+              <React.Fragment>
+                {itinerary.placeOfDelivery?.Port.HarbourName}
+                {itinerary.placeOfDelivery?.ArrivalDate && (
+                  <>
+                    <br />
+                    {`ETA: ${formatDateString(itinerary.placeOfDelivery?.ArrivalDate)}`}
+                  </>
+                )}
+              </React.Fragment>
+            )
+          }
+        />
+      ) : (
+        editing &&
+        isDashboardUser(userRecord) && (
+          <TableRow className={classes.tableRow}>
+            <TableCell colSpan={2} className={classes.tableCell}>
+              <Button
+                color="primary"
+                aria-label="Add place of receipt"
+                size="small"
+                onClick={handleAddPlaceOfDelivery}
+                fullWidth
+                style={{ flex: 1 }}
+              >
+                <AddIcon />
+                Add Place of Delivery
+              </Button>
+            </TableCell>
+          </TableRow>
+        )
       )}
     </React.Fragment>
   );

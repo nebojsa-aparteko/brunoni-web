@@ -1,12 +1,18 @@
 import 'isomorphic-fetch';
 import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import Port from '../../model/Port';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
+import { FilterOptionsState } from '@material-ui/lab';
 
-const getOptionLabel = (option: Port) => `${option.city} - ${option.country} (${option.id})`;
+const filter = createFilterOptions<Port>();
+
+const getOptionLabel = (option: Port) =>
+  option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `${option.id}`;
+const getOptionSelectItemLabel = (option: Port) =>
+  option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `Add "${option.id}"`;
 
 interface Props {
   label: string;
@@ -18,6 +24,7 @@ interface Props {
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: 'none' | 'dense' | 'normal';
+  freeSolo?: boolean;
 }
 
 const useStyles = makeStyles({
@@ -26,7 +33,18 @@ const useStyles = makeStyles({
   },
 });
 
-const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, open, onOpen, onClose, margin }) => {
+const PortInput: React.FC<Props> = ({
+  label,
+  ports,
+  inputRef,
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  margin,
+  freeSolo,
+}) => {
   const classes = useStyles();
   const loading = open && !ports;
 
@@ -39,7 +57,23 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
       onOpen={onOpen}
       onClose={onClose}
       getOptionLabel={getOptionLabel}
+      filterOptions={
+        freeSolo
+          ? (options: Port[], params: FilterOptionsState<Port>) => {
+              const filtered = filter(options, params);
+              if (params.inputValue !== '') {
+                filtered.push({
+                  id: params.inputValue.toUpperCase(),
+                  city: '',
+                  country: '',
+                } as Port);
+              }
+              return filtered;
+            }
+          : undefined
+      }
       options={ports}
+      freeSolo={freeSolo}
       loading={loading}
       renderInput={params => (
         <TextField
@@ -64,8 +98,8 @@ const PortInput: React.FC<Props> = ({ label, ports, inputRef, value, onChange, o
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(getOptionLabel(option), inputValue);
-        const parts = parse(getOptionLabel(option), matches);
+        const matches = match(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), inputValue);
+        const parts = parse(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), matches);
 
         return (
           <div>
