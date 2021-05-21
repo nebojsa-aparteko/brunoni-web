@@ -348,6 +348,7 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
           activityPath={`bookings-requests/${bookingRequest.id}/activity`}
           additionalActivityFields={{ checklistItem: checklistItem }}
           additionalMentionFields={{ checklistReference: checklistItem }}
+          documentsCount={checklistItem.documentsCount}
         />
       </Box>
     </Box>
