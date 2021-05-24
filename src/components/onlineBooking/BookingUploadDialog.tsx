@@ -14,7 +14,7 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { DropzoneArea } from 'material-ui-dropzone';
 import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
-import UserRecord, { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord from '../../model/UserRecord';
 
 import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
 import useUser from '../../hooks/useUser';
@@ -31,7 +31,7 @@ import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
-import { isNil, omitBy, pick } from 'lodash/fp';
+import { isNil, omitBy } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -45,7 +45,8 @@ import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemM
 import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
 import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
-import MissingFields from './MissingFields';
+import MissingFields, { defaultWatchedFields } from './MissingFields';
+import Client from '../../model/Client';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -196,22 +197,42 @@ const matchAndFetchSchedule = async (
   return schedules;
 };
 
+const getClientById = async (id: string): Promise<Client> => {
+  const client = await firebase
+    .firestore()
+    .collection('clients')
+    .doc(id)
+    .get();
+  return client.data() as Client;
+};
+
+const getUserByEmail = async (email: string): Promise<UserRecord> => {
+  const usersRef = await firebase
+    .firestore()
+    .collection('users')
+    .where('emailAddress', '==', email)
+    .get();
+  return usersRef.docs.map(user => user.data())[0] as UserRecord;
+};
+
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
   user: UserRecord,
-  client: UserRecordMin,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
 ): Promise<BookingRequest> => {
+  const createdBy = (await getUserByEmail(object.BOOKER_CONTACT_EMAIL)) || undefined;
+  const vgmSubmittedBy = createdBy;
+  const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
+
   const agreementNo = object.CONTRACT_NUMBER;
   const customerReference = object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS[0];
   const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
-  const inttraId = object.BOOKER_INTTRA_ID;
   const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
   const departureDate = matchDate(object.SAIL_DATE);
@@ -230,20 +251,20 @@ const mapIntoBookingRequestModel = async (
     agreementNo,
     archived: false,
     carrier,
+    client,
     containers,
     createdAt: new Date(),
-    createdBy: user,
+    createdBy,
     customerReference,
     destination,
-    inttraId,
     inttraRefNumber,
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,
-    vgmSubmittedBy: client,
+    vgmSubmittedBy,
   } as BookingRequest;
 
-  console.log(bookingRequest);
+  //console.log(bookingRequest);
 
   return bookingRequest;
 };
@@ -255,7 +276,6 @@ export const readAndParseFile = (
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
   user: UserRecord,
-  client: UserRecordMin,
   ports: Port[] | undefined,
   carriers: Carrier[] | undefined,
   containerTypes: ContainerType[] | undefined,
@@ -280,12 +300,10 @@ export const readAndParseFile = (
           duration: 4000,
         });
       }
-      console.log(object);
       // Create booking request
       let bookingRequest = await mapIntoBookingRequestModel(
         object,
         user,
-        client,
         ports,
         carriers,
         containerTypes,
@@ -315,7 +333,6 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const history = useHistory();
 
   const [, userRecord] = useUser();
-  const client = pick(UserRecordMinProperties)(userRecord) as UserRecordMin;
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
@@ -335,7 +352,6 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           setLoading,
           setFiles,
           userRecord,
-          client,
           ports,
           carriers,
           containerTypes,
@@ -344,7 +360,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
         );
       });
     },
-    [carriers, client, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
+    [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
   );
 
   const storageBasePath = useMemo((): string => {
@@ -482,7 +498,12 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                 <span style={{ visibility: loading ? 'hidden' : 'visible' }}>Save Booking</span>
               </Button>
             </Box>
-            {bookingRequest && <MissingFields bookingRequest={bookingRequest} />}
+            {bookingRequest && (
+              <MissingFields
+                bookingRequest={bookingRequest}
+                watchedFields={defaultWatchedFields.filter(field => field !== 'assignedUser')}
+              />
+            )}
           </Box>
         </DialogContent>
       </Box>

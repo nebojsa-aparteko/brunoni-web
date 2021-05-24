@@ -18,14 +18,27 @@ import { hasIn, isEmpty } from 'lodash/fp';
 import { BookingRequest } from '../../model/BookingRequest';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const defaultWatchedFields: string[] = ['carrier', 'schedule', 'vgmSubmittedBy'];
-const defaultContainerWatchedFields: string[] = [
-  'commodityType',
-  'containerType',
-  'pickupDate', // todo. Review later
-  'pickupLocation',
-  'quantity',
-];
+interface Object {
+  [key: string]: string;
+}
+
+export const WatchedFields: Object = {
+  carrier: 'Carrier',
+  schedule: 'Schedule',
+  vgmSubmittedBy: 'VGM Submission By',
+  assignedUser: 'Watcher (Assigned agent)',
+};
+
+export const ContainerWatchedFields: Object = {
+  commodityType: 'Commodity Type',
+  containerType: 'Container Type',
+  pickupDate: 'Pickup Date', // todo. Review later
+  pickupLocation: 'Pickup/Dropoff Location in Europe',
+  quantity: 'Quantity',
+};
+
+export const defaultWatchedFields: string[] = Object.keys(WatchedFields);
+export const defaultContainerWatchedFields: string[] = Object.keys(ContainerWatchedFields);
 
 const useStyles = makeStyles((theme: Theme) => ({
   additionalInfo: {
@@ -83,7 +96,7 @@ const MissingFields: React.FC<Props> = ({
                         <ListItemIcon>
                           <FiberManualRecordIcon color={'error'} fontSize={'small'} />
                         </ListItemIcon>
-                        <ListItemText>{field}</ListItemText>
+                        <ListItemText>{WatchedFields[field]}</ListItemText>
                       </ListItem>
                     ))}
                   </List>
@@ -104,7 +117,7 @@ const MissingFields: React.FC<Props> = ({
                             <ListItemIcon>
                               <FiberManualRecordIcon color={'error'} fontSize={'small'} />
                             </ListItemIcon>
-                            <ListItemText>{field}</ListItemText>
+                            <ListItemText>{ContainerWatchedFields[field]}</ListItemText>
                           </ListItem>
                         ))}
                       </List>
