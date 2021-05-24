@@ -596,13 +596,13 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('BkgTouchTimeStamp', new Date()),
     set('CarrierID', request.carrier?.name),
     set('category', BookingCategory.Export),
+    // set('CargoDetails')
     set('ForwAdrCity', request.createdBy?.company?.city),
     set('ForwAdrId', request.createdBy?.company?.id),
     set('ForwAdrName', request.createdBy?.company?.name),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
     set('FreightDetails', request.freightDetails),
-    set('Vessel', request.schedule?.OriginInfo.VoyageInfo.VesselName),
-    set('Voyage', request.schedule?.OriginInfo.VoyageInfo.VoyageNr),
     set('leadingCurrency', request.leadingCurrency),
+    set('schedule', request.schedule),
   )({});

@@ -22,6 +22,7 @@ import SchedulePicker from './SchedulePicker';
 import {
   RouteSearchResult,
   RouteSearchResultDestinationInfo,
+  RouteSearchResultIntermediatePortInfo,
   RouteSearchResultOriginInfo,
   RouteSearchResultVoyageInfo,
   SearchResultsPort,
@@ -31,7 +32,7 @@ import { Link } from 'react-router-dom';
 import { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import { set, get, unset } from 'lodash/fp';
+import { cloneDeep, get, set } from 'lodash/fp';
 import UserRecord from '../../contexts/UserRecordContext';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import AddIcon from '@material-ui/icons/Add';
@@ -118,13 +119,19 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.grey['50'],
   },
 }));
-
+interface Itinerary {
+  placeOfReceipt: any;
+  portOfLoading?: any | undefined;
+  portOfDischarge?: any | undefined;
+  placeOfDelivery: any;
+}
 const emptySearchResultPort = {
   ID: '',
   Land: '',
   HarbourName: '',
   PortName: '',
   PortAgent: '',
+  PortAgentID: '',
   TerminalID: '',
 } as SearchResultsPort;
 
@@ -169,62 +176,53 @@ const getPortFromInputValue = (value: Port | null) => {
     : undefined;
 };
 
-const intermediateVessels = ['TRUCK', 'BARGE', 'RAIL', 'FEEDER', 'RAIL/TRUCK', 'BARGE/TRUCK'];
+const intermediateVessels = ['TRUCK', 'BARGE', 'RAIL', 'FEEDER', 'RAIL/TRUCK', 'BARGE/TRUCK', ''];
 const isVesselIntermediate = (vessel: string) => {
   return intermediateVessels.includes(vessel);
 };
 
-const hasPlaceOfReceipt = (bookingRequest: BookingRequest) => {
-  return (
-    bookingRequest.schedule?.IntermediatePortInfos.length === 2 ||
-    (bookingRequest.schedule?.IntermediatePortInfos.length === 1 &&
-      isVesselIntermediate(bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName))
-  );
+const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
+  schedule?.IntermediatePortInfos.length === 2 ||
+  (schedule?.IntermediatePortInfos.length === 1 &&
+    (isVesselIntermediate(schedule?.OriginInfo.VoyageInfo.VesselName) || !hasPlaceOfDelivery(schedule))); //Place of delivery has a priority
+
+const hasPlaceOfDelivery = (schedule: RouteSearchResult | undefined) =>
+  schedule?.IntermediatePortInfos.length === 2 ||
+  (schedule?.IntermediatePortInfos.length === 1 &&
+    isVesselIntermediate(schedule?.DestinationInfo.VoyageInfo.VesselName));
+
+const getPortOfLoading = (schedule: RouteSearchResult | undefined) => {
+  return schedule?.IntermediatePortInfos.length === 2
+    ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
+      ? [schedule?.IntermediatePortInfos[1], 1]
+      : [schedule?.IntermediatePortInfos[0], 0]
+    : schedule?.IntermediatePortInfos.length === 1
+    ? [schedule?.IntermediatePortInfos[0], 0]
+    : [undefined, -1]; //This should never happen
 };
 
-const hasPlaceOfDelivery = (bookingRequest: BookingRequest) => {
-  return (
-    bookingRequest.schedule?.IntermediatePortInfos.length === 2 ||
-    (bookingRequest.schedule?.IntermediatePortInfos.length === 1 &&
-      (isVesselIntermediate(bookingRequest.schedule?.DestinationInfo.VoyageInfo.VesselName) ||
-        !hasPlaceOfReceipt(bookingRequest)))
-  );
+const getPortOfDischarge = (schedule: RouteSearchResult | undefined) => {
+  return schedule?.IntermediatePortInfos.length === 2
+    ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
+      ? [schedule?.IntermediatePortInfos[0], 0]
+      : [schedule?.IntermediatePortInfos[1], 1]
+    : schedule?.IntermediatePortInfos.length === 1
+    ? [schedule?.IntermediatePortInfos[0], 0]
+    : [undefined, -1]; //This should never happen
 };
 
-const getPortOfLoading = (bookingRequest: BookingRequest) => {
-  return bookingRequest.schedule?.IntermediatePortInfos.length === 2
-    ? bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate >
-      bookingRequest.schedule?.IntermediatePortInfos[1].DepartureDate
-      ? bookingRequest.schedule?.IntermediatePortInfos[1]
-      : bookingRequest.schedule?.IntermediatePortInfos[0]
-    : bookingRequest.schedule?.IntermediatePortInfos.length === 1
-    ? bookingRequest.schedule?.IntermediatePortInfos[0]
-    : undefined; //This should never happen
+const getFieldToUpdate = (newItinerary: Itinerary, itineraryItemName: string) => {
+  switch (itineraryItemName) {
+    case 'placeOfReceipt':
+      return 'OriginInfo';
+    case 'placeOfDelivery':
+      return 'DestinationInfo';
+    case 'portOfLoading':
+      return newItinerary.placeOfReceipt ? 'IntermediatePortInfos' : 'OriginInfo';
+    case 'portOfDischarge':
+      return newItinerary.placeOfDelivery ? 'IntermediatePortInfos' : 'DestinationInfo';
+  }
 };
-
-const getPortOfDischarge = (bookingRequest: BookingRequest) => {
-  return bookingRequest.schedule?.IntermediatePortInfos.length === 2
-    ? bookingRequest.schedule?.IntermediatePortInfos[0].DepartureDate >
-      bookingRequest.schedule?.IntermediatePortInfos[1].DepartureDate
-      ? bookingRequest.schedule?.IntermediatePortInfos[0]
-      : bookingRequest.schedule?.IntermediatePortInfos[1]
-    : bookingRequest.schedule?.IntermediatePortInfos.length === 1
-    ? bookingRequest.schedule?.IntermediatePortInfos[0]
-    : undefined; //This should never happen
-};
-
-// const getFieldToUpdate = (newItinerary, itineraryItemName) => {
-//   switch (itineraryItemName) {
-//     case 'placeOfReceipt':
-//       return 'OriginInfo';
-//     case 'placeOfDelivery':
-//       return 'DestinationInfo';
-//     case 'portOfLoading':
-//       return newItinerary.placeOfReceipt ? 'IntermediateInfo' : 'OriginInfo';
-//     case 'portOfDischarge':
-//       return newItinerary.placeOfDelivery ? 'IntermediateInfo' : "DestinationInfo";
-//   };
-// };
 
 interface ItineraryInfoProps {
   bookingRequest: BookingRequest;
@@ -236,46 +234,86 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
   const classes = useStyles();
   const ports = useContext(Ports);
   const userRecord = useContext(UserRecordContext);
-  const [isPlaceOfReceiptDefined, setIsPlaceOfReceiptDefined] = useState(hasPlaceOfReceipt(bookingRequest));
-  const [isPlaceOfDeliveryDefined, setIsPlaceOfDeliveryDefined] = useState(hasPlaceOfDelivery(bookingRequest));
-
+  const [isPlaceOfReceiptDefined, setIsPlaceOfReceiptDefined] = useState(hasPlaceOfReceipt(bookingRequest.schedule));
+  const [isPlaceOfDeliveryDefined, setIsPlaceOfDeliveryDefined] = useState(hasPlaceOfDelivery(bookingRequest.schedule));
+  const [POL] = getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
+  const [POD] = getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
   const [itinerary, setItinerary] = useState({
     placeOfReceipt: isPlaceOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
-    portOfLoading: isPlaceOfReceiptDefined ? getPortOfLoading(bookingRequest) : bookingRequest.schedule?.OriginInfo,
-    portOfDischarge: isPlaceOfDeliveryDefined
-      ? getPortOfDischarge(bookingRequest)
-      : bookingRequest.schedule?.DestinationInfo,
+    portOfLoading: isPlaceOfReceiptDefined ? POL : bookingRequest.schedule?.OriginInfo,
+    portOfDischarge: isPlaceOfDeliveryDefined ? POD : bookingRequest.schedule?.DestinationInfo,
     placeOfDelivery: isPlaceOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
   });
 
   useEffect(() => {
-    setIsPlaceOfReceiptDefined(hasPlaceOfReceipt(bookingRequest));
-    setIsPlaceOfDeliveryDefined(hasPlaceOfDelivery(bookingRequest));
-    setItinerary({
-      placeOfReceipt: isPlaceOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
-      portOfLoading: isPlaceOfReceiptDefined ? getPortOfLoading(bookingRequest) : bookingRequest.schedule?.OriginInfo,
-      portOfDischarge: isPlaceOfDeliveryDefined
-        ? getPortOfDischarge(bookingRequest)
-        : bookingRequest.schedule?.DestinationInfo,
-      placeOfDelivery: isPlaceOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
-    });
-  }, [bookingRequest]);
-
-  console.log(JSON.stringify(itinerary));
+    const placeOfReceiptDefined = hasPlaceOfReceipt(bookingRequest.schedule);
+    const placeOfDeliveryDefined = hasPlaceOfDelivery(bookingRequest.schedule);
+    setIsPlaceOfReceiptDefined(placeOfReceiptDefined);
+    setIsPlaceOfDeliveryDefined(placeOfDeliveryDefined);
+    const [POL] = getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
+    const [POD] = getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
+    const newItinerary = {
+      placeOfReceipt: placeOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
+      portOfLoading: placeOfReceiptDefined ? POL : bookingRequest.schedule?.OriginInfo,
+      portOfDischarge: placeOfDeliveryDefined ? POD : bookingRequest.schedule?.DestinationInfo,
+      placeOfDelivery: placeOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
+    };
+    setItinerary(newItinerary);
+  }, [bookingRequest.schedule]);
 
   const handleChangeItinerary = (itineraryItemName: string, fieldName: string, value: any) => {
-    setItinerary(set(itineraryItemName, set(fieldName, value)(get(itineraryItemName)(itinerary)))(itinerary));
+    const newItinerary = set(itineraryItemName, set(fieldName, value)(get(itineraryItemName)(itinerary)))(itinerary);
+    const itineraryItemToUpdate: string | undefined = getFieldToUpdate(newItinerary, itineraryItemName);
+    const schedule = { ...bookingRequest.schedule };
+    itineraryItemToUpdate &&
+      setBookingRequest &&
+      setBookingRequest(
+        set('schedule', set(itineraryItemToUpdate, get(itineraryItemName)(newItinerary))(schedule))(bookingRequest),
+      );
   };
 
   const handleAddPlaceOfReceipt = () => {
-    setItinerary(set('placeOfReceipt', emptyPlaceOfReceipt)(itinerary));
+    const newItinerary = set('placeOfReceipt', emptyPlaceOfReceipt)(itinerary);
+    const schedule = {
+      ...bookingRequest.schedule,
+      OriginInfo: newItinerary.placeOfReceipt,
+      IntermediatePortInfos: [...(bookingRequest.schedule?.IntermediatePortInfos || []), newItinerary.portOfLoading],
+    } as RouteSearchResult;
+    setBookingRequest && setBookingRequest(set('schedule', schedule)(bookingRequest));
   };
   const handleAddPlaceOfDelivery = () => {
-    setItinerary(set('placeOfDelivery', emptyPlaceOfDelivery)(itinerary));
+    const newItinerary = set('placeOfDelivery', emptyPlaceOfDelivery)(itinerary);
+    const schedule = {
+      ...bookingRequest.schedule,
+      DestinationInfo: newItinerary.placeOfReceipt,
+      IntermediatePortInfos: [...(bookingRequest.schedule?.IntermediatePortInfos || []), newItinerary.portOfDischarge],
+    } as RouteSearchResult;
+    setBookingRequest && setBookingRequest(set('schedule', schedule)(bookingRequest));
   };
-
   const handleDeleteItineraryItem = (fieldName: string) => {
-    setItinerary(unset(fieldName)(itinerary));
+    const [port, index] =
+      fieldName === 'placeOfReceipt'
+        ? (getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number])
+        : (getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number]);
+    const tempSchedule = cloneDeep(bookingRequest.schedule);
+    const schedule = tempSchedule
+      ? ((fieldName === 'placeOfReceipt'
+          ? {
+              ...tempSchedule,
+              OriginInfo: port || undefined,
+              IntermediatePortInfos: tempSchedule?.IntermediatePortInfos
+                ? tempSchedule?.IntermediatePortInfos.filter((_, i) => i !== index)
+                : undefined,
+            }
+          : {
+              ...tempSchedule,
+              DestinationInfo: tempSchedule?.IntermediatePortInfos ? port : undefined,
+              IntermediatePortInfos: tempSchedule?.IntermediatePortInfos
+                ? tempSchedule?.IntermediatePortInfos.filter((_, i) => i !== index)
+                : undefined,
+            }) as RouteSearchResult)
+      : undefined;
+    setBookingRequest && setBookingRequest(set('schedule', schedule)(bookingRequest));
   };
 
   return (
