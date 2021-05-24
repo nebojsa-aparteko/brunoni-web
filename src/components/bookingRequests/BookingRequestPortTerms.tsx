@@ -23,7 +23,7 @@ const getClientRepresentation = (client: Client) => {
 const BookingRequestPortTerms: React.FC<Props> = () => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const client = useClientById(bookingRequest?.createdBy.alphacomClientId);
+  const client = useClientById(bookingRequest?.createdBy?.alphacomClientId);
   const [selectedVGMSubmission, setSelectedVGMSubmission] = useState<string | UserRecordMin | undefined>(
     bookingRequest?.vgmSubmittedBy
       ? typeof bookingRequest.vgmSubmittedBy === 'string'

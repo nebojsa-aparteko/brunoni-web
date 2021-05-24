@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
-import { useClientById } from '../../hooks/useClient';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -572,8 +571,7 @@ export const userRepresentation = (user: UserRecordMin | undefined) => {
 const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
-  const client = useClientById(bookingRequest ? bookingRequest.createdBy.alphacomClientId : undefined);
-  const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy.alphacomId : undefined);
+  const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy?.alphacomId : undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const clients = useClients();
   const userRecord = useContext(UserRecord);
@@ -587,17 +585,17 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   };
 
   const clientInfo = useMemo(() => {
-    if (!client) {
-      return `${(bookingRequest && bookingRequest.createdBy.firstName) || ''}`;
+    if (!bookingRequest?.client) {
+      return `${(bookingRequest && bookingRequest.createdBy?.firstName) || ''}`;
     }
 
     return (
       <Fragment>
-        {client.name}, {client.city}
+        {bookingRequest.client.name}, {bookingRequest.client.city}
         <ClientDetails forwarder={forwarder} bkgRef={bookingRequest?.customerReference} />
       </Fragment>
     );
-  }, [client, bookingRequest]);
+  }, [bookingRequest]);
 
   const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
     bookingRequest &&
@@ -691,7 +689,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   )
                 }
               />
-              {bookingRequest.inttraId && <TableRowData label={'Inttra Id'} content={bookingRequest.inttraId} />}
               {bookingRequest.inttraRefNumber && (
                 <TableRowData label={'Inttra reference'} content={bookingRequest.inttraRefNumber} />
               )}
@@ -725,30 +722,47 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
                 <TableCell className={classes.tableCell}>{userRepresentation(bookingRequest?.assignedUser)}</TableCell>
               </TableRow>
-              <TableRow className={classes.tableRow}>
-                <TableCell className={classes.tableCellLabel}>Client</TableCell>
-                <TableCell className={classes.tableCell}>{clientInfo} </TableCell>
-              </TableRow>
               {clients && (
-                <TableRowData
-                  label={'Statistic Client'}
-                  content={
-                    editing ? (
-                      <ClientInput
-                        label=""
-                        clients={clients}
-                        onChange={client =>
-                          setBookingRequest(prevState => prevState && set('statClient', client)(prevState))
-                        }
-                        value={bookingRequest.statClient}
-                      />
-                    ) : (
-                      <Typography>
-                        {bookingRequest.statClient?.name}, {bookingRequest.statClient?.city}
-                      </Typography>
-                    )
-                  }
-                />
+                <>
+                  <TableRowData
+                    label={'Client'}
+                    content={
+                      editing ? (
+                        <ClientInput
+                          label=""
+                          clients={clients}
+                          onChange={client =>
+                            setBookingRequest(prevState => prevState && set('client', client)(prevState))
+                          }
+                          value={bookingRequest.client}
+                        />
+                      ) : (
+                        <span>{clientInfo}</span>
+                      )
+                    }
+                  />
+                  <TableRowData
+                    label={'Statistic Client'}
+                    content={
+                      editing ? (
+                        <ClientInput
+                          label=""
+                          clients={clients}
+                          onChange={client =>
+                            setBookingRequest(prevState => prevState && set('statClient', client)(prevState))
+                          }
+                          value={bookingRequest.statClient}
+                        />
+                      ) : (
+                        <Typography>
+                          {bookingRequest.statClient
+                            ? (bookingRequest.statClient.name, bookingRequest.statClient.city)
+                            : 'Unassigned'}
+                        </Typography>
+                      )
+                    }
+                  />
+                </>
               )}
             </TableBody>
           </Table>

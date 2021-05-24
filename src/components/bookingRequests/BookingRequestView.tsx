@@ -11,6 +11,7 @@ import React, {
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -62,6 +63,7 @@ import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
+import useClientUsers from '../../hooks/useClientUsers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -142,6 +144,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: 0,
     marginLeft: '20px',
   },
+  saveBtn: {
+    margin: theme.spacing(1),
+  },
 }));
 
 interface AgentAssignmentDialogProps {
@@ -172,6 +177,17 @@ const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
       },
       { merge: true },
     );
+const changeAssignedClient = (id: string, user: UserRecord | null) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(id)
+    .set(
+      {
+        createdBy: user ? pick(UserRecordMinProperties)(user) : null,
+      },
+      { merge: true },
+    );
 
 //TODO delete and use the booking activity after we generalize it?
 const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
@@ -188,6 +204,10 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const classes = useStyles();
   const userRecord = useUser()[1];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const assignableCustomers = useClientUsers(bookingRequest.client?.id);
+  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | null>();
+  const [selectedClient, setSelectedClient] = useState<UserRecord | null>();
+  const [, dispatch] = useGlobalAppState();
 
   const getActivityLogUserData = useCallback(
     (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
@@ -201,20 +221,52 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
     [userRecord],
   );
 
-  const handleChangeAgent = (user: UserRecordMin | null) => {
+  const handleChangeClient = () => {
+    dispatch({ type: 'START_GLOBAL_LOADING' });
     bookingRequest.id &&
-      changeAssignedAgent(bookingRequest.id, user)
+      selectedClient &&
+      changeAssignedClient(bookingRequest.id, selectedClient)
+        .then(() =>
+          addActivityItem(
+            bookingRequest.id || '',
+            createActivityObject({
+              changeType: ActivityChangeType.ASSIGNED_CLIENT,
+              by: getActivityLogUserData(userRecord),
+              addedUsers: [getActivityLogUserData(selectedClient)],
+            }),
+          ),
+        )
+        .then(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        })
+        .catch(e => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Client!' });
+        });
+  };
+
+  const handleChangeAgent = () => {
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    bookingRequest.id &&
+      selectedAgent &&
+      changeAssignedAgent(bookingRequest.id, selectedAgent)
         .then(() =>
           addActivityItem(
             bookingRequest.id || '',
             createActivityObject({
               changeType: ActivityChangeType.ASSIGNED_AGENT,
               by: getActivityLogUserData(userRecord),
-              addedUsers: [getActivityLogUserData(user)],
+              addedUsers: [getActivityLogUserData(selectedAgent)],
             }),
           ),
         )
-        .then(handleClose);
+        .then(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        })
+        .catch(e => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
+        });
   };
 
   return (
@@ -232,10 +284,30 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
             value={bookingRequest.assignedUser}
             label="Assigned Agent"
             users={assignableUsers || []}
-            onChange={(_, user) => handleChangeAgent(user)}
+            onChange={(_, user) => setSelectedAgent(user)}
+          />
+        </Box>
+        <Box my={1}>
+          <UserInput
+            value={bookingRequest.createdBy}
+            label="Assigned Client"
+            users={assignableCustomers || []}
+            onChange={(_, user) => setSelectedClient(user)}
           />
         </Box>
       </DialogContent>
+      <Button
+        onClick={() => {
+          handleChangeAgent();
+          handleChangeClient();
+          handleClose();
+        }}
+        variant="contained"
+        className={classes.saveBtn}
+        color="primary"
+      >
+        Save
+      </Button>
     </Dialog>
   );
 };
@@ -293,7 +365,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     (checklistItemActivityHandler: () => Promise<void | any>) => {
       checklistItemActivityHandler()
         .then(_ => {
-          console.log('Test', _);
           dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved message!' });
         })
         .catch(error => {

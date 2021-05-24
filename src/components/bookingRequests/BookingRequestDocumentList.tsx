@@ -22,6 +22,7 @@ const BookingRequestDocumentList: React.FC<BookingRequestDocumentListProps> = ({
   shouldShowAll,
   storageBasePath,
   activityPath,
+  documentsCount = 0,
   ...props
 }) => {
   const classes = useStyles();
@@ -44,7 +45,7 @@ const BookingRequestDocumentList: React.FC<BookingRequestDocumentListProps> = ({
           {...props}
         />
       ))}
-      {!shouldShowAll && (documents?.length || 0) > 0 && (
+      {!shouldShowAll && documentsCount > 1 && (
         <Box display="flex" justifyContent="center">
           <Button
             color="default"
@@ -69,4 +70,5 @@ interface BookingRequestDocumentListProps {
   shouldShowAll?: boolean;
   additionalActivityFields?: Partial<ActivityCreationProps>;
   additionalMentionFields?: Partial<ActivityLogContextProps>;
+  documentsCount?: number;
 }

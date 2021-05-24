@@ -12,7 +12,7 @@ import { Currency } from './Payment';
 export interface BookingRequest {
   id?: string;
   blNumber?: string;
-  inttraId?: string;
+  client?: Client;
   inttraRefNumber?: string;
   origin?: Port;
   destination?: Port;
@@ -27,7 +27,7 @@ export interface BookingRequest {
   imo?: boolean;
   soc?: boolean;
   createdAt: Date;
-  createdBy: UserRecord;
+  createdBy?: UserRecord;
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;

@@ -66,6 +66,7 @@ export interface ChecklistItem {
   valuesAdmin?: ChecklistItemValueDocument[];
   stages: Stage[];
   mentionCount?: number;
+  documentsCount?: number;
   isInternal?: boolean;
 }
 

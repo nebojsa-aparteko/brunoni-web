@@ -229,9 +229,7 @@ const extractDataOddTable = (object: DataOddTable) => {
   const INTTRA_REFERENCE_NUMBER = findDataOddTable(object, Titles.INTTRA_REFERENCE_NUMBER);
   const CUSTOMER_SHIPMENT_ID = findDataOddTable(object, Titles.CUSTOMER_SHIPMENT_ID);
   const BOOKING_OFFICE = findDataOddTable(object, Titles.BOOKING_OFFICE);
-  console.log(object);
   const CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER);
-  console.log(CONTRACT_NUMBER);
   const FREIGHT_FORWARDERS_REFERENCE_NUMBERS = findDataOddTable(
     object,
     Titles.FREIGHT_FORWARDERS_REFERENCE_NUMBERS,
@@ -370,7 +368,6 @@ const getContainerData = (array: string[]) => {
   //todo. TRANSPORT PLAN DETAILS missing
   //todo. date reversed
   //todo. reversed in INTTRA_BKG_1_176427567?
-  //console.log(SIZE_TYPE_CODE)
   const TYPE = SIZE_TYPE_CODE?.substring(0, SIZE_TYPE_CODE?.indexOf(' '));
   const SIZE = SIZE_TYPE_CODE?.substring(SIZE_TYPE_CODE?.indexOf(' ') + 1).slice(1, -1);
   const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT);
