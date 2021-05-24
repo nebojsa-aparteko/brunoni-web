@@ -320,13 +320,13 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   }, [bookingRequest?.schedule?.OriginInfo.Port.ID, bookingRequest?.schedule?.OriginInfo.Port.TerminalID, terms]);
 
   const [deliveryAddress, setDeliveryAddress] = useState<string>(
-    bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '',
+    bookingRequest?.schedule?.OriginInfo.Port.PortName?.replaceAll('<br/>', '\n') || '',
   );
 
   const userRecord = useContext(UserRecordContext);
 
   useEffect(() => {
-    setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName.replaceAll('<br/>', '\n') || '');
+    setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName?.replaceAll('<br/>', '\n') || '');
   }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
 
   const handleChange = (value: any[] | undefined) => {
