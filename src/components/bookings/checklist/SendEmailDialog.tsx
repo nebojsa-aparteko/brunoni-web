@@ -145,9 +145,9 @@ const SendEmailContent = ({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          bcc: [],
-          cc: carrierSetting?.contactCC || [],
-          contactTo: carrierSetting?.contactTo || [],
+          bcc: selectedContactBCC,
+          cc: selectedContactCC || [],
+          contactTo: selectedContactTo || [],
           portId: carrierSetting.port?.id,
           freeText: additionalInfo,
           bookingId: bookingId,

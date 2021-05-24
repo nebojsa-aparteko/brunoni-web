@@ -201,11 +201,6 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
           )}
         </Fragment>
       )}
-      {activity.changeType === ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL
-        ? activity.paymentConfirmationEmails
-          ? createEmailRepresentation(activity.paymentConfirmationEmails)
-          : null
-        : null}
     </Typography>
   );
 };
