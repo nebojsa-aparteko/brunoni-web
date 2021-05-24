@@ -22,8 +22,9 @@ import useUser from '../../../hooks/useUser';
 import useGlobalAppState from '../../../hooks/useGlobalAppState';
 import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
-import { ActivityChangeType, ActivityLogUserData } from './ChecklistItemModel';
+import { ActivityChangeType, ActivityLogUserData, ChecklistNames } from './ChecklistItemModel';
 import { ActivityType } from './ActivityModel';
+import firebase from 'firebase';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,8 +45,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   }),
 );
-
-const defaultCCEmails = ['importhsdg@brunoni.ch', 'zrh-import-crosstrade@brunoni.ch'];
 
 const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }) => {
   const classes = useStyles();
@@ -76,6 +75,7 @@ const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }
             carrierSetting={selectedCarrierSettings}
             bookingId={booking.id}
             setDialogOpen={setDialogOpen}
+            assignedClientEmail={booking.assignedCustomerUser?.emailAddress}
           />
         )}
       </DialogContent>
@@ -95,9 +95,11 @@ const SendEmailContent = ({
   carrierSetting,
   bookingId,
   setDialogOpen,
+  assignedClientEmail,
 }: {
   carrierSetting: CarrierSettingsRule;
   bookingId: string;
+  assignedClientEmail?: string;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const classes = useStyles();
@@ -113,8 +115,9 @@ const SendEmailContent = ({
 
   useEffect(() => {
     setSelectedContactTo(carrierSetting?.contactTo || []);
-    setSelectedContactCC(defaultCCEmails.concat(carrierSetting?.contactCC || []));
-  }, [carrierSetting]);
+    setSelectedContactCC((assignedClientEmail ? [assignedClientEmail] : []).concat(carrierSetting?.contactCC || []));
+    setSelectedContactBCC(assignedClientEmail ? [assignedClientEmail] : []);
+  }, [carrierSetting, assignedClientEmail]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -131,7 +134,7 @@ const SendEmailContent = ({
   const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAdditionalInfo(event.target.value);
   };
-  const handleSendEmail = async (token: string, addActivity: (emails: string[]) => Promise<any>) => {
+  const handleSendEmail = async (token: string, addActivity: (emails: string[]) => Promise<any>, bookingId: string) => {
     try {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
@@ -160,6 +163,13 @@ const SendEmailContent = ({
           dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: resp.success });
           setDialogOpen(false);
           await addActivity(resp.emails);
+          await firebase
+            .firestore()
+            .collection('bookings')
+            .doc(bookingId)
+            .collection('checklist')
+            .doc(ChecklistNames['FREIGHT COLLECTION'])
+            .update('checked', true);
         } else {
           setError(resp.error);
         }
@@ -215,17 +225,20 @@ const SendEmailContent = ({
         variant="contained"
         onClick={() =>
           user.getIdToken().then(token =>
-            handleSendEmail(token, (emails: string[]) =>
-              addActivityItem(
-                bookingId,
-                createActivityObject({
-                  changeType: ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL,
-                  by: getActivityLogUserData(),
-                  type: ActivityType.ACTIVITY,
-                  paymentConfirmationEmails: emails,
-                  internal: true,
-                }),
-              ),
+            handleSendEmail(
+              token,
+              (emails: string[]) =>
+                addActivityItem(
+                  bookingId,
+                  createActivityObject({
+                    changeType: ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL,
+                    by: getActivityLogUserData(),
+                    type: ActivityType.ACTIVITY,
+                    paymentConfirmationEmails: emails,
+                    internal: true,
+                  }),
+                ),
+              bookingId,
             ),
           )
         }
