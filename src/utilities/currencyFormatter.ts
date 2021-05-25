@@ -14,10 +14,15 @@ const formatEURCurrency = (amount: number) =>
     minimumFractionDigits: 2,
   }).format(amount);
 
-const formatCHFCurrency = (amount: number) =>
+const formatCHFCurrency = (amount: number): string =>
   new Intl.NumberFormat('de-CH', {
     style: 'currency',
     currency: 'CHF',
+    minimumFractionDigits: 2,
+  }).format(amount);
+
+export const formatCurrencyAmount = (amount: number): string =>
+  new Intl.NumberFormat('de-CH', {
     minimumFractionDigits: 2,
   }).format(amount);
 

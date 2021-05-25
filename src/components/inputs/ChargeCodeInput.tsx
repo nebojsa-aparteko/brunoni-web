@@ -1,10 +1,19 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { MenuItem, Select } from '@material-ui/core';
+import { makeStyles, TextField } from '@material-ui/core';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import { FreightDetailGroup } from '../../model/Booking';
+import { Autocomplete } from '@material-ui/lab';
+
+const useStyles = makeStyles({
+  input: {
+    // todo. Cant make it dynamic... fit-content not working.
+    minWidth: '250px',
+  },
+});
 
 const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group, margin }) => {
+  const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
   const filteredChargeCodes = useMemo(
     () =>
@@ -20,27 +29,23 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
     setChargeCode(chargeCodes ? chargeCodes.find(code => code.text === chargeCodeText) : undefined);
   }, [chargeCodeText]);
 
-  const handleSetSelectedValue = (event: React.ChangeEvent<{ value: string }>) => {
-    const selectedSpecialRemark = event.target.value
-      ? chargeCodes?.find(code => code.id === event.target.value)
-      : undefined;
+  const handleSetSelectedValue = (event: React.ChangeEvent<{}>, value: ChargeCode | null) => {
+    const selectedSpecialRemark = value ? chargeCodes?.find(code => code.id === value.id) : undefined;
     handleChange && handleChange(selectedSpecialRemark);
   };
 
   return (
-    <Select
-      value={chargeCode?.id || ''}
-      margin={margin}
+    <Autocomplete
       fullWidth
-      onChange={event => handleSetSelectedValue(event as React.ChangeEvent<{ value: string }>)}
-      style={{ flex: 1, height: 'fit-content' }}
-    >
-      {filteredChargeCodes?.map(code => (
-        <MenuItem key={code.id} value={code.id}>
-          {code.text}
-        </MenuItem>
-      ))}
-    </Select>
+      autoHighlight
+      className={classes.input}
+      options={filteredChargeCodes || []}
+      getOptionSelected={(option: ChargeCode, value: ChargeCode) => option.text === value.text}
+      getOptionLabel={option => option.text || ''}
+      onChange={handleSetSelectedValue}
+      value={chargeCode}
+      renderInput={params => <TextField {...params} fullWidth placeholder="Type to filter" variant="outlined" />}
+    />
   );
 };
 
