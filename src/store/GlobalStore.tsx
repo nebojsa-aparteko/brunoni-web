@@ -19,9 +19,10 @@ const GlobalStore: React.FC = ({ children }) => {
       enqueueSnackbar(snackbarMessage.message, {
         variant: snackbarMessage.snackbarType,
         autoHideDuration: snackbarMessage.snackbarDuration || 1000,
+        preventDuplicate: true,
       });
     }
-  });
+  }, [snackbarMessage]);
 
   useEffect(() => {
     if (promiseActivity) {
