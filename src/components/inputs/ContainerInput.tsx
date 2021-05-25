@@ -198,6 +198,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handlePickupDateChange = (v: Date | null) => {
+    setDateOpen(false);
     onChange(set('pickupDate', isContainerSO(container) ? undefined : v)(container));
   };
 
