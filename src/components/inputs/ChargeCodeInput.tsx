@@ -31,7 +31,7 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
 
   const handleSetSelectedValue = (event: React.ChangeEvent<{}>, value: ChargeCode | null) => {
     const selectedSpecialRemark = value ? chargeCodes?.find(code => code.id === value.id) : undefined;
-    handleChange && handleChange(selectedSpecialRemark);
+    selectedSpecialRemark && handleChange && handleChange(selectedSpecialRemark);
   };
 
   return (
