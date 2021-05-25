@@ -131,7 +131,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const tariffs = useCodebook({
     depotLocation: container.pickupLocation?.id,
     carrier: bookingRequest?.carrier?.id,
-    port: bookingRequest?.schedule?.DestinationInfo.Port.ID,
+    port: bookingRequest?.schedule?.OriginInfo.Port.ID,
     category: BookingCategory.Export,
     equipment: container.containerType?.id,
   }) as Codebook;

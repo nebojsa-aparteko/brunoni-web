@@ -113,7 +113,7 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
           {availableCodes?.map(tariff => {
             return (
               <MenuItem key={tariff.id} value={tariff.id} className={classes.menuItem}>
-                <Typography className={classes.menuItemPrimaryText}>{tariff.id}</Typography>
+                <Typography className={classes.menuItemPrimaryText}>{tariff.description}</Typography>
                 <Typography
                   className={classes.menuItemSecondaryText}
                   variant="body2"
