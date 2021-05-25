@@ -18,6 +18,8 @@ import { a11yProps } from '../../pages/BookingsPage';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import currencyFormatter from '../../utilities/currencyFormatter';
+import { Currency } from '../../model/Payment';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -97,10 +99,23 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
   const userRecord = useContext(UserRecordContext);
 
+  const formatCurrency = (currency: string, amount: string) => {
+    switch (currency) {
+      case Currency.EUR:
+        return currencyFormatter(Currency.EUR)(Number(amount));
+      case Currency.USD:
+        return currencyFormatter(Currency.USD)(Number(amount));
+      case Currency.CHF:
+        return currencyFormatter(Currency.CHF)(Number(amount));
+      default:
+        return '-';
+    }
+  };
+
   useEffect(() => {
     setQuantity(freightDetail.Anz || '1.00');
     setCurrency(freightDetail.Currency);
-    setUnitValue(freightDetail.UnitValue);
+    setUnitValue(formatCurrency(freightDetail.Currency, freightDetail.UnitValue));
     setCostUnit(freightDetail.Unit);
     setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
