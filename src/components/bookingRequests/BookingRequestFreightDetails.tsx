@@ -252,7 +252,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
         break;
       case 1:
         freightDetails &&
-          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1));
+          setFilteredFreightDetails(
+            freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1 || detail.Internal1),
+          );
         break;
       case 2:
         freightDetails &&

@@ -73,21 +73,6 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
       <Typography variant="body2" className={classes.remark}>
         {remark}
       </Typography>
-
-      <Box id="otherBookingRequestInfo">
-        {bookingRequestState.additionalInfo && (
-          <>
-            <Box marginTop="2em" marginBottom="2em">
-              <Divider />
-            </Box>
-            <InfoBoxItem
-              title="Additional Info"
-              label1={<Typography className={classes.additionalInfo}>{bookingRequestState.additionalInfo}</Typography>}
-              gutterBottom
-            />
-          </>
-        )}
-      </Box>
     </Page>
   ) : null;
 };

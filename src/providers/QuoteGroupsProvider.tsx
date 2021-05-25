@@ -112,6 +112,7 @@ export interface QuoteDetail {
   CostUnit?: string;
   Remark?: string;
   RemarkRef?: string;
+  ChargeID?: string;
 }
 
 export interface CostDetailRemark {
