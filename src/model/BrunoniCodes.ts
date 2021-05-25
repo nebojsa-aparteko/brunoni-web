@@ -9,6 +9,7 @@ export default interface BrunoniCodes {
   lastUpdated: Date;
   ports: string[];
   text: string;
+  description: string;
   validFrom: Date;
   carrierId: string;
   type: BrunoniCodesType;

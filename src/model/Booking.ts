@@ -246,7 +246,7 @@ export enum BookingLocType {
 export interface FreightDetail {
   Txt: string;
   Anz: string;
-  UnitValue?: string;
+  UnitValue: string;
   Total?: string;
   Currency: string;
   Unit?: string;
