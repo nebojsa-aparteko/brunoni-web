@@ -35,6 +35,7 @@ export interface BookingRequest {
   vgmSubmittedBy?: string | UserRecordMin;
   archived?: boolean;
   leadingCurrency?: Currency;
+  isScheduleChanged?: boolean;
 }
 
 export enum BookingRequestStatus {

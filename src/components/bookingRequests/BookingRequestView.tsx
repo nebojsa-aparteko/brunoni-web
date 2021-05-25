@@ -11,7 +11,6 @@ import React, {
 import {
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -56,7 +55,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { flow, set } from 'lodash/fp';
+import { flow, set, isEqual } from 'lodash/fp';
 import { BookingCategory } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
@@ -239,7 +238,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         .then(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         })
-        .catch(e => {
+        .catch(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
           return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Client!' });
         });
@@ -263,7 +262,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         .then(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
         })
-        .catch(e => {
+        .catch(() => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
           return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
         });
@@ -337,6 +336,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [, dispatch] = useGlobalAppState();
   const userRecord = useContext(UserRecordContext);
   const { open, closeModal, openModal } = useModal();
+
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
     setAgreementNumber(bookingRequest.agreementNo || '');
@@ -394,9 +394,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
     setEditing(false);
   };
-
+  console.log(bookingRequestState?.isScheduleChanged);
   const handleSave = useCallback(() => {
-    const br = { ...bookingRequestState } as BookingRequest;
+    const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
+      ? ({ ...bookingRequestState, isScheduleChanged: true } as BookingRequest)
+      : ({ ...bookingRequestState } as BookingRequest);
     omitEmptyDeep(br);
     setEditing(false);
     dispatch({ type: 'START_GLOBAL_LOADING' });
