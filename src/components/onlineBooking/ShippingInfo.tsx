@@ -12,8 +12,10 @@ import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import ChargeCode from '../../model/ChargeCode';
 
-const getRelevantFreightDetails = (quoteDetails: QuoteDetail[]) => {
+const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
   return quoteDetails
     .filter(
       (detail: QuoteDetail) =>
@@ -28,25 +30,31 @@ const getRelevantFreightDetails = (quoteDetails: QuoteDetail[]) => {
           'Certificate',
         ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
     )
-    .map(
-      quoteDetail =>
-        ({
-          Anz: '1.00',
-          SeqNr: quoteDetail.Pos,
-          Txt: quoteDetail.Description,
-          Currency: quoteDetail.Currency,
-          UnitValue: quoteDetail.CostValue,
-          Unit: quoteDetail.CostUnit,
-          Group: FreightDetailGroup.EXTERNAL,
-          Total: quoteDetail.CostValue,
-        } as FreightDetail),
-    );
+    .map(quoteDetail => {
+      const chargeCode =
+        (quoteDetail.ChargeID &&
+          chargeCodes &&
+          (chargeCodes.find(code => code.chargeCodeId === quoteDetail.ChargeID) as ChargeCode | undefined)) ||
+        undefined;
+      return {
+        Anz: '1.00',
+        SeqNr: quoteDetail.Pos,
+        Txt: quoteDetail.Description,
+        Currency: quoteDetail.Currency,
+        UnitValue: quoteDetail.CostValue,
+        Unit: quoteDetail.CostUnit,
+        Group: FreightDetailGroup.EXTERNAL,
+        Total: quoteDetail.CostValue,
+        Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
+      } as FreightDetail;
+    });
 };
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
+  const chargeCodes = useContext(ChargeCodes);
 
   const scheduleCarrier = useMemo(
     () =>
@@ -82,7 +90,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         quoteNumber: quoteNumber !== '' ? quoteNumber : undefined,
         customerReference: customerReference,
         schedule: schedule,
-        freightDetails: quote && quote.quoteDetails ? getRelevantFreightDetails(quote.quoteDetails) : undefined,
+        freightDetails:
+          quote && quote.quoteDetails ? getRelevantFreightDetails(quote.quoteDetails, chargeCodes) : undefined,
       }) as BookingRequest,
     );
     handleNext();

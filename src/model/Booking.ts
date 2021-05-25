@@ -253,6 +253,7 @@ export interface FreightDetail {
   Group: FreightDetailGroup;
   Invoice: string;
   SeqNr: string;
+  Internal1?: boolean;
 }
 
 export enum FreightDetailGroup {
