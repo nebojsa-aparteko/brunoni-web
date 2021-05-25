@@ -1,4 +1,4 @@
-import { Box, Checkbox, createStyles, makeStyles, Typography } from '@material-ui/core';
+import { Box, Checkbox, createStyles, IconButton, LinearProgress, makeStyles, Typography } from '@material-ui/core';
 import {
   ActivityChangeType,
   ActivityLogUserData,
@@ -24,6 +24,9 @@ import { fileWithExt } from '../../bookings/checklist/ChecklistItemRow';
 import useGlobalAppState from '../../../hooks/useGlobalAppState';
 import { SAVED_ACTION_SNACKBAR } from '../../../store/types/globalAppState';
 import BookingRequestDocumentList from '../BookingRequestDocumentList';
+import CloseIcon from '@material-ui/icons/Close';
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import { useActivityLogState } from '../../bookings/checklist/ActivityLogContext';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -43,6 +46,11 @@ const useStyles = makeStyles(() =>
     },
     dropZoneHint: {
       backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    tinyIconButton: {
+      '& svg': {
+        fontSize: 10,
+      },
     },
   }),
 );
@@ -125,6 +133,8 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useGlobalAppState();
+  const activityLogContext = useActivityLogState();
+
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
       ({
@@ -304,6 +314,10 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
     [checklistItem, saveFiles, storeActivity, checklistItemFileAddedHandler, getActivityLogUserData],
   );
 
+  const handleMention = useCallback(() => {
+    activityLogContext.setState({ checklistReference: checklistItem });
+  }, [activityLogContext]);
+
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles),
     noClick: true,
@@ -326,6 +340,25 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
         {...getRootProps()}
       >
         <input {...getInputProps()} />
+        {uploadProgress > 0 && (
+          <Box display="flex">
+            <div style={{ width: '100%', paddingTop: '14px' }}>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+            </div>
+            <IconButton
+              className={classes.tinyIconButton}
+              aria-label="cancel upload"
+              onClick={() => {
+                uploadTask?.cancel();
+                setUploadTask(undefined);
+                setUploadProgress(0);
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        )}
+
         <Box display="flex" flexDirection="row">
           <Box flexDirection="row" alignContent="center">
             <a id={checklistItem.id} />
@@ -341,6 +374,9 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
             <Typography display="inline">{checklistItem.label}</Typography>
           </Box>
           <Box flex="1" />
+          <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
+            <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+          </IconButton>
         </Box>
         <BookingRequestDocumentList
           collectionPath={`bookings-requests/${bookingRequest.id}/checklist/${checklistItem.id}/documents`}
