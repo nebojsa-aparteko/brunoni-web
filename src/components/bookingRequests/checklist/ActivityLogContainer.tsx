@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useActivityLogState } from '../../bookings/checklist/ActivityLogContext';
 import useFirestoreCollection from '../../../hooks/useFirestoreCollection';
 import map from 'lodash/fp/map';
-import { flow, isNil, omitBy } from 'lodash/fp';
+import { flow, isNil, omitBy, pick } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from '../../bookings/documentApproval/ComparisonDialogContent';
@@ -13,7 +13,7 @@ import { MentionItem } from 'react-mentions';
 import { ActivityLogUserData } from '../../bookings/checklist/ChecklistItemModel';
 import ActivityLogView from '../../bookings/checklist/ActivityLogView';
 import { BookingRequest } from '../../../model/BookingRequest';
-import { shortenedChecklist, shortenedDocumentValue } from '../../../utilities/shortenedModel';
+import { shortenedChecklist } from '../../../utilities/shortenedModel';
 
 interface Props {
   bookingRequest: BookingRequest;
@@ -98,7 +98,7 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
             isInternal: internal,
             mentions: mentions,
             checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
-            documents: shortenedDocumentValue(activityLogContext.state?.documentReference),
+            documents: [pick(['id', 'name', 'url', 'isInternal'])(activityLogContext.state?.documentReference)],
           } as ActivityLogItem),
         )
         .then(_ => {
