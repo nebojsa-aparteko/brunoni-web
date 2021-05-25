@@ -7,7 +7,11 @@ export default (carrierId: string, type: PaymentConfirmationType) => {
     'payment-confirmation-config',
     useCallback(
       query => {
-        query = query.where('carrier.name', '==', carrierId);
+        query = query.where(
+          'carrier.id',
+          '==',
+          carrierId === 'Hamburg Süd' ? 'HSG' : carrierId === 'HUGO STINNES' ? 'STNN' : carrierId!,
+        );
         return query.where('type', '==', type);
       },
       [carrierId, type],
