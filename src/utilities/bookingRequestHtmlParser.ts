@@ -27,6 +27,7 @@ enum Titles {
   MAIN_PORT_OF_DISCHARGE = 'MAIN PORT OF DISCHARGE',
   SAIL_DATE = 'SAIL DATE',
   ESTIMATED_ARRIVAL_DATE = 'ESTIMATED ARRIVAL DATE',
+  CARRIER_VESSEL_LLOYD_CODE_VOYAGE = "CARRIER, VESSEL, LLOYD'S CODE, VOYAGE",
   // Normal table
   CUSTOMER_COMMENTS = 'CUSTOMER COMMENTS',
   TRANSPORT_PLAN_DETAILS = 'TRANSPORT PLAN DETAILS',
@@ -93,37 +94,38 @@ export interface HtmlBookingContainer {
 
 export interface HtmlBookingRequest {
   // Odd table
-  BOOKER_INTTRA_ID: string;
-  BOOKER_CONTACT_EMAIL: string;
-  BOOKER_PHONE_NUMBER: string;
-  CARRIER_INTTRA_ID: string;
-  CARRIER_ID: string;
+  BOOKER_INTTRA_ID?: string;
+  BOOKER_CONTACT_EMAIL?: string;
+  BOOKER_PHONE_NUMBER?: string;
+  CARRIER_INTTRA_ID?: string;
+  CARRIER_ID?: string;
   CARRIER_BOOKING_NUMBER?: string;
-  INTTRA_REFERENCE_NUMBER: string;
-  CUSTOMER_SHIPMENT_ID: string;
+  INTTRA_REFERENCE_NUMBER?: string;
+  CUSTOMER_SHIPMENT_ID?: string;
   BOOKING_OFFICE?: string;
-  CONTRACT_NUMBER: string;
-  FREIGHT_FORWARDERS_REFERENCE_NUMBERS: string[];
-  SHIPPER_REFERENCE_NUMBERS: string[];
+  CONTRACT_NUMBER?: string;
+  FREIGHT_FORWARDERS_REFERENCE_NUMBERS?: string[];
+  SHIPPER_REFERENCE_NUMBERS?: string[];
   CUSTOMER_PREFERENCES?: string;
-  CUSTOMER_TRANSACTION_ASSEMBLED_DATE: string;
-  MOVE_TYPE: string;
-  PLACE_OF_CARRIER_RECEIPT: string;
-  PLACE_OF_CARRIER_DELIVERY: string;
-  MAIN_PORT_OF_LOAD: string;
-  MAIN_PORT_OF_DISCHARGE: string;
-  SAIL_DATE: string;
-  ESTIMATED_ARRIVAL_DATE: string;
+  CUSTOMER_TRANSACTION_ASSEMBLED_DATE?: string;
+  MOVE_TYPE?: string;
+  PLACE_OF_CARRIER_RECEIPT?: string;
+  PLACE_OF_CARRIER_DELIVERY?: string;
+  MAIN_PORT_OF_LOAD?: string;
+  MAIN_PORT_OF_DISCHARGE?: string;
+  SAIL_DATE?: string;
+  ESTIMATED_ARRIVAL_DATE?: string;
+  CARRIER_VESSEL_LLOYD_CODE_VOYAGE?: string;
   // Normal table
-  CUSTOMER_COMMENTS: string;
-  TRANSPORT_MODE: string;
-  CONVEYANCE_TYPE: string;
-  CARRIER: string;
-  VESSEL: string;
-  VOYAGE: string;
-  CARGO_PACKING: string;
+  CUSTOMER_COMMENTS?: string;
+  TRANSPORT_MODE?: string;
+  CONVEYANCE_TYPE?: string;
+  CARRIER?: string;
+  VESSEL?: string;
+  VOYAGE?: string;
+  CARGO_PACKING?: string;
   PACKAGES?: string;
-  CARGO_DESCRIPTION: string;
+  CARGO_DESCRIPTION?: string;
   CARGO_WEIGHT_EXCLUDING_TARE?: string;
   GROSS_VOLUME?: string;
   CONTAINERS: HtmlBookingContainer[];
@@ -249,6 +251,13 @@ const extractDataOddTable = (object: DataOddTable) => {
   const MOVE_TYPE = findDataOddTable(object, Titles.MOVE_TYPE);
   const PLACE_OF_CARRIER_RECEIPT = findDataOddTable(object, Titles.PLACE_OF_CARRIER_RECEIPT);
   const PLACE_OF_CARRIER_DELIVERY = findDataOddTable(object, Titles.PLACE_OF_CARRIER_DELIVERY);
+
+  const CARRIER_VESSEL_LLOYD_CODE_VOYAGE = findDataOddTable(object, Titles.CARRIER_VESSEL_LLOYD_CODE_VOYAGE) as
+    | string
+    | undefined;
+  const VESSEL = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[1];
+  const VOYAGE = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[3];
+
   const MAIN_PORT_OF_LOAD = findDataOddTable(object, Titles.MAIN_PORT_OF_LOAD);
   const MAIN_PORT_OF_DISCHARGE = findDataOddTable(object, Titles.MAIN_PORT_OF_DISCHARGE);
   const SAIL_DATE = findDataOddTable(object, Titles.SAIL_DATE);
@@ -272,10 +281,13 @@ const extractDataOddTable = (object: DataOddTable) => {
     MOVE_TYPE,
     PLACE_OF_CARRIER_RECEIPT,
     PLACE_OF_CARRIER_DELIVERY,
+    CARRIER_VESSEL_LLOYD_CODE_VOYAGE,
     MAIN_PORT_OF_LOAD,
     MAIN_PORT_OF_DISCHARGE,
     SAIL_DATE,
     ESTIMATED_ARRIVAL_DATE,
+    VESSEL,
+    VOYAGE,
   };
   return DATA;
 };
@@ -364,12 +376,10 @@ const getNeededData = (array: string[], neededData: NeededData) => {
 const getContainerData = (array: string[]) => {
   const QUANTITY = getNeededData(array, NeededData.QUANTITY);
   const SIZE_TYPE_CODE = getNeededData(array, NeededData.SIZE_TYPE_CODE);
-  //todo. different naming (HAMBURG SUED?)
-  //todo. TRANSPORT PLAN DETAILS missing
-  //todo. date reversed
-  //todo. reversed in INTTRA_BKG_1_176427567?
-  const TYPE = SIZE_TYPE_CODE?.substring(0, SIZE_TYPE_CODE?.indexOf(' '));
-  const SIZE = SIZE_TYPE_CODE?.substring(SIZE_TYPE_CODE?.indexOf(' ') + 1).slice(1, -1);
+
+  const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g);
+  const SIZE = TYPE ? SIZE_TYPE_CODE?.replace(TYPE[0], '').replace(/[()]/g, '') : undefined;
+
   const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT);
   const NET_VOLUME = getNeededData(array, NeededData.NET_VOLUME);
   const EQUIPMENT_SUPPLIER = getNeededData(array, NeededData.EQUIPMENT_SUPPLIER);
@@ -518,8 +528,8 @@ const extractDataNormalTable = (object: DataNormalTable) => {
     TRANSPORT_MODE,
     CONVEYANCE_TYPE,
     CARRIER,
-    VESSEL,
-    VOYAGE,
+    ...(VESSEL && { VESSEL }),
+    ...(VOYAGE && { VOYAGE }),
     CARGO_PACKING,
     PACKAGES,
     CARGO_DESCRIPTION,

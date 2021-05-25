@@ -63,12 +63,6 @@ const useStyles = makeStyles(theme =>
     dialogContent: {
       paddingBottom: theme.spacing(3),
     },
-    dropZone: {
-      border: '1px dashed black',
-    },
-    dropZoneDefault: {
-      border: '1px solid transparent',
-    },
     addBtn: {
       margin: theme.spacing(1),
     },
@@ -113,6 +107,7 @@ const matchContainerType = (containerTypes: ContainerType[] | undefined, contain
 };
 // todo better ?
 const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
+  if (!object.CARGO_DESCRIPTION) return;
   const commodityTypeNames = commodityTypes?.map(type => type.name);
   const match = string_similarity.findBestMatch(object.CARGO_DESCRIPTION, commodityTypeNames as string[]);
 
@@ -181,18 +176,18 @@ const matchAndFetchSchedule = async (
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
 
-  let schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
+  let schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
   // only filter more if more than 1
-  if (schedules.length > 1)
-    schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+  if (schedules.length > 1 && object.VOYAGE)
+    schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
-    schedules = data.Routes.filter(schedule => object.VESSEL.includes(schedule.OriginInfo.VoyageInfo.VesselName));
+    schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
     // only filter more if more than 1
-    if (schedules.length > 1)
-      schedules = schedules.filter(schedule => object.VOYAGE.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+    if (schedules.length > 1 && object.VOYAGE)
+      schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   }
   return schedules;
 };
@@ -212,7 +207,7 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
     .collection('users')
     .where('emailAddress', '==', email)
     .get();
-  return usersRef.docs.map(user => user.data())[0] as UserRecord;
+  return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
 const mapIntoBookingRequestModel = async (
@@ -224,17 +219,28 @@ const mapIntoBookingRequestModel = async (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
 ): Promise<BookingRequest> => {
-  const createdBy = (await getUserByEmail(object.BOOKER_CONTACT_EMAIL)) || undefined;
+  const createdBy = object.BOOKER_CONTACT_EMAIL
+    ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
+    : undefined;
   const vgmSubmittedBy = createdBy;
   const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
 
   const agreementNo = object.CONTRACT_NUMBER;
-  const customerReference = object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS[0];
-  const carrier = carriers?.find(carrier => object.CARRIER_ID.includes(carrier.name));
+  const customerReference = object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS
+    ? object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS[0]
+    : undefined;
+
+  const carrier = object.CARRIER_ID
+    ? carriers?.find(carrier => {
+        const match = string_similarity.compareTwoStrings(object.CARRIER_ID as string, carrier.name);
+        return match > 0.7;
+      })
+    : undefined;
+
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
-  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY.includes(port.id));
+  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
   const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
-  const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT.includes(port.id));
+  const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
     originPort: origin,
@@ -290,6 +296,7 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
+      //console.log(object)
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
@@ -469,7 +476,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               showPreviewsInDropzone={false}
               showAlerts={['error']}
               useChipsForPreview
-              filesLimit={100}
+              filesLimit={1}
               dropzoneProps={{ disabled: loading }}
               alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
