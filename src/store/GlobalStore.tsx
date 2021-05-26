@@ -27,7 +27,6 @@ const GlobalStore: React.FC = ({ children }) => {
   useEffect(() => {
     if (promiseActivity) {
       dispatch({ type: START_GLOBAL_LOADING });
-      console.log('Test');
       promiseActivity()
         .then(_ => {
           enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
