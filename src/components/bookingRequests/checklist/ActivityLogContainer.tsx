@@ -98,7 +98,9 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
             isInternal: internal,
             mentions: mentions,
             checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
-            documents: [pick(['id', 'name', 'url', 'isInternal'])(activityLogContext.state?.documentReference)],
+            documents: activityLogContext.state?.documentReference && [
+              pick(['id', 'name', 'url', 'isInternal'])(activityLogContext.state?.documentReference),
+            ],
           } as ActivityLogItem),
         )
         .then(_ => {

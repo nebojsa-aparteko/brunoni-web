@@ -394,7 +394,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
     setEditing(false);
   };
-  console.log(bookingRequestState?.isScheduleChanged);
   const handleSave = useCallback(() => {
     const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
       ? ({ ...bookingRequestState, isScheduleChanged: true } as BookingRequest)
