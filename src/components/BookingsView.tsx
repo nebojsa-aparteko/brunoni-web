@@ -27,9 +27,9 @@ import BookingsFiltersBar from './searchbar/BookingsFiltersBar';
 import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 import CategoryFilter from './CategoryFilter';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
+import { useBookingsContext } from '../providers/BookingsProvider';
 
 interface Props {
-  bookings?: Booking[];
   isAdmin?: boolean;
   archived?: boolean;
   showDateRangeFilter?: boolean;
@@ -90,9 +90,10 @@ export const getContainersString = (booking: Booking) => {
     .split('/');
 };
 
-const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRangeFilter }) => {
+const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
   const classes = useStyles();
 
+  const [bookings, isLoading] = useBookingsContext();
   const [filters, setFilters] = useBookingListFilterContext();
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
@@ -198,7 +199,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, bookings, archived, showDateRa
       />
 
       <div>
-        {bookings ? (
+        {bookings && !isLoading ? (
           <Fragment>
             <Card>
               <CardHeader

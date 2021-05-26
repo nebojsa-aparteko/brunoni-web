@@ -40,9 +40,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<BookingRequestFilters>({});
 
-  // const filters = useBookingListFilterContext()[0];
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
+      setIsLoading(true);
       let query = collection;
       //console.log(filters.archived);
       if (filters.archived) {
@@ -63,16 +63,15 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
   );
 
   const bookingRequestsSnapshot = useFirestoreCollection('bookings-requests', query);
-  // const bookingsSnapshot = useFirestoreCollection('bookings', userRecord && !actingAs ? query : null);
 
   const bookingRequestsResult = useMemo(() => {
-    setIsLoading(false);
     const bookingRequests = bookingRequestsSnapshot?.docs.map(doc => {
       return {
         id: doc.id,
         ...doc.data(),
       } as BookingRequest;
     }) as BookingRequest[] | undefined;
+    setIsLoading(false);
     return normalizeBookingRequests(bookingRequests) as BookingRequest[] | undefined;
   }, [bookingRequestsSnapshot]);
 

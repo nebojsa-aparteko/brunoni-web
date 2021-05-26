@@ -5,7 +5,7 @@ import { Badge, Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import PaymentIcon from '@material-ui/icons/Payment';
 import Meta from '../components/Meta';
-import BookingsProvider, { useBookingsContext } from '../providers/BookingsProvider';
+import BookingsProvider from '../providers/BookingsProvider';
 import ActingAs from '../contexts/ActingAs';
 import { useBookingListFilterContext } from '../providers/BookingListFilterProvider';
 import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActions';
@@ -86,7 +86,6 @@ const BookingsPageContainer: React.FC = () => {
       .ref('/booking-requests-count')
       .on('value', a => setBookingRequestCount(+a.val()));
   }, []);
-  const [bookings, isLoading] = useBookingsContext();
 
   // Remember scroll position
   // useEffect(() => {
@@ -231,18 +230,13 @@ const BookingsPageContainer: React.FC = () => {
             <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
           </Tabs>
           <TabPanel value={selectedTab} index={0}>
-            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
+            <BookingsView isAdmin={!actingAs} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
+            <BookingsView isAdmin={!actingAs} />
           </TabPanel>
           <TabPanel value={selectedTab} index={2}>
-            <BookingsView
-              bookings={isLoading ? undefined : bookings}
-              isAdmin={!actingAs}
-              archived
-              showDateRangeFilter
-            />
+            <BookingsView isAdmin={!actingAs} archived showDateRangeFilter />
           </TabPanel>
           <TabPanel value={selectedTab} index={3}>
             <BookingRequestsView isAdmin={!actingAs} />
@@ -266,15 +260,10 @@ const BookingsPageContainer: React.FC = () => {
             </Tabs>
           </div>
           <TabPanel value={selectedTab} index={0}>
-            <BookingsView bookings={isLoading ? undefined : bookings} isAdmin={!actingAs} />
+            <BookingsView isAdmin={!actingAs} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            <BookingsView
-              bookings={isLoading ? undefined : bookings}
-              isAdmin={!actingAs}
-              archived
-              showDateRangeFilter
-            />
+            <BookingsView isAdmin={!actingAs} archived showDateRangeFilter />
           </TabPanel>
         </Box>
       )}

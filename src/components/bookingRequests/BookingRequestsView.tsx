@@ -1,5 +1,17 @@
-import React, { Fragment, useCallback, useContext, useState } from 'react';
-import { Box, Button, Card, CardContent, CardHeader, Divider, makeStyles, Paper, Typography } from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Divider,
+  makeStyles,
+  Paper,
+  TablePagination,
+  Typography,
+} from '@material-ui/core';
 import { useBookingRequestsContext } from '../../providers/BookingRequestsProvider';
 import Meta from '../Meta';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
@@ -13,6 +25,11 @@ import theme from '../../theme';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
 import BookingsFiltersBar from '../searchbar/BookingsFiltersBar';
+import { useBookingListPaginationContext } from '../../providers/BookingListPaginationProvider';
+import set from 'lodash/fp/set';
+import flow from 'lodash/fp/flow';
+import chunk from 'lodash/fp/chunk';
+import get from 'lodash/fp/get';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,6 +85,31 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
   const [bookingRequests, isLoading, filters, setFilters] = useBookingRequestsContext();
 
+  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const { page, rowsPerPage } = bookingPaginationContextData;
+
+  const resultChunks = useMemo(() => {
+    return chunk(rowsPerPage)(bookingRequests);
+  }, [bookingRequests, rowsPerPage]);
+
+  const handleChangePage = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(set('page', page)(bookingPaginationContextData));
+    },
+    [bookingPaginationContextData, setBookingPaginationContextData],
+  );
+
+  const handleChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      if (setBookingPaginationContextData)
+        setBookingPaginationContextData(
+          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
+        );
+    },
+    [bookingPaginationContextData, setBookingPaginationContextData],
+  );
+
   const assignAgent = useCallback(
     event => {
       event.stopPropagation();
@@ -94,13 +136,13 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   );
 
   return (
-    <>
+    <Fragment>
       <Meta title={`Booking Requests`} />
 
       <BookingsFiltersBar filters={filters} setFilters={setFilters} />
 
       <div>
-        {bookingRequests ? (
+        {bookingRequests && !isLoading ? (
           <Fragment>
             <Card>
               <CardHeader
@@ -147,25 +189,25 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
               <Fragment>
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
-                    bookingRequests={bookingRequests}
+                    bookingRequests={resultChunks && (get(page)(resultChunks) || [])}
                     selectedRequests={selectedRequests}
                     onSelectRequest={onSelectRequest}
                   />
                 </CardContent>
 
-                {/*<CardActions className={classes.actions}>*/}
-                {/*  {bookings && bookings.length > 0 && bookings.length > rowsPerPage && (*/}
-                {/*    <TablePagination*/}
-                {/*      component="div"*/}
-                {/*      count={filteredResults ? filteredResults.length : 0}*/}
-                {/*      onChangePage={handleChangePage}*/}
-                {/*      onChangeRowsPerPage={handleChangeRowsPerPage}*/}
-                {/*      page={page}*/}
-                {/*      rowsPerPage={rowsPerPage}*/}
-                {/*      rowsPerPageOptions={[10, 25, 50]}*/}
-                {/*    />*/}
-                {/*  )}*/}
-                {/*</CardActions>*/}
+                <CardActions className={classes.actions}>
+                  {bookingRequests && bookingRequests.length > 0 && bookingRequests.length > rowsPerPage && (
+                    <TablePagination
+                      component="div"
+                      count={bookingRequests ? bookingRequests.length : 0}
+                      onChangePage={handleChangePage}
+                      onChangeRowsPerPage={handleChangeRowsPerPage}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      rowsPerPageOptions={[10, 25, 50]}
+                    />
+                  )}
+                </CardActions>
               </Fragment>
             )}
           </Fragment>
@@ -175,7 +217,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           </Paper>
         )}
       </div>
-    </>
+    </Fragment>
   );
 };
 
