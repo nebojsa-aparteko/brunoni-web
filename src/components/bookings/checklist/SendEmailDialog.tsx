@@ -115,7 +115,7 @@ const SendEmailContent = ({
 
   useEffect(() => {
     setSelectedContactTo(carrierSetting?.contactTo || []);
-    setSelectedContactCC((assignedClientEmail ? [assignedClientEmail] : []).concat(carrierSetting?.contactCC || []));
+    setSelectedContactCC(carrierSetting?.contactCC || []);
     setSelectedContactBCC(assignedClientEmail ? [assignedClientEmail] : []);
   }, [carrierSetting, assignedClientEmail]);
 
