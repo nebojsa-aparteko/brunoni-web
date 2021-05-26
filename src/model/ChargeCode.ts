@@ -3,4 +3,5 @@ export default interface ChargeCode {
   text?: string;
   internal1?: string;
   chargeCodeId?: boolean;
+  language?: string;
 }

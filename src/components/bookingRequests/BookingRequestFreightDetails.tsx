@@ -351,6 +351,15 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           )}
           {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
             <Table className={classes.table} size="small">
+              <colgroup>
+                {editing && <col style={{ width: '5%' }} />}
+                <col style={{ width: '30%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '10%' }} />
+              </colgroup>
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
                   {editing && isDashboardUser(userRecord) && (
