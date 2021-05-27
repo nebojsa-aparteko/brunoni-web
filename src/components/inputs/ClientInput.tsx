@@ -18,6 +18,7 @@ interface Props {
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
+  margin?: any;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -38,6 +39,7 @@ const ClientInput: React.FC<Props> = ({
   open,
   onOpen,
   onClose,
+  margin,
   ...rest
 }) => {
   const classes = useStyles();
@@ -65,6 +67,7 @@ const ClientInput: React.FC<Props> = ({
           label={label}
           fullWidth
           variant="outlined"
+          margin={margin}
           InputProps={{
             ...params.InputProps,
             endAdornment: (

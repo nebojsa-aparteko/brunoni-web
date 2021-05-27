@@ -735,6 +735,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                             setBookingRequest(prevState => prevState && set('client', client)(prevState))
                           }
                           value={bookingRequest.client}
+                          margin="dense"
                         />
                       ) : (
                         <span>{clientInfo}</span>
@@ -752,6 +753,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                             setBookingRequest(prevState => prevState && set('statClient', client)(prevState))
                           }
                           value={bookingRequest.statClient}
+                          margin="dense"
                         />
                       ) : (
                         <Typography>
