@@ -135,6 +135,7 @@ const SendEmailContent = ({
     setAdditionalInfo(event.target.value);
   };
   const handleSendEmail = async (token: string, addActivity: (emails: string[]) => Promise<any>, bookingId: string) => {
+    console.log('Sending payment confirmation mail...');
     try {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
