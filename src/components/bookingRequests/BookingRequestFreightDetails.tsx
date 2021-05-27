@@ -18,6 +18,10 @@ import { a11yProps } from '../../pages/BookingsPage';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import Container from '../../model/Container';
+import ContainerDetails from '../../model/ContainerDetails';
+import ContainerTypes from '../../contexts/ContainerTypes';
+import ContainerType from '../../model/ContainerType';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -88,18 +92,73 @@ const getUpdatedFreightDetails = (
 const compareValues = (value1: string | undefined, value2: string | undefined) =>
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
+// const isEditable = ();
+const getQuantity = (
+  containers: (Container & ContainerDetails)[],
+  costUnit: string,
+  numberOfContainersAndSets: number[],
+  isQAutomatic: boolean,
+) => {
+  const searchableCostUnit = costUnit.toUpperCase();
+  const [noOfContainers, noOfSets] = numberOfContainersAndSets;
+  switch (searchableCostUnit) {
+    case 'PRO SET':
+      return noOfSets.toFixed(2) || '0,00';
+    case 'PER SET':
+      return noOfSets.toFixed(2) || '0,00';
+    case 'PRO CONTAINER':
+      return noOfContainers.toFixed(2) || '0,00';
+    case 'PER CONTAINER':
+      return noOfContainers.toFixed(2) || '0,00';
+    default:
+      const relevantContainers = containers.filter(
+        container =>
+          'PRO ' + container.containerType?.name.toUpperCase() === searchableCostUnit ||
+          'PER ' + container.containerType?.name.toUpperCase() === searchableCostUnit,
+      );
+      if (relevantContainers.length > 0) {
+        return relevantContainers.reduce((a, b) => a + b.quantity, 0).toFixed(2);
+      } else {
+        if (isQAutomatic) return '0,00';
+      }
+      return undefined;
+  }
+};
+const automaticCostUnits = ['per Container', 'pro Container', 'pro Set', 'per Set'];
+const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
+  automaticCostUnits.some(unit => unit.toUpperCase() === costUnit.toUpperCase()) ||
+  containerTypeNames?.some(
+    containerName =>
+      'PRO ' + containerName.toUpperCase() === costUnit.toUpperCase() ||
+      'PER ' + containerName.toUpperCase() === costUnit.toUpperCase(),
+  );
+
 const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, selected, onSelectRow, selectedTab }) => {
   const classes = useStyles();
+  const userRecord = useContext(UserRecordContext);
+  const containerTypes = useContext(ContainerTypes) as ContainerType[];
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const [quantity, setQuantity] = useState<string | undefined>(freightDetail.Anz);
+  const [quantity, setQuantity] = useState<string | undefined>(freightDetail.Anz || '0,00');
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
-  const userRecord = useContext(UserRecordContext);
+  const [containerTypeNames, setContainerTypeNames] = useState(containerTypes.map(containerType => containerType.name));
+  const [isQAutomatic, setIsQAutomatic] = useState(
+    (costUnit && containerTypes && isQuantityAutomatic(costUnit, containerTypeNames)) || false,
+  );
 
   useEffect(() => {
-    setQuantity(freightDetail.Anz || '1.00');
+    const newContainerTypeNames = containerTypes.map(containerType => containerType.name);
+    setContainerTypeNames(newContainerTypeNames);
+    setIsQAutomatic(
+      (freightDetail.Unit && newContainerTypeNames && isQuantityAutomatic(freightDetail.Unit, newContainerTypeNames)) ||
+        false,
+    );
+  }, [containerTypes, freightDetail.Unit]);
+
+  useEffect(() => {
+    setQuantity(freightDetail.Anz || '0,00');
     setCurrency(freightDetail.Currency);
     setUnitValue(formatCurrencyAmount(Number(freightDetail.UnitValue)));
     setCostUnit(freightDetail.Unit);
@@ -155,18 +214,21 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
         )}
       </TableCell>
       <TableCell align="right">
-        {editing && isDashboardUser(userRecord) ? (
+        {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
           <TextField
             label=""
             margin="dense"
             variant="outlined"
             fullWidth
-            value={quantity}
+            // disabled={isQAutomatic}
+            value={
+              costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
+            }
             onChange={event => setQuantity(event.target.value)}
             onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
           />
         ) : (
-          freightDetail.Anz || '1.00'
+          freightDetail.Anz || '0,00'
         )}
       </TableCell>
       <TableCell align="right">
@@ -230,19 +292,73 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   return pos + '';
 };
 
+const getNumberOfContainersAndSets = (bookingRequest: BookingRequest) => {
+  let containers = 0;
+  let sets = 0;
+  bookingRequest.containers?.forEach(container => {
+    containers = containers + (container.quantity || 0);
+    sets =
+      sets +
+      (container.containerType?.id ? (container.containerType.id.startsWith('2') ? 1 : 2) * container.quantity : 0);
+  });
+  return [containers, sets];
+};
+
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
+  const [numberOfContainersAndSets, setNumberOfContainersAndSets] = useState(
+    bookingRequest ? getNumberOfContainersAndSets(bookingRequest) : [0, 0],
+  );
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
+  const containerTypes = useContext(ContainerTypes) as ContainerType[];
+  const [containerTypeNames, setContainerTypeNames] = useState(containerTypes.map(containerType => containerType.name));
+
+  useEffect(() => {
+    setContainerTypeNames(containerTypes.map(containerType => containerType.name));
+  }, [containerTypes]);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     event.stopPropagation();
     setSelectedTab(newValue);
   };
+
+  const handleChangeFreightDetails = (value: string | undefined, fieldName: string, freightDetail: FreightDetail) => {
+    bookingRequest &&
+      setBookingRequest &&
+      compareValues(value, get(fieldName, freightDetail)) &&
+      setBookingRequest(
+        set(
+          'freightDetails',
+          getUpdatedFreightDetails(bookingRequest, value, freightDetail.SeqNr, fieldName),
+        )(bookingRequest) as BookingRequest,
+      );
+  };
+
+  useEffect(() => {
+    setNumberOfContainersAndSets(bookingRequest ? getNumberOfContainersAndSets(bookingRequest) : [0, 0]);
+  }, [bookingRequest]);
+
+  useEffect(() => {
+    freightDetails?.forEach(freightDetail => {
+      handleChangeFreightDetails(
+        freightDetail.Unit && bookingRequest && bookingRequest.containers
+          ? getQuantity(
+              bookingRequest?.containers,
+              freightDetail.Unit,
+              numberOfContainersAndSets,
+              isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
+            ) || freightDetail.Anz
+          : freightDetail.Anz,
+        'Anz',
+        freightDetail,
+      );
+    });
+  }, [bookingRequest?.containers, numberOfContainersAndSets]);
 
   useEffect(() => {
     switch (selectedTab) {
@@ -291,10 +407,10 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           'freightDetails',
           (freightDetails || []).concat({
             SeqNr: freightDetails ? findNextPos(freightDetails) : '0',
-            Anz: '1.00',
+            Anz: '0,00',
             Txt: (selectedTab !== 2 ? chargeCodes && chargeCodes[0].text : '') || '',
             Currency: 'USD',
-            UnitValue: '0.00',
+            UnitValue: '0,00',
             Unit: '',
             Total: '0.00',
             Group:
