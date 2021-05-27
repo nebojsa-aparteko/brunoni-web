@@ -3,6 +3,7 @@ import useFirestoreCollection from './useFirestoreCollection';
 import { useCallback } from 'react';
 
 export default (carrierId: string, type: PaymentConfirmationType) => {
+  console.log(carrierId);
   const carrierSettingsRef = useFirestoreCollection(
     'payment-confirmation-config',
     useCallback(
@@ -10,7 +11,7 @@ export default (carrierId: string, type: PaymentConfirmationType) => {
         query = query.where(
           'carrier.id',
           '==',
-          carrierId === 'Hamburg Süd' ? 'HSG' : carrierId === 'HUGO STINNES' ? 'STNN' : carrierId!,
+          carrierId === 'HAMBURG SÜD' ? 'HSG' : carrierId === 'HUGO STINNES' ? 'STNN' : carrierId!,
         );
         return query.where('type', '==', type);
       },
