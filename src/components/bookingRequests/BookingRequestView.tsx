@@ -63,6 +63,7 @@ import Mousetrap from 'mousetrap';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
 import useClientUsers from '../../hooks/useClientUsers';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -322,7 +323,7 @@ function ScrollToTopOnMount() {
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-  const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
+  const { isOpen, openModal, closeModal } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
@@ -331,7 +332,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
   const [, dispatch] = useGlobalAppState();
   const userRecord = useContext(UserRecordContext);
-  const { open, closeModal, openModal } = useModal();
+  const {
+    isOpen: isOpenAssignmentModal,
+    closeModal: closeAssignmentModal,
+    openModal: openAssignmentModal,
+  } = useModal();
 
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
@@ -344,8 +349,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
   }, [setEditing]);
-
-  const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
   const onArchiveClick = useCallback(
     () =>
@@ -430,6 +433,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+    } else {
+      return openModal();
     }
   }, [bookingRequest]);
 
@@ -441,17 +446,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     bookingRequestState && setBookingRequestState && setBookingRequestState(set('agreementNo', v)(bookingRequestState));
   };
 
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
+  const getActivityLogUserData = useActivityLogUserData();
 
   const archiveHandler = () =>
     onArchiveClick().then(() =>
@@ -459,7 +454,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         bookingRequest.id!,
         createActivityObject({
           changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
-          by: getActivityLogUserData(),
+          by: getActivityLogUserData,
         }),
       ),
     );
@@ -488,12 +483,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
             </Paper>
           )}
-          {isAssignmentDialogOpen ? (
-            <AgentAssignmentDialog
-              bookingRequest={bookingRequest}
-              isOpen={true}
-              handleClose={handleCloseAssignmentDialog}
-            />
+          {isOpenAssignmentModal ? (
+            <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
@@ -578,12 +569,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     <EditIcon />
                   </IconButton>
                 )}
-                <IconButton
-                  size="small"
-                  aria-label="Watch"
-                  component="span"
-                  onClick={() => setIsAssignmentDialogOpen(true)}
-                >
+                <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                   <SupervisedUserCircleIcon />
                 </IconButton>
                 {!actingAs && (
@@ -637,14 +623,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           <BookingRequestCheckList bookingRequest={bookingRequest} />
         </Box>
       </Grid>
-      <ConfirmLeadingCurrencyDialog
-        isOpen={open}
-        handleConfirm={currency => {
-          setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
-          closeModal();
-        }}
-        handleClose={handleClose}
-      />
+      {isOpen && (
+        <ConfirmLeadingCurrencyDialog
+          isOpen={isOpen}
+          handleConfirm={currency => {
+            setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
+            closeModal();
+          }}
+          handleClose={handleClose}
+        />
+      )}
     </Grid>
   );
 };
