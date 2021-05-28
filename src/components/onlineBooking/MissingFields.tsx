@@ -68,7 +68,6 @@ const MissingFields: React.FC<Props> = ({
       containersNonMatchingFields.push(containerNonMatchingFields);
     });
 
-    // containerNonMatchingFields.every(isEmpty))
     return containersNonMatchingFields;
   }, [bookingRequest.containers, containerWatchedFields]);
 
@@ -103,7 +102,7 @@ const MissingFields: React.FC<Props> = ({
                 </>
               )}
               {containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty) && (
-                <Box display={'flex'}>
+                <Box display={'flex'} flexWrap={'wrap'}>
                   {containersNonMatchingFields.map((container, index) => (
                     <List key={index} disablePadding={true}>
                       <ListItem>

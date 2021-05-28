@@ -1,4 +1,5 @@
 import cheerio from 'cheerio';
+import { isEqual, omit } from 'lodash/fp';
 
 enum Types {
   CANCELED = 'Cancelled',
@@ -421,7 +422,7 @@ const getContainerLocation = (array: string[]) => {
     ADDRESS,
     POSTAL_CODE,
     COUNTRY_CODE,
-  };
+  } as PuckUpLocation;
   return location;
 };
 
@@ -446,12 +447,20 @@ const getContainerTitleData = (container: string[][], title: Titles) => {
   }
 };
 
+const getDuplicateIndex = (containers: HtmlBookingContainer[], container: HtmlBookingContainer): number => {
+  return containers.findIndex(c => {
+    const curr = omit(['QUANTITY'])(c);
+    const watched = omit(['QUANTITY'])(container);
+    return isEqual(curr, watched);
+  });
+};
+
 const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: NeededData, container?: boolean) => {
   if (!object[key]) return undefined;
 
   if (container) {
     let data = object[key];
-    let containers: any = [];
+    let containers: HtmlBookingContainer[] = [];
     // indexes where new container data start
     const startIndexes: number[] = [];
     data.forEach((el, index) => {
@@ -472,19 +481,30 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
       const EMPTY_CONTAINER_PICK_UP_LOCATION = getContainerTitleData(
         container,
         Titles.EMPTY_CONTAINER_PICK_UP_LOCATION,
-      );
+      ) as PuckUpLocation;
       const EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE = getContainerTitleData(
         container,
         Titles.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
       );
       const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS);
 
-      containers.push({
+      const containerObject = {
         ...main,
         EMPTY_CONTAINER_PICK_UP_LOCATION,
         EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
         REEFER_SETTINGS,
-      });
+      } as HtmlBookingContainer;
+
+      const duplicateIdx = getDuplicateIndex(containers, containerObject);
+
+      if (duplicateIdx !== -1) {
+        containers[duplicateIdx] = {
+          ...containers[duplicateIdx],
+          QUANTITY: String(Number(containers[duplicateIdx].QUANTITY) + Number(containerObject.QUANTITY)),
+        };
+      } else {
+        containers.push(containerObject);
+      }
     });
     return containers;
   }

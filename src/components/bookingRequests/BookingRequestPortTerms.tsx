@@ -1,12 +1,22 @@
 import TableBody from '@material-ui/core/TableBody';
-import { createStyles, FormControlLabel, makeStyles, Radio, RadioGroup, Table } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  createStyles,
+  FormControlLabel,
+  makeStyles,
+  Radio,
+  RadioGroup,
+  Table,
+  Typography,
+} from '@material-ui/core';
+import React from 'react';
 import set from 'lodash/fp/set';
 import { useClientById } from '../../hooks/useClient';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import { TableRowData, userRepresentation } from './BookingRequestSummary';
+import { TableRowData } from './BookingRequestSummary';
 import Client from '../../model/Client';
-import { UserRecordMin } from '../../model/UserRecord';
+import { BookingRequest, VGMSubmittedBy } from '../../model/BookingRequest';
+import isString from '../../utilities/isString';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -16,61 +26,28 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const getClientRepresentation = (client: Client) => {
-  return client.name + (client.name && client.city && ', ') + client.city;
+const ClientRepresentation: React.FC<{ client: Client | string }> = ({ client }) => {
+  const tempClient = useClientById(isString(client) ? client : '') || client;
+  return <>{tempClient.name + (tempClient.name && tempClient.city && ', ') + tempClient.city}</>;
 };
 
 const BookingRequestPortTerms: React.FC<Props> = () => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const client = useClientById(bookingRequest?.createdBy?.alphacomClientId);
-  const [selectedVGMSubmission, setSelectedVGMSubmission] = useState<string | UserRecordMin | undefined>(
-    bookingRequest?.vgmSubmittedBy
-      ? typeof bookingRequest.vgmSubmittedBy === 'string'
-        ? 'client'
-        : 'admin'
-      : 'client',
-  );
-  const [VGMSubmissionValue, setVGMSubmissionValue] = useState<string | JSX.Element | undefined>(
-    bookingRequest?.vgmSubmittedBy
-      ? typeof bookingRequest.vgmSubmittedBy === 'string'
-        ? bookingRequest.vgmSubmittedBy
-        : userRepresentation(bookingRequest?.vgmSubmittedBy)
-      : client && getClientRepresentation(client),
-  );
-
-  useEffect(() => {
-    setSelectedVGMSubmission(
-      bookingRequest?.vgmSubmittedBy
-        ? typeof bookingRequest.vgmSubmittedBy === 'string'
-          ? 'client'
-          : 'admin'
-        : 'client',
-    );
-    setVGMSubmissionValue(
-      bookingRequest?.vgmSubmittedBy
-        ? typeof bookingRequest.vgmSubmittedBy === 'string'
-          ? bookingRequest.vgmSubmittedBy
-          : userRepresentation(bookingRequest?.vgmSubmittedBy)
-        : client && getClientRepresentation(client),
-    );
-  }, [bookingRequest?.vgmSubmittedBy]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedVGMSubmission(event.target.value);
-    setVGMSubmissionValue(
-      event.target.value === 'client'
-        ? client && getClientRepresentation(client)
-        : userRepresentation(bookingRequest?.assignedUser),
-    );
-    bookingRequest &&
-      setBookingRequest &&
-      setBookingRequest(
-        set(
-          'vgmSubmittedBy',
-          event.target.value === 'client' ? client && getClientRepresentation(client) : bookingRequest?.assignedUser,
-        )(bookingRequest),
-      );
+    setBookingRequest(prevState => set('vgmSubmittedBy', event.target.value)(prevState as BookingRequest));
+  };
+
+  const handleAdminLabel = () => {
+    switch (process.env.REACT_APP_BRAND) {
+      case 'brunoni':
+        return 'Brunoni';
+      case 'allmarine':
+        return 'Allmarine';
+      default:
+        return 'Admin';
+    }
   };
 
   return (
@@ -95,25 +72,30 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
             editing ? (
               <RadioGroup
                 name="vgmSubmission"
-                value={selectedVGMSubmission}
+                value={bookingRequest?.vgmSubmittedBy}
                 onChange={handleChange}
                 style={{ display: 'flex', flexDirection: 'row' }}
               >
-                <FormControlLabel value="client" control={<Radio />} label="Client" />
-                <FormControlLabel
-                  value="admin"
-                  control={<Radio />}
-                  label={
-                    process.env.REACT_APP_BRAND === 'brunoni'
-                      ? 'Brunoni'
-                      : process.env.REACT_APP_BRAND === 'allmarine'
-                      ? 'Allmarine'
-                      : 'Admin'
-                  }
-                />
+                <FormControlLabel value={VGMSubmittedBy.CLIENT} control={<Radio />} label="Client" />
+                <Box display={'flex'} alignItems={'center'}>
+                  <FormControlLabel
+                    value={VGMSubmittedBy.ADMIN}
+                    control={<Radio />}
+                    disabled={!bookingRequest?.assignedUser}
+                    label={handleAdminLabel()}
+                  />
+                  {!bookingRequest?.assignedUser ? (
+                    <Typography color={'error'}>Please assign Watcher (Assigned agent) first</Typography>
+                  ) : null}
+                </Box>
               </RadioGroup>
+            ) : bookingRequest?.vgmSubmittedBy === VGMSubmittedBy.CLIENT && bookingRequest.client ? (
+              <ClientRepresentation client={bookingRequest.client} />
+            ) : bookingRequest?.vgmSubmittedBy === VGMSubmittedBy.ADMIN &&
+              bookingRequest.assignedUser?.alphacomClientId ? (
+              <ClientRepresentation client={bookingRequest.assignedUser?.alphacomClientId!} />
             ) : (
-              VGMSubmissionValue || 'Undefined'
+              'Undefined'
             )
           }
         />

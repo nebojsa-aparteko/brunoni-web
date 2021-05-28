@@ -204,8 +204,8 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const userRecord = useUser()[1];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(bookingRequest.client?.id);
-  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | null>();
-  const [selectedClient, setSelectedClient] = useState<UserRecord | null>();
+  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined>(bookingRequest.assignedUser);
+  const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
   const [, dispatch] = useGlobalAppState();
 
   const getActivityLogUserData = useCallback(
@@ -217,55 +217,46 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         alphacomId: user?.alphacomId,
         emailAddress: user?.emailAddress,
       } as ActivityLogUserData),
-    [userRecord],
+    [],
   );
 
-  const handleChangeClient = () => {
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    bookingRequest.id &&
-      selectedClient &&
-      changeAssignedClient(bookingRequest.id, selectedClient)
-        .then(() =>
-          addActivityItem(
-            bookingRequest.id || '',
-            createActivityObject({
-              changeType: ActivityChangeType.ASSIGNED_CLIENT,
-              by: getActivityLogUserData(userRecord),
-              addedUsers: [getActivityLogUserData(selectedClient)],
-            }),
-          ),
-        )
-        .then(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        })
-        .catch(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Client!' });
-        });
+  const handleChangeClient = async () => {
+    try {
+      if (bookingRequest.id && selectedClient) {
+        await changeAssignedClient(bookingRequest.id, selectedClient);
+        await addActivityItem(
+          bookingRequest.id || '',
+          createActivityObject({
+            changeType: ActivityChangeType.ASSIGNED_CLIENT,
+            by: getActivityLogUserData(userRecord),
+            addedUsers: [getActivityLogUserData(selectedClient)],
+          }),
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Client!' });
+    }
   };
 
-  const handleChangeAgent = () => {
+  const handleChangeAgent = async () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    bookingRequest.id &&
-      selectedAgent &&
-      changeAssignedAgent(bookingRequest.id, selectedAgent)
-        .then(() =>
-          addActivityItem(
-            bookingRequest.id || '',
-            createActivityObject({
-              changeType: ActivityChangeType.ASSIGNED_AGENT,
-              by: getActivityLogUserData(userRecord),
-              addedUsers: [getActivityLogUserData(selectedAgent)],
-            }),
-          ),
-        )
-        .then(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        })
-        .catch(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
-        });
+    try {
+      if (bookingRequest.id && selectedAgent) {
+        await changeAssignedAgent(bookingRequest.id, selectedAgent);
+        await addActivityItem(
+          bookingRequest.id || '',
+          createActivityObject({
+            changeType: ActivityChangeType.ASSIGNED_AGENT,
+            by: getActivityLogUserData(userRecord),
+            addedUsers: [getActivityLogUserData(selectedAgent)],
+          }),
+        );
+      }
+    } catch (e) {
+      console.log(e);
+      return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
+    }
   };
 
   return (
@@ -280,25 +271,27 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
       <DialogContent className={classes.dialogContent}>
         <Box my={1}>
           <UserInput
-            value={bookingRequest.assignedUser}
+            value={selectedAgent}
             label="Assigned Agent"
             users={assignableUsers || []}
-            onChange={(_, user) => setSelectedAgent(user)}
+            onChange={(_, user) => setSelectedAgent(user || undefined)}
           />
         </Box>
         <Box my={1}>
           <UserInput
-            value={bookingRequest.createdBy}
+            value={selectedClient}
             label="Assigned Client"
             users={assignableCustomers || []}
-            onChange={(_, user) => setSelectedClient(user)}
+            onChange={(_, user) => setSelectedClient(user || undefined)}
           />
         </Box>
       </DialogContent>
       <Button
-        onClick={() => {
-          handleChangeAgent();
-          handleChangeClient();
+        onClick={async () => {
+          dispatch({ type: 'START_GLOBAL_LOADING' });
+          await handleChangeAgent();
+          await handleChangeClient();
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
           handleClose();
         }}
         variant="contained"
