@@ -85,6 +85,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
   },
+  specialRequests: {
+    padding: theme.spacing(2),
+  },
   root: {
     padding: theme.spacing(3),
 
@@ -477,10 +480,12 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           <MissingFields bookingRequest={bookingRequest} />
           {bookingRequest.additionalInfo && (
             <Paper className={classes.additionalInfo}>
-              <Typography variant="h4" gutterBottom>
-                Special requests:
-              </Typography>
-              <Typography>{bookingRequest.additionalInfo}</Typography>
+              <Box border={1} borderColor={'primary'} className={classes.specialRequests}>
+                <Typography variant="h4" gutterBottom>
+                  Special requests:
+                </Typography>
+                <Typography>{bookingRequest.additionalInfo}</Typography>
+              </Box>
             </Paper>
           )}
           {isAssignmentDialogOpen ? (
