@@ -42,6 +42,7 @@ const BookingRequestDocumentList: React.FC<BookingRequestDocumentListProps> = ({
           shouldHaveMentionInCommentAction
           collectionPath={collectionPath}
           activityPath={activityPath}
+          shouldHaveStatuses={[]}
           {...props}
         />
       ))}
