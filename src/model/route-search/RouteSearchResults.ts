@@ -20,6 +20,11 @@ export interface RouteSearchResult {
   DestinationInfo: RouteSearchResultDestinationInfo;
   IntermediatePortInfos: RouteSearchResultIntermediatePortInfo[];
   Deadlines: RouteSearchResultDeadline[];
+  ComAmountE1?: string;
+  ComAmountE2?: string;
+  ComCurE1?: string;
+  ComCurE2?: string;
+  ComPercentE?: string;
 }
 
 export type SearchResultsPort = {
