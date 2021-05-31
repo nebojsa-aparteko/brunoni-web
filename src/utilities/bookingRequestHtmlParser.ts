@@ -385,7 +385,7 @@ const getContainerData = (array: string[]) => {
   const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g);
   const SIZE = TYPE ? SIZE_TYPE_CODE?.replace(TYPE[0], '').replace(/[()]/g, '') : undefined;
 
-  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT);
+  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
   const NET_VOLUME = getNeededData(array, NeededData.NET_VOLUME);
   const EQUIPMENT_SUPPLIER = getNeededData(array, NeededData.EQUIPMENT_SUPPLIER);
   const EMPTY_FULL = getNeededData(array, NeededData.EMPTY_FULL);

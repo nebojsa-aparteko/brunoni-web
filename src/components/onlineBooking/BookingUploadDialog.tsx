@@ -152,6 +152,7 @@ const getContainers = (
       quantity: Number(container.QUANTITY),
       temperature,
       ventilation,
+      weight: Number(container.NET_WEIGHT),
     }) as Container;
   });
   return containers;
