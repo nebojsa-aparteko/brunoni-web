@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { DropzoneArea } from 'material-ui-dropzone';
-import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
 import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
@@ -115,7 +115,7 @@ const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object:
 
   return commodityType;
 };
-// todo. date always in this format <2021-06-16 09:00> ?
+
 const matchDate = (date?: string) => {
   return date ? new Date(date) : undefined;
 };
@@ -175,7 +175,6 @@ const matchAndFetchSchedule = async (
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
-
   let schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
   // only filter more if more than 1
   if (schedules.length > 1 && object.VOYAGE)
@@ -220,9 +219,10 @@ const mapIntoBookingRequestModel = async (
   pickupLocations: PickupLocation[] | undefined,
 ): Promise<BookingRequest> => {
   const createdBy = object.BOOKER_CONTACT_EMAIL
-    ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
+    ? // todo. Could there be duplicates?
+      await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
     : undefined;
-  const vgmSubmittedBy = createdBy;
+  const vgmSubmittedBy = VGMSubmittedBy.CLIENT;
   const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
 
   const agreementNo = object.CONTRACT_NUMBER;
@@ -476,7 +476,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               showPreviewsInDropzone={false}
               showAlerts={['error']}
               useChipsForPreview
-              filesLimit={1}
+              filesLimit={100}
               dropzoneProps={{ disabled: loading }}
               alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}

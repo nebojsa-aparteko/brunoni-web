@@ -1,4 +1,4 @@
-import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
 import React, { useCallback } from 'react';
 import useUser from '../../hooks/useUser';
 import { Button, Divider, Grid, makeStyles, Theme } from '@material-ui/core';
@@ -12,7 +12,6 @@ import ContainersList from './ContainersList';
 import { useHistory } from 'react-router';
 import firebase from 'firebase';
 import { format } from 'date-fns';
-import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -66,7 +65,6 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const classes = useStyles();
   const history = useHistory();
   const [, userRecord] = useUser();
-  const client = useClientById(userRecord?.alphacomClientId);
 
   const getShortUserData = useCallback(
     (): ActivityLogUserData =>
@@ -86,9 +84,9 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       createdAt: new Date(),
       createdBy: getShortUserData(),
       status: BookingRequestStatus.REQUESTED,
-      vgmSubmittedBy: client ? client.name + (client.name && client.city && ', ') + client.city : undefined,
+      vgmSubmittedBy: VGMSubmittedBy.CLIENT,
       archived: false,
-    };
+    } as BookingRequest;
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);
     try {

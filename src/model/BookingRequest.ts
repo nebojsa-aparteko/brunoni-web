@@ -9,6 +9,11 @@ import ContainerDetails from './ContainerDetails';
 import Client from './Client';
 import { Currency } from './Payment';
 
+export enum VGMSubmittedBy {
+  CLIENT = 'CLIENT',
+  ADMIN = 'ADMIN',
+}
+
 export interface BookingRequest {
   id?: string;
   blNumber?: string;
@@ -32,7 +37,7 @@ export interface BookingRequest {
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
   statClient?: Client | null;
-  vgmSubmittedBy?: string | UserRecordMin;
+  vgmSubmittedBy?: VGMSubmittedBy;
   archived?: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;

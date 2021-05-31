@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useState } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -32,7 +32,7 @@ import { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { cloneDeep, get, set } from 'lodash/fp';
-import UserRecord from '../../contexts/UserRecordContext';
+import UserRecord from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -568,13 +568,26 @@ export const userRepresentation = (user: UserRecordMin | undefined) => {
   );
 };
 
+const ClientInfo = (bookingRequest: BookingRequest, forwarder?: UserRecord) => {
+  if (!bookingRequest?.client) {
+    return `${(bookingRequest && bookingRequest.createdBy?.firstName) || ''}`;
+  }
+
+  return (
+    <Fragment>
+      {bookingRequest.client.name}, {bookingRequest.client.city}
+      <ClientDetails forwarder={forwarder} bkgRef={bookingRequest?.customerReference} />
+    </Fragment>
+  );
+};
+
 const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
   const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy?.alphacomId : undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const clients = useClients();
-  const userRecord = useContext(UserRecord);
+  const userRecord = useContext(UserRecordContext);
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
@@ -583,19 +596,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const handleDialogOpen = () => {
     setIsDialogOpen(true);
   };
-
-  const clientInfo = useMemo(() => {
-    if (!bookingRequest?.client) {
-      return `${(bookingRequest && bookingRequest.createdBy?.firstName) || ''}`;
-    }
-
-    return (
-      <Fragment>
-        {bookingRequest.client.name}, {bookingRequest.client.city}
-        <ClientDetails forwarder={forwarder} bkgRef={bookingRequest?.customerReference} />
-      </Fragment>
-    );
-  }, [bookingRequest]);
 
   const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
     bookingRequest &&
@@ -738,7 +738,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                           margin="dense"
                         />
                       ) : (
-                        <span>{clientInfo}</span>
+                        <span>{ClientInfo(bookingRequest, forwarder)}</span>
                       )
                     }
                   />

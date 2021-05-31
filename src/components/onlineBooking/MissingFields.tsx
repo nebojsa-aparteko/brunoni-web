@@ -17,6 +17,8 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { hasIn, isEmpty } from 'lodash/fp';
 import { BookingRequest } from '../../model/BookingRequest';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import useUser from '../../hooks/useUser';
+import { isDashboardUser } from '../../model/UserRecord';
 
 interface Object {
   [key: string]: string;
@@ -54,6 +56,8 @@ const MissingFields: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
+  const userRecord = useUser()[1];
+
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
 
@@ -68,9 +72,15 @@ const MissingFields: React.FC<Props> = ({
       containersNonMatchingFields.push(containerNonMatchingFields);
     });
 
-    // containerNonMatchingFields.every(isEmpty))
     return containersNonMatchingFields;
   }, [bookingRequest.containers, containerWatchedFields]);
+
+  /*
+  Thanks for using our online services.
+  Your booking request has been submitted and is in requested status.
+  You are allowed to make changes as long the booking is not in status In Progress.
+  The next available booking agent will take care and check the availabilities.
+*/
 
   useEffect(() => {
     setNonMatchingFields(findNonMatchingFields());
@@ -81,50 +91,60 @@ const MissingFields: React.FC<Props> = ({
     (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
     <Paper className={classes.additionalInfo}>
       <Box border={1} borderColor={'error.main'}>
-        <ExpansionPanel defaultExpanded={true} TransitionProps={{ unmountOnExit: true }}>
+        <ExpansionPanel defaultExpanded={true}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">Missing fields</Typography>
+            <Typography variant="h5">{isDashboardUser(userRecord) ? 'Missing fields' : 'Message'}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
               {nonMatchingFields && nonMatchingFields.length > 0 && (
                 <>
-                  <Typography variant="h4">These fields were not found on Inttra booking: </Typography>
+                  <Typography variant="h4" style={{ whiteSpace: 'pre-line' }}>
+                    {isDashboardUser(userRecord)
+                      ? 'These fields were not found on Inttra booking:'
+                      : 'Thanks for using our online services.\n' +
+                        '  Your booking request has been submitted and is in requested status.\n' +
+                        '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
+                        '  The next available booking agent will take care and check the availabilities. Thank you.'}
+                  </Typography>
                   <List dense={true}>
-                    {nonMatchingFields.map((field, index) => (
-                      <ListItem key={index}>
-                        <ListItemIcon>
-                          <FiberManualRecordIcon color={'error'} fontSize={'small'} />
-                        </ListItemIcon>
-                        <ListItemText>{WatchedFields[field]}</ListItemText>
-                      </ListItem>
-                    ))}
+                    {isDashboardUser(userRecord) &&
+                      nonMatchingFields.map((field, index) => (
+                        <ListItem key={index}>
+                          <ListItemIcon>
+                            <FiberManualRecordIcon color={'error'} fontSize={'small'} />
+                          </ListItemIcon>
+                          <ListItemText>{WatchedFields[field]}</ListItemText>
+                        </ListItem>
+                      ))}
                   </List>
                 </>
               )}
-              {containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty) && (
-                <Box display={'flex'}>
-                  {containersNonMatchingFields.map((container, index) => (
-                    <List key={index} disablePadding={true}>
-                      <ListItem>
-                        <ListItemText>
-                          <Typography variant="h4">Container {index + 1}: </Typography>
-                        </ListItemText>
-                      </ListItem>
-                      <List dense={true}>
-                        {container.map((field, index) => (
-                          <ListItem key={index}>
-                            <ListItemIcon>
-                              <FiberManualRecordIcon color={'error'} fontSize={'small'} />
-                            </ListItemIcon>
-                            <ListItemText>{ContainerWatchedFields[field]}</ListItemText>
-                          </ListItem>
-                        ))}
+              {isDashboardUser(userRecord) &&
+                containersNonMatchingFields &&
+                !containersNonMatchingFields.every(isEmpty) && (
+                  <Box display={'flex'} flexWrap={'wrap'}>
+                    {containersNonMatchingFields.map((container, index) => (
+                      <List key={index} disablePadding={true}>
+                        <ListItem>
+                          <ListItemText>
+                            <Typography variant="h4">Container {index + 1}: </Typography>
+                          </ListItemText>
+                        </ListItem>
+                        <List dense={true}>
+                          {container.map((field, index) => (
+                            <ListItem key={index}>
+                              <ListItemIcon>
+                                <FiberManualRecordIcon color={'error'} fontSize={'small'} />
+                              </ListItemIcon>
+                              <ListItemText>{ContainerWatchedFields[field]}</ListItemText>
+                            </ListItem>
+                          ))}
+                        </List>
                       </List>
-                    </List>
-                  ))}
-                </Box>
-              )}
+                    ))}
+                  </Box>
+                )}
             </Box>
           </ExpansionPanelDetails>
         </ExpansionPanel>
