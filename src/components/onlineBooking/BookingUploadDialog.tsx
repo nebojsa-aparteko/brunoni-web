@@ -22,7 +22,7 @@ import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
-import Container from '../../model/Container';
+import Container, { Ventilation } from '../../model/Container';
 import { createRequest } from './Summary';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import CommodityTypes from '../../contexts/CommodityTypes';
@@ -51,6 +51,7 @@ import { Quote } from '../../providers/QuoteGroupsProvider';
 import { getRelevantFreightDetails } from './ShippingInfo';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
+import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -138,12 +139,19 @@ const getContainers = (
       ? matchLocation(pickupLocations, container)
       : undefined;
 
+    // Reefer settings
+    const temperature = Number(container.TEMPERATURE);
+    const ventilation =
+      container.VENTILATION && getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
+
     return omitBy(isNil)({
       commodityType,
       containerType,
       pickupDate,
       pickupLocation,
       quantity: Number(container.QUANTITY),
+      temperature,
+      ventilation,
     }) as Container;
   });
   return containers;
@@ -294,7 +302,7 @@ const mapIntoBookingRequestModel = async (
     vgmSubmittedBy,
   } as BookingRequest;
 
-  //console.log(bookingRequest);
+  console.log(bookingRequest);
 
   return bookingRequest;
 };
@@ -321,7 +329,7 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
-      //console.log(object)
+      console.log(object);
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
@@ -504,7 +512,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               showPreviewsInDropzone={false}
               showAlerts={['error']}
               useChipsForPreview
-              filesLimit={100}
+              filesLimit={1}
               dropzoneProps={{ disabled: loading }}
               alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
