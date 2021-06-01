@@ -70,6 +70,8 @@ enum NeededData {
   HAULAGE_ARRANGEMENT = 'Haulage Arrangement',
   POSTAL_CODE = 'Postal Code',
   COUNTRY_CODE = 'Country Code',
+  TEMPERATURE = 'Temperature',
+  VENTILATION = 'Vent',
 }
 
 interface PuckUpLocation {
@@ -87,7 +89,9 @@ export interface HtmlBookingContainer {
   NET_VOLUME?: string;
   NET_WEIGHT: string;
   QUANTITY: string;
-  REEFER_SETTINGS?: string;
+  REEFER_SETTINGS?: string[];
+  TEMPERATURE?: string;
+  VENTILATION?: string;
   SERVICE_ARRANGEMENT: string;
   SIZE?: string;
   TYPE?: string;
@@ -381,7 +385,7 @@ const getContainerData = (array: string[]) => {
   const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g);
   const SIZE = TYPE ? SIZE_TYPE_CODE?.replace(TYPE[0], '').replace(/[()]/g, '') : undefined;
 
-  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT);
+  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
   const NET_VOLUME = getNeededData(array, NeededData.NET_VOLUME);
   const EQUIPMENT_SUPPLIER = getNeededData(array, NeededData.EQUIPMENT_SUPPLIER);
   const EMPTY_FULL = getNeededData(array, NeededData.EMPTY_FULL);
@@ -443,7 +447,7 @@ const getContainerTitleData = (container: string[][], title: Titles) => {
       return getContainerLocation(next);
     case Titles.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE:
     case Titles.REEFER_SETTINGS:
-      return next[0];
+      return next;
   }
 };
 
@@ -486,13 +490,18 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
         container,
         Titles.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
       );
-      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS);
+
+      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS) as string[];
+      const TEMPERATURE = getNeededData(REEFER_SETTINGS, NeededData.TEMPERATURE)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
+      const VENTILATION = getNeededData(REEFER_SETTINGS, NeededData.VENTILATION);
 
       const containerObject = {
         ...main,
         EMPTY_CONTAINER_PICK_UP_LOCATION,
         EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
         REEFER_SETTINGS,
+        TEMPERATURE,
+        VENTILATION,
       } as HtmlBookingContainer;
 
       const duplicateIdx = getDuplicateIndex(containers, containerObject);

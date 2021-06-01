@@ -15,7 +15,7 @@ import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 
-const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
+export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
   return quoteDetails
     .filter(
       (detail: QuoteDetail) =>
@@ -36,7 +36,7 @@ const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: Cha
           chargeCodes &&
           (chargeCodes.find(code => code.chargeCodeId === quoteDetail.ChargeID) as ChargeCode | undefined)) ||
         undefined;
-      return {
+      return omitBy(isNil)({
         Anz: '1.00',
         SeqNr: index + 1 + '',
         Txt: quoteDetail.Description,
@@ -46,7 +46,7 @@ const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: Cha
         Group: FreightDetailGroup.EXTERNAL,
         Total: quoteDetail.CostValue,
         Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
-      } as FreightDetail;
+      }) as FreightDetail;
     });
 };
 

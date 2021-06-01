@@ -22,7 +22,7 @@ import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
-import Container from '../../model/Container';
+import Container, { Ventilation } from '../../model/Container';
 import { createRequest } from './Summary';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import CommodityTypes from '../../contexts/CommodityTypes';
@@ -47,6 +47,11 @@ import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
 import MissingFields, { defaultWatchedFields } from './MissingFields';
 import Client from '../../model/Client';
+import { Quote } from '../../providers/QuoteGroupsProvider';
+import { getRelevantFreightDetails } from './ShippingInfo';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import ChargeCode from '../../model/ChargeCode';
+import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -134,12 +139,20 @@ const getContainers = (
       ? matchLocation(pickupLocations, container)
       : undefined;
 
+    // Reefer settings
+    const temperature = Number(container.TEMPERATURE);
+    const ventilation =
+      container.VENTILATION && getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
+
     return omitBy(isNil)({
       commodityType,
       containerType,
       pickupDate,
       pickupLocation,
       quantity: Number(container.QUANTITY),
+      temperature,
+      ventilation,
+      weight: Number(container.NET_WEIGHT),
     }) as Container;
   });
   return containers;
@@ -209,6 +222,18 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
+const getLatestQuote = async (originId: string, destinationId: string) => {
+  const quotesRef = await firebase
+    .firestore()
+    .collection('quotes')
+    .where('origin', '==', originId)
+    .where('destination', '==', destinationId)
+    .orderBy('dateIssued', 'desc')
+    .limit(1)
+    .get();
+  return (quotesRef.docs.map(quote => quote.data()) as Quote[])[0] || undefined;
+};
+
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
   user: UserRecord,
@@ -217,6 +242,7 @@ const mapIntoBookingRequestModel = async (
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
+  chargeCodes: ChargeCode[] | undefined,
 ): Promise<BookingRequest> => {
   const createdBy = object.BOOKER_CONTACT_EMAIL
     ? // todo. Could there be duplicates?
@@ -238,9 +264,9 @@ const mapIntoBookingRequestModel = async (
     : undefined;
 
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
-  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
   const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
+  const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
     originPort: origin,
@@ -249,6 +275,12 @@ const mapIntoBookingRequestModel = async (
     date: departureDate,
     weeks: 4,
   } as RouteSearchParams;
+
+  // Get the latest quote by origin and dest
+  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id));
+  const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
+
+  //console.log(freightDetails)
 
   const schedules = await matchAndFetchSchedule(scheduleSearchParams, object);
   const schedule = schedules?.length === 1 ? schedules?.[0] : undefined;
@@ -263,6 +295,7 @@ const mapIntoBookingRequestModel = async (
     createdBy,
     customerReference,
     destination,
+    freightDetails,
     inttraRefNumber,
     origin,
     schedule,
@@ -270,7 +303,7 @@ const mapIntoBookingRequestModel = async (
     vgmSubmittedBy,
   } as BookingRequest;
 
-  //console.log(bookingRequest);
+  console.log(bookingRequest);
 
   return bookingRequest;
 };
@@ -287,6 +320,7 @@ export const readAndParseFile = (
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
+  chargeCodes: ChargeCode[] | undefined,
 ) => {
   const reader = new FileReader();
   // accepting only single booking 4 now...
@@ -296,7 +330,7 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
-      //console.log(object)
+      console.log(object);
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
@@ -316,6 +350,7 @@ export const readAndParseFile = (
         containerTypes,
         commodityTypes,
         pickupLocations,
+        chargeCodes,
       );
 
       // remove undefined fields
@@ -345,6 +380,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
+  const chargeCodes = useContext(ChargeCodes);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -364,10 +400,11 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           containerTypes,
           commodityTypes,
           pickupLocations,
+          chargeCodes,
         );
       });
     },
-    [carriers, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
+    [carriers, chargeCodes, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
   );
 
   const storageBasePath = useMemo((): string => {
@@ -476,7 +513,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               showPreviewsInDropzone={false}
               showAlerts={['error']}
               useChipsForPreview
-              filesLimit={100}
+              filesLimit={1}
               dropzoneProps={{ disabled: loading }}
               alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
