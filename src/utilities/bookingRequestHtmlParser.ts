@@ -491,9 +491,10 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
         Titles.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
       );
 
-      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS) as string[];
-      const TEMPERATURE = getNeededData(REEFER_SETTINGS, NeededData.TEMPERATURE)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
-      const VENTILATION = getNeededData(REEFER_SETTINGS, NeededData.VENTILATION);
+      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS) as string[] | undefined;
+      const TEMPERATURE =
+        REEFER_SETTINGS && getNeededData(REEFER_SETTINGS, NeededData.TEMPERATURE)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
+      const VENTILATION = REEFER_SETTINGS && getNeededData(REEFER_SETTINGS, NeededData.VENTILATION);
 
       const containerObject = {
         ...main,
