@@ -55,8 +55,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { flow, set, isEqual } from 'lodash/fp';
-import { BookingCategory } from '../../model/Booking';
+import { flow, set, isEqual, get, omit, map } from 'lodash/fp';
+import { BookingCategory, BookingVersion } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -470,6 +470,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      <Button onClick={() => console.log(createAlphacomReq(bookingRequest))}>Test</Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -653,14 +654,56 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('BkgCreateTimeStamp', new Date()),
     set('BkgTouchTimeStamp', new Date()),
     set('CarrierID', request.carrier?.name),
-    set('category', BookingCategory.Export),
+    set('Category', BookingCategory.Export),
+    set('Version', BookingVersion.long),
     // set('CargoDetails')
-    set('ForwAdrCity', request.createdBy?.company?.city),
-    set('ForwAdrId', request.createdBy?.company?.id),
-    set('ForwAdrName', request.createdBy?.company?.name),
+    set('ForwAdrCity', request.client?.city),
+    set('ForwAdrId', request.client?.id),
+    set('ForwAdrName', request.client?.name),
+    set('StatClient', request.statClient?.id),
+    set('StatClientRef', request.statClient?.name),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
-    set('FreightDetails', request.freightDetails),
+    set('FreightDetails', set('FreightDetail', request.freightDetails)({})),
     set('leadingCurrency', request.leadingCurrency),
-    set('schedule', request.schedule),
+    set(
+      'Remarks',
+      flow(set('Remark'))(
+        request.specialRemarks?.map((remark, index) =>
+          flow(set('RemarkSeq', `${index}`), renameField('id', 'RemarkType'), renameField('text', 'RemarkTxt'))(remark),
+        ),
+      )({}),
+    ),
+    set(
+      'PortTerms',
+      flow(
+        set('RelevantPort', request),
+        set('LinerPortAgent', request),
+        set('FOBDeliveryBy', request),
+        set('VGMSubmByID', request),
+        set('VGMSubmByTxt', request),
+        set(
+          'Closings',
+          set(
+            'Closing',
+            map(flow(renameField('Typ', 'ClosingType'), renameField('AdditionalInfo', 'ClosingTxt')))(
+              request.schedule?.Deadlines,
+            ),
+          )({}),
+        ),
+      )({}),
+    ),
   )({});
+
+const renameField = (oldName: string, newName: string, transformationFunction?: any) => (value: any) =>
+  get(oldName)(value)
+    ? flow(renameKey(oldName, newName, transformationFunction), omit([oldName]))(value)
+    : (() => {
+        delete value[oldName];
+        return value;
+      })();
+
+const renameKey = (oldName: string, newName: string, transformationFunction?: any) => (value: { [key: string]: any }) =>
+  transformationFunction
+    ? set(newName, transformationFunction(get(oldName)(value)))(value)
+    : set(newName, get(oldName)(value))(value);
