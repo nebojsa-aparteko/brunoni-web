@@ -48,7 +48,7 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
     <React.Fragment>
       <Box display="flex" className={classes.formControl}>
         <TextField
-          label={isAdmin ? 'Max Length [cm]' : 'Length [cm]'}
+          label="Max Length [cm]"
           variant="outlined"
           value={value.length}
           onChange={handleLengthChange}
@@ -56,21 +56,21 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
         />
         <TextField
           inputRef={input}
-          label={isAdmin ? 'Max Width [cm]' : 'Width [cm]'}
+          label="Max Width [cm]"
           margin="dense"
           variant="outlined"
           value={value.width}
           onChange={handleWidthChange}
         />
         <TextField
-          label={isAdmin ? 'Max Height [cm]' : 'Height [cm]'}
+          label="Max Height [cm]"
           variant="outlined"
           value={value.height}
           onChange={handleHeightChange}
           margin="dense"
         />
         <TextField
-          label={isAdmin ? 'Max Weight [kg]' : 'Weight [kg]'}
+          label="Max Weight [kg]"
           variant="outlined"
           value={value.weight}
           onChange={handleWeightChange}
