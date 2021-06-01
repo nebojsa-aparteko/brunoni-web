@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
-import { flow, get, set } from 'lodash/fp';
+import { flow, get, set, cloneDeep } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -23,6 +23,16 @@ import ContainerDetails from '../../model/ContainerDetails';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+  ResponderProvided,
+  DraggableProvided,
+  DroppableProvided,
+  DraggableStateSnapshot,
+} from 'react-beautiful-dnd';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -45,6 +55,20 @@ const useStyles = makeStyles((theme: Theme) => ({
       backgroundColor: theme.palette.background.default,
     },
   },
+  draggingTableRow: {
+    '& td': {
+      whiteSpace: 'nowrap',
+    },
+    ['@media print']: {
+      '& td': {
+        padding: theme.spacing(0),
+      },
+    },
+    // '&:nth-of-type(even)': {
+    //   backgroundColor: theme.palette.background.default,
+    // },
+    background: 'rgba(245,245,245, 0.75)',
+  },
   tableWrapper: {
     overflowX: 'auto',
   },
@@ -59,6 +83,7 @@ interface RowProps {
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
   selectedTab: number;
+  index: number;
 }
 
 const getUpdatedFreightDetails = (
@@ -85,6 +110,7 @@ const getUpdatedFreightDetails = (
           )(detail)
         : detail,
     )
+    // .map((detail: FreightDetail, index) => set('SeqNr', index+1))
   );
 };
 
@@ -133,7 +159,13 @@ const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | un
       'PER ' + containerName.toUpperCase() === costUnit.toUpperCase(),
   );
 
-const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, selected, onSelectRow, selectedTab }) => {
+const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
+  freightDetail,
+  selected,
+  onSelectRow,
+  selectedTab,
+  index,
+}) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
@@ -178,107 +210,121 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({ freightDetail, se
   };
 
   return (
-    <TableRow key={freightDetail.SeqNr} className={classes.tableRow}>
-      {editing && isDashboardUser(userRecord) && (
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={selected}
-            onClick={event => onSelectRow(event)}
-            onFocus={event => event.stopPropagation()}
-            color="primary"
-          />
-        </TableCell>
+    <Draggable
+      key={freightDetail.SeqNr}
+      draggableId={freightDetail.SeqNr}
+      index={index}
+      isDragDisabled={!editing || selectedTab === 1}
+    >
+      {(draggableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+        <TableRow
+          ref={draggableProvided.innerRef}
+          {...draggableProvided.draggableProps}
+          {...draggableProvided.dragHandleProps}
+          className={snapshot.isDragging ? classes.draggingTableRow : classes.tableRow}
+        >
+          {editing && isDashboardUser(userRecord) && (
+            <TableCell padding="checkbox">
+              <Checkbox
+                checked={selected}
+                onClick={event => onSelectRow(event)}
+                onFocus={event => event.stopPropagation()}
+                color="primary"
+              />
+            </TableCell>
+          )}
+          <TableCell component="th" scope="row">
+            {editing && isDashboardUser(userRecord) ? (
+              selectedTab !== 2 ? (
+                <ChargeCodeInput
+                  chargeCodeText={freightDetail.Txt}
+                  group={freightDetail.Group}
+                  handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
+                  margin="dense"
+                />
+              ) : (
+                <TextField
+                  label=""
+                  margin="dense"
+                  variant="outlined"
+                  fullWidth
+                  value={chargeCodeText || ''}
+                  onChange={event => setChargeCodeText(event.target.value)}
+                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
+                />
+              )
+            ) : (
+              freightDetail.Txt
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
+              <TextField
+                label=""
+                margin="dense"
+                variant="outlined"
+                fullWidth
+                // disabled={isQAutomatic}
+                value={
+                  costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
+                }
+                onChange={event => setQuantity(event.target.value)}
+                onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
+              />
+            ) : (
+              freightDetail.Anz || '0,00'
+            )}
+          </TableCell>
+          <TableCell align="right">
+            {editing && isDashboardUser(userRecord) ? (
+              <TextField
+                label=""
+                margin="dense"
+                variant="outlined"
+                fullWidth
+                value={currency || ''}
+                onChange={event => setCurrency(event.target.value)}
+                onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
+              />
+            ) : (
+              freightDetail.Currency
+            )}
+          </TableCell>
+          {freightDetail.Txt === 'Seafreight'}
+          <TableCell align="right">
+            {editing && isDashboardUser(userRecord) ? (
+              <TextField
+                label=""
+                margin="dense"
+                variant="outlined"
+                type="number"
+                value={unitValue?.replace(',', '') || ''}
+                onChange={event => setUnitValue(event.target.value)}
+                onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
+              />
+            ) : (
+              freightDetail.UnitValue
+            )}
+          </TableCell>
+          <TableCell>
+            {editing && isDashboardUser(userRecord) ? (
+              <TextField
+                label=""
+                margin="dense"
+                variant="outlined"
+                fullWidth
+                value={costUnit || ''}
+                onChange={event => setCostUnit(event.target.value)}
+                onBlur={event => handleChangeFreightDetails(event.target.value, 'Unit')}
+              />
+            ) : (
+              freightDetail.Unit
+            )}
+          </TableCell>
+          <TableCell>{freightDetail.Total || '0.00'}</TableCell>
+        </TableRow>
       )}
-      <TableCell component="th" scope="row">
-        {editing && isDashboardUser(userRecord) ? (
-          selectedTab !== 2 ? (
-            <ChargeCodeInput
-              chargeCodeText={freightDetail.Txt}
-              group={freightDetail.Group}
-              handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
-              margin="dense"
-            />
-          ) : (
-            <TextField
-              label=""
-              margin="dense"
-              variant="outlined"
-              fullWidth
-              value={chargeCodeText || ''}
-              onChange={event => setChargeCodeText(event.target.value)}
-              onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
-            />
-          )
-        ) : (
-          freightDetail.Txt
-        )}
-      </TableCell>
-      <TableCell align="right">
-        {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
-          <TextField
-            label=""
-            margin="dense"
-            variant="outlined"
-            fullWidth
-            // disabled={isQAutomatic}
-            value={
-              costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
-            }
-            onChange={event => setQuantity(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
-          />
-        ) : (
-          freightDetail.Anz || '0,00'
-        )}
-      </TableCell>
-      <TableCell align="right">
-        {editing && isDashboardUser(userRecord) ? (
-          <TextField
-            label=""
-            margin="dense"
-            variant="outlined"
-            fullWidth
-            value={currency || ''}
-            onChange={event => setCurrency(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
-          />
-        ) : (
-          freightDetail.Currency
-        )}
-      </TableCell>
-      {freightDetail.Txt === 'Seafreight'}
-      <TableCell align="right">
-        {editing && isDashboardUser(userRecord) ? (
-          <TextField
-            label=""
-            margin="dense"
-            variant="outlined"
-            type="number"
-            value={unitValue?.replace(',', '') || ''}
-            onChange={event => setUnitValue(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
-          />
-        ) : (
-          freightDetail.UnitValue
-        )}
-      </TableCell>
-      <TableCell>
-        {editing && isDashboardUser(userRecord) ? (
-          <TextField
-            label=""
-            margin="dense"
-            variant="outlined"
-            fullWidth
-            value={costUnit || ''}
-            onChange={event => setCostUnit(event.target.value)}
-            onBlur={event => handleChangeFreightDetails(event.target.value, 'Unit')}
-          />
-        ) : (
-          freightDetail.Unit
-        )}
-      </TableCell>
-      <TableCell>{freightDetail.Total || '0.00'}</TableCell>
-    </TableRow>
+    </Draggable>
   );
 };
 
@@ -315,6 +361,14 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
     if (value >= pos) pos = value + 1;
   }
   return pos + '';
+};
+
+const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
+  const aSeq = parseInt(a.SeqNr);
+  const bSeq = parseInt(b.SeqNr);
+  if (aSeq > bSeq) return 1;
+  if (aSeq < bSeq) return -1;
+  return 0;
 };
 
 const getNumberOfContainersAndSets = (bookingRequest: BookingRequest) => {
@@ -445,21 +499,30 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     });
   }, [bookingRequest?.containers, numberOfContainersAndSets]);
 
+  // console.log("OG: ", freightDetails && freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2));
+  // console.log("NEW: ", freightDetails && _.sortBy(freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2), ['Internal1']));
+
   useEffect(() => {
     switch (selectedTab) {
       case 0:
         freightDetails &&
-          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2));
+          setFilteredFreightDetails(
+            freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2).sort(sortBySeqNr),
+          );
         break;
       case 1:
         freightDetails &&
           setFilteredFreightDetails(
-            freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL1 || detail.Internal1),
+            freightDetails
+              .filter(detail => detail.Group === FreightDetailGroup.INTERNAL1 || detail.Internal1)
+              .sort(sortBySeqNr),
           );
         break;
       case 2:
         freightDetails &&
-          setFilteredFreightDetails(freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL2));
+          setFilteredFreightDetails(
+            freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL2).sort(sortBySeqNr),
+          );
         break;
     }
   }, [selectedTab, freightDetails, setFilteredFreightDetails, bookingRequest]);
@@ -522,6 +585,36 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     setSelectedDetails([]);
   };
 
+  const handleDragEnd = (result: DropResult, _?: ResponderProvided) => {
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const destinationFD = freightDetails && freightDetails[result.destination!.index];
+    const originFD = freightDetails && freightDetails[result.source!.index];
+
+    setBookingRequest(prevState => {
+      if (!prevState) return;
+      const destinationIndex =
+        prevState.freightDetails && prevState.freightDetails.findIndex(detail => detail == destinationFD);
+      const originIndex = prevState.freightDetails && prevState.freightDetails.findIndex(detail => detail == originFD);
+      if (!destinationIndex || !originIndex || destinationIndex === originIndex) return;
+      const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
+      const [sourceDetail] = temp.splice(result.source.index, 1);
+      temp.splice(destinationIndex, 0, sourceDetail);
+      return set(
+        'freightDetails',
+        temp.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
+      )(prevState);
+    });
+
+    setSelectedDetails([]);
+  };
+
   return (
     <Fragment>
       <Grid item xs={12}>
@@ -581,17 +674,27 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                   <TableCell>Total</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {filteredFreightDetails.map(freightDetail => (
-                  <BookingRequestFreightDetailsRow
-                    freightDetail={freightDetail}
-                    selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
-                    onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
-                    selectedTab={selectedTab}
-                  />
-                ))}
-                {seafreightCommission && selectedTab === 1 && <CommissionRow freightDetail={seafreightCommission} />}
-              </TableBody>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="droppable" direction="vertical">
+                  {(droppableProvided: DroppableProvided) => (
+                    <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                      {filteredFreightDetails.map((freightDetail, index) => (
+                        <BookingRequestFreightDetailsRow
+                          freightDetail={freightDetail}
+                          selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
+                          onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
+                          selectedTab={selectedTab}
+                          index={index}
+                        />
+                      ))}
+                      {seafreightCommission && selectedTab === 1 && (
+                        <CommissionRow freightDetail={seafreightCommission} />
+                      )}
+                      {droppableProvided.placeholder}
+                    </TableBody>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </Table>
           ) : (
             <Typography variant="h3" className={classes.emptyState}>

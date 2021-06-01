@@ -30,7 +30,7 @@ const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: Cha
           'Certificate',
         ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
     )
-    .map(quoteDetail => {
+    .map((quoteDetail, index) => {
       const chargeCode =
         (quoteDetail.ChargeID &&
           chargeCodes &&
@@ -38,7 +38,7 @@ const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: Cha
         undefined;
       return {
         Anz: '1.00',
-        SeqNr: quoteDetail.Pos,
+        SeqNr: index + 1 + '',
         Txt: quoteDetail.Description,
         Currency: quoteDetail.Currency,
         UnitValue: quoteDetail.CostValue,
