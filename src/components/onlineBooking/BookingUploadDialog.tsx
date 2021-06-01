@@ -139,7 +139,7 @@ const getContainers = (
       : undefined;
 
     // Reefer settings
-    const temperature = Number(container.TEMPERATURE);
+    const temperature = container.TEMPERATURE && Number(container.TEMPERATURE);
     const ventilation =
       container.VENTILATION && getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
 
@@ -148,10 +148,10 @@ const getContainers = (
       containerType,
       pickupDate,
       pickupLocation,
-      quantity: Number(container.QUANTITY),
+      quantity: container.QUANTITY && Number(container.QUANTITY),
       temperature,
       ventilation,
-      weight: Number(container.NET_WEIGHT),
+      weight: container.NET_WEIGHT && Number(container.NET_WEIGHT),
     }) as Container;
   });
   return containers;
