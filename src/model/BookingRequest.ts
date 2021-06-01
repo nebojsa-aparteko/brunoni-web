@@ -49,3 +49,10 @@ export enum BookingRequestStatus {
   CONFIRMED = 'Confirmed',
   ARCHIVED = 'Archived',
 }
+
+export enum ISOCodesEdiAlphacom {
+  '22G1' = '22G0',
+  '45G1' = '45G0',
+  '42G1' = '42G0',
+  '45R1' = '45R0',
+}

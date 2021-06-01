@@ -1,5 +1,7 @@
 import cheerio from 'cheerio';
 import { isEqual, omit } from 'lodash/fp';
+import getEnumKeyByEnumValue from './getEnumKeyByEnumValue';
+import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
 
 enum Types {
   CANCELED = 'Cancelled',
@@ -57,7 +59,7 @@ enum NeededData {
   TRANSPORT_MODE = 'Transport Mode',
   CONVEYANCE_TYPE = 'Conveyance Type',
   CARRIER = 'Carrier',
-  VESSEL = 'Vessel',
+  VESSEL = 'Vessel:',
   VOYAGE = 'Voyage',
   QUANTITY = 'Quantity',
   CONTAINER_NUMBER = 'Container Number',
@@ -380,12 +382,17 @@ const getNeededData = (array: string[], neededData: NeededData) => {
 
 const getContainerData = (array: string[]) => {
   const QUANTITY = getNeededData(array, NeededData.QUANTITY);
+
   const SIZE_TYPE_CODE = getNeededData(array, NeededData.SIZE_TYPE_CODE);
+  const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g)?.[0] || undefined;
+  const ISO_TYPE = (TYPE && getEnumKeyByEnumValue(ISOCodesEdiAlphacom, TYPE)) || undefined;
+  const SIZE = TYPE
+    ? SIZE_TYPE_CODE?.replace(TYPE, '')
+        .replace(/[()]/g, '')
+        .trim() || undefined
+    : undefined;
 
-  const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g);
-  const SIZE = TYPE ? SIZE_TYPE_CODE?.replace(TYPE[0], '').replace(/[()]/g, '') : undefined;
-
-  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
+  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0] || undefined;
   const NET_VOLUME = getNeededData(array, NeededData.NET_VOLUME);
   const EQUIPMENT_SUPPLIER = getNeededData(array, NeededData.EQUIPMENT_SUPPLIER);
   const EMPTY_FULL = getNeededData(array, NeededData.EMPTY_FULL);
@@ -395,7 +402,7 @@ const getContainerData = (array: string[]) => {
   const CONTAINER = {
     QUANTITY,
     SIZE,
-    TYPE,
+    TYPE: ISO_TYPE ? ISO_TYPE : TYPE,
     NET_WEIGHT,
     NET_VOLUME,
     EQUIPMENT_SUPPLIER,
