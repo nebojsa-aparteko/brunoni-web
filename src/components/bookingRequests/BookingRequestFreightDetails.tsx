@@ -64,9 +64,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         padding: theme.spacing(0),
       },
     },
-    // '&:nth-of-type(even)': {
-    //   backgroundColor: theme.palette.background.default,
-    // },
     background: 'rgba(245,245,245, 0.75)',
   },
   tableWrapper: {
@@ -110,7 +107,6 @@ const getUpdatedFreightDetails = (
           )(detail)
         : detail,
     )
-    // .map((detail: FreightDetail, index) => set('SeqNr', index+1))
   );
 };
 
@@ -119,7 +115,7 @@ const compareValues = (value1: string | undefined, value2: string | undefined) =
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
 // const isEditable = ();
-const getQuantity = (
+export const getQuantity = (
   containers: (Container & ContainerDetails)[],
   costUnit: string,
   numberOfContainersAndSets: number[],
@@ -151,7 +147,7 @@ const getQuantity = (
   }
 };
 const automaticCostUnits = ['per Container', 'pro Container', 'pro Set', 'per Set'];
-const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
+export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
   automaticCostUnits.some(unit => unit.toUpperCase() === costUnit.toUpperCase()) ||
   containerTypeNames?.some(
     containerName =>
@@ -371,7 +367,7 @@ const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
   return 0;
 };
 
-const getNumberOfContainersAndSets = (bookingRequest: BookingRequest) => {
+export const getNumberOfContainersAndSets = (bookingRequest: BookingRequest) => {
   let containers = 0;
   let sets = 0;
   bookingRequest.containers?.forEach(container => {

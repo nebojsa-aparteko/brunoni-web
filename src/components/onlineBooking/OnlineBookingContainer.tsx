@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -19,8 +19,16 @@ import CargoInfo from './CargoInfo';
 import AdditionalInfo from './AdditionalInfo';
 import Summary from './Summary';
 import { FormProvider, useForm } from 'react-hook-form';
+import { set } from 'lodash/fp';
 import AddIcon from '@material-ui/icons/Add';
 import BookingUploadDialog from './BookingUploadDialog';
+import {
+  getNumberOfContainersAndSets,
+  getQuantity,
+  isQuantityAutomatic,
+} from '../bookingRequests/BookingRequestFreightDetails';
+import ContainerTypes from '../../contexts/ContainerTypes';
+import ContainerType from '../../model/ContainerType';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -36,12 +44,35 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const getUpdatedFreightDetails = (
+  bookingRequest: BookingRequest,
+  containersAndSets: number[],
+  containerTypeNames: string[] | undefined,
+) => {
+  return bookingRequest && bookingRequest.freightDetails
+    ? bookingRequest.freightDetails.map(freightDetail =>
+        set(
+          'Anz',
+          freightDetail.Unit && bookingRequest && bookingRequest.containers
+            ? getQuantity(
+                bookingRequest?.containers,
+                freightDetail.Unit,
+                containersAndSets,
+                isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
+              ) || freightDetail.Anz
+            : freightDetail.Anz,
+        )(freightDetail),
+      )
+    : undefined;
+};
+
 const getSteps = () => ['General Information', 'Cargo Details', 'Additional Information', 'Summary'];
 
 const OnlineBookingContainer = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const methods = useForm();
+  const containerTypes = useContext(ContainerTypes) as ContainerType[];
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -49,6 +80,9 @@ const OnlineBookingContainer = () => {
   const [quote] = React.useState(quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined);
 
   const [bookingRequest, setBookingRequest] = useState<BookingRequest | undefined>();
+  const [containerTypeNames, setContainerTypeNames] = useState(
+    containerTypes ? containerTypes.map(containerType => containerType.name) : undefined,
+  );
 
   const scheduleJson = localStorage.getItem('schedule');
   const [schedule] = React.useState(scheduleJson ? (JSON.parse(scheduleJson) as RouteSearchResult) : undefined);
@@ -66,6 +100,20 @@ const OnlineBookingContainer = () => {
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
+
+  useEffect(() => {
+    const newContainerTypeNames = containerTypes ? containerTypes.map(containerType => containerType.name) : undefined;
+    setContainerTypeNames(newContainerTypeNames);
+  }, [containerTypes]);
+
+  useEffect(() => {
+    const updatedFreightDetails =
+      bookingRequest &&
+      getUpdatedFreightDetails(bookingRequest, getNumberOfContainersAndSets(bookingRequest), containerTypeNames);
+    bookingRequest &&
+      updatedFreightDetails &&
+      setBookingRequest(set('freightDetails', updatedFreightDetails)(bookingRequest));
+  }, [bookingRequest?.containers]);
 
   return (
     <>
