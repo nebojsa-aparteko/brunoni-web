@@ -375,6 +375,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
+        bookingRequest?.schedule &&
         isDashboardUser(userRecord) && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
@@ -511,6 +512,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
+        bookingRequest?.schedule &&
         isDashboardUser(userRecord) && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
@@ -644,13 +646,15 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     : ''
                 }
               />
-              <TableRowData
-                label={'Vessel'}
-                content={[
-                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
-                ].join(' VOY. ')}
-              />
+              {bookingRequest?.schedule && (
+                <TableRowData
+                  label={'Vessel'}
+                  content={[
+                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
+                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                  ].join(' VOY. ')}
+                />
+              )}
 
               <ItineraryInfo bookingRequest={bookingRequest} setBookingRequest={setBookingRequest} editing={editing} />
             </TableBody>
