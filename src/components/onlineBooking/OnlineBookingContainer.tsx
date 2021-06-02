@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -23,7 +23,7 @@ import { set } from 'lodash/fp';
 import AddIcon from '@material-ui/icons/Add';
 import BookingUploadDialog from './BookingUploadDialog';
 import {
-  getNumberOfContainersAndSets,
+  getNumberOfContainersAndTEUs,
   getQuantity,
   isQuantityAutomatic,
 } from '../bookingRequests/BookingRequestFreightDetails';
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const getUpdatedFreightDetails = (
   bookingRequest: BookingRequest,
-  containersAndSets: number[],
+  containersAndTEUs: number[],
   containerTypeNames: string[] | undefined,
 ) => {
   return bookingRequest && bookingRequest.freightDetails
@@ -60,7 +60,7 @@ const getUpdatedFreightDetails = (
             ? getQuantity(
                 bookingRequest?.containers,
                 freightDetail.Unit,
-                containersAndSets,
+                containersAndTEUs,
                 isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
               ) || freightDetail.Anz
             : freightDetail.Anz,
@@ -76,8 +76,6 @@ const OnlineBookingContainer = () => {
   const [activeStep, setActiveStep] = React.useState(0);
   const methods = useForm();
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [, userRecord] = useUser();
   const { closeModal, isOpen, openModal } = useModal();
@@ -112,7 +110,7 @@ const OnlineBookingContainer = () => {
   useEffect(() => {
     const updatedFreightDetails =
       bookingRequest &&
-      getUpdatedFreightDetails(bookingRequest, getNumberOfContainersAndSets(bookingRequest), containerTypeNames);
+      getUpdatedFreightDetails(bookingRequest, getNumberOfContainersAndTEUs(bookingRequest), containerTypeNames);
     bookingRequest &&
       updatedFreightDetails &&
       setBookingRequest(set('freightDetails', updatedFreightDetails)(bookingRequest));
