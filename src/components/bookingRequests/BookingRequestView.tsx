@@ -64,6 +64,10 @@ import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
 import useClientUsers from '../../hooks/useClientUsers';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { getPortOfLoading, hasPlaceOfReceipt } from './BookingRequestSummary';
+import { parse } from 'date-fns';
+import { formatDateSafe } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -644,8 +648,9 @@ interface Props {
 
 export default BookingRequestView;
 
-const createAlphacomReq = (request: BookingRequest) =>
-  flow(
+const createAlphacomReq = (request: BookingRequest) => {
+  const voyageInfo = getVoyageInfo(request.schedule);
+  return flow(
     set('Agreement', request.agreementNo),
     set('BL-No', request.blNumber),
     set('BkgAgentContact', request.assignedUser?.alphacomId),
@@ -657,6 +662,8 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('Category', BookingCategory.Export),
     set('Version', BookingVersion.long),
     // set('CargoDetails')
+    set('Vessel', voyageInfo?.VesselName),
+    set('Voyage', voyageInfo?.VoyageNr),
     set('ForwAdrCity', request.client?.city),
     set('ForwAdrId', request.client?.id),
     set('ForwAdrName', request.client?.name),
@@ -677,11 +684,11 @@ const createAlphacomReq = (request: BookingRequest) =>
     set(
       'PortTerms',
       flow(
-        set('RelevantPort', request),
-        set('LinerPortAgent', request),
-        set('FOBDeliveryBy', request),
-        set('VGMSubmByID', request),
-        set('VGMSubmByTxt', request),
+        set('RelevantPort', 'request'),
+        set('LinerPortAgent', 'request'),
+        set('FOBDeliveryBy', 'request'),
+        set('VGMSubmByID', 'request'),
+        set('VGMSubmByTxt', 'request'),
         set(
           'Closings',
           set(
@@ -693,7 +700,54 @@ const createAlphacomReq = (request: BookingRequest) =>
         ),
       )({}),
     ),
+    set(
+      'CargoDetails',
+      flow(
+        set(
+          'CargoDetail',
+          request.containers?.map((value, index) => {
+            return {
+              ItemNo: index + 1,
+              CtrQuantity: value.quantity,
+              CtypID: value.containerType?.id,
+              CommodityID: value.commodityType?.id,
+              CommodityTXT: value.commodityType?.name,
+              CtrWeight: `${value.weight} KGS`,
+              'VGM-PIN': value.vgmPin,
+              IMCO: value.imo?.length > 0 ? 'Yes' : 'No',
+              // IMCOs: {
+              //   IMCO: value.imo?.map(imco=>({IMOClass: ''}))
+              // },
+              Equipment: {
+                EquipmentDetail: request.containers?.map(ctg => ({
+                  ContainerNumber: ctg.containerNumber ? ctg.containerNumber : 'NOT AVAILABLE',
+                  CtypID: value.containerType?.id,
+                  PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.mm.yyyy'),
+                  GateInDate: null,
+                  GateOutDate: null,
+                  DropOffDate: null,
+                  PINNr: null,
+                  CtrTariffs: {
+                    CtrTariff: [
+                      {
+                        Type: 'DEM/DET',
+                        ID: '2',
+                      },
+                      {
+                        Type: 'STORAGE',
+                        ID: '1',
+                      },
+                    ],
+                  },
+                })),
+              },
+            };
+          }),
+        ),
+      )({}),
+    ),
   )({});
+};
 
 const renameField = (oldName: string, newName: string, transformationFunction?: any) => (value: any) =>
   get(oldName)(value)
@@ -707,3 +761,13 @@ const renameKey = (oldName: string, newName: string, transformationFunction?: an
   transformationFunction
     ? set(newName, transformationFunction(get(oldName)(value)))(value)
     : set(newName, get(oldName)(value))(value);
+
+const getVoyageInfo = (schedule?: RouteSearchResult) => {
+  if (!schedule) return undefined;
+  if (hasPlaceOfReceipt(schedule)) {
+    const [d] = getPortOfLoading(schedule);
+    return d?.VoyageInfo;
+  }
+
+  return schedule.OriginInfo.VoyageInfo;
+};

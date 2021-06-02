@@ -180,7 +180,7 @@ const isVesselIntermediate = (vessel: string) => {
   return intermediateVessels.includes(vessel);
 };
 
-const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
+export const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
   schedule?.IntermediatePortInfos.length === 2 ||
   (schedule?.IntermediatePortInfos.length === 1 &&
     (isVesselIntermediate(schedule?.OriginInfo.VoyageInfo.VesselName) || !hasPlaceOfDelivery(schedule))); //Place of delivery has a priority
@@ -190,7 +190,9 @@ const hasPlaceOfDelivery = (schedule: RouteSearchResult | undefined) =>
   (schedule?.IntermediatePortInfos.length === 1 &&
     isVesselIntermediate(schedule?.DestinationInfo.VoyageInfo.VesselName));
 
-const getPortOfLoading = (schedule: RouteSearchResult | undefined) => {
+export const getPortOfLoading = (
+  schedule: RouteSearchResult | undefined,
+): [RouteSearchResultIntermediatePortInfo | undefined, number] => {
   return schedule?.IntermediatePortInfos.length === 2
     ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
       ? [schedule?.IntermediatePortInfos[1], 1]
