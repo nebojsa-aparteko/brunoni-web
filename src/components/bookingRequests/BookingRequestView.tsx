@@ -55,14 +55,15 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { flow, set, isEqual } from 'lodash/fp';
-import { BookingCategory } from '../../model/Booking';
+import { flow, set, isEqual, get, omit, map } from 'lodash/fp';
+import { BookingCategory, BookingVersion } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
 import useClientUsers from '../../hooks/useClientUsers';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -322,7 +323,7 @@ function ScrollToTopOnMount() {
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-  const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
+  const { isOpen, openModal, closeModal } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
@@ -331,7 +332,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
   const [, dispatch] = useGlobalAppState();
   const userRecord = useContext(UserRecordContext);
-  const { open, closeModal, openModal } = useModal();
+  const {
+    isOpen: isOpenAssignmentModal,
+    closeModal: closeAssignmentModal,
+    openModal: openAssignmentModal,
+  } = useModal();
 
   useEffect(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
@@ -344,8 +349,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
   }, [setEditing]);
-
-  const handleCloseAssignmentDialog = () => setIsAssignmentDialogOpen(false);
 
   const onArchiveClick = useCallback(
     () =>
@@ -430,6 +433,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+    } else {
+      return openModal();
     }
   }, [bookingRequest]);
 
@@ -441,17 +446,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     bookingRequestState && setBookingRequestState && setBookingRequestState(set('agreementNo', v)(bookingRequestState));
   };
 
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
+  const getActivityLogUserData = useActivityLogUserData();
 
   const archiveHandler = () =>
     onArchiveClick().then(() =>
@@ -459,7 +454,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         bookingRequest.id!,
         createActivityObject({
           changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
-          by: getActivityLogUserData(),
+          by: getActivityLogUserData,
         }),
       ),
     );
@@ -475,6 +470,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+      <Button onClick={() => console.log(createAlphacomReq(bookingRequest))}>Test</Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -488,12 +484,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
             </Paper>
           )}
-          {isAssignmentDialogOpen ? (
-            <AgentAssignmentDialog
-              bookingRequest={bookingRequest}
-              isOpen={true}
-              handleClose={handleCloseAssignmentDialog}
-            />
+          {isOpenAssignmentModal ? (
+            <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
@@ -578,12 +570,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     <EditIcon />
                   </IconButton>
                 )}
-                <IconButton
-                  size="small"
-                  aria-label="Watch"
-                  component="span"
-                  onClick={() => setIsAssignmentDialogOpen(true)}
-                >
+                <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                   <SupervisedUserCircleIcon />
                 </IconButton>
                 {!actingAs && (
@@ -637,14 +624,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           <BookingRequestCheckList bookingRequest={bookingRequest} />
         </Box>
       </Grid>
-      <ConfirmLeadingCurrencyDialog
-        isOpen={open}
-        handleConfirm={currency => {
-          setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
-          closeModal();
-        }}
-        handleClose={handleClose}
-      />
+      {isOpen && (
+        <ConfirmLeadingCurrencyDialog
+          isOpen={isOpen}
+          handleConfirm={currency => {
+            setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
+            closeModal();
+          }}
+          handleClose={handleClose}
+        />
+      )}
     </Grid>
   );
 };
@@ -665,14 +654,56 @@ const createAlphacomReq = (request: BookingRequest) =>
     set('BkgCreateTimeStamp', new Date()),
     set('BkgTouchTimeStamp', new Date()),
     set('CarrierID', request.carrier?.name),
-    set('category', BookingCategory.Export),
+    set('Category', BookingCategory.Export),
+    set('Version', BookingVersion.long),
     // set('CargoDetails')
-    set('ForwAdrCity', request.createdBy?.company?.city),
-    set('ForwAdrId', request.createdBy?.company?.id),
-    set('ForwAdrName', request.createdBy?.company?.name),
+    set('ForwAdrCity', request.client?.city),
+    set('ForwAdrId', request.client?.id),
+    set('ForwAdrName', request.client?.name),
+    set('StatClient', request.statClient?.id),
+    set('StatClientRef', request.statClient?.name),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
-    set('FreightDetails', request.freightDetails),
+    set('FreightDetails', set('FreightDetail', request.freightDetails)({})),
     set('leadingCurrency', request.leadingCurrency),
-    set('schedule', request.schedule),
+    set(
+      'Remarks',
+      flow(set('Remark'))(
+        request.specialRemarks?.map((remark, index) =>
+          flow(set('RemarkSeq', `${index}`), renameField('id', 'RemarkType'), renameField('text', 'RemarkTxt'))(remark),
+        ),
+      )({}),
+    ),
+    set(
+      'PortTerms',
+      flow(
+        set('RelevantPort', request),
+        set('LinerPortAgent', request),
+        set('FOBDeliveryBy', request),
+        set('VGMSubmByID', request),
+        set('VGMSubmByTxt', request),
+        set(
+          'Closings',
+          set(
+            'Closing',
+            map(flow(renameField('Typ', 'ClosingType'), renameField('AdditionalInfo', 'ClosingTxt')))(
+              request.schedule?.Deadlines,
+            ),
+          )({}),
+        ),
+      )({}),
+    ),
   )({});
+
+const renameField = (oldName: string, newName: string, transformationFunction?: any) => (value: any) =>
+  get(oldName)(value)
+    ? flow(renameKey(oldName, newName, transformationFunction), omit([oldName]))(value)
+    : (() => {
+        delete value[oldName];
+        return value;
+      })();
+
+const renameKey = (oldName: string, newName: string, transformationFunction?: any) => (value: { [key: string]: any }) =>
+  transformationFunction
+    ? set(newName, transformationFunction(get(oldName)(value)))(value)
+    : set(newName, get(oldName)(value))(value);

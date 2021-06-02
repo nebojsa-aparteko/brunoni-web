@@ -104,10 +104,9 @@ const matchLocation = (
 };
 // todo better ?
 const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
-  let containerType = containerTypes?.find(
+  const containerType = containerTypes?.find(
     containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
   );
-
   return containerType;
 };
 // todo better ?
@@ -140,7 +139,7 @@ const getContainers = (
       : undefined;
 
     // Reefer settings
-    const temperature = Number(container.TEMPERATURE);
+    const temperature = container.TEMPERATURE && Number(container.TEMPERATURE);
     const ventilation =
       container.VENTILATION && getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
 
@@ -149,10 +148,10 @@ const getContainers = (
       containerType,
       pickupDate,
       pickupLocation,
-      quantity: Number(container.QUANTITY),
+      quantity: container.QUANTITY && Number(container.QUANTITY),
       temperature,
       ventilation,
-      weight: Number(container.NET_WEIGHT),
+      weight: container.NET_WEIGHT && Number(container.NET_WEIGHT),
     }) as Container;
   });
   return containers;
@@ -188,7 +187,9 @@ const matchAndFetchSchedule = async (
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
-  let schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
+  let schedules = data.Routes.filter(schedule =>
+    object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
+  );
   // only filter more if more than 1
   if (schedules.length > 1 && object.VOYAGE)
     schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));

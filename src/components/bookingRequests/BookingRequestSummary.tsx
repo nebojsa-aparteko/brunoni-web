@@ -758,7 +758,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                       ) : (
                         <Typography>
                           {bookingRequest.statClient
-                            ? (bookingRequest.statClient.name, bookingRequest.statClient.city)
+                            ? bookingRequest.statClient.name + ', ' + bookingRequest.statClient.city
                             : 'Unassigned'}
                         </Typography>
                       )

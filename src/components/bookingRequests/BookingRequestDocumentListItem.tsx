@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   Avatar,
   CircularProgress,
@@ -39,6 +39,7 @@ import { ActivityCreationProps, createActivityObject, fileWithExt } from '../boo
 import { green } from '@material-ui/core/colors';
 import theme from '../../theme/index';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,7 +101,11 @@ const addActivity = (path: string, activity: ActivityLogItem) =>
     .firestore()
     .collection(path)
     .add(activity);
-
+const ref = (collectionPath: string, id: string) =>
+  firebase
+    .firestore()
+    .collection(collectionPath)
+    .doc(id);
 const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemProps> = ({
   item,
   storageBasePath,
@@ -115,12 +120,10 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
 }) => {
   const classes = useStyles();
   const activityLogContext = useActivityLogState();
-  const [, dispatch] = useGlobalAppState();
-  const [actingAs] = useContext(ActingAs);
-  const isAdmin = !actingAs;
-
   const getActivityLogUserData = useActivityLogUserData();
-
+  const [, dispatch] = useGlobalAppState();
+  const [, , isAdmin] = useUser();
+  const docRef = useMemo(() => ref(collectionPath, item.id), [item?.id, collectionPath]);
   const deleteDocumentActivity = useCallback(
     () =>
       addActivity(
@@ -143,17 +146,12 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
     () => activityLogContext.setState({ documentReference: item, ...(additionalMentionFields || {}) }),
     [activityLogContext, item, additionalMentionFields],
   );
-  const markAsFinal = () => {};
-  const selectForComparison = () => {};
-  const onDelete = useCallback(
-    () =>
-      firebase
-        .firestore()
-        .collection(collectionPath)
-        .doc(item.id)
-        .delete(),
-    [item.id, collectionPath],
+  const markAsFinal = useCallback(() => docRef.update('final', !item.final), [item?.final]);
+  const selectForComparison = useCallback(
+    () => docRef.update('isSelectedForComparison', !item.isSelectedForComparison),
+    [item?.isSelectedForComparison],
   );
+  const onDelete = useCallback(() => docRef.delete(), [item.id, collectionPath]);
   const handleDeleteFile = useCallback(
     (item: ChecklistItemValueDocument | DocumentValue) => {
       setRemovalInProgress(true);
@@ -304,6 +302,7 @@ interface BookingRequestDocumentListItemProps {
   shouldHaveDeleteAction?: boolean;
   shouldHaveAddForComparisonAction?: boolean;
   shouldHaveMarkAsFinalAction?: boolean;
+  shouldHaveStatuses?: ChecklistItemValueDocumentStatusType[];
   additionalActivityFields?: Partial<ActivityCreationProps>;
   additionalMentionFields?: Partial<ActivityLogContextProps>;
 }

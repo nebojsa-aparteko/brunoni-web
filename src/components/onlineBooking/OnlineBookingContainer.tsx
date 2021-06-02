@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -29,6 +29,9 @@ import {
 } from '../bookingRequests/BookingRequestFreightDetails';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
+import { isDashboardUser } from '../../model/UserRecord';
+import useUser from '../../hooks/useUser';
+import useModal from '../../hooks/useModal';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -66,7 +69,7 @@ const getUpdatedFreightDetails = (
     : undefined;
 };
 
-const getSteps = () => ['General Information', 'Cargo Details', 'Additional Information', 'Summary'];
+const steps = ['General Information', 'Cargo Details', 'Additional Information', 'Summary'];
 
 const OnlineBookingContainer = () => {
   const classes = useStyles();
@@ -76,30 +79,30 @@ const OnlineBookingContainer = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const quoteJson = localStorage.getItem('quote');
-  const [quote] = React.useState(quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined);
+  const [, userRecord] = useUser();
+  const { closeModal, isOpen, openModal } = useModal();
+  const [quote] = React.useState(() => {
+    const quoteJson = localStorage.getItem('quote');
+    return quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined;
+  });
 
   const [bookingRequest, setBookingRequest] = useState<BookingRequest | undefined>();
   const [containerTypeNames, setContainerTypeNames] = useState(
     containerTypes ? containerTypes.map(containerType => containerType.name) : undefined,
   );
 
-  const scheduleJson = localStorage.getItem('schedule');
-  const [schedule] = React.useState(scheduleJson ? (JSON.parse(scheduleJson) as RouteSearchResult) : undefined);
+  const [schedule] = React.useState(() => {
+    const scheduleJson = localStorage.getItem('schedule');
+    return scheduleJson ? (JSON.parse(scheduleJson) as RouteSearchResult) : undefined;
+  });
 
-  const steps = getSteps();
-
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
-
-  const handleDialogClose = useCallback(() => {
-    setIsDialogOpen(false);
-  }, [setIsDialogOpen]);
+  }, []);
 
   useEffect(() => {
     const newContainerTypeNames = containerTypes ? containerTypes.map(containerType => containerType.name) : undefined;
@@ -164,12 +167,14 @@ const OnlineBookingContainer = () => {
               </TabPanel>
             </Box>
           </Paper>
-          <Button onClick={() => setIsDialogOpen(true)} color="primary" variant="contained" startIcon={<AddIcon />}>
-            Upload HTML booking files
-          </Button>
+          {isDashboardUser(userRecord) && (
+            <Button onClick={openModal} color="primary" variant="contained" startIcon={<AddIcon />}>
+              Upload HTML booking files
+            </Button>
+          )}
         </ContainerView>
       </FormProvider>
-      {isDialogOpen && <BookingUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} />}
+      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
     </>
   );
 };
