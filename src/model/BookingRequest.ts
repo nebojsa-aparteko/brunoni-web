@@ -17,6 +17,7 @@ export enum VGMSubmittedBy {
 export interface BookingRequest {
   id?: string;
   blNumber?: string;
+  intBlNumber?: string;
   client?: Client;
   inttraRefNumber?: string;
   origin?: Port;

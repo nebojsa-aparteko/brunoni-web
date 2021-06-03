@@ -40,6 +40,7 @@ import palette from '../../theme/palette';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
+import { CarrierId } from '../../model/Booking';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -614,6 +615,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const handleChangeBLNumber = (value?: string) => {
     bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, blNumber: value });
   };
+  const handleChangeINTBLNumber = (value?: string) => {
+    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, intBlNumber: value });
+  };
   const handleChangeCustomerRef = (value?: string) => {
     bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, customerReference: value });
   };
@@ -695,6 +699,26 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   )
                 }
               />
+              {bookingRequest?.carrier?.id === CarrierId.HSG && (
+                <TableRowData
+                  label={'INTBL'}
+                  content={
+                    editing && isDashboardUser(userRecord) ? (
+                      <TextField
+                        label=""
+                        margin="dense"
+                        variant="outlined"
+                        fullWidth
+                        value={bookingRequest?.intBlNumber}
+                        onChange={event => handleChangeINTBLNumber(event.target.value)}
+                        className={classes.blNumberInput}
+                      />
+                    ) : (
+                      bookingRequest?.intBlNumber || '[To be assigned]'
+                    )
+                  }
+                />
+              )}
               {bookingRequest.inttraRefNumber && (
                 <TableRowData label={'Inttra reference'} content={bookingRequest.inttraRefNumber} />
               )}

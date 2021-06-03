@@ -289,6 +289,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
   );
 };
 
+//TODO Refactor containers so we handle multiple models for IMCO and OOG
 const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBookingRequest, editing }) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();

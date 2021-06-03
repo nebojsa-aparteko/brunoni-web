@@ -66,7 +66,6 @@ import useClientUsers from '../../hooks/useClientUsers';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { getPortOfLoading, hasPlaceOfReceipt } from './BookingRequestSummary';
-import { parse } from 'date-fns';
 import { formatDateSafe } from '../../utilities/formattingHelpers';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -313,7 +312,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
 };
 
 export const getBookingRequestTitle = (bookingRequest?: BookingRequest) => {
-  return bookingRequest?.carrier?.id?.toUpperCase() || '';
+  return bookingRequest?.carrier?.name?.toUpperCase() || '';
 };
 
 function ScrollToTopOnMount() {
@@ -653,6 +652,7 @@ const createAlphacomReq = (request: BookingRequest) => {
   return flow(
     set('Agreement', request.agreementNo),
     set('BL-No', request.blNumber),
+    set('INTBL', request.intBlNumber),
     set('BkgAgentContact', request.assignedUser?.alphacomId),
     set('BkgAgentContactEml', request.assignedUser?.emailAddress),
     set('BkgAgentContactTxt', `${request.assignedUser?.firstName} ${request.assignedUser?.lastName}`),
