@@ -41,6 +41,8 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
 import { CarrierId } from '../../model/Booking';
+import VesselAllocationButton from '../VesselAllocationButton';
+import { getVoyageInfo } from './BookingRequestView';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -655,10 +657,15 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               {bookingRequest?.schedule && (
                 <TableRowData
                   label={'Vessel'}
-                  content={[
-                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
-                  ].join(' VOY. ')}
+                  content={
+                    <Box>
+                      {[
+                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
+                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                      ].join(' VOY. ')}
+                      <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                    </Box>
+                  }
                 />
               )}
 

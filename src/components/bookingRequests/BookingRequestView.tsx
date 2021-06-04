@@ -762,7 +762,7 @@ const renameKey = (oldName: string, newName: string, transformationFunction?: an
     ? set(newName, transformationFunction(get(oldName)(value)))(value)
     : set(newName, get(oldName)(value))(value);
 
-const getVoyageInfo = (schedule?: RouteSearchResult) => {
+export const getVoyageInfo = (schedule?: RouteSearchResult) => {
   if (!schedule) return undefined;
   if (hasPlaceOfReceipt(schedule)) {
     const [d] = getPortOfLoading(schedule);

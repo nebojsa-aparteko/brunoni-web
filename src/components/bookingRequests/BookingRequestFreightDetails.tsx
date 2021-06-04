@@ -1,6 +1,22 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { AppBar, Checkbox, Grid, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  AppBar,
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
@@ -8,7 +24,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
-import { flow, get, set, cloneDeep } from 'lodash/fp';
+import { cloneDeep, flow, get, set, uniq } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -25,14 +41,27 @@ import ContainerType from '../../model/ContainerType';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 import {
   DragDropContext,
-  Droppable,
   Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  Droppable,
+  DroppableProvided,
   DropResult,
   ResponderProvided,
-  DraggableProvided,
-  DroppableProvided,
-  DraggableStateSnapshot,
 } from 'react-beautiful-dnd';
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import CloseIcon from '@material-ui/icons/Close';
+import useModal from '../../hooks/useModal';
+import SearchIcon from '@material-ui/icons/Search';
+import { getEntity, normalizeQuote, Quote } from '../../providers/QuoteGroupsProvider';
+import firebase from '../../firebase';
+import QuickSearchQuotePreview from '../quickSearch/QuickSearchQuotePreview';
+import CommodityTypes from '../../contexts/CommodityTypes';
+import PickupLocations from '../../contexts/PickupLocations';
+import Ports from '../../contexts/Ports';
+import Carriers from '../../contexts/Carriers';
+import { getRelevantFreightDetails } from '../onlineBooking/ShippingInfo';
+import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -72,6 +101,30 @@ const useStyles = makeStyles((theme: Theme) => ({
   emptyState: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
+  },
+  closeModal: {
+    position: 'absolute',
+    top: '5px',
+    right: '12px',
+    width: '47px',
+    height: '47px',
+  },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  content: {
+    margin: theme.spacing(3),
+  },
+  formControl: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '50%',
+  },
+  searchInput: {
+    flex: 1,
   },
 }));
 
@@ -416,9 +469,23 @@ const generateCommission = (
     : undefined;
 };
 
+const getRelatedQuotes = (bookingRequest: BookingRequest) => [
+  firebase
+    .firestore()
+    .collection('quotes')
+    .where('carrier', '==', bookingRequest.carrier?.name)
+    .where('clientId', '==', bookingRequest.client?.id)
+    .where('origin', '==', bookingRequest.origin?.id)
+    .where('destination', '==', bookingRequest.destination?.id)
+    .orderBy('dateIssued', 'desc')
+    .get(),
+  uniq(bookingRequest.containers?.map(d => d.containerType?.id)) as string[],
+];
+
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
+  const { isOpen, closeModal, openModal } = useModal();
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [numberOfContainersAndTEUs, setNumberOfContainersAndTEUs] = useState(
@@ -613,13 +680,32 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
       <Grid item xs={12}>
         <TableContainer component={Paper} className={classes.tableWrapper}>
           {isDashboardUser(userRecord) && (
-            <AppBar position="static">
+            <AppBar
+              position="static"
+              style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
+            >
               <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
                 <Tab label="External" {...a11yProps(0)} />
                 <Tab label="Internal 1" {...a11yProps(1)} />
                 <Tab label="Internal 2" {...a11yProps(2)} />
               </Tabs>
+              {editing && (
+                <IconButton onClick={openModal}>
+                  <ImportContactsIcon style={{ color: 'white' }} />
+                </IconButton>
+              )}
             </AppBar>
+          )}
+          {isOpen && (
+            <QuotePickerModal
+              isOpen={isOpen}
+              handleClose={closeModal}
+              setFreights={freights =>
+                setBookingRequest(prevState => set('freightDetails', freights)(prevState as BookingRequest))
+              }
+              // @ts-ignore
+              fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+            />
           )}
           {editing && isDashboardUser(userRecord) && (
             <EnhancedTableToolbar
@@ -705,3 +791,131 @@ interface Props {
 }
 
 export default BookingRequestFreightDetails;
+
+const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreights, fetchQuotes }) => {
+  const classes = useStyles();
+  const [inputValue, setInputValue] = useState('');
+  const [searchResult, setSearchResult] = useState<Quote | undefined | null>();
+  const [fetchedResults, setFetchedResults] = useState<Quote[] | undefined>();
+  const handleQuoteSearch = useCallback(() => {
+    firebase
+      .firestore()
+      .collection('quotes')
+      .doc(inputValue)
+      .get()
+      .then(doc => {
+        setSearchResult(doc.exists ? (normalize(doc.data()) as Quote) : null);
+      });
+  }, [inputValue]);
+  const containerTypes = useContext(ContainerTypes);
+  const commodityTypes = useContext(CommodityTypes);
+  const pickupLocations = useContext(PickupLocations);
+  const chargeCodes = useContext(ChargeCodes);
+
+  const ports = useContext(Ports);
+  const carriers = useContext(Carriers);
+  const handleSelectQuote = useCallback(
+    (searchResult: Quote) => {
+      setFreights(getRelevantFreightDetails(searchResult?.quoteDetails!, chargeCodes));
+      handleClose();
+    },
+    [setFreights, chargeCodes],
+  );
+  const normalize = useMemo(() => {
+    const getContainerType = getEntity(containerTypes, containerType => containerType.id);
+    const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
+    const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
+    const getPort = getEntity(ports, port => port.id);
+    const getCarrier = getEntity(carriers, carrier => carrier.name);
+
+    return normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
+  }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
+      <Box>
+        <DialogTitle disableTypography>
+          <Typography variant="h4">Pick a quote</Typography>
+          <IconButton onClick={handleClose} className={classes.closeModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Box>
+            <Box py={1}>
+              <FormControl className={classes.formControl}>
+                <TextField
+                  autoFocus
+                  id={`input-quote`}
+                  label="Quote Nr."
+                  margin="normal"
+                  variant="outlined"
+                  value={inputValue}
+                  className={classes.searchInput}
+                  onChange={event => setInputValue(event.target.value)}
+                />
+                <IconButton
+                  aria-label="delete"
+                  color="primary"
+                  onClick={handleQuoteSearch}
+                  disabled={inputValue === ''}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </FormControl>
+              {searchResult ? (
+                <Box onClick={() => handleSelectQuote(searchResult)} mx={-1}>
+                  <QuickSearchQuotePreview quote={searchResult} />
+                </Box>
+              ) : searchResult === null ? (
+                <Alert severity="error">There is no quote with this ID</Alert>
+              ) : null}
+            </Box>
+            <Divider />
+            <Box display="flex" flexDirection="column" py={1}>
+              {fetchedResults ? (
+                fetchedResults.length === 0 ? (
+                  <Alert severity="warning">There are no quotes with booking request criteria.</Alert>
+                ) : (
+                  fetchedResults.map(doc => (
+                    <Box onClick={() => handleSelectQuote(doc)} mx={-1}>
+                      <QuickSearchQuotePreview quote={doc} />
+                    </Box>
+                  ))
+                )
+              ) : (
+                <Typography gutterBottom style={{ textAlign: 'center' }}>
+                  Want to see more quotes with similar charges.
+                </Typography>
+              )}
+              <Button
+                color="primary"
+                onClick={() => {
+                  const [promise, containers] = fetchQuotes();
+                  promise.then(doc => {
+                    setFetchedResults(
+                      doc.docs
+                        .map(d => normalize(d.data()) as Quote)
+                        .filter(d => d.containers.some(c => containers.includes(c.containerType?.id || ''))),
+                    );
+                  });
+                  console.log(containers);
+                }}
+              >
+                Load quotes
+              </Button>
+            </Box>
+          </Box>
+        </DialogContent>
+        <Divider />
+      </Box>
+    </Dialog>
+  );
+};
+
+interface ModalProps {
+  isOpen: boolean;
+  handleClose: () => void;
+  setFreights: (freights: FreightDetail[]) => void;
+  fetchQuotes: () => [Promise<firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>>, string[]];
+}
