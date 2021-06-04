@@ -64,9 +64,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         padding: theme.spacing(0),
       },
     },
-    // '&:nth-of-type(even)': {
-    //   backgroundColor: theme.palette.background.default,
-    // },
     background: 'rgba(245,245,245, 0.75)',
   },
   tableWrapper: {
@@ -110,7 +107,6 @@ const getUpdatedFreightDetails = (
           )(detail)
         : detail,
     )
-    // .map((detail: FreightDetail, index) => set('SeqNr', index+1))
   );
 };
 
@@ -119,19 +115,19 @@ const compareValues = (value1: string | undefined, value2: string | undefined) =
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
 // const isEditable = ();
-const getQuantity = (
+export const getQuantity = (
   containers: (Container & ContainerDetails)[],
   costUnit: string,
-  numberOfContainersAndSets: number[],
+  numberOfContainersAndTEUs: number[],
   isQAutomatic: boolean,
 ) => {
   const searchableCostUnit = costUnit.toUpperCase();
-  const [noOfContainers, noOfSets] = numberOfContainersAndSets;
+  const [noOfContainers, noOfTEUs] = numberOfContainersAndTEUs;
   switch (searchableCostUnit) {
-    case 'PRO SET':
-      return noOfSets.toFixed(2) || '0,00';
-    case 'PER SET':
-      return noOfSets.toFixed(2) || '0,00';
+    case 'PRO TEU':
+      return noOfTEUs.toFixed(2) || '0,00';
+    case 'PER TEU':
+      return noOfTEUs.toFixed(2) || '0,00';
     case 'PRO CONTAINER':
       return noOfContainers.toFixed(2) || '0,00';
     case 'PER CONTAINER':
@@ -150,8 +146,8 @@ const getQuantity = (
       return undefined;
   }
 };
-const automaticCostUnits = ['per Container', 'pro Container', 'pro Set', 'per Set'];
-const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
+const automaticCostUnits = ['per Container', 'pro Container', 'pro TEU', 'per TEU'];
+export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
   automaticCostUnits.some(unit => unit.toUpperCase() === costUnit.toUpperCase()) ||
   containerTypeNames?.some(
     containerName =>
@@ -371,16 +367,16 @@ const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
   return 0;
 };
 
-const getNumberOfContainersAndSets = (bookingRequest: BookingRequest) => {
+export const getNumberOfContainersAndTEUs = (bookingRequest: BookingRequest) => {
   let containers = 0;
-  let sets = 0;
+  let TEUs = 0;
   bookingRequest.containers?.forEach(container => {
     containers = containers + (container.quantity || 0);
-    sets =
-      sets +
+    TEUs =
+      TEUs +
       (container.containerType?.id ? (container.containerType.id.startsWith('2') ? 1 : 2) * container.quantity : 0);
   });
-  return [containers, sets];
+  return [containers, TEUs];
 };
 
 const generateCommission = (
@@ -425,8 +421,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const chargeCodes = useContext(ChargeCodes);
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const [numberOfContainersAndSets, setNumberOfContainersAndSets] = useState(
-    bookingRequest ? getNumberOfContainersAndSets(bookingRequest) : [0, 0],
+  const [numberOfContainersAndTEUs, setNumberOfContainersAndTEUs] = useState(
+    bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest) : [0, 0],
   );
   const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -479,7 +475,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   };
 
   useEffect(() => {
-    setNumberOfContainersAndSets(bookingRequest ? getNumberOfContainersAndSets(bookingRequest) : [0, 0]);
+    setNumberOfContainersAndTEUs(bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest) : [0, 0]);
   }, [bookingRequest]);
 
   useEffect(() => {
@@ -489,7 +485,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           ? getQuantity(
               bookingRequest?.containers,
               freightDetail.Unit,
-              numberOfContainersAndSets,
+              numberOfContainersAndTEUs,
               isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
             ) || freightDetail.Anz
           : freightDetail.Anz,
@@ -497,10 +493,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
         freightDetail,
       );
     });
-  }, [bookingRequest?.containers, numberOfContainersAndSets]);
-
-  // console.log("OG: ", freightDetails && freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2));
-  // console.log("NEW: ", freightDetails && _.sortBy(freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2), ['Internal1']));
+  }, [bookingRequest?.containers, numberOfContainersAndTEUs]);
 
   useEffect(() => {
     switch (selectedTab) {

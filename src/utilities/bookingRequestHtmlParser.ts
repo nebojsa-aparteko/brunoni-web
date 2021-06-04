@@ -375,7 +375,7 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
 
 const getNeededData = (array: string[], neededData: NeededData) => {
   return array
-    .find(el => el.includes(neededData))
+    ?.find(el => el.includes(neededData))
     ?.split(':')[1]
     .trim();
 };

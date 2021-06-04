@@ -14,6 +14,7 @@ import getTermsForCarrier from '../../utilities/getTermsForCarrier';
 import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
+import { useClientById } from '../../hooks/useClient';
 
 export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
   return quoteDetails
@@ -55,7 +56,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
   const chargeCodes = useContext(ChargeCodes);
-
+  const client = useClientById(quote?.clientId);
   const scheduleCarrier = useMemo(
     () =>
       carriers?.find(carrier => carrier.name.toLowerCase() === carrierName) ||
@@ -89,6 +90,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         carrier: carrier,
         quoteNumber: quoteNumber !== '' ? quoteNumber : undefined,
         customerReference: customerReference,
+        client,
         schedule: schedule,
         freightDetails:
           quote && quote.quoteDetails ? getRelevantFreightDetails(quote.quoteDetails, chargeCodes) : undefined,

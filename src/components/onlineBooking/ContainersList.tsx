@@ -9,7 +9,7 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
   return (
     <Grid container item xs={12} title={'Containers'}>
       {containers.map(container => (
-        <Grid item xs={4}>
+        <Grid key={container} item xs={4}>
           <InfoBoxItem
             title={
               <>

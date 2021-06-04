@@ -40,6 +40,7 @@ import palette from '../../theme/palette';
 import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
+import { CarrierId } from '../../model/Booking';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -180,7 +181,7 @@ const isVesselIntermediate = (vessel: string) => {
   return intermediateVessels.includes(vessel);
 };
 
-const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
+export const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
   schedule?.IntermediatePortInfos.length === 2 ||
   (schedule?.IntermediatePortInfos.length === 1 &&
     (isVesselIntermediate(schedule?.OriginInfo.VoyageInfo.VesselName) || !hasPlaceOfDelivery(schedule))); //Place of delivery has a priority
@@ -190,7 +191,9 @@ const hasPlaceOfDelivery = (schedule: RouteSearchResult | undefined) =>
   (schedule?.IntermediatePortInfos.length === 1 &&
     isVesselIntermediate(schedule?.DestinationInfo.VoyageInfo.VesselName));
 
-const getPortOfLoading = (schedule: RouteSearchResult | undefined) => {
+export const getPortOfLoading = (
+  schedule: RouteSearchResult | undefined,
+): [RouteSearchResultIntermediatePortInfo | undefined, number] => {
   return schedule?.IntermediatePortInfos.length === 2
     ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
       ? [schedule?.IntermediatePortInfos[1], 1]
@@ -375,6 +378,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
+        bookingRequest?.schedule &&
         isDashboardUser(userRecord) && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
@@ -511,6 +515,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
+        bookingRequest?.schedule &&
         isDashboardUser(userRecord) && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
@@ -610,6 +615,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const handleChangeBLNumber = (value?: string) => {
     bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, blNumber: value });
   };
+  const handleChangeINTBLNumber = (value?: string) => {
+    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, intBlNumber: value });
+  };
   const handleChangeCustomerRef = (value?: string) => {
     bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, customerReference: value });
   };
@@ -644,13 +652,15 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     : ''
                 }
               />
-              <TableRowData
-                label={'Vessel'}
-                content={[
-                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                  bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
-                ].join(' VOY. ')}
-              />
+              {bookingRequest?.schedule && (
+                <TableRowData
+                  label={'Vessel'}
+                  content={[
+                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
+                    bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                  ].join(' VOY. ')}
+                />
+              )}
 
               <ItineraryInfo bookingRequest={bookingRequest} setBookingRequest={setBookingRequest} editing={editing} />
             </TableBody>
@@ -689,6 +699,26 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   )
                 }
               />
+              {bookingRequest?.carrier?.id === CarrierId.HSG && (
+                <TableRowData
+                  label={'INTBL'}
+                  content={
+                    editing && isDashboardUser(userRecord) ? (
+                      <TextField
+                        label=""
+                        margin="dense"
+                        variant="outlined"
+                        fullWidth
+                        value={bookingRequest?.intBlNumber}
+                        onChange={event => handleChangeINTBLNumber(event.target.value)}
+                        className={classes.blNumberInput}
+                      />
+                    ) : (
+                      bookingRequest?.intBlNumber || '[To be assigned]'
+                    )
+                  }
+                />
+              )}
               {bookingRequest.inttraRefNumber && (
                 <TableRowData label={'Inttra reference'} content={bookingRequest.inttraRefNumber} />
               )}
