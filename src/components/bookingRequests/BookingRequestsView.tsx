@@ -30,6 +30,10 @@ import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
+import Search from '../searchbar/Search';
+import filter from 'lodash/fp/filter';
+import { BookingRequest } from '../../model/BookingRequest';
+import containsString from '../../utilities/containsString';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,11 +90,35 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const [bookingRequests, isLoading, filters, setFilters] = useBookingRequestsContext();
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
-  const { page, rowsPerPage } = bookingPaginationContextData;
+  const { searchString, page, rowsPerPage } = bookingPaginationContextData;
+
+  const [filteredResults, setFilteredResults] = useState<BookingRequest[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    return chunk(rowsPerPage)(bookingRequests);
-  }, [bookingRequests, rowsPerPage]);
+    const result = filter(
+      (bookingRequest: BookingRequest) =>
+        (bookingRequest.assignedUser?.id ? containsString(bookingRequest.assignedUser.id, searchString) : false) ||
+        (bookingRequest.assignedUser?.alphacomId
+          ? containsString(bookingRequest.assignedUser.alphacomId, searchString)
+          : false) ||
+        (bookingRequest.assignedUser?.alphacomClientId
+          ? containsString(bookingRequest.assignedUser.alphacomClientId, searchString)
+          : false) ||
+        (bookingRequest.assignedUser?.emailAddress
+          ? containsString(bookingRequest.assignedUser.emailAddress, searchString)
+          : false) ||
+        (bookingRequest.assignedUser?.firstName
+          ? containsString(bookingRequest.assignedUser.firstName, searchString)
+          : false) ||
+        (bookingRequest.assignedUser?.lastName
+          ? containsString(bookingRequest.assignedUser.lastName, searchString)
+          : false),
+    )(bookingRequests);
+
+    setFilteredResults(result);
+
+    return chunk(rowsPerPage)(result);
+  }, [bookingRequests, searchString, rowsPerPage]);
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -108,6 +136,17 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
         );
     },
     [bookingPaginationContextData, setBookingPaginationContextData],
+  );
+
+  const handleSearch = useCallback(
+    (searchStringNew: string) => {
+      if (searchStringNew !== searchString && setBookingPaginationContextData) {
+        setBookingPaginationContextData(
+          flow(set('searchString', searchStringNew), set('page', 0))(bookingPaginationContextData),
+        );
+      }
+    },
+    [bookingPaginationContextData, searchString, setBookingPaginationContextData],
   );
 
   const assignAgent = useCallback(
@@ -155,7 +194,11 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     <Box flex={1} />
                     {!actingAs && (
                       <Box display="flex" flexDirection="row">
-                        <Box display="flex" style={{ minWidth: theme.spacing(35) }} mr={1}>
+                        <Search
+                          onSearch={handleSearch}
+                          style={{ visibility: bookingRequests && bookingRequests.length > 0 ? 'initial' : 'hidden' }}
+                        />
+                        <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={1} mr={1}>
                           <UserInput
                             label="Assign task to"
                             users={assignableUsers}
@@ -199,7 +242,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                   {bookingRequests && bookingRequests.length > 0 && bookingRequests.length > rowsPerPage && (
                     <TablePagination
                       component="div"
-                      count={bookingRequests ? bookingRequests.length : 0}
+                      count={filteredResults ? filteredResults.length : 0}
                       onChangePage={handleChangePage}
                       onChangeRowsPerPage={handleChangeRowsPerPage}
                       page={page}
