@@ -1,9 +1,9 @@
 import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Button, Divider, Grid, makeStyles, Theme } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import { ActivityLogUserData, ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
@@ -12,6 +12,10 @@ import ContainersList from './ContainersList';
 import { useHistory } from 'react-router';
 import firebase from 'firebase';
 import { format } from 'date-fns';
+import useSaveFiles from '../../hooks/useSaveFiles';
+import { saveFilesToFirestore } from '../bookings/InternalStorage';
+import useGlobalAppState from '../../hooks/useGlobalAppState';
+import { BookingReqFiles } from './OnlineBookingContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -61,10 +65,11 @@ export const getBookingRequestId = async () => {
   return counter;
 };
 
-const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest }) => {
+const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest, files }) => {
   const classes = useStyles();
   const history = useHistory();
   const [, userRecord] = useUser();
+  const [, dispatch] = useGlobalAppState();
 
   const getShortUserData = useCallback(
     (): ActivityLogUserData =>
@@ -78,6 +83,12 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     [userRecord],
   );
 
+  const storageBasePath = useMemo((): string => {
+    return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
+  }, [bookingRequest]);
+
+  const { saveFiles } = useSaveFiles(storageBasePath);
+
   const handleCreateRequest = () => {
     const writableRequest = {
       ...bookingRequest,
@@ -89,11 +100,41 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);
+    dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
         createRequest(writableRequest)
-          .then(docReference => history.push(`/booking-requests/${docReference}`))
-          .catch(error => console.log(error));
+          .then(async docReference => {
+            try {
+              const documents = (await saveFiles([
+                ...files.additional,
+                ...files.certificate,
+                ...files.imo,
+              ])) as ChecklistItemValueDocument[];
+              const values = documents.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                  } as ChecklistItemValueDocument),
+              );
+              values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
+            } catch (e) {
+              return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
+            } finally {
+              history.push(`/booking-requests/${docReference}`);
+            }
+          })
+          .catch(error => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+            console.error(error);
+          })
+          .finally(() => {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          });
     } catch (error) {
       console.error('useFirestoreCollection threw an error', error);
       return null;
@@ -155,6 +196,7 @@ interface Props {
   handlePrevious: () => void;
   handleNext: () => void;
   bookingRequest: BookingRequest | undefined;
+  files: BookingReqFiles;
   setBookingRequest: React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
 }
 

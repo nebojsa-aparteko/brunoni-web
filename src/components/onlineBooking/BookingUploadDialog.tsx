@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,7 +12,6 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { DropzoneArea } from 'material-ui-dropzone';
 import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
@@ -42,7 +41,6 @@ import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { subDays } from 'date-fns';
 import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
-import { fileWithExt } from '../bookings/checklist/ChecklistItemRow';
 import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
 import MissingFields, { defaultWatchedFields } from './MissingFields';
@@ -52,6 +50,8 @@ import { getRelevantFreightDetails } from './ShippingInfo';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
+import useSaveFiles from '../../hooks/useSaveFiles';
+import DropZoneArea from '../dropzone/DropZoneArea';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -104,10 +104,9 @@ const matchLocation = (
 };
 // todo better ?
 const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
-  const containerType = containerTypes?.find(
+  return containerTypes?.find(
     containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
   );
-  return containerType;
 };
 // todo better ?
 const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
@@ -115,9 +114,7 @@ const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object:
   const commodityTypeNames = commodityTypes?.map(type => type.name);
   const match = string_similarity.findBestMatch(object.CARGO_DESCRIPTION, commodityTypeNames as string[]);
 
-  const commodityType = match.bestMatch.rating > 0.5 ? commodityTypes?.[match.bestMatchIndex] : undefined;
-
-  return commodityType;
+  return match.bestMatch.rating > 0.5 ? commodityTypes?.[match.bestMatchIndex] : undefined;
 };
 
 const matchDate = (date?: string) => {
@@ -130,7 +127,7 @@ const getContainers = (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
 ): Container[] => {
-  const containers = object.CONTAINERS.map(container => {
+  return object.CONTAINERS.map(container => {
     const containerType = matchContainerType(containerTypes, container);
     const commodityType = matchCommodityType(commodityTypes, object);
     const pickupDate = matchDate(container.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE);
@@ -154,7 +151,6 @@ const getContainers = (
       weight: container.NET_WEIGHT && Number(container.NET_WEIGHT),
     }) as Container;
   });
-  return containers;
 };
 
 const validScheduleSearch = (search: RouteSearchParams) => {
@@ -174,19 +170,19 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
   });
   const url = `${process.env.REACT_APP_API_URL}/routes?${query}`;
   const res = await fetch(url);
-  const data = (await res.json()) as RouteSearchResults;
-  return data;
+  return (await res.json()) as RouteSearchResults;
 };
 
 const matchAndFetchSchedule = async (
   scheduleSearchParams: RouteSearchParams,
   object: HtmlBookingRequest,
-): Promise<RouteSearchResult[] | undefined> => {
+): Promise<RouteSearchResult | undefined> => {
   // return undefined if params are not valid
   if (!validScheduleSearch(scheduleSearchParams)) return;
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
+  console.log(data);
   let schedules = data.Routes.filter(schedule =>
     object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
   );
@@ -202,7 +198,8 @@ const matchAndFetchSchedule = async (
     if (schedules.length > 1 && object.VOYAGE)
       schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   }
-  return schedules;
+
+  return schedules?.length === 1 ? schedules?.[0] : undefined;
 };
 
 const getClientById = async (id: string): Promise<Client> => {
@@ -268,6 +265,7 @@ const mapIntoBookingRequestModel = async (
   const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
+
   const departureDate = matchDate(object.SAIL_DATE);
   const scheduleSearchParams = {
     originPort: origin,
@@ -281,10 +279,7 @@ const mapIntoBookingRequestModel = async (
   const quote = origin && destination && (await getLatestQuote(origin.id, destination.id));
   const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
 
-  //console.log(freightDetails)
-
-  const schedules = await matchAndFetchSchedule(scheduleSearchParams, object);
-  const schedule = schedules?.length === 1 ? schedules?.[0] : undefined;
+  const schedule = await matchAndFetchSchedule(scheduleSearchParams, object);
 
   const bookingRequest = {
     agreementNo,
@@ -383,79 +378,32 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const pickupLocations = useContext(PickupLocations);
   const chargeCodes = useContext(ChargeCodes);
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (!acceptedFiles.every(file => ['html'].includes(file.name.split('.').pop() || ''))) {
-        return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'File must be of .html format' });
-      }
-      acceptedFiles.forEach(file => {
-        readAndParseFile(
-          file,
-          dispatch,
-          setBookingRequest,
-          setLoading,
-          setFiles,
-          userRecord,
-          ports,
-          carriers,
-          containerTypes,
-          commodityTypes,
-          pickupLocations,
-          chargeCodes,
-        );
-      });
-    },
-    [carriers, chargeCodes, commodityTypes, containerTypes, dispatch, pickupLocations, ports, userRecord],
-  );
-
   const storageBasePath = useMemo((): string => {
     return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
   }, [bookingRequest]);
 
-  const saveFiles = useCallback(
-    async (files: File[]): Promise<any> => {
-      const uploadFile = async (file: File): Promise<any> => {
-        return new Promise((resolve, reject) => {
-          const fileWithExtension = fileWithExt(file.name);
-          const storedFileName = `${fileWithExtension.name}_${new Date().getTime()}.${fileWithExtension.ext}`;
-          let path = [storageBasePath, storedFileName].join('/');
+  const { saveFiles } = useSaveFiles(storageBasePath);
 
-          let storageRef = firebase.storage().ref(encodeURI(path));
-          let uploadTask = storageRef.put(file);
+  const handleOnDrop = (file: File) => {
+    readAndParseFile(
+      file,
+      dispatch,
+      setBookingRequest,
+      setLoading,
+      setFiles,
+      userRecord,
+      ports,
+      carriers,
+      containerTypes,
+      commodityTypes,
+      pickupLocations,
+      chargeCodes,
+    );
+  };
 
-          uploadTask.on(
-            firebase.storage.TaskEvent.STATE_CHANGED,
-            snapshot => {
-              console.log('progress: ', (snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            },
-            error => {
-              reject(error);
-              console.error(error);
-              dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
-            },
-            () => {
-              // success
-              storageRef.updateMetadata({
-                contentDisposition: `attachment; filename=${file.name}`,
-              });
-              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL: string) => {
-                resolve({ url: downloadURL, name: file.name, storedName: storedFileName });
-              });
-            },
-          );
-        });
-      };
-
-      const requests = files.map((file: File) => {
-        return uploadFile(file).then(storedItem => {
-          return storedItem;
-        });
-      });
-
-      return Promise.all(requests);
-    },
-    [dispatch, storageBasePath],
-  );
+  const handleOnDelete = () => {
+    setBookingRequest(undefined);
+  };
 
   const handleBookingSave = () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
@@ -501,29 +449,21 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Upload Booking</Typography>
-          <IconButton onClick={handleClose} className={classes.closeModal}>
+          <IconButton onClick={handleClose} disabled={loading} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Box>
-            <DropzoneArea
-              disableRejectionFeedback={true}
-              acceptedFiles={['.html']}
-              showPreviews={!!bookingRequest}
-              showPreviewsInDropzone={false}
-              showAlerts={['error']}
-              useChipsForPreview
+            <DropZoneArea
+              handleOnDrop={handleOnDrop}
+              handleOnDelete={handleOnDelete}
               filesLimit={1}
+              acceptedExtensions={['.html']}
+              showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}
-              alertSnackbarProps={{ autoHideDuration: 4000 }}
               previewChipProps={{ disabled: !bookingRequest || loading }}
-              previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
-              previewText="Selected files"
-              onDrop={onDrop}
-              onDelete={() => {
-                setBookingRequest(undefined);
-              }}
+              dropzoneText={'Upload HTML Document'}
             />
             <Typography variant="caption">Hint: You can drag & drop HTML booking file over input.</Typography>
             <Box display="flex">

@@ -36,6 +36,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+export interface BookingReqFiles {
+  additional: File[];
+  imo: File[];
+  certificate: File[];
+}
+
 const getSteps = () => ['General Information', 'Cargo Details', 'Additional Information', 'Summary'];
 
 const OnlineBookingContainer = () => {
@@ -49,6 +55,11 @@ const OnlineBookingContainer = () => {
   const [quote] = React.useState(quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined);
 
   const [bookingRequest, setBookingRequest] = useState<BookingRequest | undefined>();
+  const [files, setFiles] = useState<BookingReqFiles>({
+    additional: [],
+    imo: [],
+    certificate: [],
+  });
 
   const scheduleJson = localStorage.getItem('schedule');
   const [schedule] = React.useState(scheduleJson ? (JSON.parse(scheduleJson) as RouteSearchResult) : undefined);
@@ -104,6 +115,8 @@ const OnlineBookingContainer = () => {
                   handleNext={handleNext}
                   bookingRequest={bookingRequest}
                   setBookingRequest={setBookingRequest}
+                  files={files}
+                  setFiles={setFiles}
                 />
               </TabPanel>
               <TabPanel value={activeStep} index={3}>
@@ -111,14 +124,17 @@ const OnlineBookingContainer = () => {
                   handlePrevious={handleBack}
                   handleNext={handleNext}
                   bookingRequest={bookingRequest}
+                  files={files}
                   setBookingRequest={setBookingRequest}
                 />
               </TabPanel>
             </Box>
           </Paper>
-          <Button onClick={() => setIsDialogOpen(true)} color="primary" variant="contained" startIcon={<AddIcon />}>
-            Upload HTML booking files
-          </Button>
+          {activeStep === 0 && (
+            <Button onClick={() => setIsDialogOpen(true)} color="primary" variant="contained" startIcon={<AddIcon />}>
+              Upload HTML booking files
+            </Button>
+          )}
         </ContainerView>
       </FormProvider>
       {isDialogOpen && <BookingUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} />}
