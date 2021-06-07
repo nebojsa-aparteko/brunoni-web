@@ -176,29 +176,44 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
 const matchAndFetchSchedule = async (
   scheduleSearchParams: RouteSearchParams,
   object: HtmlBookingRequest,
+  ports?: Port[],
 ): Promise<RouteSearchResult | undefined> => {
   // return undefined if params are not valid
   if (!validScheduleSearch(scheduleSearchParams)) return;
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
-  console.log(data);
+
   let schedules = data.Routes.filter(schedule =>
     object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
   );
   // only filter more if more than 1
   if (schedules.length > 1 && object.VOYAGE)
-    schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+    schedules = schedules.filter(schedule =>
+      object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+    );
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
+
     schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
     // only filter more if more than 1
     if (schedules.length > 1 && object.VOYAGE)
       schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
   }
+  // if still more than 1 check for intermediate ports
+  if (schedules.length > 1) {
+    const POL = ports?.find(port => object.MAIN_PORT_OF_LOAD?.includes(port.id));
+    const POD = ports?.find(port => object.MAIN_PORT_OF_DISCHARGE?.includes(port.id));
 
+    if (POL?.id !== scheduleSearchParams.originPort?.id) {
+      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POL?.id));
+    }
+    if (POD?.id !== scheduleSearchParams.destinationPort?.id) {
+      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id));
+    }
+  }
   return schedules?.length === 1 ? schedules?.[0] : undefined;
 };
 
@@ -279,7 +294,7 @@ const mapIntoBookingRequestModel = async (
   const quote = origin && destination && (await getLatestQuote(origin.id, destination.id));
   const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
 
-  const schedule = await matchAndFetchSchedule(scheduleSearchParams, object);
+  const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 
   const bookingRequest = {
     agreementNo,
@@ -458,7 +473,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropZoneArea
               handleOnDrop={handleOnDrop}
               handleOnDelete={handleOnDelete}
-              filesLimit={1}
+              filesLimit={100}
               acceptedExtensions={['.html']}
               showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}

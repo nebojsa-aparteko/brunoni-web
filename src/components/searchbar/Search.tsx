@@ -42,12 +42,13 @@ interface Props {
   className?: string;
   style?: React.CSSProperties;
   onSearch: (searchString: string) => void;
+  localStorageKey?: string;
 }
 
-const Search: React.FC<Props> = ({ onSearch, className, style }) => {
+const Search: React.FC<Props> = ({ onSearch, localStorageKey = 'quoteSearchQuery', className, style }) => {
   const classes = useStyles();
   const input = useRef<HTMLInputElement>();
-  const [searchString, setSearchString] = useLocalStorage('quoteSearchQuery', '', false, 15);
+  const [searchString, setSearchString] = useLocalStorage(localStorageKey, '', false, 15);
 
   const startSearch = useMemo(() => debounce(250, onSearch), [onSearch]);
 

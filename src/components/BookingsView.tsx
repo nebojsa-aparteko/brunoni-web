@@ -216,6 +216,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
 
                     <Search
                       onSearch={handleSearch}
+                      localStorageKey={'bookingSearchQuery'}
                       style={{ visibility: bookings && bookings.length > 0 ? 'initial' : 'hidden' }}
                     />
                   </Box>

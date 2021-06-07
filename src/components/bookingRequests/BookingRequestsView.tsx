@@ -196,6 +196,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                       <Box display="flex" flexDirection="row">
                         <Search
                           onSearch={handleSearch}
+                          localStorageKey={'bookingReqSearchQuery'}
                           style={{ visibility: bookingRequests && bookingRequests.length > 0 ? 'initial' : 'hidden' }}
                         />
                         <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={1} mr={1}>

@@ -263,7 +263,7 @@ const extractDataOddTable = (object: DataOddTable) => {
     | string
     | undefined;
   const VESSEL = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[1];
-  const VOYAGE = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[3];
+  const VOYAGE = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[3].replace(/ /g, '');
 
   const MAIN_PORT_OF_LOAD = findDataOddTable(object, Titles.MAIN_PORT_OF_LOAD);
   const MAIN_PORT_OF_DISCHARGE = findDataOddTable(object, Titles.MAIN_PORT_OF_DISCHARGE);
@@ -546,7 +546,8 @@ const extractDataNormalTable = (object: DataNormalTable) => {
   const CONVEYANCE_TYPE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.CONVEYANCE_TYPE);
   const CARRIER = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.CARRIER);
   const VESSEL = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VESSEL);
-  const VOYAGE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VOYAGE);
+  let VOYAGE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VOYAGE) as string | undefined;
+  VOYAGE = VOYAGE?.replace(/ /g, '');
   // CARGO
   const CARGO_PACKING = findDataNormalTable(object, Titles.CARGO_PACKING);
   const PACKAGES = findDataNormalTable(object, Titles.PACKAGES);
