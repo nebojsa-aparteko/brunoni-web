@@ -43,6 +43,8 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
     onChange(set('diffLength', e.target.value)(value));
   const handleOverweightChange = (e: ChangeEvent<HTMLInputElement>) =>
     onChange(set('diffWeight', e.target.value)(value));
+  const handleDisplacementChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('displacement', e.target.value)(value));
 
   return (
     <React.Fragment>
@@ -50,7 +52,7 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
         <TextField
           label="Max Length [cm]"
           variant="outlined"
-          value={value.length}
+          value={value.length || ''}
           onChange={handleLengthChange}
           margin="dense"
         />
@@ -59,20 +61,20 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
           label="Max Width [cm]"
           margin="dense"
           variant="outlined"
-          value={value.width}
+          value={value.width || ''}
           onChange={handleWidthChange}
         />
         <TextField
           label="Max Height [cm]"
           variant="outlined"
-          value={value.height}
+          value={value.height || ''}
           onChange={handleHeightChange}
           margin="dense"
         />
         <TextField
           label="Max Weight [kg]"
           variant="outlined"
-          value={value.weight}
+          value={value.weight || ''}
           onChange={handleWeightChange}
           margin="dense"
         />
@@ -82,7 +84,7 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
           <TextField
             label="OL [cm]"
             variant="outlined"
-            value={value.diffLength}
+            value={value.diffLength || ''}
             onChange={handleOverlengthChange}
             margin="dense"
           />
@@ -91,21 +93,29 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
             label="OW [cm]"
             margin="dense"
             variant="outlined"
-            value={value.diffWidth}
+            value={value.diffWidth || ''}
             onChange={handleOverwidthChange}
           />
           <TextField
             label="OH [cm]"
             variant="outlined"
-            value={value.diffHeight}
+            value={value.diffHeight || ''}
             onChange={handleOverheightChange}
             margin="dense"
           />
           <TextField
             label="OWg [kg]"
             variant="outlined"
-            value={value.diffWeight}
+            value={value.diffWeight || ''}
             onChange={handleOverweightChange}
+            margin="dense"
+          />
+          <TextField
+            label="Displacement"
+            variant="outlined"
+            type="number"
+            value={value.displacement || ''}
+            onChange={handleDisplacementChange}
             margin="dense"
           />
         </Box>
