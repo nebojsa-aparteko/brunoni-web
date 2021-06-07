@@ -262,7 +262,7 @@ const mapIntoBookingRequestModel = async (
     : undefined;
 
   const containers = getContainers(object, containerTypes, commodityTypes, pickupLocations);
-  const inttraRefNumber = object.INTTRA_REFERENCE_NUMBER;
+  const intraRefNumber = object.INTTRA_REFERENCE_NUMBER;
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
 
@@ -292,7 +292,7 @@ const mapIntoBookingRequestModel = async (
     customerReference,
     destination,
     freightDetails,
-    inttraRefNumber,
+    intraRefNumber,
     origin,
     schedule,
     status: BookingRequestStatus.REQUESTED,

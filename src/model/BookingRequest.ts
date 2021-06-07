@@ -19,7 +19,7 @@ export interface BookingRequest {
   blNumber?: string;
   intBlNumber?: string;
   client?: Client;
-  inttraRefNumber?: string;
+  intraRefNumber?: string;
   origin?: Port;
   destination?: Port;
   carrier?: Carrier;

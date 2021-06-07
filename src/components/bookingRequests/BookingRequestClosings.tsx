@@ -39,9 +39,9 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
+const BookingRequestClosings: React.FC<Props> = ({}) => {
   const classes = useStyles();
-  const [bookingRequest, setBookingRequest] = useBookingRequestContext();
+  const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const userRecord = useContext(UserRecordContext);
   const handleChangeClosing = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
     const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
@@ -102,8 +102,6 @@ const BookingRequestClosings: React.FC<Props> = ({ editing }) => {
   ) : null;
 };
 
-interface Props {
-  editing?: boolean;
-}
+interface Props {}
 
 export default BookingRequestClosings;

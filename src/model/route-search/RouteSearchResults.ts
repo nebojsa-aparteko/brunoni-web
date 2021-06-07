@@ -59,6 +59,7 @@ export interface RouteSearchResultVoyageInfo {
   VesselName: string;
   VoyageNr: string;
   Carrier: string;
+  VesselCode?: string;
 }
 
 export interface RouteSearchResultIntermediatePortInfo extends ItineraryItem {

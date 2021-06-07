@@ -32,7 +32,7 @@ import ActingAs from '../../contexts/ActingAs';
 import Page from '../bookings/Page';
 import brunoniLogo from '../../assets/logo.brunoni.svg';
 import allmarineLogo from '../../assets/logo.allmarine.png';
-import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
 import BookingRequestCheckList from './checklist/BookingRequestChecklist';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
@@ -55,7 +55,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import UserRecordContext from '../../contexts/UserRecordContext';
-import { flow, set, isEqual, get, omit, map } from 'lodash/fp';
+import { flow, set, isEqual, get, omit } from 'lodash/fp';
 import { BookingCategory, BookingVersion } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
@@ -65,8 +65,16 @@ import MissingFields from '../onlineBooking/MissingFields';
 import useClientUsers from '../../hooks/useClientUsers';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import { getPortOfLoading, hasPlaceOfReceipt } from './BookingRequestSummary';
+import {
+  getItineraryFromSchedule,
+  getPortOfLoadingFromIntermediatePorts,
+  hasPlaceOfReceipt,
+} from './BookingRequestSummary';
 import { formatDateSafe } from '../../utilities/formattingHelpers';
+import ContainerDetails from '../../model/ContainerDetails';
+import Container from '../../model/Container';
+import { getRepresentationFromClient } from './BookingRequestPortTerms';
+import Client from '../../model/Client';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -473,7 +481,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Button onClick={() => console.log(createAlphacomReq(bookingRequest))}>Test</Button>
+      <Button onClick={() => createAlphacomReq(bookingRequest).then(result => console.log(result))}>Test</Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -647,8 +655,48 @@ interface Props {
 
 export default BookingRequestView;
 
-const createAlphacomReq = (request: BookingRequest) => {
-  const voyageInfo = getVoyageInfo(request.schedule);
+const getTariffs = (container: Container & ContainerDetails) => {
+  const tariffs = [];
+  if (container.demDetTariffs && container.demDetTariffs.length > 0) {
+    tariffs.push({
+      Type: 'DEM/DET',
+      ID: container.demDetTariffs[0].id,
+    });
+  }
+  if (container.storageTariffs && container.storageTariffs.length > 0) {
+    tariffs.push({
+      Type: 'STORAGE',
+      ID: container.storageTariffs[0].id,
+    });
+  }
+  if (container.pluginTariffs && container.pluginTariffs.length > 0) {
+    tariffs.push({
+      Type: 'PLUGIN',
+      ID: container.pluginTariffs[0].id,
+    });
+  }
+};
+
+const fetchClientByAlphacomId = async (alphacomId: string) =>
+  await firebase
+    .firestore()
+    .collection('clients')
+    .doc(alphacomId)
+    .get();
+
+const createAlphacomReq = async (request: BookingRequest) => {
+  const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str => str.trim()) || [
+    undefined,
+    undefined,
+  ];
+  const vgmSubmittedByClient =
+    request?.vgmSubmittedBy === VGMSubmittedBy.CLIENT
+      ? request.client
+      : request.assignedUser?.alphacomClientId &&
+        ((await fetchClientByAlphacomId(request.assignedUser?.alphacomClientId)).data() as Client);
+  const itinerary = getItineraryFromSchedule(request.schedule);
+  const portOfLoading = itinerary?.portOfLoading;
+
   return flow(
     set('Agreement', request.agreementNo),
     set('BL-No', request.blNumber),
@@ -658,21 +706,60 @@ const createAlphacomReq = (request: BookingRequest) => {
     set('BkgAgentContactTxt', `${request.assignedUser?.firstName} ${request.assignedUser?.lastName}`),
     set('BkgCreateTimeStamp', new Date()),
     set('BkgTouchTimeStamp', new Date()),
+    set('TimeStamp', new Date()),
     set('CarrierID', request.carrier?.name),
     set('Category', BookingCategory.Export),
     set('Version', BookingVersion.long),
-    // set('CargoDetails')
-    set('Vessel', voyageInfo?.VesselName),
-    set('Voyage', voyageInfo?.VoyageNr),
+    set('VesselCode', portOfLoading?.VoyageInfo?.VesselCode),
+    set('Vessel', portOfLoading?.VoyageInfo?.VesselName), //TODO check if this is needed since we have the vessel code
+    set('Voyage', portOfLoading?.VoyageInfo?.VoyageNr),
     set('ForwAdrCity', request.client?.city),
     set('ForwAdrId', request.client?.id),
     set('ForwAdrName', request.client?.name),
     set('StatClient', request.statClient?.id),
-    set('StatClientRef', request.statClient?.name),
+    set('StatClientRef', request.agreementNo),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
     set('FreightDetails', set('FreightDetail', request.freightDetails)({})),
     set('leadingCurrency', request.leadingCurrency),
+    set('ERP-CarrierID', erpCarrierId),
+    set('ERP-ServiceID', erpServiceId),
+    set('Carrier-BkgRef', null),
+    set('Cust-BkgRef', request.customerReference),
+    set(
+      'PlaceOfRecieptISO',
+      itinerary?.placeOfReceipt ? itinerary?.placeOfReceipt?.Port.ID : itinerary?.portOfLoading?.Port.ID,
+    ),
+    set(
+      'PlaceOfRecieptName',
+      itinerary?.placeOfReceipt
+        ? itinerary?.placeOfReceipt?.Port.HarbourName
+        : itinerary?.portOfLoading?.Port.HarbourName,
+    ),
+    set(
+      'PlaceOfReceiptETS',
+      itinerary?.placeOfReceipt ? itinerary?.placeOfReceipt?.DepartureDate : itinerary?.portOfLoading?.DepartureDate,
+    ),
+    set('POL', itinerary?.portOfLoading?.Port.ID),
+    set('POLName', itinerary?.portOfLoading?.Port.HarbourName),
+    set('POLETS', itinerary?.portOfLoading?.DepartureDate),
+    set('POD', itinerary?.portOfDischarge?.Port.ID),
+    set('PODName', itinerary?.portOfDischarge?.Port.HarbourName),
+    set('PODETS', itinerary?.portOfDischarge?.DepartureDate), //TODO check if ETA or ETS is needed
+    set(
+      'FinalDestinationISO',
+      itinerary?.placeOfDelivery ? itinerary?.placeOfDelivery?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
+    ),
+    set(
+      'FinalDestinationName',
+      itinerary?.placeOfDelivery
+        ? itinerary?.placeOfDelivery?.Port.HarbourName
+        : itinerary?.portOfDischarge?.Port.HarbourName,
+    ),
+    set(
+      'FinalDestinationETA',
+      itinerary?.placeOfDelivery ? itinerary?.placeOfDelivery?.ArrivalDate : itinerary?.portOfDischarge?.ArrivalDate,
+    ),
     set(
       'Remarks',
       flow(set('Remark'))(
@@ -684,18 +771,26 @@ const createAlphacomReq = (request: BookingRequest) => {
     set(
       'PortTerms',
       flow(
-        set('RelevantPort', 'request'),
-        set('LinerPortAgent', 'request'),
-        set('FOBDeliveryBy', 'request'),
-        set('VGMSubmByID', 'request'),
-        set('VGMSubmByTxt', 'request'),
+        set('RelevantPort', null), //TODO Nenad will find out what this port needs to contain during testing, for now it is null
+        set('LinerPortAgent', portOfLoading?.Port.PortAgent),
+        set('FOBDeliveryBy', portOfLoading?.Port.PortAgent.split('<br/>')[0]),
+        set('VGMSubmByID', vgmSubmittedByClient && vgmSubmittedByClient?.id),
+        set('VGMSubmByTxt', vgmSubmittedByClient && getRepresentationFromClient(vgmSubmittedByClient)),
         set(
           'Closings',
           set(
             'Closing',
-            map(flow(renameField('Typ', 'ClosingType'), renameField('AdditionalInfo', 'ClosingTxt')))(
-              request.schedule?.Deadlines,
-            ),
+            request.schedule?.Deadlines.map(closing => {
+              const [date, time] = closing.Time?.split('-')?.map(str => str.trim()) || [undefined, undefined];
+              return {
+                ClosingType: closing.Typ,
+                ClosingDate: date,
+                ClosingTime: time,
+                ClosingTxt: ['DELIVERY', 'FCL'].includes(closing.Typ)
+                  ? null
+                  : '(TO BE SUBMITTED BEFORE CONTAINER DELIVERY AT THE TERMINAL)',
+              };
+            }),
           )({}),
         ),
       )({}),
@@ -712,12 +807,62 @@ const createAlphacomReq = (request: BookingRequest) => {
               CtypID: value.containerType?.id,
               CommodityID: value.commodityType?.id,
               CommodityTXT: value.commodityType?.name,
-              CtrWeight: `${value.weight} KGS`,
+              CtrWeight: `${value.weight?.toFixed(2)} KGS`,
               'VGM-PIN': value.vgmPin,
+              DemDetTariff: value.demDetTariffs && value.demDetTariffs.length > 0 ? value.demDetTariffs[0].id : null,
+              StorageTariff:
+                value.storageTariffs && value.storageTariffs.length > 0 ? value.storageTariffs[0].id : null,
+              PluginTariff: value.pluginTariffs && value.pluginTariffs.length > 0 ? value.pluginTariffs[0].id : null,
+              Temperature: value.temperature
+                ? `${value.temperature > 0 ? '+' + value.temperature : value.temperature}° Celsius`
+                : null,
+              Dehumidification: value.humidity ? `${value.humidity}%` : null,
+              Ventilation: value.ventilation,
+              LocRefs: {
+                LocRef: [
+                  {
+                    LocType: 'DEPOT',
+                    LocID: value.pickupLocation?.id,
+                    LocRef: value.pickupReference,
+                    LocDate: value.pickupDate && formatDateSafe(value.pickupDate, 'dd.mm.yyyy'),
+                  },
+                  {
+                    LocType: 'TERMINAL',
+                    LocID: request.schedule?.OriginInfo.Port.TerminalID || null,
+                    LocRef: value.deliveryReference,
+                    LocDate: null,
+                  },
+                ],
+              },
               IMCO: value.imo?.length > 0 ? 'Yes' : 'No',
-              // IMCOs: {
-              //   IMCO: value.imo?.map(imco=>({IMOClass: ''}))
-              // },
+              IMCOs: {
+                IMCO: value.imo?.map((imco: any) => ({
+                  IMOClass: imco?.IMOClass,
+                  UNNumber: imco?.UNNumber,
+                  PackingNumber: imco?.PGNumber,
+                  FlashPoint: null,
+                })),
+              },
+              Overdimension: value.oog?.length > 0 ? 'Yes' : 'No',
+              Overwidth: value.oog?.length > 0 ? (value.oog[0] as any).diffWidth : null,
+              Overheight: value.oog?.length > 0 ? (value.oog[0] as any).diffHeight : null,
+              Overlength: value.oog?.length > 0 ? (value.oog[0] as any).diffLength : null,
+              Overweight: value.oog?.length > 0 ? (value.oog[0] as any).diffWeight : null,
+              CtrMaxCaseDim: value.oog
+                ? {
+                    MaxWidth: value.oog?.length > 0 ? (value.oog[0] as any).width : null,
+                    MaxHeight: value.oog?.length > 0 ? (value.oog[0] as any).height : null,
+                    MaxLength: value.oog?.length > 0 ? (value.oog[0] as any).length : null,
+                    MaxWeight: value.oog?.length > 0 ? (value.oog[0] as any).weight : null,
+                  }
+                : null,
+              CtrOverDimRemark: value.oog ? 'OUT-OF-GAUGE' : null,
+              BBQuantity: null,
+              BBWeight: null,
+              BBVolume: null,
+              CargoDetailRemarks: null,
+              Stock: null,
+              DropOffRef: null,
               Equipment: {
                 EquipmentDetail: request.containers?.map(ctg => ({
                   ContainerNumber: ctg.containerNumber ? ctg.containerNumber : 'NOT AVAILABLE',
@@ -728,16 +873,7 @@ const createAlphacomReq = (request: BookingRequest) => {
                   DropOffDate: null,
                   PINNr: null,
                   CtrTariffs: {
-                    CtrTariff: [
-                      {
-                        Type: 'DEM/DET',
-                        ID: '2',
-                      },
-                      {
-                        Type: 'STORAGE',
-                        ID: '1',
-                      },
-                    ],
+                    CtrTariff: getTariffs(value), //TODO check if tariffs can remain an array
                   },
                 })),
               },
@@ -765,7 +901,7 @@ const renameKey = (oldName: string, newName: string, transformationFunction?: an
 export const getVoyageInfo = (schedule?: RouteSearchResult) => {
   if (!schedule) return undefined;
   if (hasPlaceOfReceipt(schedule)) {
-    const [d] = getPortOfLoading(schedule);
+    const [d] = getPortOfLoadingFromIntermediatePorts(schedule);
     return d?.VoyageInfo;
   }
 

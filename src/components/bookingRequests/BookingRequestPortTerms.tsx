@@ -9,7 +9,7 @@ import {
   Table,
   Typography,
 } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import set from 'lodash/fp/set';
 import { useClientById } from '../../hooks/useClient';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
@@ -26,9 +26,20 @@ const useStyles = makeStyles(() =>
   }),
 );
 
+export const getRepresentationFromClient = (client: Client) =>
+  client.name + (client.name && client.city && ', ') + client.city;
+
 const ClientRepresentation: React.FC<{ client: Client | string }> = ({ client }) => {
   const tempClient = useClientById(isString(client) ? client : '') || client;
-  return <>{tempClient.name + (tempClient.name && tempClient.city && ', ') + tempClient.city}</>;
+  const [clientRepresentation, setClientRepresentation] = useState(
+    tempClient && getRepresentationFromClient(tempClient),
+  );
+
+  useEffect(() => {
+    setClientRepresentation(tempClient && getRepresentationFromClient(tempClient));
+  }, [tempClient]);
+
+  return <>{clientRepresentation}</>;
 };
 
 const BookingRequestPortTerms: React.FC<Props> = () => {
@@ -57,6 +68,7 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
         <col style={{ width: '86%' }} />
       </colgroup>
       <TableBody>
+        {/*TODO change port to be taken from portOfLoading instead of OriginInfo*/}
         {bookingRequest?.schedule?.OriginInfo.Port.PortAgent && (
           <React.Fragment>
             <TableRowData label={'Liner Port Agent'} content={bookingRequest?.schedule?.OriginInfo.Port.PortAgent} />

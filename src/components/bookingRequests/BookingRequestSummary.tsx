@@ -19,6 +19,7 @@ import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
 import {
+  ItineraryItem,
   RouteSearchResult,
   RouteSearchResultDestinationInfo,
   RouteSearchResultIntermediatePortInfo,
@@ -122,10 +123,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 interface Itinerary {
-  placeOfReceipt: any;
-  portOfLoading?: any | undefined;
-  portOfDischarge?: any | undefined;
-  placeOfDelivery: any;
+  placeOfReceipt: ItineraryItem | undefined;
+  portOfLoading?: ItineraryItem;
+  portOfDischarge?: ItineraryItem;
+  placeOfDelivery: ItineraryItem | undefined;
 }
 const emptySearchResultPort = {
   ID: '',
@@ -193,7 +194,7 @@ const hasPlaceOfDelivery = (schedule: RouteSearchResult | undefined) =>
   (schedule?.IntermediatePortInfos.length === 1 &&
     isVesselIntermediate(schedule?.DestinationInfo.VoyageInfo.VesselName));
 
-export const getPortOfLoading = (
+export const getPortOfLoadingFromIntermediatePorts = (
   schedule: RouteSearchResult | undefined,
 ): [RouteSearchResultIntermediatePortInfo | undefined, number] => {
   return schedule?.IntermediatePortInfos.length === 2
@@ -205,7 +206,7 @@ export const getPortOfLoading = (
     : [undefined, -1]; //This should never happen
 };
 
-const getPortOfDischarge = (schedule: RouteSearchResult | undefined) => {
+const getPortOfDischargeFromIntermediatePorts = (schedule: RouteSearchResult | undefined) => {
   return schedule?.IntermediatePortInfos.length === 2
     ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
       ? [schedule?.IntermediatePortInfos[0], 0]
@@ -234,38 +235,32 @@ interface ItineraryInfoProps {
   editing?: boolean;
 }
 
+export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
+  if (!schedule) return undefined;
+  const isPlaceOfReceiptDefined = hasPlaceOfReceipt(schedule);
+  const isPlaceOfDeliveryDefined = hasPlaceOfDelivery(schedule);
+  const [POL] = getPortOfLoadingFromIntermediatePorts(schedule) as [RouteSearchResultIntermediatePortInfo, number];
+  const [POD] = getPortOfDischargeFromIntermediatePorts(schedule) as [RouteSearchResultIntermediatePortInfo, number];
+
+  return {
+    placeOfReceipt: isPlaceOfReceiptDefined ? (schedule?.OriginInfo as ItineraryItem) : undefined,
+    portOfLoading: (isPlaceOfReceiptDefined ? POL : schedule?.OriginInfo) as ItineraryItem,
+    portOfDischarge: (isPlaceOfDeliveryDefined ? POD : schedule?.DestinationInfo) as ItineraryItem,
+    placeOfDelivery: isPlaceOfDeliveryDefined ? (schedule?.DestinationInfo as ItineraryItem) : undefined,
+  } as Itinerary;
+};
 const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookingRequest, editing }) => {
   const classes = useStyles();
   const ports = useContext(Ports);
   const userRecord = useContext(UserRecordContext);
-  const [isPlaceOfReceiptDefined, setIsPlaceOfReceiptDefined] = useState(hasPlaceOfReceipt(bookingRequest.schedule));
-  const [isPlaceOfDeliveryDefined, setIsPlaceOfDeliveryDefined] = useState(hasPlaceOfDelivery(bookingRequest.schedule));
-  const [POL] = getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
-  const [POD] = getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
-  const [itinerary, setItinerary] = useState({
-    placeOfReceipt: isPlaceOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
-    portOfLoading: isPlaceOfReceiptDefined ? POL : bookingRequest.schedule?.OriginInfo,
-    portOfDischarge: isPlaceOfDeliveryDefined ? POD : bookingRequest.schedule?.DestinationInfo,
-    placeOfDelivery: isPlaceOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
-  });
+  const [itinerary, setItinerary] = useState(getItineraryFromSchedule(bookingRequest.schedule));
 
   useEffect(() => {
-    const placeOfReceiptDefined = hasPlaceOfReceipt(bookingRequest.schedule);
-    const placeOfDeliveryDefined = hasPlaceOfDelivery(bookingRequest.schedule);
-    setIsPlaceOfReceiptDefined(placeOfReceiptDefined);
-    setIsPlaceOfDeliveryDefined(placeOfDeliveryDefined);
-    const [POL] = getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
-    const [POD] = getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number];
-    const newItinerary = {
-      placeOfReceipt: placeOfReceiptDefined ? bookingRequest.schedule?.OriginInfo : undefined,
-      portOfLoading: placeOfReceiptDefined ? POL : bookingRequest.schedule?.OriginInfo,
-      portOfDischarge: placeOfDeliveryDefined ? POD : bookingRequest.schedule?.DestinationInfo,
-      placeOfDelivery: placeOfDeliveryDefined ? bookingRequest.schedule?.DestinationInfo : undefined,
-    };
-    setItinerary(newItinerary);
+    setItinerary(getItineraryFromSchedule(bookingRequest.schedule));
   }, [bookingRequest.schedule]);
 
   const handleChangeItinerary = (itineraryItemName: string, fieldName: string, value: any) => {
+    if (!itinerary) return;
     const newItinerary = set(itineraryItemName, set(fieldName, value)(get(itineraryItemName)(itinerary)))(itinerary);
     const itineraryItemToUpdate: string | undefined = getFieldToUpdate(newItinerary, itineraryItemName);
     const schedule = { ...bookingRequest.schedule };
@@ -277,6 +272,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
   };
 
   const handleAddPlaceOfReceipt = () => {
+    if (!itinerary) return;
     const newItinerary = set('placeOfReceipt', emptyPlaceOfReceipt)(itinerary);
     const schedule = {
       ...bookingRequest.schedule,
@@ -286,6 +282,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
     setBookingRequest && setBookingRequest(set('schedule', schedule)(bookingRequest));
   };
   const handleAddPlaceOfDelivery = () => {
+    if (!itinerary) return;
     const newItinerary = set('placeOfDelivery', emptyPlaceOfDelivery)(itinerary);
     const schedule = {
       ...bookingRequest.schedule,
@@ -297,8 +294,14 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
   const handleDeleteItineraryItem = (fieldName: string) => {
     const [port, index] =
       fieldName === 'placeOfReceipt'
-        ? (getPortOfLoading(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number])
-        : (getPortOfDischarge(bookingRequest.schedule) as [RouteSearchResultIntermediatePortInfo, number]);
+        ? (getPortOfLoadingFromIntermediatePorts(bookingRequest.schedule) as [
+            RouteSearchResultIntermediatePortInfo,
+            number,
+          ])
+        : (getPortOfDischargeFromIntermediatePorts(bookingRequest.schedule) as [
+            RouteSearchResultIntermediatePortInfo,
+            number,
+          ]);
     const tempSchedule = cloneDeep(bookingRequest.schedule);
     const schedule = tempSchedule
       ? ((fieldName === 'placeOfReceipt'
@@ -322,7 +325,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
 
   return (
     <React.Fragment>
-      {itinerary.placeOfReceipt ? (
+      {itinerary && itinerary.placeOfReceipt ? (
         <TableRowData
           label={'Place of Receipt'}
           content={
@@ -400,7 +403,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         )
       )}
 
-      {itinerary.portOfLoading && (
+      {itinerary && itinerary.portOfLoading && (
         <TableRowData
           label={'Port Of Loading'}
           content={
@@ -430,7 +433,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       )}
 
-      {itinerary.portOfDischarge && (
+      {itinerary && itinerary.portOfDischarge && (
         <TableRowData
           label={'Port of Discharge'}
           content={
@@ -460,7 +463,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       )}
 
-      {itinerary.placeOfDelivery ? (
+      {itinerary && itinerary.placeOfDelivery ? (
         <TableRowData
           label={'Place of Delivery'}
           content={
@@ -725,9 +728,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     )
                   }
                 />
-              )}
-              {bookingRequest.inttraRefNumber && (
-                <TableRowData label={'Inttra reference'} content={bookingRequest.inttraRefNumber} />
               )}
               {editing && (
                 <TableRowData
