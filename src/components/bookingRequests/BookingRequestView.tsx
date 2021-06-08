@@ -75,6 +75,8 @@ import ContainerDetails from '../../model/ContainerDetails';
 import Container from '../../model/Container';
 import { getRepresentationFromClient } from './BookingRequestPortTerms';
 import Client from '../../model/Client';
+import ChargeCode from '../../model/ChargeCode';
+import ChargeCodes from '../../contexts/ChargeCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -334,6 +336,7 @@ function ScrollToTopOnMount() {
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
+  const chargeCodes = useContext(ChargeCodes) as ChargeCode[];
   const { isOpen, openModal, closeModal } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -360,6 +363,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
   }, [setEditing]);
+
+  const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
+    chargeCodes,
+  ]);
 
   const onArchiveClick = useCallback(
     () =>
@@ -481,7 +488,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Button onClick={() => createAlphacomReq(bookingRequest).then(result => console.log(result))}>Test</Button>
+      <Button
+        onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}
+      >
+        Test
+      </Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -675,6 +686,22 @@ const getTariffs = (container: Container & ContainerDetails) => {
       ID: container.pluginTariffs[0].id,
     });
   }
+  return tariffs;
+};
+
+const twentyFootContainers = ["20'DC", "20'SO", "20'FR", "20'PF", "20'SR", "20'RF", "20'TK", "20'OT"];
+const fortyFootContainers = ["40'DC", "40'SO", "40'FR", "40'PF", "40'SR", "40'OT", "40'HC", "40'FH", "40'RH", "40'OH"];
+
+const getRelevantUnit = (unit: string) => {
+  if (unit === 'PRO CONTAINER' || unit === 'PER CONTAINER') return 'CTR';
+  if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT') return 'FEE';
+  if (unit === 'PRO SET' || unit === 'PER SET') return 'SET';
+  if (unit === 'PRO TEU' || unit === 'PER TEU') return 'TEU';
+  if (twentyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
+    return "20'";
+  if (fortyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
+    return "40'";
+  return unit;
 };
 
 const fetchClientByAlphacomId = async (alphacomId: string) =>
@@ -684,7 +711,7 @@ const fetchClientByAlphacomId = async (alphacomId: string) =>
     .doc(alphacomId)
     .get();
 
-const createAlphacomReq = async (request: BookingRequest) => {
+const createAlphacomReq = async (request: BookingRequest, chargeCodes: ChargeCode[] | undefined) => {
   const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str => str.trim()) || [
     undefined,
     undefined,
@@ -711,8 +738,9 @@ const createAlphacomReq = async (request: BookingRequest) => {
     set('Category', BookingCategory.Export),
     set('Version', BookingVersion.long),
     set('VesselCode', portOfLoading?.VoyageInfo?.VesselCode),
-    set('Vessel', portOfLoading?.VoyageInfo?.VesselName), //TODO check if this is needed since we have the vessel code
+    set('Vessel', portOfLoading?.VoyageInfo?.VesselName),
     set('Voyage', portOfLoading?.VoyageInfo?.VoyageNr),
+    set('requestId', request.id),
     set('ForwAdrCity', request.client?.city),
     set('ForwAdrId', request.client?.id),
     set('ForwAdrName', request.client?.name),
@@ -720,7 +748,17 @@ const createAlphacomReq = async (request: BookingRequest) => {
     set('StatClientRef', request.agreementNo),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
-    set('FreightDetails', set('FreightDetail', request.freightDetails)({})),
+    set(
+      'FreightDetails',
+      set(
+        'FreightDetail',
+        request.freightDetails?.map(detail => ({
+          ...detail,
+          Unit: detail.Unit ? getRelevantUnit(detail.Unit.trim().toUpperCase()) : undefined,
+          ChgCode: chargeCodes ? chargeCodes.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
+        })),
+      )({}),
+    ),
     set('leadingCurrency', request.leadingCurrency),
     set('ERP-CarrierID', erpCarrierId),
     set('ERP-ServiceID', erpServiceId),
@@ -771,7 +809,7 @@ const createAlphacomReq = async (request: BookingRequest) => {
     set(
       'PortTerms',
       flow(
-        set('RelevantPort', null), //TODO Nenad will find out what this port needs to contain during testing, for now it is null
+        set('RelevantPort', 'POL'), //For export this is always POL, for import it is always POD
         set('LinerPortAgent', portOfLoading?.Port.PortAgent),
         set('FOBDeliveryBy', portOfLoading?.Port.PortAgent.split('<br/>')[0]),
         set('VGMSubmByID', vgmSubmittedByClient && vgmSubmittedByClient?.id),
@@ -801,6 +839,7 @@ const createAlphacomReq = async (request: BookingRequest) => {
         set(
           'CargoDetail',
           request.containers?.map((value, index) => {
+            const tariffs = getTariffs(value);
             return {
               ItemNo: index + 1,
               CtrQuantity: value.quantity,
@@ -848,6 +887,7 @@ const createAlphacomReq = async (request: BookingRequest) => {
               Overheight: value.oog?.length > 0 ? (value.oog[0] as any).diffHeight : null,
               Overlength: value.oog?.length > 0 ? (value.oog[0] as any).diffLength : null,
               Overweight: value.oog?.length > 0 ? (value.oog[0] as any).diffWeight : null,
+              EmptySlots: value.oog?.length > 0 ? (value.oog[0] as any).displacement : null,
               CtrMaxCaseDim: value.oog
                 ? {
                     MaxWidth: value.oog?.length > 0 ? (value.oog[0] as any).width : null,
@@ -873,7 +913,7 @@ const createAlphacomReq = async (request: BookingRequest) => {
                   DropOffDate: null,
                   PINNr: null,
                   CtrTariffs: {
-                    CtrTariff: getTariffs(value), //TODO check if tariffs can remain an array
+                    CtrTariff: tariffs,
                   },
                 })),
               },

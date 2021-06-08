@@ -57,18 +57,18 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
   const [selectedValue, setSelectedValue] = React.useState<string>(
     tariff?.id || (availableCodes && availableCodes.length > 0 ? availableCodes[0].id || '' : ''),
   );
-  const [tariffDays, setTariffDays] = useState<string>(tariff?.days || '14');
+  const [tariffDays, setTariffDays] = useState<number>(tariff?.days ? parseInt(tariff?.days) : 14);
 
   useEffect(() => {
     setSelectedValue(tariff?.id || (availableCodes && availableCodes.length > 0 ? availableCodes[0].id || '' : ''));
-    setTariffDays(tariff?.days || '14');
+    setTariffDays(tariff?.days ? parseInt(tariff?.days) : 14);
   }, [tariff]);
 
   const handleSelectNewTariffId = (event: React.ChangeEvent<{ value: string }>) => {
     const selectedTariff = availableCodes?.find(tariff => tariff.id === event.target.value);
     setSelectedValue(event.target.value);
-    const newDaysValue = selectedTariff?.days || '';
-    setTariffDays(newDaysValue);
+    const newDaysValue = selectedTariff?.days;
+    setTariffDays(newDaysValue ? parseInt(newDaysValue) : -1);
     selectedTariff &&
       handleSetSelectedTariffValue({
         id: selectedTariff.id,
@@ -82,7 +82,7 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
   };
 
   const handleOnDaysChange = (newText: string | undefined) => {
-    setTariffDays(newText || '');
+    setTariffDays(newText ? parseInt(newText) : -1);
   };
 
   return (
@@ -94,7 +94,7 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
           margin={margin}
           type="number"
           fullWidth
-          value={tariffDays || ''}
+          value={tariffDays ? (tariffDays === -1 ? '' : tariffDays) : ''}
           onChange={event => handleOnDaysChange(event.target.value)}
           onBlur={event =>
             handleSetSelectedTariffValue({ id: selectedValue, days: event.target.value, text: tariff?.text } as Tariff)

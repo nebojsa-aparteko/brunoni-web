@@ -7,4 +7,5 @@ export default interface OOG {
   diffLength?: string;
   diffHeight?: string;
   diffWeight?: string;
+  displacement?: number;
 }
