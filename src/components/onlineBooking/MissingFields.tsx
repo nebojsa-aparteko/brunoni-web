@@ -19,6 +19,8 @@ import { BookingRequest } from '../../model/BookingRequest';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import useUser from '../../hooks/useUser';
 import { isDashboardUser } from '../../model/UserRecord';
+import { isBefore } from 'date-fns/fp';
+import theme from '../../theme';
 
 interface Object {
   [key: string]: string;
@@ -48,6 +50,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(1),
   },
 }));
+
+const validQuote = (bookingRequest: BookingRequest) => {
+  const quoteValidityDate = bookingRequest?.quoteValidityPeriod?.to
+    ? bookingRequest?.quoteValidityPeriod?.to
+    : undefined;
+
+  const scheduleDepartureDate = bookingRequest.schedule?.OriginInfo.DepartureDate
+    ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
+    : undefined;
+
+  if (quoteValidityDate && scheduleDepartureDate) {
+    return isBefore(scheduleDepartureDate)(quoteValidityDate);
+  }
+  return false;
+};
 
 const MissingFields: React.FC<Props> = ({
   bookingRequest,
@@ -93,32 +110,36 @@ const MissingFields: React.FC<Props> = ({
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">{isDashboardUser(userRecord) ? 'Missing fields' : 'Message'}</Typography>
+            <Typography variant="h5">{'Warning message'}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
+              {!validQuote(bookingRequest) && bookingRequest.schedule && (
+                <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
+                  {`You are booking with schedule outside quote end date (${bookingRequest.schedule?.OriginInfo
+                    .DepartureDate as string})`}
+                </Typography>
+              )}
+              <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
+                {isDashboardUser(userRecord)
+                  ? 'These fields were not found on Inttra booking:'
+                  : 'Thanks for using our online services.\n' +
+                    '  Your booking request has been submitted and is in requested status.\n' +
+                    '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
+                    '  The next available booking agent will take care and check the availabilities. Thank you.'}
+              </Typography>
               {nonMatchingFields && nonMatchingFields.length > 0 && (
-                <>
-                  <Typography variant="h4" style={{ whiteSpace: 'pre-line' }}>
-                    {isDashboardUser(userRecord)
-                      ? 'These fields were not found on Inttra booking:'
-                      : 'Thanks for using our online services.\n' +
-                        '  Your booking request has been submitted and is in requested status.\n' +
-                        '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
-                        '  The next available booking agent will take care and check the availabilities. Thank you.'}
-                  </Typography>
-                  <List dense={true}>
-                    {isDashboardUser(userRecord) &&
-                      nonMatchingFields.map((field, index) => (
-                        <ListItem key={index}>
-                          <ListItemIcon>
-                            <FiberManualRecordIcon color={'error'} fontSize={'small'} />
-                          </ListItemIcon>
-                          <ListItemText>{WatchedFields[field]}</ListItemText>
-                        </ListItem>
-                      ))}
-                  </List>
-                </>
+                <List dense={true}>
+                  {isDashboardUser(userRecord) &&
+                    nonMatchingFields.map((field, index) => (
+                      <ListItem key={index}>
+                        <ListItemIcon>
+                          <FiberManualRecordIcon color={'error'} fontSize={'small'} />
+                        </ListItemIcon>
+                        <ListItemText>{WatchedFields[field]}</ListItemText>
+                      </ListItem>
+                    ))}
+                </List>
               )}
               {isDashboardUser(userRecord) &&
                 containersNonMatchingFields &&
@@ -128,7 +149,7 @@ const MissingFields: React.FC<Props> = ({
                       <List key={index} disablePadding={true}>
                         <ListItem>
                           <ListItemText>
-                            <Typography variant="h4">Container {index + 1}: </Typography>
+                            <Typography variant="h5">Container {index + 1}: </Typography>
                           </ListItemText>
                         </ListItem>
                         <List dense={true}>

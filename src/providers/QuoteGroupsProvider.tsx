@@ -28,7 +28,6 @@ import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import { useQuotesContext } from './QuotesProvider';
 import UserRecord from '../model/UserRecord';
-import { FreightDetailGroup } from '../model/Booking';
 
 interface Props {
   children: React.ReactNode;
@@ -133,7 +132,7 @@ export interface Remark {
   RemarkTitle: string;
 }
 
-const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
+export const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
 
 const uniqueCommodityTypes = flow(map(get('commodityType')), filter(identity), uniqBy('id'));
 

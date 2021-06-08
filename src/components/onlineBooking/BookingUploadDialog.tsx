@@ -30,7 +30,7 @@ import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
-import { isNil, omitBy } from 'lodash/fp';
+import { flow, isNil, omitBy, update } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -45,13 +45,14 @@ import firebase from '../../firebase';
 import { globalActions } from '../../store/types/globalAppState';
 import MissingFields, { defaultWatchedFields } from './MissingFields';
 import Client from '../../model/Client';
-import { Quote } from '../../providers/QuoteGroupsProvider';
+import { normalizeDateRange, Quote } from '../../providers/QuoteGroupsProvider';
 import { getRelevantFreightDetails } from './ShippingInfo';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
 import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
+import safeInvoke from '../../utilities/safeInvoke';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -244,7 +245,11 @@ const getLatestQuote = async (originId: string, destinationId: string) => {
     .orderBy('dateIssued', 'desc')
     .limit(1)
     .get();
-  return (quotesRef.docs.map(quote => quote.data()) as Quote[])[0] || undefined;
+  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])[0] || undefined;
+};
+
+const normalizeQuote = (data: any) => {
+  return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
 };
 
 const mapIntoBookingRequestModel = async (
@@ -309,6 +314,7 @@ const mapIntoBookingRequestModel = async (
     freightDetails,
     intraRefNumber,
     origin,
+    quoteValidityPeriod: quote?.validityPeriod,
     schedule,
     status: BookingRequestStatus.REQUESTED,
     vgmSubmittedBy,
@@ -473,7 +479,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropZoneArea
               handleOnDrop={handleOnDrop}
               handleOnDelete={handleOnDelete}
-              filesLimit={100}
+              filesLimit={1}
               acceptedExtensions={['.html']}
               showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}
