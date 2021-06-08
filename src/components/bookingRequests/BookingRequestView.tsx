@@ -740,6 +740,7 @@ const createAlphacomReq = async (request: BookingRequest, chargeCodes: ChargeCod
     set('VesselCode', portOfLoading?.VoyageInfo?.VesselCode),
     set('Vessel', portOfLoading?.VoyageInfo?.VesselName),
     set('Voyage', portOfLoading?.VoyageInfo?.VoyageNr),
+    set('requestId', request.id),
     set('ForwAdrCity', request.client?.city),
     set('ForwAdrId', request.client?.id),
     set('ForwAdrName', request.client?.name),
