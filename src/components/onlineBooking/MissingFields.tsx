@@ -31,6 +31,7 @@ export const WatchedFields: Object = {
   schedule: 'Schedule',
   vgmSubmittedBy: 'VGM Submission By',
   assignedUser: 'Watcher (Assigned agent)',
+  freightDetails: 'Freight details',
 };
 
 export const ContainerWatchedFields: Object = {
@@ -60,8 +61,11 @@ const validQuote = (bookingRequest: BookingRequest) => {
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
     : undefined;
 
+  // console.log('quoteValidityDate', quoteValidityDate)
+  // console.log('scheduleDepartureDate', scheduleDepartureDate)
+
   if (quoteValidityDate && scheduleDepartureDate) {
-    return isBefore(scheduleDepartureDate)(quoteValidityDate);
+    return isBefore(quoteValidityDate)(scheduleDepartureDate);
   }
   return false;
 };
