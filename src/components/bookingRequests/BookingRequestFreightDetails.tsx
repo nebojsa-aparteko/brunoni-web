@@ -722,7 +722,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
               deleteTooltip={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
             />
           )}
-          {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
+          {filteredFreightDetails && (filteredFreightDetails.length > 0 || seafreightCommission) ? (
             <Table className={classes.table} size="small">
               <colgroup>
                 {editing && <col style={{ width: '5%' }} />}
@@ -738,9 +738,14 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                   {editing && isDashboardUser(userRecord) && (
                     <TableCell align="left" style={{ paddingLeft: 4 }}>
                       <Checkbox
-                        checked={selectedDetails.length === filteredFreightDetails.length}
+                        checked={
+                          filteredFreightDetails.length === 0
+                            ? false
+                            : selectedDetails.length === filteredFreightDetails.length
+                        }
                         onClick={handleSelectDeselectAll}
                         onFocus={event => event.stopPropagation()}
+                        disabled={filteredFreightDetails.length === 0}
                         color="primary"
                       />
                     </TableCell>
