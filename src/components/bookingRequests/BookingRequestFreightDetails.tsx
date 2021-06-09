@@ -466,7 +466,7 @@ const generateCommission = (
         Txt: 'Agency Commission',
         Currency: seafreightDetail.Currency,
         UnitValue: value,
-        Unit: isPercent ? '%' : 'per Shipment',
+        Unit: isPercent ? '%' : 'per TEU',
         Total: isPercent ? ((seafreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0,
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
