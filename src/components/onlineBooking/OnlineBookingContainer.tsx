@@ -119,7 +119,7 @@ const OnlineBookingContainer = () => {
     bookingRequest &&
       updatedFreightDetails &&
       setBookingRequest(set('freightDetails', updatedFreightDetails)(bookingRequest));
-  }, [bookingRequest?.containers]);
+  }, [bookingRequest, containerTypeNames]);
 
   return (
     <>

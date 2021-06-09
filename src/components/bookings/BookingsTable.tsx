@@ -215,7 +215,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2),
         '&:hover': {
-          backgroundColor: 'rgba(161,213,255,0.15) !important',
+          backgroundColor: 'rgba(161,213,255,0.20) !important',
         },
         '&:focus': {
           outline: 'none',
