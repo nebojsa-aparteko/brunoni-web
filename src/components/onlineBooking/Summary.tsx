@@ -16,6 +16,7 @@ import useSaveFiles from '../../hooks/useSaveFiles';
 import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
+import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -90,6 +91,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const { saveFiles } = useSaveFiles(storageBasePath);
 
   const handleCreateRequest = () => {
+    const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
     const writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
@@ -97,6 +99,8 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       status: BookingRequestStatus.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
       archived: false,
+      vessel: voyageInfo?.VesselName,
+      voyage: voyageInfo?.VoyageNr,
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);

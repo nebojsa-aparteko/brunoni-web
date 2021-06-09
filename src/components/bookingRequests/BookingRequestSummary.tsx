@@ -29,11 +29,10 @@ import {
 } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { Link } from 'react-router-dom';
-import { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
+import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { cloneDeep, get, set } from 'lodash/fp';
-import UserRecord from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -608,11 +607,14 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   };
 
   const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
+    const voyageInfo = getVoyageInfo(schedule);
     bookingRequest &&
       setBookingRequest &&
       setBookingRequest({
         ...bookingRequest,
         schedule: schedule,
+        vessel: voyageInfo?.VesselName,
+        voyage: voyageInfo?.VoyageNr,
       });
     handleDialogClose();
   };

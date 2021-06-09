@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import {
   Box,
@@ -20,6 +20,7 @@ import useModal from '../hooks/useModal';
 import CloseIcon from '@material-ui/icons/Close';
 import { RouteSearchResultVoyageInfo } from '../model/route-search/RouteSearchResults';
 import useVesselWithVoyageById from '../hooks/useVesselWithVoyageById';
+import VesselAllocation from '../model/VesselAllocation';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -46,6 +47,7 @@ const useStyles = makeStyles(theme => ({
 const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeModal, vesselVoyage }) => {
   const classes = useStyles();
   const vessel = useVesselWithVoyageById(`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`);
+  const allocation = useMemo(() => countAllocation(vessel), [vessel]);
   return (
     <Dialog open={isOpen} onClose={closeModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
       <Box className={classes.dialogBody}>
@@ -89,12 +91,37 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                       {vessel.weightBooked} <PercentData percent={vessel.weightPercent} />
                     </TableCell>
                   </TableRow>
+                  {vessel.requested && (
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Requested Bookings (Status: Requested)
+                      </TableCell>
+                      <TableCell align="right">{vessel.requested.quantity}</TableCell>
+                      <TableCell align="right">{vessel.requested.weight}</TableCell>
+                    </TableRow>
+                  )}
+                  {vessel.inProgress && (
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                        Requested Bookings (Status: In Progress)
+                      </TableCell>
+                      <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
+                      <TableCell align="right">{vessel.inProgress.weight}</TableCell>
+                    </TableRow>
+                  )}
                   <TableRow>
                     <TableCell component="th" scope="row">
-                      Requested
+                      Total
                     </TableCell>
-                    <TableCell align="right">{vessel.teuAllocation}</TableCell>
-                    <TableCell align="right">{vessel.weightAllocation}</TableCell>
+                    <TableCell align="right">{allocation.total.teu}</TableCell>
+                    <TableCell align="right">{allocation.total.ton}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell component="th" scope="row">
+                      Left to Book
+                    </TableCell>
+                    <TableCell align="right">{allocation.difference.teu}</TableCell>
+                    <TableCell align="right">{allocation.difference.ton}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -106,14 +133,6 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
   );
 };
 
-const rows = [
-  { label: 'Allocation', teu: '150', ton: '1200' },
-  { label: 'Booked', teu: '100', ton: '100' },
-  { label: 'Requested', teu: '2', ton: '20' },
-  { label: 'Requested (Others)', teu: '0', ton: '0' },
-  { label: 'Total', teu: '102', teuPercent: 68, ton: '1020', tonPercent: 105 },
-  { label: 'Left to book', teu: '48', ton: '180' },
-];
 const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage }) => {
   const { closeModal, openModal, isOpen } = useModal();
   return (
@@ -145,3 +164,19 @@ interface VesselAllocationModal {
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;
 }
+
+const countAllocation = (allocation?: VesselAllocation) => {
+  if (!allocation) return { total: { teu: 0, ton: 0 }, difference: { teu: 0, ton: 0 } };
+  const allocationTotal = {
+    teu: (allocation.inProgress?.quantity || 0) + (allocation.requested?.quantity || 0) + +allocation.teuBooked,
+    ton: (allocation.inProgress?.weight || 0) + (allocation.requested?.weight || 0) + +allocation.weightBooked,
+  };
+
+  return {
+    total: allocationTotal,
+    difference: {
+      teu: +allocation.teuAllocation - allocationTotal.teu,
+      ton: +allocation.weightAllocation - allocationTotal.ton,
+    },
+  };
+};

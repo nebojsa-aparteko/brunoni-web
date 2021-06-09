@@ -11,6 +11,14 @@ interface VesselAllocation {
   weightAllocation: string;
   weightBooked: string;
   weightPercent: string;
+  requested?: Allocation;
+  inProgress?: Allocation;
 }
 
 export default VesselAllocation;
+
+interface Allocation {
+  count: number;
+  weight: number;
+  quantity: number;
+}

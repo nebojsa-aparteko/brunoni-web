@@ -11,5 +11,5 @@ import ActingAs from '../contexts/ActingAs';
 export default (): [firebase.User, UserRecord, boolean] => [
   useContext(UserContext)!,
   useContext(UserRecordContext)!,
-  !useContext(ActingAs)!,
+  !useContext(ActingAs)?.[0]!,
 ];
