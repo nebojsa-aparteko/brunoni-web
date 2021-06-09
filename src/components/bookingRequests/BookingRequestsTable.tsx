@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback } from 'react';
+import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
   Card,
@@ -64,6 +65,10 @@ const useStyles = makeStyles(() => ({
     width: '47px',
     height: '47px',
   },
+  inttraLogo: {
+    width: '4em',
+    marginRight: '10px',
+  },
   checkListBackdrop: {
     zIndex: 1,
   },
@@ -105,7 +110,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
       paddingTop: theme.spacing(2),
       paddingBottom: theme.spacing(2),
       '&:hover': {
-        backgroundColor: 'rgba(161,213,255,0.15) !important',
+        backgroundColor: 'rgba(161,213,255,0.20) !important',
       },
       '&:focus': {
         outline: 'none',
@@ -137,7 +142,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   );
 
   return (
-    <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(bookingRequest.id!)} style={{ display: 'flex' }}>
+    <StyledTableRow
+      tabIndex={-1}
+      onClick={() => handleRowClick(bookingRequest.id!)}
+      style={{ display: 'flex', backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)' }}
+    >
       <Checkbox
         checked={bookingRequest.id ? selectedRequests.includes(bookingRequest.id) : false}
         onClick={event => {
@@ -149,11 +158,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
       <Grid container item spacing={2} xs={12} style={{ paddingTop: '10px', paddingLeft: '12px' }}>
         <Grid item lg={12} xs={12}>
           {bookingRequest ? (
-            <Fragment>
+            <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
               <span className={classes.tableRowHeader}>
                 <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
               </span>
-            </Fragment>
+              {bookingRequest.intraRefNumber && (
+                <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />
+              )}
+            </Box>
           ) : null}
         </Grid>
         <Grid item lg={12} xs={12}>
