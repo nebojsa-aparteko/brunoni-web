@@ -21,8 +21,8 @@ const formatCHFCurrency = (amount: number): string =>
     minimumFractionDigits: 2,
   }).format(amount);
 
-export const formatCurrencyAmount = (amount: number): string =>
-  new Intl.NumberFormat('de-CH', {
+export const formatCurrencyAmount = (amount: number, locale?: string): string =>
+  new Intl.NumberFormat(locale || 'de-CH', {
     minimumFractionDigits: 2,
   }).format(amount);
 

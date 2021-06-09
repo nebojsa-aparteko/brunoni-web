@@ -22,7 +22,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
 import { cloneDeep, flow, get, set, uniq } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
@@ -31,14 +31,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
-import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+import { FreightDetailGroup } from '../../model/Booking';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import Container from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
-import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 import {
   DragDropContext,
   Draggable,
@@ -62,6 +61,8 @@ import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
 import { getRelevantFreightDetails } from '../onlineBooking/ShippingInfo';
 import { Alert } from '@material-ui/lab';
+import { Currency } from '../../model/Payment';
+import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -139,7 +140,7 @@ interface RowProps {
 const getUpdatedFreightDetails = (
   bookingRequest: BookingRequest,
   value: any | undefined,
-  pos: string,
+  pos: number,
   field: string,
 ) => {
   return (
@@ -147,15 +148,13 @@ const getUpdatedFreightDetails = (
     bookingRequest.freightDetails.map((detail: FreightDetail) =>
       detail.SeqNr === pos
         ? flow(
-            set(field, value === '' ? undefined : value),
+            set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
             set(
               'Total',
               detail.Anz && detail.UnitValue
-                ? (
-                    (field === 'Anz' ? parseFloat(value) : parseFloat(detail.Anz)) *
-                    (field === 'UnitValue' ? parseFloat(value) : parseFloat(detail.UnitValue))
-                  ).toFixed(2)
-                : '0.00',
+                ? (field === 'Anz' ? parseFloat(value) || 0 : detail.Anz) *
+                    (field === 'UnitValue' ? parseFloat(value) : detail.UnitValue)
+                : 0.0,
             ),
           )(detail)
         : detail,
@@ -164,7 +163,7 @@ const getUpdatedFreightDetails = (
 };
 
 //inputs use an empty string instead of undefined so we need to compare those values as equal to avoid warnings
-const compareValues = (value1: string | undefined, value2: string | undefined) =>
+const compareValues = (value1: string | number | undefined, value2: string | number | undefined) =>
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
 // const isEditable = ();
@@ -178,13 +177,13 @@ export const getQuantity = (
   const [noOfContainers, noOfTEUs] = numberOfContainersAndTEUs;
   switch (searchableCostUnit) {
     case 'PRO TEU':
-      return noOfTEUs.toFixed(2) || '0,00';
+      return noOfTEUs || 0;
     case 'PER TEU':
-      return noOfTEUs.toFixed(2) || '0,00';
+      return noOfTEUs || 0;
     case 'PRO CONTAINER':
-      return noOfContainers.toFixed(2) || '0,00';
+      return noOfContainers || 0;
     case 'PER CONTAINER':
-      return noOfContainers.toFixed(2) || '0,00';
+      return noOfContainers || 0;
     default:
       const relevantContainers = containers.filter(
         container =>
@@ -192,9 +191,9 @@ export const getQuantity = (
           'PER ' + container.containerType?.name.toUpperCase() === searchableCostUnit,
       );
       if (relevantContainers.length > 0) {
-        return relevantContainers.reduce((a, b) => a + b.quantity, 0).toFixed(2);
+        return relevantContainers.reduce((a, b) => a + b.quantity, 0);
       } else {
-        if (isQAutomatic) return '0,00';
+        if (isQAutomatic) return 0;
       }
       return undefined;
   }
@@ -219,9 +218,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const userRecord = useContext(UserRecordContext);
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const [quantity, setQuantity] = useState<string | undefined>(freightDetail.Anz || '0,00');
+  const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
-  const [unitValue, setUnitValue] = useState<string | undefined>(freightDetail.UnitValue);
+  const [unitValue, setUnitValue] = useState<number | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
   const [containerTypeNames, setContainerTypeNames] = useState(containerTypes.map(containerType => containerType.name));
@@ -239,9 +238,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   }, [containerTypes, freightDetail.Unit]);
 
   useEffect(() => {
-    setQuantity(freightDetail.Anz || '0,00');
+    setQuantity(freightDetail.Anz);
     setCurrency(freightDetail.Currency);
-    setUnitValue(formatCurrencyAmount(Number(freightDetail.UnitValue)));
+    setUnitValue(freightDetail.UnitValue);
     setCostUnit(freightDetail.Unit);
     setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
@@ -261,7 +260,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   return (
     <Draggable
       key={freightDetail.SeqNr}
-      draggableId={freightDetail.SeqNr}
+      draggableId={freightDetail.SeqNr + ''}
       index={index}
       isDragDisabled={!editing || selectedTab === 1}
     >
@@ -314,14 +313,17 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
                 variant="outlined"
                 fullWidth
                 // disabled={isQAutomatic}
+                type="number"
                 value={
                   costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
                 }
-                onChange={event => setQuantity(event.target.value)}
+                onChange={event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0)}
                 onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
               />
+            ) : freightDetail.Anz ? (
+              formatCurrencyAmount(freightDetail.Anz)
             ) : (
-              freightDetail.Anz || '0,00'
+              '0,00'
             )}
           </TableCell>
           <TableCell align="right">
@@ -347,12 +349,16 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
                 margin="dense"
                 variant="outlined"
                 type="number"
-                value={unitValue?.replace(',', '') || ''}
-                onChange={event => setUnitValue(event.target.value)}
+                value={unitValue || ''}
+                onChange={event =>
+                  setUnitValue(
+                    event.target.value && event.target.value !== '' ? parseFloat(event.target.value) : undefined,
+                  )
+                }
                 onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
               />
             ) : (
-              freightDetail.UnitValue
+              freightDetail.UnitValue && formatCurrencyAmount(freightDetail.UnitValue)
             )}
           </TableCell>
           <TableCell>
@@ -370,7 +376,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
               freightDetail.Unit
             )}
           </TableCell>
-          <TableCell>{freightDetail.Total || '0.00'}</TableCell>
+          <TableCell>{freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}</TableCell>
         </TableRow>
       )}
     </Draggable>
@@ -406,15 +412,15 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
   for (let i in freightDetails) {
-    const value = parseInt(freightDetails[i].SeqNr);
+    const value = freightDetails[i].SeqNr;
     if (value >= pos) pos = value + 1;
   }
-  return pos + '';
+  return pos;
 };
 
 const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
-  const aSeq = parseInt(a.SeqNr);
-  const bSeq = parseInt(b.SeqNr);
+  const aSeq = a.SeqNr;
+  const bSeq = b.SeqNr;
   if (aSeq > bSeq) return 1;
   if (aSeq < bSeq) return -1;
   return 0;
@@ -438,32 +444,30 @@ const generateCommission = (
   freightDetails: FreightDetail[] | undefined,
 ) => {
   const isPercent = bookingRequest?.schedule?.ComPercentE && bookingRequest?.schedule.ComPercentE !== '0';
-  const quantity = isPercent ? bookingRequest?.schedule?.ComPercentE || '0.00' : '1.00';
+  const quantity = isPercent
+    ? bookingRequest?.schedule?.ComPercentE
+      ? parseFloat(bookingRequest?.schedule?.ComPercentE)
+      : 0
+    : 1;
   const value =
     seafreightDetail && isPercent
-      ? seafreightDetail.Total || '0.00'
-      : (seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE1 && bookingRequest?.schedule?.ComAmountE1) ||
-        (seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE2 && bookingRequest?.schedule?.ComAmountE2) ||
-        '0.00';
+      ? seafreightDetail.Total || 0
+      : (bookingRequest?.schedule?.ComAmountE1 &&
+          seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE1 &&
+          parseFloat(bookingRequest?.schedule?.ComAmountE1)) ||
+        (bookingRequest?.schedule?.ComAmountE2 &&
+          seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE2 &&
+          parseFloat(bookingRequest?.schedule?.ComAmountE2)) ||
+        0;
   return seafreightDetail
     ? ({
-        SeqNr: freightDetails ? findNextPos(freightDetails) : '0',
-        Anz: parseFloat(quantity).toFixed(2),
+        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+        Anz: quantity,
         Txt: 'Agency Commission',
         Currency: seafreightDetail.Currency,
-        UnitValue: parseFloat(value).toFixed(2),
+        UnitValue: value,
         Unit: isPercent ? '%' : 'per Shipment',
-        Total: isPercent
-          ? (
-              ((seafreightDetail.Total ? parseFloat(seafreightDetail.Total) || 0 : 0) *
-                (quantity ? parseFloat(quantity) || 0 : 0)) /
-              100
-            )
-              .toFixed(2)
-              .concat('-') || '0.00'
-          : parseFloat(value)
-              .toFixed(2)
-              .concat('-') || '0.00',
+        Total: isPercent ? ((seafreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0,
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -491,7 +495,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [numberOfContainersAndTEUs, setNumberOfContainersAndTEUs] = useState(
     bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest) : [0, 0],
   );
-  const [selectedDetails, setSelectedDetails] = useState<string[]>([]);
+  const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
@@ -529,7 +533,11 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     setSelectedTab(newValue);
   };
 
-  const handleChangeFreightDetails = (value: string | undefined, fieldName: string, freightDetail: FreightDetail) => {
+  const handleChangeFreightDetails = (
+    value: string | number | undefined,
+    fieldName: string,
+    freightDetail: FreightDetail,
+  ) => {
     bookingRequest &&
       setBookingRequest &&
       compareValues(value, get(fieldName, freightDetail)) &&
@@ -598,7 +606,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   };
 
   const onSelectRow = useCallback(
-    (event: React.MouseEvent<HTMLElement>, id: string) => {
+    (event: React.MouseEvent<HTMLElement>, id: number) => {
       event.stopPropagation();
       setSelectedDetails(prevState =>
         selectedDetails.includes(id) ? [...prevState.filter(d => d !== id)] : [...prevState, id],
@@ -614,13 +622,13 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
         set(
           'freightDetails',
           (freightDetails || []).concat({
-            SeqNr: freightDetails ? findNextPos(freightDetails) : '0',
-            Anz: '0.00',
+            SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+            Anz: 0,
             Txt: (selectedTab !== 2 ? chargeCodes && chargeCodes[0].text : '') || '',
             Currency: 'USD',
-            UnitValue: '0.00',
+            UnitValue: 0,
             Unit: '',
-            Total: '0.00',
+            Total: 0,
             Group:
               selectedTab === 0
                 ? FreightDetailGroup.EXTERNAL

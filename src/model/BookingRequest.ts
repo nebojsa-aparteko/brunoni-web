@@ -2,7 +2,7 @@ import Port from './Port';
 import Carrier from './Carrier';
 import { RouteSearchResult } from './route-search/RouteSearchResults';
 import UserRecord, { UserRecordMin } from './UserRecord';
-import { FreightDetail } from './Booking';
+import { FreightDetailGroup } from './Booking';
 import SpecialRemark from './SpecialRemark';
 import Container from './Container';
 import ContainerDetails from './ContainerDetails';
@@ -42,6 +42,19 @@ export interface BookingRequest {
   archived?: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
+}
+
+export interface FreightDetail {
+  Txt: string;
+  Anz: number;
+  UnitValue: number;
+  Total?: number;
+  Currency: string;
+  Unit?: string;
+  Group: FreightDetailGroup;
+  Invoice: string;
+  SeqNr: number;
+  Internal1?: boolean;
 }
 
 export enum BookingRequestStatus {

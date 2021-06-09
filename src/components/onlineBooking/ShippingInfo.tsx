@@ -1,6 +1,6 @@
 import { Quote, QuoteDetail } from '../../providers/QuoteGroupsProvider';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
 import React, { useContext, useMemo, useState } from 'react';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
@@ -11,44 +11,44 @@ import { Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from 
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
-import { FreightDetail, FreightDetailGroup } from '../../model/Booking';
+import { FreightDetailGroup } from '../../model/Booking';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import { useClientById } from '../../hooks/useClient';
+import sortBy from 'lodash/sortBy';
 
 export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
-  return quoteDetails
-    .filter(
-      (detail: QuoteDetail) =>
-        ![
-          'VGM manual submission',
-          'Umbuchungsgebühr',
-          'Stornierungsgebühr',
-          'Zertifikat',
-          'Rebooking Fee',
-          'Cancellation Fee',
-          'House-Bill of Lading',
-          'Certificate',
-        ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
-    )
-    .map((quoteDetail, index) => {
-      const chargeCode =
-        (quoteDetail.ChargeID &&
-          chargeCodes &&
-          (chargeCodes.find(code => code.chargeCodeId === quoteDetail.ChargeID) as ChargeCode | undefined)) ||
-        undefined;
-      return omitBy(isNil)({
-        Anz: '1.00',
-        SeqNr: index + 1 + '',
-        Txt: quoteDetail.Description,
-        Currency: quoteDetail.Currency,
-        UnitValue: quoteDetail.CostValue,
-        Unit: quoteDetail.CostUnit,
-        Group: FreightDetailGroup.EXTERNAL,
-        Total: quoteDetail.CostValue,
-        Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
-      }) as FreightDetail;
-    });
+  const filteredQuoteDetails = quoteDetails.filter(
+    (detail: QuoteDetail) =>
+      ![
+        'VGM manual submission',
+        'Umbuchungsgebühr',
+        'Stornierungsgebühr',
+        'Zertifikat',
+        'Rebooking Fee',
+        'Cancellation Fee',
+        'House-Bill of Lading',
+        'Certificate',
+      ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
+  );
+  return sortBy(filteredQuoteDetails, (detail: QuoteDetail) => detail.Pos).map((quoteDetail, index) => {
+    const chargeCode =
+      (quoteDetail.ChargeID &&
+        chargeCodes &&
+        (chargeCodes.find(code => code.chargeCodeId === quoteDetail.ChargeID) as ChargeCode | undefined)) ||
+      undefined;
+    return omitBy(isNil)({
+      Anz: 1,
+      SeqNr: index + 1,
+      Txt: quoteDetail.Description,
+      Currency: quoteDetail.Currency,
+      UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue),
+      Unit: quoteDetail.CostUnit,
+      Group: FreightDetailGroup.EXTERNAL,
+      Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue),
+      Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
+    }) as FreightDetail;
+  });
 };
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
