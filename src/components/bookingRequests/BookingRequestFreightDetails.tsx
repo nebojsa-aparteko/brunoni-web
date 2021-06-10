@@ -63,6 +63,9 @@ import { getRelevantFreightDetails } from '../onlineBooking/ShippingInfo';
 import { Alert } from '@material-ui/lab';
 import { Currency } from '../../model/Payment';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
+import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -215,6 +218,8 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   index,
 }) => {
   const classes = useStyles();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
   const userRecord = useContext(UserRecordContext);
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
@@ -227,7 +232,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [isQAutomatic, setIsQAutomatic] = useState(
     (costUnit && containerTypes && isQuantityAutomatic(costUnit, containerTypeNames)) || false,
   );
-
+  console.log(editing && isAdmin && selectedTab === 0);
   useEffect(() => {
     const newContainerTypeNames = containerTypes.map(containerType => containerType.name);
     setContainerTypeNames(newContainerTypeNames);
@@ -245,7 +250,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
 
-  const handleChangeFreightDetails = (value: string | undefined, fieldName: string) => {
+  const handleChangeFreightDetails = (value: any | undefined, fieldName: string) => {
     bookingRequest &&
       setBookingRequest &&
       compareValues(value, get(fieldName, freightDetail)) &&
@@ -377,6 +382,16 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
             )}
           </TableCell>
           <TableCell>{freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}</TableCell>
+          {editing && isAdmin && selectedTab === 0 && (
+            <TableCell>
+              <IconButton
+                aria-label="Copy to internal1"
+                onClick={() => handleChangeFreightDetails(freightDetail.Internal1 ? undefined : true, 'Internal1')}
+              >
+                {freightDetail.Internal1 ? <DoneAllIcon style={{ color: '#F7BC06' }} /> : <ControlPointDuplicateIcon />}
+              </IconButton>
+            </TableCell>
+          )}
         </TableRow>
       )}
     </Draggable>
@@ -488,6 +503,8 @@ const getRelatedQuotes = (bookingRequest: BookingRequest) => [
 
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
   const chargeCodes = useContext(ChargeCodes);
   const { isOpen, closeModal, openModal } = useModal();
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
@@ -733,13 +750,14 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           {filteredFreightDetails && (filteredFreightDetails.length > 0 || seafreightCommission) ? (
             <Table className={classes.table} size="small">
               <colgroup>
-                {editing && <col style={{ width: '5%' }} />}
+                {editing && <col style={{ width: '3%' }} />}
                 <col style={{ width: '30%' }} />
                 <col style={{ width: '10%' }} />
                 <col style={{ width: '10%' }} />
                 <col style={{ width: '15%' }} />
                 <col style={{ width: '15%' }} />
                 <col style={{ width: '10%' }} />
+                <col style={{ width: '2%' }} />
               </colgroup>
               <TableHead className={classes.tableHead}>
                 <TableRow className={classes.tableRow}>
@@ -764,6 +782,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                   <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
                   <TableCell align="left">Cost Unit</TableCell>
                   <TableCell>Total</TableCell>
+                  {editing && isAdmin && selectedTab === 0 && <TableCell>Internal</TableCell>}
                 </TableRow>
               </TableHead>
               <DragDropContext onDragEnd={handleDragEnd}>
