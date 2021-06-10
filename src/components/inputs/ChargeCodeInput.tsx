@@ -32,7 +32,7 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
       autoHighlight
       options={filteredChargeCodes || []}
       getOptionSelected={(option: ChargeCode, value: ChargeCode) => option.id === value.id}
-      getOptionLabel={option => `${option.text} (${option.language})` || ''}
+      getOptionLabel={option => `${option.text}` || ''}
       onChange={handleSetSelectedValue}
       value={chargeCode}
       renderInput={params => (

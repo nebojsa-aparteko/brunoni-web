@@ -38,7 +38,11 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
   ) : (
     <BookingRequestProvider>
       <FirestoreCollectionProvider name="special-remarks" context={SpecialRemarks}>
-        <FirestoreCollectionProvider name="charge-codes" context={ChargeCodes}>
+        <FirestoreCollectionProvider
+          name="charge-codes"
+          context={ChargeCodes}
+          query={query => query.where('language', '==', 'E')}
+        >
           <FirestoreCollectionProvider name="port-terms" context={PortTerms}>
             <BookingRequestView bookingRequest={bookingRequestState} />
           </FirestoreCollectionProvider>
