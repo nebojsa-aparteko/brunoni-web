@@ -269,7 +269,8 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         set('schedule', set(itineraryItemToUpdate, get(itineraryItemName)(newItinerary))(schedule))(bookingRequest),
       );
   };
-
+  //TODO this will have some issues e.g.
+  // We should remove Origin, Intermediate and Destination Port Infos from Schedule and use Itinerary instead to avoid further issues with remapping
   const handleAddPlaceOfReceipt = () => {
     if (!itinerary) return;
     const newItinerary = set('placeOfReceipt', emptyPlaceOfReceipt)(itinerary);

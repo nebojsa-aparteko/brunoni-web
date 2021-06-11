@@ -748,6 +748,7 @@ const createAlphacomReq = async (request: BookingRequest, chargeCodes: ChargeCod
     set('StatClientRef', request.agreementNo),
     set('ForwPersID', request.createdBy?.alphacomId),
     set('ForwarderPersTxt', `${request.createdBy?.firstName} ${request.createdBy?.lastName}`),
+    set('ScheduleChanged', request.isScheduleChanged),
     set(
       'FreightDetails',
       set(

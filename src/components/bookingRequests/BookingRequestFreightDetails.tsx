@@ -232,7 +232,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [isQAutomatic, setIsQAutomatic] = useState(
     (costUnit && containerTypes && isQuantityAutomatic(costUnit, containerTypeNames)) || false,
   );
-  console.log(editing && isAdmin && selectedTab === 0);
   useEffect(() => {
     const newContainerTypeNames = containerTypes.map(containerType => containerType.name);
     setContainerTypeNames(newContainerTypeNames);
