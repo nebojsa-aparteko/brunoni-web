@@ -115,6 +115,71 @@ export const isContainerSO = (container: Container & ContainerDetails) =>
   container.containerType?.description &&
   container.containerType?.description.includes('S.O.');
 
+interface ContainerNumberInputProp {
+  container: Container & ContainerDetails;
+  index: number;
+  handleChange: (newContainerNumbers: string[] | undefined) => void;
+}
+
+const ContainerNumberInput: React.FC<ContainerNumberInputProp> = ({ container, index, handleChange }) => {
+  const [containerNumber, setContainerNumber] = useState<string | undefined>(
+    container.containerNumbers && container.containerNumbers[index] && container.containerNumbers[index],
+  );
+
+  useEffect(() => {
+    setContainerNumber(
+      container.containerNumbers && container.containerNumbers[index] && container.containerNumbers[index],
+    );
+  }, [container.containerNumbers]);
+
+  const handleChangeNumber = (value: string | undefined) => {
+    let tempContainerNumbers = container.containerNumbers ? [...container.containerNumbers] : [];
+    if (container.quantity > tempContainerNumbers.length) {
+      while (container.quantity > tempContainerNumbers.length) tempContainerNumbers.push('');
+    }
+
+    const newContainerNumbers = tempContainerNumbers?.map((number, i) => (i === index ? value || '' : number));
+    handleChange(newContainerNumbers.slice(0, container.quantity));
+  };
+
+  return (
+    <Grid item md={2} xs={12}>
+      <TextField
+        label="Container No."
+        margin="dense"
+        variant="outlined"
+        fullWidth
+        value={containerNumber || ''}
+        onChange={event => setContainerNumber(event.target.value)}
+        onBlur={event => handleChangeNumber(event.target.value)}
+      />
+    </Grid>
+  );
+};
+
+const getContainerNumberInputs = (
+  container: Container & ContainerDetails,
+  handleChange: { (newContainerNumbers: string[] | undefined): void },
+) => {
+  const containerNumberInputs = [];
+  if (container.quantity && container.quantity > 0) {
+    for (let i = 0; i < container.quantity; i++) {
+      containerNumberInputs.push(
+        <ContainerNumberInput key={'container' + i} container={container} index={i} handleChange={handleChange} />,
+      );
+    }
+  }
+  return containerNumberInputs;
+};
+
+const getArrayOfCorrectLength = (containerNumbers: string[] | undefined, quantity: number) => {
+  const newContainerNumbers = containerNumbers ? [...containerNumbers] : [];
+  if (quantity >= newContainerNumbers.length) {
+    while (quantity > newContainerNumbers.length) newContainerNumbers.push('');
+  }
+  return newContainerNumbers.slice(undefined, quantity);
+};
+
 const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
@@ -139,6 +204,18 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   useEffect(() => {
     setContainer(value);
   }, [value]);
+
+  useEffect(() => {
+    if (isContainerSO(container)) {
+      const newContainerNumbers = getArrayOfCorrectLength(container.containerNumbers, container.quantity);
+      setContainer(prevState => ({
+        ...prevState,
+        containerNumbers: container.quantity === 0 ? undefined : newContainerNumbers,
+      }));
+    } else {
+      setContainer(prevState => ({ ...prevState, containerNumbers: undefined }));
+    }
+  }, [container.containerType, container.quantity]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -291,6 +368,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange({ ...container, pluginTariffs: newTariffs });
   };
 
+  const handleChangeContainerNumbers = (newContainerNumbers: string[] | undefined) => {
+    onChange({ ...container, containerNumbers: newContainerNumbers?.filter(value => value.trim() !== '') });
+  };
+
   return (
     <Fragment>
       <Grid container spacing={1}>
@@ -441,6 +522,9 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
                   </IconButton>
                 </Grid>
+                {isContainerSO(container) && container.quantity > 0
+                  ? getContainerNumberInputs(container, handleChangeContainerNumbers)
+                  : null}
                 {tariffs && tariffs.demurrage && (
                   <Grid item md={12} xs={12}>
                     <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>

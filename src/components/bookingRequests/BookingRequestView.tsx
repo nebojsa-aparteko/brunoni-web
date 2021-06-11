@@ -905,7 +905,7 @@ const createAlphacomReq = async (request: BookingRequest, chargeCodes: ChargeCod
               DropOffRef: null,
               Equipment: {
                 EquipmentDetail: request.containers?.map(ctg => ({
-                  ContainerNumber: ctg.containerNumber ? ctg.containerNumber : 'NOT AVAILABLE',
+                  ContainerNumber: ctg.containerNumbers ? ctg.containerNumbers : 'NOT AVAILABLE',
                   CtypID: value.containerType?.id,
                   PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.mm.yyyy'),
                   GateInDate: null,

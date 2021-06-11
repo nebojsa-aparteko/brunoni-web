@@ -3,7 +3,7 @@ import CommodityType from './CommodityType';
 import PickupLocation from './PickupLocation';
 
 export default interface Container {
-  containerNumber?: string;
+  containerNumbers?: string[];
   containerType?: ContainerType;
   commodityType?: CommodityType;
   pickupLocation?: PickupLocation;

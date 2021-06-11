@@ -229,6 +229,10 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
 
             {container.oog && container.oog.length > 0 && <OverdimensionDetails container={container} />}
 
+            {container.containerNumbers && container.containerNumbers.length > 0 && (
+              <TableRowData label={'Container numbers'} content={container.containerNumbers.join('<br/>')} />
+            )}
+
             {container.demDetTariffs && (
               <TableRowData
                 label={'Dem./Det. tariffs'}
@@ -332,8 +336,11 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
 
   const handleChange = (value: any[] | undefined) => {
     const writableContainers = value?.map(container => {
+      const containerNumbers =
+        container.containerNumbers && container.containerNumbers.slice(undefined, container.quantity);
       return {
         ...container,
+        containerNumbers: containerNumbers && (containerNumbers.length === 0 ? undefined : containerNumbers),
         ventilation: isReefer(container.containerType)
           ? container.ventilation || Ventilation.CLOSED
           : container.ventilation,
