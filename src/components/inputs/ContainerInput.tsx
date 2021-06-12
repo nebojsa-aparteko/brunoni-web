@@ -17,7 +17,6 @@ import { Grid, IconButton, InputAdornment, makeStyles, TextField, Theme } from '
 import InputProps from '../../model/InputProps';
 import Container, { Tariff, Ventilation } from '../../model/Container';
 import ContainerTypeInput from './ContainerTypeInput';
-import CommodityTypeInput from './CommodityTypeInput';
 import QuantityInput from './QuantityInput';
 import LocationInput from './LocationInput';
 import ContainerType from '../../model/ContainerType';
@@ -44,6 +43,7 @@ import { useBookingRequestContext } from '../../providers/BookingRequestProvider
 import Typography from '@material-ui/core/Typography';
 import TariffsInput from './TariffInput';
 import BrunoniCodes from '../../model/BrunoniCodes';
+import CommodityTypeInput from './CommodityTypeInput';
 
 interface Props extends InputProps<Container & ContainerDetails> {}
 
@@ -385,10 +385,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
         </Grid>
         <Grid item md={3} xs={12}>
           <CommodityTypeInput
-            ref={commodityTypeInput}
-            margin="dense"
-            value={container.commodityType!}
+            label={'Commodity'}
             onChange={handleCommodityTypeChange}
+            value={container.commodityType!}
+            margin="dense"
+            freeSolo={true}
+            inputRef={commodityTypeInput}
           />
         </Grid>
         {get('showLocations')(rest) && !value.containerType?.description?.endsWith('S.O.') && (

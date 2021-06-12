@@ -1,70 +1,141 @@
-import React, { forwardRef, ForwardRefRenderFunction, useContext, useImperativeHandle, useRef, useState } from 'react';
-import InputProps from '../../model/InputProps';
-import CommodityTypes from '../../contexts/CommodityTypes';
+import 'isomorphic-fetch';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref, useContext } from 'react';
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
+import { FilterOptionsState } from '@material-ui/lab';
 import CommodityType from '../../model/CommodityType';
-import SelectInput from './SelectInput';
-import filter from 'lodash/fp/filter';
-import map from 'lodash/fp/map';
-import flatten from 'lodash/fp/flatten';
-import intersectionWith from 'lodash/fp/intersectionWith';
-import isEqual from 'lodash/fp/isEqual';
+import CommodityTypes from '../../contexts/CommodityTypes';
 
-interface Props extends InputProps<CommodityType> {
-  margin: string;
+const filter = createFilterOptions<CommodityType>();
+
+const getOptionLabel = (option: CommodityType) =>
+  option ? (option.name && option.name !== '' ? option.name : option.id) : '';
+const getOptionSelectItemLabel = (option: CommodityType) => (option.name ? option.name : `Add "${option.id}"`);
+
+interface Props {
+  label: string;
+  inputRef?: MutableRefObject<HTMLInputElement | undefined>;
+  value?: CommodityType;
+  onChange: (commodityType: CommodityType | null) => void;
+  open?: boolean;
+  onOpen?: (event: React.ChangeEvent<{}>) => void;
+  onClose?: (event: React.ChangeEvent<{}>) => void;
+  margin?: 'none' | 'dense' | 'normal';
+  freeSolo?: boolean;
 }
 
-const filterFlow = (parts: string[], options: CommodityType[], findIntersection: boolean = false) => {
-  const filteredItems = map((part: string) =>
-    filter(
-      (option: CommodityType) =>
-        getCommodityTypeLabel(option)
-          .toLowerCase()
-          .indexOf(part.toLowerCase()) > -1,
-    )(options),
-  )(parts);
+const useStyles = makeStyles({
+  input: {
+    flexWrap: 'nowrap',
+  },
+});
 
-  return findIntersection
-    ? ((intersectionWith(isEqual) as any)(...filteredItems) as CommodityType[])
-    : flatten(filteredItems);
-};
-
-const filterOptions = (options: CommodityType[], { inputValue }: { inputValue: string }) => {
-  const searchWords = inputValue.split(' ');
-  return filterFlow(searchWords, options, searchWords.length > 1);
-};
-
-const getCommodityTypeLabel = (commodityType: CommodityType | undefined) => (commodityType ? commodityType.name : '');
-
-const focusAndSelect = (input: HTMLInputElement) => {
-  input.focus();
-  input.setSelectionRange(0, input.value.length);
-};
-
-const CommodityTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
-  const input = useRef();
+const CommodityTypeInput: React.FC<Props> = ({
+  label,
+  inputRef,
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  margin,
+  freeSolo,
+}) => {
   const commodityTypes = useContext(CommodityTypes);
-  const [open, setOpen] = useState(false);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      focusAndSelect(input.current!);
-    },
-  }));
+  const classes = useStyles();
+  const loading = open && !commodityTypes;
 
   return (
-    <SelectInput
-      inputRef={input}
-      label="Commodity Type"
-      margin={margin}
-      filterOptions={filterOptions}
-      options={commodityTypes || []}
-      getOptionLabel={getCommodityTypeLabel}
+    <Autocomplete
+      value={value || null}
+      onChange={(_: ChangeEvent<{}>, commodityType: CommodityType | null) => onChange(commodityType)}
+      autoHighlight
       open={open}
-      setOpen={setOpen}
-      value={value}
-      onChange={(commodityType: CommodityType | null) => onChange(commodityType)}
+      onOpen={onOpen}
+      onClose={onClose}
+      getOptionLabel={getOptionLabel}
+      filterOptions={
+        freeSolo
+          ? (options: CommodityType[], params: FilterOptionsState<CommodityType>) => {
+              const filtered = filter(options, params);
+              if (params.inputValue !== '') {
+                filtered.push({
+                  id: params.inputValue.toUpperCase(),
+                  name: '',
+                } as CommodityType);
+              }
+              return filtered;
+            }
+          : undefined
+      }
+      options={commodityTypes || []}
+      freeSolo={freeSolo}
+      loading={loading}
+      renderInput={params => (
+        <TextField
+          {...params}
+          inputRef={inputRef}
+          label={label}
+          margin={margin}
+          fullWidth
+          variant="outlined"
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <React.Fragment>
+                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </React.Fragment>
+            ),
+            className: classes.input,
+          }}
+        />
+      )}
+      PopperComponent={Popup}
+      PaperComponent={Papyrus}
+      renderOption={(option, { inputValue }) => {
+        const matches = match(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), inputValue);
+        const commodityTypes = parse(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), matches);
+
+        return (
+          <div>
+            {commodityTypes.map((commodityType: { highlight: boolean; text: string }, index: number) => (
+              <span key={index} style={{ fontWeight: commodityType.highlight ? 700 : 400 }}>
+                {commodityType.text}
+              </span>
+            ))}
+          </div>
+        );
+      }}
     />
   );
 };
 
-export default forwardRef(CommodityTypeInput);
+const usePopupStyles = makeStyles((theme: Theme) => ({
+  popper: {
+    width: theme.breakpoints.values.md / 2,
+    zIndex: 2000,
+  },
+}));
+
+function Popup(props: PopperProps) {
+  const { popperRef, anchorEl, open, children } = props;
+  const classes = usePopupStyles();
+
+  return (
+    <Popper
+      placement="bottom-start"
+      popperRef={popperRef as Ref<any>}
+      anchorEl={anchorEl}
+      open={open}
+      children={children}
+      className={classes.popper}
+    />
+  );
+}
+
+const Papyrus: React.FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => <Paper {...props} />;
+
+export default CommodityTypeInput;

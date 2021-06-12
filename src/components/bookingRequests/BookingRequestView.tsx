@@ -840,7 +840,10 @@ const createAlphacomReq = async (request: BookingRequest, chargeCodes: ChargeCod
               CtrQuantity: value.quantity,
               CtypID: value.containerType?.id,
               CommodityID: value.commodityType?.id,
-              CommodityTXT: value.commodityType?.name,
+              CommodityTXT:
+                value.commodityType?.name && value.commodityType?.name !== ''
+                  ? value.commodityType?.name
+                  : value.commodityType?.id,
               CtrWeight: `${value.weight?.toFixed(2)} KGS`,
               'VGM-PIN': value.vgmPin,
               DemDetTariff: value.demDetTariffs && value.demDetTariffs.length > 0 ? value.demDetTariffs[0].id : null,
