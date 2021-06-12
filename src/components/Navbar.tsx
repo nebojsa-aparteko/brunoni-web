@@ -293,7 +293,6 @@ const Navbar: React.FC = () => {
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
-                    <ButtonMenuItem primary="Online Booking" to="/online-booking" />
                     <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
@@ -367,6 +366,13 @@ const Navbar: React.FC = () => {
                       <ButtonMenuItem
                         primary="Get Quote"
                         to="/quotes/get"
+                        variant="contained"
+                        color="primary"
+                        typographyStyle={{ color: 'white' }}
+                      />
+                      <ButtonMenuItem
+                        primary="Book Now"
+                        to="/schedule?isPicker=true"
                         variant="contained"
                         color="primary"
                         typographyStyle={{ color: 'white' }}

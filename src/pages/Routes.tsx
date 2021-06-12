@@ -1,11 +1,14 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import RouteSearch from '../components/RouteSearch';
 import Meta from '../components/Meta';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import { useHistory } from 'react-router';
+import QueryString from 'querystring';
+import { Box } from '@material-ui/core';
 
 const Routes: React.FC = () => {
   const history = useHistory();
+  const [isPicker] = useState(QueryString.parse(window.location.search.replace('?', '')).isPicker === 'true');
 
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('schedule', JSON.stringify(schedule));
@@ -15,7 +18,9 @@ const Routes: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Schedule" />
-      <RouteSearch handleBookNow={handleBookNow} />
+      <Box display={'flex'} flexDirection="column" flex={1} mt={isPicker ? 4 : 0} mb={isPicker ? 4 : 0}>
+        <RouteSearch isPicker={isPicker} handleBookNow={handleBookNow} />
+      </Box>
     </Fragment>
   );
 };

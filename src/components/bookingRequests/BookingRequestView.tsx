@@ -76,7 +76,6 @@ import Container from '../../model/Container';
 import { getRepresentationFromClient } from './BookingRequestPortTerms';
 import Client from '../../model/Client';
 import ChargeCode from '../../model/ChargeCode';
-import ChargeCodes from '../../contexts/ChargeCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -336,7 +335,6 @@ function ScrollToTopOnMount() {
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const actingAs = useContext(ActingAs)[0];
   const classes = useStyles();
-  const chargeCodes = useContext(ChargeCodes) as ChargeCode[];
   const { isOpen, openModal, closeModal } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -363,10 +361,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
   }, [setEditing]);
-
-  const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
-    chargeCodes,
-  ]);
 
   const onArchiveClick = useCallback(
     () =>
@@ -488,11 +482,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Button
-        onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}
-      >
-        Test
-      </Button>
+      {/*<Button*/}
+      {/*  onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}*/}
+      {/*>*/}
+      {/*  Test*/}
+      {/*</Button>*/}
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />

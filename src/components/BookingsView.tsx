@@ -10,6 +10,8 @@ import {
   CardActions,
   TablePagination,
   Typography,
+  IconButton,
+  Grid,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -28,6 +30,7 @@ import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 import CategoryFilter from './CategoryFilter';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 import { useBookingsContext } from '../providers/BookingsProvider';
+import AddIcon from '@material-ui/icons/Add';
 
 interface Props {
   isAdmin?: boolean;
@@ -189,15 +192,23 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
   return (
     <Fragment>
       <Meta title={`Bookings`} />
-
-      <BookingsFiltersBar
-        filters={filters}
-        setFilters={setFilters}
-        showClientFilter={isAdmin}
-        showDateRange={showDateRangeFilter}
-        showAssigneeFilter={isAdmin}
-      />
-
+      {/*<ButtonMenuItem primary="Online Booking" to="/online-booking" />*/}
+      <Grid container direction="row">
+        <Grid item md={11} xs={10}>
+          <BookingsFiltersBar
+            filters={filters}
+            setFilters={setFilters}
+            showClientFilter={isAdmin}
+            showDateRange={showDateRangeFilter}
+            showAssigneeFilter={isAdmin}
+          />
+        </Grid>
+        <Grid md={1} xs={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <IconButton aria-label="to online booking" href='to="/online-booking"'>
+            <AddIcon fontSize="large" />
+          </IconButton>
+        </Grid>
+      </Grid>
       <div>
         {bookings && !isLoading ? (
           <Fragment>
