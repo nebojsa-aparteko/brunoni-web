@@ -14,7 +14,7 @@ import {
 import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useState } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestLabels } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
@@ -653,7 +653,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
             </colgroup>
             <TableBody>
               <TableRowData
-                label={'Carrier'}
+                label={BookingRequestLabels.carrier}
                 content={
                   bookingRequest?.carrier && bookingRequest?.carrier?.name
                     ? bookingRequest?.carrier?.name?.toUpperCase()
@@ -662,7 +662,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               />
               {bookingRequest?.schedule && (
                 <TableRowData
-                  label={'Vessel'}
+                  label={BookingRequestLabels.vessel}
                   content={
                     <Box>
                       {[
@@ -697,7 +697,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 </TableCell>
               </TableRow>
               <TableRowData
-                label={'B/L-NO'}
+                label={BookingRequestLabels.blNumber}
                 content={
                   editing && isDashboardUser(userRecord) ? (
                     <TextField
@@ -716,7 +716,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               />
               {bookingRequest?.carrier?.id === CarrierId.HSG && (
                 <TableRowData
-                  label={'INTBL'}
+                  label={BookingRequestLabels.intBlNumber}
                   content={
                     editing && isDashboardUser(userRecord) ? (
                       <TextField
@@ -736,7 +736,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               )}
               {editing && (
                 <TableRowData
-                  label={'Customer ref.'}
+                  label={BookingRequestLabels.customerReference}
                   content={
                     <TextField
                       label=""
@@ -767,7 +767,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               {clients && (
                 <>
                   <TableRowData
-                    label={'Client'}
+                    label={BookingRequestLabels.client}
                     content={
                       editing ? (
                         <ClientInput
@@ -785,7 +785,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     }
                   />
                   <TableRowData
-                    label={'Statistic Client'}
+                    label={BookingRequestLabels.statClient}
                     content={
                       editing ? (
                         <ClientInput

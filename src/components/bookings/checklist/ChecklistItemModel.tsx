@@ -121,6 +121,7 @@ export enum ActivityText {
   MARK_SOMETHING_WRONG = ' has marked that something is wrong with payment ',
   ARCHIVED = ' has archived booking request.',
   UNARCHIVED = ' has unarchived booking request.',
+  EDITED = ' has edited these following fields: ',
 }
 
 export enum ActivityChangeType {
@@ -150,6 +151,7 @@ export enum ActivityChangeType {
   MARK_SOMETHING_WRONG,
   ARCHIVED,
   UNARCHIVED,
+  EDITED,
 }
 
 export enum ChecklistNames {

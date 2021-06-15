@@ -20,16 +20,6 @@ interface Props {
   isAdmin: boolean;
 }
 
-export const addActivityItem = (bookingRequestId: string, activityLog: ActivityLogItem) => {
-  return firebase
-    .firestore()
-    .collection('bookings-requests')
-    .doc(bookingRequestId)
-    .collection('activity')
-    .doc()
-    .set(activityLog);
-};
-
 const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
   const [showMore, setShowMore] = useState<boolean>(false);
   const activityLogContext = useActivityLogState();

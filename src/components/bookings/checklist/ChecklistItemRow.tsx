@@ -161,6 +161,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     mentions,
     addedUsers,
     removedUsers,
+    changedFields,
   } = data;
   return flow(omitBy(isNil))({
     changeType: changeType,
@@ -184,6 +185,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     paymentActivityData: paymentActivityData,
     addedUsers: addedUsers,
     removedUsers: removedUsers,
+    changedFields,
   } as ActivityLogItem);
 };
 
@@ -202,6 +204,7 @@ export interface ActivityCreationProps {
   mentions?: MentionItem[];
   addedUsers?: ActivityLogUserData[];
   removedUsers?: ActivityLogUserData[];
+  changedFields?: string[];
 }
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {

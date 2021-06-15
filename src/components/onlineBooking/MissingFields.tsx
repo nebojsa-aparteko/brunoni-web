@@ -22,7 +22,7 @@ import { isDashboardUser } from '../../model/UserRecord';
 import { isBefore } from 'date-fns/fp';
 import theme from '../../theme';
 
-interface Object {
+export interface Object {
   [key: string]: string;
 }
 

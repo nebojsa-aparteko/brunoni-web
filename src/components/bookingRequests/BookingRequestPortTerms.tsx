@@ -15,7 +15,7 @@ import { useClientById } from '../../hooks/useClient';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { TableRowData } from './BookingRequestSummary';
 import Client from '../../model/Client';
-import { BookingRequest, VGMSubmittedBy } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestLabels, VGMSubmittedBy } from '../../model/BookingRequest';
 import isString from '../../utilities/isString';
 
 const useStyles = makeStyles(() =>
@@ -79,7 +79,7 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
           </React.Fragment>
         )}
         <TableRowData
-          label={'VGM Submission By'}
+          label={BookingRequestLabels.vgmSubmittedBy}
           content={
             editing ? (
               <RadioGroup
