@@ -2,10 +2,10 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
-  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -18,8 +18,6 @@ import {
   Grid,
   IconButton,
   makeStyles,
-  Menu,
-  MenuItem,
   Paper,
   TextField,
   Theme,
@@ -28,7 +26,6 @@ import {
 import PrintIcon from '@material-ui/icons/Print';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
-import ActingAs from '../../contexts/ActingAs';
 import Page from '../bookings/Page';
 import brunoniLogo from '../../assets/logo.brunoni.svg';
 import allmarineLogo from '../../assets/logo.allmarine.png';
@@ -54,8 +51,7 @@ import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import EditIcon from '@material-ui/icons/Edit';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import UserRecordContext from '../../contexts/UserRecordContext';
-import { flow, set, isEqual, get, omit } from 'lodash/fp';
+import { flow, get, isEqual, omit, set } from 'lodash/fp';
 import { BookingCategory, BookingVersion } from '../../model/Booking';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
@@ -76,6 +72,7 @@ import Container from '../../model/Container';
 import { getRepresentationFromClient } from './BookingRequestPortTerms';
 import Client from '../../model/Client';
 import ChargeCode from '../../model/ChargeCode';
+import DropdownMenu from '../DropdownMenu';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -332,26 +329,28 @@ function ScrollToTopOnMount() {
   return null;
 }
 
+type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
+
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
-  const actingAs = useContext(ActingAs)[0];
+  const [, userRecord, actingAs] = useUser();
   const classes = useStyles();
   const { isOpen, openModal, closeModal } = useModal();
-  const [printRequested, setPrintRequested] = useState(false);
-  const [isPrintWithCost, setPrintWithCost] = useState(false);
-  const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
-  const [agreementNumber, setAgreementNumber] = useState<string>(
-    bookingRequestState ? bookingRequestState.agreementNo || '' : bookingRequest.agreementNo || '',
-  );
-  const [, dispatch] = useGlobalAppState();
-  const userRecord = useContext(UserRecordContext);
   const {
     isOpen: isOpenAssignmentModal,
     closeModal: closeAssignmentModal,
     openModal: openAssignmentModal,
   } = useModal();
+  const [printRequested, setPrintRequested] = useState(false);
+  const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
+  const menuRef = useRef<DropdownMenuHandle>();
+  const [agreementNumber, setAgreementNumber] = useState<string>(
+    bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
+  );
+  const [, dispatch] = useGlobalAppState();
 
   useEffect(() => {
-    setBookingRequestState && setBookingRequestState(bookingRequest);
+    setBookingRequestState(bookingRequest);
     setAgreementNumber(bookingRequest.agreementNo || '');
   }, [bookingRequest]);
 
@@ -360,7 +359,29 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     return () => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
-  }, [setEditing]);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
+      ? ({ ...bookingRequestState, isScheduleChanged: true } as BookingRequest)
+      : ({ ...bookingRequestState } as BookingRequest);
+    omitEmptyDeep(br);
+    setEditing(false);
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    if (bookingRequestState) {
+      updateBookingRequest(br)
+        ?.then(() => {
+          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
+        })
+        .catch(error => {
+          console.error('error saving booking request', error);
+          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
+        })
+        .finally(() => {
+          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        });
+    }
+  }, [bookingRequestState, dispatch, setEditing]);
 
   const onArchiveClick = useCallback(
     () =>
@@ -386,46 +407,26 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     [dispatch],
   );
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
   const checkIfUserCanEdit = useCallback(() => {
     return !(
       [BookingRequestStatus.ARCHIVED, BookingRequestStatus.CONFIRMED].includes(bookingRequest.status) ||
       (BookingRequestStatus.REQUESTED !== bookingRequest.status && !isDashboardUser(userRecord))
     );
-  }, [bookingRequest]);
+  }, [bookingRequest, userRecord]);
 
   const canEdit = useMemo(() => checkIfUserCanEdit(), [checkIfUserCanEdit]);
 
-  const handleClickMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClickMenu = useCallback(
+    event => {
+      menuRef.current.openMenu(event);
+    },
+    [menuRef],
+  );
 
-  const handleCancelEditing = () => {
+  const handleCancelEditing = useCallback(() => {
     setBookingRequestState && setBookingRequestState(bookingRequest);
     setEditing(false);
-  };
-  const handleSave = useCallback(() => {
-    const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
-      ? ({ ...bookingRequestState, isScheduleChanged: true } as BookingRequest)
-      : ({ ...bookingRequestState } as BookingRequest);
-    omitEmptyDeep(br);
-    setEditing(false);
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    if (bookingRequestState) {
-      updateBookingRequest(br)
-        ?.then(() => {
-          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
-        })
-        .catch(error => {
-          console.error('error saving booking request', error);
-          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
-        })
-        .finally(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        });
-    }
-  }, [bookingRequestState, dispatch, setEditing]);
+  }, [bookingRequest]);
 
   useEffect(() => {
     editing && Mousetrap.bind(['command+shift+s', 'ctrl+shift+s'], () => handleSave());
@@ -450,13 +451,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   }, [bookingRequest]);
 
-  const handleChangeAgreementNumberText = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeAgreementNumberText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
-  };
+  }, []);
 
-  const handleChangeAgreementNumber = (v: string) => {
-    bookingRequestState && setBookingRequestState && setBookingRequestState(set('agreementNo', v)(bookingRequestState));
-  };
+  const handleChangeAgreementNumber = useCallback((v: string) => {
+    setBookingRequestState(prevState => set('agreementNo', v)(prevState!));
+  }, []);
 
   const getActivityLogUserData = useActivityLogUserData();
 
@@ -471,9 +472,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       ),
     );
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   useLayoutEffect(() => {
     if (printRequested) {
       window.print();
@@ -606,26 +604,25 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
                   <PrintIcon />
                 </IconButton>
-                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(false);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print without costs
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(true);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print with cost
-                  </MenuItem>
-                </Menu>
+                <DropdownMenu
+                  ref={menuRef}
+                  items={[
+                    {
+                      onClick: () => {
+                        setPrintWithCost(false);
+                        setPrintRequested(true);
+                      },
+                      label: 'Print without costs',
+                    },
+                    {
+                      onClick: () => {
+                        setPrintWithCost(true);
+                        setPrintRequested(true);
+                      },
+                      label: 'Print with cost',
+                    },
+                  ]}
+                />
               </Box>
             </Box>
 
@@ -647,7 +644,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
             closeModal();
           }}
-          handleClose={handleClose}
+          handleClose={closeModal}
         />
       )}
     </Grid>
