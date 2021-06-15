@@ -930,7 +930,6 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
                         .filter(d => d.containers.some(c => containers.includes(c.containerType?.id || ''))),
                     );
                   });
-                  console.log(containers);
                 }}
               >
                 Load quotes

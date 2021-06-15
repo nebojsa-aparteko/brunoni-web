@@ -7,7 +7,7 @@ import { ChipProps } from '@material-ui/core';
 interface Props {
   handleOnDrop: (file: File) => void;
   handleOnDelete: (file: File) => void;
-  filesLimit: number;
+  filesLimit?: number;
   acceptedExtensions?: string[];
   showPreviews?: boolean;
   dropzoneProps?: DropzoneProps;
@@ -20,7 +20,7 @@ interface Props {
 const DropZoneArea: React.FC<Props> = ({
   handleOnDrop,
   handleOnDelete,
-  filesLimit,
+  filesLimit = 1,
   acceptedExtensions,
   showPreviews = true,
   dropzoneProps,
