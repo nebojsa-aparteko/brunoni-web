@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, SetStateAction, useMemo, useState } from 'react';
+import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
@@ -9,6 +9,8 @@ import { BookingRequest } from '../model/BookingRequest';
 import safeInvoke from '../utilities/safeInvoke';
 import { ContextFilters } from './filterActions';
 import Carrier from '../model/Carrier';
+import useUser from '../hooks/useUser';
+import ActingAs from '../contexts/ActingAs';
 
 interface Props {
   children: React.ReactNode;
@@ -37,14 +39,19 @@ export const useBookingRequestsContext = () => {
 };
 
 const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
+  const userRecord = useUser()[1];
+  const actingAs = useContext(ActingAs)[0];
+
   const [isLoading, setIsLoading] = useState(false);
-  const [filters, setFilters] = useState<BookingRequestFilters>({});
+  const [filters, setFilters] = useState({
+    assignee: !actingAs && userRecord,
+  } as BookingRequestFilters);
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       setIsLoading(true);
       let query = collection;
-      query = query.where('archived', '==', filters.archived);
+      query = query.where('archived', '==', !!filters.archived);
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       }
@@ -53,6 +60,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       }
       if (filters.destinationPort) {
         query = query.where('destination.id', '==', filters.destinationPort.id);
+      }
+      if (filters.assignee?.alphacomId) {
+        query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
       }
       return query.orderBy('createdAt', 'desc');
     },
