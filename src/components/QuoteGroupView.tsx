@@ -63,6 +63,7 @@ import Ports from '../contexts/Ports';
 import { useHistory } from 'react-router';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
+import BookNowButton from './BookNowButton';
 
 interface Props {
   id: string;
@@ -170,16 +171,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
       <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
         View more
       </Button>
-      <Button
-        color="primary"
-        variant="contained"
-        size="small"
-        onClick={handleDialogOpen}
-        // href={buildMailToLink(quote, [user, userData, client])}
-        // target="_blank"
-      >
-        Book Now
-      </Button>
+      <BookNowButton bookNow={handleDialogOpen} />
       <IconButton aria-label="actions" onClick={onMoreButtonClick}>
         <MoreVertIcon />
       </IconButton>

@@ -5,14 +5,14 @@ const BookingRequestContext = createContext<
   [
     BookingRequest | undefined,
     Dispatch<SetStateAction<BookingRequest | undefined>>,
-    boolean | undefined,
-    Dispatch<SetStateAction<boolean | undefined>>,
+    boolean,
+    Dispatch<SetStateAction<boolean>>,
   ]
 >([undefined, () => {}, false, () => {}]);
 
 const BookingRequestProvider = (props: any) => {
   const [state, setState] = useState<BookingRequest>();
-  const [editing, setEditing] = useState<boolean | undefined>();
+  const [editing, setEditing] = useState<boolean>(false);
 
   return (
     <BookingRequestContext.Provider value={[state, setState, editing, setEditing]}>

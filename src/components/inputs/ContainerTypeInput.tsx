@@ -64,6 +64,7 @@ const ContainerTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onCha
       setOpen={setOpen}
       value={value}
       onChange={(containerType: ContainerType | null) => onChange(containerType)}
+      getOptionSelected={(option: ContainerType, value: ContainerType) => option.id === value?.id}
     />
   );
 };

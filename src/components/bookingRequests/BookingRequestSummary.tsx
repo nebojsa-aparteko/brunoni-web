@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Dispatch, Fragment, SetStateAction, useContext, useEffect, useState } from 'react';
+import React, { Dispatch, Fragment, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -32,7 +32,7 @@ import { Link } from 'react-router-dom';
 import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import { cloneDeep, get, set } from 'lodash/fp';
+import { cloneDeep, get, merge, set } from 'lodash/fp';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -43,6 +43,9 @@ import PortInput from '../inputs/PortInput';
 import { CarrierId } from '../../model/Booking';
 import VesselAllocationButton from '../VesselAllocationButton';
 import { getVoyageInfo } from './BookingRequestView';
+import EditingInput from '../EditingInput';
+import useUser from '../../hooks/useUser';
+import useModal from '../../hooks/useModal';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -595,71 +598,57 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
   const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy?.alphacomId : undefined);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const { closeModal, isOpen, openModal } = useModal();
   const clients = useClients();
-  const userRecord = useContext(UserRecordContext);
+  const [, userRecord] = useUser();
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-  };
+  const handleChangeSchedule = useCallback(
+    (schedule: RouteSearchResult | undefined) => {
+      const voyageInfo = getVoyageInfo(schedule);
 
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
+      setBookingRequest(prevState =>
+        merge(prevState!, {
+          schedule: schedule,
+          vessel: voyageInfo?.VesselName,
+          voyage: voyageInfo?.VoyageNr,
+        }),
+      );
+      closeModal();
+    },
+    [closeModal],
+  );
 
-  const handleChangeSchedule = (schedule: RouteSearchResult | undefined) => {
-    const voyageInfo = getVoyageInfo(schedule);
-    bookingRequest &&
-      setBookingRequest &&
-      setBookingRequest({
-        ...bookingRequest,
-        schedule: schedule,
-        vessel: voyageInfo?.VesselName,
-        voyage: voyageInfo?.VoyageNr,
-      });
-    handleDialogClose();
-  };
-
-  const handleChangeBLNumber = (value?: string) => {
-    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, blNumber: value });
-  };
-  const handleChangeINTBLNumber = (value?: string) => {
-    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, intBlNumber: value });
-  };
-  const handleChangeCustomerRef = (value?: string) => {
-    bookingRequest && setBookingRequest && setBookingRequest({ ...bookingRequest, customerReference: value });
-  };
+  const handleChangeBLNumber = useCallback((value?: string) => {
+    setBookingRequest(prevState => set('blNumber', value)(prevState!));
+  }, []);
+  const handleChangeINTBLNumber = useCallback((value?: string) => {
+    setBookingRequest(prevState => set('intBlNumber', value)(prevState!));
+  }, []);
+  const handleChangeCustomerRef = useCallback((value?: string) => {
+    setBookingRequest(prevState => set('customerReference', value)(prevState!));
+  }, []);
 
   return bookingRequest ? (
     <Box flexDirection="column">
       {editing && (
-        <Button color={'primary'} variant="contained" onClick={handleDialogOpen}>
+        <Button color={'primary'} variant="contained" onClick={openModal}>
           Change Schedule
         </Button>
       )}
       <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
-        <SchedulePicker
-          isOpen={isDialogOpen}
-          handleClose={handleDialogClose}
-          origin={bookingRequest.origin}
-          destination={bookingRequest.destination}
-          handleBookNow={handleChangeSchedule}
-        />
+        {isOpen && (
+          <SchedulePicker
+            isOpen={isOpen}
+            handleClose={closeModal}
+            origin={bookingRequest.origin}
+            destination={bookingRequest.destination}
+            handleBookNow={handleChangeSchedule}
+          />
+        )}
         <Grid item md={5} xs={12} className={classes.firstColumn}>
           <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
-            <colgroup>
-              <col style={{ width: '16.6%' }} />
-              <col style={{ width: '83.4%' }} />
-            </colgroup>
             <TableBody>
-              <TableRowData
-                label={'Carrier'}
-                content={
-                  bookingRequest?.carrier && bookingRequest?.carrier?.name
-                    ? bookingRequest?.carrier?.name?.toUpperCase()
-                    : ''
-                }
-              />
+              <TableRowData label={'Carrier'} content={bookingRequest?.carrier?.name?.toUpperCase() || ''} />
               {bookingRequest?.schedule && (
                 <TableRowData
                   label={'Vessel'}
@@ -683,10 +672,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
         </Grid>
         <Grid item md={7} xs={12} className={classes.secondColumn}>
           <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
-            <colgroup>
-              <col style={{ width: '30%' }} />
-              <col style={{ width: '70%' }} />
-            </colgroup>
             <TableBody>
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Status</TableCell>
@@ -696,41 +681,32 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   </Paper>
                 </TableCell>
               </TableRow>
+
               <TableRowData
                 label={'B/L-NO'}
                 content={
-                  editing && isDashboardUser(userRecord) ? (
-                    <TextField
-                      label=""
-                      margin="dense"
-                      variant="outlined"
-                      fullWidth
-                      value={bookingRequest.blNumber}
-                      onChange={event => handleChangeBLNumber(event.target.value)}
-                      className={classes.blNumberInput}
-                    />
-                  ) : (
-                    bookingRequest.blNumber || '[To be assigned]'
-                  )
+                  <EditingInput
+                    editing={editing}
+                    value={bookingRequest.blNumber}
+                    inputProps={{
+                      onChange: event => handleChangeBLNumber(event.target.value),
+                      className: classes.blNumberInput,
+                    }}
+                  />
                 }
               />
               {bookingRequest?.carrier?.id === CarrierId.HSG && (
                 <TableRowData
                   label={'INTBL'}
                   content={
-                    editing && isDashboardUser(userRecord) ? (
-                      <TextField
-                        label=""
-                        margin="dense"
-                        variant="outlined"
-                        fullWidth
-                        value={bookingRequest?.intBlNumber}
-                        onChange={event => handleChangeINTBLNumber(event.target.value)}
-                        className={classes.blNumberInput}
-                      />
-                    ) : (
-                      bookingRequest?.intBlNumber || '[To be assigned]'
-                    )
+                    <EditingInput
+                      editing={editing}
+                      value={bookingRequest.intBlNumber}
+                      inputProps={{
+                        onChange: event => handleChangeINTBLNumber(event.target.value),
+                        className: classes.blNumberInput,
+                      }}
+                    />
                   }
                 />
               )}
@@ -738,14 +714,13 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 <TableRowData
                   label={'Customer ref.'}
                   content={
-                    <TextField
-                      label=""
-                      margin="dense"
-                      variant="outlined"
-                      fullWidth
+                    <EditingInput
+                      editing={editing}
                       value={bookingRequest.customerReference}
-                      onChange={event => handleChangeCustomerRef(event.target.value)}
-                      className={classes.blNumberInput}
+                      inputProps={{
+                        onChange: event => handleChangeCustomerRef(event.target.value),
+                        className: classes.blNumberInput,
+                      }}
                     />
                   }
                 />
@@ -817,7 +792,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
 };
 
 interface Props {
-  editing?: boolean;
+  editing: boolean;
 }
 
 export default BookingRequestSummary;

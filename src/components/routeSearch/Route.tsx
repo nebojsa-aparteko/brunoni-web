@@ -39,6 +39,7 @@ import { DateFormats } from '../../utilities/formattingHelpers';
 import RouteDeadlines from './RouteDeaadlines';
 import RouteItinerary from './RouteItinerary';
 import RouteSummary from './RouteSummary';
+import BookNowButton from '../BookNowButton';
 
 interface Props {
   route?: RouteSearchResult;
@@ -200,9 +201,7 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
                   {route &&
                     parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 4) &&
                     (isPicker && handleBookNow ? (
-                      <Button color="primary" variant="contained" size="small" onClick={() => handleBookNow(route)}>
-                        Book Now
-                      </Button>
+                      <BookNowButton bookNow={() => handleBookNow(route)} />
                     ) : (
                       <Fragment>
                         <IconButton aria-label="actions" onClick={onMoreButtonClick}>

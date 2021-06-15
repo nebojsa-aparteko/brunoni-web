@@ -14,6 +14,7 @@ interface Props<T> extends InputProps<T> {
   inputRef?: React.Ref<any>;
   open: boolean;
   setOpen: (open: boolean) => void;
+  getOptionSelected?: (option: T, value: T) => boolean;
 }
 
 const useStyles = makeStyles({
@@ -33,6 +34,7 @@ export default function SelectInput<T>({
   setOpen,
   value,
   onChange,
+  getOptionSelected,
 }: Props<T>) {
   const classes = useStyles();
   const loading = open && !options;
@@ -40,6 +42,7 @@ export default function SelectInput<T>({
   return (
     <Autocomplete
       value={value}
+      getOptionSelected={getOptionSelected}
       onChange={(_: ChangeEvent<{}>, value: T | null) => onChange(value)}
       autoSelect
       autoHighlight
