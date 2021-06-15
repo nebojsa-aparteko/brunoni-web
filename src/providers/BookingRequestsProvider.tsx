@@ -44,10 +44,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
     () => (collection: firebase.firestore.Query) => {
       setIsLoading(true);
       let query = collection;
-      //console.log(filters.archived);
-      if (filters.archived) {
-        query = query.where('archived', '==', filters.archived);
-      }
+      query = query.where('archived', '==', filters.archived);
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       }
