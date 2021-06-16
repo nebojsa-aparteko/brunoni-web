@@ -67,7 +67,7 @@ const validQuote = (bookingRequest: BookingRequest) => {
   if (quoteValidityDate && scheduleDepartureDate) {
     return isBefore(quoteValidityDate)(scheduleDepartureDate);
   }
-  return false;
+  return true;
 };
 
 const MissingFields: React.FC<Props> = ({

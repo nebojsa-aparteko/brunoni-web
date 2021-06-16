@@ -221,19 +221,21 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
   const userRecord = useContext(UserRecordContext);
-  const containerTypes = useContext(ContainerTypes) as ContainerType[];
+  const containerTypes = useContext(ContainerTypes);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<number | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
-  const [containerTypeNames, setContainerTypeNames] = useState(containerTypes.map(containerType => containerType.name));
+  const [containerTypeNames, setContainerTypeNames] = useState(
+    containerTypes?.map(containerType => containerType.name),
+  );
   const [isQAutomatic, setIsQAutomatic] = useState(
     (costUnit && containerTypes && isQuantityAutomatic(costUnit, containerTypeNames)) || false,
   );
   useEffect(() => {
-    const newContainerTypeNames = containerTypes.map(containerType => containerType.name);
+    const newContainerTypeNames = containerTypes?.map(containerType => containerType.name);
     setContainerTypeNames(newContainerTypeNames);
     setIsQAutomatic(
       (freightDetail.Unit && newContainerTypeNames && isQuantityAutomatic(freightDetail.Unit, newContainerTypeNames)) ||
@@ -514,8 +516,10 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
-  const containerTypes = useContext(ContainerTypes) as ContainerType[];
-  const [containerTypeNames, setContainerTypeNames] = useState(containerTypes.map(containerType => containerType.name));
+  const containerTypes = useContext(ContainerTypes);
+  const [containerTypeNames, setContainerTypeNames] = useState(
+    containerTypes?.map(containerType => containerType.name),
+  );
   const [seafreightDetail, setSeafreightDetail] = useState(
     freightDetails?.find(
       (detail: FreightDetail) =>
@@ -524,7 +528,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   );
 
   useEffect(() => {
-    setContainerTypeNames(containerTypes.map(containerType => containerType.name));
+    setContainerTypeNames(containerTypes?.map(containerType => containerType.name));
   }, [containerTypes]);
 
   useEffect(() => {
