@@ -7,6 +7,7 @@ import { set } from 'lodash/fp';
 import { BookingRequest } from '../../model/BookingRequest';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import theme from '../../theme';
 
 const useStyles = makeStyles(() => ({
   specialRemarkLabel: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
+const BookingRequestSpecialRemarks: React.FC = () => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [specialRemarksState, setSpecialRemarksState] = React.useState<SpecialRemark[] | undefined>(
@@ -39,7 +40,11 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
       {editing && isDashboardUser(userRecord) ? (
         <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
       ) : specialRemarksState && specialRemarksState.length > 0 ? (
-        <Grid container direction="row" style={{ border: '1px solid #00b0ff', borderRadius: 5, padding: 4 }}>
+        <Grid
+          container
+          direction="row"
+          style={{ border: '1px solid #00b0ff', borderRadius: 5, padding: theme.spacing(1) }}
+        >
           <Grid item xs={2} style={{ paddingRight: 5 }}>
             <Typography className={classes.specialRemarkLabel}>Special Remarks</Typography>
           </Grid>
@@ -47,8 +52,6 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
             {specialRemarksState?.map(remark => (
               <Grid key={remark.id + '_' + remark.text} item xs={12}>
                 <Typography className={classes.specialRemark}>{remark.text}</Typography>
-                <br />
-                <br />
               </Grid>
             ))}
           </Grid>
@@ -57,7 +60,5 @@ const BookingRequestSpecialRemarks: React.FC<Props> = ({}) => {
     </React.Fragment>
   ) : null;
 };
-
-interface Props {}
 
 export default BookingRequestSpecialRemarks;

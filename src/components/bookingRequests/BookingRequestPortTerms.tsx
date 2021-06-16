@@ -63,10 +63,6 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
 
   return (
     <Table size="small" aria-label="a dense table" className={classes.portTermsTable}>
-      <colgroup>
-        <col style={{ width: '14%' }} />
-        <col style={{ width: '86%' }} />
-      </colgroup>
       <TableBody>
         {/*TODO change port to be taken from portOfLoading instead of OriginInfo*/}
         {bookingRequest?.schedule?.OriginInfo.Port.PortAgent && (

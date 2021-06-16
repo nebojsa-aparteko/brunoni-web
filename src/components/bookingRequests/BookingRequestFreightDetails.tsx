@@ -221,7 +221,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
   const userRecord = useContext(UserRecordContext);
-  const containerTypes = useContext(ContainerTypes);
+  const containerTypes = useContext(ContainerTypes) as ContainerType[];
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
@@ -516,7 +516,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
-  const containerTypes = useContext(ContainerTypes);
+  const containerTypes = useContext(ContainerTypes) as ContainerType[];
   const [containerTypeNames, setContainerTypeNames] = useState(
     containerTypes?.map(containerType => containerType.name),
   );
