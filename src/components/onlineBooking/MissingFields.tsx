@@ -22,7 +22,7 @@ import { isDashboardUser } from '../../model/UserRecord';
 import { isBefore } from 'date-fns/fp';
 import theme from '../../theme';
 
-interface Object {
+export interface Object {
   [key: string]: string;
 }
 
@@ -67,7 +67,7 @@ const validQuote = (bookingRequest: BookingRequest) => {
   if (quoteValidityDate && scheduleDepartureDate) {
     return isBefore(quoteValidityDate)(scheduleDepartureDate);
   }
-  return false;
+  return true;
 };
 
 const MissingFields: React.FC<Props> = ({

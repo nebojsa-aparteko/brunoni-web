@@ -10,11 +10,12 @@ import {
   Theme,
 } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
-import React, { useContext } from 'react';
+import React, { useCallback } from 'react';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { isDashboardUser } from '../../model/UserRecord';
-import UserRecordContext from '../../contexts/UserRecordContext';
+import useUser from '../../hooks/useUser';
+import EditingInput from '../EditingInput';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,21 +43,24 @@ const useStyles = makeStyles((theme: Theme) =>
 const BookingRequestClosings: React.FC<Props> = ({}) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const userRecord = useContext(UserRecordContext);
-  const handleChangeClosing = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
-    const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
-      index === deadlineIndex ? { ...deadline, Time: event.target.value } : deadline,
-    );
-    bookingRequest &&
-      setBookingRequest &&
-      setBookingRequest({
-        ...bookingRequest,
-        schedule: {
-          ...bookingRequest.schedule,
-          Deadlines: newDeadlines,
-        } as RouteSearchResult,
-      });
-  };
+  const userRecord = useUser()[1];
+  const handleChangeClosing = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
+      const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
+        index === deadlineIndex ? { ...deadline, Time: event.target.value } : deadline,
+      );
+      bookingRequest &&
+        setBookingRequest &&
+        setBookingRequest({
+          ...bookingRequest,
+          schedule: {
+            ...bookingRequest.schedule,
+            Deadlines: newDeadlines,
+          } as RouteSearchResult,
+        });
+    },
+    [bookingRequest],
+  );
 
   return bookingRequest && bookingRequest.schedule?.Deadlines && setBookingRequest ? (
     <Box className={classes.tableWrapper} marginTop="1em" marginBottom="1em">
@@ -74,18 +78,14 @@ const BookingRequestClosings: React.FC<Props> = ({}) => {
               <TableRow key={`booking-request-closing-${item.Typ}`} className={classes.tableRow}>
                 <TableCell align="left">{item.Typ === 'FCL' ? 'DELIVERY' : item.Typ}</TableCell>
                 <TableCell align="left" style={{ minWidth: '4em' }}>
-                  {editing && isDashboardUser(userRecord) ? (
-                    <TextField
-                      label={''}
-                      fullWidth
+                  {
+                    <EditingInput
+                      canEdit={isDashboardUser(userRecord)}
+                      editing={editing}
                       value={item.Time}
-                      onChange={event => handleChangeClosing(event, index)}
-                      variant="outlined"
-                      margin="dense"
+                      inputProps={{ onChange: event => handleChangeClosing(event, index) }}
                     />
-                  ) : (
-                    item.Time
-                  )}
+                  }
                 </TableCell>
                 <TableCell align="left">
                   {/*TODO check if the DELIVERY type is different in other languages*/}

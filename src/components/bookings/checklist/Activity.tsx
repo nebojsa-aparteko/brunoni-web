@@ -11,6 +11,7 @@ import {
 import DateFormattedText from '../../DateFormattedText';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
 import { activityHasLink, getFullName, isPlatformActivity } from '../../../utilities/activityHelper';
+import { BookingRequestLabels } from '../../../model/BookingRequest';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -88,6 +89,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.ARCHIVED;
       case ActivityChangeType.UNARCHIVED:
         return ActivityText.UNARCHIVED;
+      case ActivityChangeType.EDITED:
+        return ActivityText.EDITED;
     }
   };
 
@@ -143,6 +146,21 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
             `${doc.name} `
           );
         })}
+      {activity.changedFields && (
+        <Box display={'flex'}>
+          {activity.changedFields.map((field, index) => {
+            return (
+              <Fragment key={index}>
+                <Typography color={'primary'}>{BookingRequestLabels[field]}</Typography>
+                {index !== activity.changedFields!.length - 1 && (
+                  <Typography style={{ paddingRight: '.5em' }}>,</Typography>
+                )}
+              </Fragment>
+            );
+          })}
+          .
+        </Box>
+      )}
       {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
         activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
         ' for comparison'}

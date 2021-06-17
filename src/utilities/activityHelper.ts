@@ -2,6 +2,7 @@ import { ActivityChangeType, ActivityLogUserData } from '../components/bookings/
 import isString from './isString';
 import { ActivityLogItem, Platform } from '../components/bookings/checklist/ActivityModel';
 import { capitalCase } from 'change-case';
+import firebase from '../firebase';
 
 export const isPlatformActivity = (by: ActivityLogUserData | Platform): by is Platform =>
   isString(by) && by === 'PLATFORM';
@@ -20,3 +21,13 @@ export const activityHasLink = (activity: ActivityLogItem): boolean =>
     ActivityChangeType.UNMARK_AS_FINAL,
     ActivityChangeType.DOCUMENT_STATUS_CHANGED,
   ].some(type => type === activity.changeType);
+
+export const addActivityItem = (collection: string, id: string, activityLog: ActivityLogItem) => {
+  return firebase
+    .firestore()
+    .collection(collection)
+    .doc(id)
+    .collection('activity')
+    .doc()
+    .set(activityLog);
+};

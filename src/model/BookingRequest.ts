@@ -8,6 +8,7 @@ import Container from './Container';
 import ContainerDetails from './ContainerDetails';
 import Client from './Client';
 import { Currency } from './Payment';
+import { Object } from '../components/onlineBooking/MissingFields';
 
 export enum VGMSubmittedBy {
   CLIENT = 'CLIENT',
@@ -73,3 +74,19 @@ export enum ISOCodesEdiAlphacom {
   '42G1' = '42G0',
   '45R1' = '45R0',
 }
+
+export const BookingRequestLabels: Object = {
+  blNumber: 'B/L-NO',
+  intBlNumber: 'INTBL',
+  customerReference: 'Customer ref.',
+  client: 'Client',
+  statClient: 'Statistic Client',
+  carrier: 'Carrier',
+  vessel: 'Vessel',
+  schedule: 'Schedule',
+  vgmSubmittedBy: 'VGM Submission By',
+  assignedUser: 'Watcher (Assigned agent)',
+  freightDetails: 'Freight details',
+  quoteNumber: 'Quote Reference',
+  containers: 'Container',
+};

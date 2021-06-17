@@ -14,7 +14,7 @@ import {
 import React, { Dispatch, Fragment, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestLabels } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
@@ -656,10 +656,13 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
         <Grid item md={5} xs={12} className={classes.firstColumn}>
           <Table size="small" aria-label="a dense table" className={classes.summaryTable}>
             <TableBody>
-              <TableRowData label={'Carrier'} content={bookingRequest?.carrier?.name?.toUpperCase() || ''} />
+              <TableRowData
+                label={BookingRequestLabels.carrier}
+                content={bookingRequest?.carrier?.name?.toUpperCase() || ''}
+              />
               {bookingRequest?.schedule && (
                 <TableRowData
-                  label={'Vessel'}
+                  label={BookingRequestLabels.vessel}
                   content={
                     <Box>
                       {[
@@ -691,7 +694,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               </TableRow>
 
               <TableRowData
-                label={'B/L-NO'}
+                label={BookingRequestLabels.blNumber}
                 content={
                   <EditingInput
                     editing={editing}
@@ -705,7 +708,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               />
               {bookingRequest?.carrier?.id === CarrierId.HSG && (
                 <TableRowData
-                  label={'INTBL'}
+                  label={BookingRequestLabels.intBlNumber}
                   content={
                     <EditingInput
                       editing={editing}
@@ -720,7 +723,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               )}
               {editing && (
                 <TableRowData
-                  label={'Customer ref.'}
+                  label={BookingRequestLabels.customerReference}
                   content={
                     <EditingInput
                       editing={editing}
@@ -750,7 +753,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               {clients && (
                 <>
                   <TableRowData
-                    label={'Client'}
+                    label={BookingRequestLabels.client}
                     content={
                       editing ? (
                         <ClientInput
@@ -768,7 +771,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     }
                   />
                   <TableRowData
-                    label={'Statistic Client'}
+                    label={BookingRequestLabels.statClient}
                     content={
                       editing ? (
                         <ClientInput

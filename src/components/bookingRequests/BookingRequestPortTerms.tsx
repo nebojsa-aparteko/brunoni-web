@@ -15,7 +15,7 @@ import { useClientById } from '../../hooks/useClient';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { TableRowData } from './BookingRequestSummary';
 import Client from '../../model/Client';
-import { BookingRequest, VGMSubmittedBy } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestLabels, VGMSubmittedBy } from '../../model/BookingRequest';
 import isString from '../../utilities/isString';
 
 const useStyles = makeStyles(() =>
@@ -63,10 +63,6 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
 
   return (
     <Table size="small" aria-label="a dense table" className={classes.portTermsTable}>
-      <colgroup>
-        <col style={{ width: '14%' }} />
-        <col style={{ width: '86%' }} />
-      </colgroup>
       <TableBody>
         {/*TODO change port to be taken from portOfLoading instead of OriginInfo*/}
         {bookingRequest?.schedule?.OriginInfo.Port.PortAgent && (
@@ -79,7 +75,7 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
           </React.Fragment>
         )}
         <TableRowData
-          label={'VGM Submission By'}
+          label={BookingRequestLabels.vgmSubmittedBy}
           content={
             editing ? (
               <RadioGroup

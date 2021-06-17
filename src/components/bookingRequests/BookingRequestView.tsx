@@ -45,10 +45,9 @@ import pick from 'lodash/fp/pick';
 import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
-import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { isEqual, set } from 'lodash/fp';
+import { isEqual, set, omit, keys } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -62,6 +61,8 @@ import DropdownMenu from '../DropdownMenu';
 import LogoImage from '../LogoImage';
 import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
+import { addActivityItem } from '../../utilities/activityHelper';
+import { difference } from '../../utilities/getDifferenceObject';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -189,18 +190,6 @@ const changeAssignedClient = (id: string, user: UserRecord | null) =>
       },
       { merge: true },
     );
-
-//TODO delete and use the booking activity after we generalize it?
-const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
-  return firebase
-    .firestore()
-    .collection('bookings-requests')
-    .doc(bookingId)
-    .collection('activity')
-    .doc()
-    .set(activityLog);
-};
-
 const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRequest, isOpen, handleClose }) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
@@ -227,7 +216,8 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
       if (bookingRequest.id && selectedClient) {
         await changeAssignedClient(bookingRequest.id, selectedClient);
         await addActivityItem(
-          bookingRequest.id || '',
+          'bookings-requests',
+          bookingRequest.id,
           createActivityObject({
             changeType: ActivityChangeType.ASSIGNED_CLIENT,
             by: getActivityLogUserData(userRecord),
@@ -247,7 +237,8 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
       if (bookingRequest.id && selectedAgent) {
         await changeAssignedAgent(bookingRequest.id, selectedAgent);
         await addActivityItem(
-          bookingRequest.id || '',
+          'bookings-requests',
+          bookingRequest.id,
           createActivityObject({
             changeType: ActivityChangeType.ASSIGNED_AGENT,
             by: getActivityLogUserData(userRecord),
@@ -378,9 +369,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           console.error('error saving booking request', error);
           dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
         })
-        .finally(() => {
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        .finally(async () => {
           setEditing(false);
+          try {
+            await handleFieldsEditActivity();
+          } catch (error) {
+            console.error('error creating activity', error);
+            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
+          } finally {
+            dispatch({ type: 'STOP_GLOBAL_LOADING' });
+          }
         });
     }
   }, [bookingRequestState, dispatch, setEditing]);
@@ -455,6 +453,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const archiveHandler = () =>
     onArchiveClick().then(() =>
       addActivityItem(
+        'bookings-requests',
         bookingRequest.id!,
         createActivityObject({
           changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
@@ -469,6 +468,28 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       setPrintRequested(false);
     }
   }, [printRequested]);
+
+  const handleFieldsEditActivity = async () => {
+    // without freight details for now
+    const differencesObject = difference(
+      omit('freightDetails')(bookingRequestState),
+      omit('freightDetails')(bookingRequest),
+    );
+    const changedKeys = keys(differencesObject);
+
+    if (changedKeys.length > 0) {
+      await addActivityItem(
+        'bookings-requests',
+        bookingRequest.id!,
+        createActivityObject({
+          changeType: ActivityChangeType.EDITED,
+          by: getActivityLogUserData,
+          changedFields: changedKeys,
+        }),
+      );
+    }
+  };
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {/*<Button*/}
