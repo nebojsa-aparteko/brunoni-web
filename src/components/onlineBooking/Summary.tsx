@@ -1,4 +1,4 @@
-import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatus, FreightDetail, VGMSubmittedBy } from '../../model/BookingRequest';
 import React, { useCallback, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Button, Divider, Grid, makeStyles, Theme } from '@material-ui/core';
@@ -17,6 +17,8 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
+import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { compact } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -92,6 +94,14 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
 
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
+    const commission = generateCommission(
+      bookingRequest?.schedule,
+      bookingRequest?.freightDetails?.find(
+        (detail: FreightDetail) =>
+          detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
+      ),
+      bookingRequest?.freightDetails,
+    );
     const writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
@@ -101,6 +111,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       archived: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
+      freightDetails: compact([...(bookingRequest?.freightDetails || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);
