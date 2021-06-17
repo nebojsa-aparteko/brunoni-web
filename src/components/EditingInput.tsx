@@ -2,7 +2,7 @@ import { TextField, Typography } from '@material-ui/core';
 import React from 'react';
 import { TextFieldProps } from '@material-ui/core/TextField/TextField';
 
-const EditingInput: React.FC<EditingInputProps> = ({ editing, inputProps, value, canEdit }) =>
+const EditingInput: React.FC<EditingInputProps> = ({ editing, inputProps, value, canEdit = true }) =>
   editing && canEdit ? (
     <TextField margin="dense" variant="outlined" fullWidth value={value} {...inputProps} />
   ) : (
