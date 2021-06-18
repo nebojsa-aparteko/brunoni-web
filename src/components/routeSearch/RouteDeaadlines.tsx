@@ -7,7 +7,7 @@ const RouteDeadlines: React.FC<Props> = ({ route }) => {
   return (
     <>
       {route!.Deadlines.map((deadline, i) => (
-        <Grid key={i} item md={4} sm={4}>
+        <Grid key={i} item md={3} sm={4}>
           <InfoBoxItem
             title={`${deadline.Typ}
     closing`}
