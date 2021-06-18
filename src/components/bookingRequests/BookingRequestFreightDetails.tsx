@@ -415,8 +415,8 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
 };
 
 const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
-  const aSeq = a.SeqNr;
-  const bSeq = b.SeqNr;
+  const aSeq = +a.SeqNr;
+  const bSeq = +b.SeqNr;
   if (aSeq > bSeq) return 1;
   if (aSeq < bSeq) return -1;
   return 0;
