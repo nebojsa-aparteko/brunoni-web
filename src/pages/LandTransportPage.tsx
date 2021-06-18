@@ -15,17 +15,17 @@ const LandTransportPage = () => {
   const classes = useStyles();
   const sendFiles = async () => {
     const formData = new FormData();
-    formData.append('files', files.pop()!);
+    files.forEach(file => formData.append('files', file));
     const response = await fetch('https://europe-west6-brunoni-allmarine.cloudfunctions.net/land-transport', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
-      credentials: 'include',
-      headers: { ContentType: 'multipart/form-data', Accept: 'application/json' },
+      // credentials: 'include',
+      headers: { Accept: 'application/json' },
       body: formData,
     });
 
-    console.log(response);
+    console.log(await response.json());
   };
   return (
     <Fragment>

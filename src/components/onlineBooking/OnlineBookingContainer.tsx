@@ -21,7 +21,6 @@ import Summary from './Summary';
 import { FormProvider, useForm } from 'react-hook-form';
 import { set } from 'lodash/fp';
 import AddIcon from '@material-ui/icons/Add';
-import BookingUploadDialog from './BookingUploadDialog';
 import {
   getNumberOfContainersAndTEUs,
   getQuantity,
@@ -180,7 +179,6 @@ const OnlineBookingContainer = () => {
           )}
         </ContainerView>
       </FormProvider>
-      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
     </>
   );
 };

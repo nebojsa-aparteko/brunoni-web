@@ -31,6 +31,8 @@ import CategoryFilter from './CategoryFilter';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 import { useBookingsContext } from '../providers/BookingsProvider';
 import AddIcon from '@material-ui/icons/Add';
+import useModal from '../hooks/useModal';
+import BookingUploadDialog from './onlineBooking/BookingUploadDialog';
 
 interface Props {
   isAdmin?: boolean;
@@ -95,7 +97,7 @@ export const getContainersString = (booking: Booking) => {
 
 const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
   const classes = useStyles();
-
+  const { isOpen, openModal, closeModal } = useModal();
   const [bookings, isLoading] = useBookingsContext();
   const [filters, setFilters] = useBookingListFilterContext();
 
@@ -204,9 +206,10 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
           />
         </Grid>
         <Grid md={1} xs={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconButton aria-label="to online booking" href='to="/online-booking"'>
+          <IconButton onClick={openModal}>
             <AddIcon fontSize="large" />
           </IconButton>
+          {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
         </Grid>
       </Grid>
       <div>
