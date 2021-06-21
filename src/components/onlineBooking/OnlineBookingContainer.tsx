@@ -75,7 +75,7 @@ const steps = ['General Information', 'Cargo Details', 'Additional Information',
 
 const OnlineBookingContainer = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(2);
+  const [activeStep, setActiveStep] = React.useState(0);
   const methods = useForm<OnlineBookingInputs>();
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
 
