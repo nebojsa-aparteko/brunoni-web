@@ -7,11 +7,11 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
   IconButton,
   makeStyles,
   Paper,
   TablePagination,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import { useBookingRequestsContext } from '../../providers/BookingRequestsProvider';
@@ -164,9 +164,11 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                       Bookings Requests
                     </Typography>
                     <Box ml={2}>
-                      <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
-                        <AddIcon fontSize="large" />
-                      </IconButton>
+                      <Tooltip title="Add from a html file">
+                        <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                          <AddIcon fontSize="large" />
+                        </IconButton>
+                      </Tooltip>
                       {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
                     </Box>
                     <Divider orientation="vertical" style={{ height: '100%' }} />

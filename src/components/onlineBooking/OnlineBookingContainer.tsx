@@ -1,15 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Container as ContainerView,
-  makeStyles,
-  Paper,
-  Step,
-  StepLabel,
-  Stepper,
-  Theme,
-} from '@material-ui/core';
+import { Box, Container as ContainerView, makeStyles, Paper, Step, StepLabel, Stepper, Theme } from '@material-ui/core';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { TabPanel } from '../../pages/BookingsPage';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -19,7 +9,6 @@ import CargoInfo from './CargoInfo';
 import AdditionalInfo from './AdditionalInfo';
 import Summary from './Summary';
 import { set } from 'lodash/fp';
-import AddIcon from '@material-ui/icons/Add';
 import {
   getNumberOfContainersAndTEUs,
   getQuantity,
@@ -27,11 +16,8 @@ import {
 } from '../bookingRequests/BookingRequestFreightDetails';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
-import { isDashboardUser } from '../../model/UserRecord';
-import useUser from '../../hooks/useUser';
-import useModal from '../../hooks/useModal';
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-import { useForm, FormProvider, Resolver } from 'react-hook-form';
+
+import { useForm, FormProvider } from 'react-hook-form';
 import Carrier from '../../model/Carrier';
 import Port from '../../model/Port';
 
@@ -79,8 +65,6 @@ const OnlineBookingContainer = () => {
   const methods = useForm<OnlineBookingInputs>();
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
 
-  const [, userRecord] = useUser();
-  const { closeModal, isOpen, openModal } = useModal();
   const [quote] = React.useState(() => {
     const quoteJson = localStorage.getItem('quote');
     return quoteJson ? (JSON.parse(quoteJson) as Quote) : undefined;
@@ -175,11 +159,11 @@ const OnlineBookingContainer = () => {
               </TabPanel>
             </Box>
           </Paper>
-          {activeStep === 0 && isDashboardUser(userRecord) && (
-            <Button onClick={openModal} color="primary" variant="contained" startIcon={<AddIcon />}>
-              Upload HTML booking files
-            </Button>
-          )}
+          {/*{activeStep === 0 && isDashboardUser(userRecord) && (*/}
+          {/*  <Button onClick={openModal} color="primary" variant="contained" startIcon={<AddIcon />}>*/}
+          {/*    Upload HTML booking files*/}
+          {/*  </Button>*/}
+          {/*)}*/}
         </ContainerView>
       </FormProvider>
     </>
