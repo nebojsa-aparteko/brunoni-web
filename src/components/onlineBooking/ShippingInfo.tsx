@@ -217,7 +217,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
               />
             }
             label={
-              <Box display={'flex'} flexDirection={'row'} alignItems={'center'}>
+              <Box display={'flex'} flexDirection={'row'} alignItems={'center'} style={{ cursor: 'default' }}>
                 <Typography>
                   I accept the{' '}
                   <Button target="_blank" href={getTermsForCarrier(carrier?.id)} color={'primary'}>
