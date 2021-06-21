@@ -52,6 +52,7 @@ import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import { useHistory } from 'react-router';
 import { getLogo } from './Navbar';
+import PromoBox from './PromoBox';
 
 interface Props {
   quote?: Quote;
@@ -291,6 +292,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           <Container maxWidth="lg">
             <ScrollToTopOnMount />
             <Paper className={classes.root}>
+              <PromoBox />
               <Box display="none" displayPrint="block" mb={2}>
                 <Box mb={2}>
                   <img
