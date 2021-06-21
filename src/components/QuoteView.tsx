@@ -451,12 +451,14 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
               <QuoteActivityLogContainer quoteId={quote.id} quote={quote} />
             </ActivityLogProvider>
           </Box>
-          <SchedulePicker
-            isOpen={isDialogOpen}
-            handleClose={handleDialogClose}
-            quote={quote}
-            handleBookNow={handleBookNow}
-          />
+          {isDialogOpen && (
+            <SchedulePicker
+              isOpen={isDialogOpen}
+              handleClose={handleDialogClose}
+              quote={quote}
+              handleBookNow={handleBookNow}
+            />
+          )}{' '}
         </Grid>
       }
     </Grid>

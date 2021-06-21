@@ -1,7 +1,7 @@
-import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
-import React, { useCallback, useMemo } from 'react';
+import { BookingRequest, BookingRequestStatus, FreightDetail, VGMSubmittedBy } from '../../model/BookingRequest';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
-import { Button, Divider, Grid, makeStyles, Theme } from '@material-ui/core';
+import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
 import { ActivityLogUserData, ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
@@ -17,6 +17,9 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
+import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { compact } from 'lodash/fp';
+import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -28,12 +31,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: '.75em',
     marginRight: theme.spacing(1),
   },
-  deadlines: {
-    marginBottom: theme.spacing(2),
-  },
   stepper: {
     paddingLeft: theme.spacing(0),
     paddingRight: theme.spacing(0),
+  },
+  actions: {
+    marginTop: theme.spacing(3),
+    '& > *': {
+      marginRight: theme.spacing(1),
+    },
   },
 }));
 
@@ -92,6 +98,14 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
 
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
+    const commission = generateCommission(
+      bookingRequest?.schedule,
+      bookingRequest?.freightDetails?.find(
+        (detail: FreightDetail) =>
+          detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
+      ),
+      bookingRequest?.freightDetails,
+    );
     const writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
@@ -101,6 +115,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       archived: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
+      freightDetails: compact([...(bookingRequest?.freightDetails || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     setBookingRequest(writableRequest);
@@ -146,53 +161,60 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   };
 
   return (
-    <Grid container direction="column" spacing={4}>
+    <Container maxWidth="md">
       {bookingRequest && bookingRequest?.schedule && (
-        <Grid container item direction="row" spacing={4} xs={12}>
-          <Grid container item xs={8} title={'General Information'}>
+        <Grid container spacing={4} xs={12}>
+          <Grid item xs={12} title={'General Information'}>
             <RouteSummary route={bookingRequest?.schedule} />
           </Grid>
           <Grid item xs={12}>
             <Divider />
           </Grid>
           {bookingRequest.containers && (
-            <>
-              <ContainersList containers={bookingRequest?.containers} />
+            <Fragment>
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" display="block" gutterBottom>
+                  <Box fontWeight="fontWeightBold" mb={2}>
+                    Cargo details
+                  </Box>
+                </Typography>
+                <ContainersList containers={bookingRequest?.containers} />
+              </Grid>
               <Grid item xs={12}>
                 <Divider />
               </Grid>
-            </>
+            </Fragment>
           )}
-          <Grid container item xs={8}>
-            <Grid item container xs={12} spacing={2} className={classes.deadlines}>
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
               <RouteDeadlines route={bookingRequest.schedule} />
             </Grid>
-            <Grid item xs={12}>
-              <Stepper orientation="vertical" className={classes.stepper}>
-                {bookingRequest?.schedule!.OriginInfo && (
-                  <ItineraryItem noLine={false} itineraryItem={bookingRequest?.schedule!.OriginInfo} />
-                )}
-                {bookingRequest?.schedule!.IntermediatePortInfos.map((intermediatePortInfo, i) => (
-                  <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
-                ))}
-                {bookingRequest?.schedule!.DestinationInfo && (
-                  <ItineraryItem noLine={true} itineraryItem={bookingRequest?.schedule!.DestinationInfo} />
-                )}
-              </Stepper>
-            </Grid>
-            {/*</Container>*/}
+          </Grid>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12}>
+            <Stepper orientation="vertical" className={classes.stepper}>
+              {bookingRequest?.schedule!.OriginInfo && (
+                <ItineraryItem noLine={false} itineraryItem={bookingRequest?.schedule!.OriginInfo} />
+              )}
+              {bookingRequest?.schedule!.IntermediatePortInfos.map((intermediatePortInfo, i) => (
+                <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
+              ))}
+              {bookingRequest?.schedule!.DestinationInfo && (
+                <ItineraryItem noLine={true} itineraryItem={bookingRequest?.schedule!.DestinationInfo} />
+              )}
+            </Stepper>
           </Grid>
         </Grid>
       )}
-      <Grid item xs={12}>
-        <Button variant="text" color="default" onClick={handlePrevious}>
-          Previous
-        </Button>
+      <div className={classes.actions}>
+        <Button onClick={handlePrevious}>Previous</Button>
         <Button variant="contained" color="primary" onClick={handleCreateRequest}>
           Submit
         </Button>
-      </Grid>
-    </Grid>
+      </div>
+    </Container>
   );
 };
 

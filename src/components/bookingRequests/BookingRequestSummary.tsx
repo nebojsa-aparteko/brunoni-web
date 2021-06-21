@@ -14,7 +14,7 @@ import {
 import React, { Dispatch, Fragment, SetStateAction, useCallback, useContext, useEffect, useState } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest, BookingRequestLabels } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestLabels, FreightDetail } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
@@ -32,7 +32,7 @@ import { Link } from 'react-router-dom';
 import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import { cloneDeep, get, merge, set } from 'lodash/fp';
+import { cloneDeep, compact, get, merge, set } from 'lodash/fp';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -46,6 +46,7 @@ import { getVoyageInfo } from './BookingRequestView';
 import EditingInput from '../EditingInput';
 import useUser from '../../hooks/useUser';
 import useModal from '../../hooks/useModal';
+import { generateCommission } from './BookingRequestFreightDetails';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -605,25 +606,32 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const handleChangeSchedule = useCallback(
     (schedule: RouteSearchResult | undefined) => {
       const voyageInfo = getVoyageInfo(schedule);
+      const commission = generateCommission(
+        bookingRequest?.schedule,
+        bookingRequest?.freightDetails?.find(
+          (detail: FreightDetail) =>
+            detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
+        ),
+        bookingRequest?.freightDetails,
+      );
 
       setBookingRequest(prevState =>
         merge(prevState!, {
           schedule: schedule,
           vessel: voyageInfo?.VesselName,
           voyage: voyageInfo?.VoyageNr,
+          freightDetails: compact([...(bookingRequest?.freightDetails || []), commission]),
         }),
       );
       closeModal();
     },
-    [closeModal],
+    [closeModal, bookingRequest],
   );
 
-  const handleChangeBLNumber = useCallback((value?: string) => {
-    setBookingRequest(prevState => set('blNumber', value)(prevState!));
+  const handleChangeBRField = useCallback((field: keyof BookingRequest, value?: string) => {
+    setBookingRequest(prevState => set(field, value)(prevState!));
   }, []);
-  const handleChangeINTBLNumber = useCallback((value?: string) => {
-    setBookingRequest(prevState => set('intBlNumber', value)(prevState!));
-  }, []);
+
   const handleChangeCustomerRef = useCallback((value?: string) => {
     setBookingRequest(prevState => set('customerReference', value)(prevState!));
   }, []);
@@ -692,7 +700,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     editing={editing}
                     value={bookingRequest.blNumber}
                     inputProps={{
-                      onChange: event => handleChangeBLNumber(event.target.value),
+                      onChange: event => handleChangeBRField('blNumber', event.target.value),
                       className: classes.blNumberInput,
                     }}
                   />
@@ -706,7 +714,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                       editing={editing}
                       value={bookingRequest.intBlNumber}
                       inputProps={{
-                        onChange: event => handleChangeINTBLNumber(event.target.value),
+                        onChange: event => handleChangeBRField('intBlNumber', event.target.value),
                         className: classes.blNumberInput,
                       }}
                     />
@@ -721,7 +729,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                       editing={editing}
                       value={bookingRequest.customerReference}
                       inputProps={{
-                        onChange: event => handleChangeCustomerRef(event.target.value),
+                        onChange: event => handleChangeBRField('customerReference', event.target.value),
                         className: classes.blNumberInput,
                       }}
                     />

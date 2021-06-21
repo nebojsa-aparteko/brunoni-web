@@ -37,7 +37,6 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import Container from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import ContainerTypes from '../../contexts/ContainerTypes';
-import ContainerType from '../../model/ContainerType';
 import {
   DragDropContext,
   Draggable,
@@ -66,6 +65,7 @@ import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import ActingAs from '../../contexts/ActingAs';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -140,28 +140,33 @@ interface RowProps {
   index: number;
 }
 
+const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
+
 const getUpdatedFreightDetails = (
   bookingRequest: BookingRequest,
   value: any | undefined,
   pos: number,
   field: string,
 ) => {
+  console.log(value, pos, field);
   return (
     bookingRequest.freightDetails &&
-    bookingRequest.freightDetails.map((detail: FreightDetail) =>
-      detail.SeqNr === pos
+    bookingRequest.freightDetails.map((detail: FreightDetail) => {
+      console.log(checkIfPercent(detail));
+      return detail.SeqNr === pos
         ? flow(
             set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
             set(
               'Total',
               detail.Anz && detail.UnitValue
-                ? (field === 'Anz' ? parseFloat(value) || 0 : detail.Anz) *
-                    (field === 'UnitValue' ? parseFloat(value) : detail.UnitValue)
+                ? ((field === 'Anz' ? parseFloat(value) || 0 : detail.Anz) *
+                    (field === 'UnitValue' ? parseFloat(value) : detail.UnitValue)) /
+                    (checkIfPercent(detail) ? 100 : 1)
                 : 0.0,
             ),
           )(detail)
-        : detail,
-    )
+        : detail;
+    })
   );
 };
 
@@ -399,31 +404,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   );
 };
 
-interface CommissionProps {
-  freightDetail: FreightDetail;
-}
-
-const CommissionRow: React.FC<CommissionProps> = ({ freightDetail }) => {
-  const classes = useStyles();
-  const userRecord = useContext(UserRecordContext);
-  const [, , editing] = useBookingRequestContext();
-
-  return (
-    <TableRow key={freightDetail.SeqNr} className={classes.tableRow}>
-      {editing && isDashboardUser(userRecord) && <TableCell padding="checkbox" />}
-      <TableCell component="th" scope="row">
-        {freightDetail.Txt}
-      </TableCell>
-      <TableCell align="right">{freightDetail.Anz || '0,00'}</TableCell>
-      <TableCell align="right">{freightDetail.Currency}</TableCell>
-      {freightDetail.Txt === 'Seafreight'}
-      <TableCell align="right">{freightDetail.UnitValue}</TableCell>
-      <TableCell>{freightDetail.Unit}</TableCell>
-      <TableCell>{freightDetail.Total || '0.00'}</TableCell>
-    </TableRow>
-  );
-};
-
 const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
@@ -435,8 +415,8 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
 };
 
 const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
-  const aSeq = a.SeqNr;
-  const bSeq = b.SeqNr;
+  const aSeq = +a.SeqNr;
+  const bSeq = +b.SeqNr;
   if (aSeq > bSeq) return 1;
   if (aSeq < bSeq) return -1;
   return 0;
@@ -454,36 +434,32 @@ export const getNumberOfContainersAndTEUs = (bookingRequest: BookingRequest) => 
   return [containers, TEUs];
 };
 
-const generateCommission = (
-  bookingRequest: BookingRequest | undefined,
-  seafreightDetail: FreightDetail | undefined,
+export const generateCommission = (
+  schedule: RouteSearchResult | undefined,
+  seaFreightDetail: FreightDetail | undefined,
   freightDetails: FreightDetail[] | undefined,
 ) => {
-  const isPercent = bookingRequest?.schedule?.ComPercentE && bookingRequest?.schedule.ComPercentE !== '0';
-  const quantity = isPercent
-    ? bookingRequest?.schedule?.ComPercentE
-      ? parseFloat(bookingRequest?.schedule?.ComPercentE)
-      : 0
-    : 1;
+  const isPercent = schedule?.ComPercentE && schedule.ComPercentE !== '0';
+  const quantity = isPercent ? (schedule?.ComPercentE ? parseFloat(schedule?.ComPercentE) : 0) : 1;
   const value =
-    seafreightDetail && isPercent
-      ? seafreightDetail.Total || 0
-      : (bookingRequest?.schedule?.ComAmountE1 &&
-          seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE1 &&
-          parseFloat(bookingRequest?.schedule?.ComAmountE1)) ||
-        (bookingRequest?.schedule?.ComAmountE2 &&
-          seafreightDetail?.Currency === bookingRequest?.schedule?.ComCurE2 &&
-          parseFloat(bookingRequest?.schedule?.ComAmountE2)) ||
+    seaFreightDetail && isPercent
+      ? seaFreightDetail.Total || 0
+      : (schedule?.ComAmountE1 &&
+          seaFreightDetail?.Currency === schedule?.ComCurE1 &&
+          parseFloat(schedule?.ComAmountE1)) ||
+        (schedule?.ComAmountE2 &&
+          seaFreightDetail?.Currency === schedule?.ComCurE2 &&
+          parseFloat(schedule?.ComAmountE2)) ||
         0;
-  return seafreightDetail
+  return seaFreightDetail
     ? ({
         SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
         Anz: quantity,
         Txt: 'Agency Commission',
-        Currency: seafreightDetail.Currency,
+        Currency: seaFreightDetail.Currency,
         UnitValue: value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: isPercent ? ((seafreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0,
+        Total: isPercent ? ((seaFreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0,
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -520,33 +496,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [containerTypeNames, setContainerTypeNames] = useState(
     containerTypes?.map(containerType => containerType.name),
   );
-  const [seafreightDetail, setSeafreightDetail] = useState(
-    freightDetails?.find(
-      (detail: FreightDetail) =>
-        detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-    ),
-  );
-
   useEffect(() => {
     setContainerTypeNames(containerTypes?.map(containerType => containerType.name));
   }, [containerTypes]);
-
-  useEffect(() => {
-    setSeafreightDetail(
-      freightDetails?.find(
-        (detail: FreightDetail) =>
-          detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-      ),
-    );
-  }, [freightDetails]);
-
-  const [seafreightCommission, setSeafreightCommission] = useState(() => {
-    return generateCommission(bookingRequest, seafreightDetail, freightDetails);
-  });
-
-  useEffect(() => {
-    setSeafreightCommission(generateCommission(bookingRequest, seafreightDetail, freightDetails));
-  }, [freightDetails, seafreightDetail]);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     event.stopPropagation();
@@ -595,7 +547,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
       case 0:
         freightDetails &&
           setFilteredFreightDetails(
-            freightDetails.filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2).sort(sortBySeqNr),
+            freightDetails
+              .filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2 && detail.Txt !== 'Agency Commission')
+              .sort(sortBySeqNr),
           );
         break;
       case 1:
@@ -613,7 +567,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
           );
         break;
     }
-  }, [selectedTab, freightDetails, setFilteredFreightDetails, bookingRequest]);
+  }, [selectedTab, freightDetails, bookingRequest]);
 
   const handleSelectDeselectAll = () => {
     if (filteredFreightDetails) {
@@ -750,7 +704,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
               deleteTooltip={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
             />
           )}
-          {filteredFreightDetails && (filteredFreightDetails.length > 0 || seafreightCommission) ? (
+          {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
             <Table className={classes.table} size="small">
               <colgroup>
                 {editing && <col style={{ width: '3%' }} />}
@@ -801,9 +755,6 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                           index={index}
                         />
                       ))}
-                      {seafreightCommission && selectedTab === 1 && (
-                        <CommissionRow freightDetail={seafreightCommission} />
-                      )}
                       {droppableProvided.placeholder}
                     </TableBody>
                   )}
