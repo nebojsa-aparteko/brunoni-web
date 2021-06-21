@@ -5,6 +5,7 @@ import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Th
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import Carrier from '../../model/Carrier';
+import { FieldError } from 'react-hook-form';
 
 const getOptionSelected = (option: Carrier, value: Carrier) => option.id === value?.id;
 const getOptionLabel = (option: Carrier) => `${option.name} - (${option.id})`;
@@ -19,6 +20,7 @@ interface Props {
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: 'none' | 'dense' | 'normal';
+  formError?: FieldError;
 }
 
 const useStyles = makeStyles(() => ({
@@ -40,6 +42,7 @@ const CarrierInput: React.FC<Props> = ({
   onOpen,
   onClose,
   margin,
+  formError,
   ...rest
 }) => {
   const classes = useStyles();
@@ -63,6 +66,8 @@ const CarrierInput: React.FC<Props> = ({
       renderInput={params => (
         <TextField
           {...params}
+          error={!!formError}
+          helperText={formError ? formError.message : null}
           inputRef={inputRef}
           label={label}
           margin={margin}

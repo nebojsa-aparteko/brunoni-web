@@ -18,7 +18,6 @@ import ShippingInfo from './ShippingInfo';
 import CargoInfo from './CargoInfo';
 import AdditionalInfo from './AdditionalInfo';
 import Summary from './Summary';
-import { FormProvider, useForm } from 'react-hook-form';
 import { set } from 'lodash/fp';
 import AddIcon from '@material-ui/icons/Add';
 import BookingUploadDialog from './BookingUploadDialog';
@@ -32,6 +31,10 @@ import ContainerType from '../../model/ContainerType';
 import { isDashboardUser } from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
 import useModal from '../../hooks/useModal';
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+import { useForm, FormProvider, Resolver } from 'react-hook-form';
+import Carrier from '../../model/Carrier';
+import Port from '../../model/Port';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -73,8 +76,8 @@ const steps = ['General Information', 'Cargo Details', 'Additional Information',
 
 const OnlineBookingContainer = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const methods = useForm();
+  const [activeStep, setActiveStep] = React.useState(2);
+  const methods = useForm<OnlineBookingInputs>();
   const containerTypes = useContext(ContainerTypes) as ContainerType[];
 
   const [, userRecord] = useUser();
@@ -184,6 +187,15 @@ const OnlineBookingContainer = () => {
     </>
   );
 };
+
+export interface OnlineBookingInputs {
+  customerReference: string;
+  quoteNumber: string;
+  carrier: Carrier;
+  originPort: Port;
+  destinationPort: Port;
+  acceptedTerms: boolean;
+}
 
 export interface BookingReqFiles {
   additional: File[];
