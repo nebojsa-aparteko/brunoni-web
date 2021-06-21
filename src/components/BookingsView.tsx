@@ -97,7 +97,6 @@ export const getContainersString = (booking: Booking) => {
 
 const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
   const classes = useStyles();
-  const { isOpen, openModal, closeModal } = useModal();
   const [bookings, isLoading] = useBookingsContext();
   const [filters, setFilters] = useBookingListFilterContext();
 
@@ -196,7 +195,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
       <Meta title={`Bookings`} />
       {/*<ButtonMenuItem primary="Online Booking" to="/online-booking" />*/}
       <Grid container direction="row">
-        <Grid item md={11} xs={10}>
+        <Grid item md={12}>
           <BookingsFiltersBar
             filters={filters}
             setFilters={setFilters}
@@ -204,12 +203,6 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
             showDateRange={showDateRangeFilter}
             showAssigneeFilter={isAdmin}
           />
-        </Grid>
-        <Grid md={1} xs={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconButton onClick={openModal}>
-            <AddIcon fontSize="large" />
-          </IconButton>
-          {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
         </Grid>
       </Grid>
       <div>

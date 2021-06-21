@@ -7,6 +7,8 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  Grid,
+  IconButton,
   makeStyles,
   Paper,
   TablePagination,
@@ -31,6 +33,9 @@ import flow from 'lodash/fp/flow';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
 import { BookingRequest } from '../../model/BookingRequest';
+import AddIcon from '@material-ui/icons/Add';
+import BookingUploadDialog from '../onlineBooking/BookingUploadDialog';
+import useModal from '../../hooks/useModal';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -81,6 +86,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const { isOpen, openModal, closeModal } = useModal();
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
@@ -157,6 +163,12 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     <Typography variant="subtitle1" display="inline">
                       Bookings Requests
                     </Typography>
+                    <Box ml={2}>
+                      <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                        <AddIcon fontSize="large" />
+                      </IconButton>
+                      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
+                    </Box>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
                     {!actingAs && (

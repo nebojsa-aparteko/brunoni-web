@@ -99,7 +99,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
         ) : (
           <Activity activity={activityItem} />
         )}
-        {showPinButton && booking && activityItem.type !== ActivityType.ACTIVITY ? (
+        {showPinButton && activityItem.type !== ActivityType.ACTIVITY ? (
           <Box display="flex" flexDirection="column">
             <IconButton
               edge="end"

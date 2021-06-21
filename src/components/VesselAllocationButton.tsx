@@ -82,19 +82,19 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
-                      Booked
+                      Confirmed Bookings
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.teuBooked} <PercentData percent={vessel.teuPercent} />
+                      {vessel.teuBooked} <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} />
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked} <PercentData percent={vessel.weightPercent} />
+                      {vessel.weightBooked} <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
                     </TableCell>
                   </TableRow>
                   {vessel.requested && (
                     <TableRow>
                       <TableCell component="th" scope="row">
-                        Requested Bookings (Status: Requested)
+                        Requested Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.requested.quantity}</TableCell>
                       <TableCell align="right">{vessel.requested.weight}</TableCell>
@@ -103,7 +103,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                   {vessel.inProgress && (
                     <TableRow>
                       <TableCell component="th" scope="row">
-                        Requested Bookings (Status: In Progress)
+                        In Progress Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                       <TableCell align="right">{vessel.inProgress.weight}</TableCell>

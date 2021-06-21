@@ -333,7 +333,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         <TableRowData
           label={'Place of Receipt'}
           content={
-            editing && isDashboardUser(userRecord) ? (
+            editing ? (
               <Paper className={classes.paper}>
                 <Box display="flex">
                   <Box display="flex" flexDirection="column" flex="1" p={1}>
@@ -346,13 +346,15 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
                       onChange={value => handleChangeItinerary('placeOfReceipt', 'Port', getPortFromInputValue(value))}
                       freeSolo
                     />
-                    <TextField
-                      label={'ETS'}
-                      value={itinerary.placeOfReceipt?.DepartureDate}
-                      onChange={event => handleChangeItinerary('placeOfReceipt', 'DepartureDate', event.target.value)}
-                      variant="outlined"
-                      margin="dense"
-                    />
+                    {isDashboardUser(userRecord) && (
+                      <TextField
+                        label={'ETS'}
+                        value={itinerary.placeOfReceipt?.DepartureDate}
+                        onChange={event => handleChangeItinerary('placeOfReceipt', 'DepartureDate', event.target.value)}
+                        variant="outlined"
+                        margin="dense"
+                      />
+                    )}
                   </Box>
                   <Box
                     py={2}
@@ -697,6 +699,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 label={BookingRequestLabels.blNumber}
                 content={
                   <EditingInput
+                    canEdit={isDashboardUser(userRecord)}
                     editing={editing}
                     value={bookingRequest.blNumber}
                     inputProps={{
@@ -711,6 +714,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   label={BookingRequestLabels.intBlNumber}
                   content={
                     <EditingInput
+                      canEdit={isDashboardUser(userRecord)}
                       editing={editing}
                       value={bookingRequest.intBlNumber}
                       inputProps={{
