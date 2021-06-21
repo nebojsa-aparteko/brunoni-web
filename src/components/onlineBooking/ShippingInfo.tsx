@@ -192,7 +192,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           defaultValue={''}
           render={({ field: { onChange, value } }) => (
             <TextField
-              label="Customer reference (optional)"
+              label="Your reference (optional)"
               variant="outlined"
               fullWidth
               margin="dense"
