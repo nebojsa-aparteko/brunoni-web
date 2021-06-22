@@ -165,7 +165,7 @@ const QuoteGroupsView: React.FC<Props> = ({
             <CardHeader
               title={
                 <Box display="flex" alignItems="center">
-                  <Typography variant="subtitle1" display="inline">
+                  <Typography variant="h3" display="inline">
                     Quotes
                   </Typography>
                   {showGetQuoteButton && (

@@ -10,6 +10,7 @@ import MuiListItem from './MuiListItem';
 import MuiListItemIcon from './MuiListItemIcon';
 import MuiOutlinedInput from './MuiOutlinedInput';
 import MuiPaper from './MuiPaper';
+import MuiTab from './MuiTab';
 import MuiTableCell from './MuiTableCell';
 import MuiTableHead from './MuiTableHead';
 import MuiTablePagination from './MuiTablePagination';
@@ -31,6 +32,7 @@ export default {
   MuiListItemIcon,
   MuiOutlinedInput,
   MuiPaper,
+  MuiTab,
   MuiTableCell,
   MuiTableHead,
   MuiTablePagination,
