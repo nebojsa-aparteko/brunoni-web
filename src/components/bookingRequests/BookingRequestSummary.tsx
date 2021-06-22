@@ -389,8 +389,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
-        bookingRequest?.schedule &&
-        isDashboardUser(userRecord) && (
+        bookingRequest?.schedule && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
               <Button
@@ -473,7 +472,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         <TableRowData
           label={'Place of Delivery'}
           content={
-            editing && isDashboardUser(userRecord) ? (
+            editing ? (
               <Paper className={classes.paper}>
                 <Box display="flex">
                   <Box display="flex" flexDirection="column" flex="1" p={1}>
@@ -485,13 +484,15 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
                       onChange={value => handleChangeItinerary('placeOfDelivery', 'Port', getPortFromInputValue(value))}
                       freeSolo
                     />
-                    <TextField
-                      label={'ETA'}
-                      value={itinerary.placeOfDelivery?.ArrivalDate}
-                      onChange={event => handleChangeItinerary('placeOfDelivery', 'ArrivalDate', event.target.value)}
-                      variant="outlined"
-                      margin="dense"
-                    />
+                    {isDashboardUser(userRecord) && (
+                      <TextField
+                        label={'ETA'}
+                        value={itinerary.placeOfDelivery?.ArrivalDate}
+                        onChange={event => handleChangeItinerary('placeOfDelivery', 'ArrivalDate', event.target.value)}
+                        variant="outlined"
+                        margin="dense"
+                      />
+                    )}
                   </Box>
                   <Box
                     py={2}
@@ -526,8 +527,7 @@ const ItineraryInfo: React.FC<ItineraryInfoProps> = ({ bookingRequest, setBookin
         />
       ) : (
         editing &&
-        bookingRequest?.schedule &&
-        isDashboardUser(userRecord) && (
+        bookingRequest?.schedule && (
           <TableRow className={classes.tableRow}>
             <TableCell colSpan={2} className={classes.tableCell}>
               <Button

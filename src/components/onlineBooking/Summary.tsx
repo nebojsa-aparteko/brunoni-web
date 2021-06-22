@@ -138,9 +138,10 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     name: item.name,
                     url: item.url,
                     storedName: item.storedName,
+                    isInternal: false,
                   } as ChecklistItemValueDocument),
               );
-              values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
+              await Promise.all(values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)));
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {

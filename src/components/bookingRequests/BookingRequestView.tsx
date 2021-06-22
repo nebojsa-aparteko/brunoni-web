@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -47,7 +48,7 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { isEqual, set, omit, keys } from 'lodash/fp';
+import { isEqual, keys, omit, set } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -63,6 +64,10 @@ import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
+import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import BookingPinnedActivities from '../bookings/BookingPinnedActivities';
+import useActivities from '../../hooks/useActivities';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -332,7 +337,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
-
+  // const activities = useActivities(
+  //   useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]),
+  //   collection => collection.where('isPinned', '==', true),
+  // );
+  console.log('TEST');
   const canEdit = useMemo(
     () =>
       !(
@@ -489,7 +498,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       );
     }
   };
-
+  const chargeCodes = useContext(ChargeCodes);
+  const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
+    chargeCodes,
+  ]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {/*<Button*/}
@@ -500,6 +512,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
+          {/*{activities && activities?.length > 0 && (*/}
+          {/*  <Box my={2}>*/}
+          {/*    <Box displayPrint="none">*/}
+          {/*      <BookingPinnedActivities pinnedActivities={activities} />*/}
+          {/*    </Box>*/}
+          {/*  </Box>*/}
+          {/*)}*/}
           {bookingRequest.additionalInfo && <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />}
           {isOpenAssignmentModal && (
             <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
@@ -649,3 +668,11 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
     </Paper>
   );
 };
+const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
+  console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
+  // throw new Error('Function not implemented.');
+};
+
+function filteredChargeCodes(bookingRequest: BookingRequest, filteredChargeCodes: any) {
+  throw new Error('Function not implemented.');
+}

@@ -443,6 +443,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                     name: item.name,
                     url: item.url,
                     storedName: item.storedName,
+                    isInternal: false,
                   } as ChecklistItemValueDocument),
               );
               values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));

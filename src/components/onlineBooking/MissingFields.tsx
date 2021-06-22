@@ -114,7 +114,7 @@ const MissingFields: React.FC<Props> = ({
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">{'Warning message'}</Typography>
+            <Typography variant="h5">{isDashboardUser(userRecord) ? 'Warning message' : ''}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>

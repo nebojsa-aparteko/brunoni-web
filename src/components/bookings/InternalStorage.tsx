@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   documentList: {
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
   },
   tinyIconButton: {
     '& svg': {
@@ -86,9 +86,9 @@ const addActivity = (activity: ActivityLogItem, collection: string, id: string) 
     .collection('activity')
     .doc()
     .set(activity);
-const InternalStorage: React.FC<Props> = ({ id, collection }) => {
+const InternalStorage: React.FC<Props> = ({ id, collection, isInternal = true, label = 'Internal documents' }) => {
   const classes = useStyles();
-  const query = useCallback(q => q.orderBy('uploadedAt', 'desc'), []);
+  const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
@@ -237,6 +237,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
                 name: item.name,
                 url: item.url,
                 storedName: item.storedName,
+                isInternal,
               } as ChecklistItemValueDocument),
           );
           values.map(value => saveFilesToFirestore(collection, id, value));
@@ -288,9 +289,9 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
       )}
 
       {normalizedFiles && normalizedFiles.length > 0 ? (
-        <Card>
+        <Card style={{ backgroundColor: isInternal ? '#eee' : '#fff' }}>
           <CardHeader
-            title="Internal documents"
+            title={label}
             action={
               <IconButton size="small" aria-label="Add Comment" onClick={open}>
                 <AttachFileIcon />
@@ -324,4 +325,6 @@ export default InternalStorage;
 interface Props {
   id: string;
   collection: string;
+  isInternal?: boolean;
+  label?: string;
 }

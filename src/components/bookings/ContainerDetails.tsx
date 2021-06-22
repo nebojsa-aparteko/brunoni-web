@@ -418,7 +418,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                 {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
 
                 {detail.Overdimension && detail.Overdimension === CargoOverdimension.Trigger && (
-                  <OverdimensionComponent detail={detail} />
+                  <OverdimensionComponent detail={detail} key={`${index}-Overdimension`} />
                 )}
 
                 {detail.Equipment && detail.Equipment[0] ? (
