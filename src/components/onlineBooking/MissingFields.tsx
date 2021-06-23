@@ -21,6 +21,8 @@ import useUser from '../../hooks/useUser';
 import { isDashboardUser } from '../../model/UserRecord';
 import { isBefore } from 'date-fns/fp';
 import theme from '../../theme';
+import { isShipperOwnedContainer } from '../../hooks/useCodebook';
+import Container from '../../model/Container';
 
 export interface Object {
   [key: string]: string;
@@ -86,10 +88,18 @@ const MissingFields: React.FC<Props> = ({
     return watchedFields.filter(field => !hasIn(field)(bookingRequest));
   }, [bookingRequest, watchedFields]);
 
+  const containerHasNoDropOffLocation = (container: Container) => {
+    return !!(container.containerType?.id && isShipperOwnedContainer(container.containerType.id));
+  };
+
   const findContainerNonMatchingFields = useCallback((): string[][] => {
     const containersNonMatchingFields: string[][] = [];
     bookingRequest.containers?.forEach(container => {
-      const containerNonMatchingFields = containerWatchedFields.filter(field => !hasIn(field)(container));
+      const containerNonMatchingFields = containerWatchedFields.filter(field => {
+        return field === 'pickupLocation' && containerHasNoDropOffLocation(container)
+          ? false
+          : !hasIn(field)(container);
+      });
       containersNonMatchingFields.push(containerNonMatchingFields);
     });
 
