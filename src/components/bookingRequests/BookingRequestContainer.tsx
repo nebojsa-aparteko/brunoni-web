@@ -10,6 +10,7 @@ import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import PortTerms from '../../contexts/PortTerms';
 import useBookingRequest from '../../hooks/useBookingRequest';
+import { map, update, flow } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -25,7 +26,18 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
   const [bookingRequestState, setBookingRequestState] = useBookingRequestContext();
 
   useEffect(() => {
-    setBookingRequestState && setBookingRequestState(bookingRequest);
+    setBookingRequestState &&
+      setBookingRequestState(
+        update(
+          'containers',
+          map((container: any) =>
+            flow(
+              update('imo', val => (val ? [true, val] : [false])),
+              update('oog', val => (val ? [true, val] : [false])),
+            )(container),
+          ),
+        )(bookingRequest!),
+      );
   }, [bookingRequest]);
 
   return !bookingRequestState ? (

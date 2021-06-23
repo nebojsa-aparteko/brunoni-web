@@ -80,7 +80,7 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
   const classes = useStyles();
   return (
     <React.Fragment>
-      {(container.oog as OOG[]).map((oogItem: OOG, index) => (
+      {(container.oog?.[1] as OOG[]).map((oogItem: OOG, index) => (
         <TableRow key={`${index}:${oogItem.length}-${oogItem.width}-${oogItem.height}-${oogItem.weight}`}>
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
           <TableCell className={classes.tableCell}>
@@ -120,7 +120,7 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {(container.imo as IMO[]).map((imoItem, index) => (
+      {(container.imo?.[1] as IMO[]).map((imoItem, index) => (
         <TableRow key={`${index}:${imoItem.IMOClass}-${imoItem.PGNumber}-${imoItem.UNNumber}`}>
           <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
           <TableCell className={classes.tableCell}>
@@ -225,9 +225,9 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
 
             {container.ventilation && <TableRowData label={'Ventilation'} content={container.ventilation} />}
 
-            {container.imo && container.imo.length > 0 && <IMCODetails container={container} />}
+            {container.imo && container.imo?.[0] && <IMCODetails container={container} />}
 
-            {container.oog && container.oog.length > 0 && <OverdimensionDetails container={container} />}
+            {container.oog && container.oog?.[0] && <OverdimensionDetails container={container} />}
 
             {container.containerNumbers && container.containerNumbers.length > 0 && (
               <TableRowData label={'Container numbers'} content={container.containerNumbers.join('<br/>')} />
@@ -344,8 +344,8 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
         ventilation: isReefer(container.containerType)
           ? container.ventilation || Ventilation.CLOSED
           : container.ventilation,
-        imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
-        oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
+        // imo: container.imo,
+        // oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
         pickupDate: isContainerSO(container) ? undefined : container.pickupDate ? container.pickupDate : new Date(),
       };
     });

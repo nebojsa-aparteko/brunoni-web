@@ -12,7 +12,7 @@ import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
-  containers && containers.some((container: Container & ContainerDetails) => container.imo && container.imo[0]);
+  containers && containers.some((container: Container & ContainerDetails) => container.imo?.[0]);
 
 const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers &&
@@ -85,8 +85,8 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
     const writableContainers = containers.map(container => {
       return {
         ...container,
-        imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
-        oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
+        // imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
+        // oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
         pickupDate: isContainerSO(container) ? null : container.pickupDate ? container.pickupDate : new Date(),
       };
     });

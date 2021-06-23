@@ -71,15 +71,15 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                     container.containerType?.description.includes('S.O.') &&
                     'Container is shipper owned'}
                   {container.imo &&
-                    container.imo.length > 0 &&
-                    container.imo.map(
+                    container.imo?.[0] &&
+                    container.imo?.[1]?.map(
                       (imoItem: IMO) =>
                         `(${'IMO Class: ' + imoItem.IMOClass} - ${'PG Number: ' + imoItem.PGNumber} - ${'UN Number: ' +
                           imoItem.UNNumber} )`,
                     )}
                   {container.oog &&
-                    container.oog.length > 0 &&
-                    container.oog.map(
+                    container.oog?.[0] &&
+                    container.oog?.[1]?.map(
                       (oogItem: OOG) =>
                         `(${'Length: ' + oogItem.length} - ${'Width: ' + oogItem.width} - ${'Height: ' +
                           oogItem.height} - ${'Weight: ' + oogItem.weight})`,

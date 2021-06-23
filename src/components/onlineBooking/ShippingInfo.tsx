@@ -43,10 +43,10 @@ export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCod
       SeqNr: index + 1,
       Txt: quoteDetail.Description,
       Currency: quoteDetail.Currency,
-      UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue),
+      UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Unit: quoteDetail.CostUnit,
       Group: FreightDetailGroup.EXTERNAL,
-      Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue),
+      Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
     }) as FreightDetail;
   });

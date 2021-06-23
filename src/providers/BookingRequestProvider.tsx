@@ -13,7 +13,6 @@ const BookingRequestContext = createContext<
 const BookingRequestProvider = (props: any) => {
   const [state, setState] = useState<BookingRequest>();
   const [editing, setEditing] = useState<boolean>(false);
-
   return (
     <BookingRequestContext.Provider value={[state, setState, editing, setEditing]}>
       {props.children}

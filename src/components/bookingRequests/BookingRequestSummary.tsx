@@ -622,7 +622,10 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
           schedule: schedule,
           vessel: voyageInfo?.VesselName,
           voyage: voyageInfo?.VoyageNr,
-          freightDetails: compact([...(bookingRequest?.freightDetails || []), commission]),
+          freightDetails: compact([
+            ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+            commission,
+          ]),
         }),
       );
       closeModal();
@@ -632,10 +635,6 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
 
   const handleChangeBRField = useCallback((field: keyof BookingRequest, value?: string) => {
     setBookingRequest(prevState => set(field, value)(prevState!));
-  }, []);
-
-  const handleChangeCustomerRef = useCallback((value?: string) => {
-    setBookingRequest(prevState => set('customerReference', value)(prevState!));
   }, []);
 
   return bookingRequest ? (

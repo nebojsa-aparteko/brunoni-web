@@ -48,19 +48,6 @@ export interface BookingRequest {
   isScheduleChanged?: boolean;
 }
 
-export interface FreightDetail {
-  Txt: string;
-  Anz: number;
-  UnitValue: number;
-  Total?: number;
-  Currency: string;
-  Unit?: string;
-  Group: FreightDetailGroup;
-  Invoice: string;
-  SeqNr: number;
-  Internal1?: boolean;
-}
-
 export enum BookingRequestStatus {
   REQUESTED = 'Requested',
   IN_PROGRESS = 'In Progress',
@@ -90,3 +77,20 @@ export const BookingRequestLabels: Object = {
   quoteNumber: 'Quote Reference',
   containers: 'Container',
 };
+
+export interface FreightDetail {
+  Txt: string;
+  Anz: number;
+  UnitValue: number;
+  Total?: number;
+  Currency: string;
+  Unit?: string;
+  Group: FreightDetailGroup;
+  Invoice: string;
+  SeqNr: number;
+  Internal1?: boolean;
+}
+
+export const commissionRelatedFreights = ['Seafreight', 'Seefracht', 'Fret Maritime'];
+
+export const emptyFreightDetail: Partial<FreightDetail> = { Currency: 'USD', UnitValue: 0, Unit: '', Total: 0, Anz: 0 };

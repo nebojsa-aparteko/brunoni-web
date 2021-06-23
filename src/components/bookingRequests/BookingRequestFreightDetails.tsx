@@ -22,7 +22,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
+import { BookingRequest, emptyFreightDetail, FreightDetail } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
 import { cloneDeep, flow, get, set, uniq } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
@@ -439,7 +439,7 @@ export const generateCommission = (
   seaFreightDetail: FreightDetail | undefined,
   freightDetails: FreightDetail[] | undefined,
 ) => {
-  const isPercent = schedule?.ComPercentE && schedule.ComPercentE !== '0';
+  const isPercent = schedule?.ComPercentE !== '0';
   const quantity = isPercent ? (schedule?.ComPercentE ? parseFloat(schedule?.ComPercentE) : 0) : 1;
   const value =
     seaFreightDetail && isPercent
@@ -457,9 +457,9 @@ export const generateCommission = (
         Anz: quantity,
         Txt: 'Agency Commission',
         Currency: seaFreightDetail.Currency,
-        UnitValue: value,
+        UnitValue: -value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: isPercent ? ((seaFreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0,
+        Total: -(isPercent ? ((seaFreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0),
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -588,44 +588,38 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     },
     [selectedDetails],
   );
+  const selectedGroup = useMemo(
+    () =>
+      selectedTab === 0
+        ? FreightDetailGroup.EXTERNAL
+        : selectedTab === 1
+        ? FreightDetailGroup.INTERNAL1
+        : FreightDetailGroup.INTERNAL2,
+    [selectedTab],
+  );
+  const onAdd = useCallback(() => {
+    setBookingRequest(prevState =>
+      set(
+        'freightDetails',
+        (freightDetails || []).concat({
+          ...emptyFreightDetail,
+          SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+          Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
+          Group: selectedGroup,
+        } as FreightDetail),
+      )(prevState!),
+    );
+  }, [selectedGroup, freightDetails]);
 
-  const onAdd = () => {
-    bookingRequest &&
-      setBookingRequest &&
-      setBookingRequest(
-        set(
-          'freightDetails',
-          (freightDetails || []).concat({
-            SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
-            Anz: 0,
-            Txt: (selectedTab !== 2 ? chargeCodes && chargeCodes[0].text : '') || '',
-            Currency: 'USD',
-            UnitValue: 0,
-            Unit: '',
-            Total: 0,
-            Group:
-              selectedTab === 0
-                ? FreightDetailGroup.EXTERNAL
-                : selectedTab === 1
-                ? FreightDetailGroup.INTERNAL1
-                : FreightDetailGroup.INTERNAL2,
-          } as FreightDetail),
-        )(bookingRequest) as BookingRequest,
-      );
-  };
-
-  const onDelete = () => {
-    bookingRequest &&
-      setBookingRequest &&
-      freightDetails &&
-      setBookingRequest(
-        set(
-          'freightDetails',
-          freightDetails.filter(detail => !selectedDetails.includes(detail.SeqNr)),
-        )(bookingRequest) as BookingRequest,
-      );
+  const onDelete = useCallback(() => {
+    setBookingRequest(prevState =>
+      set(
+        'freightDetails',
+        freightDetails?.filter(detail => !selectedDetails.includes(detail.SeqNr)),
+      )(prevState!),
+    );
     setSelectedDetails([]);
-  };
+  }, [selectedDetails]);
 
   const handleDragEnd = (result: DropResult, _?: ResponderProvided) => {
     if (!result.destination) {
@@ -748,6 +742,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                     <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                       {filteredFreightDetails.map((freightDetail, index) => (
                         <BookingRequestFreightDetailsRow
+                          key={index}
                           freightDetail={freightDetail}
                           selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
                           onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}

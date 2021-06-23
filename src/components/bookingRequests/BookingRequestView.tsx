@@ -48,7 +48,7 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { isEqual, keys, omit, set } from 'lodash/fp';
+import { isEqual, keys, map, omit, set, update, flow } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -66,8 +66,6 @@ import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
 import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
 import ChargeCodes from '../../contexts/ChargeCodes';
-import BookingPinnedActivities from '../bookings/BookingPinnedActivities';
-import useActivities from '../../hooks/useActivities';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -168,7 +166,18 @@ const updateBookingRequest = (bookingRequest: BookingRequest) => {
       .firestore()
       .collection('bookings-requests')
       .doc(bookingRequest.id)
-      .set(bookingRequest, { merge: true });
+      .set(
+        update(
+          'containers',
+          map((value: any) =>
+            flow(
+              update('imo', val => (val?.[0] ? val[1] : null)),
+              update('oog', val => (val?.[0] ? val[1] : null)),
+            )(value),
+          ),
+        )(bookingRequest),
+        { merge: true },
+      );
   }
   return Promise.resolve();
 };
@@ -341,7 +350,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   //   useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]),
   //   collection => collection.where('isPinned', '==', true),
   // );
-  console.log('TEST');
   const canEdit = useMemo(
     () =>
       !(
@@ -445,7 +453,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     if (freight && freight.length > 0) {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
-      setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+      setBookingRequestState(prevState => set('leadingCurrency', f?.Currency)(prevState!));
     } else {
       return openModal();
     }

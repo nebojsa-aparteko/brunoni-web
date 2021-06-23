@@ -1,9 +1,15 @@
-import { BookingRequest, BookingRequestStatus, FreightDetail, VGMSubmittedBy } from '../../model/BookingRequest';
-import React, { Fragment, useCallback, useMemo } from 'react';
+import {
+  BookingRequest,
+  BookingRequestStatus,
+  commissionRelatedFreights,
+  FreightDetail,
+  VGMSubmittedBy,
+} from '../../model/BookingRequest';
+import React, { Fragment, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { ActivityLogUserData, ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
@@ -18,8 +24,9 @@ import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
-import { compact } from 'lodash/fp';
+import { compact, flow, map, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -78,21 +85,12 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const [, userRecord] = useUser();
   const [, dispatch] = useGlobalAppState();
 
-  const getShortUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
+  const activityLogUserData = useActivityLogUserData();
 
-  const storageBasePath = useMemo((): string => {
-    return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
-  }, [bookingRequest]);
+  const storageBasePath = useMemo(
+    (): string => [`bookings-requests-documents-internal`, bookingRequest?.id].join('/'),
+    [bookingRequest],
+  );
 
   const { saveFiles } = useSaveFiles(storageBasePath);
 
@@ -100,29 +98,49 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
     const commission = generateCommission(
       bookingRequest?.schedule,
-      bookingRequest?.freightDetails?.find(
-        (detail: FreightDetail) =>
-          detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-      ),
+      bookingRequest?.freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
       bookingRequest?.freightDetails,
     );
     const writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
-      createdBy: getShortUserData(),
+      createdBy: activityLogUserData,
       status: BookingRequestStatus.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
       archived: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
-      freightDetails: compact([...(bookingRequest?.freightDetails || []), commission]),
+      freightDetails: compact([
+        ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+        commission,
+      ]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
-    setBookingRequest(writableRequest);
+    setBookingRequest(
+      update(
+        'containers',
+        map((value: any) =>
+          flow(
+            update('imo', val => (val?.[0] ? val[1] : null)),
+            update('oog', val => (val?.[0] ? val[1] : null)),
+          )(value),
+        ),
+      )(writableRequest),
+    );
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest(writableRequest)
+        createRequest(
+          update(
+            'containers',
+            map((value: any) =>
+              flow(
+                update('imo', val => (val?.[0] ? val[1] : null)),
+                update('oog', val => (val?.[0] ? val[1] : null)),
+              )(value),
+            ),
+          )(writableRequest),
+        )
           .then(async docReference => {
             try {
               const documents = (await saveFiles([
