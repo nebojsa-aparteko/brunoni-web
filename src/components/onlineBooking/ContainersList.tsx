@@ -28,9 +28,11 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
           </Box>
 
           <Box display="flex" alignItems="center" mb={2}>
-            <Box mr={2}>
-              <DepotLocationIcon />
-            </Box>
+            {container.pickupLocation && (
+              <Box mr={2}>
+                <DepotLocationIcon />
+              </Box>
+            )}
             <Typography variant="body2">
               {
                 <>
