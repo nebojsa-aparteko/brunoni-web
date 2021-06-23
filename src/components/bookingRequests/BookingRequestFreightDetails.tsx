@@ -629,16 +629,14 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
     if (result.destination.index === result.source.index) {
       return;
     }
-
     const destinationFD = freightDetails && freightDetails[result.destination!.index];
     const originFD = freightDetails && freightDetails[result.source!.index];
 
     setBookingRequest(prevState => {
-      if (!prevState) return;
-      const destinationIndex =
-        prevState.freightDetails && prevState.freightDetails.findIndex(detail => detail == destinationFD);
-      const originIndex = prevState.freightDetails && prevState.freightDetails.findIndex(detail => detail == originFD);
-      if (!destinationIndex || !originIndex || destinationIndex === originIndex) return;
+      if (!prevState || !prevState.freightDetails) return prevState;
+      const destinationIndex = prevState.freightDetails.findIndex(detail => detail == destinationFD);
+      const originIndex = prevState.freightDetails.findIndex(detail => detail == originFD);
+      if (destinationIndex < 0 || originIndex < 0 || destinationIndex === originIndex) return prevState;
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);

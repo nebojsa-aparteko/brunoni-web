@@ -285,7 +285,9 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             )}
 
             <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be assigned]'} />
-            {container.oog && <TableRowData label={'Remarks'} content={container.oog ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />}
+            {container.oog?.[0] && (
+              <TableRowData label={'Remarks'} content={container.oog?.[0] ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />
+            )}
           </TableBody>
         </Table>
       </Grid>
