@@ -61,10 +61,12 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
               }
             </Typography>
           </Box>
-          <Typography>{`Container numbers: ${container.containerNumbers?.join(', ')}`}</Typography>
+          {container.containerNumbers && (
+            <Typography variant="body2">{`Container numbers: ${container.containerNumbers?.join(', ')}`}</Typography>
+          )}
 
           <Box display="flex" alignItems="center">
-            <Typography variant="caption">
+            <Typography variant="body2" color="textSecondary">
               {
                 <>
                   {container.containerType &&
