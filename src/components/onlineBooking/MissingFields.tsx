@@ -23,6 +23,9 @@ import { isBefore } from 'date-fns/fp';
 import theme from '../../theme';
 import { isShipperOwnedContainer } from '../../hooks/useCodebook';
 import Container from '../../model/Container';
+import { normalizeQuote } from './BookingUploadDialog';
+import { Quote } from '../../providers/QuoteGroupsProvider';
+import firebase from '../../firebase';
 
 export interface Object {
   [key: string]: string;
@@ -54,10 +57,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const validQuote = (bookingRequest: BookingRequest) => {
-  const quoteValidityDate = bookingRequest?.quoteValidityPeriod?.to
-    ? bookingRequest?.quoteValidityPeriod?.to
-    : undefined;
+export const getQuoteDoc = async (quoteId: string) =>
+  (
+    await firebase
+      .firestore()
+      .collection('quotes')
+      .doc(quoteId)
+      .get()
+  ).data();
+
+const validQuote = async (bookingRequest: BookingRequest) => {
+  const quote = bookingRequest.quoteNumber && (await getQuoteDoc(`${bookingRequest.quoteNumber}`));
+  const quoteNormalized = normalizeQuote(quote) as Quote;
+
+  const quoteValidityDate = quoteNormalized?.validityPeriod.to ? quoteNormalized?.validityPeriod.to : undefined;
 
   const scheduleDepartureDate = bookingRequest.schedule?.OriginInfo.DepartureDate
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
@@ -83,6 +96,7 @@ const MissingFields: React.FC<Props> = ({
 
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
+  const [validQuoteState, setValidQuoteState] = useState(true);
 
   const findNonMatchingFields = useCallback((): string[] => {
     return watchedFields.filter(field => !hasIn(field)(bookingRequest));
@@ -114,9 +128,10 @@ const MissingFields: React.FC<Props> = ({
 */
 
   useEffect(() => {
+    validQuote(bookingRequest).then(vq => setValidQuoteState(vq));
     setNonMatchingFields(findNonMatchingFields());
     setContainersNonMatchingFields(findContainerNonMatchingFields());
-  }, [findContainerNonMatchingFields, findNonMatchingFields]);
+  }, [bookingRequest, findContainerNonMatchingFields, findNonMatchingFields]);
 
   return (nonMatchingFields && nonMatchingFields.length > 0) ||
     (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
@@ -128,7 +143,7 @@ const MissingFields: React.FC<Props> = ({
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
-              {!validQuote(bookingRequest) && bookingRequest.schedule && (
+              {!validQuoteState && bookingRequest.schedule && (
                 <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
                   {`You are booking with schedule outside quote end date (${bookingRequest.schedule?.OriginInfo
                     .DepartureDate as string})`}

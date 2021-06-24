@@ -27,7 +27,6 @@ export interface BookingRequest {
   destination?: Port;
   carrier?: Carrier;
   quoteNumber?: number;
-  quoteValidityPeriod?: { from: Date; to: Date };
   freightDetails?: FreightDetail[];
   customerReference?: string;
   agreementNo?: string;

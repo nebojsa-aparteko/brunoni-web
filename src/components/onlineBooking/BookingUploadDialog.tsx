@@ -236,7 +236,7 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-const getLatestQuote = async (originId: string, destinationId: string) => {
+export const getLatestQuote = async (originId: string, destinationId: string) => {
   const quotesRef = await firebase
     .firestore()
     .collection('quotes')
@@ -248,7 +248,7 @@ const getLatestQuote = async (originId: string, destinationId: string) => {
   return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])[0] || undefined;
 };
 
-const normalizeQuote = (data: any) => {
+export const normalizeQuote = (data: any) => {
   return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
 };
 
@@ -314,7 +314,6 @@ const mapIntoBookingRequestModel = async (
     freightDetails,
     intraRefNumber,
     origin,
-    quoteValidityPeriod: quote?.validityPeriod,
     schedule,
     status: BookingRequestStatus.REQUESTED,
     vgmSubmittedBy,
