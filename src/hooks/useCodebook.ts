@@ -19,14 +19,13 @@ export default function useCodebook({
   port?: string;
   equipment?: string;
 }) {
-  // console.log(depotLocation, category, carrier, equipment, port);
+  console.log(depotLocation, category, carrier, equipment, port);
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
-      let q = collection.where(
-        'depotLocations',
-        'array-contains',
-        depotLocation ? (isShipperOwnedContainer(depotLocation) ? '0' : depotLocation) : '',
-      );
+      let q = collection;
+      if (depotLocation && !isShipperOwnedContainer(equipment!)) {
+        q = collection.where('depotLocations', 'array-contains', depotLocation ? depotLocation : '');
+      }
       q = q.where('category', '==', category || '');
       q = q.where('carrierId', '==', carrier || '');
       return q;
@@ -35,12 +34,12 @@ export default function useCodebook({
   );
   const codeBookCollection = useFirestoreCollection('brunoni-codes', query);
 
-  if (!depotLocation)
+  if (!depotLocation && !isShipperOwnedContainer(equipment!))
     return { storage: [] as BrunoniCodes[], demurrage: [] as BrunoniCodes[], plugin: [] as BrunoniCodes[] };
 
   return codeBookCollection?.docs
     .map(d => {
-      // console.log(normalizeCodebook(d.data()))
+      // console.log(normalizeCodebook(d.data()));
       return normalizeCodebook(d.data()) as BrunoniCodes;
     })
     .filter(
