@@ -28,9 +28,11 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
           </Box>
 
           <Box display="flex" alignItems="center" mb={2}>
-            <Box mr={2}>
-              <DepotLocationIcon />
-            </Box>
+            {container.pickupLocation && (
+              <Box mr={2}>
+                <DepotLocationIcon />
+              </Box>
+            )}
             <Typography variant="body2">
               {
                 <>
@@ -61,9 +63,12 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
               }
             </Typography>
           </Box>
+          {container.containerNumbers && (
+            <Typography variant="body2">{`Container numbers: ${container.containerNumbers?.join(', ')}`}</Typography>
+          )}
 
           <Box display="flex" alignItems="center">
-            <Typography>
+            <Typography variant="body2" color="textSecondary">
               {
                 <>
                   {container.containerType &&
