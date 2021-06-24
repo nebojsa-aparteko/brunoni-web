@@ -25,6 +25,9 @@ export default function useCodebook({
       if (depotLocation && !isShipperOwnedContainer(equipment!)) {
         q = collection.where('depotLocations', 'array-contains', depotLocation ? depotLocation : '');
       }
+      if (isShipperOwnedContainer(equipment!)) {
+        q = q.where('type', '!=', 'DEMURRAGE');
+      }
       q = q.where('category', '==', category || '');
       q = q.where('carrierId', '==', carrier || '');
       return q;

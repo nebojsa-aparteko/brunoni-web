@@ -543,6 +543,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
       setBookingRequest(prevState =>
         merge(prevState!, {
           schedule: schedule,
+          itinerary: getItineraryFromSchedule(schedule),
           vessel: voyageInfo?.VesselName,
           voyage: voyageInfo?.VoyageNr,
           freightDetails: compact([
