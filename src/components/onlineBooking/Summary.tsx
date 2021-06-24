@@ -27,6 +27,8 @@ import { generateCommission } from '../bookingRequests/BookingRequestFreightDeta
 import { compact, flow, map, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
+import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { isVesselIntermediate } from '../bookingRequests/BookingRequestSummary';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -79,6 +81,42 @@ export const getBookingRequestId = async () => {
   return counter;
 };
 
+const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
+  if (!schedule) return undefined;
+  if (schedule.IntermediatePortInfos.length === 0) {
+    // pol - pod
+    return { portOfLoading: schedule.OriginInfo, portOfDischarge: schedule.DestinationInfo };
+  } else if (schedule.IntermediatePortInfos.length === 2) {
+    // plr - pol - pod - fdp
+    const intermediatePorts =
+      schedule.IntermediatePortInfos[0].ArrivalDate > schedule.IntermediatePortInfos[1].ArrivalDate
+        ? { portOfLoading: schedule.IntermediatePortInfos[1], portOfDischarge: schedule.IntermediatePortInfos[0] }
+        : { portOfLoading: schedule.IntermediatePortInfos[0], portOfDischarge: schedule.IntermediatePortInfos[1] };
+    return {
+      placeOfReceipt: schedule.OriginInfo,
+      ...intermediatePorts,
+      finalDestinationPort: schedule.DestinationInfo,
+    };
+  } else if (schedule.IntermediatePortInfos.length === 1) {
+    // plr - pol - pod or pol - pod - fdp
+    if (isVesselIntermediate(schedule.OriginInfo?.VoyageInfo?.VesselName)) {
+      return {
+        placeOfReceipt: schedule.OriginInfo,
+        portOfLoading: schedule.IntermediatePortInfos[0],
+        portOfDischarge: schedule.DestinationInfo,
+      };
+    } else if (isVesselIntermediate(schedule.DestinationInfo?.VoyageInfo?.VesselName)) {
+      return {
+        portOfLoading: schedule.OriginInfo,
+        portOfDischarge: schedule.IntermediatePortInfos[0],
+        finalDestinationPort: schedule.DestinationInfo,
+      };
+    }
+  } else {
+    // nothing
+  }
+};
+
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest, files }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -86,12 +124,10 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const [, dispatch] = useGlobalAppState();
 
   const activityLogUserData = useActivityLogUserData();
-
   const storageBasePath = useMemo(
     (): string => [`bookings-requests-documents-internal`, bookingRequest?.id].join('/'),
     [bookingRequest],
   );
-
   const { saveFiles } = useSaveFiles(storageBasePath);
 
   const handleCreateRequest = () => {
@@ -110,6 +146,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       archived: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
+      itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
       freightDetails: compact([
         ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
         commission,

@@ -19,7 +19,6 @@ export default function useCodebook({
   port?: string;
   equipment?: string;
 }) {
-  console.log(depotLocation, category, carrier, equipment, port);
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let q = collection;

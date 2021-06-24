@@ -35,7 +35,7 @@ const BookingRequestSpecialRemarks: React.FC = () => {
       setBookingRequest(set('specialRemarks', specialRemarks)(bookingRequest) as BookingRequest);
   };
 
-  return bookingRequest && setBookingRequest ? (
+  return bookingRequest ? (
     <React.Fragment>
       {editing && isDashboardUser(userRecord) ? (
         <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />

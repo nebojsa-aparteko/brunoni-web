@@ -39,7 +39,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
   const classes = useStyles();
   const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
-  return bookingRequestState && setBookingRequestState ? (
+  return bookingRequestState ? (
     <Page title={getBookingRequestTitle(bookingRequestState)}>
       <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
         <BookingRequestSummary editing={editing} />

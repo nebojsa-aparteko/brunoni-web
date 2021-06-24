@@ -66,6 +66,7 @@ import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
 import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
 import ChargeCodes from '../../contexts/ChargeCodes';
+import { validate } from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -162,6 +163,8 @@ interface AgentAssignmentDialogProps {
 
 const updateBookingRequest = (bookingRequest: BookingRequest) => {
   if (bookingRequest.id) {
+    console.log('Update Itinerary', bookingRequest.itinerary);
+
     return firebase
       .firestore()
       .collection('bookings-requests')
@@ -176,7 +179,7 @@ const updateBookingRequest = (bookingRequest: BookingRequest) => {
             )(value),
           ),
         )(bookingRequest),
-        { merge: true },
+        // { merge: true },
       );
   }
   return Promise.resolve();
@@ -338,9 +341,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
   const menuRef = useRef<DropdownMenuHandle>();
-  useEffect(() => {
-    console.log(bookingRequest);
-  }, [bookingRequest]);
+
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
   );
@@ -377,7 +378,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       : bookingRequestState;
     omitEmptyDeep(br);
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    if (bookingRequestState) {
+    console.log('Itinerary', br.itinerary);
+    if (br) {
       updateBookingRequest({ ...br!, agreementNo: agreementNumber })
         ?.then(() => {
           dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
@@ -398,7 +400,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           }
         });
     }
-  }, [bookingRequestState, dispatch, setEditing]);
+  }, [bookingRequestState, bookingRequest]);
 
   const onArchiveClick = useCallback(
     () =>
@@ -512,11 +514,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   ]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {/*<Button*/}
-      {/*  onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}*/}
-      {/*>*/}
-      {/*  Test*/}
-      {/*</Button>*/}
+      <Button
+        onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}
+      >
+        Test
+      </Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
