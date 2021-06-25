@@ -4,7 +4,7 @@ import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
 import React, { useContext, useMemo } from 'react';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
-import { isEmpty, isNil, omitBy } from 'lodash/fp';
+import { isNil, omitBy } from 'lodash/fp';
 import { Box, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField, Typography } from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
@@ -91,7 +91,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useFormContext();
 
   const handleContinue = (data: OnlineBookingInputs) => {
@@ -111,6 +111,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     );
     handleNext();
   };
+
+  console.log(errors);
 
   return (
     <Grid container direction="row" spacing={2}>
@@ -232,7 +234,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         </FormControl>
       </Grid>
       <Grid item>
-        <Button variant="contained" color="primary" onClick={handleSubmit(handleContinue)} disabled={!isEmpty(errors)}>
+        <Button variant="contained" color="primary" onClick={handleSubmit(handleContinue)} disabled={!isDirty}>
           Next
         </Button>
       </Grid>
