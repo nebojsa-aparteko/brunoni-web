@@ -640,6 +640,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
+      console.log(temp, result.source.index, destinationIndex, originIndex);
       return set(
         'freightDetails',
         temp.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),

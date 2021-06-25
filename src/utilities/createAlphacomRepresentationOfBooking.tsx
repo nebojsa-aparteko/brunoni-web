@@ -4,11 +4,11 @@ import firebase from '../firebase';
 import { BookingRequest, VGMSubmittedBy } from '../model/BookingRequest';
 import ChargeCode from '../model/ChargeCode';
 import Client from '../model/Client';
-import { getItineraryFromSchedule } from '../components/bookingRequests/BookingRequestSummary';
 import { flow, get, omit, set } from 'lodash/fp';
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import { getRepresentationFromClient } from '../components/bookingRequests/BookingRequestPortTerms';
 import { formatDateSafe } from './formattingHelpers';
+import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
 
 const getTariffs = (container: Container & ContainerDetails) => {
   const tariffs = [];
@@ -131,17 +131,19 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
     set('PODETS', itinerary?.portOfDischarge?.DepartureDate), //TODO check if ETA or ETS is needed
     set(
       'FinalDestinationISO',
-      itinerary?.placeOfDelivery ? itinerary?.placeOfDelivery?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
+      itinerary?.finalDestinationPort ? itinerary?.finalDestinationPort?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
     ),
     set(
       'FinalDestinationName',
-      itinerary?.placeOfDelivery
-        ? itinerary?.placeOfDelivery?.Port.HarbourName
+      itinerary?.finalDestinationPort
+        ? itinerary?.finalDestinationPort?.Port.HarbourName
         : itinerary?.portOfDischarge?.Port.HarbourName,
     ),
     set(
       'FinalDestinationETA',
-      itinerary?.placeOfDelivery ? itinerary?.placeOfDelivery?.ArrivalDate : itinerary?.portOfDischarge?.ArrivalDate,
+      itinerary?.finalDestinationPort
+        ? itinerary?.finalDestinationPort?.ArrivalDate
+        : itinerary?.portOfDischarge?.ArrivalDate,
     ),
     set(
       'Remarks',

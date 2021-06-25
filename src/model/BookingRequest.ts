@@ -1,6 +1,6 @@
 import Port from './Port';
 import Carrier from './Carrier';
-import { RouteSearchResult } from './route-search/RouteSearchResults';
+import { ItineraryItem, RouteSearchResult } from './route-search/RouteSearchResults';
 import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetailGroup } from './Booking';
 import SpecialRemark from './SpecialRemark';
@@ -45,6 +45,14 @@ export interface BookingRequest {
   archived?: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
+  itinerary: BookingRequestItinerary;
+}
+
+export interface BookingRequestItinerary {
+  portOfLoading: ItineraryItem;
+  portOfDischarge: ItineraryItem;
+  placeOfReceipt?: ItineraryItem;
+  finalDestinationPort?: ItineraryItem;
 }
 
 export enum BookingRequestStatus {

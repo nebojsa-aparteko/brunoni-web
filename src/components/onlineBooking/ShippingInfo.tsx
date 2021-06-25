@@ -4,7 +4,7 @@ import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
 import React, { useContext, useMemo } from 'react';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
-import { isNil, omitBy, isEmpty } from 'lodash/fp';
+import { isEmpty, isNil, omitBy } from 'lodash/fp';
 import { Box, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField, Typography } from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
@@ -58,6 +58,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
   const chargeCodes = useContext(ChargeCodes);
   const client = useClientById(quote?.clientId);
+
   const scheduleCarrier = useMemo(
     () =>
       carriers?.find(carrier => carrier.name.toLowerCase() === carrierName) ||

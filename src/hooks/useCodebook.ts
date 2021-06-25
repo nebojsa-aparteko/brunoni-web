@@ -19,12 +19,14 @@ export default function useCodebook({
   port?: string;
   equipment?: string;
 }) {
-  console.log(depotLocation, category, carrier, equipment, port);
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let q = collection;
       if (depotLocation && !isShipperOwnedContainer(equipment!)) {
         q = collection.where('depotLocations', 'array-contains', depotLocation ? depotLocation : '');
+      }
+      if (isShipperOwnedContainer(equipment!)) {
+        q = q.where('type', '!=', 'DEMURRAGE');
       }
       q = q.where('category', '==', category || '');
       q = q.where('carrierId', '==', carrier || '');
