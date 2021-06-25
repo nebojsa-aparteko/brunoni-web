@@ -63,8 +63,8 @@ import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
 import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
-import ChargeCodes from '../../contexts/ChargeCodes';
-import { validate } from '@material-ui/pickers';
+// import ChargeCodes from '../../contexts/ChargeCodes';
+// import { validate } from '@material-ui/pickers';
 // import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
 // import ChargeCodes from '../../contexts/ChargeCodes';
 import { ChangedField } from '../bookings/checklist/ActivityModel';
@@ -217,6 +217,18 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
   const [, dispatch] = useGlobalAppState();
 
+  console.log('prev selectedAgent');
+  console.log(bookingRequest.assignedUser);
+
+  console.log('curr selectedAgent');
+  console.log(selectedAgent);
+
+  console.log('prev selectedClient');
+  console.log(bookingRequest.createdBy);
+
+  console.log('curr selectedClient');
+  console.log(selectedClient);
+
   const getActivityLogUserData = useCallback(
     (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
       ({
@@ -231,7 +243,11 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
 
   const handleChangeClient = async () => {
     try {
-      if (bookingRequest.id && selectedClient) {
+      if (
+        bookingRequest.id &&
+        selectedClient &&
+        bookingRequest.createdBy?.emailAddress !== selectedClient.emailAddress
+      ) {
         await changeAssignedClient(bookingRequest.id, selectedClient);
         await addActivityItem(
           'bookings-requests',
@@ -252,7 +268,11 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const handleChangeAgent = async () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
-      if (bookingRequest.id && selectedAgent) {
+      if (
+        bookingRequest.id &&
+        selectedAgent &&
+        bookingRequest.assignedUser?.emailAddress !== selectedAgent.emailAddress
+      ) {
         await changeAssignedAgent(bookingRequest.id, selectedAgent);
         await addActivityItem(
           'bookings-requests',
