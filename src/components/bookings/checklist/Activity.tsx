@@ -12,6 +12,7 @@ import DateFormattedText from '../../DateFormattedText';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
 import { activityHasLink, getFullName, isPlatformActivity } from '../../../utilities/activityHelper';
 import { BookingRequestLabels } from '../../../model/BookingRequest';
+import isString from '../../../utilities/isString';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -95,118 +96,122 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
   };
 
   return (
-    <Typography>
-      {isPlatformActivity(activity.by) ? (
-        `Platform`
-      ) : (
-        <Link href={`mailto:${activity.by.emailAddress}`}>{getFullName(activity)}</Link>
-      )}
-      {mapChangeTypeToText()}
-      {activity.stage && ` '${activity.stage?.label}' stage `}
-      {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
-        activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&
-      activity.addedUsers
-        ? createUsersRepresentation(activity.addedUsers)
-        : null}
-      {activity.changeType === ActivityChangeType.SET_WATCHERS ? (
-        activity.addedUsers && activity.addedUsers.length > 0 ? (
-          <Fragment>
-            <Fragment>
-              {'added to watchers '}
-              {createUsersRepresentation(activity.addedUsers)}
-            </Fragment>
-
-            {activity.removedUsers && activity.removedUsers.length > 0 && (
-              <Fragment>
-                {' and removed '}
-                {createUsersRepresentation(activity.removedUsers)}
-              </Fragment>
-            )}
-          </Fragment>
+    <Fragment>
+      <Typography>
+        {isPlatformActivity(activity.by) ? (
+          `Platform`
         ) : (
-          activity.removedUsers &&
-          activity.removedUsers.length > 0 && (
+          <Link href={`mailto:${activity.by.emailAddress}`}>{getFullName(activity)}</Link>
+        )}
+        {mapChangeTypeToText()}
+        {activity.stage && ` '${activity.stage?.label}' stage `}
+        {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
+          activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&
+        activity.addedUsers
+          ? createUsersRepresentation(activity.addedUsers)
+          : null}
+        {activity.changeType === ActivityChangeType.SET_WATCHERS ? (
+          activity.addedUsers && activity.addedUsers.length > 0 ? (
             <Fragment>
-              {'removed from watchers '}
-              {createUsersRepresentation(activity.removedUsers)}
-            </Fragment>
-          )
-        )
-      ) : null}
-      {activity.documents &&
-        activity.documents.map((doc, index) => {
-          return activityHasLink(activity) ? (
-            <Fragment key={doc.url}>
-              <Link href={doc.url} target="_blank">
-                {doc.name}
-              </Link>
-              {makeStyledString(activity, index)}
+              <Fragment>
+                {'added to watchers '}
+                {createUsersRepresentation(activity.addedUsers)}
+              </Fragment>
+
+              {activity.removedUsers && activity.removedUsers.length > 0 && (
+                <Fragment>
+                  {' and removed '}
+                  {createUsersRepresentation(activity.removedUsers)}
+                </Fragment>
+              )}
             </Fragment>
           ) : (
-            `${doc.name} `
-          );
-        })}
+            activity.removedUsers &&
+            activity.removedUsers.length > 0 && (
+              <Fragment>
+                {'removed from watchers '}
+                {createUsersRepresentation(activity.removedUsers)}
+              </Fragment>
+            )
+          )
+        ) : null}
+        {activity.documents &&
+          activity.documents.map((doc, index) => {
+            return activityHasLink(activity) ? (
+              <Fragment key={doc.url}>
+                <Link href={doc.url} target="_blank">
+                  {doc.name}
+                </Link>
+                {makeStyledString(activity, index)}
+              </Fragment>
+            ) : (
+              `${doc.name} `
+            );
+          })}
+        {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
+          activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
+          ' for comparison'}
+        {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
+        activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
+        activity.changeType === ActivityChangeType.POSTPONE_PAYMENT ||
+        activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
+        activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
+        activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
+        activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ||
+        activity.changeType === ActivityChangeType.MARK_SOMETHING_WRONG ? (
+          <Fragment>
+            {activity.paymentReference}
+            {activity.changeType === ActivityChangeType.POSTPONE_PAYMENT &&
+            activity.paymentActivityData?.dateBeforeChange &&
+            activity.paymentActivityData.dateAfterChange
+              ? ` from ${formatDateSafe(
+                  activity.paymentActivityData.dateBeforeChange,
+                  'd. MMMM yyyy',
+                )} to ${formatDateSafe(activity.paymentActivityData.dateAfterChange, 'd. MMMM yyyy')}`
+              : null}
+            .
+          </Fragment>
+        ) : (
+          <Fragment>
+            {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
+            (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
+              ? activity.changeType === ActivityChangeType.ADD_FILE
+                ? ' into '
+                : ' from '
+              : null}
+
+            {activity.checklistItem ? (
+              <Fragment>
+                <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+              </Fragment>
+            ) : !activity.isAccountingActivity ? (
+              activity.isInternal ? (
+                'Internal storage.'
+              ) : null
+            ) : (
+              'Accounting.'
+            )}
+          </Fragment>
+        )}
+      </Typography>
       {activity.changedFields && (
-        <Box display={'flex'}>
+        <Fragment>
           {activity.changedFields.map((field, index) => {
             return (
-              <Fragment key={index}>
-                <Typography color={'primary'}>{BookingRequestLabels[field]}</Typography>
+              <Box display={'flex'} key={index}>
+                <Typography color={'primary'}>{BookingRequestLabels[field.fieldName]}</Typography>
+                <Typography style={{ paddingLeft: '.5em' }}>
+                  {isString(field.oldVal) && isString(field.newVal) ? `(${field.oldVal} -> ${field.newVal})` : ''}
+                </Typography>
                 {index !== activity.changedFields!.length - 1 && (
                   <Typography style={{ paddingRight: '.5em' }}>,</Typography>
                 )}
-              </Fragment>
+              </Box>
             );
           })}
-          .
-        </Box>
-      )}
-      {(activity.changeType === ActivityChangeType.SELECT_FOR_COMPARISON ||
-        activity.changeType === ActivityChangeType.UNSELECT_FOR_COMPARISON) &&
-        ' for comparison'}
-      {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
-      activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
-      activity.changeType === ActivityChangeType.POSTPONE_PAYMENT ||
-      activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
-      activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
-      activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
-      activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ||
-      activity.changeType === ActivityChangeType.MARK_SOMETHING_WRONG ? (
-        <Fragment>
-          {activity.paymentReference}
-          {activity.changeType === ActivityChangeType.POSTPONE_PAYMENT &&
-          activity.paymentActivityData?.dateBeforeChange &&
-          activity.paymentActivityData.dateAfterChange
-            ? ` from ${formatDateSafe(
-                activity.paymentActivityData.dateBeforeChange,
-                'd. MMMM yyyy',
-              )} to ${formatDateSafe(activity.paymentActivityData.dateAfterChange, 'd. MMMM yyyy')}`
-            : null}
-          .
-        </Fragment>
-      ) : (
-        <Fragment>
-          {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&
-          (activity.checklistItem || activity.isInternal || activity.isAccountingActivity)
-            ? activity.changeType === ActivityChangeType.ADD_FILE
-              ? ' into '
-              : ' from '
-            : null}
-
-          {activity.checklistItem ? (
-            <Fragment>
-              <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
-            </Fragment>
-          ) : !activity.isAccountingActivity ? (
-            activity.isInternal ? (
-              'Internal storage.'
-            ) : null
-          ) : (
-            'Accounting.'
-          )}
         </Fragment>
       )}
-    </Typography>
+    </Fragment>
   );
 };
 

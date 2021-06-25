@@ -2,7 +2,6 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
-  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -42,13 +41,12 @@ import UserRecord, {
   UserRecordMinProperties,
 } from '../../model/UserRecord';
 import firebase from '../../firebase';
-import pick from 'lodash/fp/pick';
 import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { isEqual, keys, map, omit, set, update, flow } from 'lodash/fp';
+import { isEqual, keys, map, omit, set, update, flow, pick } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -64,8 +62,9 @@ import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
-import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
-import ChargeCodes from '../../contexts/ChargeCodes';
+// import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
+// import ChargeCodes from '../../contexts/ChargeCodes';
+import { ChangedField } from '../bookings/checklist/ActivityModel';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -339,7 +338,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
   const menuRef = useRef<DropdownMenuHandle>();
   useEffect(() => {
-    console.log(bookingRequest);
+    //console.log(bookingRequest);
   }, [bookingRequest]);
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
@@ -486,13 +485,36 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   }, [printRequested]);
 
+  const createChangedFieldsObject = (changedKeys: string[], oldVal: any, newVal: any) => {
+    const changedFields: ChangedField[] = [];
+    changedKeys.forEach(key => {
+      changedFields.push({
+        fieldName: key,
+        oldVal: oldVal[key],
+        newVal: newVal[key],
+      } as ChangedField);
+    });
+    return changedFields;
+  };
+
   const handleFieldsEditActivity = async () => {
-    // without freight details for now
-    const differencesObject = difference(
-      omit('freightDetails')(bookingRequestState),
-      omit('freightDetails')(bookingRequest),
-    );
-    const changedKeys = keys(differencesObject);
+    //todo. without freight details for now?... Because it change at beggining
+    const newObject = difference(omit('freightDetails')(bookingRequestState), omit('freightDetails')(bookingRequest));
+
+    // console.log('new Object')
+    // console.log(newObject)
+
+    const changedKeys = keys(newObject);
+    // console.log('changedKeys')
+    // console.log(changedKeys)
+
+    const oldObject = pick(changedKeys, bookingRequest);
+    // console.log('old Object')
+    // console.log(oldObject)
+
+    const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
+    // console.log('changedFields')
+    // console.log(changedFields)
 
     if (changedKeys.length > 0) {
       await addActivityItem(
@@ -501,15 +523,15 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         createActivityObject({
           changeType: ActivityChangeType.EDITED,
           by: getActivityLogUserData,
-          changedFields: changedKeys,
+          changedFields,
         }),
       );
     }
   };
-  const chargeCodes = useContext(ChargeCodes);
-  const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
-    chargeCodes,
-  ]);
+  // const chargeCodes = useContext(ChargeCodes);
+  // const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
+  //   chargeCodes,
+  // ]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {/*<Button*/}
@@ -676,11 +698,11 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
     </Paper>
   );
 };
-const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
-  console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
-  // throw new Error('Function not implemented.');
-};
-
-function filteredChargeCodes(bookingRequest: BookingRequest, filteredChargeCodes: any) {
-  throw new Error('Function not implemented.');
-}
+// const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
+//   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
+//   // throw new Error('Function not implemented.');
+// };
+//
+// function filteredChargeCodes(bookingRequest: BookingRequest, filteredChargeCodes: any) {
+//   throw new Error('Function not implemented.');
+// }

@@ -6,8 +6,6 @@ import {
   Stage,
 } from './ChecklistItemModel';
 import { MentionItem } from 'react-mentions';
-import { useMemo } from 'react';
-import map from 'lodash/fp/map';
 import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
@@ -32,8 +30,14 @@ export interface ActivityLogItem {
   removedUsers?: ActivityLogUserData[];
   paymentActivityData?: PaymentActivityData;
   isPinned?: boolean;
-  changedFields?: string[];
+  changedFields?: ChangedField[];
   path?: string;
+}
+
+export interface ChangedField {
+  fieldName: string;
+  oldVal?: any;
+  newVal?: any;
 }
 
 export enum ActivityType {

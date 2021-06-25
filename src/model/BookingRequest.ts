@@ -69,6 +69,7 @@ export const BookingRequestLabels: Object = {
   statClient: 'Statistic Client',
   carrier: 'Carrier',
   vessel: 'Vessel',
+  voyage: 'VOY. ',
   schedule: 'Schedule',
   vgmSubmittedBy: 'VGM Submission By',
   assignedUser: 'Watcher (Assigned agent)',

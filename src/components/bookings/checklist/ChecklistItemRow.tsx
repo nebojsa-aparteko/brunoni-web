@@ -33,7 +33,7 @@ import { Booking, StoredDocument } from '../../../model/Booking';
 import firebase from '../../../firebase';
 import { useDropzone } from 'react-dropzone';
 import UserRecordContext from '../../../contexts/UserRecordContext';
-import { ActivityLogItem, ActivityType, PaymentActivityData } from './ActivityModel';
+import { ActivityLogItem, ActivityType, ChangedField, PaymentActivityData } from './ActivityModel';
 import ChecklistStagesView from './ChecklistStagesView';
 import { useActivityLogState } from './ActivityLogContext';
 import { addActivityItem } from './ActivityLogContainer';
@@ -204,7 +204,7 @@ export interface ActivityCreationProps {
   mentions?: MentionItem[];
   addedUsers?: ActivityLogUserData[];
   removedUsers?: ActivityLogUserData[];
-  changedFields?: string[];
+  changedFields?: ChangedField[];
 }
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
