@@ -17,6 +17,7 @@ import BookingRequestsView from '../components/bookingRequests/BookingRequestsVi
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import InputIcon from '@material-ui/icons/Input';
 import firebase from 'firebase';
+import { useBookingRequestsFilterContext } from '../providers/BookingRequestsFilterProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -76,7 +77,7 @@ const BookingsPageContainer: React.FC = () => {
   const actingAs = useContext(ActingAs)[0];
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
-  const [, , , setFilters] = useBookingRequestsContext();
+  const setFilters = useBookingRequestsFilterContext()[1];
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const [bookingRequestCount, setBookingRequestCount] = useState(0);
   const selectedTab = bookingPaginationContextData.activeTab;
@@ -143,10 +144,10 @@ const BookingsPageContainer: React.FC = () => {
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
           case 3:
-            setFilters(prevState => set('archived', false)(prevState));
+            setFilters && setFilters(prevState => set('archived', false)(prevState));
             return bookingsContextData;
           case 4:
-            setFilters(prevState => set('archived', true)(prevState));
+            setFilters && setFilters(prevState => set('archived', true)(prevState));
             return bookingsContextData;
           default:
             return bookingsContextData;

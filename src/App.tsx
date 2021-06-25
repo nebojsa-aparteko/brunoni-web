@@ -50,6 +50,7 @@ import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
 import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 import LandTransportPage from './pages/LandTransportPage';
+import BookingRequestsFilterProvider from './providers/BookingRequestsFilterProvider';
 
 const anonymousRoutes = (
   <Switch>
@@ -195,19 +196,21 @@ const App: React.FC = () => {
         <TaskFilterProvider>
           <BookingListPaginationProvider>
             <BookingListFilterProvider>
-              <Navbar />
-              <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
-                <CircularProgress color="inherit" />
-              </Backdrop>
-              <div className={classes.deviceControl}>
-                {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
-              </div>
-              <ScrollToTop className={classes.goTop} />
-              {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <BrunoniFooter />
-              ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <AllmarineFooter />
-              ) : null}
+              <BookingRequestsFilterProvider>
+                <Navbar />
+                <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
+                  <CircularProgress color="inherit" />
+                </Backdrop>
+                <div className={classes.deviceControl}>
+                  {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+                </div>
+                <ScrollToTop className={classes.goTop} />
+                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                  <BrunoniFooter />
+                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                  <AllmarineFooter />
+                ) : null}
+              </BookingRequestsFilterProvider>
             </BookingListFilterProvider>
           </BookingListPaginationProvider>
         </TaskFilterProvider>

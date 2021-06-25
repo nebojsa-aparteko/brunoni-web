@@ -36,6 +36,7 @@ import { BookingRequest } from '../../model/BookingRequest';
 import AddIcon from '@material-ui/icons/Add';
 import BookingUploadDialog from '../onlineBooking/BookingUploadDialog';
 import useModal from '../../hooks/useModal';
+import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -90,7 +91,9 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
-  const [bookingRequests, isLoading, filters, setFilters] = useBookingRequestsContext();
+
+  const [bookingRequests, isLoading] = useBookingRequestsContext();
+  const [filters, setFilters] = useBookingRequestsFilterContext();
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
