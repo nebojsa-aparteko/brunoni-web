@@ -81,7 +81,7 @@ export const getBookingRequestId = async () => {
   return counter;
 };
 
-const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
+export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
   if (!schedule) return undefined;
   if (schedule.IntermediatePortInfos.length === 0) {
     // pol - pod
@@ -106,6 +106,12 @@ const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
         portOfDischarge: schedule.DestinationInfo,
       };
     } else if (isVesselIntermediate(schedule.DestinationInfo?.VoyageInfo?.VesselName)) {
+      return {
+        portOfLoading: schedule.OriginInfo,
+        portOfDischarge: schedule.IntermediatePortInfos[0],
+        finalDestinationPort: schedule.DestinationInfo,
+      };
+    } else {
       return {
         portOfLoading: schedule.OriginInfo,
         portOfDischarge: schedule.IntermediatePortInfos[0],
@@ -152,6 +158,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
         commission,
       ]),
     } as BookingRequest;
+    console.log(getItineraryFromSchedule(bookingRequest?.schedule));
     omitEmptyDeep(writableRequest);
     setBookingRequest(
       update(

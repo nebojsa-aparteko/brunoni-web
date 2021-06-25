@@ -54,6 +54,7 @@ import useModal from '../../hooks/useModal';
 import { generateCommission } from './BookingRequestFreightDetails';
 import isString from '../../utilities/isString';
 import theme from '../../theme';
+import { getItineraryFromSchedule } from '../onlineBooking/Summary';
 
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
@@ -212,31 +213,6 @@ export const getPortOfLoadingFromIntermediatePorts = (
     : schedule?.IntermediatePortInfos.length === 1
     ? [schedule?.IntermediatePortInfos[0], 0]
     : [undefined, -1]; //This should never happen
-};
-
-const getPortOfDischargeFromIntermediatePorts = (schedule: RouteSearchResult | undefined) => {
-  return schedule?.IntermediatePortInfos.length === 2
-    ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
-      ? [schedule?.IntermediatePortInfos[0], 0]
-      : [schedule?.IntermediatePortInfos[1], 1]
-    : schedule?.IntermediatePortInfos.length === 1
-    ? [schedule?.IntermediatePortInfos[0], 0]
-    : [undefined, -1]; //This should never happen
-};
-
-export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
-  if (!schedule) return undefined;
-  const isPlaceOfReceiptDefined = hasPlaceOfReceipt(schedule);
-  const isPlaceOfDeliveryDefined = hasPlaceOfDelivery(schedule);
-  const [POL] = getPortOfLoadingFromIntermediatePorts(schedule) as [RouteSearchResultIntermediatePortInfo, number];
-  const [POD] = getPortOfDischargeFromIntermediatePorts(schedule) as [RouteSearchResultIntermediatePortInfo, number];
-
-  return {
-    placeOfReceipt: isPlaceOfReceiptDefined ? (schedule?.OriginInfo as ItineraryItem) : undefined,
-    portOfLoading: (isPlaceOfReceiptDefined ? POL : schedule?.OriginInfo) as ItineraryItem,
-    portOfDischarge: (isPlaceOfDeliveryDefined ? POD : schedule?.DestinationInfo) as ItineraryItem,
-    placeOfDelivery: isPlaceOfDeliveryDefined ? (schedule?.DestinationInfo as ItineraryItem) : undefined,
-  } as Itinerary;
 };
 
 type RelevantDate = keyof Pick<ItineraryItem, 'ArrivalDate' | 'DepartureDate'>;
