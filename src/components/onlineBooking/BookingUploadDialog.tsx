@@ -236,7 +236,15 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-export const getLatestQuote = async (originId: string, destinationId: string) => {
+export const getLatestQuote = async (originId: string, destinationId: string, agreementNo: string = '') => {
+  const quoteByAgreement = await firebase
+    .firestore()
+    .collection('quotes')
+    .doc(agreementNo)
+    .get();
+  if (quoteByAgreement.exists) {
+    return normalizeQuote(quoteByAgreement.data() as Quote);
+  }
   const quotesRef = await firebase
     .firestore()
     .collection('quotes')
@@ -245,7 +253,7 @@ export const getLatestQuote = async (originId: string, destinationId: string) =>
     .orderBy('dateIssued', 'desc')
     .limit(1)
     .get();
-  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])[0] || undefined;
+  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])?.[0] || undefined;
 };
 
 export const normalizeQuote = (data: any) => {
@@ -296,7 +304,7 @@ const mapIntoBookingRequestModel = async (
   } as RouteSearchParams;
 
   // Get the latest quote by origin and dest
-  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id));
+  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
   const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
 
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
