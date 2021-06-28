@@ -32,7 +32,7 @@ export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCod
         'Certificate',
       ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
   );
-  return sortBy(filteredQuoteDetails, (detail: QuoteDetail) => detail.Pos).map((quoteDetail, index) => {
+  return sortBy(filteredQuoteDetails, (detail: QuoteDetail) => +detail.Pos).map((quoteDetail, index) => {
     const chargeCode =
       (quoteDetail.ChargeID &&
         chargeCodes &&
