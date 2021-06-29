@@ -187,7 +187,9 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
                   <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
                 </TableCell>
                 <TableCell className={classes.tableCell}>
-                  {container.commodityType?.name || container.commodityType?.id}
+                  {container.commodityType?.name && container.commodityType?.name !== ''
+                    ? container.commodityType?.name
+                    : container.commodityType?.id}
                 </TableCell>
               </TableRow>
             )}
