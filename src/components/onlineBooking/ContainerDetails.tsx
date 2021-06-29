@@ -181,12 +181,14 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               </TableCell>
             </TableRow>
 
-            {container.commodityType && container.commodityType?.name && (
+            {container.commodityType && (container.commodityType?.name || container.commodityType?.id) && (
               <TableRow>
                 <TableCell className={classes.tableCell}>
                   <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
                 </TableCell>
-                <TableCell className={classes.tableCell}>{container.commodityType?.name}</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {container.commodityType?.name || container.commodityType?.id}
+                </TableCell>
               </TableRow>
             )}
 
