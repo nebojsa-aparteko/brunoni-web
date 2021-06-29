@@ -228,6 +228,12 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const userRecord = useContext(UserRecordContext);
   const containerTypes = useContext(ContainerTypes);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
+  const invisible = useMemo(
+    () =>
+      selectedTab === 0 &&
+      (freightDetail.Group === FreightDetailGroup.INTERNAL2 || freightDetail.Txt === 'Agency Commission'),
+    [freightDetail],
+  );
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<number | undefined>(freightDetail.UnitValue);
@@ -273,133 +279,147 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
       key={freightDetail.SeqNr}
       draggableId={freightDetail.SeqNr + ''}
       index={index}
-      isDragDisabled={!editing || selectedTab === 1}
+      isDragDisabled={!editing || selectedTab === 1 || invisible}
     >
-      {(draggableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-        <TableRow
-          ref={draggableProvided.innerRef}
-          {...draggableProvided.draggableProps}
-          {...draggableProvided.dragHandleProps}
-          className={snapshot.isDragging ? classes.draggingTableRow : classes.tableRow}
-        >
-          {editing && isDashboardUser(userRecord) && (
-            <TableCell padding="checkbox">
-              <Checkbox
-                checked={selected}
-                onClick={event => onSelectRow(event)}
-                onFocus={event => event.stopPropagation()}
-                color="primary"
-              />
-            </TableCell>
-          )}
-          <TableCell component="th" scope="row">
-            {editing && isDashboardUser(userRecord) ? (
-              selectedTab !== 2 ? (
-                <ChargeCodeInput
-                  chargeCodeText={freightDetail.Txt}
-                  group={freightDetail.Group}
-                  handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
-                  margin="dense"
+      {(draggableProvided: DraggableProvided, snapshot: DraggableStateSnapshot) =>
+        invisible ? (
+          <tr
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+          />
+        ) : (
+          <TableRow
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+            className={snapshot.isDragging ? classes.draggingTableRow : classes.tableRow}
+          >
+            {editing && isDashboardUser(userRecord) && (
+              <TableCell padding="checkbox">
+                <Checkbox
+                  checked={selected}
+                  onClick={event => onSelectRow(event)}
+                  onFocus={event => event.stopPropagation()}
+                  color="primary"
                 />
+              </TableCell>
+            )}
+            <TableCell component="th" scope="row">
+              {editing && isDashboardUser(userRecord) ? (
+                selectedTab !== 2 ? (
+                  <ChargeCodeInput
+                    chargeCodeText={freightDetail.Txt}
+                    group={freightDetail.Group}
+                    handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
+                    margin="dense"
+                  />
+                ) : (
+                  <TextField
+                    label=""
+                    margin="dense"
+                    variant="outlined"
+                    fullWidth
+                    value={chargeCodeText || ''}
+                    onChange={event => setChargeCodeText(event.target.value)}
+                    onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
+                  />
+                )
               ) : (
+                freightDetail.Txt
+              )}
+            </TableCell>
+            <TableCell align="right">
+              {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
                 <TextField
                   label=""
                   margin="dense"
                   variant="outlined"
                   fullWidth
-                  value={chargeCodeText || ''}
-                  onChange={event => setChargeCodeText(event.target.value)}
-                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
+                  // disabled={isQAutomatic}
+                  type="number"
+                  value={
+                    costUnit && bookingRequest && bookingRequest.containers && isQAutomatic
+                      ? freightDetail.Anz
+                      : quantity
+                  }
+                  onChange={event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0)}
+                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
                 />
-              )
-            ) : (
-              freightDetail.Txt
-            )}
-          </TableCell>
-          <TableCell align="right">
-            {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
-              <TextField
-                label=""
-                margin="dense"
-                variant="outlined"
-                fullWidth
-                // disabled={isQAutomatic}
-                type="number"
-                value={
-                  costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
-                }
-                onChange={event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0)}
-                onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
-              />
-            ) : freightDetail.Anz ? (
-              formatCurrencyAmount(freightDetail.Anz)
-            ) : (
-              '0,00'
-            )}
-          </TableCell>
-          <TableCell align="right">
-            {editing && isDashboardUser(userRecord) ? (
-              <TextField
-                label=""
-                margin="dense"
-                variant="outlined"
-                fullWidth
-                value={currency || ''}
-                onChange={event => setCurrency(event.target.value)}
-                onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
-              />
-            ) : (
-              freightDetail.Currency
-            )}
-          </TableCell>
-          {freightDetail.Txt === 'Seafreight'}
-          <TableCell align="right">
-            {editing && isDashboardUser(userRecord) ? (
-              <TextField
-                label=""
-                margin="dense"
-                variant="outlined"
-                type="number"
-                value={unitValue || ''}
-                onChange={event =>
-                  setUnitValue(
-                    event.target.value && event.target.value !== '' ? parseFloat(event.target.value) : undefined,
-                  )
-                }
-                onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
-              />
-            ) : (
-              freightDetail.UnitValue && formatCurrencyAmount(freightDetail.UnitValue)
-            )}
-          </TableCell>
-          <TableCell>
-            {editing && isDashboardUser(userRecord) ? (
-              <TextField
-                label=""
-                margin="dense"
-                variant="outlined"
-                fullWidth
-                value={costUnit || ''}
-                onChange={event => setCostUnit(event.target.value)}
-                onBlur={event => handleChangeFreightDetails(event.target.value, 'Unit')}
-              />
-            ) : (
-              freightDetail.Unit
-            )}
-          </TableCell>
-          <TableCell>{freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}</TableCell>
-          {editing && isAdmin && selectedTab === 0 && (
-            <TableCell>
-              <IconButton
-                aria-label="Copy to internal1"
-                onClick={() => handleChangeFreightDetails(freightDetail.Internal1 ? undefined : true, 'Internal1')}
-              >
-                {freightDetail.Internal1 ? <DoneAllIcon style={{ color: '#F7BC06' }} /> : <ControlPointDuplicateIcon />}
-              </IconButton>
+              ) : freightDetail.Anz ? (
+                formatCurrencyAmount(freightDetail.Anz)
+              ) : (
+                '0,00'
+              )}
             </TableCell>
-          )}
-        </TableRow>
-      )}
+            <TableCell align="right">
+              {editing && isDashboardUser(userRecord) ? (
+                <TextField
+                  label=""
+                  margin="dense"
+                  variant="outlined"
+                  fullWidth
+                  value={currency || ''}
+                  onChange={event => setCurrency(event.target.value)}
+                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
+                />
+              ) : (
+                freightDetail.Currency
+              )}
+            </TableCell>
+            {freightDetail.Txt === 'Seafreight'}
+            <TableCell align="right">
+              {editing && isDashboardUser(userRecord) ? (
+                <TextField
+                  label=""
+                  margin="dense"
+                  variant="outlined"
+                  type="number"
+                  value={unitValue || ''}
+                  onChange={event =>
+                    setUnitValue(
+                      event.target.value && event.target.value !== '' ? parseFloat(event.target.value) : undefined,
+                    )
+                  }
+                  onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
+                />
+              ) : (
+                freightDetail.UnitValue && formatCurrencyAmount(freightDetail.UnitValue)
+              )}
+            </TableCell>
+            <TableCell>
+              {editing && isDashboardUser(userRecord) ? (
+                <TextField
+                  label=""
+                  margin="dense"
+                  variant="outlined"
+                  fullWidth
+                  value={costUnit || ''}
+                  onChange={event => setCostUnit(event.target.value)}
+                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Unit')}
+                />
+              ) : (
+                freightDetail.Unit
+              )}
+            </TableCell>
+            <TableCell>{freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}</TableCell>
+            {editing && isAdmin && selectedTab === 0 && (
+              <TableCell>
+                <IconButton
+                  aria-label="Copy to internal1"
+                  onClick={() => handleChangeFreightDetails(freightDetail.Internal1 ? undefined : true, 'Internal1')}
+                >
+                  {freightDetail.Internal1 ? (
+                    <DoneAllIcon style={{ color: '#F7BC06' }} />
+                  ) : (
+                    <ControlPointDuplicateIcon />
+                  )}
+                </IconButton>
+              </TableCell>
+            )}
+          </TableRow>
+        )
+      }
     </Draggable>
   );
 };
@@ -548,7 +568,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
         freightDetails &&
           setFilteredFreightDetails(
             freightDetails
-              .filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2 && detail.Txt !== 'Agency Commission')
+              // .filter(detail => detail.Group !== FreightDetailGroup.INTERNAL2 && detail.Txt !== 'Agency Commission')
               .sort(sortBySeqNr),
           );
         break;
