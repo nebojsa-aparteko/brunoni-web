@@ -48,7 +48,7 @@ const BookingRequestSpecialRemarks: React.FC = () => {
           <Grid item xs={2} style={{ paddingRight: 5 }}>
             <Typography className={classes.specialRemarkLabel}>Special Remarks</Typography>
           </Grid>
-          <Grid item container xs={10}>
+          <Grid item container xs={10} spacing={2}>
             {specialRemarksState?.map(remark => (
               <Grid key={remark.id + '_' + remark.text} item xs={12}>
                 <Typography className={classes.specialRemark}>{remark.text}</Typography>
