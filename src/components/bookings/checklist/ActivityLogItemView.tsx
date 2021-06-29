@@ -31,18 +31,19 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const setIsPinned = (
   activityItemId: string,
-  bookingId: string,
+  collection: string,
+  documentId: string,
   isPinned: boolean,
   numberOfPinnedComments: number,
 ) =>
   firebase
     .firestore()
-    .collection('bookings')
-    .doc(bookingId)
+    .collection(collection)
+    .doc(documentId)
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(bookingId, numberOfPinnedComments + (isPinned ? 1 : -1)))
+    .then(() => updateTasksWithPinnedCommentsFlag(documentId, numberOfPinnedComments + (isPinned ? 1 : -1)))
     .catch(err => console.error(err));
 
 const updateTasksWithPinnedCommentsFlag = async (bookingId: string, numberOfPinnedComments: number) =>
@@ -73,7 +74,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
       event.stopPropagation();
 
       if (booking?.id && activityItem.id) {
-        setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
+        setIsPinned(activityItem.id, 'bookings', booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
           .then(() =>
             dispatch({
               type: SHOW_SUCCESS_SNACKBAR,

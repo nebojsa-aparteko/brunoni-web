@@ -41,7 +41,7 @@ import { ActivityChangeType, ActivityLogUserData } from './checklist/ChecklistIt
 import { addActivityItem } from './checklist/ActivityLogContainer';
 import { createActivityObject } from './checklist/ChecklistItemRow';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import BookingPinnedActivities from './BookingPinnedActivities';
+import PinnedActivities from './PinnedActivities';
 import { ActivityLogItem } from './checklist/ActivityModel';
 import map from 'lodash/fp/map';
 import { flow } from 'lodash/fp';
@@ -288,7 +288,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       {isAdmin && normalizedPinnedActivities && normalizedPinnedActivities.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
-            <BookingPinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />
+            <PinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />
           </Box>
         </Grid>
       )}

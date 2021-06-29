@@ -46,7 +46,7 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { isEqual, keys, map, omit, set, update, flow, pick } from 'lodash/fp';
+import { flow, isEqual, keys, map, omit, pick, set, update } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -68,6 +68,8 @@ import createAlphacomRepresentationOfBooking from '../../utilities/createAlphaco
 // import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
 // import ChargeCodes from '../../contexts/ChargeCodes';
 import { ChangedField } from '../bookings/checklist/ActivityModel';
+import useActivities from '../../hooks/useActivities';
+import PinnedActivities from '../bookings/PinnedActivities';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -351,6 +353,7 @@ type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
 
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [, userRecord, actingAs] = useUser();
+  const isAdmin = userRecord.isAdmin;
   const classes = useStyles();
   const { isOpen, openModal, closeModal } = useModal();
   const {
@@ -368,10 +371,19 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
-  // const activities = useActivities(
-  //   useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]),
-  //   collection => collection.where('isPinned', '==', true),
-  // );
+  const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]);
+
+  const activities = useActivities(
+    bookingRequestPath,
+    useCallback(
+      query => {
+        const queryByAdminRole = isAdmin ? query : query.where('isInternal', '==', isAdmin);
+        return queryByAdminRole.where('isPinned', '==', true).orderBy('at', 'desc');
+      },
+      [isAdmin],
+    ),
+  );
+
   const canEdit = useMemo(
     () =>
       !(
@@ -566,13 +578,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
-          {/*{activities && activities?.length > 0 && (*/}
-          {/*  <Box my={2}>*/}
-          {/*    <Box displayPrint="none">*/}
-          {/*      <BookingPinnedActivities pinnedActivities={activities} />*/}
-          {/*    </Box>*/}
-          {/*  </Box>*/}
-          {/*)}*/}
+          {activities && activities?.length > 0 && (
+            <Box my={2}>
+              <Box displayPrint="none">
+                <PinnedActivities
+                  pinnedActivities={activities}
+                  collection={'bookings-requests'}
+                  docId={bookingRequest.id}
+                />
+              </Box>
+            </Box>
+          )}
           {bookingRequest.additionalInfo && <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />}
           {isOpenAssignmentModal && (
             <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
