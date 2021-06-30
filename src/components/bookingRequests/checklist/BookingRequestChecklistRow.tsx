@@ -128,7 +128,12 @@ const checklistDocumentsRef = (path: string) =>
     .doc(path)
     .collection('documents');
 
-const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: BookingRequestChecklistRowProp) => {
+const BookingRequestChecklistRow = ({
+  bookingRequest,
+  checklistItem,
+  isAdmin,
+  isCommentIconHidden,
+}: BookingRequestChecklistRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -374,9 +379,11 @@ const BookingRequestChecklistRow = ({ bookingRequest, checklistItem, isAdmin }: 
             <Typography display="inline">{checklistItem.label}</Typography>
           </Box>
           <Box flex="1" />
-          <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-            <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-          </IconButton>
+          {!isCommentIconHidden && (
+            <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
+              <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+            </IconButton>
+          )}
         </Box>
         <BookingRequestDocumentList
           collectionPath={`bookings-requests/${bookingRequest.id}/checklist/${checklistItem.id}/documents`}
@@ -396,6 +403,7 @@ interface BookingRequestChecklistRowProp {
   isAdmin: boolean | undefined;
   bookingRequest: BookingRequest;
   comparableDocuments: ChecklistItemValueDocument[];
+  isCommentIconHidden?: boolean;
 }
 
 interface ConfirmedByCustomer {

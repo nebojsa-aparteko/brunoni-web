@@ -36,6 +36,7 @@ export interface BookingRequest {
   imo?: boolean;
   soc?: boolean;
   createdAt: Date;
+  updatedAt: Date;
   createdBy?: UserRecord;
   status: BookingRequestStatus;
   schedule?: RouteSearchResult;
@@ -46,6 +47,8 @@ export interface BookingRequest {
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
   itinerary: BookingRequestItinerary;
+  checklistCheckedCount: number;
+  checklistItemCount: number;
 }
 
 export interface BookingRequestItinerary {

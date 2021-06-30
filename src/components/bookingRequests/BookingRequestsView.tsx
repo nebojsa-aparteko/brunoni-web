@@ -101,7 +101,6 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const [filteredResults, setFilteredResults] = useState<BookingRequest[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    // todo maybe add filtering later?
     setFilteredResults(bookingRequests);
 
     return chunk(rowsPerPage)(bookingRequests);
@@ -213,6 +212,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
                     bookingRequests={resultChunks && (get(page)(resultChunks) || [])}
+                    isAdmin={isAdmin}
                     selectedRequests={selectedRequests}
                     onSelectRequest={onSelectRequest}
                   />

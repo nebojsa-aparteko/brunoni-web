@@ -8,9 +8,10 @@ import useBookingRequestChecklist from '../../../hooks/useBookingRequestChecklis
 
 interface CheckListContentProps {
   bookingRequest: BookingRequest;
+  isCommentIconHidden?: boolean;
 }
 
-const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ bookingRequest }) => {
+const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ bookingRequest, isCommentIconHidden }) => {
   const checklistItems = useBookingRequestChecklist(bookingRequest.id || '-');
   const actingAs = useContext(ActingAs)[0];
 
@@ -33,6 +34,7 @@ const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ booki
               isAdmin={!actingAs}
               checklistItem={item}
               comparableDocuments={[]}
+              isCommentIconHidden={isCommentIconHidden}
             />
           )
         ) : (
@@ -42,6 +44,7 @@ const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ booki
             isAdmin={!actingAs}
             checklistItem={item}
             comparableDocuments={[]}
+            isCommentIconHidden={isCommentIconHidden}
           />
         ),
       )}
