@@ -98,10 +98,15 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
                 <Typography>{`OW: ${parseFloat(oogItem.diffWeight).toFixed(2)} KGS`}</Typography>
               )}
               {(oogItem.width || oogItem.height || oogItem.length || oogItem.weight) && (
-                <Typography variant="body2">
-                  {`Max: ${oogItem.length}${oogItem.length && oogItem.width ? 'x' : ''}${oogItem.width}${
-                    (oogItem.length || oogItem.width) && oogItem.height ? 'x' : ''
-                  }${oogItem.height} cm${oogItem.weight && ' - ' + oogItem.weight + ' Kgs'}`}
+                <Typography variant="body2" style={{ whiteSpace: 'pre-wrap' }}>
+                  {oogItem.width && oogItem.height && oogItem.length && oogItem.weight
+                    ? `Max: ${oogItem.length}${oogItem.length && oogItem.width ? 'x' : ''}${oogItem.width}${
+                        (oogItem.length || oogItem.width) && oogItem.height ? 'x' : ''
+                      }${oogItem.height} cm${oogItem.weight && ' - ' + oogItem.weight + ' Kgs'}`
+                    : `${oogItem.width && 'Max Width: ' + oogItem.width + 'cm\n'}${oogItem.height &&
+                        'Max Height: ' + oogItem.height + 'cm\n'}${oogItem.length &&
+                        'Max Length: ' + oogItem.length + 'cm\n'}${oogItem.weight &&
+                        'Max Weight: ' + oogItem.weight + 'Kgs\n'}`}
                 </Typography>
               )}
             </Box>
