@@ -12,7 +12,7 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
   return (
     <Grid container spacing={2}>
       {containers.map(container => (
-        <Grid item md={4} key={container}>
+        <Grid item md={6} key={container}>
           <Box display="flex" alignItems="center" mb={2}>
             <Box mr={2}>
               <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
@@ -86,8 +86,11 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                     container.oog?.[0] &&
                     container.oog?.[1]?.map(
                       (oogItem: OOG) =>
-                        `(${'Length: ' + oogItem.length} - ${'Width: ' + oogItem.width} - ${'Height: ' +
-                          oogItem.height} - ${'Weight: ' + oogItem.weight})`,
+                        `(${'Length: ' + (oogItem.length || '0') + 'cm'} - ${'Width: ' +
+                          (oogItem.width || '0') +
+                          'cm'} - ${'Height: ' + (oogItem.height || '0') + 'cm'} - ${'Weight: ' +
+                          (oogItem.weight || '0') +
+                          'Kgs'})`,
                     )}
                 </>
               }
