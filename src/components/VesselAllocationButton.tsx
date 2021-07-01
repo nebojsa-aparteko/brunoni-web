@@ -77,18 +77,22 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                     <TableCell component="th" scope="row">
                       Allocation
                     </TableCell>
-                    <TableCell align="right">{vessel.teuAllocation}</TableCell>
-                    <TableCell align="right">{vessel.weightAllocation}</TableCell>
+                    <TableCell align="right">{vessel.teuAllocation || 'On Request'}</TableCell>
+                    <TableCell align="right">{vessel.weightAllocation || 'On Request'}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
                       Confirmed Bookings
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.teuBooked} <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} />
+                      {vessel.teuBooked || 0}{' '}
+                      {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked} <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
+                      {vessel.weightBooked || 0}{' '}
+                      {vessel.weightPercent ? (
+                        <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
+                      ) : null}
                     </TableCell>
                   </TableRow>
                   {vessel.requested && (
@@ -113,15 +117,15 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                     <TableCell component="th" scope="row">
                       Total
                     </TableCell>
-                    <TableCell align="right">{allocation.total.teu}</TableCell>
-                    <TableCell align="right">{allocation.total.ton}</TableCell>
+                    <TableCell align="right">{allocation.total.teu || 0}</TableCell>
+                    <TableCell align="right">{allocation.total.ton || 0}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
                       Left to Book
                     </TableCell>
-                    <TableCell align="right">{allocation.difference.teu}</TableCell>
-                    <TableCell align="right">{allocation.difference.ton}</TableCell>
+                    <TableCell align="right">{allocation.difference.teu || 'On Request'}</TableCell>
+                    <TableCell align="right">{allocation.difference.ton || 'On Request'}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
