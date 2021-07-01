@@ -9,6 +9,7 @@ import ContainerDetails from './ContainerDetails';
 import Client from './Client';
 import { Currency } from './Payment';
 import { Object } from '../components/onlineBooking/MissingFields';
+import { QuoteDetail } from '../providers/QuoteGroupsProvider';
 
 export enum VGMSubmittedBy {
   CLIENT = 'CLIENT',
@@ -28,6 +29,7 @@ export interface BookingRequest {
   carrier?: Carrier;
   quoteNumber?: number;
   freightDetails?: FreightDetail[];
+  quoteDetails?: QuoteDetail[];
   customerReference?: string;
   agreementNo?: string;
   containers?: (Container & ContainerDetails)[];
@@ -46,7 +48,7 @@ export interface BookingRequest {
   archived?: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
-  itinerary: BookingRequestItinerary;
+  itinerary?: BookingRequestItinerary;
   checklistCheckedCount: number;
   checklistItemCount: number;
   pinnedCommentsCount?: number;
@@ -76,6 +78,7 @@ export enum ISOCodesEdiAlphacom {
 export const BookingRequestLabels: Object = {
   blNumber: 'B/L-NO',
   intBlNumber: 'INTBL',
+  intraRefNumber: 'INTTRA Ref.',
   customerReference: 'Customer ref.',
   client: 'Client',
   statClient: 'Statistic Client',

@@ -22,7 +22,7 @@ import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
 import Container, { Ventilation } from '../../model/Container';
-import { createRequest } from './Summary';
+import { createRequest, getItineraryFromSchedule } from './Summary';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
@@ -437,7 +437,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest(bookingRequest)
+        createRequest({ ...bookingRequest, itinerary: getItineraryFromSchedule(bookingRequest?.schedule) })
           .then(async docReference => {
             // Save HTML file to storage
             try {

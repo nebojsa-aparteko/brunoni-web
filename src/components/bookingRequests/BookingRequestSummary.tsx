@@ -639,6 +639,22 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   />
                 }
               />
+              {bookingRequest.intraRefNumber && (
+                <TableRowData
+                  label={BookingRequestLabels.intraRefNumber}
+                  content={
+                    <EditingInput
+                      canEdit={isDashboardUser(userRecord)}
+                      editing={editing}
+                      value={bookingRequest.intraRefNumber}
+                      inputProps={{
+                        onChange: event => handleChangeBRField('intraRefNumber', event.target.value),
+                        className: classes.blNumberInput,
+                      }}
+                    />
+                  }
+                />
+              )}
               {bookingRequest?.carrier?.id === CarrierId.HSG && (
                 <TableRowData
                   label={BookingRequestLabels.intBlNumber}

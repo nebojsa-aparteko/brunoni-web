@@ -24,11 +24,15 @@ import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
-import { compact, flow, map, update } from 'lodash/fp';
+import { compact, flow, get, isNil, map, omitBy, set, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { isVesselIntermediate } from '../bookingRequests/BookingRequestSummary';
+import { QuoteDetail } from '../../providers/QuoteGroupsProvider';
+import { FreightDetailGroup } from '../../model/Booking';
+import ContainerDetails from '../../model/ContainerDetails';
+import Ctg from '../../model/Container';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -122,7 +126,82 @@ export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
     // nothing
   }
 };
+const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 
+const isRelevantFreight = (
+  freightDetail: QuoteDetail,
+  containers: { TEU: number; Total: number; [key: string]: number },
+) => {
+  if (!freightDetail.CostUnit?.includes("'")) return true;
+  return Object.entries(containers).some(
+    ([key, value]) => value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.CostUnit?.toUpperCase() || ''),
+  );
+};
+
+const getRelevantFreightDetailsFromQuote = (quoteDetails: QuoteDetail[]) =>
+  quoteDetails.filter(
+    detail =>
+      ![
+        'VGM manual submission',
+        'Umbuchungsgebühr',
+        'Stornierungsgebühr',
+        'Zertifikat',
+        'Rebooking Fee',
+        'Cancellation Fee',
+        'House-Bill of Lading',
+        'Certificate',
+      ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
+  );
+
+const transformFreightDetails = (
+  containers: { TEU: number; Total: number; [key: string]: number },
+  freightDetails: QuoteDetail[],
+): FreightDetail[] =>
+  freightDetails?.map((quoteDetail, index) =>
+    omitBy(isNil)({
+      Anz: getQuantity(containers, quoteDetail.CostUnit),
+      SeqNr: index + 1,
+      Txt: quoteDetail.Description,
+      Currency: quoteDetail.Currency,
+      UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
+      Unit: quoteDetail.CostUnit,
+      Group: FreightDetailGroup.EXTERNAL,
+      Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
+      // Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
+    }),
+  ) as FreightDetail[];
+
+const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
+  switch (costUnit) {
+    case 'PRO TEU':
+    case 'PER TEU':
+      return containers.TEU;
+    case 'PER CONTAINER':
+    case 'PRO CONTAINER':
+      return containers.Total;
+    default:
+      console.log(containers[costUnit?.split(' ')?.pop() || '']);
+      return containers[costUnit?.split(' ')?.pop() || ''] || 1;
+  }
+};
+
+const updateFreightDetails = (
+  containers: { TEU: number; Total: number; [key: string]: number },
+  freightDetails: QuoteDetail[],
+) => {
+  // get relevant
+  // recalculate
+  // sort
+  // reduce it by unnecessary freights and sort
+  console.log(containers);
+  return freightDetails.reduce((previousValue, currentValue) => {
+    if (isRelevantFreight(currentValue, containers)) {
+      return previousValue.concat(currentValue);
+    } else {
+      return previousValue;
+    }
+  }, [] as QuoteDetail[]);
+};
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest, files }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -138,10 +217,17 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
 
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
+    const containers = calculateContainers(bookingRequest?.containers);
+
+    const freights = flow(
+      getRelevantFreightDetailsFromQuote,
+      updateFreightDetails.bind(this, containers),
+      transformFreightDetails.bind(this, containers),
+    )(bookingRequest?.quoteDetails || []);
     const commission = generateCommission(
       bookingRequest?.schedule,
-      bookingRequest?.freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
-      bookingRequest?.freightDetails,
+      freights?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
+      freights,
     );
     const writableRequest = {
       ...bookingRequest,
@@ -153,10 +239,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
-      freightDetails: compact([
-        ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
-        commission,
-      ]),
+      freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
     } as BookingRequest;
     console.log(getItineraryFromSchedule(bookingRequest?.schedule));
     omitEmptyDeep(writableRequest);
@@ -273,6 +356,22 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       )}
       <div className={classes.actions}>
         <Button onClick={handlePrevious}>Previous</Button>
+        <Button
+          onClick={() => {
+            const containers = calculateContainers(bookingRequest?.containers);
+            console.log(
+              'Freights',
+              containers,
+              flow(
+                getRelevantFreightDetailsFromQuote,
+                updateFreightDetails.bind(this, containers),
+                transformFreightDetails.bind(this, containers),
+              )(bookingRequest?.quoteDetails || []),
+            );
+          }}
+        >
+          Previous
+        </Button>
         <Button variant="contained" color="primary" onClick={handleCreateRequest}>
           Submit
         </Button>
@@ -280,6 +379,29 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     </Container>
   );
 };
+
+const calculateContainers = (containers?: (Ctg & ContainerDetails)[]) =>
+  containers?.reduce(
+    (previousValue, currentValue) => {
+      const lastValue = get(currentValue.containerType?.name || '')(previousValue) || 0;
+      const lastTEU = get('TEU')(previousValue) || 0;
+      const lastTotal = get('Total')(previousValue) || 0;
+      if (currentValue.containerType?.name)
+        return flow(
+          set(currentValue.containerType.name, lastValue + +currentValue.quantity),
+          set(
+            'TEU',
+            lastTEU +
+              (currentValue.containerType?.id
+                ? (currentValue.containerType.id.startsWith('2') ? 1 : 2) * currentValue.quantity
+                : 0),
+          ),
+          set('Total', lastTotal + +currentValue.quantity),
+        )(previousValue);
+      return previousValue;
+    },
+    { TEU: 0, Total: 0 },
+  ) || { TEU: 0, Total: 0 };
 
 interface Props {
   handlePrevious: () => void;

@@ -173,13 +173,16 @@ const updateBookingRequest = (bookingRequest: BookingRequest) => {
       .collection('bookings-requests')
       .doc(bookingRequest.id)
       .set(
-        update(
-          'containers',
-          map((value: any) =>
-            flow(
-              update('imo', val => (val?.[0] ? val[1] : null)),
-              update('oog', val => (val?.[0] ? val[1] : null)),
-            )(value),
+        flow(
+          set('updatedAt', new Date()),
+          update(
+            'containers',
+            map((value: any) =>
+              flow(
+                update('imo', val => (val?.[0] ? val[1] : null)),
+                update('oog', val => (val?.[0] ? val[1] : null)),
+              )(value),
+            ),
           ),
         )(bookingRequest),
         // { merge: true },
@@ -411,7 +414,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       : bookingRequestState;
     omitEmptyDeep(br);
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    //console.log('Itinerary', br.itinerary);
     if (br) {
       updateBookingRequest({ ...br!, agreementNo: agreementNumber })
         ?.then(() => {
@@ -433,7 +435,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           }
         });
     }
-  }, [bookingRequestState, bookingRequest]);
+  }, [bookingRequestState, bookingRequest?.schedule, agreementNumber]);
 
   const onArchiveClick = useCallback(
     () =>

@@ -101,7 +101,11 @@ const OnlineBookingContainer = () => {
   useEffect(() => {
     const updatedFreightDetails =
       bookingRequest &&
-      getUpdatedFreightDetails(bookingRequest, getNumberOfContainersAndTEUs(bookingRequest), containerTypeNames);
+      getUpdatedFreightDetails(
+        bookingRequest,
+        getNumberOfContainersAndTEUs(bookingRequest?.containers),
+        containerTypeNames,
+      );
     bookingRequest &&
       updatedFreightDetails &&
       setBookingRequest(set('freightDetails', updatedFreightDetails)(bookingRequest));

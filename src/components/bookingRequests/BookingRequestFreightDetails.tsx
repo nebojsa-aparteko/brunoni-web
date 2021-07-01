@@ -185,11 +185,9 @@ export const getQuantity = (
   const [noOfContainers, noOfTEUs] = numberOfContainersAndTEUs;
   switch (searchableCostUnit) {
     case 'PRO TEU':
-      return noOfTEUs || 0;
     case 'PER TEU':
       return noOfTEUs || 0;
     case 'PRO CONTAINER':
-      return noOfContainers || 0;
     case 'PER CONTAINER':
       return noOfContainers || 0;
     default:
@@ -206,7 +204,8 @@ export const getQuantity = (
       return undefined;
   }
 };
-const automaticCostUnits = ['per Container', 'pro Container', 'pro TEU', 'per TEU'];
+
+const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
   automaticCostUnits.some(unit => unit.toUpperCase() === costUnit.toUpperCase()) ||
   containerTypeNames?.some(
@@ -442,10 +441,10 @@ const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
   return 0;
 };
 
-export const getNumberOfContainersAndTEUs = (bookingRequest: BookingRequest) => {
+export const getNumberOfContainersAndTEUs = (containersList?: (Container & ContainerDetails)[]) => {
   let containers = 0;
   let TEUs = 0;
-  bookingRequest.containers?.forEach(container => {
+  containersList?.forEach(container => {
     containers = containers + (container.quantity || 0);
     TEUs =
       TEUs +
@@ -507,7 +506,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const [numberOfContainersAndTEUs, setNumberOfContainersAndTEUs] = useState(
-    bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest) : [0, 0],
+    bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest?.containers) : [0, 0],
   );
   const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -542,8 +541,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   };
 
   useEffect(() => {
-    setNumberOfContainersAndTEUs(bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest) : [0, 0]);
-  }, [bookingRequest]);
+    setNumberOfContainersAndTEUs(bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest?.containers) : [0, 0]);
+  }, [bookingRequest?.containers]);
 
   useEffect(() => {
     freightDetails?.forEach(freightDetail => {
