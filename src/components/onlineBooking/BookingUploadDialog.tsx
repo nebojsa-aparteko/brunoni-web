@@ -22,7 +22,7 @@ import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
 import Container, { Ventilation } from '../../model/Container';
-import { createRequest, getItineraryFromSchedule } from './Summary';
+import { createRequest, getItineraryFromSchedule, takeQuoteDetails } from './Summary';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
@@ -46,13 +46,13 @@ import { globalActions } from '../../store/types/globalAppState';
 import MissingFields, { defaultWatchedFields } from './MissingFields';
 import Client from '../../model/Client';
 import { normalizeDateRange, Quote } from '../../providers/QuoteGroupsProvider';
-import { getRelevantFreightDetails } from './ShippingInfo';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
 import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
+import ContainerDetails from '../../model/ContainerDetails';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -127,7 +127,7 @@ const getContainers = (
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
-): Container[] => {
+): (Container & ContainerDetails)[] => {
   return object.CONTAINERS.map(container => {
     const containerType = matchContainerType(containerTypes, container);
     const commodityType = matchCommodityType(commodityTypes, object);
@@ -150,7 +150,7 @@ const getContainers = (
       temperature,
       ventilation,
       weight: container.NET_WEIGHT && Number(container.NET_WEIGHT),
-    }) as Container;
+    }) as Container & ContainerDetails;
   });
 };
 
@@ -305,7 +305,7 @@ const mapIntoBookingRequestModel = async (
 
   // Get the latest quote by origin and dest
   const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
-  const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
+  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers);
 
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 

@@ -1,58 +1,19 @@
-import { Quote, QuoteDetail } from '../../providers/QuoteGroupsProvider';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import { BookingRequest, FreightDetail } from '../../model/BookingRequest';
+import { BookingRequest } from '../../model/BookingRequest';
 import React, { useContext, useMemo } from 'react';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
-import { flow, get, isNil, omitBy, set } from 'lodash/fp';
+import { isNil, omitBy } from 'lodash/fp';
 import { Box, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField, Typography } from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
-import { FreightDetailGroup } from '../../model/Booking';
 import ChargeCodes from '../../contexts/ChargeCodes';
-import ChargeCode from '../../model/ChargeCode';
 import { useClientById } from '../../hooks/useClient';
-import sortBy from 'lodash/sortBy';
 import { Controller, useFormContext } from 'react-hook-form';
 import { defaultValidationRules } from '../controlledInputs/FormTextField';
 import { OnlineBookingInputs } from './OnlineBookingContainer';
-import Ctg from '../../model/Container';
-import ContainerDetails from '../../model/ContainerDetails';
-
-export const getRelevantFreightDetails = (quoteDetails: QuoteDetail[], chargeCodes: ChargeCode[] | undefined) => {
-  const filteredQuoteDetails = quoteDetails.filter(
-    (detail: QuoteDetail) =>
-      ![
-        'VGM manual submission',
-        'Umbuchungsgebühr',
-        'Stornierungsgebühr',
-        'Zertifikat',
-        'Rebooking Fee',
-        'Cancellation Fee',
-        'House-Bill of Lading',
-        'Certificate',
-      ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
-  );
-  return sortBy(filteredQuoteDetails, (detail: QuoteDetail) => +detail.Pos).map((quoteDetail, index) => {
-    const chargeCode =
-      (quoteDetail.ChargeID &&
-        chargeCodes &&
-        (chargeCodes.find(code => code.chargeCodeId === quoteDetail.ChargeID) as ChargeCode | undefined)) ||
-      undefined;
-    return omitBy(isNil)({
-      Anz: 1,
-      SeqNr: index + 1,
-      Txt: quoteDetail.Description,
-      Currency: quoteDetail.Currency,
-      UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-      Unit: quoteDetail.CostUnit,
-      Group: FreightDetailGroup.EXTERNAL,
-      Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-      Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
-    }) as FreightDetail;
-  });
-};
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
@@ -97,8 +58,6 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   } = useFormContext();
 
   const handleContinue = (data: OnlineBookingInputs) => {
-    const containers = calculateContainers(bookingRequest?.containers);
-
     setBookingRequest(
       omitBy(isNil)({
         ...bookingRequest,
@@ -110,114 +69,9 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         client,
         schedule: schedule,
         quoteDetails: quote?.quoteDetails,
-        freightDetails:
-          quote && quote.quoteDetails
-            ? flow(
-                getRelevantFreightDetailsFromQuote,
-                updateFreightDetails.bind(this, containers),
-                transformFreightDetails.bind(this, containers),
-              )(quote?.quoteDetails || [])
-            : undefined,
       }) as BookingRequest,
     );
     handleNext();
-  };
-
-  const calculateContainers = (containers?: (Ctg & ContainerDetails)[]) =>
-    containers?.reduce(
-      (previousValue, currentValue) => {
-        const lastValue = get(currentValue.containerType?.name || '')(previousValue) || 0;
-        const lastTEU = get('TEU')(previousValue) || 0;
-        const lastTotal = get('Total')(previousValue) || 0;
-        if (currentValue.containerType?.name)
-          return flow(
-            set(currentValue.containerType.name, lastValue + +currentValue.quantity),
-            set(
-              'TEU',
-              lastTEU +
-                (currentValue.containerType?.id
-                  ? (currentValue.containerType.id.startsWith('2') ? 1 : 2) * currentValue.quantity
-                  : 0),
-            ),
-            set('Total', lastTotal + +currentValue.quantity),
-          )(previousValue);
-        return previousValue;
-      },
-      { TEU: 0, Total: 0 },
-    ) || { TEU: 0, Total: 0 };
-  const isRelevantFreight = (
-    freightDetail: QuoteDetail,
-    containers: { TEU: number; Total: number; [key: string]: number },
-  ) => {
-    if (!freightDetail.CostUnit?.includes("'")) return true;
-    return Object.entries(containers).some(
-      ([key, value]) => value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.CostUnit?.toUpperCase() || ''),
-    );
-  };
-
-  const getRelevantFreightDetailsFromQuote = (quoteDetails: QuoteDetail[]) =>
-    quoteDetails.filter(
-      detail =>
-        ![
-          'VGM manual submission',
-          'Umbuchungsgebühr',
-          'Stornierungsgebühr',
-          'Zertifikat',
-          'Rebooking Fee',
-          'Cancellation Fee',
-          'House-Bill of Lading',
-          'Certificate',
-        ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
-    );
-
-  const transformFreightDetails = (
-    containers: { TEU: number; Total: number; [key: string]: number },
-    freightDetails: QuoteDetail[],
-  ): FreightDetail[] =>
-    freightDetails?.map((quoteDetail, index) =>
-      omitBy(isNil)({
-        Anz: getQuantity(containers, quoteDetail.CostUnit),
-        SeqNr: index + 1,
-        Txt: quoteDetail.Description,
-        Currency: quoteDetail.Currency,
-        UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-        Unit: quoteDetail.CostUnit,
-        Group: FreightDetailGroup.EXTERNAL,
-        Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-        // Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
-      }),
-    ) as FreightDetail[];
-
-  const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
-    switch (costUnit) {
-      case 'PRO TEU':
-      case 'PER TEU':
-        return containers.TEU;
-      case 'PER CONTAINER':
-      case 'PRO CONTAINER':
-        return containers.Total;
-      default:
-        console.log(containers[costUnit?.split(' ')?.pop() || '']);
-        return containers[costUnit?.split(' ')?.pop() || ''] || 1;
-    }
-  };
-
-  const updateFreightDetails = (
-    containers: { TEU: number; Total: number; [key: string]: number },
-    freightDetails: QuoteDetail[],
-  ) => {
-    // get relevant
-    // recalculate
-    // sort
-    // reduce it by unnecessary freights and sort
-    console.log(containers);
-    return freightDetails.reduce((previousValue, currentValue) => {
-      if (isRelevantFreight(currentValue, containers)) {
-        return previousValue.concat(currentValue);
-      } else {
-        return previousValue;
-      }
-    }, [] as QuoteDetail[]);
   };
 
   return (

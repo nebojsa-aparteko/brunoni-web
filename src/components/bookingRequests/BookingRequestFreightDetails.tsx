@@ -58,7 +58,6 @@ import CommodityTypes from '../../contexts/CommodityTypes';
 import PickupLocations from '../../contexts/PickupLocations';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
-import { getRelevantFreightDetails } from '../onlineBooking/ShippingInfo';
 import { Alert } from '@material-ui/lab';
 import { Currency } from '../../model/Payment';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
@@ -66,6 +65,7 @@ import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate'
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import ActingAs from '../../contexts/ActingAs';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { takeQuoteDetails } from '../onlineBooking/Summary';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -149,6 +149,7 @@ const getUpdatedFreightDetails = (
   field: string,
 ) => {
   console.log(value, pos, field);
+  // console.log(bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos), );
   return (
     bookingRequest.freightDetails &&
     bookingRequest.freightDetails.map((detail: FreightDetail) => {
@@ -231,7 +232,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     () =>
       selectedTab === 0 &&
       (freightDetail.Group === FreightDetailGroup.INTERNAL2 || freightDetail.Txt === 'Agency Commission'),
-    [freightDetail],
+    [freightDetail, selectedTab],
   );
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
@@ -815,7 +816,7 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
   const carriers = useContext(Carriers);
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      setFreights(getRelevantFreightDetails(searchResult?.quoteDetails!, chargeCodes));
+      setFreights(takeQuoteDetails(searchResult?.quoteDetails!));
       handleClose();
     },
     [setFreights, chargeCodes],

@@ -129,12 +129,12 @@ export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
 const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 
 const isRelevantFreight = (
-  freightDetail: QuoteDetail,
+  freightDetail: FreightDetail,
   containers: { TEU: number; Total: number; [key: string]: number },
 ) => {
-  if (!freightDetail.CostUnit?.includes("'")) return true;
+  if (!freightDetail.Unit?.includes("'")) return true;
   return Object.entries(containers).some(
-    ([key, value]) => value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.CostUnit?.toUpperCase() || ''),
+    ([key, value]) => value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.Unit?.toUpperCase() || ''),
   );
 };
 
@@ -180,28 +180,41 @@ const getQuantity = (containers: { TEU: number; Total: number; [key: string]: nu
     case 'PRO CONTAINER':
       return containers.Total;
     default:
-      console.log(containers[costUnit?.split(' ')?.pop() || '']);
       return containers[costUnit?.split(' ')?.pop() || ''] || 1;
   }
 };
 
 const updateFreightDetails = (
   containers: { TEU: number; Total: number; [key: string]: number },
-  freightDetails: QuoteDetail[],
+  freightDetails: FreightDetail[],
 ) => {
-  // get relevant
-  // recalculate
-  // sort
-  // reduce it by unnecessary freights and sort
-  console.log(containers);
+  if (containers.Total === 0) return freightDetails;
   return freightDetails.reduce((previousValue, currentValue) => {
     if (isRelevantFreight(currentValue, containers)) {
       return previousValue.concat(currentValue);
     } else {
       return previousValue;
     }
-  }, [] as QuoteDetail[]);
+  }, [] as FreightDetail[]);
 };
+const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
+const recalculateFreightDetails = (freights: FreightDetail[]) =>
+  freights.map(freightDetail => {
+    const total = (freightDetail.UnitValue * freightDetail.Anz) / (checkIfPercent(freightDetail) ? 100 : 1);
+    return set('Total', total)(freightDetail);
+  });
+
+export const takeQuoteDetails = (quoteDetails: QuoteDetail[], bkgContainers?: (Ctg & ContainerDetails)[]) => {
+  const containers = calculateContainers(bkgContainers);
+
+  return flow(
+    getRelevantFreightDetailsFromQuote,
+    transformFreightDetails.bind(this, containers),
+    updateFreightDetails.bind(this, containers),
+    recalculateFreightDetails,
+  )(quoteDetails);
+};
+
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest, files }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -217,13 +230,8 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
 
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
-    const containers = calculateContainers(bookingRequest?.containers);
 
-    const freights = flow(
-      getRelevantFreightDetailsFromQuote,
-      updateFreightDetails.bind(this, containers),
-      transformFreightDetails.bind(this, containers),
-    )(bookingRequest?.quoteDetails || []);
+    const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers);
     const commission = generateCommission(
       bookingRequest?.schedule,
       freights?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
