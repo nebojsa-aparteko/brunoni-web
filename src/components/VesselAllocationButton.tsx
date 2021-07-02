@@ -48,12 +48,18 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
   const classes = useStyles();
   const vessel = useVesselWithVoyageById(`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`);
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
+
+  const handleCloseModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    closeModal();
+    event.stopPropagation();
+  };
+
   return (
-    <Dialog open={isOpen} onClose={closeModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
+    <Dialog open={isOpen} onClose={handleCloseModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Vessel Allocation</Typography>
-          <IconButton onClick={closeModal} className={classes.closeModal}>
+          <IconButton onClick={handleCloseModal} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -139,9 +145,15 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
 
 const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage }) => {
   const { closeModal, openModal, isOpen } = useModal();
+
+  const handleOpenModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    openModal();
+    event.stopPropagation();
+  };
+
   return (
     <>
-      <IconButton color="primary" aria-label="check vessel space" onClick={openModal}>
+      <IconButton color="primary" aria-label="check vessel space" onClick={event => handleOpenModal(event)}>
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (

@@ -49,6 +49,7 @@ export interface BookingRequest {
   itinerary: BookingRequestItinerary;
   checklistCheckedCount: number;
   checklistItemCount: number;
+  pinnedCommentsCount?: number;
 }
 
 export interface BookingRequestItinerary {

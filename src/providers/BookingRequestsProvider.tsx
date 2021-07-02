@@ -15,6 +15,7 @@ interface Props {
 
 export const normalizeBookingRequest = flow(
   update('createdAt', invoke('toDate')),
+  update('updatedAt', invoke('toDate')),
   update('containers', flow(map(flow(update('pickupDate', safeInvoke('toDate')))))),
 );
 

@@ -31,6 +31,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import BookingRequestChecklistContent from './checklist/BookingRequestChecklistContent';
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
+import { isDashboardUser } from '../../model/UserRecord';
+import VesselAllocationButton from '../VesselAllocationButton';
+import { getVoyageInfo } from './BookingRequestView';
+import useUser from '../../hooks/useUser';
+import PinnedCommentsButton from './PinnedCommentsButton';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -162,11 +167,11 @@ export const BookingRequestProgress: React.FC<ShipmentProgressProps> = ({ bookin
         <div
           className={classes.progressBar}
           role="progressbar"
-          style={{ width: `${((checklistCheckedCount || 2) / (checklistItemCount || 7)) * 100}%` }}
+          style={{ width: `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%` }}
         />
       </div>
       <Typography variant="subtitle2">
-        {checklistCheckedCount || 2}/{checklistItemCount || 7}
+        {checklistCheckedCount || 0}/{checklistItemCount || 1}
       </Typography>
     </div>
   );
@@ -209,6 +214,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
+  const [, userRecord] = useUser();
 
   const handleRowClick = useCallback(
     (id: string) => {
@@ -274,13 +280,20 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               />
             </Grid>
             {bookingRequest.vessel && (
-              <Grid item md={3} xs={12}>
-                <InfoBoxItem
-                  title="Vessel"
-                  label1={bookingRequest.vessel ? bookingRequest.vessel.toUpperCase() : ''}
-                  label2={bookingRequest.voyage ? bookingRequest.voyage.toUpperCase() : ''}
-                  gutterBottom
-                />
+              <Grid item container md={3} xs={12} direction={'row'}>
+                <Grid item>
+                  <InfoBoxItem
+                    title="Vessel"
+                    label1={bookingRequest.vessel ? bookingRequest.vessel.toUpperCase() : ''}
+                    label2={bookingRequest.voyage ? bookingRequest.voyage.toUpperCase() : ''}
+                    gutterBottom
+                  />
+                </Grid>
+                {isDashboardUser(userRecord) && (
+                  <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                  </Grid>
+                )}
               </Grid>
             )}
             {bookingRequest.status && (
@@ -322,7 +335,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
             </Grid>
             <Grid item md={2} xs={12}>
-              <InfoBoxItem title="BL Number" label1={bookingRequest.blNumber || '-'} gutterBottom />
+              <InfoBoxItem title="Quote Number" label1={bookingRequest.quoteNumber || '-'} gutterBottom />
             </Grid>
             <Grid item md={3} xs={12}>
               <InfoBoxItem
@@ -331,37 +344,39 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            <Grid item md={3} xs={12}>
-              <Fragment>
-                <Box style={{ display: 'flex', flexDirection: 'row' }}>
-                  <Box style={{ width: '50%', paddingRight: '20px' }}>
-                    <InfoBoxItem
-                      IconComponent={ChevronRightIcon}
-                      title="Origin"
-                      label1={
-                        <Fragment>
-                          {bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
-                          <br />
-                        </Fragment>
-                      }
-                      gutterBottom
-                    />
-                  </Box>
-                  <Box style={{ width: '50%' }}>
-                    <InfoBoxItem
-                      IconComponent={LastPageIcon}
-                      title="Destination"
-                      label1={
-                        <Fragment>
-                          {bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
-                          <br />
-                        </Fragment>
-                      }
-                      gutterBottom
-                    />
-                  </Box>
-                </Box>
-              </Fragment>
+            <Grid item container md={3} xs={12}>
+              <Grid item xs={6}>
+                <InfoBoxItem
+                  IconComponent={ChevronRightIcon}
+                  title="Origin"
+                  label1={bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETS: ${
+                      bookingRequest.itinerary.placeOfReceipt
+                        ? bookingRequest.itinerary.placeOfReceipt?.DepartureDate
+                        : bookingRequest.itinerary.portOfLoading.DepartureDate
+                    }`
+                  }
+                  gutterBottom
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <InfoBoxItem
+                  IconComponent={LastPageIcon}
+                  title="Destination"
+                  label1={bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETA: ${
+                      bookingRequest.itinerary.finalDestinationPort
+                        ? bookingRequest.itinerary.finalDestinationPort?.ArrivalDate
+                        : bookingRequest.itinerary.portOfDischarge.ArrivalDate
+                    }`
+                  }
+                  gutterBottom
+                />
+              </Grid>
             </Grid>
             <Grid item md={2} xs={12}>
               <InfoBoxItem
@@ -377,6 +392,13 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
+            {isDashboardUser(userRecord) &&
+              bookingRequest.pinnedCommentsCount &&
+              bookingRequest.pinnedCommentsCount > 0 && (
+                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                  <PinnedCommentsButton bookingRequestId={bookingRequest.id} />
+                </Grid>
+              )}
           </Grid>
         </Grid>
       </Grid>
