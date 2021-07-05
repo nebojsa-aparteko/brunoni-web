@@ -30,12 +30,30 @@ const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) =
             <BookingRequestChecklistContent bookingRequest={bookingRequest} />
           </CardContent>
         </Card>
-        {!actingAs && bookingRequest.id && (
-          <InternalStorage id={bookingRequest.id} collection={'bookings-requests'} isInternal={true} />
-        )}
-        {bookingRequest.id && (
-          <InternalStorage id={bookingRequest.id} collection={'bookings-requests'} isInternal={false} label="Storage" />
-        )}
+        <Card style={{ backgroundColor: '#eee', marginTop: 16, marginBottom: 16 }}>
+          {!actingAs && bookingRequest.id && (
+            <InternalStorage
+              id={bookingRequest.id}
+              collection={'bookings-requests'}
+              isInternal={true}
+              cardMargin={0}
+              dndLabel={"Drag 'n' drop internal files or click here"}
+              showHeader={true}
+            />
+          )}
+        </Card>
+        <Card style={{ backgroundColor: '#fff', marginTop: 16, marginBottom: 16 }}>
+          {bookingRequest.id && (
+            <InternalStorage
+              id={bookingRequest.id}
+              collection={'bookings-requests'}
+              isInternal={false}
+              label="Storage"
+              cardMargin={0}
+              showHeader={true}
+            />
+          )}
+        </Card>
         <ActivityLogContainer bookingRequest={bookingRequest} isAdmin={!actingAs} />
       </ActivityLogProvider>
     </Fragment>

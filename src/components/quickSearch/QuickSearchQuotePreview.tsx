@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { Grid, Theme, Typography } from '@material-ui/core';
 import InfoBoxItem from '../InfoBoxItem';

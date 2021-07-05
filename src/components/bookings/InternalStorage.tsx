@@ -8,7 +8,6 @@ import {
   LinearProgress,
   List,
   makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
@@ -25,7 +24,7 @@ import { useActivityLogState } from './checklist/ActivityLogContext';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   rootEmpty: {
     flexGrow: 1,
     border: '1px dashed #ccc',
@@ -86,7 +85,15 @@ const addActivity = (activity: ActivityLogItem, collection: string, id: string) 
     .collection('activity')
     .doc()
     .set(activity);
-const InternalStorage: React.FC<Props> = ({ id, collection, isInternal = true, label = 'Internal documents' }) => {
+const InternalStorage: React.FC<Props> = ({
+  id,
+  collection,
+  isInternal = true,
+  label = 'Internal documents',
+  cardMargin = 2,
+  dndLabel,
+  showHeader,
+}) => {
   const classes = useStyles();
   const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
   // status indicators
@@ -257,66 +264,78 @@ const InternalStorage: React.FC<Props> = ({ id, collection, isInternal = true, l
     noClick: normalizedFiles.length > 0,
   });
   return (
-    <Box
-      {...getRootProps()}
-      className={
-        isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
-      }
-      my={2}
-      py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
-      display="flex"
-      justifyContent="center"
-      flexDirection="column"
-    >
-      <input {...getInputProps()} />
-      {uploadProgress > 0 && (
-        <Box display="flex">
-          <div style={{ width: '100%', paddingTop: '14px' }}>
-            <LinearProgress variant="determinate" value={uploadProgress} />
-          </div>
-          <IconButton
-            className={classes.tinyIconButton}
-            aria-label="cancel upload"
-            onClick={() => {
-              uploadTask?.cancel();
-              setUploadTask(undefined);
-              setUploadProgress(0);
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+    <React.Fragment>
+      {!(normalizedFiles && normalizedFiles.length > 0) && showHeader && (
+        <Box m={2} ml={3}>
+          <Typography variant={'h5'}>{label}</Typography>
         </Box>
       )}
-
-      {normalizedFiles && normalizedFiles.length > 0 ? (
-        <Card style={{ backgroundColor: isInternal ? '#eee' : '#fff' }}>
-          <CardHeader
-            title={label}
-            action={
-              <IconButton size="small" aria-label="Add Comment" onClick={open}>
-                <AttachFileIcon />
+      <Box
+        p={!(normalizedFiles && normalizedFiles.length > 0) && showHeader && 2}
+        pb={!(normalizedFiles && normalizedFiles.length > 0) && showHeader && 2}
+      >
+        <Box
+          {...getRootProps()}
+          className={
+            isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
+          }
+          my={cardMargin}
+          py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
+          display="flex"
+          justifyContent="center"
+          flexDirection="column"
+        >
+          <input {...getInputProps()} />
+          {uploadProgress > 0 && (
+            <Box display="flex">
+              <div style={{ width: '100%', paddingTop: '14px' }}>
+                <LinearProgress variant="determinate" value={uploadProgress} />
+              </div>
+              <IconButton
+                className={classes.tinyIconButton}
+                aria-label="cancel upload"
+                onClick={() => {
+                  uploadTask?.cancel();
+                  setUploadTask(undefined);
+                  setUploadProgress(0);
+                }}
+              >
+                <CloseIcon />
               </IconButton>
-            }
-          />
-          <CardContent>
-            <List className={classes.documentList}>
-              {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
-                <InternalStorageItem
-                  key={`chklistitem-${item.storedName}`}
-                  item={item}
-                  handleDelete={onDeleteFile}
-                  handleMention={onMentionFile}
-                />
-              ))}
-            </List>
-          </CardContent>
-        </Card>
-      ) : (
-        <Box display="flex" justifyContent="center">
-          <Typography>Drag 'n' Drop files or click here</Typography>
+            </Box>
+          )}
+
+          {normalizedFiles && normalizedFiles.length > 0 ? (
+            <Card style={{ backgroundColor: isInternal ? '#eee' : '#fff' }}>
+              <CardHeader
+                title={label}
+                action={
+                  <IconButton size="small" aria-label="Add Comment" onClick={open}>
+                    <AttachFileIcon />
+                  </IconButton>
+                }
+              />
+              <CardContent>
+                <List className={classes.documentList}>
+                  {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
+                    <InternalStorageItem
+                      key={`chklistitem-${item.storedName}`}
+                      item={item}
+                      handleDelete={onDeleteFile}
+                      handleMention={onMentionFile}
+                    />
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          ) : (
+            <Box display="flex" justifyContent="center">
+              <Typography>{dndLabel || "Drag 'n' Drop files or click here"}</Typography>
+            </Box>
+          )}
         </Box>
-      )}
-    </Box>
+      </Box>
+    </React.Fragment>
   );
 };
 
@@ -327,4 +346,7 @@ interface Props {
   collection: string;
   isInternal?: boolean;
   label?: string;
+  cardMargin?: number;
+  dndLabel?: string;
+  showHeader?: boolean;
 }
