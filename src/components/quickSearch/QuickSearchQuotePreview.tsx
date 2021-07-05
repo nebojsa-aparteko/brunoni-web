@@ -1,16 +1,19 @@
 import React from 'react';
 import { Quote } from '../../providers/QuoteGroupsProvider';
-import { Box, Theme } from '@material-ui/core';
+import { Grid, Theme, Typography } from '@material-ui/core';
 import InfoBoxItem from '../InfoBoxItem';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { portLongFormatLabel } from '../../utilities/formattedPortDisplay';
 import { makeStyles } from '@material-ui/core/styles';
+import { formatDateSafe } from '../../utilities/formattingHelpers';
+import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import UserRecord from '../../model/UserRecord';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     cursor: 'pointer',
-    margin: theme.spacing(1),
+    marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderStyle: 'outset',
     borderWidth: 1,
@@ -25,30 +28,82 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
   const classes = useStyles();
+  const clientUser = useUserByAlphacomId(quote.userId) as UserRecord;
+
+  const handlePropagation = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+  };
 
   return (
-    <Box display="flex" justifyContent="space-between" className={classes.root}>
-      <div>
+    <Grid container spacing={2} className={classes.root}>
+      <Grid item md={3} xs={12}>
         <InfoBoxItem title="Quote" label1={quote.id} />
-      </div>
-      <div>
+      </Grid>
+      <Grid item md={3} xs={12}>
         <InfoBoxItem title="Carrier" label1={quote.carrier?.name} />
-      </div>
-      <div>
+      </Grid>
+      <Grid item md={3} xs={12}>
         <InfoBoxItem
           IconComponent={ChevronRightIcon}
           title="Place of Loading"
           label1={portLongFormatLabel(quote.origin)}
         />
-      </div>
-      <div>
+      </Grid>
+      <Grid item md={3} xs={12}>
         <InfoBoxItem
           IconComponent={LastPageIcon}
           title="Place of Discharge"
           label1={portLongFormatLabel(quote.destination)}
         />
-      </div>
-    </Box>
+      </Grid>
+      <Grid item md={3} xs={12}>
+        <InfoBoxItem title="Commodities" label1={quote.commodityTypes?.map(commodity => commodity.name).join(', ')} />
+      </Grid>
+      <Grid item md={3} xs={12}>
+        <InfoBoxItem
+          title="Equipment"
+          label1={
+            <Typography style={{ whiteSpace: 'pre-wrap' }}>
+              {quote.containers
+                ?.map(
+                  container =>
+                    `${container.quantity && container.quantity > 0 ? container.quantity + ' x ' : ''}${container
+                      .containerType?.description || ''}`,
+                )
+                .join(',\n')}
+            </Typography>
+          }
+        />
+      </Grid>
+      <Grid item md={3} xs={12}>
+        <InfoBoxItem
+          title="Customer"
+          label1={
+            <a href={'mailto:' + clientUser.emailAddress} onClick={handlePropagation}>
+              {(clientUser.firstName + ' ' + clientUser.lastName).toUpperCase()}
+            </a>
+            // <Avatar
+            //   name={clientUser?.firstName + ' ' + clientUser?.lastName}
+            //   title={`${clientUser?.firstName + ' ' + clientUser?.lastName} <${
+            //     clientUser?.emailAddress ? clientUser?.emailAddress : null
+            //   }>`}
+            //   size="40"
+            //   round={true}
+            //   style={{ paddingLeft: '9px' }}
+            // />
+          }
+        />
+      </Grid>
+      <Grid item md={3} xs={12}>
+        <InfoBoxItem
+          title="Validity"
+          label1={`${formatDateSafe(quote.validityPeriod.from, 'dd.MM.yyyy')} - ${formatDateSafe(
+            quote.validityPeriod.to,
+            'dd.MM.yyyy',
+          )}`}
+        />
+      </Grid>
+    </Grid>
   );
 };
 
