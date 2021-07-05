@@ -9,6 +9,7 @@ import BookingRequestPortTerms from './BookingRequestPortTerms';
 import BookingRequestSpecialRemarks from './BookingRequestSpecialRemarks';
 import BookingRequestFreightDetails from './BookingRequestFreightDetails';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import SimpleExpansionPanel from '../SimpleExpansionPanel';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
@@ -41,10 +42,10 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
 
   return bookingRequestState ? (
     <Page title={getBookingRequestTitle(bookingRequestState)}>
-      <Box id="bookingSummaryBkg" marginTop="1em" marginBottom="0em">
+      <SimpleExpansionPanel label={'Booking Request Summary'}>
         <BookingRequestSummary editing={editing} />
-      </Box>
-      <Box marginTop="0em" marginBottom={editing ? '2em' : '0em'}>
+      </SimpleExpansionPanel>
+      <SimpleExpansionPanel label={'Cargo Details'}>
         {bookingRequestState.containers && (
           <>
             <Box marginTop="2em" marginBottom="2em">
@@ -58,12 +59,16 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
             />
           </>
         )}
-      </Box>
-      <BookingRequestPortTerms />
+      </SimpleExpansionPanel>
+      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'}>
+        <Box flex={1} display="flex" flexDirection="column">
+          <BookingRequestPortTerms />
 
-      <BookingRequestClosings />
+          <BookingRequestClosings />
 
-      <BookingRequestSpecialRemarks />
+          <BookingRequestSpecialRemarks />
+        </Box>
+      </SimpleExpansionPanel>
 
       <Box marginTop="2em" marginBottom="2em">
         <Divider />
