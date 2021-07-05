@@ -79,8 +79,12 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                     container.imo?.[0] &&
                     container.imo?.[1]?.map(
                       (imoItem: IMO) =>
-                        `(${'IMO Class: ' + imoItem.IMOClass} - ${'PG Number: ' + imoItem.PGNumber} - ${'UN Number: ' +
-                          imoItem.UNNumber} )`,
+                        (imoItem.IMOClass || imoItem.PGNumber || imoItem.UNNumber) &&
+                        `(${imoItem.IMOClass && 'IMO Class: ' + imoItem.IMOClass}${imoItem.IMOClass &&
+                          (imoItem.PGNumber || imoItem.UNNumber) &&
+                          ' - '}${imoItem.PGNumber && 'PG Number: ' + imoItem.PGNumber}${imoItem.PGNumber &&
+                          imoItem.UNNumber &&
+                          ' - '}${imoItem.UNNumber && 'UN Number: ' + imoItem.UNNumber})`,
                     )}
                   {container.oog &&
                     container.oog?.[0] &&

@@ -125,18 +125,28 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {(container.imo?.[1] as IMO[]).map((imoItem, index) => (
-        <TableRow key={`${index}:${imoItem.IMOClass}-${imoItem.PGNumber}-${imoItem.UNNumber}`}>
+      {container.imo?.[0] && (
+        <TableRow>
           <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
           <TableCell className={classes.tableCell}>
-            <Box display="flex" flexDirection="column">
-              {imoItem.IMOClass && <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>}
-              {imoItem.UNNumber && <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>}
-              {imoItem.PGNumber && <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>}
-            </Box>
+            {(container.imo?.[1] as IMO[]).map(
+              (imoItem, index) =>
+                (imoItem.IMOClass || imoItem.UNNumber || imoItem.PGNumber) && (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    key={`${index}:${imoItem.IMOClass}-${imoItem.PGNumber}-${imoItem.UNNumber}`}
+                    mb={2}
+                  >
+                    {imoItem.IMOClass && <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>}
+                    {imoItem.UNNumber && <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>}
+                    {imoItem.PGNumber && <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>}
+                  </Box>
+                ),
+            )}
           </TableCell>
         </TableRow>
-      ))}
+      )}
     </React.Fragment>
   );
 };
