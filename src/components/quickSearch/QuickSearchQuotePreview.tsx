@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { Grid, Theme, Typography } from '@material-ui/core';
 import InfoBoxItem from '../InfoBoxItem';
@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { formatDateSafe } from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import UserRecord from '../../model/UserRecord';
+import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
   const classes = useStyles();
+  const client = useClientById(quote.clientId);
   const clientUser = useUserByAlphacomId(quote.userId) as UserRecord;
 
   const handlePropagation = (event: React.MouseEvent<HTMLElement>) => {
@@ -78,19 +80,11 @@ const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
       <Grid item md={3} xs={12}>
         <InfoBoxItem
           title="Customer"
-          label1={
+          label1={client && `${client.name}, ${client.city}`}
+          label2={
             <a href={'mailto:' + clientUser.emailAddress} onClick={handlePropagation}>
               {(clientUser.firstName + ' ' + clientUser.lastName).toUpperCase()}
             </a>
-            // <Avatar
-            //   name={clientUser?.firstName + ' ' + clientUser?.lastName}
-            //   title={`${clientUser?.firstName + ' ' + clientUser?.lastName} <${
-            //     clientUser?.emailAddress ? clientUser?.emailAddress : null
-            //   }>`}
-            //   size="40"
-            //   round={true}
-            //   style={{ paddingLeft: '9px' }}
-            // />
           }
         />
       </Grid>
