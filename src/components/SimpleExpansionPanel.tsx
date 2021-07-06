@@ -18,11 +18,11 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const SimpleExpansionPanel = ({ label, children }: Props) => {
+const SimpleExpansionPanel = ({ label, defaultExpanded, children }: Props) => {
   const classes = useStyles();
 
   return (
-    <ExpansionPanel>
+    <ExpansionPanel defaultExpanded={defaultExpanded}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.elevatedComponent}>
         <Typography>{label}</Typography>
       </ExpansionPanelSummary>
@@ -33,6 +33,7 @@ const SimpleExpansionPanel = ({ label, children }: Props) => {
 
 interface Props {
   label: string;
+  defaultExpanded?: boolean;
   children: ReactNode;
 }
 

@@ -42,10 +42,10 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
 
   return bookingRequestState ? (
     <Page title={getBookingRequestTitle(bookingRequestState)}>
-      <SimpleExpansionPanel label={'Booking Request Summary'}>
+      <SimpleExpansionPanel label={'Booking Request Summary'} defaultExpanded={true}>
         <BookingRequestSummary editing={editing} />
       </SimpleExpansionPanel>
-      <SimpleExpansionPanel label={'Cargo Details'}>
+      <SimpleExpansionPanel label={'Cargo Details'} defaultExpanded={true}>
         {bookingRequestState.containers && (
           <>
             <Box marginTop="2em" marginBottom="2em">
@@ -60,7 +60,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
           </>
         )}
       </SimpleExpansionPanel>
-      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'}>
+      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'} defaultExpanded={true}>
         <Box flex={1} display="flex" flexDirection="column">
           <BookingRequestPortTerms />
 
