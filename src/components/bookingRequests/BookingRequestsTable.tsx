@@ -354,8 +354,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                     bookingRequest.itinerary &&
                     `ETS: ${
                       bookingRequest.itinerary.placeOfReceipt
-                        ? bookingRequest.itinerary.placeOfReceipt?.DepartureDate
-                        : bookingRequest.itinerary.portOfLoading.DepartureDate
+                        ? bookingRequest.itinerary.placeOfReceipt.DepartureDate
+                        : bookingRequest.itinerary.portOfLoading && bookingRequest.itinerary.portOfLoading.DepartureDate
                     }`
                   }
                   gutterBottom
@@ -370,8 +370,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                     bookingRequest.itinerary &&
                     `ETA: ${
                       bookingRequest.itinerary.finalDestinationPort
-                        ? bookingRequest.itinerary.finalDestinationPort?.ArrivalDate
-                        : bookingRequest.itinerary.portOfDischarge.ArrivalDate
+                        ? bookingRequest.itinerary.finalDestinationPort.ArrivalDate
+                        : bookingRequest.itinerary.portOfDischarge &&
+                          bookingRequest.itinerary.portOfDischarge.ArrivalDate
                     }`
                   }
                   gutterBottom
