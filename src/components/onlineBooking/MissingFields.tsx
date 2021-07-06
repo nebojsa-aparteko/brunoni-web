@@ -145,13 +145,12 @@ const MissingFields: React.FC<Props> = ({
             <Box display={'flex'} flexDirection={'column'}>
               {!validQuoteState && bookingRequest.schedule && (
                 <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
-                  {`You are booking with schedule outside quote end date (${bookingRequest.schedule?.OriginInfo
-                    .DepartureDate as string})`}
+                  {`You are booking on a vessel with an expired quotation date`}
                 </Typography>
               )}
               <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
                 {isDashboardUser(userRecord)
-                  ? 'These fields were not found on Inttra booking:'
+                  ? 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +
                     '  Your booking request has been submitted and is in requested status.\n' +
                     '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
