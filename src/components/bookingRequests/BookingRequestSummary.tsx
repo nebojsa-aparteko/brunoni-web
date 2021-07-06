@@ -37,7 +37,7 @@ import { Link } from 'react-router-dom';
 import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import { compact, get, merge, omit, set } from 'lodash/fp';
+import { compact, get, merge, omit, set, flow } from 'lodash/fp';
 import getWithFallback from 'lodash/get';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -133,12 +133,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.grey['50'],
   },
 }));
-interface Itinerary {
-  placeOfReceipt: ItineraryItem | undefined;
-  portOfLoading?: ItineraryItem;
-  portOfDischarge?: ItineraryItem;
-  placeOfDelivery: ItineraryItem | undefined;
-}
+
 const emptySearchResultPort = {
   ID: '',
   Land: '',
@@ -496,6 +491,14 @@ const ClientInfo = (bookingRequest: BookingRequest, forwarder?: UserRecord) => {
   );
 };
 
+const getHSGIntBLFromBL = (blNo: string) => {
+  return blNo.slice(6, 8) + blNo.slice(9, -1);
+};
+
+const getHSGRefValueFromBL = (blNo: string) => {
+  return blNo.slice(5, -1);
+};
+
 const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
@@ -536,6 +539,33 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const handleChangeBRField = useCallback((field: keyof BookingRequest, value?: string) => {
     setBookingRequest(prevState => set(field, value)(prevState!));
   }, []);
+
+  const handleChangesAfterBLChange = useCallback(
+    (value?: string) => {
+      if (bookingRequest.carrier?.id && bookingRequest.carrier.id === CarrierId.HSG && value && value.length === 16) {
+        const intBL = getHSGIntBLFromBL(value);
+        const refValue = getHSGRefValueFromBL(value);
+        setBookingRequest(prevState =>
+          flow(
+            set('intBlNumber', prevState.intBlNumber ? prevState.intBlNumber : intBL),
+            set(
+              'containers',
+              prevState.containers
+                ? prevState.containers.map(container =>
+                    flow(
+                      set('pickupReference', container.pickupReference ? container.pickupReference : refValue),
+                      set('deliveryReference', container.deliveryReference ? container.deliveryReference : refValue),
+                      set('vgmPin', container.vgmPin ? container.vgmPin : refValue),
+                    )(container),
+                  )
+                : undefined,
+            ),
+          )(prevState!),
+        );
+      }
+    },
+    [bookingRequest],
+  );
 
   return bookingRequest ? (
     <Box flexDirection="column">
@@ -603,6 +633,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     value={bookingRequest.blNumber}
                     inputProps={{
                       onChange: event => handleChangeBRField('blNumber', event.target.value),
+                      onBlur: event => handleChangesAfterBLChange(event.target.value),
                       className: classes.blNumberInput,
                     }}
                   />
