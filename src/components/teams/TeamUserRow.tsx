@@ -1,6 +1,6 @@
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import invoke from 'lodash/fp/invoke';
 import UserRecord, { ADMIN_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
@@ -10,14 +10,21 @@ import firebase from '../../firebase';
 import { pick } from 'lodash/fp';
 import UserNotificationRedirectionSwitch from '../UserNotificationRedirectionSwitch';
 import { Checkbox } from '@material-ui/core';
+import CarrierInput from '../inputs/CarrierInput';
+import Carriers from '../../contexts/Carriers';
 
 const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
+  const carriers = useContext(Carriers);
   const assignableUsersWithoutCurrent = useMemo(
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
     [assignableUsers, user],
   );
-  const onChange = useCallback(
+  const userCarrier = useMemo(() => {
+    return user.carrier ? carriers?.find(carrier => carrier.id === user.carrier) : undefined;
+  }, [user.carrier, carriers]);
+
+  const handleChangeRedirectedAdmin = useCallback(
     (selectedUser: UserRecordMin | null) => {
       firebase
         .firestore()
@@ -28,6 +35,19 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
     },
     [user],
   );
+
+  const handleChangeCarrier = useCallback(
+    (selectedCarrierId?: string) => {
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(user.id)
+        .set({ carrier: selectedCarrierId ? selectedCarrierId : null }, { merge: true })
+        .then(_ => console.log('Saved'));
+    },
+    [user],
+  );
+
   return (
     <TableRow {...other}>
       <TableCell padding="checkbox">
@@ -44,6 +64,14 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
       <TableCell align="right">
+        <CarrierInput
+          label={'Select Carrier'}
+          carriers={carriers || []}
+          onChange={carrier => handleChangeCarrier(carrier?.id)}
+          value={userCarrier}
+        />
+      </TableCell>
+      <TableCell align="right">
         {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}
       </TableCell>
       <TableCell align="right">
@@ -53,7 +81,7 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
         <UserInput
           label="Redirect To"
           users={assignableUsersWithoutCurrent || []}
-          onChange={(_, user) => onChange(user)}
+          onChange={(_, user) => handleChangeRedirectedAdmin(user)}
           value={user.redirectedAdmin}
         />
       </TableCell>

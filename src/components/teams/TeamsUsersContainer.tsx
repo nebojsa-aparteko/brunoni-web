@@ -229,6 +229,7 @@ const TeamsUsersContainer: React.FC = () => {
                   <TableCell>Name</TableCell>
                   <TableCell align="right">Email</TableCell>
                   <TableCell align="right">Role</TableCell>
+                  <TableCell align="right">Carrier</TableCell>
                   <TableCell align="right">Last Login</TableCell>
                   <TableCell align="center">Vacation</TableCell>
                   <TableCell align="center">Redirect To</TableCell>

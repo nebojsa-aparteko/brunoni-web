@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
 import useVesselWithVoyage from '../../hooks/useVesselWithVoyage';
 import VesselVoyageItem from './VesselVoyageItem';
@@ -9,22 +9,35 @@ import set from 'lodash/fp/set';
 import VesselVoyageDialog from './VesselVoyageDialog';
 import { BookingCategory } from '../../model/Booking';
 import { useVesselFilterContext } from '../../providers/VesselOverviewFilterProvider';
-import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import theme from '../../theme';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import DateRangeInput from '../inputs/DateRangeInput';
+import useUser from '../../hooks/useUser';
 
 const groups = ['vesselWithVoyage', 'pol'];
 
 const VesselVoyageContainer: React.FC<Props> = () => {
   const vessel = useVesselWithVoyage();
+  const user = useUser()[1];
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
   const [filters, setFilters] = useVesselFilterContext();
-  const { category, carrier, dateRange } = filters;
+  const { category, dateRange } = filters;
   const carriers = useContext(Carriers);
+
+  useEffect(() => {
+    user.carrier &&
+      setFilters &&
+      setFilters(
+        set(
+          'carrier',
+          carriers?.find(carrier => carrier.id === user.carrier),
+        )(filters),
+      );
+  }, [user.carrier, carriers]);
+
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
@@ -59,16 +72,6 @@ const VesselVoyageContainer: React.FC<Props> = () => {
             </Typography>
             <Divider orientation="vertical" style={{ height: '100%' }} />
             <CategoryFilter value={category} onChange={handleImportOrExportChange} />
-            <Box display="flex" style={{ minWidth: theme.spacing(35) }}>
-              <CarrierInput
-                label={'Carriers'}
-                carriers={carriers}
-                onChange={carrier => {
-                  if (setFilters) setFilters(set('carrier', carrier)(filters));
-                }}
-                value={carrier}
-              />
-            </Box>
             <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
               <DateRangeInput
                 onChange={dateRange => {

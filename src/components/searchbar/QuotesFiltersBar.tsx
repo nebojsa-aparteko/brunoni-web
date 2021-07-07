@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
@@ -11,9 +11,8 @@ import Port from '../../model/Port';
 import Client from '../../model/Client';
 import { useQuotesContext } from '../../providers/QuotesProvider';
 import set from 'lodash/fp/set';
-import Carrier from '../../model/Carrier';
-import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
+import useUser from '../../hooks/useUser';
 
 interface Props {
   showClientFilter?: boolean;
@@ -24,11 +23,23 @@ interface Props {
 const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, showRefreshButton }) => {
   const clients = useClients();
   const ports = useContext(Ports);
+  const user = useUser()[1];
   const carriers = useContext(Carriers);
 
   const [, , filters, setFilters] = useQuotesContext();
 
-  const { clientFilter, originPort, destinationPort, dateRange, carrier } = filters;
+  const { clientFilter, originPort, destinationPort, dateRange } = filters;
+
+  useEffect(() => {
+    user.carrier &&
+      setFilters &&
+      setFilters(
+        set(
+          'carrier',
+          carriers?.find(carrier => carrier.id === user.carrier),
+        )(filters),
+      );
+  }, [user.carrier, carriers]);
 
   const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
 
@@ -37,9 +48,6 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
 
   const setClientFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('clientFilter', client || undefined)(filters));
-
-  const setCarrier = (carrier: Carrier | null | undefined) =>
-    setFilters && setFilters(set('carrier', carrier || undefined)(filters));
 
   const setDateRange = (dateRange: DateRange) =>
     setFilters && setFilters(set('dateRange', dateRange || undefined)(filters));
@@ -75,10 +83,6 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
         <Grid id="destinationQuotes" item sm={3} xs={12}>
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
-        <Grid id="carrierQuotes" item sm={3} xs={12}>
-          <CarrierInput label={'Choose Carrier'} carriers={carriers || []} value={carrier} onChange={setCarrier} />
-        </Grid>
-
         {!showClientFilter && <Grid item sm={3} xs={12} />}
         {showDateRange && (
           <Grid item sm={3} xs={12}>
