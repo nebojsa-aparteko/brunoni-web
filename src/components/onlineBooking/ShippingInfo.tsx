@@ -9,7 +9,6 @@ import { Box, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField, 
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
-import ChargeCodes from '../../contexts/ChargeCodes';
 import { useClientById } from '../../hooks/useClient';
 import { Controller, useFormContext } from 'react-hook-form';
 import { defaultValidationRules } from '../controlledInputs/FormTextField';
@@ -19,7 +18,6 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
-  const chargeCodes = useContext(ChargeCodes);
   const client = useClientById(quote?.clientId);
 
   const scheduleCarrier = useMemo(

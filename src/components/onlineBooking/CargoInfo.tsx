@@ -1,6 +1,6 @@
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { BookingRequest } from '../../model/BookingRequest';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Container, { Ventilation } from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import { isNil, omitBy } from 'lodash/fp';
@@ -51,22 +51,8 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
       : [],
   );
 
-  const [isNextButtonDisabled, setIsNextButtonDisabled] = useState<boolean>(
-    !(
-      containers.length > 0 &&
-      containers.every(
-        container =>
-          (isContainerSO(container) ? true : container.pickupLocation && container.pickupDate) &&
-          container.quantity &&
-          container.containerType &&
-          container.commodityType &&
-          container.weight,
-      )
-    ),
-  );
-
-  useEffect(() => {
-    setIsNextButtonDisabled(
+  const isNextButtonDisabled = useMemo<boolean>(
+    () =>
       !(
         containers.length > 0 &&
         containers.every(
@@ -78,8 +64,8 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
             container.weight,
         )
       ),
-    );
-  }, [containers]);
+    [containers],
+  );
 
   const handleContinue = () => {
     const writableContainers = containers.map(container => {

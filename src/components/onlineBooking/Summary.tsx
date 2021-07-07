@@ -171,6 +171,11 @@ const transformFreightDetails = (
     }),
   ) as FreightDetail[];
 
+const recalculateQuantity = (
+  containers: { TEU: number; Total: number; [key: string]: number },
+  freightDetails: FreightDetail[],
+) => freightDetails.map(detail => set('Anz', getQuantity(containers, detail.Unit))(detail));
+
 const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
   switch (costUnit) {
     case 'PRO TEU':
@@ -197,6 +202,11 @@ const updateFreightDetails = (
     }
   }, [] as FreightDetail[]);
 };
+
+export const onContainersChange = (
+  containers: { TEU: number; Total: number; [key: string]: number },
+  freightDetails: FreightDetail[],
+) => flow(recalculateQuantity.bind(this, containers), updateFreightDetails.bind(this, containers))(freightDetails);
 const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
 const recalculateFreightDetails = (freights: FreightDetail[]) =>
   freights.map(freightDetail => {
@@ -249,7 +259,6 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
       freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
     } as BookingRequest;
-    console.log(getItineraryFromSchedule(bookingRequest?.schedule));
     omitEmptyDeep(writableRequest);
     setBookingRequest(
       update(
@@ -364,22 +373,6 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       )}
       <div className={classes.actions}>
         <Button onClick={handlePrevious}>Previous</Button>
-        <Button
-          onClick={() => {
-            const containers = calculateContainers(bookingRequest?.containers);
-            console.log(
-              'Freights',
-              containers,
-              flow(
-                getRelevantFreightDetailsFromQuote,
-                updateFreightDetails.bind(this, containers),
-                transformFreightDetails.bind(this, containers),
-              )(bookingRequest?.quoteDetails || []),
-            );
-          }}
-        >
-          Previous
-        </Button>
         <Button variant="contained" color="primary" onClick={handleCreateRequest}>
           Submit
         </Button>
@@ -388,7 +381,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   );
 };
 
-const calculateContainers = (containers?: (Ctg & ContainerDetails)[]) =>
+export const calculateContainers = (containers?: (Ctg & ContainerDetails)[]) =>
   containers?.reduce(
     (previousValue, currentValue) => {
       const lastValue = get(currentValue.containerType?.name || '')(previousValue) || 0;

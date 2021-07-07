@@ -572,11 +572,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   // ]);
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Button
-        onClick={() => createAlphacomReq(bookingRequest, filteredChargeCodes).then(result => console.log(result))}
-      >
-        Test
-      </Button>
+      <Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -741,6 +737,7 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
   );
 };
 const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
+  console.log(bookingRequest, 'BR');
   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
   // throw new Error('Function not implemented.');
 };

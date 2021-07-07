@@ -100,7 +100,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
         request.freightDetails?.map(detail => ({
           ...detail,
           Unit: detail.Unit ? getRelevantUnit(detail.Unit.trim().toUpperCase()) : undefined,
-          ChgCode: chargeCodes ? chargeCodes.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
+          // ChgCode: chargeCodes ? chargeCodes?.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
         })),
       )({}),
     ),

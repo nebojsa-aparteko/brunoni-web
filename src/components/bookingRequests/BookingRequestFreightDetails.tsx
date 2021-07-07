@@ -65,7 +65,8 @@ import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate'
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import ActingAs from '../../contexts/ActingAs';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import { takeQuoteDetails } from '../onlineBooking/Summary';
+import { calculateContainers, onContainersChange, takeQuoteDetails } from '../onlineBooking/Summary';
+import EditingInput from '../EditingInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -148,27 +149,23 @@ const getUpdatedFreightDetails = (
   pos: number,
   field: string,
 ) => {
-  console.log(value, pos, field);
-  // console.log(bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos), );
-  return (
-    bookingRequest.freightDetails &&
-    bookingRequest.freightDetails.map((detail: FreightDetail) => {
-      console.log(checkIfPercent(detail));
-      return detail.SeqNr === pos
-        ? flow(
-            set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
-            set(
-              'Total',
-              detail.Anz && detail.UnitValue
-                ? ((field === 'Anz' ? parseFloat(value) || 0 : detail.Anz) *
-                    (field === 'UnitValue' ? parseFloat(value) : detail.UnitValue)) /
-                    (checkIfPercent(detail) ? 100 : 1)
-                : 0.0,
-            ),
-          )(detail)
-        : detail;
-    })
-  );
+  if (bookingRequest.freightDetails) {
+    const index = bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos);
+    if (index < 0) return bookingRequest.freightDetails;
+    const d = bookingRequest.freightDetails[index];
+    bookingRequest.freightDetails[index] = flow(
+      set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
+      set(
+        'Total',
+        d.Anz && d.UnitValue
+          ? ((field === 'Anz' ? parseFloat(value) || 0 : d.Anz) *
+              (field === 'UnitValue' ? parseFloat(value) : d.UnitValue)) /
+              (checkIfPercent(d) ? 100 : 1)
+          : 0.0,
+      ),
+    )(d);
+  }
+  return bookingRequest.freightDetails;
 };
 
 //inputs use an empty string instead of undefined so we need to compare those values as equal to avoid warnings
@@ -263,6 +260,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   }, [freightDetail]);
 
   const handleChangeFreightDetails = (value: any | undefined, fieldName: string) => {
+    console.log('VALUE', value, 'fieldName', fieldName);
     bookingRequest &&
       setBookingRequest &&
       compareValues(value, get(fieldName, freightDetail)) &&
@@ -330,27 +328,41 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
               )}
             </TableCell>
             <TableCell align="right">
-              {editing && isDashboardUser(userRecord) && !isQAutomatic ? (
-                <TextField
-                  label=""
-                  margin="dense"
-                  variant="outlined"
-                  fullWidth
-                  // disabled={isQAutomatic}
-                  type="number"
-                  value={
-                    costUnit && bookingRequest && bookingRequest.containers && isQAutomatic
-                      ? freightDetail.Anz
-                      : quantity
-                  }
-                  onChange={event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0)}
-                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}
-                />
-              ) : freightDetail.Anz ? (
-                formatCurrencyAmount(freightDetail.Anz)
-              ) : (
-                '0,00'
-              )}
+              <EditingInput
+                editing={editing}
+                inputProps={{
+                  name: 'Anz',
+                  type: 'number',
+                  onChange: event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0),
+                  onBlur: event => handleChangeFreightDetails(event.target.value, event.target.name),
+                }}
+                value={
+                  costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
+                }
+                canEdit={isDashboardUser(userRecord) && !isQAutomatic}
+              />
+              {/*{editing && isDashboardUser(userRecord) && !isQAutomatic ? (*/}
+              {/*  <TextField*/}
+              {/*    name="Anz"*/}
+              {/*    label=""*/}
+              {/*    margin="dense"*/}
+              {/*    variant="outlined"*/}
+              {/*    fullWidth*/}
+              {/*    // disabled={isQAutomatic}*/}
+              {/*    type="number"*/}
+              {/*    value={*/}
+              {/*      costUnit && bookingRequest && bookingRequest.containers && isQAutomatic*/}
+              {/*        ? freightDetail.Anz*/}
+              {/*        : quantity*/}
+              {/*    }*/}
+              {/*    onChange={event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0)}*/}
+              {/*    onBlur={event => handleChangeFreightDetails(event.target.value, 'Anz')}*/}
+              {/*  />*/}
+              {/*) : freightDetail.Anz ? (*/}
+              {/*  formatCurrencyAmount(freightDetail.Anz)*/}
+              {/*) : (*/}
+              {/*  '0,00'*/}
+              {/*)}*/}
             </TableCell>
             <TableCell align="right">
               {editing && isDashboardUser(userRecord) ? (
@@ -506,61 +518,25 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const { isOpen, closeModal, openModal } = useModal();
   const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
-  const [numberOfContainersAndTEUs, setNumberOfContainersAndTEUs] = useState(
-    bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest?.containers) : [0, 0],
-  );
+
   const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
-  const containerTypes = useContext(ContainerTypes);
-  const [containerTypeNames, setContainerTypeNames] = useState(
-    containerTypes?.map(containerType => containerType.name),
-  );
+
+  const containers = useMemo(() => calculateContainers(bookingRequest?.containers), [bookingRequest?.containers]);
+
   useEffect(() => {
-    setContainerTypeNames(containerTypes?.map(containerType => containerType.name));
-  }, [containerTypes]);
+    setBookingRequest(prevState =>
+      prevState.freightDetails
+        ? set('freightDetails', onContainersChange(containers, prevState.freightDetails))(prevState)
+        : prevState,
+    );
+  }, [containers]);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     event.stopPropagation();
     setSelectedTab(newValue);
   };
-
-  const handleChangeFreightDetails = (
-    value: string | number | undefined,
-    fieldName: string,
-    freightDetail: FreightDetail,
-  ) => {
-    bookingRequest &&
-      setBookingRequest &&
-      compareValues(value, get(fieldName, freightDetail)) &&
-      setBookingRequest(
-        set(
-          'freightDetails',
-          getUpdatedFreightDetails(bookingRequest, value, freightDetail.SeqNr, fieldName),
-        )(bookingRequest) as BookingRequest,
-      );
-  };
-
-  useEffect(() => {
-    setNumberOfContainersAndTEUs(bookingRequest ? getNumberOfContainersAndTEUs(bookingRequest?.containers) : [0, 0]);
-  }, [bookingRequest?.containers]);
-
-  useEffect(() => {
-    freightDetails?.forEach(freightDetail => {
-      handleChangeFreightDetails(
-        freightDetail.Unit && bookingRequest && bookingRequest.containers
-          ? getQuantity(
-              bookingRequest?.containers,
-              freightDetail.Unit,
-              numberOfContainersAndTEUs,
-              isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
-            ) || freightDetail.Anz
-          : freightDetail.Anz,
-        'Anz',
-        freightDetail,
-      );
-    });
-  }, [bookingRequest?.containers, numberOfContainersAndTEUs]);
 
   useEffect(() => {
     switch (selectedTab) {

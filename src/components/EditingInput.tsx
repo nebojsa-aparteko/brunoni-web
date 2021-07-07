@@ -13,6 +13,6 @@ export default EditingInput;
 interface EditingInputProps {
   editing: boolean;
   inputProps?: TextFieldProps;
-  value?: string;
+  value?: string | number;
   canEdit?: boolean;
 }
