@@ -491,7 +491,7 @@ export const generateCommission = (
         Currency: seaFreightDetail.Currency,
         UnitValue: -value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: -(isPercent ? ((seaFreightDetail.Total || 0) * (quantity || 0)) / 100 || 0 : value || 0),
+        Total: -(((quantity || 1) * (value || 1)) / (isPercent ? 100 : 1)),
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -792,7 +792,7 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
   const carriers = useContext(Carriers);
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      setFreights(takeQuoteDetails(searchResult?.quoteDetails!));
+      setFreights(takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes));
       handleClose();
     },
     [setFreights, chargeCodes],

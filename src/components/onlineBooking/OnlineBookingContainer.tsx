@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Box, Container as ContainerView, makeStyles, Paper, Step, StepLabel, Stepper, Theme } from '@material-ui/core';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { TabPanel } from '../../pages/BookingsPage';
@@ -8,16 +8,8 @@ import ShippingInfo from './ShippingInfo';
 import CargoInfo from './CargoInfo';
 import AdditionalInfo from './AdditionalInfo';
 import Summary from './Summary';
-import { set } from 'lodash/fp';
-import {
-  getNumberOfContainersAndTEUs,
-  getQuantity,
-  isQuantityAutomatic,
-} from '../bookingRequests/BookingRequestFreightDetails';
-import ContainerTypes from '../../contexts/ContainerTypes';
-import ContainerType from '../../model/ContainerType';
 
-import { useForm, FormProvider } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import Carrier from '../../model/Carrier';
 import Port from '../../model/Port';
 
@@ -35,35 +27,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const getUpdatedFreightDetails = (
-  bookingRequest: BookingRequest,
-  containersAndTEUs: number[],
-  containerTypeNames: string[] | undefined,
-) => {
-  return bookingRequest && bookingRequest.freightDetails
-    ? bookingRequest.freightDetails.map(freightDetail =>
-        set(
-          'Anz',
-          freightDetail.Unit && bookingRequest && bookingRequest.containers
-            ? getQuantity(
-                bookingRequest?.containers,
-                freightDetail.Unit,
-                containersAndTEUs,
-                isQuantityAutomatic(freightDetail.Unit, containerTypeNames) || false,
-              ) || freightDetail.Anz
-            : freightDetail.Anz,
-        )(freightDetail),
-      )
-    : undefined;
-};
-
 const steps = ['General Information', 'Cargo Details', 'Additional Information', 'Summary'];
 
 const OnlineBookingContainer = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const methods = useForm<OnlineBookingInputs>();
-  const containerTypes = useContext(ContainerTypes) as ContainerType[];
 
   const [quote] = React.useState(() => {
     const quoteJson = localStorage.getItem('quote');
@@ -71,9 +40,6 @@ const OnlineBookingContainer = () => {
   });
 
   const [bookingRequest, setBookingRequest] = useState<BookingRequest | undefined>();
-  const [containerTypeNames, setContainerTypeNames] = useState(
-    containerTypes ? containerTypes.map(containerType => containerType.name) : undefined,
-  );
   const [files, setFiles] = useState<BookingReqFiles>({
     additional: [],
     imo: [],
@@ -92,24 +58,6 @@ const OnlineBookingContainer = () => {
   const handleBack = useCallback(() => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   }, []);
-
-  useEffect(() => {
-    const newContainerTypeNames = containerTypes ? containerTypes.map(containerType => containerType.name) : undefined;
-    setContainerTypeNames(newContainerTypeNames);
-  }, [containerTypes]);
-
-  useEffect(() => {
-    const updatedFreightDetails =
-      bookingRequest &&
-      getUpdatedFreightDetails(
-        bookingRequest,
-        getNumberOfContainersAndTEUs(bookingRequest?.containers),
-        containerTypeNames,
-      );
-    bookingRequest &&
-      updatedFreightDetails &&
-      setBookingRequest(set('freightDetails', updatedFreightDetails)(bookingRequest));
-  }, [bookingRequest?.containers, containerTypeNames]); //TODO check if we can use bookingRequest.containers
 
   return (
     <>

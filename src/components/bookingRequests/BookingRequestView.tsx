@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -70,6 +71,7 @@ import createAlphacomRepresentationOfBooking from '../../utilities/createAlphaco
 import { ChangedField } from '../bookings/checklist/ActivityModel';
 import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
+import ChargeCodes from '../../contexts/ChargeCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -355,9 +357,10 @@ function ScrollToTopOnMount() {
 type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
 
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
-  const [, userRecord, actingAs] = useUser();
+  const [user, userRecord, actingAs] = useUser();
   const isAdmin = userRecord.isAdmin;
   const classes = useStyles();
+  const chargeCodes = useContext(ChargeCodes);
   const { isOpen, openModal, closeModal } = useModal();
   const {
     isOpen: isOpenAssignmentModal,
@@ -482,7 +485,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     };
   }, [editing, handleSave]);
 
-  const bookNow = useCallback(() => {
+  const bookNow = useCallback(async () => {
     // if freight has ocean freight create leading currency
     // if not choose between eur and usd
     const freight = bookingRequestState?.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
@@ -491,11 +494,26 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => set('leadingCurrency', f?.Currency)(prevState!));
+      const token = await user.getIdToken();
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/bookingRequest`, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(await createAlphacomRepresentationOfBooking(bookingRequest, chargeCodes)),
+      });
+      if (response.ok) {
+        console.log('Response ok');
+      }
     } else {
       return openModal();
     }
-  }, [bookingRequestState]);
-
+  }, [bookingRequest, user, chargeCodes]);
   const handleChangeAgreementNumberText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
   }, []);
@@ -741,7 +759,3 @@ const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeC
   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
   // throw new Error('Function not implemented.');
 };
-
-function filteredChargeCodes(bookingRequest: BookingRequest, filteredChargeCodes: any) {
-  throw new Error('Function not implemented.');
-}

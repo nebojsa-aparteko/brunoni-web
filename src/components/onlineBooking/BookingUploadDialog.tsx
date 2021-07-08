@@ -305,7 +305,7 @@ const mapIntoBookingRequestModel = async (
 
   // Get the latest quote by origin and dest
   const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
-  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers);
+  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
 
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 

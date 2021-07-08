@@ -5,7 +5,7 @@ import {
   FreightDetail,
   VGMSubmittedBy,
 } from '../../model/BookingRequest';
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
@@ -33,6 +33,8 @@ import { QuoteDetail } from '../../providers/QuoteGroupsProvider';
 import { FreightDetailGroup } from '../../model/Booking';
 import ContainerDetails from '../../model/ContainerDetails';
 import Ctg from '../../model/Container';
+import ChargeCode from '../../model/ChargeCode';
+import ChargeCodes from '../../contexts/ChargeCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -153,7 +155,14 @@ const getRelevantFreightDetailsFromQuote = (quoteDetails: QuoteDetail[]) =>
       ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
   );
 
+const findChargeCode = (chargeCodes: ChargeCode[], chargeId?: string) => {
+  if (!chargeId) return undefined;
+  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId);
+  return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
+};
+
 const transformFreightDetails = (
+  chargeCodes: ChargeCode[],
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: QuoteDetail[],
 ): FreightDetail[] =>
@@ -167,7 +176,7 @@ const transformFreightDetails = (
       Unit: quoteDetail.CostUnit,
       Group: FreightDetailGroup.EXTERNAL,
       Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-      // Internal1: chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined,
+      Internal1: findChargeCode(chargeCodes, quoteDetail.ChargeID),
     }),
   ) as FreightDetail[];
 
@@ -214,12 +223,16 @@ const recalculateFreightDetails = (freights: FreightDetail[]) =>
     return set('Total', total)(freightDetail);
   });
 
-export const takeQuoteDetails = (quoteDetails: QuoteDetail[], bkgContainers?: (Ctg & ContainerDetails)[]) => {
+export const takeQuoteDetails = (
+  quoteDetails: QuoteDetail[],
+  bkgContainers?: (Ctg & ContainerDetails)[],
+  chargeCodes?: ChargeCode[],
+) => {
   const containers = calculateContainers(bkgContainers);
 
   return flow(
     getRelevantFreightDetailsFromQuote,
-    transformFreightDetails.bind(this, containers),
+    transformFreightDetails.bind(this, chargeCodes || [], containers),
     updateFreightDetails.bind(this, containers),
     recalculateFreightDetails,
   )(quoteDetails);
@@ -230,6 +243,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const history = useHistory();
   const [, userRecord] = useUser();
   const [, dispatch] = useGlobalAppState();
+  const chargeCodes = useContext(ChargeCodes);
 
   const activityLogUserData = useActivityLogUserData();
   const storageBasePath = useMemo(
@@ -241,7 +255,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
 
-    const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers);
+    const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers, chargeCodes);
     const commission = generateCommission(
       bookingRequest?.schedule,
       freights?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
