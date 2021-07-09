@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Box, Typography } from '@material-ui/core';
 import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 import { BookingCategory } from '../../model/Booking';
 import ExportFlowsTable from './ExportFlowsTable';
+import CarrierInput from '../inputs/CarrierInput';
 import { set } from 'lodash/fp';
 import VersionFilter from '../VersionFilter';
 import Carriers from '../../contexts/Carriers';
@@ -10,27 +11,29 @@ import { useEquipmentControlFilterProviderContext } from '../../providers/Equipm
 import useUser from '../../hooks/useUser';
 
 const ExportFlowsContainer: React.FC = () => {
-  const user = useUser()[1];
   const summary = useEquipmentSummary(BookingCategory.Export);
   const carriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
-  const { version } = filters;
+  const { version, carrier } = filters;
+  const user = useUser()[1];
 
-  useEffect(() => {
-    user.carrier &&
-      setFilters &&
-      setFilters(
-        set(
-          'carrier',
-          carriers?.find(carrier => carrier.id === user.carrier),
-        )(filters),
-      );
-  }, [user.carrier, carriers]);
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   return (
     <Box>
       <Typography variant="h4">Export Flows</Typography>
       <Box width="95vw" display="flex" flexDirection="row">
+        <Box minWidth={250} maxWidth={400} margin={4} marginLeft={0} paddingRight={1}>
+          <CarrierInput
+            label="Select a carrier"
+            onChange={carrier => setFilters(prevState => set('carrier', carrier)(prevState))}
+            carriers={availableCarriers}
+            value={carrier}
+          />
+        </Box>
         <VersionFilter
           value={version}
           onChange={event => setFilters(prevState => set('version', event.target.value)(prevState))}

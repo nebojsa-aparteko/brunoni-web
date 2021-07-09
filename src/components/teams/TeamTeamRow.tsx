@@ -18,6 +18,7 @@ import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
 import pick from 'lodash/fp/pick';
 import { TaskDescription, TaskType } from '../../model/Task';
+import CarriersMultiInput from '../inputs/CarriersMultiInput';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -128,21 +129,22 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...oth
         <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
       </TableCell>
       <TableCell align="right">
-        <Autocomplete
-          multiple
-          autoHighlight
-          options={carriers || []}
-          getOptionSelected={(option, value) => option.name === value.name}
-          getOptionLabel={option => option.name}
-          defaultValue={team.carriers}
-          onChange={handleCarrierChange}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)
-          }
-          renderInput={params => (
-            <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />
-          )}
-        />
+        <CarriersMultiInput options={carriers || []} defaultValues={team.carriers} onChange={handleCarrierChange} />
+        {/*<Autocomplete*/}
+        {/*  multiple*/}
+        {/*  autoHighlight*/}
+        {/*  options={carriers || []}*/}
+        {/*  getOptionSelected={(option, value) => option.name === value.name}*/}
+        {/*  getOptionLabel={option => option.name}*/}
+        {/*  defaultValue={team.carriers}*/}
+        {/*  onChange={handleCarrierChange}*/}
+        {/*  renderTags={(value, getTagProps) =>*/}
+        {/*    value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)*/}
+        {/*  }*/}
+        {/*  renderInput={params => (*/}
+        {/*    <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />*/}
+        {/*  )}*/}
+        {/*/>*/}
       </TableCell>
       <TableCell align="right">
         <Autocomplete

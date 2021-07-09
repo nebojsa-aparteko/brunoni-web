@@ -24,7 +24,7 @@ export default interface UserRecord extends UserRecordMin {
   dontShowGuide?: boolean;
   lastOpenedChecklistTab?: string;
   unreadNotifications?: number;
-  carrier?: string;
+  carriers?: string[];
 }
 
 export type Role = 'superadmin' | 'sales' | 'operations';

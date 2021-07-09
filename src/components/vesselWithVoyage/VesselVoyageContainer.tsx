@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Card, CardContent, CardHeader, Divider, Typography } from '@material-ui/core';
 import useVesselWithVoyage from '../../hooks/useVesselWithVoyage';
 import VesselVoyageItem from './VesselVoyageItem';
@@ -9,6 +9,7 @@ import set from 'lodash/fp/set';
 import VesselVoyageDialog from './VesselVoyageDialog';
 import { BookingCategory } from '../../model/Booking';
 import { useVesselFilterContext } from '../../providers/VesselOverviewFilterProvider';
+import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import theme from '../../theme';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
@@ -19,28 +20,23 @@ const groups = ['vesselWithVoyage', 'pol'];
 
 const VesselVoyageContainer: React.FC<Props> = () => {
   const vessel = useVesselWithVoyage();
-  const user = useUser()[1];
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [vesselName, setVesselName] = useState('');
   const [dialogData, setDialogData] = useState<VesselWithVoyage[] | undefined>(undefined);
   const [filters, setFilters] = useVesselFilterContext();
-  const { category, dateRange } = filters;
+  const { category, carrier, dateRange } = filters;
   const carriers = useContext(Carriers);
+  const user = useUser()[1];
 
-  useEffect(() => {
-    user.carrier &&
-      setFilters &&
-      setFilters(
-        set(
-          'carrier',
-          carriers?.find(carrier => carrier.id === user.carrier),
-        )(filters),
-      );
-  }, [user.carrier, carriers]);
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
   }, [setIsDialogOpen]);
+
   const normalizedVessel = useMemo(
     () =>
       vessel?.reduce((r: any, o: any) => {
@@ -54,14 +50,17 @@ const VesselVoyageContainer: React.FC<Props> = () => {
       }, {}),
     [vessel],
   );
+
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (setFilters) setFilters(set('category', (event.target as HTMLInputElement).value as BookingCategory)(filters));
   };
+
   const handleDialogOpen = (item: VesselWithVoyage[], vessel: string) => {
     setVesselName(vessel);
     setDialogData(item);
     setIsDialogOpen(true);
   };
+
   return (
     <Card>
       <CardHeader
@@ -72,6 +71,16 @@ const VesselVoyageContainer: React.FC<Props> = () => {
             </Typography>
             <Divider orientation="vertical" style={{ height: '100%' }} />
             <CategoryFilter value={category} onChange={handleImportOrExportChange} />
+            <Box display="flex" style={{ minWidth: theme.spacing(35) }}>
+              <CarrierInput
+                label={'Carriers'}
+                carriers={availableCarriers}
+                onChange={carrier => {
+                  if (setFilters) setFilters(set('carrier', carrier)(filters));
+                }}
+                value={carrier}
+              />
+            </Box>
             <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
               <DateRangeInput
                 onChange={dateRange => {

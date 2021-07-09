@@ -1,22 +1,22 @@
-import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useContainers from '../../../hooks/useContainers';
 import map from 'lodash/fp/map';
 import invoke from 'lodash/fp/invoke';
 import {
-  Box,
-  Button,
   Card,
   CardContent,
   CardHeader,
-  createStyles,
-  makeStyles,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
   Typography,
+  Button,
+  Box,
+  makeStyles,
+  createStyles,
 } from '@material-ui/core';
 import LoadListUploadDialog from './LoadListUploadDialog';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
@@ -28,6 +28,7 @@ import LoadListContainerModel from '../../../model/LoadListContainerModel';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import AddIcon from '@material-ui/icons/Add';
 import { useLoadListFilterContext } from '../../../providers/LoadListFilterProvider';
+import CarrierInput from '../../inputs/CarrierInput';
 import set from 'lodash/fp/set';
 import Carriers from '../../../contexts/Carriers';
 import theme from '../../../theme';
@@ -85,22 +86,16 @@ const LoadListContainer = () => {
   const [dialogData, setDialogData] = useState<Booking | undefined>(undefined);
   const [isProgressDialogOpen, setIsProgressDialogOpen] = useState(false);
   const [filters, setFilters] = useLoadListFilterContext();
-  const { origin, dateRange } = filters;
+  const { carrier, origin, dateRange } = filters;
   const classes = useStyles();
-  const user = useUser()[1];
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
+  const user = useUser()[1];
 
-  useEffect(() => {
-    user.carrier &&
-      setFilters &&
-      setFilters(
-        set(
-          'carrier',
-          carriers?.find(carrier => carrier.id === user.carrier),
-        )(filters),
-      );
-  }, [user.carrier, carriers]);
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   const handleProgressClick = useCallback(
     async (event: React.MouseEvent<unknown>, bookingId: string) => {
@@ -147,6 +142,16 @@ const LoadListContainer = () => {
           <Box display="flex" alignItems="center">
             <Typography variant="h3">Load list</Typography>
             <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+              <CarrierInput
+                label={'Carriers'}
+                carriers={availableCarriers}
+                onChange={carrier => {
+                  if (setFilters) setFilters(set('carrier', carrier)(filters));
+                }}
+                value={carrier}
+              />
+            </Box>
+            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
               <PortInput
                 label="Origin"
                 ports={ports || []}
@@ -180,7 +185,7 @@ const LoadListContainer = () => {
       <CardContent>
         {!containers && <ChartsCircularProgress />}
         {normalizedContainers &&
-          Object.entries(normalizedContainers).map(([date, items]: any) => (
+          Object.entries(normalizedContainers).map(([date, items]: any, index: number) => (
             <Fragment key={`date-loadList-${date}`}>
               {Object.entries(items).map(([pol, items]: any, index: number) => (
                 <Card key={`mapitemid-${index}`} style={{ marginBottom: '2em' }}>

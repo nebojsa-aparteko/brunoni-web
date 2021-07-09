@@ -10,19 +10,26 @@ import firebase from '../../firebase';
 import { pick } from 'lodash/fp';
 import UserNotificationRedirectionSwitch from '../UserNotificationRedirectionSwitch';
 import { Checkbox } from '@material-ui/core';
-import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
+import CarriersMultiInput from '../inputs/CarriersMultiInput';
+import Carrier from '../../model/Carrier';
+import asArray from '../../utilities/asArray';
 
 const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
   const carriers = useContext(Carriers);
+  const selectedCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
+
   const assignableUsersWithoutCurrent = useMemo(
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
     [assignableUsers, user],
   );
-  const userCarrier = useMemo(() => {
-    return user.carrier ? carriers?.find(carrier => carrier.id === user.carrier) : undefined;
-  }, [user.carrier, carriers]);
+  // const userCarrier = useMemo(() => {
+  //   return user.carrier ? carriers?.find(carrier => carrier.id === user.carrier) : undefined;
+  // }, [user.carrier, carriers]);
 
   const handleChangeRedirectedAdmin = useCallback(
     (selectedUser: UserRecordMin | null) => {
@@ -36,17 +43,15 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
     [user],
   );
 
-  const handleChangeCarrier = useCallback(
-    (selectedCarrierId?: string) => {
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(user.id)
-        .set({ carrier: selectedCarrierId ? selectedCarrierId : null }, { merge: true })
-        .then(_ => console.log('Saved'));
-    },
-    [user],
-  );
+  const handleChangeCarriers = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
+    const carrierIds = asArray(value).map(carrier => carrier.id);
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(user.id)
+      .set({ carriers: carrierIds && carrierIds.length > 0 ? carrierIds : null }, { merge: true })
+      .then(_ => console.log('Saved'));
+  };
 
   return (
     <TableRow {...other}>
@@ -64,12 +69,13 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
       <TableCell align="right">
-        <CarrierInput
-          label={'Select Carrier'}
-          carriers={carriers || []}
-          onChange={carrier => handleChangeCarrier(carrier?.id)}
-          value={userCarrier}
-        />
+        <CarriersMultiInput options={carriers || []} defaultValues={selectedCarriers} onChange={handleChangeCarriers} />
+        {/*<CarrierInput*/}
+        {/*  label={'Select Carrier'}*/}
+        {/*  carriers={carriers || []}*/}
+        {/*  onChange={carrier => handleChangeCarrier(carrier?.id)}*/}
+        {/*  value={userCarrier}*/}
+        {/*/>*/}
       </TableCell>
       <TableCell align="right">
         {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}
