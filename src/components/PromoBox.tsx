@@ -5,6 +5,8 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 import Zoom from '@material-ui/core/Zoom';
 import { Button, Card, CardActions, CardContent, CardMedia } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
+import useUser from '../hooks/useUser';
+import firebase from '../firebase';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function PromoBox() {
   const classes = useStyles();
+  const [, userRecord] = useUser();
   const [showInterest, setShowInterest] = useState(false);
   const [dismissPopup, setDismissPopup] = useState(false);
   const trigger = useScrollTrigger({
@@ -40,10 +43,25 @@ export default function PromoBox() {
   };
 
   const handleDismissPopup = () => {
+    if (userRecord?.id && !showInterest)
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(userRecord.id)
+        .set({ showedInterest: false }, { merge: true })
+        .then(() => console.log('Not Showed interest'));
     setDismissPopup(true);
   };
 
   const handleShowInterest = () => {
+    console.log(userRecord.id);
+    if (userRecord?.id)
+      firebase
+        .firestore()
+        .collection('users')
+        .doc(userRecord.id)
+        .set({ showedInterest: true }, { merge: true })
+        .then(() => console.log('Showed interest'));
     setShowInterest(true);
   };
 

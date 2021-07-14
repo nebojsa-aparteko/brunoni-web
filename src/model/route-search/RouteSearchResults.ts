@@ -33,6 +33,7 @@ export type SearchResultsPort = {
   Land: string;
   PortName: string;
   PortAgent: string;
+  PortAgentID: string;
   TerminalID?: string;
 };
 

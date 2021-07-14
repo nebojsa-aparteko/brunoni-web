@@ -24,6 +24,7 @@ export const normalizeBookingRequest = flow(
 export const normalizeBookingRequests = map(normalizeBookingRequest);
 interface BookingRequestFilters extends ContextFilters {
   carrier?: Carrier | undefined;
+  hold?: boolean;
 }
 
 const BookingRequestsContext = createContext<

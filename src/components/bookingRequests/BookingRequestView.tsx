@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -63,6 +64,10 @@ import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
 import { difference } from '../../utilities/getDifferenceObject';
+import { WeeklyPaymentApiAction } from '../../model/WeeklyPayment';
+import { addDays } from 'date-fns';
+import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
+import ChargeCodes from '../../contexts/ChargeCodes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -312,7 +317,7 @@ function ScrollToTopOnMount() {
 type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
 
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
-  const [, userRecord, actingAs] = useUser();
+  const [user, userRecord, isAdmin] = useUser();
   const classes = useStyles();
   const { isOpen, openModal, closeModal } = useModal();
   const {
@@ -324,9 +329,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
   const menuRef = useRef<DropdownMenuHandle>();
-  useEffect(() => {
-    console.log(bookingRequest);
-  }, [bookingRequest]);
+  const chargeCodes = useContext(ChargeCodes);
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
   );
@@ -393,6 +396,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     [bookingRequest],
   );
 
+  const onHoldClick = useCallback(
+    () =>
+      firebase
+        .firestore()
+        .collection('bookings-requests')
+        .doc(bookingRequest?.id)
+        .update('hold', !bookingRequest.hold),
+    [bookingRequest],
+  );
+
   const storeActivity = useCallback(
     (checklistItemActivityHandler: () => Promise<void | any>) => {
       checklistItemActivityHandler()
@@ -428,7 +441,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     };
   }, [editing, handleSave]);
 
-  const bookNow = useCallback(() => {
+  const bookNow = useCallback(async () => {
     // if freight has ocean freight create leading currency
     // if not choose between eur and usd
     const freight = bookingRequestState?.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
@@ -437,10 +450,39 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+      try {
+        const token = await user.getIdToken();
+        console.log('Postponing', await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes));
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/bookingRequest`, {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Content-Disposition': 'attachment; filename=test.json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes)),
+        });
+
+        if (response.ok) {
+          console.log(await response.json());
+          // const body = await response.json();
+          // console.log('Body', await response.blob());
+        } else {
+          const body = await response.json();
+          console.error(`Failed to request`, response, body);
+        }
+      } catch (e) {
+        console.error('Failed to perform request', e);
+      } finally {
+      }
     } else {
       return openModal();
     }
-  }, [bookingRequestState]);
+  }, [bookingRequestState, user, chargeCodes]);
 
   const handleChangeAgreementNumberText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
@@ -457,6 +499,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         bookingRequest.id!,
         createActivityObject({
           changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
+          by: getActivityLogUserData,
+        }),
+      ),
+    );
+  const holdHandler = () =>
+    onHoldClick().then(() =>
+      addActivityItem(
+        'bookings-requests',
+        bookingRequest.id!,
+        createActivityObject({
+          changeType: !bookingRequest.hold ? ActivityChangeType.PUT_ON_HOLD : ActivityChangeType.REVERT_PUT_ON_HOLD,
           by: getActivityLogUserData,
         }),
       ),
@@ -556,7 +609,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                   <SupervisedUserCircleIcon />
                 </IconButton>
-                {!actingAs && (
+                {isAdmin && (
                   <Fragment>
                     <Button
                       aria-label="archive"
@@ -566,6 +619,19 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       onClick={() => storeActivity(archiveHandler)}
                     >
                       {bookingRequest.archived ? 'Restore' : 'Archive'}
+                    </Button>
+                  </Fragment>
+                )}
+                {isAdmin && (
+                  <Fragment>
+                    <Button
+                      aria-label="hold"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ArchiveIcon />}
+                      onClick={() => storeActivity(holdHandler)}
+                    >
+                      {bookingRequest.hold ? 'Hold' : 'Unhold'}
                     </Button>
                   </Fragment>
                 )}
