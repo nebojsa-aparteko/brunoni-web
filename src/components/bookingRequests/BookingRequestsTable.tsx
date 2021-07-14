@@ -36,6 +36,9 @@ import VesselAllocationButton from '../VesselAllocationButton';
 import { getVoyageInfo } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
+import TagsPreviewList from '../tags/TagsPreviewList';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { Tag, TagCategory } from '../../model/Tag';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -216,6 +219,22 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   const history = useHistory();
   const [, userRecord] = useUser();
 
+  const tags = useFirestoreCollection(
+    'bookings-requests',
+    useCallback(
+      query => {
+        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
+        return queryByCategory.orderBy('createdAt', 'asc');
+      },
+      [isAdmin],
+    ),
+    bookingRequest.id,
+    'tags',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Tag[];
+
   const handleRowClick = useCallback(
     (id: string) => {
       if (!preventDefaultClick) {
@@ -231,6 +250,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
       onClick={() => handleRowClick(bookingRequest.id!)}
       style={{ display: 'flex', backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)' }}
     >
+      <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
+        <TagsPreviewList tags={tags} />
+      </Box>
       <Checkbox
         checked={bookingRequest.id ? selectedRequests.includes(bookingRequest.id) : false}
         onClick={event => {

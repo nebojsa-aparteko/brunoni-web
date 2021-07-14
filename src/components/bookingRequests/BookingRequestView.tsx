@@ -72,6 +72,9 @@ import { ChangedField } from '../bookings/checklist/ActivityModel';
 import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
 import ChargeCodes from '../../contexts/ChargeCodes';
+import TagsList from '../tags/TagsList';
+import { Tag, TagCategory } from '../../model/Tag';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -377,6 +380,23 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
+
+  const tags = useFirestoreCollection(
+    'bookings-requests',
+    useCallback(
+      query => {
+        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING_REQUEST);
+        return queryByCategory.orderBy('createdAt', 'asc');
+      },
+      [isAdmin],
+    ),
+    bookingRequest.id,
+    'tags',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Tag[];
+
   const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]);
 
   const activities = useActivities(
@@ -649,6 +669,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
+              <Box px={1}>
+                <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
+              </Box>
               {!editing && isDashboardUser(userRecord) && <BookNowButton bookNow={bookNow} />}
               <Box className={classes.actions} displayPrint="none">
                 <EditButton

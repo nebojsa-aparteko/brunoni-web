@@ -48,6 +48,8 @@ import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
+import TagsList from '../tags/TagsList';
+import { Tag, TagCategory } from '../../model/Tag';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -150,6 +152,7 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
+  // const tags = useContext(Tags);
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
@@ -161,7 +164,21 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
-
+  const tags = useFirestoreCollection(
+    'bookings',
+    useCallback(
+      query => {
+        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
+        return queryByCategory.orderBy('createdAt', 'asc');
+      },
+      [isAdmin],
+    ),
+    booking.id,
+    'tags',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Tag[];
   const pinnedActivities = useFirestoreCollection(
     'bookings',
     useCallback(
@@ -274,6 +291,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       setPrintRequested(false);
     }
   }, [printRequested]);
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {normalizedPinnedActivities === undefined && (
@@ -349,6 +367,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 </Typography>
               </Box>
               <Box flex="1" />
+              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
               <Box className={classes.actions} displayPrint="none">
                 {!actingAs && (
                   <Fragment>

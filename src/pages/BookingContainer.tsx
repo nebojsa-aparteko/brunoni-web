@@ -7,6 +7,9 @@ import { Booking } from '../model/Booking';
 import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../components/dashboard/ChartsCircularProgress';
 import { useHistory } from 'react-router';
+import Tags from '../contexts/Tags';
+import { TagCategory } from '../model/Tag';
+import FirestoreCollectionProvider from '../providers/FirestoreCollection';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -38,7 +41,13 @@ const BookingContainer: React.FC<Props> = ({ match }) => {
       </Paper>
     </Container>
   ) : (
-    <BookingView booking={booking} />
+    <FirestoreCollectionProvider
+      name="tags"
+      context={Tags}
+      query={query => query.where('category', '==', TagCategory.BOOKING)}
+    >
+      <BookingView booking={booking} />
+    </FirestoreCollectionProvider>
   );
 };
 

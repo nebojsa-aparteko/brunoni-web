@@ -12,12 +12,15 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import set from 'lodash/fp/set';
 import flow from 'lodash/fp/flow';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
-import BookingRequestsProvider, { useBookingRequestsContext } from '../providers/BookingRequestsProvider';
+import BookingRequestsProvider from '../providers/BookingRequestsProvider';
 import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import InputIcon from '@material-ui/icons/Input';
 import firebase from 'firebase';
 import { useBookingRequestsFilterContext } from '../providers/BookingRequestsFilterProvider';
+import FirestoreCollectionProvider from '../providers/FirestoreCollection';
+import Tags from '../contexts/Tags';
+import { TagCategory } from '../model/Tag';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -230,21 +233,33 @@ const BookingsPageContainer: React.FC = () => {
             />
             <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
           </Tabs>
-          <TabPanel value={selectedTab} index={0}>
-            <BookingsView isAdmin={!actingAs} />
-          </TabPanel>
-          <TabPanel value={selectedTab} index={1}>
-            <BookingsView isAdmin={!actingAs} />
-          </TabPanel>
-          <TabPanel value={selectedTab} index={2}>
-            <BookingsView isAdmin={!actingAs} archived showDateRangeFilter />
-          </TabPanel>
-          <TabPanel value={selectedTab} index={3}>
-            <BookingRequestsView isAdmin={!actingAs} />
-          </TabPanel>
-          <TabPanel value={selectedTab} index={4}>
-            <BookingRequestsView isAdmin={!actingAs} />
-          </TabPanel>
+          <FirestoreCollectionProvider
+            name="tags"
+            context={Tags}
+            query={query => query.where('category', '==', TagCategory.BOOKING)}
+          >
+            <TabPanel value={selectedTab} index={0}>
+              <BookingsView isAdmin={!actingAs} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={1}>
+              <BookingsView isAdmin={!actingAs} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={2}>
+              <BookingsView isAdmin={!actingAs} archived showDateRangeFilter />
+            </TabPanel>
+          </FirestoreCollectionProvider>
+          <FirestoreCollectionProvider
+            name="tags"
+            context={Tags}
+            query={query => query.where('category', '==', TagCategory.BOOKING_REQUEST)}
+          >
+            <TabPanel value={selectedTab} index={3}>
+              <BookingRequestsView isAdmin={!actingAs} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={4}>
+              <BookingRequestsView isAdmin={!actingAs} />
+            </TabPanel>
+          </FirestoreCollectionProvider>
         </Box>
       ) : (
         <Box className={classes.tabContainer}>

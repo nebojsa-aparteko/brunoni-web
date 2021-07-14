@@ -1,17 +1,16 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   Box,
-  makeStyles,
-  Divider,
-  Paper,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
-  CardActions,
+  Divider,
+  Grid,
+  makeStyles,
+  Paper,
   TablePagination,
   Typography,
-  IconButton,
-  Grid,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -30,9 +29,6 @@ import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 import CategoryFilter from './CategoryFilter';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 import { useBookingsContext } from '../providers/BookingsProvider';
-import AddIcon from '@material-ui/icons/Add';
-import useModal from '../hooks/useModal';
-import BookingUploadDialog from './onlineBooking/BookingUploadDialog';
 
 interface Props {
   isAdmin?: boolean;
@@ -219,6 +215,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
                     <div id="exportImportBkgView">
                       <CategoryFilter value={filters.category} onChange={handleImportOrExportChange} />
                     </div>
+
                     <Box flex={1} />
 
                     <Search
