@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import WeeklyPayment, {
   WeeklyPaymentApiAction,
   WeeklyPaymentPlatformStatus,
@@ -40,6 +40,8 @@ import { GlobalContext } from '../../../store/GlobalStore';
 import ActingAs from '../../../contexts/ActingAs';
 import { useSnackbar } from 'notistack';
 import useUser from '../../../hooks/useUser';
+import firebase from '../../../firebase';
+import Task, { TaskType } from '../../../model/Task';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -169,6 +171,18 @@ const RevertApprovalDialog: React.FC<RevertApprovalDialogProps> = ({
   );
 };
 
+const getTask = async (bookingId: string, taskId: string) => {
+  return (
+    await firebase
+      .firestore()
+      .collection('bookings')
+      .doc(bookingId)
+      .collection('tasks')
+      .doc(taskId)
+      .get()
+  ).data() as Task;
+};
+
 const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
   payment,
   booking,
@@ -181,6 +195,13 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
   const [user] = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
+  const [resolved, setResolved] = useState<boolean>(false);
+
+  useEffect(() => {
+    getTask(booking.id, `${TaskType.CLEAR_INVOICE}_${payment.id!}`).then(task => {
+      setResolved(task.resolved);
+    });
+  }, [booking.id, payment]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -222,7 +243,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           });
         });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar, updateComponent],
   );
 
   const handleChangePaymentStatus = useCallback(
@@ -269,6 +290,10 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
     ],
   );
 
+  const revertApprovalDisabled = useMemo(() => {
+    return (resolved && payment.status === WeeklyPaymentStatus.BLOCKED) || payment.status === WeeklyPaymentStatus.PAID;
+  }, [payment.status, resolved]);
+
   const paymentApprovalDisabled = useMemo(
     () =>
       payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD ||
@@ -300,8 +325,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           </Button>
         )
       ) : (
-        ((payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
-          payment.status === WeeklyPaymentStatus.BLOCKED) && (
+        !revertApprovalDisabled && (
           <Button onClick={handleDialogOpen} color="primary" variant="outlined">
             Revert Approval
           </Button>

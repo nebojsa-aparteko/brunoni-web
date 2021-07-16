@@ -26,18 +26,7 @@ const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ booki
   return (
     <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
       {checklistItems?.map(item =>
-        item.isInternal ? (
-          !actingAs && (
-            <BookingRequestChecklistRow
-              key={`chkitem-${bookingRequest.id}-${item.id}`}
-              bookingRequest={bookingRequest}
-              isAdmin={!actingAs}
-              checklistItem={item}
-              comparableDocuments={[]}
-              isCommentIconHidden={isCommentIconHidden}
-            />
-          )
-        ) : (
+        !(actingAs && item.isInternal) ? (
           <BookingRequestChecklistRow
             key={`chkitem-${bookingRequest.id}-${item.id}`}
             bookingRequest={bookingRequest}
@@ -46,7 +35,7 @@ const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ booki
             comparableDocuments={[]}
             isCommentIconHidden={isCommentIconHidden}
           />
-        ),
+        ) : null,
       )}
     </Box>
   );
