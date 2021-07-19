@@ -280,7 +280,9 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handleWeightTextChange = (v: number | null) => {
-    setContainer(set('weight', v)(container));
+    let res = v && v < 0 ? 0 : v;
+    res = res && isNaN(res) ? null : res;
+    setContainer(set('weight', res)(container));
   };
 
   const handleWeightChange = (v: number | null) => {
@@ -425,14 +427,17 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             )}
             <Grid item md={2} xs={12}>
               <TextField
+                defaultValue={null}
                 label="Weight (Kg)"
                 type="number"
                 margin="dense"
                 variant="outlined"
                 fullWidth
                 value={container.weight}
-                onChange={event => handleWeightTextChange(parseInt(event.target.value))}
-                onBlur={event => handleWeightChange(parseInt(event.target.value))}
+                onChange={event =>
+                  handleWeightTextChange(event.target.value === '' ? null : parseInt(event.target.value))
+                }
+                onBlur={event => handleWeightChange(event.target.value === '' ? null : parseInt(event.target.value))}
               />
             </Grid>
             {container.containerType && isReefer(container.containerType) && (

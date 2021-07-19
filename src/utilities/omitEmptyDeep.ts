@@ -8,11 +8,11 @@ const omitEmptyDeep = (obj: any) => {
   }
 };
 
-export const removeEmpty = (obj: any) => {
+export const removeEmptyDeep = (obj: any) => {
   let finalObj = {} as any;
   Object.keys(obj).forEach(key => {
     if (obj[key] && typeof obj[key] === 'object') {
-      const nestedObj = removeEmpty(obj[key]);
+      const nestedObj = removeEmptyDeep(obj[key]);
       if (Object.keys(nestedObj).length) {
         finalObj[key] = nestedObj;
       }

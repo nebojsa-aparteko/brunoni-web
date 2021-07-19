@@ -46,8 +46,8 @@ import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/C
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import omitEmptyDeep, { removeEmpty } from '../../utilities/omitEmptyDeep';
-import { flow, isEqual, keys, map, pick, set, update } from 'lodash/fp';
+import omitEmptyDeep, { removeEmptyDeep } from '../../utilities/omitEmptyDeep';
+import { flow, isEqual, keys, map, omit, pick, set, update } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -423,14 +423,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   useEffect(() => {
     setBookingRequestState(bookingRequest);
     setAgreementNumber(bookingRequest.agreementNo || '');
-  }, [bookingRequest, setBookingRequestState]);
+  }, [bookingRequest]);
 
   useEffect(() => {
     Mousetrap.bind(['command+shift+e', 'ctrl+shift+e'], () => setEditing(prevState => !prevState));
     return () => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
-  }, [setEditing]);
+  }, []);
 
   const handleSave = useCallback(() => {
     const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
@@ -439,7 +439,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     omitEmptyDeep(br);
     dispatch({ type: 'START_GLOBAL_LOADING' });
     if (br) {
-      updateBookingRequest({ ...br!, agreementNo: agreementNumber })
+      updateBookingRequest({ ...br, agreementNo: agreementNumber })
         ?.then(() => {
           dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
         })
@@ -565,12 +565,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const createChangedFieldsObject = (changedKeys: string[], oldVal: any, newVal: any) => {
     const changedFields: ChangedField[] = [];
     changedKeys.forEach(key => {
-      const obj = removeEmpty({
+      const obj = removeEmptyDeep({
         fieldName: key,
         oldVal: oldVal[key],
         newVal: newVal[key],
       });
-      // omitEmptyDeep(obj)
       changedFields.push(obj as ChangedField);
     });
     return changedFields;
@@ -578,11 +577,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   const handleFieldsEditActivity = async () => {
     //todo. without freight details for now?... Because it change at beggining
-    const oldObject = diff(bookingRequestState, bookingRequest);
-    const newObject = diff(bookingRequest, bookingRequestState);
+    const oldObject = diff(omit('freightDetails')(bookingRequestState), omit('freightDetails')(bookingRequest));
+    const newObject = diff(omit('freightDetails')(bookingRequest), omit('freightDetails')(bookingRequestState));
     // console.log('oldObject')
     // console.log(oldObject)
-
+    //
     // console.log('new Object')
     // console.log(newObject)
     const changedKeys = keys(newObject);
@@ -599,7 +598,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // console.log('activityObject')
     // console.log(activityObject)
     if (changedKeys.length > 0) {
-      await addActivityItem('bookings-requests', bookingRequest.id!, activityObject);
+      bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
     }
   };
   // const chargeCodes = useContext(ChargeCodes);
@@ -652,6 +651,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 />
                 {editing && isDashboardUser(userRecord) ? (
                   <TextField
+                    defaultValue={''}
                     label="Agreement No."
                     margin="dense"
                     variant="outlined"
