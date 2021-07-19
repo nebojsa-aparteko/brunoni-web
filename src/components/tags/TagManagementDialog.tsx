@@ -244,7 +244,7 @@ const addSelectedTag = (tagCategory: TagCategory, tag: Tag, documentId: string) 
     .doc(documentId)
     .collection(tagCategory === TagCategory.BOOKING ? 'tags-booking' : 'tags-booking-request')
     .doc(tag.id)
-    .set(set('createdAt', new Date())(tag));
+    .set(flow(set('createdAt', new Date()), set('documentId', documentId))(tag));
 };
 
 const removeSelectedTag = (tagCategory: TagCategory, tagId: string, documentId: string) => {
