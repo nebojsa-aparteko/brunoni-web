@@ -174,7 +174,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       [isAdmin],
     ),
     booking.id,
-    'tags',
+    'tags-booking',
   )?.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),

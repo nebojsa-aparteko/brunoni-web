@@ -242,7 +242,7 @@ const addSelectedTag = (tagCategory: TagCategory, tag: Tag, documentId: string) 
     .firestore()
     .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
     .doc(documentId)
-    .collection('tags')
+    .collection(tagCategory === TagCategory.BOOKING ? 'tags-booking' : 'tags-booking-request')
     .doc(tag.id)
     .set(set('createdAt', new Date())(tag));
 };
@@ -252,7 +252,7 @@ const removeSelectedTag = (tagCategory: TagCategory, tagId: string, documentId: 
     .firestore()
     .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
     .doc(documentId)
-    .collection('tags')
+    .collection(tagCategory === TagCategory.BOOKING ? 'tags-booking' : 'tags-booking-request')
     .doc(tagId)
     .delete();
 };

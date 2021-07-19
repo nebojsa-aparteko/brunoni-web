@@ -240,7 +240,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
       [isAdmin],
     ),
     booking.id,
-    'tags',
+    'tags-booking',
   )?.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),
