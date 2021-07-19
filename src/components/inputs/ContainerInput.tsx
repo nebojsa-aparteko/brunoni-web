@@ -498,8 +498,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     variant="outlined"
                     fullWidth
                     value={container.pickupReference || ''}
-                    onChange={event => handlePickupReferenceTextChange(event.target.value)}
-                    onBlur={event => handlePickupReferenceChange(event.target.value)}
+                    onChange={event =>
+                      handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                    }
+                    onBlur={event => handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)}
                   />
                 </Grid>
               )}
@@ -511,8 +513,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     variant="outlined"
                     fullWidth
                     value={container.deliveryReference || ''}
-                    onChange={event => handleDeliveryReferenceTextChange(event.target.value)}
-                    onBlur={event => handleDeliveryReferenceChange(event.target.value)}
+                    onChange={event =>
+                      handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                    }
+                    onBlur={event =>
+                      handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
+                    }
                   />
                 </Grid>
               )}
@@ -524,8 +530,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     variant="outlined"
                     fullWidth
                     value={container.vgmPin || ''}
-                    onChange={event => handleVGMPinTextChange(event.target.value)}
-                    onBlur={event => handleVGMPinChange(event.target.value)}
+                    onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
+                    onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
                   />
                   <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
                     {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
