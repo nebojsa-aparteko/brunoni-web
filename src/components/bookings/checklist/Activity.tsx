@@ -13,6 +13,7 @@ import { formatDateSafe } from '../../../utilities/formattingHelpers';
 import { activityHasLink, getFullName, isPlatformActivity } from '../../../utilities/activityHelper';
 import { BookingRequestLabels } from '../../../model/BookingRequest';
 import isString from '../../../utilities/isString';
+import { isNil } from 'lodash/fp';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -202,6 +203,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
                 <Typography color={'primary'}>{BookingRequestLabels[field.fieldName]}</Typography>
                 <Typography style={{ paddingLeft: '.5em' }}>
                   {isString(field.oldVal) && isString(field.newVal) ? `(${field.oldVal} -> ${field.newVal})` : ''}
+                  {isNil(field.oldVal) && isString(field.newVal) ? `( -> ${field.newVal})` : ''}
+                  {isString(field.oldVal) && isNil(field.newVal) ? `(${field.oldVal} -> )` : ''}
                 </Typography>
                 {index !== activity.changedFields!.length - 1 && (
                   <Typography style={{ paddingRight: '.5em' }}>,</Typography>

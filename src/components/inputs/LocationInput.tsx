@@ -88,7 +88,7 @@ const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       options={sortedLocations}
       getOptionLabel={getLocationLabel}
       filterOptions={filterOptions}
-      getOptionSelected={(option, value1) => option.id === value1.id}
+      getOptionSelected={(option, value1) => option?.id === value1?.id}
       open={open}
       setOpen={setOpen}
       value={value}

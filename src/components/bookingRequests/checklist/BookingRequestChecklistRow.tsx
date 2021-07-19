@@ -369,7 +369,7 @@ const BookingRequestChecklistRow = ({
             <a id={checklistItem.id} />
             {isAdmin ? (
               <Checkbox
-                defaultChecked={checklistItem.checked}
+                checked={checklistItem.checked || false}
                 disabled={!isAdmin}
                 onChange={event => handleCheckboxChange(event.target.checked)}
               />

@@ -46,8 +46,8 @@ import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/C
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { flow, isEqual, keys, map, omit, pick, set, update } from 'lodash/fp';
+import omitEmptyDeep, { removeEmpty } from '../../utilities/omitEmptyDeep';
+import { flow, isEqual, keys, map, pick, set, update } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -62,7 +62,6 @@ import LogoImage from '../LogoImage';
 import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
-import { difference } from '../../utilities/getDifferenceObject';
 import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
 // import ChargeCodes from '../../contexts/ChargeCodes';
 // import { validate } from '@material-ui/pickers';
@@ -72,9 +71,11 @@ import { ChangedField } from '../bookings/checklist/ActivityModel';
 import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
 import ChargeCodes from '../../contexts/ChargeCodes';
+// import useBookingRequestChecklist from '../../hooks/useBookingRequestChecklist';
 import TagsList from '../tags/TagsList';
 import { Tag, TagCategory } from '../../model/Tag';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { diff } from 'deep-object-diff';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -422,14 +423,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   useEffect(() => {
     setBookingRequestState(bookingRequest);
     setAgreementNumber(bookingRequest.agreementNo || '');
-  }, [bookingRequest]);
+  }, [bookingRequest, setBookingRequestState]);
 
   useEffect(() => {
     Mousetrap.bind(['command+shift+e', 'ctrl+shift+e'], () => setEditing(prevState => !prevState));
     return () => {
       Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
     };
-  }, []);
+  }, [setEditing]);
 
   const handleSave = useCallback(() => {
     const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
@@ -564,44 +565,41 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const createChangedFieldsObject = (changedKeys: string[], oldVal: any, newVal: any) => {
     const changedFields: ChangedField[] = [];
     changedKeys.forEach(key => {
-      changedFields.push({
+      const obj = removeEmpty({
         fieldName: key,
         oldVal: oldVal[key],
         newVal: newVal[key],
-      } as ChangedField);
+      });
+      // omitEmptyDeep(obj)
+      changedFields.push(obj as ChangedField);
     });
     return changedFields;
   };
 
   const handleFieldsEditActivity = async () => {
     //todo. without freight details for now?... Because it change at beggining
-    const newObject = difference(omit('freightDetails')(bookingRequestState), omit('freightDetails')(bookingRequest));
+    const oldObject = diff(bookingRequestState, bookingRequest);
+    const newObject = diff(bookingRequest, bookingRequestState);
+    // console.log('oldObject')
+    // console.log(oldObject)
 
     // console.log('new Object')
     // console.log(newObject)
-
     const changedKeys = keys(newObject);
     // console.log('changedKeys')
     // console.log(changedKeys)
-
-    const oldObject = pick(changedKeys, bookingRequest);
-    // console.log('old Object')
-    // console.log(oldObject)
-
     const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
     // console.log('changedFields')
     // console.log(changedFields)
-
+    const activityObject = createActivityObject({
+      changeType: ActivityChangeType.EDITED,
+      by: getActivityLogUserData,
+      changedFields,
+    });
+    // console.log('activityObject')
+    // console.log(activityObject)
     if (changedKeys.length > 0) {
-      await addActivityItem(
-        'bookings-requests',
-        bookingRequest.id!,
-        createActivityObject({
-          changeType: ActivityChangeType.EDITED,
-          by: getActivityLogUserData,
-          changedFields,
-        }),
-      );
+      await addActivityItem('bookings-requests', bookingRequest.id!, activityObject);
     }
   };
   // const chargeCodes = useContext(ChargeCodes);

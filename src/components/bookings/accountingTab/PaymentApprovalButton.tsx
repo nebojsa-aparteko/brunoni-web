@@ -198,9 +198,12 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
   const [resolved, setResolved] = useState<boolean>(false);
 
   useEffect(() => {
-    getTask(booking.id, `${TaskType.CLEAR_INVOICE}_${payment.id!}`).then(task => {
-      setResolved(task.resolved);
-    });
+    payment.id &&
+      getTask(booking.id, `${TaskType.CLEAR_INVOICE}_${payment.id}`)
+        .then(task => {
+          setResolved(task?.resolved);
+        })
+        .catch(e => console.error(e));
   }, [booking.id, payment]);
 
   const getActivityLogUserData = useCallback(
