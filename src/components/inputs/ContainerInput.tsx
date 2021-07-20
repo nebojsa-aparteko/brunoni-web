@@ -427,13 +427,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             )}
             <Grid item md={2} xs={12}>
               <TextField
-                defaultValue={null}
                 label="Weight (Kg)"
                 type="number"
                 margin="dense"
                 variant="outlined"
                 fullWidth
-                value={container.weight}
+                value={container.weight || null}
                 onChange={event =>
                   handleWeightTextChange(event.target.value === '' ? null : parseInt(event.target.value))
                 }

@@ -229,17 +229,17 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
   const [, dispatch] = useGlobalAppState();
 
-  console.log('prev selectedAgent');
-  console.log(bookingRequest.assignedUser);
-
-  console.log('curr selectedAgent');
-  console.log(selectedAgent);
-
-  console.log('prev selectedClient');
-  console.log(bookingRequest.createdBy);
-
-  console.log('curr selectedClient');
-  console.log(selectedClient);
+  // console.log('prev selectedAgent');
+  // console.log(bookingRequest.assignedUser);
+  //
+  // console.log('curr selectedAgent');
+  // console.log(selectedAgent);
+  //
+  // console.log('prev selectedClient');
+  // console.log(bookingRequest.createdBy);
+  //
+  // console.log('curr selectedClient');
+  // console.log(selectedClient);
 
   const getActivityLogUserData = useCallback(
     (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
@@ -642,7 +642,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>
+      {/*<Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>*/}
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
