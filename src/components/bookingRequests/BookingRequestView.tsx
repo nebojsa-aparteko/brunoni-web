@@ -47,7 +47,7 @@ import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import omitEmptyDeep, { removeEmptyDeep } from '../../utilities/omitEmptyDeep';
-import { flow, isEqual, keys, map, omit, pick, set, update } from 'lodash/fp';
+import { flow, isEqual, keys, map, omit, pick, set, update, isNil } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
 import Mousetrap from 'mousetrap';
@@ -76,6 +76,7 @@ import TagsList from '../tags/TagsList';
 import { Tag, TagCategory } from '../../model/Tag';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { diff } from 'deep-object-diff';
+import { ItemsOptions } from '../../model/Checklist';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -360,6 +361,20 @@ function ScrollToTopOnMount() {
 
 type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
 
+const setChecked = async (bookingReqId: string, itemType: string, checked: boolean) => {
+  await setChecklistItem(bookingReqId, itemType, checked);
+};
+
+const setChecklistItem = async (bookingReqId: string, itemType: string, checked: boolean) => {
+  await firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingReqId)
+    .collection('checklist')
+    .doc(itemType)
+    .set({ checked }, { merge: true });
+};
+
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, actingAs] = useUser();
   const isAdmin = userRecord.isAdmin;
@@ -575,13 +590,36 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     return changedFields;
   };
 
+  const checkForUpdatesInArray = async (obj: any[]) => {
+    //Commodity type
+    const hasCommodityType = obj.every(k => !isNil(k.commodityType));
+    await setChecked(bookingRequest.id!, ItemsOptions.COMMODITY_CHECK, hasCommodityType);
+    //Weight Change
+    const hasWeight = obj.every(k => !isNil(k.weight));
+    await setChecked(bookingRequest.id!, ItemsOptions.WEIGHT_CHECK, hasWeight);
+    //Weight Change
+    const hasPickUpAndDeliveryRef = obj.every(k => !isNil(k.pickupReference) && !isNil(k.deliveryReference));
+    await setChecked(bookingRequest.id!, ItemsOptions.PICKUP_AND_DELIVERY_REF, hasPickUpAndDeliveryRef);
+    // Terminal Change
+    const hasTerminal = obj.every(k => !isNil(k.pickupLocation));
+    await setChecked(bookingRequest.id!, ItemsOptions.TERMINAL_CHECK, hasTerminal);
+  };
+
+  const autoCheckList = async (oldObject: BookingRequest, newObject: BookingRequest) => {
+    if (newObject.containers) {
+      //containers
+      await checkForUpdatesInArray(newObject.containers);
+    }
+  };
+
   const handleFieldsEditActivity = async () => {
     //todo. without freight details for now?... Because it change at beggining
     const oldObject = diff(omit('freightDetails')(bookingRequestState), omit('freightDetails')(bookingRequest));
     const newObject = diff(omit('freightDetails')(bookingRequest), omit('freightDetails')(bookingRequestState));
+
+    if (!actingAs) await autoCheckList(bookingRequest, bookingRequestState);
     // console.log('oldObject')
     // console.log(oldObject)
-    //
     // console.log('new Object')
     // console.log(newObject)
     const changedKeys = keys(newObject);
@@ -601,10 +639,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
     }
   };
-  // const chargeCodes = useContext(ChargeCodes);
-  // const filteredChargeCodes = useMemo(() => (chargeCodes ? chargeCodes.filter(code => code.language === 'E') : []), [
-  //   chargeCodes,
-  // ]);
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>
