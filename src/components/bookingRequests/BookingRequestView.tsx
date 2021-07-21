@@ -436,8 +436,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
 
   useEffect(() => {
-    setBookingRequestState(bookingRequest);
-    setAgreementNumber(bookingRequest.agreementNo || '');
+    !editing && setBookingRequestState(bookingRequest);
+    !editing && setAgreementNumber(bookingRequest.agreementNo || '');
   }, [bookingRequest]);
 
   useEffect(() => {

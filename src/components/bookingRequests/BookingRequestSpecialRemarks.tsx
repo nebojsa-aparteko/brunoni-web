@@ -26,10 +26,11 @@ const BookingRequestSpecialRemarks: React.FC = () => {
   );
   const userRecord = useContext(UserRecordContext);
   useEffect(() => {
-    setSpecialRemarksState(bookingRequest?.specialRemarks);
+    !editing && setSpecialRemarksState(bookingRequest?.specialRemarks);
   }, [bookingRequest?.specialRemarks]);
 
   const handleChangeSpecialRemarks = (specialRemarks: SpecialRemark[]) => {
+    setSpecialRemarksState(specialRemarks);
     bookingRequest &&
       setBookingRequest &&
       setBookingRequest(set('specialRemarks', specialRemarks)(bookingRequest) as BookingRequest);
