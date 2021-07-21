@@ -147,10 +147,13 @@ const BookingsPageContainer: React.FC = () => {
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
           case 3:
-            setFilters && setFilters(prevState => set('archived', false)(prevState));
+            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
             return bookingsContextData;
           case 4:
-            setFilters && setFilters(prevState => set('archived', true)(prevState));
+            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
+            return bookingsContextData;
+          case 5:
+            setFilters && setFilters(prevState => flow(set('archived', true))(prevState));
             return bookingsContextData;
           default:
             return bookingsContextData;
@@ -231,7 +234,8 @@ const BookingsPageContainer: React.FC = () => {
               label="Requests"
               {...a11yProps(3)}
             />
-            <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(4)} />
+            <Tab icon={<InputIcon />} label="Hold Requests" {...a11yProps(4)} />
+            <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(5)} />
           </Tabs>
           <FirestoreCollectionProvider
             name="tags"
@@ -257,6 +261,9 @@ const BookingsPageContainer: React.FC = () => {
               <BookingRequestsView isAdmin={!actingAs} />
             </TabPanel>
             <TabPanel value={selectedTab} index={4}>
+              <BookingRequestsView isAdmin={!actingAs} />
+            </TabPanel>
+            <TabPanel value={selectedTab} index={5}>
               <BookingRequestsView isAdmin={!actingAs} />
             </TabPanel>
           </FirestoreCollectionProvider>

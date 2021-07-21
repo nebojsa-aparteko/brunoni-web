@@ -158,6 +158,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
       flow(
         set('RelevantPort', 'POL'), //For export this is always POL, for import it is always POD
         set('LinerPortAgent', portOfLoading?.Port.PortAgent),
+        set('LinerPortAgentID', portOfLoading?.Port.PortAgentID),
         set('FOBDeliveryBy', portOfLoading?.Port.PortAgent.split('<br/>')[0]),
         set('VGMSubmByID', vgmSubmittedByClient && vgmSubmittedByClient?.id),
         set('VGMSubmByTxt', vgmSubmittedByClient && getRepresentationFromClient(vgmSubmittedByClient)),

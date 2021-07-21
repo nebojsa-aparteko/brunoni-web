@@ -268,6 +268,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       status: BookingRequestStatus.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
       archived: false,
+      hold: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),

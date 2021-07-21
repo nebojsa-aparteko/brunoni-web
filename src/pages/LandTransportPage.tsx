@@ -1,8 +1,12 @@
 import React, { Fragment, useState } from 'react';
 import Meta from '../components/Meta';
-import { Box, Button, createStyles, makeStyles, Paper } from '@material-ui/core';
+import { Box, Button, createStyles, Grid, makeStyles, Paper } from '@material-ui/core';
 import DropZoneArea from '../components/dropzone/DropZoneArea';
 import theme from '../theme';
+import LandTransportSearchBar from '../components/landTransport/LandTransportSearchBar';
+import LandTransportDateIntervalBar from '../components/landTransport/LandTransportDateIntervalBar';
+import LandTransportFare from '../components/landTransport/LandTransportFare';
+
 const useStyles = makeStyles(() =>
   createStyles({
     dialogBody: {
@@ -13,6 +17,7 @@ const useStyles = makeStyles(() =>
 const LandTransportPage = () => {
   const [files, setFiles] = useState<File[]>([]);
   const classes = useStyles();
+
   const sendFiles = async () => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
@@ -51,6 +56,18 @@ const LandTransportPage = () => {
         </Box>
         <Button onClick={sendFiles}>Send</Button>
       </Paper>
+      {/todo *Test*/}
+      <Grid container spacing={2}>
+        <Grid item sm={6} xs={12}>
+          <LandTransportSearchBar />
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          <LandTransportDateIntervalBar />
+        </Grid>
+        <Grid item sm={6} xs={12}>
+          <LandTransportFare />
+        </Grid>
+      </Grid>
     </Fragment>
   );
 };
