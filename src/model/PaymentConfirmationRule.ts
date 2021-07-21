@@ -2,7 +2,7 @@
 import Carrier from './Carrier';
 import Client from './Client';
 import Port from './Port';
-import { BookingCategory } from './Booking';
+//import { BookingCategory } from './Booking';
 import firebase from '../firebase';
 
 interface PaymentConfirmation {
@@ -20,7 +20,7 @@ export interface CarrierSettingsRule extends PaymentConfirmation {
 }
 export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: BookingCategory;
+  category: ImpExp;
   client: Client;
   statisticClient: Client;
   type: PaymentConfirmationType.CUSTOMER_SETTINGS;

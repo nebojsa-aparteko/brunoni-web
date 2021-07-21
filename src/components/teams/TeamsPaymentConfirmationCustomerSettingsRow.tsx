@@ -8,14 +8,15 @@ import Carriers from '../../contexts/Carriers';
 import useClients from '../../hooks/useClients';
 import Carrier from '../../model/Carrier';
 import Client from '../../model/Client';
-import { CustomerSettingsRule, CarrierSettingsRule } from '../../model/PaymentConfirmationRule';
+import { CustomerSettingsRule, CarrierSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
-import { BookingCategory } from '../../model/Booking';
-import CategoryFilter from '../CategoryFilter';
+//import { BookingCategory } from '../../model/Booking';
+//import CategoryFilter from '../CategoryFilter';
 import CarrierInput from '../inputs/CarrierInput';
 import ClientInput from '../inputs/ClientInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
+import CategoryMultiSelect from '../CategoryMultiSelect';
 
 interface Props {
   paymentConfirmation: CustomerSettingsRule;
@@ -41,9 +42,6 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
   const [, dispatch] = useContext(GlobalContext);
   const [paymentConfirmationState, setPaymentConfirmationState] = useState<CustomerSettingsRule>(paymentConfirmation);
   const { enqueueSnackbar } = useSnackbar();
-
-  // console.log('state', paymentConfirmationState);
-  // console.log('normal', paymentConfirmation);
 
   const { carrier, category, client, contact, statisticClient } = paymentConfirmationState;
 
@@ -77,12 +75,12 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
     }
   }, [carrier, client, dispatch, enqueueSnackbar, paymentConfirmation.id, paymentConfirmationState]);
 
-  const changeData = useCallback((path: string, value?: Carrier | Client | string | string[] | null) => {
+  const changeData = useCallback((path: string, value?: Carrier | Client | string | string[] | null | ImpExp) => {
     setPaymentConfirmationState(prevState => set(path, value)(prevState));
   }, []);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    changeData('category', (event.target as HTMLInputElement).value as BookingCategory);
+    changeData('category', { ...category, [event.target.name]: event.target.checked } as ImpExp);
   };
 
   return (
@@ -99,7 +97,7 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
       </TableCell>
       <TableCell align="left">
-        <CategoryFilter value={category} onChange={handleImportOrExportChange} />
+        <CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />
       </TableCell>
       <TableCell align="left">
         <ClientInput
