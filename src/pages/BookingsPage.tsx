@@ -150,7 +150,7 @@ const BookingsPageContainer: React.FC = () => {
             setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
             return bookingsContextData;
           case 4:
-            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
+            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', true))(prevState));
             return bookingsContextData;
           case 5:
             setFilters && setFilters(prevState => flow(set('archived', true))(prevState));
@@ -234,7 +234,7 @@ const BookingsPageContainer: React.FC = () => {
               label="Requests"
               {...a11yProps(3)}
             />
-            <Tab icon={<InputIcon />} label="Hold Requests" {...a11yProps(4)} />
+            <Tab icon={<InputIcon />} label="On Hold" {...a11yProps(4)} />
             <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(5)} />
           </Tabs>
           <FirestoreCollectionProvider

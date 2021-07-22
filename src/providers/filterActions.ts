@@ -31,6 +31,7 @@ export const LAST_3_MONTHS = {
 export interface ContextFilters {
   dateRange?: DateRange;
   archived?: boolean;
+  hold?: boolean;
   pendingPayment?: boolean;
   assignee?: UserRecord;
   clientFilter?: Client;

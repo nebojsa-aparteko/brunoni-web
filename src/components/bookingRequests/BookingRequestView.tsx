@@ -77,6 +77,7 @@ import { Tag, TagCategory } from '../../model/Tag';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { diff } from 'deep-object-diff';
 import { ItemsOptions } from '../../model/Checklist';
+import PanToolIcon from '@material-ui/icons/PanTool';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -739,7 +740,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               <Box px={1}>
                 <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
               </Box>
-              {!editing && isDashboardUser(userRecord) && <BookNowButton bookNow={bookNow} />}
+              {!editing && isDashboardUser(userRecord) && !bookingRequest.hold && <BookNowButton bookNow={bookNow} />}
               <Box className={classes.actions} displayPrint="none">
                 <EditButton
                   handleCancelEditing={handleCancelEditing}
@@ -770,10 +771,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       aria-label="hold"
                       variant="outlined"
                       size="small"
-                      startIcon={<ArchiveIcon />}
+                      startIcon={bookingRequest.hold ? null : <PanToolIcon />}
                       onClick={() => storeActivity(holdHandler)}
                     >
-                      {bookingRequest.hold ? 'Hold' : 'Unhold'}
+                      {bookingRequest.hold ? 'Unhold' : 'Hold'}
                     </Button>
                   </Fragment>
                 )}
@@ -857,8 +858,8 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
     </Paper>
   );
 };
-const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
-  console.log(bookingRequest, 'BR');
-  console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
-  // throw new Error('Function not implemented.');
-};
+// const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
+//   console.log(bookingRequest, 'BR');
+//   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
+//   // throw new Error('Function not implemented.');
+// };
