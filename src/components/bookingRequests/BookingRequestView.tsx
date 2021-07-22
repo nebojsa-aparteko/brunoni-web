@@ -42,7 +42,7 @@ import UserRecord, {
   UserRecordMinProperties,
 } from '../../model/UserRecord';
 import firebase from '../../firebase';
-import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
+import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
@@ -78,6 +78,7 @@ import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { diff } from 'deep-object-diff';
 import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
+import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -230,30 +231,6 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
   const [, dispatch] = useGlobalAppState();
 
-  // console.log('prev selectedAgent');
-  // console.log(bookingRequest.assignedUser);
-  //
-  // console.log('curr selectedAgent');
-  // console.log(selectedAgent);
-  //
-  // console.log('prev selectedClient');
-  // console.log(bookingRequest.createdBy);
-  //
-  // console.log('curr selectedClient');
-  // console.log(selectedClient);
-
-  const getActivityLogUserData = useCallback(
-    (user: UserRecord | UserRecordMin | null | undefined): ActivityLogUserData =>
-      ({
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        alphacomClientId: user?.alphacomClientId,
-        alphacomId: user?.alphacomId,
-        emailAddress: user?.emailAddress,
-      } as ActivityLogUserData),
-    [],
-  );
-
   const handleChangeClient = async () => {
     try {
       if (
@@ -331,6 +308,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         </Box>
       </DialogContent>
       <Button
+        disabled={!(selectedAgent && selectedClient)}
         onClick={async () => {
           dispatch({ type: 'START_GLOBAL_LOADING' });
           await handleChangeAgent();

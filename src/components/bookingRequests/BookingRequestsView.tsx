@@ -37,6 +37,12 @@ import AddIcon from '@material-ui/icons/Add';
 import BookingUploadDialog from '../onlineBooking/BookingUploadDialog';
 import useModal from '../../hooks/useModal';
 import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
+import { GlobalContext } from '../../store/GlobalStore';
+import { addActivityItem } from '../../utilities/activityHelper';
+import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
+import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
+import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -88,8 +94,12 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const actingAs = useContext(ActingAs)[0];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const { isOpen, openModal, closeModal } = useModal();
+  const [, dispatch] = useContext(GlobalContext);
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+
+  const byActivityLogUserData = useActivityLogUserData();
+
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
 
   const [bookingRequests, isLoading] = useBookingRequestsContext();
@@ -135,6 +145,21 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
           .then(() => {
             setSelectedRequests([]);
+          })
+          .catch(e => {
+            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Error assigning task. Please try again.' });
+            console.error(e);
+          })
+          .finally(async () => {
+            await addActivityItem(
+              'bookings-requests',
+              id,
+              createActivityObject({
+                changeType: ActivityChangeType.ASSIGNED_AGENT,
+                by: byActivityLogUserData,
+                addedUsers: [getActivityLogUserData(assignTo)],
+              }),
+            );
           });
       });
     },

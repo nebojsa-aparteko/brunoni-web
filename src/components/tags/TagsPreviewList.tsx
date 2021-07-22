@@ -20,8 +20,14 @@ const TagsPreviewList: React.FC<TagPreviewListProps> = ({ tags }) => {
 
   return tags && tags[0] ? (
     <Fragment>
-      {tags.map(tag => (
-        <Chip label={tag.text} className={classes.smallTag} size="small" style={{ backgroundColor: tag.color }} />
+      {tags.map((tag, i) => (
+        <Chip
+          key={i}
+          label={tag.text}
+          className={classes.smallTag}
+          size="small"
+          style={{ backgroundColor: tag.color }}
+        />
       ))}
     </Fragment>
   ) : null;
