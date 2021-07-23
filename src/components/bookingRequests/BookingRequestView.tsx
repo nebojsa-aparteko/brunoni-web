@@ -79,6 +79,7 @@ import { diff } from 'deep-object-diff';
 import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
+import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -520,7 +521,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
       try {
         const token = await user.getIdToken();
-        console.log('Postponing', await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes));
+        // console.log('Postponing', await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes));
         const response = await fetch(`${process.env.REACT_APP_API_URL}/bookingRequest`, {
           method: 'POST',
           mode: 'cors',
@@ -536,7 +537,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         });
 
         if (response.ok) {
-          console.log(await response.json());
+          // console.log(await response.json());
           // const body = await response.json();
           // console.log('Body', await response.blob());
         } else {
@@ -749,7 +750,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       aria-label="hold"
                       variant="outlined"
                       size="small"
-                      startIcon={bookingRequest.hold ? null : <PanToolIcon />}
+                      startIcon={bookingRequest.hold ? <SettingsBackupRestoreIcon /> : <PanToolIcon />}
                       onClick={() => storeActivity(holdHandler)}
                     >
                       {bookingRequest.hold ? 'Unhold' : 'Hold'}

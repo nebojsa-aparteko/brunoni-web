@@ -45,8 +45,8 @@ export interface BookingRequest {
   assignedUser?: UserRecordMin;
   statClient?: Client | null;
   vgmSubmittedBy?: VGMSubmittedBy;
-  archived?: boolean;
-  hold?: boolean;
+  archived: boolean;
+  hold: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
   itinerary?: BookingRequestItinerary;

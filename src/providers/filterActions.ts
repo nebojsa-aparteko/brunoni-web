@@ -4,7 +4,6 @@ import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
 import { subMonths, subWeeks } from 'date-fns';
-import Carrier from '../model/Carrier';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =
@@ -30,8 +29,8 @@ export const LAST_3_MONTHS = {
 // filters by which we can filter bookings
 export interface ContextFilters {
   dateRange?: DateRange;
-  archived?: boolean;
-  hold?: boolean;
+  archived: boolean;
+  hold: boolean;
   pendingPayment?: boolean;
   assignee?: UserRecord;
   clientFilter?: Client;
