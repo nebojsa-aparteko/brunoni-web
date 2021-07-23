@@ -179,6 +179,7 @@ const SendEmailContent = ({
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
       }
     } catch (e) {
+      console.log(e);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
     }
   };
