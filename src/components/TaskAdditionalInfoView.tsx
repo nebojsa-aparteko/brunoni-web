@@ -39,7 +39,7 @@ const AdditionalInfoBadge: React.FC<BadgeProps> = ({ additionalInfo }) => (
 const TaskAdditionalInfoView: React.FC<Props> = ({ additionalInfo }) => (
   <Box>
     {Array.isArray(additionalInfo) ? (
-      additionalInfo.map(info => <AdditionalInfoBadge key={info.type} additionalInfo={info} />)
+      additionalInfo.map((info, i) => <AdditionalInfoBadge key={`${info.type}-${i}`} additionalInfo={info} />)
     ) : (
       <AdditionalInfoBadge additionalInfo={additionalInfo} />
     )}

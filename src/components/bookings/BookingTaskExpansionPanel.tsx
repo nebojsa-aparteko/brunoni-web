@@ -19,30 +19,51 @@ import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import BookingTaskTable from '../tasks/BookingTaskTable';
 import ActingAs from '../../contexts/ActingAs';
+import { addActivityItem } from '../../utilities/activityHelper';
+import { createActivityObject } from './checklist/ChecklistItemRow';
+import { ActivityChangeType } from './checklist/ChecklistItemModel';
+import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
+import useUser from '../../hooks/useUser';
 
 const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent, selectedTab }) => {
   const users = useAdminUsers();
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const actingAs = useContext(ActingAs)[0];
+  const userRecord = useUser()[1];
   const [showResolved, setShowResolved] = useState(false);
   const assignUser = useCallback(
     event => {
-      // console.log(tasks?.filter(task => task.selected));
       event.stopPropagation();
-      selectedTasks.forEach(id => {
+      selectedTasks.forEach(async id => {
         const [bookingId, taskId] = id.split('/');
 
-        firebase
+        const taskRef = firebase
           .firestore()
           .collection('bookings')
           .doc(bookingId)
           .collection('tasks')
-          .doc(taskId)
+          .doc(taskId);
+
+        const task = (await taskRef.get()).data() as Task;
+
+        taskRef
           .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
           .then(() => {
             updateComponent?.();
             setSelectedTasks([]);
+          })
+          .finally(async () => {
+            await addActivityItem(
+              'bookings',
+              bookingId,
+              createActivityObject({
+                changeType: ActivityChangeType.ASSIGNED_ON_TASK,
+                by: getActivityLogUserData(userRecord),
+                addedUsers: [getActivityLogUserData(assignTo)],
+                task,
+              }),
+            );
           });
       });
     },
@@ -79,7 +100,6 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent, se
                   label="Assign task to"
                   users={users}
                   onChange={(event, user) => {
-                    console.log(user);
                     setAssignTo(user || undefined);
                     event.stopPropagation();
                   }}

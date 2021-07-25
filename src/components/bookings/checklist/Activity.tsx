@@ -14,6 +14,7 @@ import { activityHasLink, getFullName, isPlatformActivity } from '../../../utili
 import { BookingRequestLabels } from '../../../model/BookingRequest';
 import isString from '../../../utilities/isString';
 import { isNil } from 'lodash/fp';
+import { TaskDescription } from '../../../model/Task';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -24,7 +25,7 @@ const createUsersRepresentation = (users: ActivityLogUserData[]) => {
         ) : (
           user.firstName + ' ' + user.lastName
         )}
-        {index === users.length - 1 ? '.' : ', '}
+        {index === users.length - 1 ? '' : ', '}
       </Fragment>
     );
   });
@@ -93,6 +94,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.UNARCHIVED;
       case ActivityChangeType.EDITED:
         return ActivityText.EDITED;
+      case ActivityChangeType.ASSIGNED_ON_TASK:
+        return ActivityText.ASSIGNED_ON_TASK;
     }
   };
 
@@ -111,6 +114,15 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         activity.addedUsers
           ? createUsersRepresentation(activity.addedUsers)
           : null}
+        {activity.task && activity.addedUsers && (
+          <>
+            <Typography component="span">{createUsersRepresentation(activity.addedUsers)}</Typography>
+            <Typography component="span">{' on the task '}</Typography>
+            <Typography component="span" color="primary">
+              {TaskDescription[activity.task.type] || '[no description]'}
+            </Typography>
+          </>
+        )}
         {activity.changeType === ActivityChangeType.SET_WATCHERS ? (
           activity.addedUsers && activity.addedUsers.length > 0 ? (
             <Fragment>

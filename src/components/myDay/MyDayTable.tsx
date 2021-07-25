@@ -26,6 +26,11 @@ import useAdminUsers from '../../hooks/useAdminUsers';
 import { UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
+import { addActivityItem } from '../../utilities/activityHelper';
+import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
+import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
+import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,26 +65,43 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const classes = useStyles();
   const { numSelected, selectedTasks, setSelectedTasks, trigger } = props;
   const users = useAdminUsers();
+  const userRecord = useUser()[1];
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
 
   const onAssignUser = useCallback(() => {
-    selectedTasks.forEach(id => {
+    selectedTasks.forEach(async id => {
       const teamTasks = id.split('-');
       const [bookingId, taskId] = teamTasks[0].split('/');
 
-      firebase
+      const taskRef = firebase
         .firestore()
         .collection('bookings')
         .doc(bookingId)
         .collection('tasks')
-        .doc(taskId)
+        .doc(taskId);
+
+      const task = (await taskRef.get()).data() as Task;
+
+      taskRef
         .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
         .then(() => {
           setSelectedTasks([]);
           trigger();
+        })
+        .finally(async () => {
+          await addActivityItem(
+            'bookings',
+            bookingId,
+            createActivityObject({
+              changeType: ActivityChangeType.ASSIGNED_ON_TASK,
+              by: getActivityLogUserData(userRecord),
+              addedUsers: [getActivityLogUserData(assignTo)],
+              task,
+            }),
+          );
         });
     });
-  }, [selectedTasks, assignTo]);
+  }, [selectedTasks, assignTo, setSelectedTasks, trigger, userRecord]);
 
   return (
     <Toolbar

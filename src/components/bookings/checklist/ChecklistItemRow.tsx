@@ -43,6 +43,7 @@ import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 import { MentionItem } from 'react-mentions';
+import Task from '../../../model/Task';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -162,6 +163,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     addedUsers,
     removedUsers,
     changedFields,
+    task,
   } = data;
   return flow(omitBy(isNil))({
     changeType: changeType,
@@ -186,6 +188,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     addedUsers: addedUsers,
     removedUsers: removedUsers,
     changedFields,
+    task,
   } as ActivityLogItem);
 };
 
@@ -205,6 +208,7 @@ export interface ActivityCreationProps {
   addedUsers?: ActivityLogUserData[];
   removedUsers?: ActivityLogUserData[];
   changedFields?: ChangedField[];
+  task?: Task;
 }
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
@@ -496,7 +500,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     internal: boolean,
     dontCreateActivity?: boolean,
   ) => {
-    console.log(dontCreateActivity);
     let newItemArray: ChecklistItemValueDocument[];
     if (item.status && !editRestriction(item.status!.at as Date)) {
       return enqueueSnackbar(

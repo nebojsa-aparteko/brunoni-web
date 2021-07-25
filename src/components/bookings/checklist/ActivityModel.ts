@@ -10,6 +10,7 @@ import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from '../documentApproval/ComparisonDialogContent';
+import Task from '../../../model/Task';
 
 export interface ActivityLogItem {
   id?: string;
@@ -32,6 +33,7 @@ export interface ActivityLogItem {
   isPinned?: boolean;
   changedFields?: ChangedField[];
   path?: string;
+  task?: Task;
 }
 
 export interface ChangedField {
