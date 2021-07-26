@@ -68,10 +68,14 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.APPROVE_PAYMENT;
       case ActivityChangeType.REVERT_PAYMENT_APPROVAL:
         return ActivityText.REVERT_PAYMENT_APPROVAL;
-      case ActivityChangeType.PUT_ON_HOLD:
-        return ActivityText.PUT_ON_HOLD;
-      case ActivityChangeType.REVERT_PUT_ON_HOLD:
-        return ActivityText.REVERT_PUT_ON_HOLD;
+      case ActivityChangeType.PUT_ON_HOLD_PAYMENT:
+        return ActivityText.PUT_ON_HOLD_PAYMENT;
+      case ActivityChangeType.REVERT_PUT_ON_HOLD_PAYMENT:
+        return ActivityText.REVERT_PUT_ON_HOLD_PAYMENT;
+      case ActivityChangeType.PUT_ON_HOLD_BOOKING_REQ:
+        return ActivityText.PUT_ON_HOLD_BOOKING_REQ;
+      case ActivityChangeType.REVERT_PUT_ON_HOLD_BOOKING_REQ:
+        return ActivityText.REVERT_PUT_ON_HOLD_BOOKING_REQ;
       case ActivityChangeType.SET_WATCHING:
         return ActivityText.SET_WATCHING;
       case ActivityChangeType.UNSET_WATCHING:
@@ -167,8 +171,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         {activity.changeType === ActivityChangeType.APPROVE_PAYMENT ||
         activity.changeType === ActivityChangeType.REVERT_PAYMENT_APPROVAL ||
         activity.changeType === ActivityChangeType.POSTPONE_PAYMENT ||
-        activity.changeType === ActivityChangeType.PUT_ON_HOLD ||
-        activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD ||
+        activity.changeType === ActivityChangeType.PUT_ON_HOLD_PAYMENT ||
+        activity.changeType === ActivityChangeType.REVERT_PUT_ON_HOLD_PAYMENT ||
         activity.changeType === ActivityChangeType.CLEAR_PAYMENT ||
         activity.changeType === ActivityChangeType.REVERT_CLEAR_PAYMENT ||
         activity.changeType === ActivityChangeType.MARK_SOMETHING_WRONG ? (
@@ -182,7 +186,6 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
                   'd. MMMM yyyy',
                 )} to ${formatDateSafe(activity.paymentActivityData.dateAfterChange, 'd. MMMM yyyy')}`
               : null}
-            .
           </Fragment>
         ) : (
           <Fragment>
@@ -195,14 +198,14 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 
             {activity.checklistItem ? (
               <Fragment>
-                <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item.
+                <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item
               </Fragment>
             ) : !activity.isAccountingActivity ? (
               activity.isInternal ? (
-                'Internal storage.'
+                'Internal storage'
               ) : null
             ) : (
-              'Accounting.'
+              'Accounting'
             )}
           </Fragment>
         )}

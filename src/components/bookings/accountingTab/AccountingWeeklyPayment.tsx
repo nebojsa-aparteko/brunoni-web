@@ -332,8 +332,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                 createActivityObject({
                   changeType:
                     newStatus === WeeklyPaymentPlatformStatus.ON_HOLD
-                      ? ActivityChangeType.PUT_ON_HOLD
-                      : ActivityChangeType.REVERT_PUT_ON_HOLD,
+                      ? ActivityChangeType.PUT_ON_HOLD_PAYMENT
+                      : ActivityChangeType.REVERT_PUT_ON_HOLD_PAYMENT,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
                   paymentReference: payment.reference,

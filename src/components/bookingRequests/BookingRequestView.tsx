@@ -579,7 +579,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         'bookings-requests',
         bookingRequest.id!,
         createActivityObject({
-          changeType: !bookingRequest.hold ? ActivityChangeType.PUT_ON_HOLD : ActivityChangeType.REVERT_PUT_ON_HOLD,
+          changeType: !bookingRequest.hold
+            ? ActivityChangeType.PUT_ON_HOLD_BOOKING_REQ
+            : ActivityChangeType.REVERT_PUT_ON_HOLD_BOOKING_REQ,
           by: getActivityLogUserData,
         }),
       ),
