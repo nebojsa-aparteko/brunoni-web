@@ -326,7 +326,25 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Box>
         </Grid>
       )}
-      <Grid item md={7} xs={12}>
+      <Grid container item md={7} xs={12}>
+        <Grid item xs={12}>
+          {tags ? (
+            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
+          ) : (
+            <Box
+              display="flex"
+              flexDirection="row"
+              mb={1}
+              alignItems="center"
+              border="1px solid rgba(0,0,0,0.15)"
+              p={1}
+              maxWidth="100%"
+            >
+              <CircularProgress size={20} style={{ margin: 'auto' }} />
+            </Box>
+          )}
+        </Grid>
+
         <Page title={getBookingTitle(booking)}>
           {isOpenWatcherDialog ? (
             <WatchersDialog booking={booking} isOpen={true} handleClose={handleCloseWatcherDialog} id={booking.id} />
@@ -367,7 +385,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 </Typography>
               </Box>
               <Box flex="1" />
-              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
               <Box className={classes.actions} displayPrint="none">
                 {!actingAs && (
                   <Fragment>

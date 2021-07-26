@@ -12,6 +12,7 @@ import React, {
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -671,6 +672,21 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
             </Box>
           )}
+          {tags ? (
+            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
+          ) : (
+            <Box
+              display="flex"
+              flexDirection="row"
+              mb={1}
+              alignItems="center"
+              border="1px solid rgba(0,0,0,0.15)"
+              p={1}
+              maxWidth="100%"
+            >
+              <CircularProgress size={20} style={{ margin: 'auto' }} />
+            </Box>
+          )}
           {bookingRequest.additionalInfo && <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />}
           {isOpenAssignmentModal && (
             <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
@@ -716,10 +732,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              <Box px={1}>
-                <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
-              </Box>
-              {!editing && isDashboardUser(userRecord) && !bookingRequest.hold && <BookNowButton bookNow={bookNow} />}
+              {!editing && isDashboardUser(userRecord) && <BookNowButton bookNow={bookNow} />}
               <Box className={classes.actions} displayPrint="none">
                 <EditButton
                   handleCancelEditing={handleCancelEditing}

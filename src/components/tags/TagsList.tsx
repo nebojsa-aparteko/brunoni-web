@@ -8,8 +8,10 @@ import Tags from '../../contexts/Tags';
 const useStyles = makeStyles(() => ({
   tagList: {
     alignItems: 'center',
-    maxWidth: '15vw',
-    overflow: 'scroll',
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
+    flexWrap: 'wrap',
   },
   tag: {
     maxWidth: 280,
@@ -17,6 +19,8 @@ const useStyles = makeStyles(() => ({
     color: 'white',
     borderRadius: 4,
     marginRight: '2px',
+    marginTop: '1px',
+    marginBottom: '1px',
   },
 }));
 
@@ -36,7 +40,15 @@ const TagsList: React.FC<TagsListProps> = ({ tags, tagCategory, documentId }) =>
 
   const availableTags = useContext(Tags);
   return (
-    <Box display="flex" flexDirection="row" mb={1} alignItems="center" border="1px solid rgba(0,0,0,0.15)" p={1}>
+    <Box
+      display="flex"
+      flexDirection="row"
+      mb={1}
+      alignItems="center"
+      border="1px solid rgba(0,0,0,0.15)"
+      p={1}
+      maxWidth="100%"
+    >
       <Typography variant="subtitle2">Tags:</Typography>
       <Box display="flex" flexDirection="row" className={classes.tagList} mx={1}>
         {tags.map(tag => (
