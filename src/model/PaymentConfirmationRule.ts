@@ -4,6 +4,7 @@ import Client from './Client';
 import Port from './Port';
 //import { BookingCategory } from './Booking';
 import firebase from '../firebase';
+import { BookingCategory } from './Booking';
 
 interface PaymentConfirmation {
   type: PaymentConfirmationType;
@@ -20,7 +21,7 @@ export interface CarrierSettingsRule extends PaymentConfirmation {
 }
 export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: ImpExp;
+  category: BookingCategory[];
   client: Client;
   statisticClient: Client;
   type: PaymentConfirmationType.CUSTOMER_SETTINGS;
@@ -30,6 +31,7 @@ export enum PaymentConfirmationType {
   CARRIER_SETTINGS = 'CARRIER_SETTINGS',
   CUSTOMER_SETTINGS = 'CUSTOMER_SETTINGS',
 }
+
 export interface ImpExp {
   export: boolean;
   import: boolean;

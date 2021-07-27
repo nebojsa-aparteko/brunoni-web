@@ -1,4 +1,4 @@
-import { Button, IconButton, Tooltip, Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
+import { Button, Checkbox, IconButton, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import firebase from 'firebase';
 import { isEqual, omit, set } from 'lodash/fp';
@@ -8,15 +8,14 @@ import Carriers from '../../contexts/Carriers';
 import useClients from '../../hooks/useClients';
 import Carrier from '../../model/Carrier';
 import Client from '../../model/Client';
-import { CustomerSettingsRule, CarrierSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
+import { CarrierSettingsRule, CustomerSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
-//import { BookingCategory } from '../../model/Booking';
-//import CategoryFilter from '../CategoryFilter';
 import CarrierInput from '../inputs/CarrierInput';
 import ClientInput from '../inputs/ClientInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import CategoryMultiSelect from '../CategoryMultiSelect';
+import { BookingCategory } from '../../model/Booking';
 
 interface Props {
   paymentConfirmation: CustomerSettingsRule;
@@ -80,7 +79,21 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
   }, []);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    changeData('category', { ...category, [event.target.name]: event.target.checked } as ImpExp);
+    let categoryArray: BookingCategory[] = category;
+    switch (event.target.name) {
+      case BookingCategory.Export:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Export)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
+        changeData('category', categoryArray);
+        return;
+      case BookingCategory.Import:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Import)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
+        changeData('category', categoryArray);
+        return;
+    }
   };
 
   return (

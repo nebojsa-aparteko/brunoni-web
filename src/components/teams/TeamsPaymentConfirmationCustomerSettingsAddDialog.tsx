@@ -17,14 +17,13 @@ import Carriers from '../../contexts/Carriers';
 import { GlobalContext } from '../../store/GlobalStore';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import firebase from '../../firebase';
-import { CustomerSettingsRule, ImpExp, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
-// import { BookingCategory } from '../../model/Booking';
-// import CategoryFilter from '../CategoryFilter';
+import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
 import { useSnackbar } from 'notistack';
 import CategoryMultiSelect from '../CategoryMultiSelect';
+import { BookingCategory } from '../../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,15 +60,27 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   // TODO CLEAR STATE AFTER CLOSING DIALOG???
   // TODO REFACTOR AND CREATE MORE REUSABLE COMPONENTS ???
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
-  const [selectedCategory, setSelectedCategory] = useState<ImpExp>({ import: false, export: false }); // todo. Set correct initial value
+  const [selectedCategory, setSelectedCategory] = useState<BookingCategory[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>(undefined);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
   const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<Client | undefined | null>(undefined);
 
-  // console.log(selectedCategory)
-
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedCategory({ ...selectedCategory, [event.target.name]: event.target.checked } as ImpExp);
+    let categoryArray: BookingCategory[] = selectedCategory;
+    switch (event.target.name) {
+      case BookingCategory.Export:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Export)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
+        setSelectedCategory([...categoryArray]);
+        return;
+      case BookingCategory.Import:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Import)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
+        setSelectedCategory([...categoryArray]);
+        return;
+    }
   };
 
   const handleAddCustomerSetting = useCallback(async () => {
