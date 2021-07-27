@@ -294,7 +294,7 @@ const mapIntoBookingRequestModel = async (
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
 
-  const departureDate = matchDate(object.SAIL_DATE);
+  const departureDate = matchDate(object.SAIL_DATE || object.ETD);
   const scheduleSearchParams = {
     originPort: origin,
     destinationPort: destination,
@@ -306,7 +306,6 @@ const mapIntoBookingRequestModel = async (
   // Get the latest quote by origin and dest
   const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
   const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
-
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 
   const bookingRequest = {
