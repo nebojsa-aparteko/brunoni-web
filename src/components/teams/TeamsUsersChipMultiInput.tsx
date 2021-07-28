@@ -19,7 +19,7 @@ const TeamsUsersChipMultiInput: React.FC<Props> = ({ options, values, onChange }
       options={options}
       getOptionSelected={(option, value) => option.alphacomId === value.alphacomId}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
-      defaultValue={values}
+      value={values || []}
       onChange={onChange}
       renderTags={(value, getTagProps) =>
         value.map((option, index) => (

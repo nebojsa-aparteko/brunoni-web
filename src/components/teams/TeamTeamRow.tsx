@@ -1,6 +1,6 @@
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team, TeamType } from '../../model/Teams';
@@ -41,6 +41,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
   const { enqueueSnackbar } = useSnackbar();
 
   const carriers = useContext(Carriers);
+
+  useEffect(() => {
+    setActiveTeam(team);
+  }, [team]);
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
@@ -125,7 +129,11 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
         <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
       <TableCell align="right">
-        <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
+        <TeamsUsersChipMultiInput
+          options={adminUsers || []}
+          values={activeTeam.users || []}
+          onChange={onTeamsChanged}
+        />
       </TableCell>
       <TableCell align="right">
         <Autocomplete
