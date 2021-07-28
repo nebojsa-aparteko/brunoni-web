@@ -77,7 +77,11 @@ const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name
   );
 };
 
-const renderDocument = (document: ChecklistItemValueDocument, fileType: string | undefined, containerId: string) => (
+export const renderDocument = (
+  document: ChecklistItemValueDocument,
+  fileType: string | undefined,
+  containerId: string,
+) => (
   <DocumentLayout name={document.name}>
     {fileType === 'pdf' ? (
       <PDFViewer file={document} />

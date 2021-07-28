@@ -23,6 +23,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
+import { showCrispChat } from '../../index';
+import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
 
 const useStyles = makeStyles(() => ({
   rootEmpty: {
@@ -93,12 +95,15 @@ const InternalStorage: React.FC<Props> = ({
   cardMargin = 2,
   dndLabel,
   showHeader,
+  bookingRequestId,
 }) => {
   const classes = useStyles();
   const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<ChecklistItemValueDocument | undefined>(undefined);
 
   const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
   const activityLogContext = useActivityLogState();
@@ -110,6 +115,22 @@ const InternalStorage: React.FC<Props> = ({
 
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
+
+  const handleDialogClose = useCallback(() => {
+    setSelectedDocument(undefined);
+    showCrispChat(true);
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(
+    (document: ChecklistItemValueDocument) => {
+      setSelectedDocument(document);
+      showCrispChat(false);
+      setIsDialogOpen(true);
+    },
+    [setIsDialogOpen],
+  );
+
   const storageBasePath = useMemo((): string => {
     return [`${collection}-documents-internal`, id].join('/');
   }, [id, collection]);
@@ -323,6 +344,7 @@ const InternalStorage: React.FC<Props> = ({
                       item={item}
                       handleDelete={onDeleteFile}
                       handleMention={onMentionFile}
+                      handleDialogOpen={handleDialogOpen}
                     />
                   ))}
                 </List>
@@ -334,6 +356,14 @@ const InternalStorage: React.FC<Props> = ({
             </Box>
           )}
         </Box>
+        {bookingRequestId && selectedDocument && (
+          <BookingRequestComparisonDialog
+            document={selectedDocument}
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingRequestId={bookingRequestId}
+          />
+        )}
       </Box>
     </React.Fragment>
   );
@@ -349,4 +379,5 @@ interface Props {
   cardMargin?: number;
   dndLabel?: string;
   showHeader?: boolean;
+  bookingRequestId?: string;
 }

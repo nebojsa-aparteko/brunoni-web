@@ -39,6 +39,7 @@ const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) =
               cardMargin={0}
               dndLabel={"Drag 'n' drop internal files or click here"}
               showHeader={true}
+              bookingRequestId={bookingRequest.id}
             />
           )}
         </Card>
@@ -51,6 +52,7 @@ const BookingRequestCheckList: React.FC<CheckListProps> = ({ bookingRequest }) =
               label="Storage"
               cardMargin={0}
               showHeader={true}
+              bookingRequestId={bookingRequest.id}
             />
           )}
         </Card>

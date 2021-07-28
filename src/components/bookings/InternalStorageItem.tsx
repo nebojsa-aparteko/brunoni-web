@@ -20,6 +20,7 @@ import safeInvoke from '../../utilities/safeInvoke';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import theme from '../../theme';
 import { isPlatformActivity } from '../../utilities/activityHelper';
+import CompareIcon from '@material-ui/icons/Compare';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -41,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelete }) => {
+const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelete, handleDialogOpen }) => {
   const classes = useStyles();
 
   const [removalInProgress, setRemovalInProgress] = useState(false);
@@ -76,6 +77,11 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
       </a>
       <ListItemSecondaryAction>
         <div className={classes.progressWrapper}>
+          {handleDialogOpen && (
+            <IconButton size="small" aria-label="Add to Comparison" onClick={() => handleDialogOpen(item)}>
+              <CompareIcon />
+            </IconButton>
+          )}
           <IconButton
             size="small"
             aria-label="Add Comment"
@@ -114,4 +120,5 @@ interface Props {
   item: ChecklistItemValueDocument;
   handleDelete: (item: ChecklistItemValueDocument, setProgress: any) => void;
   handleMention: (item: ChecklistItemValueDocument) => void;
+  handleDialogOpen?: (document: ChecklistItemValueDocument) => void;
 }
