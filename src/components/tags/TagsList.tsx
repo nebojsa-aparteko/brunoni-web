@@ -28,7 +28,7 @@ interface TagItemProps {
   tag: Tag;
 }
 
-const TagItem: React.FC<TagItemProps> = ({ tag }) => {
+export const TagItem: React.FC<TagItemProps> = ({ tag }) => {
   const classes = useStyles();
 
   return <Chip label={tag.text} size="small" className={classes.tag} style={{ backgroundColor: tag.color }} />;

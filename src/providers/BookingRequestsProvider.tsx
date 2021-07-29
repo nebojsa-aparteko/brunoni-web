@@ -54,6 +54,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.assignee?.alphacomId) {
         query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
       }
+      if (filters.assignedTags && filters.assignedTags.length > 0) {
+        query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
+      }
       return query.orderBy('createdAt', 'desc');
     },
     [filters],

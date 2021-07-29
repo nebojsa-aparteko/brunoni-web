@@ -6,6 +6,7 @@ import Carrier from '../model/Carrier';
 import { BookingContextFilters } from './BookingListFilterProvider';
 
 interface BookingRequestContextFilters extends ContextFilters {
+  assignedTags?: string[];
   carrier?: Carrier;
 }
 

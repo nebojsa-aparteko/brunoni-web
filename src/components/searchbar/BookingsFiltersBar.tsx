@@ -17,6 +17,10 @@ import Carrier from '../../model/Carrier';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
 import useUser from '../../hooks/useUser';
+import Tags from '../../contexts/Tags';
+import { Tag } from '../../model/Tag';
+import ExistingTagsMultiInput from '../inputs/ExistingTagsMultiInput';
+import asArray from '../../utilities/asArray';
 
 interface Props {
   filters: any;
@@ -25,6 +29,7 @@ interface Props {
   showDateRange?: boolean;
   showRefreshButton?: boolean;
   showAssigneeFilter?: boolean;
+  showTagsFilter?: boolean;
 }
 
 const BookingsFiltersBar: React.FC<Props> = ({
@@ -34,11 +39,13 @@ const BookingsFiltersBar: React.FC<Props> = ({
   showDateRange,
   showRefreshButton,
   showAssigneeFilter,
+  showTagsFilter,
 }) => {
   const clients = useClients();
   const users = useAdminUsers();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
+  const tags = useContext(Tags);
   const user = useUser()[1];
 
   const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
@@ -64,6 +71,12 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const setCarrier = (carrier: Carrier | null | undefined) =>
     setFilters && setFilters(set('carrier', carrier || undefined)(filters));
+
+  const setTags = (assignedTags: Tag[] | Tag | null) => {
+    // @ts-ignore
+    setFilters &&
+      setFilters(set('assignedTags', assignedTags ? asArray(assignedTags).map(tag => tag.id) : undefined)(filters));
+  };
 
   return (
     <Box
@@ -96,6 +109,11 @@ const BookingsFiltersBar: React.FC<Props> = ({
         <Grid item sm={3} xs={12}>
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
+        {showTagsFilter && tags && (
+          <Grid item sm={3} xs={12}>
+            <ExistingTagsMultiInput options={tags || []} onChange={(_, tags) => setTags(tags)} />
+          </Grid>
+        )}
 
         {showDateRange && (
           <Grid item sm={3} xs={12}>
