@@ -163,13 +163,17 @@ const TagManagementContent: React.FC<TagManagementProps> = ({ tag, tagCategory, 
         variant="outlined"
         margin="dense"
       />
-      <TextField
-        label="Color"
-        value={tagColor || ''}
-        onChange={event => setTagColor(event.target.value)}
-        variant="outlined"
-        margin="dense"
-      />
+      <Box display="flex" flexDirection="row" alignItems="center">
+        <Typography>Color: </Typography>
+        <input
+          type="color"
+          id="color"
+          name="color"
+          value={tagColor || ''}
+          onChange={event => setTagColor(event.target.value)}
+          style={{ margin: 8, height: 36, width: 36 }}
+        />
+      </Box>
       <Box flex={1} display="flex" justifyContent="space-between" mt={1}>
         <Button
           onClick={() => handleManageTag(tag)}
@@ -355,7 +359,7 @@ const TagManagementDialog: React.FC<TagManagementDialogProps> = ({
   return (
     <Dialog
       open={isOpen}
-      onClose={handleClose}
+      onClose={isEditingOrCreating ? undefined : handleClose}
       onExited={handleFinishEditing}
       aria-labelledby="dialog-title-tags"
       maxWidth="md"
