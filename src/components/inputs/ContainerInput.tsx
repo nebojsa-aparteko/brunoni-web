@@ -283,6 +283,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     let res = v && v < 0 ? 0 : v;
     res = res && isNaN(res) ? null : res;
     setContainer(set('weight', res)(container));
+    onChange(set('weight', v)(container));
   };
 
   const handleWeightChange = (v: number | null) => {
