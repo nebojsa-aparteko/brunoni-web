@@ -22,6 +22,7 @@ export default interface UserRecord extends UserRecordMin {
   redirectedAdmin?: UserRecordMin;
   isRedirectionActive?: boolean;
   dontShowGuide?: boolean;
+  answeredLandInterest?: boolean;
   lastOpenedChecklistTab?: string;
   unreadNotifications?: number;
 }

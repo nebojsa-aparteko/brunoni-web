@@ -48,6 +48,7 @@ import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
+import PromoBox from '../PromoBox';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -315,6 +316,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
+            <PromoBox />
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
                 <img

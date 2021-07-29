@@ -37,7 +37,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
             {},
             (snapshot: firebase.firestore.DocumentSnapshot) => {
               console.debug('userRecord updated with', snapshot);
-              setUserRecord(snapshot.data() as UserRecord);
+              setUserRecord({ ...snapshot.data(), id: user.uid } as UserRecord);
             },
             (error: Error) => {
               console.error('userRecord threw an error', error);

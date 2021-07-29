@@ -48,6 +48,7 @@ import { formatDateSafe } from '../utilities/formattingHelpers';
 import { useSnackbar } from 'notistack';
 import { GlobalContext } from '../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
+import PromoBox from './PromoBox';
 
 interface Props {
   quote?: Quote;
@@ -271,6 +272,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           <Container maxWidth="lg">
             <ScrollToTopOnMount />
             <Paper className={classes.root}>
+              <PromoBox />
               <Box display="none" displayPrint="block" mb={2}>
                 <Box mb={2}>
                   <img
