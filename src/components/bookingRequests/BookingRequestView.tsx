@@ -81,6 +81,7 @@ import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -340,6 +341,15 @@ function ScrollToTopOnMount() {
   return null;
 }
 
+function timeout(delay: number) {
+  return new Promise(res => setTimeout(res, delay));
+}
+
+async function urlExists(url: string) {
+  const result = await fetch(url, { method: 'HEAD' });
+  return result.ok;
+}
+
 type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
 
 const setChecked = async (bookingReqId: string, itemType: string, checked: boolean) => {
@@ -375,6 +385,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
   );
   const [, dispatch] = useGlobalAppState();
+  const history = useHistory();
   const getActivityLogUserData = useActivityLogUserData();
 
   const tags = useFirestoreCollection(
@@ -476,6 +487,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     [bookingRequest],
   );
 
+  const onBookingCreate = useCallback(
+    (bookingId: string) =>
+      firebase
+        .firestore()
+        .collection('bookings-requests')
+        .doc(bookingRequest?.id)
+        .update('bookingId', bookingId, 'status', BookingRequestStatus.REQUESTED),
+    [bookingRequest],
+  );
+
   const storeActivity = useCallback(
     (checklistItemActivityHandler: () => Promise<void | any>) => {
       checklistItemActivityHandler()
@@ -521,8 +542,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
       try {
+        dispatch({ type: 'START_GLOBAL_LOADING' });
         const token = await user.getIdToken();
-        // console.log('Postponing', await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes));
         const response = await fetch(`${process.env.REACT_APP_API_URL}/bookingRequest`, {
           method: 'POST',
           mode: 'cors',
@@ -538,16 +559,40 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         });
 
         if (response.ok) {
-          // console.log(await response.json());
-          // const body = await response.json();
-          // console.log('Body', await response.blob());
+          const body = await response.json();
+          if (body.FileID) {
+            await onBookingCreate(body.FileID);
+            await timeout(1000);
+            if (await urlExists(`/bookings/${body.FileID}`)) {
+              history.push(`/bookings/${body.FileID}`);
+            } else {
+              await timeout(2000);
+              if (await urlExists(`/bookings/${body.FileID}`)) {
+                history.push(`/bookings/${body.FileID}`);
+              } else {
+                dispatch({
+                  type: 'SHOW_SUCCESS_SNACKBAR',
+                  duration: 5000,
+                  message:
+                    'Booking is still being created. Click on the booking number displayed in the request to view it.',
+                });
+              }
+            }
+          } else {
+            console.log('No booking ID received, unable to redirect');
+          }
         } else {
           const body = await response.json();
           console.error(`Failed to request`, response, body);
+          dispatch({
+            type: 'SHOW_ERROR_SNACKBAR',
+            message: 'Failed to request booking',
+          });
         }
       } catch (e) {
         console.error('Failed to perform request', e);
       } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
       }
     } else {
       return openModal();

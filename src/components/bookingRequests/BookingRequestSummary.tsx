@@ -623,7 +623,16 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   </Paper>
                 </TableCell>
               </TableRow>
-
+              {bookingRequest.bookingId && (
+                <TableRow>
+                  <TableCell className={classes.tableCellLabel}>Booking</TableCell>
+                  <TableCell className={classes.tableCell}>
+                    <Link to={`/bookings/${bookingRequest.bookingId}`} target="_blank">
+                      {bookingRequest.bookingId}
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              )}
               <TableRowData
                 label={BookingRequestLabels.blNumber}
                 content={
