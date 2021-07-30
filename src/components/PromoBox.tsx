@@ -59,8 +59,8 @@ export default () => {
   const handleShowInterest = () => {
     setShowInterest(true);
   };
-
-  return !userRecord.answeredLandInterest && !actingAs ? (
+  console.log('Acting as', !actingAs);
+  return !userRecord.answeredLandInterest && !userRecord.isAdmin ? (
     <Zoom in={trigger && !dismissPopup}>
       <div onClick={handleClick} role="presentation" className={classes.root}>
         <Card elevation={4} className={classes.card}>
