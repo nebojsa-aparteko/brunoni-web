@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useScrollTrigger from '@material-ui/core/useScrollTrigger';
@@ -8,7 +8,6 @@ import Alert from '@material-ui/lab/Alert';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
 import truckImg from '../assets/truck.jpg';
-import ActingAs from '../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,7 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default () => {
   const classes = useStyles();
   const [, userRecord] = useUser();
-  const actingAs = useContext(ActingAs);
   const [showInterest, setShowInterest] = useState(false);
   const [dismissPopup, setDismissPopup] = useState(false);
   const trigger = useScrollTrigger({
@@ -59,7 +57,6 @@ export default () => {
   const handleShowInterest = () => {
     setShowInterest(true);
   };
-  console.log('Acting as', !actingAs);
   return !userRecord.answeredLandInterest && !userRecord.isAdmin ? (
     <Zoom in={trigger && !dismissPopup}>
       <div onClick={handleClick} role="presentation" className={classes.root}>
