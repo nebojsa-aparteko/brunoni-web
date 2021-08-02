@@ -95,7 +95,7 @@ const InternalStorage: React.FC<Props> = ({
   cardMargin = 2,
   dndLabel,
   showHeader,
-  bookingRequestId,
+  showComparison,
 }) => {
   const classes = useStyles();
   const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
@@ -344,7 +344,7 @@ const InternalStorage: React.FC<Props> = ({
                       item={item}
                       handleDelete={onDeleteFile}
                       handleMention={onMentionFile}
-                      handleDialogOpen={handleDialogOpen}
+                      handleDialogOpen={showComparison ? handleDialogOpen : undefined}
                     />
                   ))}
                 </List>
@@ -356,12 +356,12 @@ const InternalStorage: React.FC<Props> = ({
             </Box>
           )}
         </Box>
-        {bookingRequestId && selectedDocument && (
+        {showComparison && selectedDocument && (
           <BookingRequestComparisonDialog
             document={selectedDocument}
             isOpen={isDialogOpen}
             handleClose={handleDialogClose}
-            bookingRequestId={bookingRequestId}
+            bookingRequestId={id}
           />
         )}
       </Box>
@@ -379,5 +379,5 @@ interface Props {
   cardMargin?: number;
   dndLabel?: string;
   showHeader?: boolean;
-  bookingRequestId?: string;
+  showComparison?: boolean;
 }
