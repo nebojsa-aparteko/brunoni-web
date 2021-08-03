@@ -29,7 +29,6 @@ interface Props {
   showDateRange?: boolean;
   showRefreshButton?: boolean;
   showAssigneeFilter?: boolean;
-  showTagsFilter?: boolean;
 }
 
 const BookingsFiltersBar: React.FC<Props> = ({
@@ -39,7 +38,6 @@ const BookingsFiltersBar: React.FC<Props> = ({
   showDateRange,
   showRefreshButton,
   showAssigneeFilter,
-  showTagsFilter,
 }) => {
   const clients = useClients();
   const users = useAdminUsers();
@@ -109,7 +107,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
         <Grid item sm={3} xs={12}>
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
-        {showTagsFilter && tags && (
+        {tags && (
           <Grid item sm={3} xs={12}>
             <ExistingTagsMultiInput options={tags || []} onChange={(_, tags) => setTags(tags)} />
           </Grid>

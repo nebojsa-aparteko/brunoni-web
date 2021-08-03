@@ -36,6 +36,7 @@ export interface ContextFilters {
   clientFilter?: Client;
   originPort?: Port;
   destinationPort?: Port;
+  assignedTags?: string[];
 }
 
 export type Action = {

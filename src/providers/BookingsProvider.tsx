@@ -6,10 +6,8 @@ import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
-import pick from 'lodash/fp/pick';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
-import { UserRecordMinProperties } from '../model/UserRecord';
 import { useBookingListFilterContext } from './BookingListFilterProvider';
 import firebase from '../firebase';
 
@@ -83,8 +81,12 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         query = query.where('createdAt', '<=', filters.dateRange.endDate);
       }
 
-      if (filters.assignee) {
-        query = query.where('watchers', 'array-contains', pick(UserRecordMinProperties)(filters.assignee));
+      if (filters.assignee && filters.assignee.alphacomId) {
+        query = query.where('BkgAgentContact', '==', filters.assignee.alphacomId);
+      }
+
+      if (filters.assignedTags && filters.assignedTags.length > 0) {
+        query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
       }
 
       if (filters.carrier) {
