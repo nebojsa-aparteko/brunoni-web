@@ -17,22 +17,20 @@ import { Alert, AlertTitle } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paperRoot: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(2),
   },
   container: {
     display: 'flex',
     flexDirection: 'column',
   },
-  body: {
+  firstLabel: {
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    flexDirection: 'row-reverse',
   },
   footer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
 }));
@@ -43,53 +41,72 @@ const LandTransportFare: React.FC = () => {
   return (
     <Paper className={classes.paperRoot}>
       <Box className={classes.container}>
-        <Box display={'flex'} justifyContent={'flex-end'}>
-          <Box>
-            <Alert icon={false} color={'success'}>
-              <AlertTitle>{'CHEAPEST'}</AlertTitle>
-            </Alert>
-          </Box>
-        </Box>
-        <Box className={classes.body}>
-          {/* body */}
-          <Box flexGrow={1}>
-            <Stepper alternativeLabel connector={<StepConnector />}>
-              <Step>
-                <StepLabel StepIconComponent={FiberManualRecordIcon}>
-                  <Box className={classes.container}>
-                    <Typography variant={'h4'}>{'13:45'}</Typography>
-                    <Typography>{'14-04-21'}</Typography>
-                    <Typography variant={'h5'}>{'NL RTM'}</Typography>
-                  </Box>
-                </StepLabel>
-              </Step>
-              <Step>
-                <StepLabel StepIconComponent={FiberManualRecordIcon}>
-                  <Box className={classes.container}>
-                    <Typography variant={'h4'}>{'16:20'}</Typography>
-                    <Typography>{'18-04-21'}</Typography>
-                    <Typography variant={'h5'}>{'BEANR'}</Typography>
-                  </Box>
-                </StepLabel>
-              </Step>
-            </Stepper>
-          </Box>
-        </Box>
+        <FareHeader />
+        <FareBody />
         <Divider />
-        <Box className={classes.footer}>
-          <Box className={classes.body}>
-            <Typography variant={'h4'} style={{ paddingRight: '1em' }}>
-              Est. price
-            </Typography>
-            <Typography variant={'h5'}>{2932.0}</Typography>
-          </Box>
-          <Typography variant={'h4'}>Contargo</Typography>
-          <Button style={{ margin: '.5em' }} color="primary" variant="contained" onClick={() => console.log('clicked')}>
-            Book now
-          </Button>
-        </Box>
+        <FareFooter />
       </Box>
     </Paper>
+  );
+};
+
+const FareHeader = () => {
+  return (
+    <Box display={'flex'} justifyContent={'flex-end'}>
+      <Box>
+        <Alert icon={null} color={'success'}>
+          <AlertTitle>{'CHEAPEST'}</AlertTitle>
+        </Alert>
+      </Box>
+    </Box>
+  );
+};
+
+const FareBody = () => {
+  const classes = useStyles();
+
+  return (
+    <Box flexGrow={1}>
+      <Stepper connector={<StepConnector />}>
+        <Step>
+          <StepLabel className={classes.firstLabel} icon={<FiberManualRecordIcon />}>
+            <Box className={classes.container}>
+              <Typography variant={'h4'}>{'13:45'}</Typography>
+              <Typography>{'14-04-21'}</Typography>
+              <Typography variant={'h5'}>{'NL RTM'}</Typography>
+            </Box>
+          </StepLabel>
+        </Step>
+        <Step>
+          <StepLabel icon={<FiberManualRecordIcon />}>
+            <Box className={classes.container}>
+              <Typography variant={'h4'}>{'16:20'}</Typography>
+              <Typography>{'18-04-21'}</Typography>
+              <Typography variant={'h5'}>{'BEANR'}</Typography>
+            </Box>
+          </StepLabel>
+        </Step>
+      </Stepper>
+    </Box>
+  );
+};
+
+const FareFooter = () => {
+  const classes = useStyles();
+
+  return (
+    <Box className={classes.footer}>
+      <Box className={classes.footer} style={{ paddingRight: '.5em' }}>
+        <Typography variant={'h4'} style={{ paddingRight: '.5em' }}>
+          Est. price
+        </Typography>
+        <Typography variant={'h4'}>{2932.0}€</Typography>
+      </Box>
+      <Typography variant={'h4'}>Contargo</Typography>
+      <Button style={{ margin: '.5em' }} color="primary" variant="contained" onClick={() => console.log('clicked')}>
+        Book now
+      </Button>
+    </Box>
   );
 };
 

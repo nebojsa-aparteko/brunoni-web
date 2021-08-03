@@ -19,6 +19,11 @@ interface Props<T> {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   paper: {
     marginBottom: theme.spacing(1),
     '&:hover': {
@@ -71,7 +76,7 @@ function ListInput<T>({
   };
 
   return (
-    <Box>
+    <Box className={classes.root}>
       {value.map((item, i) => (
         <Paper key={i} className={classes.paper}>
           <Box display="flex">
