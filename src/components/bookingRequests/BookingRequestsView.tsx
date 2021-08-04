@@ -178,12 +178,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
     <Fragment>
       <Meta title={`Booking Requests`} />
 
-      <BookingsFiltersBar
-        filters={filters}
-        setFilters={setFilters}
-        showAssigneeFilter={isAdmin}
-        showTagsFilter={true}
-      />
+      <BookingsFiltersBar filters={filters} setFilters={setFilters} showAssigneeFilter={isAdmin} />
 
       <div>
         {bookingRequests && !isLoading ? (
