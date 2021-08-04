@@ -168,7 +168,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       .then(() => handleClose())
       .catch(() => handleClose())
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notification, handleClose]);
+  }, [dispatch, notification.readId, userRecord, handleClose]);
   const handleClick = useCallback(() => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     notificationSeenStatusChange(notification.id, userRecord, NotificationStatusAction.READ_NOTIFICATION)
@@ -191,7 +191,17 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
         }
       })
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notification, handleShowDrawer, history]);
+  }, [
+    dispatch,
+    notification.id,
+    notification.type,
+    notification.referenceObject,
+    notification.referenceID,
+    notification.activity,
+    userRecord,
+    handleShowDrawer,
+    history,
+  ]);
 
   const handleCommentClick = () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });

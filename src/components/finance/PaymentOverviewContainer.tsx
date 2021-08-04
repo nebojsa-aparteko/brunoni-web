@@ -216,7 +216,7 @@ const PaymentOverviewContainer = () => {
         setCommissionsFilter(prevState => set('currency', event.target.value as Currency[])(prevState));
       }
     },
-    [setFilters],
+    [setCommissionsFilter, setFilters],
   );
 
   const onCarrierChange = useCallback(
@@ -228,7 +228,7 @@ const PaymentOverviewContainer = () => {
         setCommissionsFilter(prevState => set('carriers', [carrier])(prevState));
       }
     },
-    [setFilters],
+    [setCommissionsFilter, setFilters],
   );
 
   const onStatusChange = useCallback(
@@ -277,7 +277,7 @@ const PaymentOverviewContainer = () => {
         selectedStatuses.length > 0 &&
         checkIfStatusSelected(data, platformStatus, selectedStatuses),
     );
-  }, [overviewData, status, platformStatus, currency, selectedStatuses]);
+  }, [overviewData, platformStatus, currency, selectedStatuses]);
 
   const relevantBookingIds = filteredOverviewData.map(weeklyPayment => weeklyPayment.bookingId);
   const relevantCommissions = commissions
@@ -353,7 +353,7 @@ const PaymentOverviewContainer = () => {
         })
         .finally(() => setSelectedPayments([]));
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, handleSelect, user, dispatch],
+    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, user, dispatch],
   );
 
   const selectDeselectAll = () => {

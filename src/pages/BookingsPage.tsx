@@ -105,23 +105,41 @@ const BookingsPageContainer: React.FC = () => {
   //   };
   // }, [isLoading, bookingPaginationContextData.scrollPosition]);
 
-  useEffect(() => {
-    if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
-      if (!actingAs) {
-        handleTabChange(bookingPaginationContextData.activeTab);
-      } else {
-        handleCustomerTabChange(bookingPaginationContextData.activeTab);
-      }
-    }
-  }, [bookingPaginationContextData.activeTab]);
+  const handleCustomerTabChange = useCallback(
+    (newValue: number) => {
+      const bookingsContextDataNew = () => {
+        switch (newValue) {
+          case 0:
+            return flow(
+              set('archived', false),
+              set('pendingPayment', undefined),
+              set('dateRange', undefined),
+            )(bookingsContextData);
+          case 1:
+            return flow(
+              set('archived', true),
+              set('pendingPayment', undefined),
+              set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
+            )(bookingsContextData);
+          case 3:
+            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
+            return bookingsContextData;
+          case 4:
+            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', true))(prevState));
+            return bookingsContextData;
+          case 5:
+            setFilters && setFilters(prevState => flow(set('archived', true))(prevState));
+            return bookingsContextData;
+          default:
+            return bookingsContextData;
+        }
+      };
 
-  const setSelectedTab = useCallback(
-    (event: React.ChangeEvent<{}>, newValue: number) => {
-      if (setBookingPaginationContextData) {
-        setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
+      if (setBookingsContextData) {
+        setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
-    [bookingPaginationContextData.activeTab],
+    [bookingsContextData, setBookingsContextData],
   );
 
   const handleTabChange = useCallback(
@@ -146,15 +164,6 @@ const BookingsPageContainer: React.FC = () => {
               set('pendingPayment', undefined),
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
-          case 3:
-            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
-            return bookingsContextData;
-          case 4:
-            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', true))(prevState));
-            return bookingsContextData;
-          case 5:
-            setFilters && setFilters(prevState => flow(set('archived', true))(prevState));
-            return bookingsContextData;
           default:
             return bookingsContextData;
         }
@@ -164,35 +173,32 @@ const BookingsPageContainer: React.FC = () => {
         setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
       }
     },
-    [setBookingsContextData],
+    [bookingsContextData, setBookingsContextData],
   );
 
-  const handleCustomerTabChange = useCallback(
-    (newValue: number) => {
-      const bookingsContextDataNew = () => {
-        switch (newValue) {
-          case 0:
-            return flow(
-              set('archived', false),
-              set('pendingPayment', undefined),
-              set('dateRange', undefined),
-            )(bookingsContextData);
-          case 1:
-            return flow(
-              set('archived', true),
-              set('pendingPayment', undefined),
-              set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
-            )(bookingsContextData);
-          default:
-            return bookingsContextData;
-        }
-      };
+  useEffect(() => {
+    if (bookingsContextData.activeTab !== bookingPaginationContextData.activeTab) {
+      if (!actingAs) {
+        handleTabChange(bookingPaginationContextData.activeTab);
+      } else {
+        handleCustomerTabChange(bookingPaginationContextData.activeTab);
+      }
+    }
+  }, [
+    actingAs,
+    bookingPaginationContextData.activeTab,
+    bookingsContextData.activeTab,
+    handleCustomerTabChange,
+    handleTabChange,
+  ]);
 
-      if (setBookingsContextData) {
-        setBookingsContextData(set('activeTab', newValue)(bookingsContextDataNew()));
+  const setSelectedTab = useCallback(
+    (event: React.ChangeEvent<{}>, newValue: number) => {
+      if (setBookingPaginationContextData) {
+        setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
       }
     },
-    [setBookingsContextData],
+    [bookingPaginationContextData, setBookingPaginationContextData],
   );
 
   useEffect(() => {
@@ -207,7 +213,7 @@ const BookingsPageContainer: React.FC = () => {
           )(bookingsContextData),
         );
     }
-  }, [actingAs, setBookingsContextData]);
+  }, [actingAs, bookingsContextData, setBookingsContextData]);
 
   return (
     <Fragment>

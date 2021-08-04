@@ -51,6 +51,7 @@ import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 import brunoniLogo from '../assets/logo.brunoni.svg';
 import allmarineLogo from '../assets/logo.allmarine.png';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     height: 100,
@@ -58,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
     background: theme.palette.background.paper,
 
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
@@ -242,7 +243,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setGuide(getPageGuide());
-  }, [window.location.pathname]);
+  }, []);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 

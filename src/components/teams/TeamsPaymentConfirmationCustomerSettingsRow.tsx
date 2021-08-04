@@ -1,4 +1,5 @@
-import { Button, Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
+import { Button, Checkbox, IconButton, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 import firebase from 'firebase';
 import { isEqual, omit, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
@@ -7,18 +8,20 @@ import Carriers from '../../contexts/Carriers';
 import useClients from '../../hooks/useClients';
 import Carrier from '../../model/Carrier';
 import Client from '../../model/Client';
-import { CustomerSettingsRule, CarrierSettingsRule } from '../../model/PaymentConfirmationRule';
+import { CarrierSettingsRule, CustomerSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
-import CategoryFilter from '../CategoryFilter';
 import CarrierInput from '../inputs/CarrierInput';
 import ClientInput from '../inputs/ClientInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
+import CategoryMultiSelect from '../CategoryMultiSelect';
+import { BookingCategory } from '../../model/Booking';
 
 interface Props {
   paymentConfirmation: CustomerSettingsRule;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
+  onCopy: (id: string) => Promise<void>;
 }
 
 // utility function to remove automaticMessage field from paymentConfirmation Object
@@ -30,6 +33,7 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
   paymentConfirmation,
   selected,
   onSelectRow,
+  onCopy,
   ...other
 }) => {
   const carriers = useContext(Carriers);
@@ -37,9 +41,6 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
   const [, dispatch] = useContext(GlobalContext);
   const [paymentConfirmationState, setPaymentConfirmationState] = useState<CustomerSettingsRule>(paymentConfirmation);
   const { enqueueSnackbar } = useSnackbar();
-
-  // console.log('state', paymentConfirmationState);
-  // console.log('normal', paymentConfirmation);
 
   const { carrier, category, client, contact, statisticClient } = paymentConfirmationState;
 
@@ -73,12 +74,26 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
     }
   }, [carrier, client, dispatch, enqueueSnackbar, paymentConfirmation.id, paymentConfirmationState]);
 
-  const changeData = useCallback((path: string, value?: Carrier | Client | string[] | string | null) => {
+  const changeData = useCallback((path: string, value?: Carrier | Client | string | string[] | null | ImpExp) => {
     setPaymentConfirmationState(prevState => set(path, value)(prevState));
   }, []);
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    changeData('category', (event.target as HTMLInputElement).value);
+    let categoryArray: BookingCategory[] = category;
+    switch (event.target.name) {
+      case BookingCategory.Export:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Export)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
+        changeData('category', categoryArray);
+        return;
+      case BookingCategory.Import:
+        event.target.checked
+          ? categoryArray.push(BookingCategory.Import)
+          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
+        changeData('category', categoryArray);
+        return;
+    }
   };
 
   return (
@@ -95,7 +110,7 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
       </TableCell>
       <TableCell align="left">
-        <CategoryFilter value={category} onChange={handleImportOrExportChange} />
+        <CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />
       </TableCell>
       <TableCell align="left">
         <ClientInput
@@ -127,10 +142,16 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         />
       </TableCell>
       <TableCell align="right">
-        {changed && (
+        {changed ? (
           <Button onClick={handleEditClientStatistic} size="small" color="primary" variant="contained">
             Save
           </Button>
+        ) : (
+          <Tooltip title="Copy">
+            <IconButton onClick={() => onCopy(paymentConfirmation.id)} aria-label="copy" color="primary">
+              <FileCopyIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </TableCell>
     </TableRow>

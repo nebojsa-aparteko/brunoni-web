@@ -12,6 +12,8 @@ interface Props {
   bookingAgent: UserRecord | null | undefined;
 }
 
+const mediaNotPrint = '@media not print';
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   summaryWrapper: {
     display: 'flex',
@@ -35,7 +37,7 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '8em',
   },
   tableRow: {
-    ['@media not print']: {
+    [mediaNotPrint]: {
       [theme.breakpoints.down('sm')]: {
         display: 'block',
         marginTop: theme.spacing(1),
@@ -46,7 +48,7 @@ const useStyles = makeStyles(theme => ({
         },
       },
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },
@@ -62,7 +64,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   tableCellQuoteUserData: {
-    ['@media not print']: {
+    [mediaNotPrint]: {
       display: 'none',
     },
   },

@@ -60,6 +60,7 @@ interface Props {
   showCompanyInfo?: boolean;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(4),
@@ -71,14 +72,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
   },
   logo: {
     width: '5em',
-    ['@media print']: {
+    [mediaPrint]: {
       width: '20em',
     },
   },
@@ -89,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
-    ['@media print']: {
+    [mediaPrint]: {
       marginBottom: theme.spacing(0),
     },
   },
@@ -99,7 +100,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   hidePrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },

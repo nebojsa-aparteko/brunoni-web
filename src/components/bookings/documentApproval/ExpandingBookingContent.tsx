@@ -15,14 +15,15 @@ import get from 'lodash/fp/get';
 import filter from 'lodash/fp/filter';
 import { remark } from '../BookingViewMainContent';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(() => ({
   hidePrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
   showPrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'initial',
     },
   },

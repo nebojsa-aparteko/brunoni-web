@@ -139,7 +139,6 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           </Fragment>
         );
       })}
-
       <Popover
         id={id}
         open={open}

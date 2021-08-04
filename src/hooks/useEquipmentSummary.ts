@@ -57,7 +57,8 @@ export default function useEquipmentSummary<T extends BookingCategory>(
 
       return () => clearInterval(unsubscribe);
     }, 600000);
-  }, [filters]);
+  }, [category, filters, user]);
+
   useEffect(() => {
     user
       .getIdToken()
@@ -87,7 +88,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             setEquipmentControl(flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))));
         },
       );
-  }, [filters]);
+  }, [category, filters, user]);
 
   return useMemo(() => equipmentControl as any, [equipmentControl]);
 }

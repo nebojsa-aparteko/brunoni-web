@@ -9,13 +9,14 @@ interface Props {
   subtitle: string;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   title: {
     [theme.breakpoints.down('sm')]: {
       marginLeft: theme.spacing(1),
       marginBottom: theme.spacing(2),
     },
-    ['@media print']: {
+    [mediaPrint]: {
       marginLeft: theme.spacing(0),
     },
   },

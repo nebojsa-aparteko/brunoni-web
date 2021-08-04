@@ -4,7 +4,7 @@ import { Quote, QuoteGroup } from '../providers/QuoteGroupsProvider';
 export const portShortFormatLabel = (port: Port | undefined): string => port?.city || port?.id || '?';
 
 export const portLongFormatLabel = (port: Port | undefined): string =>
-  port?.city ? port?.city || '?' + ', ' + port?.country || '?' : port ? port.id : '?';
+  port?.city ? port?.city || `?, ${port?.country}` || '?' : port ? port.id : '?';
 
 export const quoteRouteLabelDisplay = (quote: Quote | QuoteGroup | undefined, shortFormat: boolean = false) => {
   return quote

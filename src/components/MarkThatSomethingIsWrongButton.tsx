@@ -62,7 +62,7 @@ const MarkThatSomethingIsWrongButton: React.FC<Props> = ({ payment, booking, upd
           });
         });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar, updateComponent],
   );
 
   const handleSetIsSomethingWrong = () => {
