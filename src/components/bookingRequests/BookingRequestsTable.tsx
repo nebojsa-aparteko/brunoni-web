@@ -248,7 +248,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     <StyledTableRow
       tabIndex={-1}
       onClick={() => handleRowClick(bookingRequest.id!)}
-      style={{ display: 'flex', backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)' }}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)',
+      }}
     >
       <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
         <TagsPreviewList tags={tags} />

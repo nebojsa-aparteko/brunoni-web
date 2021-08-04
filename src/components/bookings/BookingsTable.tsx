@@ -212,6 +212,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
       root: {
+        position: 'relative',
         cursor: 'pointer',
         paddingLeft: theme.spacing(2),
         paddingRight: theme.spacing(2),
