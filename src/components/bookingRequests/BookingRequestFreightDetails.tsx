@@ -689,8 +689,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
                   : `${selectedDetails.length} details selected`
               }
               labelWhenNotSelected={''}
-              addTooltip={'Add new detail'}
-              deleteTooltip={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
+              addButtonLabel={'Add new detail'}
+              deleteButtonLabel={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
             />
           )}
           {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
