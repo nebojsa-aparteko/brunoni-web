@@ -26,7 +26,7 @@ import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
-//import { useSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
@@ -157,7 +157,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
-  //const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -209,7 +209,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     return tasks?.filter(task =>
       task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
     );
-  }, [selectedTab, tasks]);
+  }, [tasks, userRecord]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -275,7 +275,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         })
         .catch(err => console.log(err));
     },
-    [booking, userRecord, dispatch, getActivityLogUserData],
+    [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],
   );
   const [anchorEl, setAnchorEl] = React.useState(null);
 

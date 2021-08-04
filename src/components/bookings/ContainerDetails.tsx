@@ -457,14 +457,16 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                           <TableRowData label={'Pick Up Location'} content={ref.LocDet} />
                         </Fragment>
                       );
-                    } else if (ref.LocType === 'DELIVERY') {
+                    }
+
+                    if (ref.LocType === 'DELIVERY') {
                       return (
                         <Fragment key={`booking-loc-type-${index}`}>
                           <TableRowData label={'Delivery Reference'} content={ref.LocRef} />
                           <TableRowData label={'Delivery Address'} content={ref.LocDet} />
                         </Fragment>
                       );
-                    } else return null;
+                    }
                   })}
                   {detail['VGM-PIN'] && (
                     <TableRowData label={'VGM Pin'} content={detail['VGM-PIN']} key={`booking-vgm-pin-type-${index}`} />
