@@ -32,7 +32,7 @@ const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
 const taskTypes = Object.entries(TaskDescription).map(t => t[1]);
 const taskTypeNamesPreview = Object.entries(TaskDescription);
 
-const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...other }) => {
+const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other }) => {
   const adminUsers = useAdminUsers();
 
   const [activeTeam, setActiveTeam] = useState(team);
@@ -113,7 +113,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...oth
   }, [activeTeam, enqueueSnackbar]);
 
   return (
-    <TableRow key={key} {...other}>
+    <TableRow {...other}>
       <TableCell padding="checkbox">
         <Checkbox
           checked={selected}

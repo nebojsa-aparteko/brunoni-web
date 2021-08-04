@@ -9,8 +9,10 @@ import {
   LinearProgress,
   makeStyles,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
+import EmailIcon from '@material-ui/icons/Email';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import {
@@ -43,6 +45,7 @@ import { editRestriction } from './CheckList';
 import ActionModal from './ActionModel';
 import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 import { MentionItem } from 'react-mentions';
+import SendEmailDialog from './SendEmailDialog';
 import Task from '../../../model/Task';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -164,6 +167,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     removedUsers,
     changedFields,
     task,
+    paymentConfirmationEmails,
   } = data;
   return flow(omitBy(isNil))({
     changeType: changeType,
@@ -189,6 +193,7 @@ export const createActivityObject = (data: ActivityCreationProps): ActivityLogIt
     removedUsers: removedUsers,
     changedFields,
     task,
+    paymentConfirmationEmails,
   } as ActivityLogItem);
 };
 
@@ -209,6 +214,7 @@ export interface ActivityCreationProps {
   removedUsers?: ActivityLogUserData[];
   changedFields?: ChangedField[];
   task?: Task;
+  paymentConfirmationEmails?: string[];
 }
 
 const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
@@ -224,6 +230,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -656,13 +663,26 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           <Box flex="1" />
           <Box display="flex">
             <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-              {/*<Badge badgeContent={checklistItem.mentionCount || 0} color="primary">*/}
               <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-              {/*</Badge>*/}
             </IconButton>
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
             </IconButton>
+            {checklistItem.id === 'FREIGHT COLLECTION' && (
+              <Tooltip title="Send email" placement={'top'}>
+                <IconButton
+                  size="small"
+                  aria-label="send email"
+                  onClick={() => setEmailDialogOpen(true)}
+                  disabled={checklistItem.checked}
+                >
+                  <EmailIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {emailDialogOpen && (
+              <SendEmailDialog booking={booking} setDialogOpen={setEmailDialogOpen} dialogOpen={emailDialogOpen} />
+            )}
           </Box>
         </Box>
         {!isAdmin &&

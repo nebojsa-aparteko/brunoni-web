@@ -212,6 +212,8 @@ const TeamsUsersContainer: React.FC = () => {
                 ? `${selectedUsers.length} admin selected`
                 : `${selectedUsers.length} admins selected`
             }
+            addButtonLabel={'Add admin'}
+            deleteButtonLabel={selectedUsers.length === 1 ? `Delete admin` : `Delete admins`}
             labelWhenNotSelected={'Admins'}
           />
           <TableContainer>

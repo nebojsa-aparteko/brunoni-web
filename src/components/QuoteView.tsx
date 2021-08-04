@@ -27,7 +27,7 @@ import QuoteItemRemarks from './quotes/QuoteItemRemarks';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import SearchEmptyResults from './routeSearch/SearchEmptyResults';
 import PrintIcon from '@material-ui/icons/Print';
-import { buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
+import { buildMailToLink, buildSpecialRequestLink } from './quotes/QuoteBookingBodyTextSharePrep';
 import useUser from '../hooks/useUser';
 import FlareIcon from '@material-ui/icons/Flare';
 import QuoteNav from './quotes/QuoteItemNav';

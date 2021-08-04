@@ -125,6 +125,7 @@ export enum ActivityText {
   ARCHIVED = ' has archived booking request.',
   UNARCHIVED = ' has unarchived booking request.',
   EDITED = ' has edited these following fields: ',
+  SENT_PAYMENT_CONFIRMATION_EMAIL = ' has sent payment confirmation to this emails: ',
 }
 
 export enum ActivityChangeType {
@@ -158,6 +159,7 @@ export enum ActivityChangeType {
   ASSIGNED_ON_TASK,
   PUT_ON_HOLD_BOOKING_REQ,
   REVERT_PUT_ON_HOLD_BOOKING_REQ,
+  SENT_PAYMENT_CONFIRMATION_EMAIL,
 }
 
 export enum ChecklistNames {

@@ -294,6 +294,7 @@ const Navbar: React.FC = () => {
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
+                    {/*<ButtonMenuItem primary="Online Booking" to="/online-booking" />*/}
                     <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
@@ -469,7 +470,7 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
-                  <ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />
+                  {/*<ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />*/}
 
                   <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
 

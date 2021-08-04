@@ -297,6 +297,7 @@ export enum CarrierId {
   SLOM = 'SLOM',
   STNN = 'STNN',
   UAL = 'UAL',
+  HUGO_STINNES = 'HUGO STINNES',
 }
 
 export enum AlertType {

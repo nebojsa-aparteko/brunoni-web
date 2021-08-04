@@ -85,7 +85,7 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
       </TableCell>
       <TableCell align="right">
         <UserInput
-          label="Redirect To"
+          label=""
           users={assignableUsersWithoutCurrent || []}
           onChange={(_, user) => handleChangeRedirectedAdmin(user)}
           value={user.redirectedAdmin}

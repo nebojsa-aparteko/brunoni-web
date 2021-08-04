@@ -31,6 +31,17 @@ const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   });
 };
 
+const createEmailRepresentation = (paymentConfirmationEmails: string[]) => {
+  return paymentConfirmationEmails.map((email, index) => {
+    return (
+      <Fragment key={index}>
+        <Link href={`mailto:${email}`}>{email}</Link>
+        {index === paymentConfirmationEmails.length - 1 ? '.' : ', '}
+      </Fragment>
+    );
+  });
+};
+
 export const makeActivityRepresentation = (activity: ActivityLogItem) => {
   const makeStyledString = (activity: ActivityLogItem, index: number) =>
     activity.documents && index !== activity.documents?.length - 1 ? ', ' : ' ';
@@ -100,6 +111,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.EDITED;
       case ActivityChangeType.ASSIGNED_ON_TASK:
         return ActivityText.ASSIGNED_ON_TASK;
+      case ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL:
+        return ActivityText.SENT_PAYMENT_CONFIRMATION_EMAIL;
     }
   };
 
@@ -187,6 +200,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
                 )} to ${formatDateSafe(activity.paymentActivityData.dateAfterChange, 'd. MMMM yyyy')}`
               : null}
           </Fragment>
+        ) : activity.changeType === ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL &&
+          activity.paymentConfirmationEmails ? (
+          createEmailRepresentation(activity.paymentConfirmationEmails)
         ) : (
           <Fragment>
             {activity.changeType !== ActivityChangeType.DONE_BY_CUSTOMER &&

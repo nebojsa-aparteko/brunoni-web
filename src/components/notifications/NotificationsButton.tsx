@@ -18,7 +18,12 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
     setIsNotificationDrawerOpen(prevState => !prevState);
   };
   const userRecord = useContext(UserRecordContext);
-  const notifications = useNotifications(userRecord?.alphacomId, showOnlyUnread, numberToLoad);
+  const notifications = useNotifications(
+    userRecord?.alphacomId,
+    userRecord?.emailAddress,
+    showOnlyUnread,
+    numberToLoad,
+  );
 
   const handleShowMore = () => {
     setNumberToLoad(prevState => prevState + 20);
@@ -36,7 +41,7 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
         style={{ padding: 8 }}
         {...props}
       >
-        <Badge badgeContent={userRecord?.unreadNotifications || 0} color="secondary">
+        <Badge badgeContent={getNotificationCount(userRecord?.unreadNotifications)} color="secondary">
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>
@@ -59,3 +64,14 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
 };
 
 export default NotificationsButton;
+
+const getNotificationCount = (unreadNotifications?: number) => {
+  if (unreadNotifications) {
+    if (unreadNotifications > 500) {
+      return '500+';
+    } else if (unreadNotifications > 0 && unreadNotifications < 500) {
+      return unreadNotifications;
+    }
+  }
+  return 0;
+};

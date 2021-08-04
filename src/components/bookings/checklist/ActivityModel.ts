@@ -16,6 +16,7 @@ export interface ActivityLogItem {
   id?: string;
   comment?: string;
   documents?: ShortChecklistItemValueDocument[] | null;
+  paymentConfirmationEmails?: string[];
   checklistItem?: ShortChecklistItem;
   paymentReference?: string;
   stage?: Stage;

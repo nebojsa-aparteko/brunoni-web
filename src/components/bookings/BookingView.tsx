@@ -50,6 +50,7 @@ import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
 import TagsList from '../tags/TagsList';
 import { Tag, TagCategory } from '../../model/Tag';
+import PromoBox from '../PromoBox';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -152,7 +153,6 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
 
 const BookingView: React.FC<Props> = ({ booking }) => {
   const actingAs = useContext(ActingAs)[0];
-  // const tags = useContext(Tags);
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
@@ -351,6 +351,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
+            <PromoBox />
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
                 <img

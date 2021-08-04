@@ -16,7 +16,7 @@ const getOptionSelectItemLabel = (option: Port) =>
   option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `Add "${option.id}"`;
 
 interface Props {
-  label: string;
+  label?: string;
   ports: Port[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Port;
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 });
 
 const PortInput: React.FC<Props> = ({
-  label,
+  label = '',
   ports,
   inputRef,
   value,
