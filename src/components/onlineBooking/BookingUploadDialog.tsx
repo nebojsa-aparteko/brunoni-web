@@ -12,7 +12,12 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
+import {
+  BookingRequest,
+  BookingRequestStatusCode,
+  BookingRequestStatusText,
+  VGMSubmittedBy,
+} from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
 import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
@@ -323,7 +328,8 @@ const mapIntoBookingRequestModel = async (
     intraRefNumber,
     origin,
     schedule,
-    status: BookingRequestStatus.REQUESTED,
+    statusCode: BookingRequestStatusCode.REQUESTED,
+    statusText: BookingRequestStatusText.REQUESTED,
     vgmSubmittedBy,
   } as BookingRequest;
 

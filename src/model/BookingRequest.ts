@@ -40,7 +40,8 @@ export interface BookingRequest {
   createdAt: Date;
   updatedAt: Date;
   createdBy?: UserRecord;
-  status: BookingRequestStatus;
+  statusCode: BookingRequestStatusCode;
+  statusText: BookingRequestStatusText;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
   statClient?: Client | null;
@@ -63,7 +64,14 @@ export interface BookingRequestItinerary {
   finalDestinationPort?: ItineraryItem;
 }
 
-export enum BookingRequestStatus {
+export enum BookingRequestStatusCode {
+  REQUESTED = 10,
+  IN_PROGRESS = 20,
+  CONFIRMED = 30,
+  ARCHIVED = 40,
+}
+
+export enum BookingRequestStatusText {
   REQUESTED = 'Requested',
   IN_PROGRESS = 'In Progress',
   CONFIRMED = 'Confirmed',

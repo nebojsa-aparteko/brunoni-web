@@ -21,6 +21,7 @@ import { useBookingRequestsFilterContext } from '../providers/BookingRequestsFil
 import FirestoreCollectionProvider from '../providers/FirestoreCollection';
 import Tags from '../contexts/Tags';
 import { TagCategory } from '../model/Tag';
+import { BookingRequestStatusCode } from '../model/BookingRequest';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -147,13 +148,35 @@ const BookingsPageContainer: React.FC = () => {
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
           case 3:
-            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', false))(prevState));
+            setFilters &&
+              setFilters(prevState =>
+                flow(
+                  set('archived', false),
+                  set('hold', false),
+                  set('maxStatusCode', BookingRequestStatusCode.REQUESTED),
+                  set('minStatusCode', undefined),
+                )(prevState),
+              );
             return bookingsContextData;
           case 4:
-            setFilters && setFilters(prevState => flow(set('archived', false), set('hold', true))(prevState));
+            setFilters &&
+              setFilters(prevState =>
+                flow(
+                  set('archived', false),
+                  set('hold', true),
+                  set('maxStatusCode', BookingRequestStatusCode.REQUESTED),
+                  set('minStatusCode', undefined),
+                )(prevState),
+              );
             return bookingsContextData;
           case 5:
-            setFilters && setFilters(prevState => flow(set('archived', true))(prevState));
+            setFilters &&
+              setFilters(prevState =>
+                flow(
+                  set('minStatusCode', BookingRequestStatusCode.CONFIRMED),
+                  set('maxStatusCode', undefined),
+                )(prevState),
+              );
             return bookingsContextData;
           default:
             return bookingsContextData;

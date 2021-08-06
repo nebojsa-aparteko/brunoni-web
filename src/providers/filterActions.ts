@@ -4,6 +4,7 @@ import Client from '../model/Client';
 import Port from '../model/Port';
 import set from 'lodash/fp/set';
 import { subMonths, subWeeks } from 'date-fns';
+import { BookingRequestStatusCode } from '../model/BookingRequest';
 
 export type ActionType = 'set' | 'clear';
 export type FilterFields =
@@ -37,6 +38,8 @@ export interface ContextFilters {
   originPort?: Port;
   destinationPort?: Port;
   assignedTags?: string[];
+  minStatusCode?: BookingRequestStatusCode;
+  maxStatusCode?: BookingRequestStatusCode;
 }
 
 export type Action = {

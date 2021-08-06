@@ -322,9 +322,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 )}
               </Grid>
             )}
-            {bookingRequest.status && (
+            {bookingRequest.statusText && (
               <Grid item md={2} xs={12}>
-                <InfoBoxItem title="Status" label1={bookingRequest.status.toUpperCase()} gutterBottom />
+                <InfoBoxItem title="Status" label1={bookingRequest.statusText.toUpperCase()} gutterBottom />
               </Grid>
             )}
             {bookingRequest.createdBy && (
