@@ -7,11 +7,13 @@ import { useTheme } from '@material-ui/core';
 import moment from 'moment';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import { getWeek } from 'date-fns';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface Props {
   label?: string;
   value?: Date | null;
   onChange: (date: Date) => void;
+  onBlur?: () => void;
   open: boolean;
   onOpen?: () => void;
   onClose?: () => void;
@@ -55,10 +57,11 @@ const DateInput: React.FC<Props> = ({
   onChange,
   open,
   onOpen,
+  onBlur,
   onClose,
   label = 'Earliest Date',
   margin,
-  fullWidth,
+  fullWidth = true,
 }) => {
   const theme = useTheme();
   return (
@@ -72,8 +75,9 @@ const DateInput: React.FC<Props> = ({
         open={open}
         onOpen={onOpen}
         onClose={onClose}
-        value={value}
+        value={value || null}
         onChange={date => onChange(date as Date)}
+        onBlur={onBlur}
         format="d.MMMM"
         margin={margin}
         fullWidth={fullWidth}
@@ -92,6 +96,42 @@ const DateInput: React.FC<Props> = ({
         }}
       />
     </MuiPickersUtilsProvider>
+  );
+};
+
+interface ControlledProps extends Omit<Props, 'onChange' | 'value' | 'onBlur'> {
+  name: string;
+}
+
+export const ControlledDateInput: React.FC<ControlledProps> = ({
+  name,
+  open,
+  onOpen,
+  onClose,
+  label,
+  margin,
+  fullWidth,
+}) => {
+  const { control } = useFormContext();
+
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, onBlur, value } }) => (
+        <DateInput
+          fullWidth={fullWidth}
+          margin={margin}
+          label={label}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={value}
+          open={open}
+          onOpen={onOpen}
+          onClose={onClose}
+        />
+      )}
+    />
   );
 };
 
