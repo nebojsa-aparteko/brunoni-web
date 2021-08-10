@@ -1,23 +1,15 @@
 import React from 'react';
-import { Button, CircularProgress, makeStyles, Theme } from '@material-ui/core';
+import { Button, CircularProgress, makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   button: {
     maxWidth: '15em',
     minHeight: '4em',
   },
 }));
 
-const LoadingButton: React.FC<Props> = ({ loading, setLoading }) => {
+const LoadingButton: React.FC<Props> = ({ loading, handleClick }) => {
   const classes = useStyles();
-
-  const handleSearch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('searched!');
-    }, 2000);
-  };
 
   return (
     <Button
@@ -26,7 +18,7 @@ const LoadingButton: React.FC<Props> = ({ loading, setLoading }) => {
       className={classes.button}
       variant="contained"
       color="primary"
-      onClick={handleSearch}
+      onClick={handleClick}
     >
       {loading ? '' : 'Search'}
     </Button>
@@ -37,5 +29,5 @@ export default LoadingButton;
 
 interface Props {
   loading: boolean;
-  setLoading: (value: ((prevState: boolean) => boolean) | boolean) => void;
+  handleClick: () => void;
 }

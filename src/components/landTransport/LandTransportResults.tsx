@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Divider, makeStyles, Theme } from '@material-ui/core';
 import LandTransportFilterBar from './LandTransportFilterBar';
 import LandTransportFareCollection from './LandTransportFareCollection';
+import LandTransportFilterProvider from '../../providers/LandTransportFilterProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -21,9 +22,11 @@ const LandTransportResults = () => {
 
   return (
     <Box className={classes.container}>
-      <LandTransportFilterBar />
-      <Divider className={classes.divider} orientation={'vertical'} flexItem />
-      <LandTransportFareCollection collection={['1', '2', '3', '4']} />
+      <LandTransportFilterProvider>
+        <LandTransportFilterBar />
+        <Divider className={classes.divider} orientation={'vertical'} flexItem />
+        <LandTransportFareCollection />
+      </LandTransportFilterProvider>
     </Box>
   );
 };

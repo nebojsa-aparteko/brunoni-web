@@ -8,6 +8,10 @@ import Container from '../../model/Container';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import ContainerDetails from '../../model/ContainerDetails';
 import LoadingButton from '../LoadingButton';
+import { useFormContext } from 'react-hook-form';
+import { DATA } from './landtransport.data';
+import { LandTransportContext } from '../../providers/LandTransportProvider';
+import LandTransportRouteSearchParams from '../../model/land-transport/RouteSearchParams';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -41,6 +45,20 @@ const LandTransportSearch = () => {
   const [containers, setContainers] = useState<(Container & ContainerDetails)[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
+
+  const [, setLandTransport] = useContext(LandTransportContext);
+
+  const handleSearch = (data: LandTransportRouteSearchParams) => {
+    setLoading(true);
+    setTimeout(() => {
+      console.log(data);
+      console.log('searched!');
+      setLandTransport(DATA);
+      setLoading(false);
+    }, 500);
+  };
+
   return (
     <Paper className={classes.container}>
       <Box className={classes.title}>
@@ -61,7 +79,14 @@ const LandTransportSearch = () => {
           value={containers}
           onChange={setContainers}
         />
-        <LoadingButton loading={loading} setLoading={setLoading} />
+        {/*<ControlledListInput*/}
+        {/*  name={'containers'}*/}
+        {/*  ItemInputProps={{*/}
+        {/*    label: 'at'*/}
+        {/*  }}*/}
+        {/*  ItemInput={ControlledLandLocationInput}*/}
+        {/*/>*/}
+        <LoadingButton loading={loading} handleClick={handleSubmit(handleSearch)} />
       </Box>
     </Paper>
   );

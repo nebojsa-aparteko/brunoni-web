@@ -3,6 +3,9 @@ import Meta from '../components/Meta';
 import { Box, createStyles, makeStyles } from '@material-ui/core';
 import LandTransportSearch from '../components/landTransport/LandTransportSearch';
 import LandTransportResults from '../components/landTransport/LandTransportResults';
+import { useForm, FormProvider } from 'react-hook-form';
+import LandTransportProvider from '../providers/LandTransportProvider';
+import LandTransportRouteSearchParams from '../model/land-transport/RouteSearchParams';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -17,12 +20,18 @@ const useStyles = makeStyles(() =>
 const LandTransportPage = () => {
   const classes = useStyles();
 
+  const methods = useForm<LandTransportRouteSearchParams>();
+
   return (
     <Fragment>
       <Meta title="Land Transport" />
       <Box className={classes.container}>
-        <LandTransportSearch />
-        <LandTransportResults />
+        <FormProvider {...methods}>
+          <LandTransportProvider>
+            <LandTransportSearch />
+            <LandTransportResults />
+          </LandTransportProvider>
+        </FormProvider>
       </Box>
     </Fragment>
   );

@@ -5,6 +5,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import InputProps from '../../model/InputProps';
 import palette from '../../theme/palette';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 interface Props<T> {
   ref?: React.Ref<unknown>;
@@ -111,5 +112,53 @@ function ListInput<T>({
     </Box>
   );
 }
+
+interface ControlledProps<T>
+  extends Omit<Props<any>, 'onChange' | 'value' | 'onBlur' | 'ItemInput' | 'defaultItemValue'> {
+  name: string;
+  ItemInput: React.ComponentType<T>;
+}
+
+export const ControlledListInput: React.FC<ControlledProps<any>> = ({ ItemInput, name, addText, ItemInputProps }) => {
+  const classes = useStyles();
+
+  const { control } = useFormContext();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: name,
+  });
+
+  return (
+    <Box className={classes.root}>
+      {fields.map(({ id }, i) => (
+        <Paper key={id} className={classes.paper}>
+          <Box display="flex">
+            <Box flex="1" p={2}>
+              <ItemInput name={`${name}.${i}.${ItemInputProps?.['label']}`} {...ItemInputProps} />
+            </Box>
+            <Box
+              py={2}
+              px={1}
+              display="flex"
+              alignContent="center"
+              alignItems="center"
+              className={classes.actionSection}
+            >
+              <IconButton onClick={() => remove(i)} aria-label="delete" size="small">
+                <DeleteForeverIcon />
+              </IconButton>
+            </Box>
+          </Box>
+        </Paper>
+      ))}
+      <Box>
+        <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={() => append({})}>
+          {addText ? addText : 'Add'}
+        </Button>
+      </Box>
+    </Box>
+  );
+};
 
 export default ListInput;

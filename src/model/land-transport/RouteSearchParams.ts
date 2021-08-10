@@ -1,6 +1,6 @@
 import Container from '../Container';
 
-export default interface RouteSearchParams {
+export default interface LandTransportRouteSearchParams {
   from: string;
   to: string;
   earliestDate: Date;

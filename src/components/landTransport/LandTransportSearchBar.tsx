@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Checkbox, createStyles, FormControlLabel, makeStyles } from '@material-ui/core';
-import DateInput from '../inputs/DateInput';
-import TransportModeInput from '../inputs/TransportModeInput';
-import LandLocationInput from '../inputs/LandLocationInput';
+import { Box, createStyles, makeStyles } from '@material-ui/core';
+import { ControlledDateInput } from '../inputs/DateInput';
+import { ControlledTransportModeInput } from '../inputs/TransportModeInput';
+import { ControlledLandLocationInput } from '../inputs/LandLocationInput';
+import { ControlledCheckBox } from '../inputs/CheckBox';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -26,29 +27,22 @@ const LandTransportSearchBar: React.FC = () => {
   const classes = useStyles();
 
   const [dateOpen, setDateOpen] = useState<boolean>(false);
-  const [isChecked, setIsChecked] = useState<boolean>(true);
 
   return (
     <Box className={classes.root}>
       <Box className={classes.body}>
-        <LandLocationInput label={'from'} onChange={port => console.log(port)} />
-        <LandLocationInput label={'to'} onChange={port => console.log(port)} />
-        <DateInput
-          fullWidth={true}
-          onChange={date => console.log(date)}
+        <ControlledLandLocationInput label={'from'} name={'from'} />
+        <ControlledLandLocationInput label={'to'} name={'to'} />
+        <ControlledDateInput
+          name={'earliestDate'}
           open={dateOpen}
           onOpen={() => setDateOpen(true)}
           onClose={() => setDateOpen(false)}
         />
-        <TransportModeInput onChange={mode => console.log(mode)} />
+        <ControlledTransportModeInput name={'transportMode'} />
       </Box>
       <Box>
-        <FormControlLabel
-          control={
-            <Checkbox checked={isChecked} onChange={event => setIsChecked(event.target.checked)} color="primary" />
-          }
-          label="Show direct lines only"
-        />
+        <ControlledCheckBox label={'Show direct lines only'} name={'directLines'} />
       </Box>
     </Box>
   );

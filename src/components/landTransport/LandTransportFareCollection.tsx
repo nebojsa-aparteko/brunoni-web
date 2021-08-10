@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import LandTransportFare from './LandTransportFare';
 import { Box, makeStyles, Theme } from '@material-ui/core';
+import { LandTransportContext } from '../../providers/LandTransportProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -13,20 +14,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const LandTransportFareCollection: React.FC<Props> = ({ collection }) => {
+const LandTransportFareCollection: React.FC = () => {
   const classes = useStyles();
+  const [landTransports] = useContext(LandTransportContext);
 
   return (
     <Box className={classes.container}>
-      {collection.map((fare, i) => (
-        <LandTransportFare key={i} />
+      {landTransports.map((fare, i) => (
+        <LandTransportFare key={`${fare.id}-${i}`} {...fare} />
       ))}
     </Box>
   );
 };
-
-interface Props {
-  collection: string[];
-}
 
 export default LandTransportFareCollection;
