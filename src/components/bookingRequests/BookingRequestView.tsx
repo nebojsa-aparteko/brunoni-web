@@ -786,7 +786,12 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              {!editing && isDashboardUser(userRecord) && <BookNowButton bookNow={bookNow} />}
+              {!editing && isDashboardUser(userRecord) && (
+                <BookNowButton
+                  bookNow={bookNow}
+                  disabled={bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED}
+                />
+              )}
               <Box className={classes.actions} displayPrint="none">
                 <EditButton
                   handleCancelEditing={handleCancelEditing}

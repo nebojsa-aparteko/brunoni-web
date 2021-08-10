@@ -259,6 +259,11 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
 
+  // const handleChangeChargeCode = (code: ChargeCode | undefined) => {
+  //   handleChangeFreightDetails(code?.text, 'Txt');
+  //   handleChangeFreightDetails(code?.chargeCodeId, 'ChargeID');
+  // };
+
   const handleChangeFreightDetails = (value: any | undefined, fieldName: string) => {
     console.log('VALUE', value, 'fieldName', fieldName);
     bookingRequest &&
