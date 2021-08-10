@@ -81,7 +81,7 @@ const adminRoutes = (
     <Route exact path="/teams" component={TeamManagementPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
-    {/*<Route exact path="/land-transport" component={LandTransportPage} />*/}
+    <Route exact path="/land-transport" component={LandTransportPage} />
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/equipment-control" component={EquipmentControlPage} />
     <Route exact path="/my-day" component={MyDayPage} />
