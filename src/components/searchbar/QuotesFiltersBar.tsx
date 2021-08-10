@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
@@ -14,6 +14,7 @@ import set from 'lodash/fp/set';
 import Carrier from '../../model/Carrier';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
+import useUser from '../../hooks/useUser';
 
 interface Props {
   showClientFilter?: boolean;
@@ -25,6 +26,12 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
   const clients = useClients();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
+  const user = useUser()[1];
+
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   const [, , filters, setFilters] = useQuotesContext();
 
@@ -76,7 +83,12 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
         <Grid id="carrierQuotes" item sm={3} xs={12}>
-          <CarrierInput label={'Choose Carrier'} carriers={carriers || []} value={carrier} onChange={setCarrier} />
+          <CarrierInput
+            label={'Choose Carrier'}
+            carriers={availableCarriers || []}
+            value={carrier}
+            onChange={setCarrier}
+          />
         </Grid>
 
         {!showClientFilter && <Grid item sm={3} xs={12} />}

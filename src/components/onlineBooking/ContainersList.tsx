@@ -12,7 +12,7 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
   return (
     <Grid container spacing={2}>
       {containers.map(container => (
-        <Grid item md={4} key={container}>
+        <Grid item md={6} key={container}>
           <Box display="flex" alignItems="center" mb={2}>
             <Box mr={2}>
               <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
@@ -28,9 +28,11 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
           </Box>
 
           <Box display="flex" alignItems="center" mb={2}>
-            <Box mr={2}>
-              <DepotLocationIcon />
-            </Box>
+            {container.pickupLocation && (
+              <Box mr={2}>
+                <DepotLocationIcon />
+              </Box>
+            )}
             <Typography variant="body2">
               {
                 <>
@@ -61,9 +63,12 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
               }
             </Typography>
           </Box>
+          {container.containerNumbers && (
+            <Typography variant="body2">{`Container numbers: ${container.containerNumbers?.join(', ')}`}</Typography>
+          )}
 
           <Box display="flex" alignItems="center">
-            <Typography>
+            <Typography variant="body2" color="textSecondary">
               {
                 <>
                   {container.containerType &&
@@ -71,18 +76,25 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                     container.containerType?.description.includes('S.O.') &&
                     'Container is shipper owned'}
                   {container.imo &&
-                    container.imo.length > 0 &&
-                    container.imo.map(
+                    container.imo?.[0] &&
+                    container.imo?.[1]?.map(
                       (imoItem: IMO) =>
-                        `(${'IMO Class: ' + imoItem.IMOClass} - ${'PG Number: ' + imoItem.PGNumber} - ${'UN Number: ' +
-                          imoItem.UNNumber} )`,
+                        (imoItem.IMOClass || imoItem.PGNumber || imoItem.UNNumber) &&
+                        `(${imoItem.IMOClass && 'IMO Class: ' + imoItem.IMOClass}${imoItem.IMOClass &&
+                          (imoItem.PGNumber || imoItem.UNNumber) &&
+                          ' - '}${imoItem.PGNumber && 'PG Number: ' + imoItem.PGNumber}${imoItem.PGNumber &&
+                          imoItem.UNNumber &&
+                          ' - '}${imoItem.UNNumber && 'UN Number: ' + imoItem.UNNumber})`,
                     )}
                   {container.oog &&
-                    container.oog.length > 0 &&
-                    container.oog.map(
+                    container.oog?.[0] &&
+                    container.oog?.[1]?.map(
                       (oogItem: OOG) =>
-                        `(${'Length: ' + oogItem.length} - ${'Width: ' + oogItem.width} - ${'Height: ' +
-                          oogItem.height} - ${'Weight: ' + oogItem.weight})`,
+                        `(${'Length: ' + (oogItem.length || '0') + 'cm'} - ${'Width: ' +
+                          (oogItem.width || '0') +
+                          'cm'} - ${'Height: ' + (oogItem.height || '0') + 'cm'} - ${'Weight: ' +
+                          (oogItem.weight || '0') +
+                          'Kgs'})`,
                     )}
                 </>
               }

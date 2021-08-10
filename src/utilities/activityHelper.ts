@@ -3,6 +3,7 @@ import isString from './isString';
 import { ActivityLogItem, Platform } from '../components/bookings/checklist/ActivityModel';
 import { capitalCase } from 'change-case';
 import firebase from '../firebase';
+import { isNil, omitBy } from 'lodash/fp';
 
 export const isPlatformActivity = (by: ActivityLogUserData | Platform): by is Platform =>
   isString(by) && by === 'PLATFORM';
@@ -29,5 +30,5 @@ export const addActivityItem = (collection: string, id: string, activityLog: Act
     .doc(id)
     .collection('activity')
     .doc()
-    .set(activityLog);
+    .set(omitBy(isNil)(activityLog));
 };

@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { ActivityLogItem, ActivityType } from './ActivityModel';
 import Comment from './Comment';
 import Activity from './Activity';
@@ -31,18 +31,19 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const setIsPinned = (
   activityItemId: string,
-  bookingId: string,
+  collection: string,
+  documentId: string,
   isPinned: boolean,
   numberOfPinnedComments: number,
 ) =>
   firebase
     .firestore()
-    .collection('bookings')
-    .doc(bookingId)
+    .collection(collection)
+    .doc(documentId)
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(bookingId, numberOfPinnedComments + (isPinned ? 1 : -1)))
+    .then(() => updateTasksWithPinnedCommentsFlag(documentId, numberOfPinnedComments + (isPinned ? 1 : -1)))
     .catch(err => console.error(err));
 
 const updateTasksWithPinnedCommentsFlag = async (bookingId: string, numberOfPinnedComments: number) =>
@@ -68,21 +69,35 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
   const [, dispatch] = useGlobalAppState();
   const classes = useStyles();
   const cantPin = useMemo(() => pinnedCommentsCount === 2, [pinnedCommentsCount]);
+  const handleSetIsPinned = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.stopPropagation();
 
-  const handleSetIsPinned = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.stopPropagation();
-
-    if (booking?.id && activityItem.id) {
-      setIsPinned(activityItem.id, booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
-        .then(() =>
-          dispatch({
-            type: SHOW_SUCCESS_SNACKBAR,
-            message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
-          }),
-        )
-        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
-    }
-  };
+      if (booking?.id && activityItem.id) {
+        setIsPinned(activityItem.id, 'bookings', booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
+          .then(() =>
+            dispatch({
+              type: SHOW_SUCCESS_SNACKBAR,
+              message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
+            }),
+          )
+          .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+      } else if (activityItem.path) {
+        firebase
+          .firestore()
+          .doc(activityItem.path)
+          .update('isPinned', !activityItem.isPinned)
+          .then(() =>
+            dispatch({
+              type: SHOW_SUCCESS_SNACKBAR,
+              message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
+            }),
+          )
+          .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+      }
+    },
+    [activityItem, booking],
+  );
 
   return (
     <Fragment {...other}>
@@ -99,7 +114,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
         ) : (
           <Activity activity={activityItem} />
         )}
-        {showPinButton && booking && activityItem.type !== ActivityType.ACTIVITY ? (
+        {showPinButton && activityItem.type !== ActivityType.ACTIVITY ? (
           <Box display="flex" flexDirection="column">
             <IconButton
               edge="end"

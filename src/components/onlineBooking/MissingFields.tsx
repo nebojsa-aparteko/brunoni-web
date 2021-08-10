@@ -21,6 +21,11 @@ import useUser from '../../hooks/useUser';
 import { isDashboardUser } from '../../model/UserRecord';
 import { isBefore } from 'date-fns/fp';
 import theme from '../../theme';
+import { isShipperOwnedContainer } from '../../hooks/useCodebook';
+import Container from '../../model/Container';
+import { normalizeQuote } from './BookingUploadDialog';
+import { Quote } from '../../providers/QuoteGroupsProvider';
+import firebase from '../../firebase';
 
 export interface Object {
   [key: string]: string;
@@ -52,10 +57,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const validQuote = (bookingRequest: BookingRequest) => {
-  const quoteValidityDate = bookingRequest?.quoteValidityPeriod?.to
-    ? bookingRequest?.quoteValidityPeriod?.to
-    : undefined;
+export const getQuoteDoc = async (quoteId: string) =>
+  (
+    await firebase
+      .firestore()
+      .collection('quotes')
+      .doc(quoteId)
+      .get()
+  ).data();
+
+const validQuote = async (bookingRequest: BookingRequest) => {
+  const quote = bookingRequest.quoteNumber && (await getQuoteDoc(`${bookingRequest.quoteNumber}`));
+  const quoteNormalized = normalizeQuote(quote) as Quote;
+
+  const quoteValidityDate = quoteNormalized?.validityPeriod.to ? quoteNormalized?.validityPeriod.to : undefined;
 
   const scheduleDepartureDate = bookingRequest.schedule?.OriginInfo.DepartureDate
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
@@ -81,15 +96,24 @@ const MissingFields: React.FC<Props> = ({
 
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
+  const [validQuoteState, setValidQuoteState] = useState(true);
 
   const findNonMatchingFields = useCallback((): string[] => {
     return watchedFields.filter(field => !hasIn(field)(bookingRequest));
   }, [bookingRequest, watchedFields]);
 
+  const containerHasNoDropOffLocation = (container: Container) => {
+    return !!(container.containerType?.id && isShipperOwnedContainer(container.containerType.id));
+  };
+
   const findContainerNonMatchingFields = useCallback((): string[][] => {
     const containersNonMatchingFields: string[][] = [];
     bookingRequest.containers?.forEach(container => {
-      const containerNonMatchingFields = containerWatchedFields.filter(field => !hasIn(field)(container));
+      const containerNonMatchingFields = containerWatchedFields.filter(field => {
+        return field === 'pickupLocation' && containerHasNoDropOffLocation(container)
+          ? false
+          : !hasIn(field)(container);
+      });
       containersNonMatchingFields.push(containerNonMatchingFields);
     });
 
@@ -104,9 +128,10 @@ const MissingFields: React.FC<Props> = ({
 */
 
   useEffect(() => {
+    validQuote(bookingRequest).then(vq => setValidQuoteState(vq));
     setNonMatchingFields(findNonMatchingFields());
     setContainersNonMatchingFields(findContainerNonMatchingFields());
-  }, [findContainerNonMatchingFields, findNonMatchingFields]);
+  }, [bookingRequest, findContainerNonMatchingFields, findNonMatchingFields]);
 
   return (nonMatchingFields && nonMatchingFields.length > 0) ||
     (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
@@ -114,19 +139,18 @@ const MissingFields: React.FC<Props> = ({
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">{'Warning message'}</Typography>
+            <Typography variant="h5">{isDashboardUser(userRecord) ? 'Warning message' : ''}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
-              {!validQuote(bookingRequest) && bookingRequest.schedule && (
+              {!validQuoteState && bookingRequest.schedule && (
                 <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
-                  {`You are booking with schedule outside quote end date (${bookingRequest.schedule?.OriginInfo
-                    .DepartureDate as string})`}
+                  {`You are booking on a vessel with an expired quotation date`}
                 </Typography>
               )}
               <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
                 {isDashboardUser(userRecord)
-                  ? 'These fields were not found on Inttra booking:'
+                  ? 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +
                     '  Your booking request has been submitted and is in requested status.\n' +
                     '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +

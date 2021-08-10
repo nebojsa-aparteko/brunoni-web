@@ -13,6 +13,7 @@ export interface BookingContextFilters extends ContextFilters {
 
 export const BOOKING_FILTERS_INITIAL_STATE = {
   archived: false,
+  hold: false,
   category: BookingCategory.Export,
 } as BookingContextFilters;
 

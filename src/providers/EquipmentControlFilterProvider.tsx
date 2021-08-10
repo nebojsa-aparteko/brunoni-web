@@ -1,15 +1,21 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
-import { BookingVersion } from '../model/Booking';
+import { getISOWeek } from 'date-fns';
+import { containerTypesValues } from '../model/EquipmentControl';
 
 export interface EquipmentControlFilterContext {
   carrier?: Carrier;
-  version: BookingVersion;
+  country: string[];
+  location?: string;
+  week: number;
+  containerTypes: string[];
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {
-  version: BookingVersion.long,
+  country: [],
+  week: getISOWeek(new Date()),
+  containerTypes: containerTypesValues,
 } as EquipmentControlFilterContext;
 
 const EquipmentControlFilterProviderContext = createContext<
@@ -26,6 +32,7 @@ const EquipmentControlFilterProvider = (props: any) => {
     if (!carriers) return;
     setState(prevState => ({ ...prevState, carrier: carriers[0] }));
   }, [carriers]);
+
   return (
     <EquipmentControlFilterProviderContext.Provider value={[state, setState]}>
       {props.children}

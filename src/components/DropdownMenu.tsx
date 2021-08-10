@@ -13,8 +13,9 @@ const DropdownMenu: ForwardRefRenderFunction<any, Props> = ({ items }, ref) => {
   }));
   return (
     <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-      {items.map(item => (
+      {items.map((item, index) => (
         <MenuItem
+          key={index}
           onClick={() => {
             item.onClick();
             handleClose();

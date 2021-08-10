@@ -41,7 +41,7 @@ export default function SelectInput<T>({
 
   return (
     <Autocomplete
-      value={value}
+      value={value || null}
       getOptionSelected={getOptionSelected}
       onChange={(_: ChangeEvent<{}>, value: T | null) => onChange(value)}
       autoSelect

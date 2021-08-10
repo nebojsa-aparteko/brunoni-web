@@ -4,30 +4,50 @@ import Comment from './checklist/Comment';
 import ActivityWithComment from './checklist/ActivityWithComment';
 import Activity from './checklist/Activity';
 import { Booking } from '../../model/Booking';
-import { Box, IconButton, Paper, Typography } from '@material-ui/core';
+import { Box, IconButton, Paper } from '@material-ui/core';
 import { mdiPinOff, mdiStarCircleOutline } from '@mdi/js';
 import Icon from '@mdi/react';
 import { setIsPinned } from './checklist/ActivityLogItemView';
-import { useSnackbar } from 'notistack';
+import firebase from '../../firebase';
+import { SHOW_ERROR_SNACKBAR, SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
+import useGlobalAppState from '../../hooks/useGlobalAppState';
 
-const BookingPinnedActivities: React.FC<Props> = ({ pinnedActivities, booking }) => {
-  const [showUnpinButtonForActivity, setShowUnpinButtonForActivity] = useState<string | undefined>(undefined);
-  const { enqueueSnackbar } = useSnackbar();
-
+const PinnedActivities: React.FC<Props> = ({ pinnedActivities, booking, collection, docId }) => {
+  const [showUnpinButtonForActivity, setShowUnpinButtonForActivity] = useState<string | undefined>();
+  const [, dispatch] = useGlobalAppState();
   const handleUnpin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, activity: ActivityLogItem) => {
     event.stopPropagation();
-    if (booking?.id && activity.id)
-      setIsPinned(activity.id, booking?.id, false, pinnedActivities.length)
+    if (booking?.id && activity.id) {
+      setIsPinned(activity.id, 'bookings', booking?.id, false, pinnedActivities.length)
         .then(() =>
-          enqueueSnackbar(<Typography color="inherit">{`The activity has been unpinned successfully.`}</Typography>, {
-            variant: 'success',
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
         )
-        .catch(error =>
-          enqueueSnackbar(<Typography color="inherit">{`An error has occurred - ` + error}</Typography>, {
-            variant: 'error',
+        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+    } else if (collection && docId && activity.id) {
+      setIsPinned(activity.id, collection, docId, false, pinnedActivities.length)
+        .then(() =>
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
-        );
+        )
+        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+    } else if (activity.path) {
+      firebase
+        .firestore()
+        .doc(activity.path)
+        .update('isPinned', false)
+        .then(() =>
+          dispatch({
+            type: SHOW_SUCCESS_SNACKBAR,
+            message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
+          }),
+        )
+        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+    }
   };
 
   return (
@@ -75,9 +95,11 @@ const BookingPinnedActivities: React.FC<Props> = ({ pinnedActivities, booking })
   );
 };
 
-export default BookingPinnedActivities;
+export default PinnedActivities;
 
 interface Props {
   pinnedActivities: ActivityLogItem[];
-  booking: Booking;
+  booking?: Booking;
+  collection?: string;
+  docId?: string;
 }

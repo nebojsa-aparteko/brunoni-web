@@ -41,14 +41,18 @@ import { ActivityChangeType, ActivityLogUserData } from './checklist/ChecklistIt
 import { addActivityItem } from './checklist/ActivityLogContainer';
 import { createActivityObject } from './checklist/ChecklistItemRow';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import BookingPinnedActivities from './BookingPinnedActivities';
+import PinnedActivities from './PinnedActivities';
 import { ActivityLogItem } from './checklist/ActivityModel';
 import map from 'lodash/fp/map';
 import { flow } from 'lodash/fp';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
+import TagsList from '../tags/TagsList';
+import { Tag, TagCategory } from '../../model/Tag';
+import PromoBox from '../PromoBox';
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
     marginTop: theme.spacing(4),
@@ -61,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
@@ -74,14 +78,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
   },
   logo: {
     width: '5em',
-    ['@media print']: {
+    [mediaPrint]: {
       width: '20em',
     },
   },
@@ -92,13 +96,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
-    ['@media print']: {
+    [mediaPrint]: {
       marginBottom: theme.spacing(0),
     },
   },
   tableWrapper: {
     overflowX: 'auto',
-    ['@media print']: {
+    [mediaPrint]: {
       width: '30%',
     },
   },
@@ -108,7 +112,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   hidePrint: {
-    ['@media print']: {
+    [mediaPrint]: {
       display: 'none',
     },
   },
@@ -161,7 +165,21 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
-
+  const tags = useFirestoreCollection(
+    'bookings',
+    useCallback(
+      query => {
+        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
+        return queryByCategory.orderBy('createdAt', 'asc');
+      },
+      [isAdmin],
+    ),
+    booking.id,
+    'tags-booking',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Tag[];
   const pinnedActivities = useFirestoreCollection(
     'bookings',
     useCallback(
@@ -274,6 +292,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       setPrintRequested(false);
     }
   }, [printRequested]);
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {normalizedPinnedActivities === undefined && (
@@ -288,7 +307,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       {isAdmin && normalizedPinnedActivities && normalizedPinnedActivities.length > 0 && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none">
-            <BookingPinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />
+            <PinnedActivities pinnedActivities={normalizedPinnedActivities} booking={booking} />
           </Box>
         </Grid>
       )}
@@ -308,13 +327,32 @@ const BookingView: React.FC<Props> = ({ booking }) => {
           </Box>
         </Grid>
       )}
-      <Grid item md={7} xs={12}>
+      <Grid container item md={7} xs={12}>
+        <Grid item xs={12}>
+          {tags ? (
+            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
+          ) : (
+            <Box
+              display="flex"
+              flexDirection="row"
+              mb={1}
+              alignItems="center"
+              border="1px solid rgba(0,0,0,0.15)"
+              p={1}
+              maxWidth="100%"
+            >
+              <CircularProgress size={20} style={{ margin: 'auto' }} />
+            </Box>
+          )}
+        </Grid>
+
         <Page title={getBookingTitle(booking)}>
           {isOpenWatcherDialog ? (
             <WatchersDialog booking={booking} isOpen={true} handleClose={handleCloseWatcherDialog} id={booking.id} />
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
+            <PromoBox />
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
                 <img

@@ -212,10 +212,22 @@ const TeamsUsersContainer: React.FC = () => {
                 ? `${selectedUsers.length} admin selected`
                 : `${selectedUsers.length} admins selected`
             }
+            addButtonLabel={'Add admin'}
+            deleteButtonLabel={selectedUsers.length === 1 ? `Delete admin` : `Delete admins`}
             labelWhenNotSelected={'Admins'}
           />
           <TableContainer>
             <Table className={classes.table} size="small" aria-label="a dense table">
+              <colgroup>
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '5%' }} />
+                <col style={{ width: '20%' }} />
+              </colgroup>
               <TableHead>
                 <TableRow>
                   <TableCell align="left" style={{ paddingLeft: 4 }}>
@@ -229,6 +241,7 @@ const TeamsUsersContainer: React.FC = () => {
                   <TableCell>Name</TableCell>
                   <TableCell align="right">Email</TableCell>
                   <TableCell align="right">Role</TableCell>
+                  <TableCell align="right">Carrier</TableCell>
                   <TableCell align="right">Last Login</TableCell>
                   <TableCell align="center">Vacation</TableCell>
                   <TableCell align="center">Redirect To</TableCell>

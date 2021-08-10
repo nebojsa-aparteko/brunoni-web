@@ -26,16 +26,17 @@ const BookingRequestSpecialRemarks: React.FC = () => {
   );
   const userRecord = useContext(UserRecordContext);
   useEffect(() => {
-    setSpecialRemarksState(bookingRequest?.specialRemarks);
+    !editing && setSpecialRemarksState(bookingRequest?.specialRemarks);
   }, [bookingRequest?.specialRemarks]);
 
   const handleChangeSpecialRemarks = (specialRemarks: SpecialRemark[]) => {
+    setSpecialRemarksState(specialRemarks);
     bookingRequest &&
       setBookingRequest &&
       setBookingRequest(set('specialRemarks', specialRemarks)(bookingRequest) as BookingRequest);
   };
 
-  return bookingRequest && setBookingRequest ? (
+  return bookingRequest ? (
     <React.Fragment>
       {editing && isDashboardUser(userRecord) ? (
         <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
@@ -48,7 +49,7 @@ const BookingRequestSpecialRemarks: React.FC = () => {
           <Grid item xs={2} style={{ paddingRight: 5 }}>
             <Typography className={classes.specialRemarkLabel}>Special Remarks</Typography>
           </Grid>
-          <Grid item container xs={10}>
+          <Grid item container xs={10} spacing={2}>
             {specialRemarksState?.map(remark => (
               <Grid key={remark.id + '_' + remark.text} item xs={12}>
                 <Typography className={classes.specialRemark}>{remark.text}</Typography>

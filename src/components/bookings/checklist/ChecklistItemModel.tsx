@@ -109,12 +109,15 @@ export enum ActivityText {
   POSTPONE_PAYMENT = ' has postponed payment ',
   APPROVE_PAYMENT = ' has approved payment ',
   REVERT_PAYMENT_APPROVAL = ' has reverted the approval of payment ',
-  PUT_ON_HOLD = ' has put on hold payment ',
-  REVERT_PUT_ON_HOLD = ' has reverted the "On Hold" status of payment ',
+  PUT_ON_HOLD_PAYMENT = ' has put "on hold" payment ',
+  REVERT_PUT_ON_HOLD_PAYMENT = ' has reverted the "on hold" status of payment ',
+  PUT_ON_HOLD_BOOKING_REQ = ' has put "on hold" booking request ',
+  REVERT_PUT_ON_HOLD_BOOKING_REQ = ' has reverted the "on hold" status of booking request ',
   SET_WATCHING = ' has started watching this booking.',
   UNSET_WATCHING = ' has stopped watching this booking.',
   ASSIGNED_AGENT = ' has assigned agent ',
   ASSIGNED_CLIENT = ' has assigned client ',
+  ASSIGNED_ON_TASK = ' has assigned ',
   SET_WATCHERS = ' has ',
   CLEAR_PAYMENT = ' has cleared payment ',
   REVERT_CLEAR_PAYMENT = ' has reverted the clearing of payment ',
@@ -122,6 +125,7 @@ export enum ActivityText {
   ARCHIVED = ' has archived booking request.',
   UNARCHIVED = ' has unarchived booking request.',
   EDITED = ' has edited these following fields: ',
+  SENT_PAYMENT_CONFIRMATION_EMAIL = ' has sent payment confirmation to this emails: ',
 }
 
 export enum ActivityChangeType {
@@ -139,8 +143,8 @@ export enum ActivityChangeType {
   POSTPONE_PAYMENT,
   APPROVE_PAYMENT,
   REVERT_PAYMENT_APPROVAL,
-  PUT_ON_HOLD,
-  REVERT_PUT_ON_HOLD,
+  PUT_ON_HOLD_PAYMENT,
+  REVERT_PUT_ON_HOLD_PAYMENT,
   SET_WATCHING,
   UNSET_WATCHING,
   ASSIGNED_AGENT,
@@ -152,6 +156,10 @@ export enum ActivityChangeType {
   ARCHIVED,
   UNARCHIVED,
   EDITED,
+  ASSIGNED_ON_TASK,
+  PUT_ON_HOLD_BOOKING_REQ,
+  REVERT_PUT_ON_HOLD_BOOKING_REQ,
+  SENT_PAYMENT_CONFIRMATION_EMAIL,
 }
 
 export enum ChecklistNames {

@@ -165,7 +165,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
     return tasks && tasks.length > 0
       ? tasks.find(task => task.type === TaskType.CLEAR_INVOICE && task.id.includes(payment.reference))
       : undefined;
-  }, [tasks]);
+  }, [payment.reference, tasks]);
   const handleClickMenu = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -209,7 +209,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
         })
         .catch(error => console.error('Error saving new document list', error));
     },
-    [booking, getActivityLogUserData, payment.reference],
+    [booking, getActivityLogUserData, payment.reference, updateComponent],
   );
 
   const handleDeleteFile = useCallback(
@@ -229,7 +229,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
         })
         .catch(error => console.error('Error during document deletion', error));
     },
-    [booking, getActivityLogUserData, payment.reference],
+    [booking, getActivityLogUserData, payment.reference, updateComponent],
   );
 
   const storeAccountingActivity = useCallback(
@@ -250,7 +250,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
           });
         });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar, updateComponent],
   );
 
   const handleDocumentStatusChange = useCallback(
@@ -285,7 +285,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
         }),
       );
     },
-    [payment.reference, booking, enqueueSnackbar, getActivityLogUserData, storeAccountingActivity],
+    [storeAccountingActivity, enqueueSnackbar, payment.reference, updateComponent, booking, getActivityLogUserData],
   );
 
   const handleChangePayDate = useCallback(
@@ -317,7 +317,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
           handleClose();
         });
     },
-    [payment, booking, getActivityLogUserData, storeAccountingActivity, user],
+    [payment, dispatch, user, storeAccountingActivity, booking, getActivityLogUserData, updateComponent],
   );
 
   const handleChangePaymentPlatformStatus = useCallback(
@@ -332,8 +332,8 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                 createActivityObject({
                   changeType:
                     newStatus === WeeklyPaymentPlatformStatus.ON_HOLD
-                      ? ActivityChangeType.PUT_ON_HOLD
-                      : ActivityChangeType.REVERT_PUT_ON_HOLD,
+                      ? ActivityChangeType.PUT_ON_HOLD_PAYMENT
+                      : ActivityChangeType.REVERT_PUT_ON_HOLD_PAYMENT,
                   by: getActivityLogUserData(),
                   isAccountingActivity: true,
                   paymentReference: payment.reference,

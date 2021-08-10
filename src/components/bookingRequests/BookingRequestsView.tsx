@@ -7,9 +7,11 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  IconButton,
   makeStyles,
   Paper,
   TablePagination,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import { useBookingRequestsContext } from '../../providers/BookingRequestsProvider';
@@ -31,6 +33,16 @@ import flow from 'lodash/fp/flow';
 import chunk from 'lodash/fp/chunk';
 import get from 'lodash/fp/get';
 import { BookingRequest } from '../../model/BookingRequest';
+import AddIcon from '@material-ui/icons/Add';
+import BookingUploadDialog from '../onlineBooking/BookingUploadDialog';
+import useModal from '../../hooks/useModal';
+import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
+import { GlobalContext } from '../../store/GlobalStore';
+import { addActivityItem } from '../../utilities/activityHelper';
+import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
+import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
+import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -81,10 +93,17 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
+  const { isOpen, openModal, closeModal } = useModal();
+  const [, dispatch] = useContext(GlobalContext);
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
+
+  const byActivityLogUserData = useActivityLogUserData();
+
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
-  const [bookingRequests, isLoading, filters, setFilters] = useBookingRequestsContext();
+
+  const [bookingRequests, isLoading] = useBookingRequestsContext();
+  const [filters, setFilters] = useBookingRequestsFilterContext();
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
@@ -92,7 +111,6 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const [filteredResults, setFilteredResults] = useState<BookingRequest[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    // todo maybe add filtering later?
     setFilteredResults(bookingRequests);
 
     return chunk(rowsPerPage)(bookingRequests);
@@ -127,6 +145,21 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           .update('assignedUser', pick(UserRecordMinProperties)(assignTo))
           .then(() => {
             setSelectedRequests([]);
+          })
+          .catch(e => {
+            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Error assigning task. Please try again.' });
+            console.error(e);
+          })
+          .finally(async () => {
+            await addActivityItem(
+              'bookings-requests',
+              id,
+              createActivityObject({
+                changeType: ActivityChangeType.ASSIGNED_AGENT,
+                by: byActivityLogUserData,
+                addedUsers: [getActivityLogUserData(assignTo)],
+              }),
+            );
           });
       });
     },
@@ -157,6 +190,14 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     <Typography variant="subtitle1" display="inline">
                       Bookings Requests
                     </Typography>
+                    <Box ml={2}>
+                      <Tooltip title="Add from a html file">
+                        <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                          <AddIcon fontSize="large" />
+                        </IconButton>
+                      </Tooltip>
+                      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
+                    </Box>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
                     {!actingAs && (
@@ -196,6 +237,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
                     bookingRequests={resultChunks && (get(page)(resultChunks) || [])}
+                    isAdmin={isAdmin}
                     selectedRequests={selectedRequests}
                     onSelectRequest={onSelectRequest}
                   />

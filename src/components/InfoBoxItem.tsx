@@ -12,9 +12,10 @@ interface Props {
   occupySpaceForTitle?: boolean;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(() => ({
   printText: {
-    ['@media print']: {
+    [mediaPrint]: {
       fontSize: '10px',
     },
   },

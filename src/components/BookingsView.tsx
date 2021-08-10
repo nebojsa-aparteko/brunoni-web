@@ -1,17 +1,16 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   Box,
-  makeStyles,
-  Divider,
-  Paper,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
-  CardActions,
+  Divider,
+  Grid,
+  makeStyles,
+  Paper,
   TablePagination,
   Typography,
-  IconButton,
-  Grid,
 } from '@material-ui/core';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -30,9 +29,6 @@ import BookingsEmptyResults from './bookings/BookingsEmptyResults';
 import CategoryFilter from './CategoryFilter';
 import { useBookingListPaginationContext } from '../providers/BookingListPaginationProvider';
 import { useBookingsContext } from '../providers/BookingsProvider';
-import AddIcon from '@material-ui/icons/Add';
-import useModal from '../hooks/useModal';
-import BookingUploadDialog from './onlineBooking/BookingUploadDialog';
 
 interface Props {
   isAdmin?: boolean;
@@ -97,7 +93,6 @@ export const getContainersString = (booking: Booking) => {
 
 const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
   const classes = useStyles();
-  const { isOpen, openModal, closeModal } = useModal();
   const [bookings, isLoading] = useBookingsContext();
   const [filters, setFilters] = useBookingListFilterContext();
 
@@ -196,7 +191,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
       <Meta title={`Bookings`} />
       {/*<ButtonMenuItem primary="Online Booking" to="/online-booking" />*/}
       <Grid container direction="row">
-        <Grid item md={11} xs={10}>
+        <Grid item md={12}>
           <BookingsFiltersBar
             filters={filters}
             setFilters={setFilters}
@@ -204,12 +199,6 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
             showDateRange={showDateRangeFilter}
             showAssigneeFilter={isAdmin}
           />
-        </Grid>
-        <Grid md={1} xs={2} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <IconButton onClick={openModal}>
-            <AddIcon fontSize="large" />
-          </IconButton>
-          {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
         </Grid>
       </Grid>
       <div>
@@ -226,6 +215,7 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
                     <div id="exportImportBkgView">
                       <CategoryFilter value={filters.category} onChange={handleImportOrExportChange} />
                     </div>
+
                     <Box flex={1} />
 
                     <Search

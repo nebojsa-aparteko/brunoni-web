@@ -37,6 +37,7 @@ interface Props {
   className?: string;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(4),
@@ -48,7 +49,7 @@ const useStyles = makeStyles(theme => ({
       paddingTop: theme.spacing(3),
     },
 
-    ['@media print']: {
+    [mediaPrint]: {
       marginTop: theme.spacing(0),
       paddingTop: theme.spacing(0),
     },
@@ -165,7 +166,7 @@ const QuoteGroupsView: React.FC<Props> = ({
             <CardHeader
               title={
                 <Box display="flex" alignItems="center">
-                  <Typography variant="subtitle1" display="inline">
+                  <Typography variant="h3" display="inline">
                     Quotes
                   </Typography>
                   {showGetQuoteButton && (

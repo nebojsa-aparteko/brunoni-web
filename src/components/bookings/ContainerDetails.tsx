@@ -94,6 +94,7 @@ interface ContainerItemProps {
   remarks: Remark[];
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   tableCellLabel: {
     verticalAlign: 'top',
@@ -116,7 +117,7 @@ const useStyles = makeStyles(theme => ({
         },
       },
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },
@@ -418,7 +419,7 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                 {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
 
                 {detail.Overdimension && detail.Overdimension === CargoOverdimension.Trigger && (
-                  <OverdimensionComponent detail={detail} />
+                  <OverdimensionComponent detail={detail} key={`${index}-Overdimension`} />
                 )}
 
                 {detail.Equipment && detail.Equipment[0] ? (

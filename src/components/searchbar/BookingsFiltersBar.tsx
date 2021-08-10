@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Box, Grid } from '@material-ui/core';
 import ClientInput from '../inputs/ClientInput';
 import SynchronizeButton from '../SynchronizeButton';
@@ -13,10 +13,14 @@ import UserInput from '../inputs/UserInput';
 import UserRecord from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
-//import { useBookingListFilterContext } from '../../providers/BookingListFilterProvider';
 import Carrier from '../../model/Carrier';
 import CarrierInput from '../inputs/CarrierInput';
 import Carriers from '../../contexts/Carriers';
+import useUser from '../../hooks/useUser';
+import Tags from '../../contexts/Tags';
+import { Tag } from '../../model/Tag';
+import ExistingTagsMultiInput from '../inputs/ExistingTagsMultiInput';
+import asArray from '../../utilities/asArray';
 
 interface Props {
   filters: any;
@@ -39,6 +43,13 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const users = useAdminUsers();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
+  const tags = useContext(Tags);
+  const user = useUser()[1];
+
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 
@@ -58,6 +69,12 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const setCarrier = (carrier: Carrier | null | undefined) =>
     setFilters && setFilters(set('carrier', carrier || undefined)(filters));
+
+  const setTags = (assignedTags: Tag[] | Tag | null) => {
+    // @ts-ignore
+    setFilters &&
+      setFilters(set('assignedTags', assignedTags ? asArray(assignedTags).map(tag => tag.id) : undefined)(filters));
+  };
 
   return (
     <Box
@@ -90,6 +107,11 @@ const BookingsFiltersBar: React.FC<Props> = ({
         <Grid item sm={3} xs={12}>
           <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
         </Grid>
+        {tags && (
+          <Grid item sm={3} xs={12}>
+            <ExistingTagsMultiInput options={tags || []} onChange={(_, tags) => setTags(tags)} />
+          </Grid>
+        )}
 
         {showDateRange && (
           <Grid item sm={3} xs={12}>
@@ -109,7 +131,7 @@ const BookingsFiltersBar: React.FC<Props> = ({
           </Grid>
         )}
         <Grid item sm={3} xs={12}>
-          <CarrierInput label={'Choose Carrier'} carriers={carriers} onChange={setCarrier} value={carrier} />
+          <CarrierInput label={'Choose Carrier'} carriers={availableCarriers} onChange={setCarrier} value={carrier} />
         </Grid>
       </Grid>
       {showAssigneeFilter && showDateRange && users && (

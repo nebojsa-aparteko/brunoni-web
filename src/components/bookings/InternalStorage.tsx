@@ -8,7 +8,6 @@ import {
   LinearProgress,
   List,
   makeStyles,
-  Theme,
   Typography,
 } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
@@ -24,8 +23,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useActivityLogState } from './checklist/ActivityLogContext';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
+import { showCrispChat } from '../../index';
+import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   rootEmpty: {
     flexGrow: 1,
     border: '1px dashed #ccc',
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   documentList: {
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    // backgroundColor: theme.palette.background.paper,
   },
   tinyIconButton: {
     '& svg': {
@@ -86,12 +87,23 @@ const addActivity = (activity: ActivityLogItem, collection: string, id: string) 
     .collection('activity')
     .doc()
     .set(activity);
-const InternalStorage: React.FC<Props> = ({ id, collection }) => {
+const InternalStorage: React.FC<Props> = ({
+  id,
+  collection,
+  isInternal = true,
+  label = 'Internal documents',
+  cardMargin = 2,
+  dndLabel,
+  showHeader,
+  showComparison,
+}) => {
   const classes = useStyles();
-  const query = useCallback(q => q.orderBy('uploadedAt', 'desc'), []);
+  const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<ChecklistItemValueDocument | undefined>(undefined);
 
   const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
   const activityLogContext = useActivityLogState();
@@ -103,6 +115,22 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
 
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
+
+  const handleDialogClose = useCallback(() => {
+    setSelectedDocument(undefined);
+    showCrispChat(true);
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
+
+  const handleDialogOpen = useCallback(
+    (document: ChecklistItemValueDocument) => {
+      setSelectedDocument(document);
+      showCrispChat(false);
+      setIsDialogOpen(true);
+    },
+    [setIsDialogOpen],
+  );
+
   const storageBasePath = useMemo((): string => {
     return [`${collection}-documents-internal`, id].join('/');
   }, [id, collection]);
@@ -157,6 +185,31 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
     [storageBasePath, enqueueSnackbar],
   );
 
+  const getActivityLogUserData = useCallback(
+    (): ActivityLogUserData =>
+      ({
+        firstName: userRecord?.firstName,
+        lastName: userRecord?.lastName,
+        alphacomClientId: userRecord?.alphacomClientId,
+        alphacomId: userRecord?.alphacomId,
+        emailAddress: userRecord?.emailAddress,
+      } as ActivityLogUserData),
+    [userRecord],
+  );
+
+  const createActivity = useCallback(
+    (documents: ChecklistItemValueDocument[], activityType: ActivityChangeType) =>
+      ({
+        at: new Date(),
+        by: getActivityLogUserData(),
+        type: ActivityType.ACTIVITY,
+        isInternal: true,
+        documents: documents,
+        changeType: activityType,
+      } as ActivityLogItem),
+    [getActivityLogUserData],
+  );
+
   const onDeleteFile = useCallback(
     (item: ChecklistItemValueDocument, setRemovalInProgress: any) => {
       setRemovalInProgress(true);
@@ -198,33 +251,9 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
         });
       }
     },
-    [storageBasePath, collection, id],
+    [storageBasePath, collection, id, createActivity, enqueueSnackbar],
   );
 
-  const getActivityLogUserData = useCallback(
-    (): ActivityLogUserData =>
-      ({
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
-    [userRecord],
-  );
-
-  const createActivity = useCallback(
-    (documents: ChecklistItemValueDocument[], activityType: ActivityChangeType) =>
-      ({
-        at: new Date(),
-        by: getActivityLogUserData(),
-        type: ActivityType.ACTIVITY,
-        isInternal: true,
-        documents: documents,
-        changeType: activityType,
-      } as ActivityLogItem),
-    [getActivityLogUserData, userRecord],
-  );
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       saveFiles(acceptedFiles)
@@ -237,6 +266,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
                 name: item.name,
                 url: item.url,
                 storedName: item.storedName,
+                isInternal,
               } as ChecklistItemValueDocument),
           );
           values.map(value => saveFilesToFirestore(collection, id, value));
@@ -247,7 +277,7 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
           console.error(`Error while storing files ${JSON.stringify(id, null, 2)}`, err);
         });
     },
-    [saveFiles, id, collection, getActivityLogUserData],
+    [saveFiles, getActivityLogUserData, collection, id, createActivity],
   );
   const onMentionFile = (item: ChecklistItemValueDocument) =>
     activityLogContext.setState({ documentReference: item, internal: true });
@@ -256,66 +286,87 @@ const InternalStorage: React.FC<Props> = ({ id, collection }) => {
     noClick: normalizedFiles.length > 0,
   });
   return (
-    <Box
-      {...getRootProps()}
-      className={
-        isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
-      }
-      my={2}
-      py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
-      display="flex"
-      justifyContent="center"
-      flexDirection="column"
-    >
-      <input {...getInputProps()} />
-      {uploadProgress > 0 && (
-        <Box display="flex">
-          <div style={{ width: '100%', paddingTop: '14px' }}>
-            <LinearProgress variant="determinate" value={uploadProgress} />
-          </div>
-          <IconButton
-            className={classes.tinyIconButton}
-            aria-label="cancel upload"
-            onClick={() => {
-              uploadTask?.cancel();
-              setUploadTask(undefined);
-              setUploadProgress(0);
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+    <React.Fragment>
+      {!(normalizedFiles && normalizedFiles.length > 0) && showHeader && (
+        <Box m={2} ml={3}>
+          <Typography variant={'h5'}>{label}</Typography>
         </Box>
       )}
-
-      {normalizedFiles && normalizedFiles.length > 0 ? (
-        <Card>
-          <CardHeader
-            title="Internal documents"
-            action={
-              <IconButton size="small" aria-label="Add Comment" onClick={open}>
-                <AttachFileIcon />
+      <Box
+        p={!(normalizedFiles && normalizedFiles.length > 0) && showHeader && 2}
+        pb={!(normalizedFiles && normalizedFiles.length > 0) && showHeader && 2}
+      >
+        <Box
+          {...getRootProps()}
+          className={
+            isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
+          }
+          my={cardMargin}
+          py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
+          display="flex"
+          justifyContent="center"
+          flexDirection="column"
+        >
+          <input {...getInputProps()} />
+          {uploadProgress > 0 && (
+            <Box display="flex">
+              <div style={{ width: '100%', paddingTop: '14px' }}>
+                <LinearProgress variant="determinate" value={uploadProgress} />
+              </div>
+              <IconButton
+                className={classes.tinyIconButton}
+                aria-label="cancel upload"
+                onClick={() => {
+                  uploadTask?.cancel();
+                  setUploadTask(undefined);
+                  setUploadProgress(0);
+                }}
+              >
+                <CloseIcon />
               </IconButton>
-            }
-          />
-          <CardContent>
-            <List className={classes.documentList}>
-              {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
-                <InternalStorageItem
-                  key={`chklistitem-${item.storedName}`}
-                  item={item}
-                  handleDelete={onDeleteFile}
-                  handleMention={onMentionFile}
-                />
-              ))}
-            </List>
-          </CardContent>
-        </Card>
-      ) : (
-        <Box display="flex" justifyContent="center">
-          <Typography>Drag 'n' Drop files or click here</Typography>
+            </Box>
+          )}
+
+          {normalizedFiles && normalizedFiles.length > 0 ? (
+            <Card style={{ backgroundColor: isInternal ? '#eee' : '#fff' }}>
+              <CardHeader
+                title={label}
+                action={
+                  <IconButton size="small" aria-label="Add Comment" onClick={open}>
+                    <AttachFileIcon />
+                  </IconButton>
+                }
+              />
+              <CardContent>
+                <List className={classes.documentList}>
+                  {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
+                    <InternalStorageItem
+                      key={`chklistitem-${item.storedName}`}
+                      item={item}
+                      handleDelete={onDeleteFile}
+                      handleMention={onMentionFile}
+                      handleDialogOpen={showComparison ? handleDialogOpen : undefined}
+                    />
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          ) : (
+            <Box display="flex" justifyContent="center">
+              <Typography>{dndLabel || "Drag 'n' Drop files or click here"}</Typography>
+            </Box>
+          )}
         </Box>
-      )}
-    </Box>
+        {showComparison && selectedDocument && (
+          <BookingRequestComparisonDialog
+            document={selectedDocument}
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingRequestId={id}
+          />
+        )}
+      </Box>
+    </React.Fragment>
   );
 };
 
@@ -324,4 +375,10 @@ export default InternalStorage;
 interface Props {
   id: string;
   collection: string;
+  isInternal?: boolean;
+  label?: string;
+  cardMargin?: number;
+  dndLabel?: string;
+  showHeader?: boolean;
+  showComparison?: boolean;
 }

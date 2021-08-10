@@ -1,15 +1,5 @@
-import React, { useCallback, useContext } from 'react';
-import {
-  Box,
-  Button,
-  createStyles,
-  Divider,
-  Grid,
-  IconButton,
-  ListItem,
-  makeStyles,
-  Typography,
-} from '@material-ui/core';
+import React, { Fragment, useCallback, useContext } from 'react';
+import { Box, Button, createStyles, IconButton, ListItem, makeStyles, Typography } from '@material-ui/core';
 import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
@@ -30,16 +20,6 @@ const useStyles = makeStyles(theme =>
       [theme.breakpoints.up('lg')]: {
         width: theme.spacing(70),
       },
-    },
-    title: {
-      margin: theme.spacing(1),
-      color: 'white',
-    },
-    titleRoot: {
-      backgroundColor: '#3c4858',
-    },
-    icon: {
-      color: 'white',
     },
   }),
 );
@@ -65,7 +45,6 @@ const NotificationsView: React.FC<Props> = ({
   onShowMore,
   numberToLoad,
 }) => {
-  const classes = useStyles();
   const [, dispatch] = useContext(GlobalContext);
   const [, userRecord] = useUser();
   const markAllAsRead = useCallback(async () => {
@@ -80,20 +59,26 @@ const NotificationsView: React.FC<Props> = ({
         dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
-  }, [notifications, dispatch, userRecord, handleShow]);
+  }, [dispatch, userRecord, handleShow]);
 
   return (
-    <Grid className={classes.root}>
+    <Fragment>
+      <Box
+        px={4}
+        py={1}
+        mb={2}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        borderBottom={1}
+        borderColor="grey.300"
+      >
+        <Typography variant="h4">Notifications</Typography>
+        <IconButton aria-label="close-button-notification-center" onClick={handleShow}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
       <Box width="100%" flexDirection="column" justifyContent="center">
-        <Box flex={1} display="flex" justifyContent="space-between" className={classes.titleRoot}>
-          <Typography variant="subtitle1" className={classes.title} align="center">
-            Notifications
-          </Typography>
-          <IconButton aria-label="close-button-notification-center" onClick={handleShow} className={classes.icon}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Divider />
         {notifications && notifications.length === 0 && filterByUnread ? (
           <Box flex={1} display="flex">
             <Box display="flex" flexDirection="column" margin="auto" padding={2}>
@@ -104,10 +89,14 @@ const NotificationsView: React.FC<Props> = ({
             </Box>
           </Box>
         ) : (
-          <React.Fragment>
-            <Box flex={1} display="flex" justifyContent="space-between">
-              <Button onClick={onFilterByUnread}>{filterByUnread ? 'View all' : 'Filter by unread'}</Button>
-              <Button onClick={markAllAsRead}>Mark all as read</Button>
+          <Fragment>
+            <Box px={4} flex={1} display="flex" justifyContent="space-between">
+              <Button size="small" color="primary" variant="outlined" onClick={onFilterByUnread}>
+                {filterByUnread ? 'View all' : 'Filter by unread'}
+              </Button>
+              <Button size="small" color="primary" variant="outlined" onClick={markAllAsRead}>
+                Mark all as read
+              </Button>
             </Box>
             {notifications?.map(notification => (
               <ListItem key={notification.id}>
@@ -119,10 +108,10 @@ const NotificationsView: React.FC<Props> = ({
                 <Button onClick={onShowMore}>Show More</Button>
               </Box>
             )}
-          </React.Fragment>
+          </Fragment>
         )}
       </Box>
-    </Grid>
+    </Fragment>
   );
 };
 

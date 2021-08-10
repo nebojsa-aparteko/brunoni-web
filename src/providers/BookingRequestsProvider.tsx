@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
+import React, { createContext, useMemo, useState } from 'react';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
@@ -7,10 +7,7 @@ import invoke from 'lodash/fp/invoke';
 import firebase from '../firebase';
 import { BookingRequest } from '../model/BookingRequest';
 import safeInvoke from '../utilities/safeInvoke';
-import { ContextFilters } from './filterActions';
-import Carrier from '../model/Carrier';
-import useUser from '../hooks/useUser';
-import ActingAs from '../contexts/ActingAs';
+import { useBookingRequestsFilterContext } from './BookingRequestsFilterProvider';
 
 interface Props {
   children: React.ReactNode;
@@ -18,18 +15,13 @@ interface Props {
 
 export const normalizeBookingRequest = flow(
   update('createdAt', invoke('toDate')),
+  update('updatedAt', invoke('toDate')),
   update('containers', flow(map(flow(update('pickupDate', safeInvoke('toDate')))))),
 );
 
 export const normalizeBookingRequests = map(normalizeBookingRequest);
-interface BookingRequestFilters extends ContextFilters {
-  carrier?: Carrier | undefined;
-  hold?: boolean;
-}
 
-const BookingRequestsContext = createContext<
-  [BookingRequest[] | undefined, boolean, BookingRequestFilters, Dispatch<SetStateAction<BookingRequestFilters>>]
->([undefined, true, {}, () => {}]);
+const BookingRequestsContext = createContext<[BookingRequest[] | undefined, boolean]>([undefined, true]);
 
 export const useBookingRequestsContext = () => {
   const context = React.useContext(BookingRequestsContext);
@@ -40,19 +32,22 @@ export const useBookingRequestsContext = () => {
 };
 
 const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
-  const userRecord = useUser()[1];
-  const actingAs = useContext(ActingAs)[0];
-
   const [isLoading, setIsLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    assignee: !actingAs && userRecord,
-  } as BookingRequestFilters);
+
+  const filters = useBookingRequestsFilterContext()[0];
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       setIsLoading(true);
       let query = collection;
-      query = query.where('archived', '==', !!filters.archived);
+      query = query.where('archived', '==', filters.archived);
+      query = query.where('hold', '==', filters.hold);
+      if (filters.minStatusCode) {
+        query = query.where('statusCode', '>=', filters.minStatusCode.valueOf());
+      }
+      if (filters.maxStatusCode) {
+        query = query.where('statusCode', '<=', filters.maxStatusCode);
+      }
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       }
@@ -65,7 +60,10 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.assignee?.alphacomId) {
         query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
       }
-      return query.orderBy('createdAt', 'desc');
+      if (filters.assignedTags && filters.assignedTags.length > 0) {
+        query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
+      }
+      return query.orderBy('statusCode', 'desc').orderBy('createdAt', 'desc');
     },
     [filters],
   );
@@ -84,7 +82,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
   }, [bookingRequestsSnapshot]);
 
   return (
-    <BookingRequestsContext.Provider value={[bookingRequestsResult, isLoading, filters, setFilters]}>
+    <BookingRequestsContext.Provider value={[bookingRequestsResult, isLoading]}>
       {children}
     </BookingRequestsContext.Provider>
   );

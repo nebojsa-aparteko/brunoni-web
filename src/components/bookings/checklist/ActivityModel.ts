@@ -6,11 +6,17 @@ import {
   Stage,
 } from './ChecklistItemModel';
 import { MentionItem } from 'react-mentions';
+import { flow } from 'lodash/fp';
+import update from 'lodash/fp/update';
+import invoke from 'lodash/fp/invoke';
+import { normalizePaymentActivityData } from '../documentApproval/ComparisonDialogContent';
+import Task from '../../../model/Task';
 
 export interface ActivityLogItem {
   id?: string;
   comment?: string;
   documents?: ShortChecklistItemValueDocument[] | null;
+  paymentConfirmationEmails?: string[];
   checklistItem?: ShortChecklistItem;
   paymentReference?: string;
   stage?: Stage;
@@ -26,7 +32,15 @@ export interface ActivityLogItem {
   removedUsers?: ActivityLogUserData[];
   paymentActivityData?: PaymentActivityData;
   isPinned?: boolean;
-  changedFields?: string[];
+  changedFields?: ChangedField[];
+  path?: string;
+  task?: Task;
+}
+
+export interface ChangedField {
+  fieldName: string;
+  oldVal?: any;
+  newVal?: any;
 }
 
 export enum ActivityType {
@@ -61,3 +75,9 @@ export interface PaymentActivityData {
 }
 
 export type Platform = 'PLATFORM';
+
+export const normalizeActivity = (activity: any) =>
+  flow(
+    update('at', invoke('toDate')),
+    update('paymentActivityData', normalizePaymentActivityData),
+  )(activity) as ActivityLogItem;

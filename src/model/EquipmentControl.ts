@@ -36,14 +36,13 @@ export interface EquipmentExportSummary extends Summary {
   containers: CountedValue;
 }
 
-export type CountedValue = { [k: string]: number };
+export type CountedValue = { [k: string]: { [key: string]: string; count: string } };
 
 export enum ImportEquipmentControlStatus {
   'On Water' = 'ON WATER',
   Arrived = 'ARRIVED',
   'Gate Out' = 'GATE OUT',
   Total = 'TOTAL',
-  Today = 'RETURNED TODAY',
 }
 
 export enum EquipmentControlContainerTypes {
@@ -62,3 +61,5 @@ export const statusLabels = Object.values(ImportEquipmentControlStatus);
 
 export const containerTypesValues = Object.keys(EquipmentControlContainerTypes);
 export const containerTypesLabels = Object.values(EquipmentControlContainerTypes);
+
+export const weeksColumns = ['Week 1', 'Week 2', 'Week 3', 'Export Total'];

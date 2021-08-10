@@ -4,7 +4,7 @@ import getEnumKeyByEnumValue from './getEnumKeyByEnumValue';
 import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
 
 enum Types {
-  CANCELED = 'Cancelled',
+  //CANCELED = 'Cancelled',
   REQUESTED = 'Requested',
 }
 
@@ -28,6 +28,8 @@ enum Titles {
   PLACE_OF_CARRIER_DELIVERY = 'PLACE OF CARRIER DELIVERY',
   MAIN_PORT_OF_LOAD = 'MAIN PORT OF LOAD',
   MAIN_PORT_OF_DISCHARGE = 'MAIN PORT OF DISCHARGE',
+  ETD = 'ETD',
+  ETA = 'ETA',
   SAIL_DATE = 'SAIL DATE',
   ESTIMATED_ARRIVAL_DATE = 'ESTIMATED ARRIVAL DATE',
   CARRIER_VESSEL_LLOYD_CODE_VOYAGE = "CARRIER, VESSEL, LLOYD'S CODE, VOYAGE",
@@ -120,6 +122,8 @@ export interface HtmlBookingRequest {
   PLACE_OF_CARRIER_DELIVERY?: string;
   MAIN_PORT_OF_LOAD?: string;
   MAIN_PORT_OF_DISCHARGE?: string;
+  ETD?: string;
+  ETA?: string;
   SAIL_DATE?: string;
   ESTIMATED_ARRIVAL_DATE?: string;
   CARRIER_VESSEL_LLOYD_CODE_VOYAGE?: string;
@@ -268,9 +272,11 @@ const extractDataOddTable = (object: DataOddTable) => {
   const MAIN_PORT_OF_LOAD = findDataOddTable(object, Titles.MAIN_PORT_OF_LOAD);
   const MAIN_PORT_OF_DISCHARGE = findDataOddTable(object, Titles.MAIN_PORT_OF_DISCHARGE);
   const SAIL_DATE = findDataOddTable(object, Titles.SAIL_DATE);
+  const ETD = findDataOddTable(object, Titles.ETD);
+  const ETA = findDataOddTable(object, Titles.ETA);
   const ESTIMATED_ARRIVAL_DATE = findDataOddTable(object, Titles.ESTIMATED_ARRIVAL_DATE);
 
-  const DATA = {
+  return {
     BOOKER_INTTRA_ID,
     BOOKER_CONTACT_EMAIL,
     BOOKER_PHONE_NUMBER,
@@ -292,11 +298,12 @@ const extractDataOddTable = (object: DataOddTable) => {
     MAIN_PORT_OF_LOAD,
     MAIN_PORT_OF_DISCHARGE,
     SAIL_DATE,
+    ETD,
+    ETA,
     ESTIMATED_ARRIVAL_DATE,
     VESSEL,
     VOYAGE,
   };
-  return DATA;
 };
 
 const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
@@ -399,7 +406,7 @@ const getContainerData = (array: string[]) => {
   const SERVICE_ARRANGEMENT = getNeededData(array, NeededData.SERVICE_ARRANGEMENT);
   const HAULAGE_ARRANGEMENT = getNeededData(array, NeededData.HAULAGE_ARRANGEMENT);
 
-  const CONTAINER = {
+  return {
     QUANTITY,
     SIZE,
     TYPE: ISO_TYPE ? ISO_TYPE : TYPE,
@@ -410,8 +417,6 @@ const getContainerData = (array: string[]) => {
     SERVICE_ARRANGEMENT,
     HAULAGE_ARRANGEMENT,
   } as HtmlBookingContainer;
-
-  return CONTAINER;
 };
 
 const getContainerLocation = (array: string[]) => {
@@ -429,12 +434,11 @@ const getContainerLocation = (array: string[]) => {
       ADDRESS.push(el);
     }
   });
-  const location = {
+  return {
     ADDRESS,
     POSTAL_CODE,
     COUNTRY_CODE,
   } as PuckUpLocation;
-  return location;
 };
 
 const getContainerMainData = (container: string[][]) => {
@@ -561,7 +565,7 @@ const extractDataNormalTable = (object: DataNormalTable) => {
   const FREIGHT_PAYER = findDataNormalTable(object, Titles.FREIGHT_PAYER);
   const PAYMENT_LOCATION = findDataNormalTable(object, Titles.PAYMENT_LOCATION);
 
-  const DATA = {
+  return {
     CUSTOMER_COMMENTS,
     TRANSPORT_MODE,
     CONVEYANCE_TYPE,
@@ -578,7 +582,6 @@ const extractDataNormalTable = (object: DataNormalTable) => {
     FREIGHT_PAYER,
     PAYMENT_LOCATION,
   };
-  return DATA;
 };
 
 const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number => {

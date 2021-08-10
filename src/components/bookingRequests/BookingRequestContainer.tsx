@@ -10,6 +10,9 @@ import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import PortTerms from '../../contexts/PortTerms';
 import useBookingRequest from '../../hooks/useBookingRequest';
+import { map, update, flow } from 'lodash/fp';
+import Tags from '../../contexts/Tags';
+import { TagCategory } from '../../model/Tag';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -25,7 +28,18 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
   const [bookingRequestState, setBookingRequestState] = useBookingRequestContext();
 
   useEffect(() => {
-    setBookingRequestState && setBookingRequestState(bookingRequest);
+    setBookingRequestState &&
+      setBookingRequestState(
+        update(
+          'containers',
+          map((container: any) =>
+            flow(
+              update('imo', val => (val ? [true, val] : [false])),
+              update('oog', val => (val ? [true, val] : [false])),
+            )(container),
+          ),
+        )(bookingRequest!),
+      );
   }, [bookingRequest]);
 
   return !bookingRequestState ? (
@@ -42,8 +56,14 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
           context={ChargeCodes}
           query={query => query.where('language', '==', 'E')}
         >
-          <FirestoreCollectionProvider name="port-terms" context={PortTerms}>
-            <BookingRequestView bookingRequest={bookingRequestState} />
+          <FirestoreCollectionProvider
+            name="tags"
+            context={Tags}
+            query={query => query.where('category', '==', TagCategory.BOOKING_REQUEST)}
+          >
+            <FirestoreCollectionProvider name="port-terms" context={PortTerms}>
+              <BookingRequestView bookingRequest={bookingRequestState} />
+            </FirestoreCollectionProvider>
           </FirestoreCollectionProvider>
         </FirestoreCollectionProvider>
       </FirestoreCollectionProvider>

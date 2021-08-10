@@ -27,6 +27,7 @@ interface Props {
 const getSpecificFreight = (freightDetails: FreightDetail[], group: FreightDetailGroup) =>
   freightDetails.filter(f => f.Group === group);
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     width: '100%',
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& td': {
       whiteSpace: 'nowrap',
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },

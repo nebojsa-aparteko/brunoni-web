@@ -1,5 +1,7 @@
+import { spacing } from '../spacing';
+
 export default {
   root: {
-    padding: 24,
+    padding: spacing(3),
   },
 };

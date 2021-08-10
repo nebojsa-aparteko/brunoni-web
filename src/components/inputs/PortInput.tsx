@@ -6,6 +6,7 @@ import Port from '../../model/Port';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { FilterOptionsState } from '@material-ui/lab';
+import { FieldError } from 'react-hook-form';
 
 const filter = createFilterOptions<Port>();
 
@@ -15,7 +16,7 @@ const getOptionSelectItemLabel = (option: Port) =>
   option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `Add "${option.id}"`;
 
 interface Props {
-  label: string;
+  label?: string;
   ports: Port[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
   value?: Port;
@@ -25,6 +26,7 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: 'none' | 'dense' | 'normal';
   freeSolo?: boolean;
+  formError?: FieldError;
 }
 
 const useStyles = makeStyles({
@@ -34,7 +36,7 @@ const useStyles = makeStyles({
 });
 
 const PortInput: React.FC<Props> = ({
-  label,
+  label = '',
   ports,
   inputRef,
   value,
@@ -44,6 +46,7 @@ const PortInput: React.FC<Props> = ({
   onClose,
   margin,
   freeSolo,
+  formError,
 }) => {
   const classes = useStyles();
   const loading = open && !ports;
@@ -82,6 +85,8 @@ const PortInput: React.FC<Props> = ({
           label={label}
           margin={margin}
           fullWidth
+          error={!!formError}
+          helperText={formError ? formError.message : null}
           variant="outlined"
           InputProps={{
             ...params.InputProps,

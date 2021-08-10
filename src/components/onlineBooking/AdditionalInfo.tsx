@@ -1,6 +1,6 @@
 import { BookingRequest } from '../../model/BookingRequest';
 import React, { useState } from 'react';
-import { Box, Button, createStyles, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, createStyles, Grid, makeStyles, TextField } from '@material-ui/core';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import { BookingReqFiles } from './OnlineBookingContainer';
 
@@ -23,12 +23,12 @@ const AdditionalInfo: React.FC<Props> = ({
   const classes = useStyles();
   const [additionalInfo, setAdditionalInfo] = useState<string | undefined>();
 
-  const allGood = () => {
-    return !(
-      (bookingRequest?.soc && files.certificate.length === 0) ||
-      (bookingRequest?.imo && files.imo.length === 0)
-    );
-  };
+  // const allGood = () => {
+  //   return !(
+  //     (bookingRequest?.soc && files.certificate.length === 0) ||
+  //     (bookingRequest?.imo && files.imo.length === 0)
+  //   );
+  // };
 
   const handleContinue = () => {
     setBookingRequest({
@@ -128,17 +128,17 @@ const AdditionalInfo: React.FC<Props> = ({
         <Button variant="text" color="default" onClick={handlePrevious}>
           Previous
         </Button>
-        <Button variant="contained" color="primary" onClick={handleContinue} disabled={!allGood()}>
+        <Button variant="contained" color="primary" onClick={handleContinue}>
           Next
         </Button>
-        <Box display={'flex'} flexDirection={'column'}>
-          {bookingRequest?.soc && files.certificate.length === 0 && (
-            <Typography color={'error'}>Please upload certificate</Typography>
-          )}
-          {bookingRequest?.imo && files.imo.length === 0 && (
-            <Typography color={'error'}>Please upload IMO Documents</Typography>
-          )}
-        </Box>
+        {/*<Box display={'flex'} flexDirection={'column'}>*/}
+        {/*  {bookingRequest?.soc && files.certificate.length === 0 && (*/}
+        {/*    <Typography color={'error'}>Please upload certificate</Typography>*/}
+        {/*  )}*/}
+        {/*  {bookingRequest?.imo && files.imo.length === 0 && (*/}
+        {/*    <Typography color={'error'}>Please upload IMO Documents</Typography>*/}
+        {/*  )}*/}
+        {/*</Box>*/}
       </Grid>
     </Grid>
   );

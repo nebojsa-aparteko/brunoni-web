@@ -48,12 +48,18 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
   const classes = useStyles();
   const vessel = useVesselWithVoyageById(`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`);
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
+
+  const handleCloseModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    closeModal();
+    event.stopPropagation();
+  };
+
   return (
-    <Dialog open={isOpen} onClose={closeModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
+    <Dialog open={isOpen} onClose={handleCloseModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Vessel Allocation</Typography>
-          <IconButton onClick={closeModal} className={classes.closeModal}>
+          <IconButton onClick={handleCloseModal} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -77,24 +83,28 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                     <TableCell component="th" scope="row">
                       Allocation
                     </TableCell>
-                    <TableCell align="right">{vessel.teuAllocation}</TableCell>
-                    <TableCell align="right">{vessel.weightAllocation}</TableCell>
+                    <TableCell align="right">{vessel.teuAllocation || 'On Request'}</TableCell>
+                    <TableCell align="right">{vessel.weightAllocation || 'On Request'}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
-                      Booked
+                      Confirmed Bookings
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.teuBooked} <PercentData percent={vessel.teuPercent} />
+                      {vessel.teuBooked || 0}{' '}
+                      {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked} <PercentData percent={vessel.weightPercent} />
+                      {vessel.weightBooked || 0}{' '}
+                      {vessel.weightPercent ? (
+                        <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
+                      ) : null}
                     </TableCell>
                   </TableRow>
                   {vessel.requested && (
                     <TableRow>
                       <TableCell component="th" scope="row">
-                        Requested Bookings (Status: Requested)
+                        Requested Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.requested.quantity}</TableCell>
                       <TableCell align="right">{vessel.requested.weight}</TableCell>
@@ -103,7 +113,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                   {vessel.inProgress && (
                     <TableRow>
                       <TableCell component="th" scope="row">
-                        Requested Bookings (Status: In Progress)
+                        In Progress Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                       <TableCell align="right">{vessel.inProgress.weight}</TableCell>
@@ -113,15 +123,15 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                     <TableCell component="th" scope="row">
                       Total
                     </TableCell>
-                    <TableCell align="right">{allocation.total.teu}</TableCell>
-                    <TableCell align="right">{allocation.total.ton}</TableCell>
+                    <TableCell align="right">{allocation.total.teu || 0}</TableCell>
+                    <TableCell align="right">{allocation.total.ton || 0}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
                       Left to Book
                     </TableCell>
-                    <TableCell align="right">{allocation.difference.teu}</TableCell>
-                    <TableCell align="right">{allocation.difference.ton}</TableCell>
+                    <TableCell align="right">{allocation.difference.teu || 'On Request'}</TableCell>
+                    <TableCell align="right">{allocation.difference.ton || 'On Request'}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -135,9 +145,15 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
 
 const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage }) => {
   const { closeModal, openModal, isOpen } = useModal();
+
+  const handleOpenModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    openModal();
+    event.stopPropagation();
+  };
+
   return (
     <>
-      <IconButton color="primary" aria-label="check vessel space" onClick={openModal}>
+      <IconButton color="primary" aria-label="check vessel space" onClick={event => handleOpenModal(event)}>
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (

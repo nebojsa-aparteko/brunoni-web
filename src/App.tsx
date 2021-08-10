@@ -50,6 +50,7 @@ import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
 import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 import LandTransportPage from './pages/LandTransportPage';
+import BookingRequestsFilterProvider from './providers/BookingRequestsFilterProvider';
 
 const anonymousRoutes = (
   <Switch>
@@ -80,7 +81,7 @@ const adminRoutes = (
     <Route exact path="/teams" component={TeamManagementPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
-    <Route exact path="/land-transport" component={LandTransportPage} />
+    {/*<Route exact path="/land-transport" component={LandTransportPage} />*/}
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/equipment-control" component={EquipmentControlPage} />
     <Route exact path="/my-day" component={MyDayPage} />
@@ -195,19 +196,21 @@ const App: React.FC = () => {
         <TaskFilterProvider>
           <BookingListPaginationProvider>
             <BookingListFilterProvider>
-              <Navbar />
-              <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
-                <CircularProgress color="inherit" />
-              </Backdrop>
-              <div className={classes.deviceControl}>
-                {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
-              </div>
-              <ScrollToTop className={classes.goTop} />
-              {process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <BrunoniFooter />
-              ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <AllmarineFooter />
-              ) : null}
+              <BookingRequestsFilterProvider>
+                <Navbar />
+                <Backdrop className={classes.backdrop} open={isGlobalLoadingInProgress}>
+                  <CircularProgress color="inherit" />
+                </Backdrop>
+                <div className={classes.deviceControl}>
+                  {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+                </div>
+                <ScrollToTop className={classes.goTop} />
+                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                  <BrunoniFooter />
+                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                  <AllmarineFooter />
+                ) : null}
+              </BookingRequestsFilterProvider>
             </BookingListFilterProvider>
           </BookingListPaginationProvider>
         </TaskFilterProvider>

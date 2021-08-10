@@ -12,7 +12,12 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import { BookingRequest, BookingRequestStatus, VGMSubmittedBy } from '../../model/BookingRequest';
+import {
+  BookingRequest,
+  BookingRequestStatusCode,
+  BookingRequestStatusText,
+  VGMSubmittedBy,
+} from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
 import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
@@ -22,7 +27,7 @@ import Carriers from '../../contexts/Carriers';
 import Port from '../../model/Port';
 import Carrier from '../../model/Carrier';
 import Container, { Ventilation } from '../../model/Container';
-import { createRequest } from './Summary';
+import { createRequest, getItineraryFromSchedule, takeQuoteDetails } from './Summary';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
@@ -46,13 +51,13 @@ import { globalActions } from '../../store/types/globalAppState';
 import MissingFields, { defaultWatchedFields } from './MissingFields';
 import Client from '../../model/Client';
 import { normalizeDateRange, Quote } from '../../providers/QuoteGroupsProvider';
-import { getRelevantFreightDetails } from './ShippingInfo';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import ChargeCode from '../../model/ChargeCode';
 import getEnumKeyByEnumValue from '../../utilities/getEnumKeyByEnumValue';
 import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
+import ContainerDetails from '../../model/ContainerDetails';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -127,7 +132,7 @@ const getContainers = (
   containerTypes: ContainerType[] | undefined,
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
-): Container[] => {
+): (Container & ContainerDetails)[] => {
   return object.CONTAINERS.map(container => {
     const containerType = matchContainerType(containerTypes, container);
     const commodityType = matchCommodityType(commodityTypes, object);
@@ -150,7 +155,7 @@ const getContainers = (
       temperature,
       ventilation,
       weight: container.NET_WEIGHT && Number(container.NET_WEIGHT),
-    }) as Container;
+    }) as Container & ContainerDetails;
   });
 };
 
@@ -236,7 +241,15 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-const getLatestQuote = async (originId: string, destinationId: string) => {
+export const getLatestQuote = async (originId: string, destinationId: string, agreementNo: string = '') => {
+  const quoteByAgreement = await firebase
+    .firestore()
+    .collection('quotes')
+    .doc(agreementNo)
+    .get();
+  if (quoteByAgreement.exists) {
+    return normalizeQuote(quoteByAgreement.data() as Quote);
+  }
   const quotesRef = await firebase
     .firestore()
     .collection('quotes')
@@ -245,10 +258,10 @@ const getLatestQuote = async (originId: string, destinationId: string) => {
     .orderBy('dateIssued', 'desc')
     .limit(1)
     .get();
-  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])[0] || undefined;
+  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])?.[0] || undefined;
 };
 
-const normalizeQuote = (data: any) => {
+export const normalizeQuote = (data: any) => {
   return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
 };
 
@@ -286,7 +299,7 @@ const mapIntoBookingRequestModel = async (
   const origin = ports?.find(port => object.PLACE_OF_CARRIER_RECEIPT?.includes(port.id));
   const destination = ports?.find(port => object.PLACE_OF_CARRIER_DELIVERY?.includes(port.id));
 
-  const departureDate = matchDate(object.SAIL_DATE);
+  const departureDate = matchDate(object.SAIL_DATE || object.ETD);
   const scheduleSearchParams = {
     originPort: origin,
     destinationPort: destination,
@@ -296,9 +309,8 @@ const mapIntoBookingRequestModel = async (
   } as RouteSearchParams;
 
   // Get the latest quote by origin and dest
-  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id));
-  const freightDetails = quote && getRelevantFreightDetails(quote.quoteDetails, chargeCodes);
-
+  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
+  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 
   const bookingRequest = {
@@ -315,9 +327,9 @@ const mapIntoBookingRequestModel = async (
     freightDetails,
     intraRefNumber,
     origin,
-    quoteValidityPeriod: quote?.validityPeriod,
     schedule,
-    status: BookingRequestStatus.REQUESTED,
+    statusCode: BookingRequestStatusCode.REQUESTED,
+    statusText: BookingRequestStatusText.REQUESTED,
     vgmSubmittedBy,
   } as BookingRequest;
 
@@ -431,7 +443,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest(bookingRequest)
+        createRequest({ ...bookingRequest, itinerary: getItineraryFromSchedule(bookingRequest?.schedule) })
           .then(async docReference => {
             // Save HTML file to storage
             try {
@@ -444,6 +456,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                     name: item.name,
                     url: item.url,
                     storedName: item.storedName,
+                    isInternal: false,
                   } as ChecklistItemValueDocument),
               );
               values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));

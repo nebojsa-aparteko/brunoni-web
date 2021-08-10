@@ -269,15 +269,15 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const setAssignedUser = (user: UserRecord | null, quotes: any) => {
     const updateBatch = firebase.firestore().batch();
 
-    quotes.map((quote: Quote) => {
+    quotes.map((quote: Quote) =>
       updateBatch.update(
         firebase
           .firestore()
           .collection('quotes')
           .doc(quote.id),
         { assignedTo: user },
-      );
-    });
+      ),
+    );
 
     updateBatch
       .commit()

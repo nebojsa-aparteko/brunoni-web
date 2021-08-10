@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -6,8 +6,12 @@ import {
   Checkbox,
   Container as MUIContainer,
   createStyles,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
+  IconButton,
   makeStyles,
   Paper,
   Theme,
@@ -23,6 +27,18 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { BookingRequest } from '../../model/BookingRequest';
 import Avatar from 'react-avatar';
 import { useHistory } from 'react-router';
+import CloseIcon from '@material-ui/icons/Close';
+import BookingRequestChecklistContent from './checklist/BookingRequestChecklistContent';
+import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
+import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
+import { isDashboardUser } from '../../model/UserRecord';
+import VesselAllocationButton from '../VesselAllocationButton';
+import { getVoyageInfo } from './BookingRequestView';
+import useUser from '../../hooks/useUser';
+import PinnedCommentsButton from './PinnedCommentsButton';
+import TagsPreviewList from '../tags/TagsPreviewList';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { Tag, TagCategory } from '../../model/Tag';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -91,6 +107,16 @@ const useStyles = makeStyles(() => ({
     marginRight: '1px',
     marginBottom: '1px',
   },
+  statusContainer: {
+    backgroundColor: 'rgb(43,132,215)',
+    paddingLeft: '5px',
+    paddingRight: '5px',
+    width: 'fit-content',
+  },
+  statusText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 }));
 
 interface BookingRequestRowProps {
@@ -99,6 +125,7 @@ interface BookingRequestRowProps {
   preventDefaultClick?: boolean;
   selectedRequests: string[];
   onSelectRequest: (bookingRequestId: string) => void;
+  onProgressClick?: any;
 }
 
 const StyledTableRow = withStyles((theme: Theme) =>
@@ -122,15 +149,91 @@ const StyledTableRow = withStyles((theme: Theme) =>
   }),
 )(Box);
 
+interface ProgressDialogProps {
+  isOpen: boolean;
+  bookingRequest: BookingRequest;
+  handleClose: any;
+}
+
+interface ShipmentProgressProps {
+  bookingRequest: BookingRequest;
+}
+
+export const BookingRequestProgress: React.FC<ShipmentProgressProps> = ({ bookingRequest }) => {
+  const classes = useStyles();
+
+  const { checklistItemCount, checklistCheckedCount } = bookingRequest;
+
+  return (
+    <div>
+      <div className={classes.progress}>
+        <div
+          className={classes.progressBar}
+          role="progressbar"
+          style={{ width: `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%` }}
+        />
+      </div>
+      <Typography variant="subtitle2">
+        {checklistCheckedCount || 0}/{checklistItemCount || 1}
+      </Typography>
+    </div>
+  );
+};
+
+export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
+  isOpen,
+  handleClose,
+  bookingRequest,
+}) => {
+  const classes = useStyles();
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
+      <span className={classes.dialogBody}>
+        <DialogTitle disableTypography id="dialog-title-check-list">
+          <Typography variant="h4">{bookingRequest?.carrier?.name.toUpperCase()}</Typography>
+          {bookingRequest && bookingRequest.blNumber ? (
+            <Typography variant="h6">BL Number: {bookingRequest.blNumber}</Typography>
+          ) : null}
+          <IconButton onClick={handleClose} className={classes.closeModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent className={classes.dialogContent}>
+          <BookingRequestChecklistContent bookingRequest={bookingRequest} isCommentIconHidden={true} />
+        </DialogContent>
+      </span>
+    </Dialog>
+  );
+};
+
 export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   isAdmin,
   bookingRequest,
   preventDefaultClick,
   selectedRequests,
   onSelectRequest,
+  onProgressClick,
 }) => {
   const classes = useStyles();
   const history = useHistory();
+  const [, userRecord] = useUser();
+
+  const tags = useFirestoreCollection(
+    'bookings-requests',
+    useCallback(
+      query => {
+        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
+        return queryByCategory.orderBy('createdAt', 'asc');
+      },
+      [isAdmin],
+    ),
+    bookingRequest.id,
+    'tags-booking-request',
+  )?.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Tag[];
 
   const handleRowClick = useCallback(
     (id: string) => {
@@ -145,8 +248,15 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     <StyledTableRow
       tabIndex={-1}
       onClick={() => handleRowClick(bookingRequest.id!)}
-      style={{ display: 'flex', backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)' }}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)',
+      }}
     >
+      <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
+        <TagsPreviewList tags={tags} />
+      </Box>
       <Checkbox
         checked={bookingRequest.id ? selectedRequests.includes(bookingRequest.id) : false}
         onClick={event => {
@@ -157,16 +267,12 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
       />
       <Grid container item spacing={2} xs={12} style={{ paddingTop: '10px', paddingLeft: '12px' }}>
         <Grid item lg={12} xs={12}>
-          {bookingRequest ? (
-            <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-              <span className={classes.tableRowHeader}>
-                <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
-              </span>
-              {bookingRequest.intraRefNumber && (
-                <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />
-              )}
-            </Box>
-          ) : null}
+          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+            <span className={classes.tableRowHeader}>
+              <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
+            </span>
+            {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
+          </Box>
         </Grid>
         <Grid item lg={12} xs={12}>
           <Grid container spacing={1}>
@@ -181,30 +287,48 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            <Grid item md={2} xs={12}>
-              {/*TODO Fix label 1*/}
+            <Grid item md={3} xs={12}>
               <InfoBoxItem
-                title="Containers"
+                title="Client"
                 label1={
-                  bookingRequest && bookingRequest.containers && bookingRequest.containers.length > 0
-                    ? bookingRequest.containers
-                        .map(
-                          container =>
-                            container.quantity +
-                            ' x ' +
-                            container.containerType?.name +
-                            ' - ' +
-                            container.commodityType?.name,
-                        )
-                        .join('\n')
-                        .toUpperCase()
+                  bookingRequest && bookingRequest.client && bookingRequest.client.name
+                    ? bookingRequest.client.name.toUpperCase()
+                    : ''
+                }
+                label2={
+                  bookingRequest &&
+                  bookingRequest.createdBy &&
+                  (bookingRequest.createdBy.firstName || bookingRequest.createdBy.lastName)
+                    ? (bookingRequest.createdBy.firstName + ' ' + bookingRequest.createdBy.lastName).toUpperCase()
                     : ''
                 }
                 gutterBottom
               />
             </Grid>
+            {bookingRequest.vessel && (
+              <Grid item container md={3} xs={12} direction={'row'}>
+                <Grid item>
+                  <InfoBoxItem
+                    title="Vessel"
+                    label1={bookingRequest.vessel ? bookingRequest.vessel.toUpperCase() : ''}
+                    label2={bookingRequest.voyage ? bookingRequest.voyage.toUpperCase() : ''}
+                    gutterBottom
+                  />
+                </Grid>
+                {isDashboardUser(userRecord) && (
+                  <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                  </Grid>
+                )}
+              </Grid>
+            )}
+            {bookingRequest.statusText && (
+              <Grid item md={2} xs={12}>
+                <InfoBoxItem title="Status" label1={bookingRequest.statusText.toUpperCase()} gutterBottom />
+              </Grid>
+            )}
             {bookingRequest.createdBy && (
-              <Grid item style={{ width: '25%' }}>
+              <Grid item md={1} xs={12}>
                 <InfoBoxItem
                   title="Created By"
                   label1={
@@ -222,72 +346,86 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 />
               </Grid>
             )}
-            <Grid item md={2} xs={12}>
-              {/*TODO Fix label 1*/}
-              <InfoBoxItem title="Is IMO" label1={bookingRequest && bookingRequest.imo ? 'Yes' : 'No'} gutterBottom />
-            </Grid>
-            <Grid item md={2} xs={12}>
-              {/*TODO Fix label 1*/}
-              <InfoBoxItem title="Is S.O." label1={bookingRequest && bookingRequest.soc ? 'Yes' : 'No'} gutterBottom />
+            <Grid item md={1} xs={12}>
+              <InfoBoxItem
+                title="Progress"
+                label1={
+                  <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
+                    <BookingRequestProgress bookingRequest={bookingRequest} />
+                  </Box>
+                }
+                gutterBottom
+              />
             </Grid>
             <Grid item xs={12}>
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
             </Grid>
-            {bookingRequest.quoteNumber && (
-              <Grid item md={2} xs={12}>
-                <InfoBoxItem title="Quote Number" label1={bookingRequest.quoteNumber} gutterBottom />
-              </Grid>
-            )}
-            {bookingRequest.customerReference && (
-              <Grid item md={3} xs={12}>
-                <InfoBoxItem
-                  title={isAdmin ? 'Customer reference' : 'Reference'}
-                  label1={bookingRequest.customerReference}
-                  gutterBottom
-                />
-              </Grid>
-            )}
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem title="Quote Number" label1={bookingRequest.quoteNumber || '-'} gutterBottom />
+            </Grid>
             <Grid item md={3} xs={12}>
-              <Fragment>
-                <Box style={{ display: 'flex', flexDirection: 'row' }}>
-                  <Box style={{ width: '50%', paddingRight: '20px' }}>
-                    <InfoBoxItem
-                      IconComponent={ChevronRightIcon}
-                      title="Origin"
-                      label1={
-                        <Fragment>
-                          {bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
-                          <br />
-                        </Fragment>
-                      }
-                      gutterBottom
-                    />
-                  </Box>
-                  <Box style={{ width: '50%' }}>
-                    <InfoBoxItem
-                      IconComponent={LastPageIcon}
-                      title="Destination"
-                      label1={
-                        <Fragment>
-                          {bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
-                          <br />
-                        </Fragment>
-                      }
-                      gutterBottom
-                    />
-                  </Box>
-                </Box>
-              </Fragment>
+              <InfoBoxItem
+                title={isAdmin ? 'Customer reference' : 'Reference'}
+                label1={bookingRequest.customerReference || '-'}
+                gutterBottom
+              />
             </Grid>
-            <Grid item md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
-              <Grid item style={{ width: '45%' }}>
+            <Grid item container md={3} xs={12}>
+              <Grid item xs={6}>
                 <InfoBoxItem
-                  title="Created On"
-                  label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy') : ''}
+                  IconComponent={ChevronRightIcon}
+                  title="Origin"
+                  label1={bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETS: ${
+                      bookingRequest.itinerary.placeOfReceipt
+                        ? bookingRequest.itinerary.placeOfReceipt.DepartureDate
+                        : bookingRequest.itinerary.portOfLoading && bookingRequest.itinerary.portOfLoading.DepartureDate
+                    }`
+                  }
+                  gutterBottom
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <InfoBoxItem
+                  IconComponent={LastPageIcon}
+                  title="Destination"
+                  label1={bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETA: ${
+                      bookingRequest.itinerary.finalDestinationPort
+                        ? bookingRequest.itinerary.finalDestinationPort.ArrivalDate
+                        : bookingRequest.itinerary.portOfDischarge &&
+                          bookingRequest.itinerary.portOfDischarge.ArrivalDate
+                    }`
+                  }
                   gutterBottom
                 />
               </Grid>
             </Grid>
+            <Grid item md={2} xs={12}>
+              <InfoBoxItem
+                title="Created On"
+                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy') : ''}
+                gutterBottom
+              />
+            </Grid>
+            <Grid item md={1} xs={12}>
+              <InfoBoxItem
+                title="Last updated"
+                label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                gutterBottom
+              />
+            </Grid>
+            {isDashboardUser(userRecord) &&
+              bookingRequest.pinnedCommentsCount &&
+              bookingRequest.pinnedCommentsCount > 0 && (
+                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                  <PinnedCommentsButton bookingRequestId={bookingRequest.id} />
+                </Grid>
+              )}
           </Grid>
         </Grid>
       </Grid>
@@ -302,6 +440,21 @@ const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({
   onSelectRequest,
 }) => {
   const classes = useStyles();
+  const [dialogData, setDialogData] = useState<BookingRequest | undefined>(undefined);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleProgressClick = useCallback(
+    (event: React.MouseEvent<unknown>, bookingRequest: BookingRequest) => {
+      event.stopPropagation();
+      setIsDialogOpen(true);
+      setDialogData(bookingRequest);
+    },
+    [setIsDialogOpen, setDialogData],
+  );
+
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+  }, [setIsDialogOpen]);
 
   return (
     <Fragment>
@@ -319,9 +472,19 @@ const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({
               bookingRequest={bookingRequest}
               selectedRequests={selectedRequests}
               onSelectRequest={onSelectRequest}
+              onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, bookingRequest)}
             />
           </Card>
         ))
+      )}
+      {isDialogOpen && dialogData && (
+        <ActivityLogProvider>
+          <BookingRequestProgressDialog
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingRequest={dialogData}
+          />
+        </ActivityLogProvider>
       )}
     </Fragment>
   );

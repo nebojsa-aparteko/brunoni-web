@@ -1,8 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import useTeams from '../../hooks/useTeams';
 import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import OperationsTeamsTable from './OperationsTeamsTable';
 import AccountingTeamsTable from './AccountingTeamsTable';
@@ -12,18 +10,6 @@ import firebase from '../../firebase';
 const useStyles = makeStyles({
   expansionPanel: {
     marginBottom: 8,
-  },
-  closeModal: {
-    position: 'absolute',
-    top: '5px',
-    right: '12px',
-    width: '47px',
-    height: '47px',
-  },
-  dialogActions: {
-    display: 'flex',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
   },
   expansionPanelSummary: {
     display: 'flex',
@@ -51,7 +37,6 @@ export const deleteTeams = async (teamIds: string[]): Promise<any> => {
 
 const TeamsTeamsContainer: React.FC = () => {
   const classes = useStyles();
-  const teams = useTeams();
 
   const onAdd = (isAccounting: boolean) => {
     firebase
@@ -65,42 +50,28 @@ const TeamsTeamsContainer: React.FC = () => {
   };
 
   return (
-    <div style={{ overflowY: 'hidden' }}>
-      {!teams ? (
-        <ChartsCircularProgress />
-      ) : (
-        <div>
-          <Box flex={1} display="flex" flexDirection="column" m={1}>
-            <ExpansionPanel className={classes.expansionPanel}>
-              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
-                <Typography variant="h5" className={classes.expansionPanelTitle}>
-                  Accounting teams
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <AccountingTeamsTable
-                  teams={teams.filter(team => team.teamType === TeamType.ACCOUNTING)}
-                  onAdd={onAdd}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-            <ExpansionPanel defaultExpanded={true} className={classes.expansionPanel}>
-              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
-                <Typography variant="h5" className={classes.expansionPanelTitle}>
-                  Operations teams
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <OperationsTeamsTable
-                  teams={teams.filter(team => team.teamType === TeamType.OPERATIONS)}
-                  onAdd={onAdd}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          </Box>
-        </div>
-      )}
-    </div>
+    <Box flex={1} display="flex" flexDirection="column" m={1}>
+      <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+          <Typography variant="h5" className={classes.expansionPanelTitle}>
+            Accounting teams
+          </Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <AccountingTeamsTable onAdd={onAdd} />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+          <Typography variant="h5" className={classes.expansionPanelTitle}>
+            Operations teams
+          </Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <OperationsTeamsTable onAdd={onAdd} />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+    </Box>
   );
 };
 

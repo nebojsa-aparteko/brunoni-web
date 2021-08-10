@@ -101,10 +101,11 @@ const MyDayContainer = () => {
       filteredTeams
         ?.reduce(async (previousValue, currentValue) => {
           dispatch({ type: 'START_GLOBAL_LOADING' });
+          //TODO check what should be queried if currentValue.checklistItems or currentValue.taskTypes is an empty array
           const tasksPerTeam =
             (await currentValue.teamType) === TeamType.OPERATIONS
-              ? await getOperationsTeamTasks(currentValue.checklistItems || [], formatCarrierId(carrier?.id))
-              : await getAccountingTeamTasks(currentValue.taskTypes || [], formatCarrierId(carrier?.id));
+              ? await getOperationsTeamTasks(currentValue.checklistItems || [''], formatCarrierId(carrier?.id))
+              : await getAccountingTeamTasks(currentValue.taskTypes || [''], formatCarrierId(carrier?.id));
           const p = await previousValue;
 
           const newTuple = [
@@ -122,7 +123,7 @@ const MyDayContainer = () => {
               .filter(
                 task =>
                   currentValue.carriers
-                    ?.map(carrier => getId(carrier.name) || carrier.name)
+                    ?.map(carrier => getCarrierId(carrier.name) || carrier.name)
                     .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
                   currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
                   (payDate && task.payDate
@@ -138,7 +139,7 @@ const MyDayContainer = () => {
           setNormalizedTasks(n || []);
         });
     }
-  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, carrier?.name, payDate]);
+  }, [filteredTeams, setNormalizedTasks, assignedUserTrigger, payDate, dispatch, carrier]);
 
   const onStatusFilter = useCallback(
     (_, status) => {
@@ -168,7 +169,7 @@ const MyDayContainer = () => {
         await setLastOpenedChecklistTab(category === TaskCategory.ACCOUNTING ? 'accounting' : 'operations', user.uid);
       }
     },
-    [filters, setFilters],
+    [filters, setFilters, user.uid],
   );
 
   const onPayDateChange = useCallback(
@@ -425,17 +426,19 @@ export const formatCarrierId = (carrierId: string | undefined) => {
       ? 'Hamburg Süd'
       : carrierId === 'SLOM'
       ? 'SLOMAN NEPTUN'
+      : carrierId === 'STNN'
+      ? 'HUGO STINNES'
       : carrierId
     : undefined;
 };
 
-const getId = (carrierName: string) => {
-  return carrierIds[carrierName.toLowerCase()];
+export const getCarrierId = (carrierName?: string) => {
+  return carrierName ? carrierIds[carrierName.toLowerCase()] : '';
 };
 const carrierIds = {
   ['Hamburg Süd'.toLowerCase()]: 'Hamburg Süd'.toUpperCase(),
   ['HMM'.toLowerCase()]: 'HMM',
-  ['Hugo Stinnes'.toLowerCase()]: 'STNN',
+  ['Hugo Stinnes'.toLowerCase()]: 'HUGO STINNES',
   ['MACS'.toLowerCase()]: 'MACS',
   ['Sloman Neptun'.toLowerCase()]: 'SLOM',
   ['UAL'.toLowerCase()]: 'UAL',

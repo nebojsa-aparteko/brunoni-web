@@ -15,6 +15,7 @@ interface Props {
   hideRemarks?: boolean;
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     width: '100%',
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '& td': {
       whiteSpace: 'nowrap',
     },
-    ['@media print']: {
+    [mediaPrint]: {
       '& td': {
         padding: theme.spacing(0),
       },

@@ -1,6 +1,6 @@
 import Port from './Port';
 import Carrier from './Carrier';
-import { RouteSearchResult } from './route-search/RouteSearchResults';
+import { ItineraryItem, RouteSearchResult } from './route-search/RouteSearchResults';
 import UserRecord, { UserRecordMin } from './UserRecord';
 import { FreightDetailGroup } from './Booking';
 import SpecialRemark from './SpecialRemark';
@@ -9,6 +9,7 @@ import ContainerDetails from './ContainerDetails';
 import Client from './Client';
 import { Currency } from './Payment';
 import { Object } from '../components/onlineBooking/MissingFields';
+import { QuoteDetail } from '../providers/QuoteGroupsProvider';
 
 export enum VGMSubmittedBy {
   CLIENT = 'CLIENT',
@@ -27,8 +28,8 @@ export interface BookingRequest {
   destination?: Port;
   carrier?: Carrier;
   quoteNumber?: number;
-  quoteValidityPeriod?: { from: Date; to: Date };
   freightDetails?: FreightDetail[];
+  quoteDetails?: QuoteDetail[];
   customerReference?: string;
   agreementNo?: string;
   containers?: (Container & ContainerDetails)[];
@@ -37,32 +38,40 @@ export interface BookingRequest {
   imo?: boolean;
   soc?: boolean;
   createdAt: Date;
+  updatedAt: Date;
   createdBy?: UserRecord;
-  status: BookingRequestStatus;
+  statusCode: BookingRequestStatusCode;
+  statusText: BookingRequestStatusText;
   schedule?: RouteSearchResult;
   assignedUser?: UserRecordMin;
   statClient?: Client | null;
   vgmSubmittedBy?: VGMSubmittedBy;
-  archived?: boolean;
-  hold?: boolean;
+  archived: boolean;
+  hold: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
+  itinerary?: BookingRequestItinerary;
+  checklistCheckedCount: number;
+  checklistItemCount: number;
+  pinnedCommentsCount?: number;
+  bookingId?: string;
 }
 
-export interface FreightDetail {
-  Txt: string;
-  Anz: number;
-  UnitValue: number;
-  Total?: number;
-  Currency: string;
-  Unit?: string;
-  Group: FreightDetailGroup;
-  Invoice: string;
-  SeqNr: number;
-  Internal1?: boolean;
+export interface BookingRequestItinerary {
+  portOfLoading: ItineraryItem;
+  portOfDischarge: ItineraryItem;
+  placeOfReceipt?: ItineraryItem;
+  finalDestinationPort?: ItineraryItem;
 }
 
-export enum BookingRequestStatus {
+export enum BookingRequestStatusCode {
+  REQUESTED = 10,
+  IN_PROGRESS = 20,
+  CONFIRMED = 30,
+  ARCHIVED = 40,
+}
+
+export enum BookingRequestStatusText {
   REQUESTED = 'Requested',
   IN_PROGRESS = 'In Progress',
   CONFIRMED = 'Confirmed',
@@ -79,11 +88,13 @@ export enum ISOCodesEdiAlphacom {
 export const BookingRequestLabels: Object = {
   blNumber: 'B/L-NO',
   intBlNumber: 'INTBL',
+  intraRefNumber: 'INTTRA Ref.',
   customerReference: 'Customer ref.',
   client: 'Client',
   statClient: 'Statistic Client',
   carrier: 'Carrier',
   vessel: 'Vessel',
+  voyage: 'VOY. ',
   schedule: 'Schedule',
   vgmSubmittedBy: 'VGM Submission By',
   assignedUser: 'Watcher (Assigned agent)',
@@ -91,3 +102,20 @@ export const BookingRequestLabels: Object = {
   quoteNumber: 'Quote Reference',
   containers: 'Container',
 };
+
+export interface FreightDetail {
+  Txt: string;
+  Anz: number;
+  UnitValue: number;
+  Total?: number;
+  Currency: string;
+  Unit?: string;
+  Group: FreightDetailGroup;
+  Invoice: string;
+  SeqNr: number;
+  Internal1?: boolean;
+}
+
+export const commissionRelatedFreights = ['Seafreight', 'Seefracht', 'Fret Maritime'];
+
+export const emptyFreightDetail: Partial<FreightDetail> = { Currency: 'USD', UnitValue: 0, Unit: '', Total: 0, Anz: 0 };

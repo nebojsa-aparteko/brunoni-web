@@ -1,12 +1,12 @@
-import React, { useMemo, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Grid, Typography, ListItem, Box, makeStyles, ListItemIcon, ListItemText, SvgIcon } from '@material-ui/core';
 import List from '@material-ui/core/List';
-import flow from 'lodash/fp/flow';
-import filter from 'lodash/fp/filter';
-import identity from 'lodash/fp/identity';
-import map from 'lodash/fp/map';
-import get from 'lodash/fp/get';
-import uniqBy from 'lodash/fp/uniqBy';
+// import flow from 'lodash/fp/flow';
+// import filter from 'lodash/fp/filter';
+// import identity from 'lodash/fp/identity';
+// import map from 'lodash/fp/map';
+// import get from 'lodash/fp/get';
+// import uniqBy from 'lodash/fp/uniqBy';
 import Container from '../../model/Container';
 import CommodityType from '../../model/CommodityType';
 import { getLocationLabel } from '../inputs/LocationInput';
@@ -19,9 +19,10 @@ interface Props {
   commodityTypes?: CommodityType[];
 }
 
+const mediaPrint = '@media print';
 const useStyles = makeStyles(theme => ({
   chip: {
-    ['@media print']: {
+    [mediaPrint]: {
       padding: theme.spacing(0),
       background: 'transparent',
       height: 'auto',
@@ -40,16 +41,16 @@ const useStyles = makeStyles(theme => ({
 const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) => {
   const classes = useStyles();
 
-  const locations = useMemo(
-    () =>
-      flow(
-        map(get('location')),
-        filter(identity),
-        filter(location => location.countryCode.trim() !== '0'),
-        uniqBy('id'),
-      )(containers),
-    [containers],
-  );
+  // const locations = useMemo(
+  //   () =>
+  //     flow(
+  //       map(get('location')),
+  //       filter(identity),
+  //       filter(location => location.countryCode.trim() !== '0'),
+  //       uniqBy('id'),
+  //     )(containers),
+  //   [containers],
+  // );
 
   return (
     <Grid item xs={12}>

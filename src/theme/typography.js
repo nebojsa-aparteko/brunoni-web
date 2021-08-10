@@ -4,6 +4,7 @@ export default {
   fontFamily: 'Montserrat,Helvetica,Arial,sans-serif',
   fontSize: 13,
   textSizeAdjust: 'none',
+  fontWeightRegular: 500,
   // '-webkit-text-size-adjust': 'none',
   h1: {
     color: palette.text.primary,

@@ -7,6 +7,7 @@ import { Button, Card, CardActions, CardContent, CardMedia } from '@material-ui/
 import Alert from '@material-ui/lab/Alert';
 import useUser from '../hooks/useUser';
 import firebase from '../firebase';
+import truckImg from '../assets/truck.jpg';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function PromoBox() {
+export default () => {
   const classes = useStyles();
   const [, userRecord] = useUser();
   const [showInterest, setShowInterest] = useState(false);
@@ -42,30 +43,21 @@ export default function PromoBox() {
     }
   };
 
-  const handleDismissPopup = () => {
-    if (userRecord?.id && !showInterest)
-      firebase
-        .firestore()
-        .collection('users')
-        .doc(userRecord.id)
-        .set({ showedInterest: false }, { merge: true })
-        .then(() => console.log('Not Showed interest'));
-    setDismissPopup(true);
-  };
-
-  const handleShowInterest = () => {
-    console.log(userRecord.id);
+  const handleDismissPopup = (showedInterest: boolean) => {
     if (userRecord?.id)
       firebase
         .firestore()
         .collection('users')
         .doc(userRecord.id)
-        .set({ showedInterest: true }, { merge: true })
-        .then(() => console.log('Showed interest'));
-    setShowInterest(true);
+        .set({ showedInterest, answeredLandInterest: true }, { merge: true })
+        .then(() => console.log('Not Showed interest'));
+    setDismissPopup(true);
   };
 
-  return (
+  const handleShowInterest = () => {
+    setShowInterest(true);
+  };
+  return !userRecord.answeredLandInterest && !userRecord.isAdmin ? (
     <Zoom in={trigger && !dismissPopup}>
       <div onClick={handleClick} role="presentation" className={classes.root}>
         <Card elevation={4} className={classes.card}>
@@ -73,7 +65,7 @@ export default function PromoBox() {
             component="img"
             alt="Contemplative Reptile"
             height="160"
-            image="https://media.istockphoto.com/photos/long-haul-semi-truck-on-a-rural-western-usa-interstate-highway-picture-id1156528620?k=6&m=1156528620&s=612x612&w=0&h=eYx9HanOU8OihHYHezQTcPxjbe3hB6-MfgQ4RjYHWaY="
+            image={truckImg}
             title="Contemplative Reptile"
           />
           <CardContent className={classes.content}>
@@ -94,10 +86,10 @@ export default function PromoBox() {
                 <Button onClick={handleShowInterest} variant="contained" color="primary">
                   Yes, please
                 </Button>
-                <Button onClick={handleDismissPopup}>No, thanks</Button>
+                <Button onClick={() => handleDismissPopup(false)}>No, thanks</Button>
               </Fragment>
             ) : (
-              <Button variant="contained" color="primary" onClick={handleDismissPopup}>
+              <Button variant="contained" color="primary" onClick={() => handleDismissPopup(true)}>
                 OK
               </Button>
             )}
@@ -105,5 +97,5 @@ export default function PromoBox() {
         </Card>
       </div>
     </Zoom>
-  );
-}
+  ) : null;
+};

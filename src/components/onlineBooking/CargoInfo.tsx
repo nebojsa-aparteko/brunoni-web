@@ -1,6 +1,6 @@
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { BookingRequest } from '../../model/BookingRequest';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Container, { Ventilation } from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import { isNil, omitBy } from 'lodash/fp';
@@ -12,7 +12,7 @@ import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
-  containers && containers.some((container: Container & ContainerDetails) => container.imo && container.imo[0]);
+  containers && containers.some((container: Container & ContainerDetails) => container.imo?.[0]);
 
 const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers &&
@@ -51,22 +51,8 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
       : [],
   );
 
-  const [isNextButtonDisabled, setIsNextButtonDisabled] = useState<boolean>(
-    !(
-      containers.length > 0 &&
-      containers.every(
-        container =>
-          (isContainerSO(container) ? true : container.pickupLocation && container.pickupDate) &&
-          container.quantity &&
-          container.containerType &&
-          container.commodityType &&
-          container.weight,
-      )
-    ),
-  );
-
-  useEffect(() => {
-    setIsNextButtonDisabled(
+  const isNextButtonDisabled = useMemo<boolean>(
+    () =>
       !(
         containers.length > 0 &&
         containers.every(
@@ -78,15 +64,15 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
             container.weight,
         )
       ),
-    );
-  }, [containers]);
+    [containers],
+  );
 
   const handleContinue = () => {
     const writableContainers = containers.map(container => {
       return {
         ...container,
-        imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
-        oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
+        // imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
+        // oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
         pickupDate: isContainerSO(container) ? null : container.pickupDate ? container.pickupDate : new Date(),
       };
     });

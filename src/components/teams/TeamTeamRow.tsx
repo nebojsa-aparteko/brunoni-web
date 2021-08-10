@@ -1,6 +1,6 @@
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import TeamsUsersChipMultiInput from './TeamsUsersChipMultiInput';
 import { Team, TeamType } from '../../model/Teams';
@@ -18,6 +18,7 @@ import Carrier from '../../model/Carrier';
 import { useSnackbar } from 'notistack';
 import pick from 'lodash/fp/pick';
 import { TaskDescription, TaskType } from '../../model/Task';
+import CarriersMultiInput from '../inputs/CarriersMultiInput';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -31,7 +32,7 @@ const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
 const taskTypes = Object.entries(TaskDescription).map(t => t[1]);
 const taskTypeNamesPreview = Object.entries(TaskDescription);
 
-const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...other }) => {
+const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other }) => {
   const adminUsers = useAdminUsers();
 
   const [activeTeam, setActiveTeam] = useState(team);
@@ -41,6 +42,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...oth
   const { enqueueSnackbar } = useSnackbar();
 
   const carriers = useContext(Carriers);
+
+  useEffect(() => {
+    setActiveTeam(team);
+  }, [team]);
 
   const handleCarrierChange = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
     setActiveTeam(set('carriers', asArray(value))(activeTeam));
@@ -112,7 +117,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...oth
   }, [activeTeam, enqueueSnackbar]);
 
   return (
-    <TableRow key={key} {...other}>
+    <TableRow {...other}>
       <TableCell padding="checkbox">
         <Checkbox
           checked={selected}
@@ -125,24 +130,29 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, key, ...oth
         <TextField defaultValue={team?.name} placeholder="Team name" onChange={onNameChange} />
       </TableCell>
       <TableCell align="right">
-        <TeamsUsersChipMultiInput options={adminUsers || []} values={team.users || []} onChange={onTeamsChanged} />
+        <TeamsUsersChipMultiInput
+          options={adminUsers || []}
+          values={activeTeam.users || []}
+          onChange={onTeamsChanged}
+        />
       </TableCell>
       <TableCell align="right">
-        <Autocomplete
-          multiple
-          autoHighlight
-          options={carriers || []}
-          getOptionSelected={(option, value) => option.name === value.name}
-          getOptionLabel={option => option.name}
-          defaultValue={team.carriers}
-          onChange={handleCarrierChange}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)
-          }
-          renderInput={params => (
-            <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />
-          )}
-        />
+        <CarriersMultiInput options={carriers || []} defaultValues={team.carriers} onChange={handleCarrierChange} />
+        {/*<Autocomplete*/}
+        {/*  multiple*/}
+        {/*  autoHighlight*/}
+        {/*  options={carriers || []}*/}
+        {/*  getOptionSelected={(option, value) => option.name === value.name}*/}
+        {/*  getOptionLabel={option => option.name}*/}
+        {/*  defaultValue={team.carriers}*/}
+        {/*  onChange={handleCarrierChange}*/}
+        {/*  renderTags={(value, getTagProps) =>*/}
+        {/*    value.map((option, index) => <Chip label={option.name} {...getTagProps({ index })} />)*/}
+        {/*  }*/}
+        {/*  renderInput={params => (*/}
+        {/*    <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />*/}
+        {/*  )}*/}
+        {/*/>*/}
       </TableCell>
       <TableCell align="right">
         <Autocomplete

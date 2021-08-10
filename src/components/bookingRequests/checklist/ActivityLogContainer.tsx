@@ -14,6 +14,7 @@ import { ActivityLogUserData } from '../../bookings/checklist/ChecklistItemModel
 import ActivityLogView from '../../bookings/checklist/ActivityLogView';
 import { BookingRequest } from '../../../model/BookingRequest';
 import { shortenedChecklist } from '../../../utilities/shortenedModel';
+import useActivities from '../../../hooks/useActivities';
 
 interface Props {
   bookingRequest: BookingRequest;
@@ -23,9 +24,8 @@ interface Props {
 const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
   const [showMore, setShowMore] = useState<boolean>(false);
   const activityLogContext = useActivityLogState();
-
-  const activityLogCollection = useFirestoreCollection(
-    'bookings-requests',
+  const activities = useActivities(
+    `/bookings-requests/${bookingRequest.id}/activity`,
     useCallback(
       query => {
         const queryByItemFilter = showMore
@@ -36,31 +36,15 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
       },
       [isAdmin, showMore],
     ),
-    bookingRequest.id,
-    'activity',
   );
 
-  const activityCollection = activityLogCollection?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as ActivityLogItem[];
-
-  const normalizedActivityLog = useMemo(
-    () =>
-      map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
-        activityCollection,
-      ) as ActivityLogItem[],
-    [activityCollection],
-  );
-  const pinnedCommentsCount = useMemo(() => normalizedActivityLog?.filter(item => item.isPinned).length, [
-    normalizedActivityLog,
-  ]);
+  const pinnedCommentsCount = useMemo(() => activities?.filter(item => item.isPinned).length, [activities]);
   const filteredActivityLog = useMemo(
     () =>
-      normalizedActivityLog?.filter((item: ActivityLogItem) =>
+      activities?.filter((item: ActivityLogItem) =>
         showMore ? true : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT,
       ),
-    [showMore, normalizedActivityLog],
+    [showMore, activities],
   );
 
   const userRecord = useContext(UserRecordContext);

@@ -35,6 +35,7 @@ import theme from '../../../theme';
 import Ports from '../../../contexts/Ports';
 import PortInput from '../../inputs/PortInput';
 import DateRangeInput from '../../inputs/DateRangeInput';
+import useUser from '../../../hooks/useUser';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -89,6 +90,12 @@ const LoadListContainer = () => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
+  const user = useUser()[1];
+
+  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
+    user.carriers,
+    carriers,
+  ]);
 
   const handleProgressClick = useCallback(
     async (event: React.MouseEvent<unknown>, bookingId: string) => {
@@ -137,7 +144,7 @@ const LoadListContainer = () => {
             <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
               <CarrierInput
                 label={'Carriers'}
-                carriers={carriers}
+                carriers={availableCarriers}
                 onChange={carrier => {
                   if (setFilters) setFilters(set('carrier', carrier)(filters));
                 }}
