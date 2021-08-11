@@ -10,6 +10,8 @@ import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
 import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
 import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
 import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
+import { useHistory } from 'react-router';
+import QueryString from 'querystring';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -31,25 +33,37 @@ function a11yProps(index: any) {
 }
 
 const TeamManagementPage: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
-
   const classes = useStyles();
+  const history = useHistory();
+  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const tab = params.tab as string | undefined;
 
-  // todo Check if we need this here
+  const tabToIndex: any = {
+    users: 1,
+    'reassign-users': 2,
+    'payment-confirmation': 3,
+  };
+
+  const [selectedTab, setSelectedTab] = useState(tab && tabToIndex[tab] ? tabToIndex[tab] : 0);
+
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
-    // switch (newValue) {
-    //   case 0:
-    //     break;
-    //   case 1:
-    //     break;
-    //   case 2:
-    //     break;
-    //   case 3:
-    //     break;
-    //   default:
-    //     break;
-    // }
+    switch (newValue) {
+      case 0:
+        history.push('/teams');
+        break;
+      case 1:
+        history.push('/teams?tab=users');
+        break;
+      case 2:
+        history.push('/teams?tab=reassign-users');
+        break;
+      case 3:
+        history.push('/teams?tab=payment-confirmation');
+        break;
+      default:
+        break;
+    }
   };
 
   return (
