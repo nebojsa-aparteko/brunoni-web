@@ -256,7 +256,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               <TableRowData
                 label={'Dem./Det. tariffs'}
                 content={container.demDetTariffs
-                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .map(
+                    (tariff: Tariff) =>
+                      `${tariff.days} ${tariff.text} ${
+                        tariff.description ? '<br/>' + '[' + tariff.description + ']' : ''
+                      }`,
+                  )
                   .join('<br/><br/>')}
               />
             )}
@@ -264,7 +269,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               <TableRowData
                 label={'Storage tariffs'}
                 content={container.storageTariffs
-                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .map(
+                    (tariff: Tariff) =>
+                      `${tariff.days} ${tariff.text} ${
+                        tariff.description ? '<br/>' + '[' + tariff.description + ']' : ''
+                      }`,
+                  )
                   .join('<br/><br/>')}
               />
             )}
@@ -272,7 +282,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               <TableRowData
                 label={'Plug-in tariffs'}
                 content={container.pluginTariffs
-                  .map((tariff: Tariff) => tariff.days + ' ' + tariff.text)
+                  .map(
+                    (tariff: Tariff) =>
+                      `${tariff.days} ${tariff.text} ${
+                        tariff.description ? '<br/>' + '[' + tariff.description + ']' : ''
+                      }`,
+                  )
                   .join('<br/><br/>')}
               />
             )}

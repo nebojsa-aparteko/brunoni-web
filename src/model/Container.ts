@@ -30,4 +30,5 @@ export interface Tariff {
   id: string;
   days: string;
   text: string;
+  description?: string;
 }
