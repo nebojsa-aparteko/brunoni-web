@@ -18,6 +18,7 @@ import palette from '../../theme/palette';
 import Typography from '@material-ui/core/Typography';
 import BrunoniCodes from '../../model/BrunoniCodes';
 import { Tariff } from '../../model/Container';
+import { isNil, omitBy } from 'lodash/fp';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -132,7 +133,7 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
 };
 
 const getTariffFromBrunoniCode = (code: BrunoniCodes) => {
-  return { id: code.id, days: code.days, text: code.text } as Tariff;
+  return omitBy(isNil)({ id: code.id, days: code.days, text: code.text, description: code.description }) as Tariff;
 };
 const TariffsInput: React.FC<Props> = ({ tariffs, availableTariffs, margin, handleChange }) => {
   const classes = useStyles();
