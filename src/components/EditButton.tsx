@@ -13,7 +13,7 @@ const EditButton: React.FC<EditButtonProps> = ({ editing, startEditing, disabled
       </Button>
     </>
   ) : (
-    <IconButton size="small" aria-label="Edit" component="span" onClick={startEditing} disabled={disabled}>
+    <IconButton aria-label="Edit" component="span" onClick={startEditing} disabled={disabled}>
       <EditIcon />
     </IconButton>
   );

@@ -1,14 +1,4 @@
-import React, {
-  ChangeEvent,
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -28,6 +18,7 @@ import {
 import PrintIcon from '@material-ui/icons/Print';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
+import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import Page from '../bookings/Page';
 import { BookingRequest, BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
@@ -58,21 +49,16 @@ import useClientUsers from '../../hooks/useClientUsers';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { getPortOfLoadingFromIntermediatePorts, hasPlaceOfReceipt } from './BookingRequestSummary';
-import DropdownMenu from '../DropdownMenu';
+import { DropDownMenuWithItems } from '../DropdownMenu';
 import LogoImage from '../LogoImage';
 import BookNowButton from '../BookNowButton';
 import EditButton from '../EditButton';
 import { addActivityItem } from '../../utilities/activityHelper';
 import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
-// import ChargeCodes from '../../contexts/ChargeCodes';
-// import { validate } from '@material-ui/pickers';
-// import createAlphacomRepresentationOfBooking from '../../utilities/createAlphacomRepresentationOfBooking';
-// import ChargeCodes from '../../contexts/ChargeCodes';
 import { ChangedField } from '../bookings/checklist/ActivityModel';
 import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
 import ChargeCodes from '../../contexts/ChargeCodes';
-// import useBookingRequestChecklist from '../../hooks/useBookingRequestChecklist';
 import TagsList from '../tags/TagsList';
 import { Tag, TagCategory } from '../../model/Tag';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
@@ -350,8 +336,6 @@ async function urlExists(url: string) {
   return result.ok;
 }
 
-type DropdownMenuHandle = React.ElementRef<typeof DropdownMenu>;
-
 const setChecked = async (bookingReqId: string, itemType: string, checked: boolean) => {
   await setChecklistItem(bookingReqId, itemType, checked);
 };
@@ -379,7 +363,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
-  const menuRef = useRef<DropdownMenuHandle>();
 
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
@@ -518,13 +501,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     [dispatch],
   );
 
-  const handleClickMenu = useCallback(
-    event => {
-      menuRef.current.openMenu(event);
-    },
-    [menuRef],
-  );
-
   const handleCancelEditing = useCallback(() => {
     setBookingRequestState(bookingRequest);
     setEditing(false);
@@ -609,10 +585,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const handleChangeAgreementNumberText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setAgreementNumber(event.target.value);
   }, []);
-  //
-  // const handleChangeAgreementNumber = useCallback((v: string) => {
-  //   setBookingRequestState(prevState => set('agreementNo', v)(prevState!));
-  // }, []);
 
   const archiveHandler = () =>
     onArchiveClick().then(() =>
@@ -786,75 +758,65 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              {!editing && isDashboardUser(userRecord) && (
-                <BookNowButton
-                  bookNow={bookNow}
-                  disabled={bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED}
-                />
-              )}
-              <Box className={classes.actions} displayPrint="none">
-                <EditButton
-                  handleCancelEditing={handleCancelEditing}
-                  handleSave={handleSave}
-                  disabled={!canEdit}
-                  editing={editing}
-                  startEditing={() => setEditing(true)}
-                />
-                <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
-                  <SupervisedUserCircleIcon />
-                </IconButton>
-                {isAdmin && (
-                  <Fragment>
-                    <Button
-                      aria-label="archive"
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ArchiveIcon />}
-                      onClick={() => storeActivity(archiveHandler)}
-                    >
-                      {bookingRequest.archived ? 'Restore' : 'Archive'}
-                    </Button>
-                  </Fragment>
+              <Box component={Paper} display={'flex'} alignItems={'center'} padding={'.5em'}>
+                {!editing && isDashboardUser(userRecord) && (
+                  <BookNowButton
+                    bookNow={bookNow}
+                    disabled={bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED}
+                  />
                 )}
-                {isAdmin && (
-                  <Fragment>
-                    <Button
-                      aria-label="hold"
-                      variant="outlined"
-                      size="small"
-                      startIcon={bookingRequest.hold ? <SettingsBackupRestoreIcon /> : <PanToolIcon />}
-                      onClick={() => storeActivity(holdHandler)}
-                    >
-                      {bookingRequest.hold ? 'Unhold' : 'Hold'}
-                    </Button>
-                  </Fragment>
-                )}
+                <Box className={classes.actions} displayPrint="none">
+                  <EditButton
+                    handleCancelEditing={handleCancelEditing}
+                    handleSave={handleSave}
+                    disabled={!canEdit}
+                    editing={editing}
+                    startEditing={() => setEditing(true)}
+                  />
+                  <IconButton aria-label="Watch" component="span" onClick={openAssignmentModal}>
+                    <SupervisedUserCircleIcon />
+                  </IconButton>
 
-                <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
-                  <PrintIcon />
-                </IconButton>
-                <DropdownMenu
-                  ref={menuRef}
-                  items={[
-                    {
-                      onClick: () => {
-                        setPrintWithCost(false);
-                        setPrintRequested(true);
+                  {isAdmin && (
+                    <DropDownMenuWithItems
+                      items={[
+                        {
+                          onClick: () => storeActivity(archiveHandler),
+                          icon: bookingRequest.archived ? <UnarchiveIcon /> : <ArchiveIcon />,
+                          label: bookingRequest.archived ? 'Restore' : 'Archive',
+                        },
+                        {
+                          onClick: () => storeActivity(holdHandler),
+                          icon: bookingRequest.hold ? <SettingsBackupRestoreIcon /> : <PanToolIcon />,
+                          label: bookingRequest.hold ? 'Unhold' : 'Hold',
+                        },
+                      ]}
+                    />
+                  )}
+
+                  <DropDownMenuWithItems
+                    toolTip={''}
+                    dropDownIcon={<PrintIcon />}
+                    items={[
+                      {
+                        onClick: () => {
+                          setPrintWithCost(false);
+                          setPrintRequested(true);
+                        },
+                        label: 'Print without costs',
                       },
-                      label: 'Print without costs',
-                    },
-                    {
-                      onClick: () => {
-                        setPrintWithCost(true);
-                        setPrintRequested(true);
+                      {
+                        onClick: () => {
+                          setPrintWithCost(true);
+                          setPrintRequested(true);
+                        },
+                        label: 'Print with cost',
                       },
-                      label: 'Print with cost',
-                    },
-                  ]}
-                />
+                    ]}
+                  />
+                </Box>
               </Box>
             </Box>
-
             <Grid item xs={12}>
               <BookingRequestViewMainContent isPrintWithCost={isPrintWithCost} />
             </Grid>
