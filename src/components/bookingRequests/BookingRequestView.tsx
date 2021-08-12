@@ -29,7 +29,7 @@ import PrintIcon from '@material-ui/icons/Print';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import Page from '../bookings/Page';
-import { BookingRequest, BookingRequestStatus } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
 import BookingRequestCheckList from './checklist/BookingRequestChecklist';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
@@ -420,8 +420,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const canEdit = useMemo(
     () =>
       !(
-        [BookingRequestStatus.ARCHIVED, BookingRequestStatus.CONFIRMED].includes(bookingRequest.status) ||
-        (BookingRequestStatus.REQUESTED !== bookingRequest.status && !isDashboardUser(userRecord))
+        bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED ||
+        (BookingRequestStatusText.REQUESTED !== bookingRequest.statusText && !isDashboardUser(userRecord))
       ),
     [bookingRequest, userRecord],
   );
@@ -493,7 +493,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         .firestore()
         .collection('bookings-requests')
         .doc(bookingRequest?.id)
-        .update('bookingId', bookingId, 'status', BookingRequestStatus.REQUESTED),
+        .update(
+          'bookingId',
+          bookingId,
+          'statusCode',
+          BookingRequestStatusCode.CONFIRMED,
+          'statusText',
+          BookingRequestStatusText.CONFIRMED,
+        ),
     [bookingRequest],
   );
 
@@ -779,7 +786,12 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              {!editing && isDashboardUser(userRecord) && <BookNowButton bookNow={bookNow} />}
+              {!editing && isDashboardUser(userRecord) && (
+                <BookNowButton
+                  bookNow={bookNow}
+                  disabled={bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED}
+                />
+              )}
               <Box className={classes.actions} displayPrint="none">
                 <EditButton
                   handleCancelEditing={handleCancelEditing}

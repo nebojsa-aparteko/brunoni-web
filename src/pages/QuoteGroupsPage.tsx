@@ -12,6 +12,8 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 import QuoteGroupsProvider from '../providers/QuoteGroupsProvider';
+import { useHistory } from 'react-router';
+import QueryString from 'querystring';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -38,18 +40,29 @@ function a11yProps(index: any) {
 const QuoteGroups: React.FC = () => {
   const classes = useStyles();
 
-  const [selectedTab, setSelectedTab] = useState(0);
   const actingAs = useContext(ActingAs)[0];
 
   const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
+
+  const history = useHistory();
+  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const tab = params.tab as string | undefined;
+
+  const tabToIndex: any = {
+    archived: 1,
+  };
+
+  const [selectedTab, setSelectedTab] = useState(tab && tabToIndex[tab] ? tabToIndex[tab] : 0);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
+        history.push('/quotes/groups');
         setQuoteFilters && setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
         break;
       case 1:
+        history.push('/quotes/groups?tab=archived');
         setQuoteFilters &&
           setQuoteFilters(
             flow(

@@ -42,6 +42,12 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       let query = collection;
       query = query.where('archived', '==', filters.archived);
       query = query.where('hold', '==', filters.hold);
+      if (filters.minStatusCode) {
+        query = query.where('statusCode', '>=', filters.minStatusCode.valueOf());
+      }
+      if (filters.maxStatusCode) {
+        query = query.where('statusCode', '<=', filters.maxStatusCode);
+      }
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       }
@@ -57,7 +63,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.assignedTags && filters.assignedTags.length > 0) {
         query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
       }
-      return query.orderBy('createdAt', 'desc');
+      return query.orderBy('statusCode', 'desc').orderBy('createdAt', 'desc');
     },
     [filters],
   );

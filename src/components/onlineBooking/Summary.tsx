@@ -1,6 +1,7 @@
 import {
   BookingRequest,
-  BookingRequestStatus,
+  BookingRequestStatusCode,
+  BookingRequestStatusText,
   commissionRelatedFreights,
   FreightDetail,
   VGMSubmittedBy,
@@ -265,7 +266,8 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       ...bookingRequest,
       createdAt: new Date(),
       createdBy: activityLogUserData,
-      status: BookingRequestStatus.REQUESTED,
+      statusCode: BookingRequestStatusCode.REQUESTED,
+      statusText: BookingRequestStatusText.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
       archived: false,
       hold: false,

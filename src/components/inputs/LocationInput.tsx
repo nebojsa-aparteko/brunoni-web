@@ -91,7 +91,7 @@ const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       getOptionSelected={(option, value1) => option?.id === value1?.id}
       open={open}
       setOpen={setOpen}
-      value={value}
+      value={value || null}
       onChange={(location: PickupLocation | null) => onChange(location)}
     />
   );

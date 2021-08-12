@@ -619,7 +619,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 <TableCell className={classes.tableCellLabel}>Status</TableCell>
                 <TableCell className={classes.tableCell}>
                   <Paper elevation={0} className={classes.statusContainer}>
-                    <Typography className={classes.statusText}>{bookingRequest.status}</Typography>
+                    <Typography className={classes.statusText}>{bookingRequest.statusText}</Typography>
                   </Paper>
                 </TableCell>
               </TableRow>

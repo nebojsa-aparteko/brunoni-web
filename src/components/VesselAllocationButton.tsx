@@ -95,7 +95,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                       {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked || 0}{' '}
+                      {vessel.weightBooked ? parseFloat(vessel.weightBooked) / 1000 : 0}{' '}
                       {vessel.weightPercent ? (
                         <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
                       ) : null}
@@ -107,7 +107,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                         Requested Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.requested.quantity}</TableCell>
-                      <TableCell align="right">{vessel.requested.weight}</TableCell>
+                      <TableCell align="right">
+                        {vessel.requested.weight ? vessel.requested.weight / 1000 : 0}
+                      </TableCell>
                     </TableRow>
                   )}
                   {vessel.inProgress && (
@@ -116,7 +118,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
                         In Progress Bookings
                       </TableCell>
                       <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
-                      <TableCell align="right">{vessel.inProgress.weight}</TableCell>
+                      <TableCell align="right">
+                        {vessel.inProgress.weight ? vessel.inProgress.weight / 1000 : 0}
+                      </TableCell>
                     </TableRow>
                   )}
                   <TableRow>
@@ -184,8 +188,10 @@ interface VesselAllocationModal {
 const countAllocation = (allocation?: VesselAllocation) => {
   if (!allocation) return { total: { teu: 0, ton: 0 }, difference: { teu: 0, ton: 0 } };
   const allocationTotal = {
-    teu: (allocation.inProgress?.quantity || 0) + (allocation.requested?.quantity || 0) + +allocation.teuBooked,
-    ton: (allocation.inProgress?.weight || 0) + (allocation.requested?.weight || 0) + +allocation.weightBooked,
+    teu: (allocation.inProgress?.quantity || 0) + (allocation.requested?.quantity || 0) + +(allocation.teuBooked || 0),
+    ton:
+      ((allocation.inProgress?.weight || 0) + (allocation.requested?.weight || 0) + +(allocation.weightBooked || 0)) /
+      1000,
   };
 
   return {
