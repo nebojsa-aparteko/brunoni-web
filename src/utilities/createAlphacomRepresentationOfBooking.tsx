@@ -214,7 +214,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                     LocType: 'DEPOT',
                     LocID: value.pickupLocation?.id,
                     LocRef: value.pickupReference,
-                    LocDate: value.pickupDate && formatDateSafe(value.pickupDate, 'dd.mm.yyyy'),
+                    LocDate: value.pickupDate && formatDateSafe(value.pickupDate, 'dd.MM.yyyy'),
                   },
                   {
                     LocType: 'TERMINAL',
@@ -258,7 +258,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                 EquipmentDetail: request.containers?.map(ctg => ({
                   ContainerNumber: ctg.containerNumbers ? ctg.containerNumbers : 'NOT AVAILABLE',
                   CtypID: value.containerType?.id,
-                  PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.mm.yyyy'),
+                  PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.MM.yyyy'),
                   GateInDate: null,
                   GateOutDate: null,
                   DropOffDate: null,
