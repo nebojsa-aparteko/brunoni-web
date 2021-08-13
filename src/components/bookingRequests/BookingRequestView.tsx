@@ -758,7 +758,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              <Box component={Paper} display={'flex'} alignItems={'center'} padding={'.5em'}>
+              <Box display={'flex'} alignItems={'center'}>
                 {!editing && isDashboardUser(userRecord) && (
                   <BookNowButton
                     bookNow={bookNow}
@@ -773,7 +773,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     editing={editing}
                     startEditing={() => setEditing(true)}
                   />
-                  <IconButton aria-label="Watch" component="span" onClick={openAssignmentModal}>
+                  <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                     <SupervisedUserCircleIcon />
                   </IconButton>
 
@@ -790,30 +790,25 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                           icon: bookingRequest.hold ? <SettingsBackupRestoreIcon /> : <PanToolIcon />,
                           label: bookingRequest.hold ? 'Unhold' : 'Hold',
                         },
+                        {
+                          onClick: () => {
+                            setPrintWithCost(false);
+                            setPrintRequested(true);
+                          },
+                          icon: <PrintIcon />,
+                          label: 'Print without costs',
+                        },
+                        {
+                          onClick: () => {
+                            setPrintWithCost(true);
+                            setPrintRequested(true);
+                          },
+                          icon: <PrintIcon />,
+                          label: 'Print with cost',
+                        },
                       ]}
                     />
                   )}
-
-                  <DropDownMenuWithItems
-                    toolTip={''}
-                    dropDownIcon={<PrintIcon />}
-                    items={[
-                      {
-                        onClick: () => {
-                          setPrintWithCost(false);
-                          setPrintRequested(true);
-                        },
-                        label: 'Print without costs',
-                      },
-                      {
-                        onClick: () => {
-                          setPrintWithCost(true);
-                          setPrintRequested(true);
-                        },
-                        label: 'Print with cost',
-                      },
-                    ]}
-                  />
                 </Box>
               </Box>
             </Box>

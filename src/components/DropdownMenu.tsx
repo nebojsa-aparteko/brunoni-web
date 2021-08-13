@@ -23,7 +23,7 @@ export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
   return (
     <>
       <Tooltip title={toolTip} placement={'top'}>
-        <IconButton aria-label="actions" onClick={onMoreButtonClick}>
+        <IconButton size="small" aria-label="actions" onClick={onMoreButtonClick}>
           {dropDownIcon}
         </IconButton>
       </Tooltip>
