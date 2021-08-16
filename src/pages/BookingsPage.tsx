@@ -184,7 +184,7 @@ const BookingsPageContainer: React.FC = () => {
                 flow(
                   set('archived', false),
                   set('hold', false),
-                  set('maxStatusCode', BookingRequestStatusCode.REQUESTED),
+                  set('maxStatusCode', BookingRequestStatusCode.IN_PROGRESS),
                   set('minStatusCode', undefined),
                 )(prevState),
               );
@@ -196,7 +196,7 @@ const BookingsPageContainer: React.FC = () => {
                 flow(
                   set('archived', false),
                   set('hold', true),
-                  set('maxStatusCode', BookingRequestStatusCode.REQUESTED),
+                  set('maxStatusCode', BookingRequestStatusCode.IN_PROGRESS),
                   set('minStatusCode', undefined),
                 )(prevState),
               );
