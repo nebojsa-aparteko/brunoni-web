@@ -13,4 +13,4 @@ steps:
     args: ['use', '$_BRAND', '--debug']
   - name: 'eu.gcr.io/brunoni-allmarine/firebase-tools'
     args: ['deploy', '--only', 'hosting:$BRANCH_NAME', '--debug']
-timeout: '900s'
+timeout: '1200s'
