@@ -281,10 +281,7 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
       q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
     );
   }
-  if (quotes.length > 1) {
-    return quotes[0];
-  }
-  return undefined;
+  return quotes[0] || undefined;
 };
 
 export const normalizeQuote = (data: any) => {
@@ -362,7 +359,7 @@ const mapIntoBookingRequestModel = async (
     freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
     freightDetails,
   );
-  // console.log({ containers, freightDetails, commission })
+  console.log({ containers, freightDetails, commission });
 
   const bookingRequest = {
     agreementNo,
