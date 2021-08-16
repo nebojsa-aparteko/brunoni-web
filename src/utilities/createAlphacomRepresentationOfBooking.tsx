@@ -38,7 +38,7 @@ const fortyFootContainers = ["40'DC", "40'SO", "40'FR", "40'PF", "40'SR", "40'OT
 
 const getRelevantUnit = (unit: string) => {
   if (unit === 'PRO CONTAINER' || unit === 'PER CONTAINER') return 'CTR';
-  if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT') return 'FEE';
+  if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT' || unit === 'PRO SHIPMENT') return 'FEE';
   if (unit === 'PRO SET' || unit === 'PER SET') return 'SET';
   if (unit === 'PRO TEU' || unit === 'PER TEU') return 'TEU';
   if (twentyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
