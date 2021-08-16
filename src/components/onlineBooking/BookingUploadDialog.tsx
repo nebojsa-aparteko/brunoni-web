@@ -16,6 +16,8 @@ import {
   BookingRequest,
   BookingRequestStatusCode,
   BookingRequestStatusText,
+  commissionRelatedFreights,
+  FreightDetail,
   VGMSubmittedBy,
 } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
@@ -35,7 +37,7 @@ import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
-import { flow, isNil, omitBy, update } from 'lodash/fp';
+import { compact, flow, isNil, omitBy, update } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -58,6 +60,8 @@ import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
 import ContainerDetails from '../../model/ContainerDetails';
+import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -241,29 +245,57 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-export const getLatestQuote = async (originId: string, destinationId: string, agreementNo: string = '') => {
-  const quoteByAgreement = await firebase
-    .firestore()
-    .collection('quotes')
-    .doc(agreementNo)
-    .get();
-  if (quoteByAgreement.exists) {
-    return normalizeQuote(quoteByAgreement.data() as Quote);
+export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<Quote | undefined> => {
+  if (quoteSearchParams.agreementNo) {
+    const quoteByAgreement = await firebase
+      .firestore()
+      .collection('quotes')
+      .doc(quoteSearchParams.agreementNo)
+      .get();
+    if (quoteByAgreement.exists) {
+      return normalizeQuote(quoteByAgreement.data() as Quote);
+    }
   }
-  const quotesRef = await firebase
-    .firestore()
-    .collection('quotes')
-    .where('origin', '==', originId)
-    .where('destination', '==', destinationId)
+  let query = (await firebase.firestore().collection('quotes')) as firebase.firestore.Query;
+
+  if (quoteSearchParams.originPort) {
+    query = query.where('origin', '==', quoteSearchParams.originPort.id);
+  }
+  if (quoteSearchParams.destinationPort) {
+    query = query.where('destination', '==', quoteSearchParams.destinationPort.id);
+  }
+  if (quoteSearchParams.carrier) {
+    query = query.where('carrier', '==', quoteSearchParams.carrier);
+  }
+  if (quoteSearchParams.clientId) {
+    query = query.where('clientId', '==', quoteSearchParams.clientId);
+  }
+  const quotesRef = await query
     .orderBy('dateIssued', 'desc')
-    .limit(1)
+    .limit(100)
     .get();
-  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])?.[0] || undefined;
+  let quotes = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
+  if (quoteSearchParams.containers) {
+    quotes = quotes.filter(q => q.containers.length === quoteSearchParams.containers!.length);
+    quotes = quotes.filter(q =>
+      q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
+    );
+  }
+  if (quotes.length > 1) {
+    return quotes[0];
+  }
+  return undefined;
 };
 
 export const normalizeQuote = (data: any) => {
   return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
 };
+
+interface QuoteSearchParams extends Omit<RouteSearchParams, 'date' | 'weeks'> {
+  agreementNo: string | undefined;
+  clientId: string | undefined;
+  containers: (Container & ContainerDetails)[] | undefined;
+}
 
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
@@ -308,15 +340,33 @@ const mapIntoBookingRequestModel = async (
     weeks: 4,
   } as RouteSearchParams;
 
-  // Get the latest quote by origin and dest
-  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
-  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
+
+  const quoteSearchParams = {
+    originPort: origin,
+    destinationPort: destination,
+    carrier: carrier?.name,
+    agreementNo,
+    clientId: client?.id,
+    containers: containers,
+  } as QuoteSearchParams;
+
+  // Get the latest quote by origin and dest
+  const quote = await getLatestQuote(quoteSearchParams);
+  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
+
+  const voyageInfo = getVoyageInfo(schedule);
+
+  const commission = generateCommission(
+    schedule,
+    freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
+    freightDetails,
+  );
+  // console.log({ containers, freightDetails, commission })
 
   const bookingRequest = {
     agreementNo,
     archived: false,
-    hold: false,
     carrier,
     client,
     containers,
@@ -324,13 +374,19 @@ const mapIntoBookingRequestModel = async (
     createdBy,
     customerReference,
     destination,
-    freightDetails,
+    freightDetails: compact([
+      ...(freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+      commission,
+    ]),
+    hold: false,
     intraRefNumber,
     origin,
     schedule,
     statusCode: BookingRequestStatusCode.REQUESTED,
     statusText: BookingRequestStatusText.REQUESTED,
+    vessel: voyageInfo?.VesselName,
     vgmSubmittedBy,
+    voyage: voyageInfo?.VoyageNr,
   } as BookingRequest;
 
   console.log(bookingRequest);
@@ -461,6 +517,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               );
               values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
             } catch (e) {
+              dispatch({ type: 'STOP_GLOBAL_LOADING' });
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
               history.push(`/booking-requests/${docReference}`);
@@ -474,6 +531,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             dispatch({ type: 'STOP_GLOBAL_LOADING' });
           });
     } catch (e) {
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
       return null;
     }
