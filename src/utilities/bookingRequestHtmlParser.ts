@@ -242,7 +242,8 @@ const extractDataOddTable = (object: DataOddTable) => {
   const INTTRA_REFERENCE_NUMBER = findDataOddTable(object, Titles.INTTRA_REFERENCE_NUMBER);
   const CUSTOMER_SHIPMENT_ID = findDataOddTable(object, Titles.CUSTOMER_SHIPMENT_ID);
   const BOOKING_OFFICE = findDataOddTable(object, Titles.BOOKING_OFFICE);
-  const CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER);
+  let CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER) as string | undefined;
+  CONTRACT_NUMBER = CONTRACT_NUMBER?.split('/')[0];
   const FREIGHT_FORWARDERS_REFERENCE_NUMBERS = findDataOddTable(
     object,
     Titles.FREIGHT_FORWARDERS_REFERENCE_NUMBERS,

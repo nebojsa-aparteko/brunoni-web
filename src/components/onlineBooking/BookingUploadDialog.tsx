@@ -247,13 +247,17 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
 
 export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<Quote | undefined> => {
   if (quoteSearchParams.agreementNo) {
-    const quoteByAgreement = await firebase
-      .firestore()
-      .collection('quotes')
-      .doc(quoteSearchParams.agreementNo)
-      .get();
-    if (quoteByAgreement.exists) {
-      return normalizeQuote(quoteByAgreement.data() as Quote);
+    try {
+      const quoteByAgreement = await firebase
+        .firestore()
+        .collection('quotes')
+        .doc(quoteSearchParams.agreementNo)
+        .get();
+      if (quoteByAgreement.exists) {
+        return normalizeQuote(quoteByAgreement.data() as Quote);
+      }
+    } catch (e) {
+      console.error('Error fetching quote by Agreement No.');
     }
   }
   let query = (await firebase.firestore().collection('quotes')) as firebase.firestore.Query;
@@ -281,6 +285,7 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
       q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
     );
   }
+  console.log({ quotes });
   return quotes[0] || undefined;
 };
 
@@ -548,7 +553,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropZoneArea
               handleOnDrop={handleOnDrop}
               handleOnDelete={handleOnDelete}
-              filesLimit={1}
+              filesLimit={100}
               acceptedExtensions={['.html']}
               showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}
