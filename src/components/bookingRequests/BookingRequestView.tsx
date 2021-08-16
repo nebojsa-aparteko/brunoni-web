@@ -698,21 +698,22 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
             </Box>
           )}
-          {tags ? (
-            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
-          ) : (
-            <Box
-              display="flex"
-              flexDirection="row"
-              mb={1}
-              alignItems="center"
-              border="1px solid rgba(0,0,0,0.15)"
-              p={1}
-              maxWidth="100%"
-            >
-              <CircularProgress size={20} style={{ margin: 'auto' }} />
-            </Box>
-          )}
+          {isAdmin &&
+            (tags ? (
+              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
+            ) : (
+              <Box
+                display="flex"
+                flexDirection="row"
+                mb={1}
+                alignItems="center"
+                border="1px solid rgba(0,0,0,0.15)"
+                p={1}
+                maxWidth="100%"
+              >
+                <CircularProgress size={20} style={{ margin: 'auto' }} />
+              </Box>
+            ))}
           {bookingRequest.additionalInfo && <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />}
           {isOpenAssignmentModal && (
             <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />

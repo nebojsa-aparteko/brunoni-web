@@ -329,21 +329,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       )}
       <Grid container item md={7} xs={12}>
         <Grid item xs={12}>
-          {tags ? (
-            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
-          ) : (
-            <Box
-              display="flex"
-              flexDirection="row"
-              mb={1}
-              alignItems="center"
-              border="1px solid rgba(0,0,0,0.15)"
-              p={1}
-              maxWidth="100%"
-            >
-              <CircularProgress size={20} style={{ margin: 'auto' }} />
-            </Box>
-          )}
+          {isAdmin &&
+            (tags ? (
+              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
+            ) : (
+              <Box
+                display="flex"
+                flexDirection="row"
+                mb={1}
+                alignItems="center"
+                border="1px solid rgba(0,0,0,0.15)"
+                p={1}
+                maxWidth="100%"
+              >
+                <CircularProgress size={20} style={{ margin: 'auto' }} />
+              </Box>
+            ))}
         </Grid>
 
         <Page title={getBookingTitle(booking)}>
