@@ -9,6 +9,7 @@ import { BookingCategory, BookingVersion } from '../model/Booking';
 import { getRepresentationFromClient } from '../components/bookingRequests/BookingRequestPortTerms';
 import { formatDateSafe } from './formattingHelpers';
 import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
+import IMO from '../model/IMO';
 
 const getTariffs = (container: Container & ContainerDetails) => {
   const tariffs = [];
@@ -224,15 +225,18 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                   },
                 ],
               },
-              IMCO: value.imo?.length > 0 ? 'Yes' : 'No',
-              IMCOs: {
-                IMCO: value.imo?.map((imco: any) => ({
-                  IMOClass: imco?.IMOClass,
-                  UNNumber: imco?.UNNumber,
-                  PackingNumber: imco?.PGNumber,
-                  FlashPoint: null,
-                })),
-              },
+              IMCO: value.imo?.length > 0 && value.imo?.[0] ? 'Yes' : 'No',
+              IMCOs:
+                value.imo?.length > 0
+                  ? {
+                      IMCO: (value.imo?.[1] as IMO[]).map((imco: any) => ({
+                        IMOClass: imco.IMOClass,
+                        UNNumber: imco.UNNumber,
+                        PackingNumber: imco.PGNumber,
+                        FlashPoint: null,
+                      })),
+                    }
+                  : null,
               Overdimension: value.oog?.length > 0 ? 'Yes' : 'No',
               Overwidth: value.oog?.length > 0 ? (value.oog[0] as any).diffWidth : null,
               Overheight: value.oog?.length > 0 ? (value.oog[0] as any).diffHeight : null,
