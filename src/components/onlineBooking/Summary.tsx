@@ -184,7 +184,7 @@ const transformFreightDetails = (
 const recalculateQuantity = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
-) => freightDetails.map(detail => set('Anz', getQuantity(containers, detail.Unit))(detail));
+) => freightDetails.map(detail => set('Anz', getQuantity(containers, detail.Unit?.toUpperCase()))(detail));
 
 const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
   switch (costUnit) {
