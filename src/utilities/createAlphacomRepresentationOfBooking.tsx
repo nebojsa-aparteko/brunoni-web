@@ -227,7 +227,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
               },
               IMCO: value.imo?.length > 0 && value.imo?.[0] ? 'Yes' : 'No',
               IMCOs:
-                value.imo?.length > 0
+                value.imo?.length > 1 && value.imo?.[1] && (value.imo?.[1] as IMO[]).length > 0
                   ? {
                       IMCO: (value.imo?.[1] as IMO[]).map((imco: any) => ({
                         IMOClass: imco.IMOClass,
