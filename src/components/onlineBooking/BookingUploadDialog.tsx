@@ -285,7 +285,7 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
       q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
     );
   }
-  console.log({ quotes });
+
   return quotes[0] || undefined;
 };
 
@@ -364,7 +364,6 @@ const mapIntoBookingRequestModel = async (
     freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
     freightDetails,
   );
-  console.log({ containers, freightDetails, commission });
 
   const bookingRequest = {
     agreementNo,
@@ -391,8 +390,6 @@ const mapIntoBookingRequestModel = async (
     voyage: voyageInfo?.VoyageNr,
   } as BookingRequest;
 
-  console.log(bookingRequest);
-
   return bookingRequest;
 };
 
@@ -418,7 +415,6 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
-      console.log(object);
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
