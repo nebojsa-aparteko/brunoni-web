@@ -51,6 +51,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       }
+      if (filters.clientFilter) {
+        query = query.where('client.id', '==', filters.clientFilter.id);
+      }
       if (filters.originPort) {
         query = query.where('origin.id', '==', filters.originPort.id);
       }

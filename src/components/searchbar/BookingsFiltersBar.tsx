@@ -46,10 +46,10 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const tags = useContext(Tags);
   const user = useUser()[1];
 
-  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const availableCarriers = useMemo(
+    () => (user ? carriers?.filter(carrier => user.carriers?.includes(carrier.id)) : []),
+    [user, carriers],
+  );
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 

@@ -103,6 +103,22 @@ const BookingsPageContainer: React.FC = () => {
       }
     : {
         history: 1,
+        requests: 2,
+        'archived-requests': 3,
+      };
+
+  const indexToTab: any = !actingAs
+    ? {
+        1: 'pending-payment',
+        2: 'archived',
+        3: 'requests',
+        4: 'on-hold',
+        5: 'archived-requests',
+      }
+    : {
+        1: 'history',
+        2: 'requests',
+        3: 'archived-requests',
       };
 
   useEffect(() => {
@@ -146,9 +162,12 @@ const BookingsPageContainer: React.FC = () => {
   );
 
   useEffect(() => {
-    const newValue = tab && tabToIndex[tab] ? tabToIndex[tab] : 0;
+    const newValue = tab && tabToIndex[tab] ? tabToIndex[tab] : bookingPaginationContextData.activeTab;
     if (setBookingPaginationContextData) {
       setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
+      bookingPaginationContextData.activeTab
+        ? history.push(`/bookings?tab=${indexToTab[bookingPaginationContextData.activeTab]}`)
+        : history.push(`/bookings`);
     }
   }, []);
 
@@ -241,6 +260,30 @@ const BookingsPageContainer: React.FC = () => {
               set('pendingPayment', undefined),
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
+          case 2:
+            history.push('/bookings?tab=requests');
+            setFilters &&
+              setFilters(prevState =>
+                flow(
+                  set('archived', false),
+                  set('hold', false),
+                  set('clientFilter', actingAs?.company),
+                  set('maxStatusCode', BookingRequestStatusCode.IN_PROGRESS),
+                  set('minStatusCode', undefined),
+                )(prevState),
+              );
+            return bookingsContextData;
+          case 3:
+            history.push('/bookings?tab=archived-requests');
+            setFilters &&
+              setFilters(prevState =>
+                flow(
+                  set('clientFilter', actingAs?.company),
+                  set('minStatusCode', BookingRequestStatusCode.CONFIRMED),
+                  set('maxStatusCode', undefined),
+                )(prevState),
+              );
+            return bookingsContextData;
           default:
             return bookingsContextData;
         }
@@ -338,6 +381,16 @@ const BookingsPageContainer: React.FC = () => {
             >
               <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
               <Tab icon={<ArchiveIcon />} label="History" {...a11yProps(1)} />
+              <Tab
+                icon={
+                  <Badge badgeContent={bookingRequestCount} color="primary">
+                    <AssessmentIcon />
+                  </Badge>
+                }
+                label="Requests"
+                {...a11yProps(2)}
+              />
+              <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(3)} />
             </Tabs>
           </div>
           <TabPanel value={selectedTab} index={0}>
@@ -345,6 +398,12 @@ const BookingsPageContainer: React.FC = () => {
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
             <BookingsView isAdmin={!actingAs} archived showDateRangeFilter />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={2}>
+            <BookingRequestsView isAdmin={!actingAs} />
+          </TabPanel>
+          <TabPanel value={selectedTab} index={3}>
+            <BookingRequestsView isAdmin={!actingAs} />
           </TabPanel>
         </Box>
       )}
