@@ -16,8 +16,6 @@ import {
   BookingRequest,
   BookingRequestStatusCode,
   BookingRequestStatusText,
-  commissionRelatedFreights,
-  FreightDetail,
   VGMSubmittedBy,
 } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
@@ -359,11 +357,7 @@ const mapIntoBookingRequestModel = async (
 
   const voyageInfo = getVoyageInfo(schedule);
 
-  const commission = generateCommission(
-    schedule,
-    freightDetails?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
-    freightDetails,
-  );
+  const commission = generateCommission(schedule, freightDetails, carrier?.id, containers);
 
   const bookingRequest = {
     agreementNo,

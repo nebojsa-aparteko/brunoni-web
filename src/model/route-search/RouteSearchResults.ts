@@ -25,6 +25,7 @@ export interface RouteSearchResult {
   ComCurE1?: string;
   ComCurE2?: string;
   ComPercentE?: string;
+  ComPercentI?: string;
 }
 
 export type SearchResultsPort = {

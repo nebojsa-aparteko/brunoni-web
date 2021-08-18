@@ -512,11 +512,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
       const voyageInfo = getVoyageInfo(schedule);
       const commission = generateCommission(
         bookingRequest?.schedule,
-        bookingRequest?.freightDetails?.find(
-          (detail: FreightDetail) =>
-            detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-        ),
         bookingRequest?.freightDetails,
+        bookingRequest.carrier?.id,
+        bookingRequest.containers,
       );
 
       setBookingRequest(prevState =>

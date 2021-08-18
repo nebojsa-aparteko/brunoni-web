@@ -2,7 +2,6 @@ import {
   BookingRequest,
   BookingRequestStatusCode,
   BookingRequestStatusText,
-  commissionRelatedFreights,
   FreightDetail,
   VGMSubmittedBy,
 } from '../../model/BookingRequest';
@@ -184,7 +183,12 @@ const transformFreightDetails = (
 const recalculateQuantity = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
-) => freightDetails.map(detail => set('Anz', getQuantity(containers, detail.Unit?.toUpperCase()))(detail));
+) => {
+  return freightDetails.map(detail => {
+    const newQuantity = getQuantity(containers, detail.Unit?.toUpperCase());
+    return set('Anz', newQuantity || detail.Anz || 1)(detail);
+  });
+};
 
 const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
   switch (costUnit) {
@@ -195,7 +199,7 @@ const getQuantity = (containers: { TEU: number; Total: number; [key: string]: nu
     case 'PRO CONTAINER':
       return containers.Total;
     default:
-      return containers[costUnit?.split(' ')?.pop() || ''] || 1;
+      return containers[costUnit?.split(' ')?.pop() || ''] || undefined;
   }
 };
 
@@ -259,8 +263,9 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers, chargeCodes);
     const commission = generateCommission(
       bookingRequest?.schedule,
-      freights?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
       freights,
+      bookingRequest?.carrier?.id,
+      bookingRequest?.containers,
     );
     const writableRequest = {
       ...bookingRequest,
