@@ -489,92 +489,96 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 </Grid>
               </React.Fragment>
             )}
-            <React.Fragment>
-              {!isContainerSO(container) && isAdmin && (
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.pickupReference || ''}
-                    onChange={event =>
-                      handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
-                    }
-                    onBlur={event => handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)}
-                  />
-                </Grid>
-              )}
-              {isAdmin && (
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.deliveryReference || ''}
-                    onChange={event =>
-                      handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
-                    }
-                    onBlur={event =>
-                      handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
-                    }
-                  />
-                </Grid>
-              )}
-              {isAdmin && (
-                <Grid item md={3} xs={12} style={{ display: 'flex' }}>
-                  <TextField
-                    label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.vgmPin || ''}
-                    onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
-                    onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
-                  />
-                  <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
-                    {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
-                  </IconButton>
-                </Grid>
-              )}
-              {isContainerSO(container) && container.quantity > 0
-                ? getContainerNumberInputs(container, handleChangeContainerNumbers)
-                : null}
-              {tariffs && tariffs.demurrage && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangeDemDetTariffs}
-                    availableTariffs={tariffs.demurrage}
-                    tariffs={container.demDetTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-              {tariffs && tariffs.storage && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Storage tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangeStorageTariffs}
-                    availableTariffs={tariffs.storage}
-                    tariffs={container.storageTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-              {tariffs && tariffs.plugin && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Plug-in tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangePluginTariffs}
-                    availableTariffs={tariffs.plugin}
-                    tariffs={container.pluginTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-            </React.Fragment>
+            {!get('showLessDetailedInput')(rest) && (
+              <React.Fragment>
+                {!isContainerSO(container) && isAdmin && (
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.pickupReference || ''}
+                      onChange={event =>
+                        handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                      }
+                      onBlur={event =>
+                        handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)
+                      }
+                    />
+                  </Grid>
+                )}
+                {isAdmin && (
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.deliveryReference || ''}
+                      onChange={event =>
+                        handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                      }
+                      onBlur={event =>
+                        handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
+                      }
+                    />
+                  </Grid>
+                )}
+                {isAdmin && (
+                  <Grid item md={3} xs={12} style={{ display: 'flex' }}>
+                    <TextField
+                      label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.vgmPin || ''}
+                      onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
+                      onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
+                    />
+                    <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
+                      {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
+                    </IconButton>
+                  </Grid>
+                )}
+                {isContainerSO(container) && container.quantity > 0
+                  ? getContainerNumberInputs(container, handleChangeContainerNumbers)
+                  : null}
+                {tariffs && tariffs.demurrage && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeDemDetTariffs}
+                      availableTariffs={tariffs.demurrage}
+                      tariffs={container.demDetTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.storage && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Storage tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeStorageTariffs}
+                      availableTariffs={tariffs.storage}
+                      tariffs={container.storageTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.plugin && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Plug-in tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangePluginTariffs}
+                      availableTariffs={tariffs.plugin}
+                      tariffs={container.pluginTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+              </React.Fragment>
+            )}
           </>
         )}
       </Grid>

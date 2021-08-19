@@ -52,7 +52,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const {
     control,
     handleSubmit,
-    formState: { errors, dirtyFields },
+    watch,
+    formState: { errors },
   } = useFormContext();
 
   const handleContinue = (data: OnlineBookingInputs) => {
@@ -196,7 +197,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           variant="contained"
           color="primary"
           onClick={handleSubmit(handleContinue)}
-          disabled={!!isNil(dirtyFields.acceptedTerms)}
+          disabled={!watch('acceptedTerms')}
         >
           Next
         </Button>
