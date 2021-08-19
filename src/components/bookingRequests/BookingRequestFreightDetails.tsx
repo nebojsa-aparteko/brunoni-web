@@ -31,7 +31,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
-import { FreightDetailGroup } from '../../model/Booking';
+import { CarrierId, FreightDetailGroup } from '../../model/Booking';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import Container from '../../model/Container';
@@ -172,37 +172,6 @@ const getUpdatedFreightDetails = (
 const compareValues = (value1: string | number | undefined, value2: string | number | undefined) =>
   (value1 ? value1 : '') !== (value2 ? value2 : '');
 
-// const isEditable = ();
-export const getQuantity = (
-  containers: (Container & ContainerDetails)[],
-  costUnit: string,
-  numberOfContainersAndTEUs: number[],
-  isQAutomatic: boolean,
-) => {
-  const searchableCostUnit = costUnit.toUpperCase();
-  const [noOfContainers, noOfTEUs] = numberOfContainersAndTEUs;
-  switch (searchableCostUnit) {
-    case 'PRO TEU':
-    case 'PER TEU':
-      return noOfTEUs || 0;
-    case 'PRO CONTAINER':
-    case 'PER CONTAINER':
-      return noOfContainers || 0;
-    default:
-      const relevantContainers = containers.filter(
-        container =>
-          'PRO ' + container.containerType?.name.toUpperCase() === searchableCostUnit ||
-          'PER ' + container.containerType?.name.toUpperCase() === searchableCostUnit,
-      );
-      if (relevantContainers.length > 0) {
-        return relevantContainers.reduce((a, b) => a + b.quantity, 0);
-      } else {
-        if (isQAutomatic) return 0;
-      }
-      return undefined;
-  }
-};
-
 const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string[] | undefined) =>
   automaticCostUnits.some(unit => unit.toUpperCase() === costUnit.toUpperCase()) ||
@@ -211,6 +180,8 @@ export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string
       'PRO ' + containerName.toUpperCase() === costUnit.toUpperCase() ||
       'PER ' + containerName.toUpperCase() === costUnit.toUpperCase(),
   );
+
+const isAgencyCommission = (freightDetail: FreightDetail) => freightDetail.Txt === 'Agency Commission';
 
 const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   freightDetail,
@@ -227,8 +198,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const invisible = useMemo(
     () =>
-      selectedTab === 0 &&
-      (freightDetail.Group === FreightDetailGroup.INTERNAL2 || freightDetail.Txt === 'Agency Commission'),
+      selectedTab === 0 && (freightDetail.Group === FreightDetailGroup.INTERNAL2 || isAgencyCommission(freightDetail)),
     [freightDetail, selectedTab],
   );
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
@@ -459,44 +429,58 @@ const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
   return 0;
 };
 
-export const getNumberOfContainersAndTEUs = (containersList?: (Container & ContainerDetails)[]) => {
-  let containers = 0;
-  let TEUs = 0;
-  containersList?.forEach(container => {
-    containers = containers + (container.quantity || 0);
-    TEUs =
-      TEUs +
-      (container.containerType?.id ? (container.containerType.id.startsWith('2') ? 1 : 2) * container.quantity : 0);
-  });
-  return [containers, TEUs];
-};
-
 export const generateCommission = (
   schedule: RouteSearchResult | undefined,
-  seaFreightDetail: FreightDetail | undefined,
   freightDetails: FreightDetail[] | undefined,
+  carrierId?: string,
+  containers?: (Container & ContainerDetails)[],
 ) => {
-  const isPercent = schedule?.ComPercentE !== '0';
-  const quantity = isPercent ? (schedule?.ComPercentE ? parseFloat(schedule?.ComPercentE) : 0) : 1;
+  const seaFreightDetails = freightDetails?.filter(
+    (detail: FreightDetail) =>
+      detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
+  );
+  const seaFreightTotal = seaFreightDetails?.reduce((a, b) => a + (b?.Total || 0), 0);
+  const isHMM = carrierId && carrierId === CarrierId.HMM;
+  const isPercent = schedule?.ComPercentE
+    ? parseFloat(schedule?.ComPercentE) !== 0
+    : schedule?.ComPercentI
+    ? parseFloat(schedule?.ComPercentI) !== 0
+    : false;
+  const quantity = isPercent
+    ? isHMM
+      ? 5
+      : schedule?.ComPercentE
+      ? parseFloat(schedule?.ComPercentE)
+      : schedule?.ComPercentI
+      ? parseFloat(schedule?.ComPercentI)
+      : 0
+    : 1;
   const value =
-    seaFreightDetail && isPercent
-      ? seaFreightDetail.Total || 0
+    seaFreightDetails && seaFreightDetails.length > 0 && isPercent
+      ? seaFreightTotal || 0
       : (schedule?.ComAmountE1 &&
-          seaFreightDetail?.Currency === schedule?.ComCurE1 &&
+          seaFreightDetails &&
+          seaFreightDetails.length > 0 &&
+          seaFreightDetails[0]?.Currency === schedule?.ComCurE1 &&
           parseFloat(schedule?.ComAmountE1)) ||
         (schedule?.ComAmountE2 &&
-          seaFreightDetail?.Currency === schedule?.ComCurE2 &&
+          seaFreightDetails &&
+          seaFreightDetails.length > 0 &&
+          seaFreightDetails[0]?.Currency === schedule?.ComCurE2 &&
           parseFloat(schedule?.ComAmountE2)) ||
         0;
-  return seaFreightDetail
+  return seaFreightDetails && seaFreightDetails.length > 0
     ? ({
         SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
         Anz: quantity,
         Txt: 'Agency Commission',
-        Currency: seaFreightDetail.Currency,
+        Currency: seaFreightDetails[0].Currency,
         UnitValue: -value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: -(((quantity || 1) * (value || 1)) / (isPercent ? 100 : 1)),
+        Total: -(
+          ((quantity || 1) * (isPercent ? 1 : calculateContainers(containers).Total) * (value || 1)) /
+          (isPercent ? 100 : 1)
+        ),
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;

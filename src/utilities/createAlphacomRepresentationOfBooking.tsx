@@ -193,7 +193,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
               ItemNo: index + 1,
               CtrQuantity: value.quantity,
               CtypID: value.containerType?.id,
-              CommodityID: value.commodityType?.id,
+              CommodityID: value.commodityType?.id === value.commodityType?.name ? null : value.commodityType?.id,
               CommodityTXT:
                 value.commodityType?.name && value.commodityType?.name !== ''
                   ? value.commodityType?.name
