@@ -302,7 +302,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
           </colgroup>
           <TableBody>
             {!isContainerSO(container) && (
-              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be assigned]'} />
+              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be advised]'} />
             )}
             {container.pickupDate && (
               <TableRowData
@@ -313,12 +313,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {pickupLocation && pickupLocation.name && (
               <TableRowData label={'Pick Up Location'} content={createAddressString(pickupLocation)} />
             )}
-            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be assigned]'} />
+            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be advised]'} />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
               <TableRowData label={'Delivery Address'} content={bookingRequest.schedule.OriginInfo.Port.PortName} />
             )}
 
-            <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be assigned]'} />
+            <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be advised]'} />
             {container.oog?.[0] && (
               <TableRowData label={'Remarks'} content={container.oog?.[0] ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />
             )}
