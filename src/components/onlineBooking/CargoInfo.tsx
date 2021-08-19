@@ -1,15 +1,15 @@
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { BookingRequest } from '../../model/BookingRequest';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import Container, { Ventilation } from '../../model/Container';
 import ContainerDetails from '../../model/ContainerDetails';
 import { isNil, omitBy } from 'lodash/fp';
 import { Button, Grid } from '@material-ui/core';
 import ListInput from '../inputs/ListInput';
 import ContainerInput, { isContainerSO, isReefer } from '../inputs/ContainerInput';
-import { useFormContext } from 'react-hook-form';
 import { isDashboardUser } from '../../model/UserRecord';
 import UserRecordContext from '../../contexts/UserRecordContext';
+import ActingAs from '../../contexts/ActingAs';
 
 const checkRequestForIMO = (containers: (Container & ContainerDetails)[] | undefined) =>
   containers && containers.some((container: Container & ContainerDetails) => container.imo?.[0]);
@@ -26,11 +26,8 @@ const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undef
 const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, bookingRequest, setBookingRequest }) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
-  const {
-    register,
-    formState: { isDirty },
-  } = useFormContext();
   const userRecord = useContext(UserRecordContext);
+  const actingAs = useContext(ActingAs)[0]; //isAdmin -> !actingAs
 
   //TODO set conainers in ContainerInput even if no change happened
   const [containers, setContainers] = useState<(Container & ContainerDetails)[]>(
@@ -97,6 +94,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         ItemInputProps={{
           showLocations: true,
           isDetailedInput: true,
+          showLessDetailedInput: !actingAs,
           shouldShowAllDepots: isDashboardUser(userRecord),
         }}
         addText="Add Container"
