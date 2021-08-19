@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -17,8 +17,9 @@ import { useSnackbar } from 'notistack';
 import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 import TeamsPaymentConfirmationCustomerSettingsAddDialog from './TeamsPaymentConfirmationCustomerSettingsAddDialog';
 import TeamPaymentConfirmationCustomerSettingsRow from './TeamsPaymentConfirmationCustomerSettingsRow';
+import { addSeconds } from 'date-fns';
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     tableContainer: {
       flex: 1,
@@ -86,27 +87,24 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
 
   const handleCopy = useCallback(
     async (id: string) => {
-      dispatch({ type: 'START_GLOBAL_LOADING' });
       const collectionRef = firebase.firestore().collection('payment-confirmation-config');
       try {
         const exitingPaymentConfirmation = await collectionRef.doc(id).get();
         const dataCopy = exitingPaymentConfirmation.data() as CustomerSettingsRule;
         if (exitingPaymentConfirmation) {
           const ref = collectionRef.doc();
-          const createdAt = firebase.firestore.Timestamp.now();
+          const createdAt = firebase.firestore.Timestamp.fromDate(addSeconds(dataCopy.createdAt.toDate(), 2));
           await ref.set({ ...dataCopy, id: ref.id, createdAt });
         }
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
       } catch (error) {
         console.error(error);
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
         enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });
       }
     },
-    [dispatch, enqueueSnackbar],
+    [enqueueSnackbar],
   );
 
   return (

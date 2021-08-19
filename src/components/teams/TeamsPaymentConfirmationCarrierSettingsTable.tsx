@@ -17,6 +17,7 @@ import TeamPaymentConfirmationCarrierSettingsRow from './TeamsPaymentConfirmatio
 import { useSnackbar } from 'notistack';
 import TeamsPaymentConfirmationCarrierSettingsAddDialog from './TeamsPaymentConfirmationCarrierSettingsAddDialog';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import { addSeconds } from 'date-fns';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -86,27 +87,24 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
 
   const handleCopy = useCallback(
     async (id: string) => {
-      dispatch({ type: 'START_GLOBAL_LOADING' });
       const collectionRef = firebase.firestore().collection('payment-confirmation-config');
       try {
         const exitingPaymentConfirmation = await collectionRef.doc(id).get();
         const dataCopy = exitingPaymentConfirmation.data() as CarrierSettingsRule;
         if (exitingPaymentConfirmation) {
           const ref = collectionRef.doc();
-          const createdAt = firebase.firestore.Timestamp.now();
+          const createdAt = firebase.firestore.Timestamp.fromDate(addSeconds(dataCopy.createdAt.toDate(), 2));
           await ref.set({ ...dataCopy, id: ref.id, createdAt });
         }
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
       } catch (error) {
         console.error(error);
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
         enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });
       }
     },
-    [dispatch, enqueueSnackbar],
+    [enqueueSnackbar],
   );
 
   return (
