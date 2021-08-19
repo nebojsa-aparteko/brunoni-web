@@ -52,7 +52,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const {
     control,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, dirtyFields },
   } = useFormContext();
 
   const handleContinue = (data: OnlineBookingInputs) => {
@@ -192,7 +192,12 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         </FormControl>
       </Grid>
       <Grid item>
-        <Button variant="contained" color="primary" onClick={handleSubmit(handleContinue)} disabled={!isDirty}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit(handleContinue)}
+          disabled={!!isNil(dirtyFields.acceptedTerms)}
+        >
           Next
         </Button>
       </Grid>

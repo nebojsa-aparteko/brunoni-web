@@ -153,7 +153,7 @@ const MissingFields: React.FC<Props> = ({
                   ? 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +
                     '  Your booking request has been submitted and is in requested status.\n' +
-                    '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
+                    '  You are allowed to make changes as long as the booking is not in status: In Progress.\n\n' +
                     '  The next available booking agent will take care and check the availabilities. Thank you.'}
               </Typography>
               {nonMatchingFields && nonMatchingFields.length > 0 && (
