@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -39,6 +39,7 @@ import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { Tag, TagCategory } from '../../model/Tag';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -161,21 +162,31 @@ interface ShipmentProgressProps {
 
 export const BookingRequestProgress: React.FC<ShipmentProgressProps> = ({ bookingRequest }) => {
   const classes = useStyles();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const { checklistItemCount, checklistCheckedCount } = bookingRequest;
+  const { checklistItemCountCustomer, checklistCheckedCountCustomer } = bookingRequest;
+
+  const getProgress = () => {
+    let bar: string;
+    let count: string;
+    if (isAdmin) {
+      bar = `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%`;
+      count = `${checklistCheckedCount || 0}/${checklistItemCount || 1}`;
+    } else {
+      bar = `${((checklistCheckedCountCustomer || 0) / (checklistItemCountCustomer || 1)) * 100}%`;
+      count = `${checklistCheckedCountCustomer || 0}/${checklistItemCountCustomer || 1}`;
+    }
+    return [bar, count];
+  };
 
   return (
     <div>
       <div className={classes.progress}>
-        <div
-          className={classes.progressBar}
-          role="progressbar"
-          style={{ width: `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%` }}
-        />
+        <div className={classes.progressBar} role="progressbar" style={{ width: getProgress()[0] }} />
       </div>
-      <Typography variant="subtitle2">
-        {checklistCheckedCount || 0}/{checklistItemCount || 1}
-      </Typography>
+      <Typography variant="subtitle2">{getProgress()[1]}</Typography>
     </div>
   );
 };
