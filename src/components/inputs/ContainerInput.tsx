@@ -279,9 +279,14 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange(set('pickupDate', isContainerSO(container) ? undefined : v)(container));
   };
 
-  const handleWeightTextChange = (v: number | null) => {
+  const getWeight = (v: number | null) => {
     let res = v && v < 0 ? 0 : v;
     res = res && isNaN(res) ? null : res;
+    return res;
+  };
+
+  const handleWeightTextChange = (v: number | null) => {
+    const res = getWeight(v);
     setContainer(set('weight', res)(container));
     onChange(set('weight', v)(container));
   };
@@ -433,7 +438,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 margin="dense"
                 variant="outlined"
                 fullWidth
-                value={container.weight || null}
+                value={container.weight || ''}
                 onChange={event =>
                   handleWeightTextChange(event.target.value === '' ? null : parseInt(event.target.value))
                 }

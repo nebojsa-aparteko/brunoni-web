@@ -4,8 +4,19 @@ import { BookingRequest } from '../../model/BookingRequest';
 import React, { useContext, useMemo } from 'react';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
-import { isNil, omitBy } from 'lodash/fp';
-import { Box, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField, Typography } from '@material-ui/core';
+import { isNil, omitBy, set } from 'lodash/fp';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
 import PortInput from '../inputs/PortInput';
 import CarrierInput from '../inputs/CarrierInput';
 import getTermsForCarrier from '../../utilities/getTermsForCarrier';
@@ -13,12 +24,22 @@ import { useClientById } from '../../hooks/useClient';
 import { Controller, useFormContext } from 'react-hook-form';
 import { defaultValidationRules } from '../controlledInputs/FormTextField';
 import { OnlineBookingInputs } from './OnlineBookingContainer';
+import { getQuoteDocRef } from './MissingFields';
+import useModal from '../../hooks/useModal';
+import ImportContactsIcon from '@material-ui/icons/ImportContacts';
+import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRequestFreightDetails';
+import useNormalizeQuote from '../../hooks/useNormalizedQuote';
+import { takeQuoteDetails } from './Summary';
+import ChargeCodes from '../../contexts/ChargeCodes';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
   const client = useClientById(quote?.clientId);
+  const { isOpen, closeModal, openModal } = useModal();
+  const chargeCodes = useContext(ChargeCodes);
+  const normalize = useNormalizeQuote();
 
   const scheduleCarrier = useMemo(
     () =>
@@ -53,10 +74,11 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     control,
     handleSubmit,
     watch,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
-  const handleContinue = (data: OnlineBookingInputs) => {
+  const updateBookingRequest = (data: OnlineBookingInputs) => {
     setBookingRequest(
       omitBy(isNil)({
         ...bookingRequest,
@@ -70,6 +92,41 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         quoteDetails: quote?.quoteDetails,
       }) as BookingRequest,
     );
+  };
+
+  const showGetQuote = () => {
+    const watched = ['originPort', 'destinationPort', 'carrier'];
+    const res = watch(watched);
+    return res.every(e => !isNil(e) && e !== '') && !watch('quoteNumber');
+  };
+
+  const shouldGetQuote = (data: OnlineBookingInputs): boolean => {
+    return (
+      !!data.quoteNumber &&
+      data.quoteNumber !== '' &&
+      ((!bookingRequest?.containers && bookingRequest?.containers?.length !== 0) || !bookingRequest.freightDetails)
+    );
+  };
+
+  const getQuote = async (data: OnlineBookingInputs) => {
+    const quoteRef = await getQuoteDocRef(data.quoteNumber);
+    if (quoteRef.exists) {
+      const normalizedQuote = normalize(quoteRef.data()) as Quote;
+      setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) =>
+        set(
+          'freightDetails',
+          takeQuoteDetails(normalizedQuote?.quoteDetails!, [], chargeCodes),
+        )(prevState as BookingRequest),
+      );
+    }
+  };
+
+  const handleContinue = async (data: OnlineBookingInputs) => {
+    updateBookingRequest(data);
+    if (shouldGetQuote(data)) {
+      await getQuote(data);
+    }
     handleNext();
   };
 
@@ -130,22 +187,36 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         />
       </Grid>
       <Grid item sm={3} xs={12}>
-        <Controller
-          control={control}
-          name="quoteNumber"
-          defaultValue={quote?.id || ''}
-          render={({ field: { onChange, value } }) => (
-            <TextField
-              label="Quote number (optional)"
-              variant="outlined"
-              fullWidth
-              type="number"
-              margin="dense"
-              value={value}
-              onChange={onChange}
-            />
+        <Box display={'flex'} alignItems={'center'}>
+          {showGetQuote() && (
+            <Tooltip title={'Load quote'} placement={'left'}>
+              <IconButton
+                onClick={async () => {
+                  await updateBookingRequest(getValues() as OnlineBookingInputs);
+                  openModal();
+                }}
+              >
+                <ImportContactsIcon />
+              </IconButton>
+            </Tooltip>
           )}
-        />
+          <Controller
+            control={control}
+            name="quoteNumber"
+            defaultValue={quote?.id || ''}
+            render={({ field: { onChange, value } }) => (
+              <TextField
+                label="Quote number (optional)"
+                variant="outlined"
+                fullWidth
+                type="number"
+                margin="dense"
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+        </Box>
       </Grid>
       <Grid item sm={3} xs={12}>
         <Controller
@@ -202,6 +273,16 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           Next
         </Button>
       </Grid>
+      {isOpen && (
+        <QuotePickerModal
+          isOpen={isOpen}
+          handleClose={closeModal}
+          hasContainers={!!bookingRequest?.containers}
+          setBookingRequest={setBookingRequest}
+          // @ts-ignore
+          fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+        />
+      )}
     </Grid>
   );
 };

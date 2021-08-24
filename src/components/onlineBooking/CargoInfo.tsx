@@ -64,7 +64,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
     [containers],
   );
 
-  const handleContinue = () => {
+  const handleProgress = (forward: boolean) => {
     const writableContainers = containers.map(container => {
       return {
         ...container,
@@ -78,11 +78,12 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
       omitBy(isNil)({
         ...bookingRequest,
         containers: writableContainers,
+        freightDetails: containers && containers.length !== 0 ? bookingRequest?.freightDetails : null,
         imo: checkRequestForIMO(containers) || undefined,
         soc: checkRequestForSOC(containers) || undefined,
       }) as BookingRequest,
     );
-    handleNext();
+    forward ? handleNext() : handlePrevious();
   };
 
   return (
@@ -103,10 +104,15 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         onChange={setContainers}
       />
       <Grid item>
-        <Button variant="text" color="default" onClick={handlePrevious}>
+        <Button variant="text" color="default" onClick={() => handleProgress(false)}>
           Previous
         </Button>
-        <Button variant="contained" color="primary" onClick={handleContinue} disabled={isNextButtonDisabled}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleProgress(true)}
+          disabled={isNextButtonDisabled}
+        >
           Next
         </Button>
       </Grid>

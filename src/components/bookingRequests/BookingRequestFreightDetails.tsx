@@ -51,15 +51,10 @@ import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import CloseIcon from '@material-ui/icons/Close';
 import useModal from '../../hooks/useModal';
 import SearchIcon from '@material-ui/icons/Search';
-import { getEntity, normalizeQuote, Quote } from '../../providers/QuoteGroupsProvider';
+import { Quote } from '../../providers/QuoteGroupsProvider';
 import firebase from '../../firebase';
 import QuickSearchQuotePreview from '../quickSearch/QuickSearchQuotePreview';
-import CommodityTypes from '../../contexts/CommodityTypes';
-import PickupLocations from '../../contexts/PickupLocations';
-import Ports from '../../contexts/Ports';
-import Carriers from '../../contexts/Carriers';
 import { Alert } from '@material-ui/lab';
-import { Currency } from '../../model/Payment';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
@@ -67,6 +62,7 @@ import ActingAs from '../../contexts/ActingAs';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { calculateContainers, onContainersChange, takeQuoteDetails } from '../onlineBooking/Summary';
 import EditingInput from '../EditingInput';
+import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -141,7 +137,7 @@ interface RowProps {
   index: number;
 }
 
-const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
+// const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
 
 const getUpdatedFreightDetails = (
   bookingRequest: BookingRequest,
@@ -480,18 +476,29 @@ export const generateCommission = (
     : undefined;
 };
 
-const getRelatedQuotes = (bookingRequest: BookingRequest) => [
-  firebase
-    .firestore()
-    .collection('quotes')
-    .where('carrier', '==', bookingRequest.carrier?.name)
-    .where('clientId', '==', bookingRequest.client?.id)
-    .where('origin', '==', bookingRequest.origin?.id)
-    .where('destination', '==', bookingRequest.destination?.id)
+export const getRelatedQuotes = async (bookingRequest: BookingRequest) => {
+  let query = (await firebase.firestore().collection('quotes')) as firebase.firestore.Query;
+  console.log(bookingRequest);
+  if (bookingRequest.carrier?.name) {
+    query = query.where('carrier', '==', bookingRequest.carrier?.name);
+  }
+  if (bookingRequest.client?.id) {
+    query = query.where('clientId', '==', bookingRequest.client?.id);
+  }
+  if (bookingRequest.origin?.id) {
+    query = query.where('origin', '==', bookingRequest.origin?.id);
+  }
+  if (bookingRequest.destination?.id) {
+    query = query.where('destination', '==', bookingRequest.destination?.id);
+  }
+
+  const quotesRef = await query
     .orderBy('dateIssued', 'desc')
-    .get(),
-  uniq(bookingRequest.containers?.map(d => d.containerType?.id)) as string[],
-];
+    .limit(10)
+    .get();
+
+  return [quotesRef, uniq(bookingRequest.containers?.map(d => d.containerType?.id)) as string[]];
+};
 
 const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   const classes = useStyles();
@@ -588,7 +595,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
         } as FreightDetail),
       )(prevState!),
     );
-  }, [selectedGroup, freightDetails]);
+  }, [setBookingRequest, freightDetails, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
     setBookingRequest(prevState =>
@@ -613,8 +620,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
 
     setBookingRequest(prevState => {
       if (!prevState || !prevState.freightDetails) return prevState;
-      const destinationIndex = prevState.freightDetails.findIndex(detail => detail == destinationFD);
-      const originIndex = prevState.freightDetails.findIndex(detail => detail == originFD);
+      const destinationIndex = prevState.freightDetails.findIndex(detail => detail === destinationFD);
+      const originIndex = prevState.freightDetails.findIndex(detail => detail === originFD);
       if (destinationIndex < 0 || originIndex < 0 || destinationIndex === originIndex) return prevState;
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
@@ -653,9 +660,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
             <QuotePickerModal
               isOpen={isOpen}
               handleClose={closeModal}
-              setFreights={freights =>
-                setBookingRequest(prevState => set('freightDetails', freights)(prevState as BookingRequest))
-              }
+              setBookingRequest={setBookingRequest}
               // @ts-ignore
               fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
             />
@@ -750,11 +755,21 @@ interface Props {
 
 export default BookingRequestFreightDetails;
 
-const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreights, fetchQuotes }) => {
+export const QuotePickerModal: React.FC<ModalProps> = ({
+  isOpen,
+  handleClose,
+  setBookingRequest,
+  fetchQuotes,
+  hasContainers = true,
+}) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Quote | undefined | null>();
   const [fetchedResults, setFetchedResults] = useState<Quote[] | undefined>();
+  const chargeCodes = useContext(ChargeCodes);
+
+  const normalize = useNormalizeQuote();
+
   const handleQuoteSearch = useCallback(() => {
     firebase
       .firestore()
@@ -764,30 +779,22 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
       .then(doc => {
         setSearchResult(doc.exists ? (normalize(doc.data()) as Quote) : null);
       });
-  }, [inputValue]);
-  const containerTypes = useContext(ContainerTypes);
-  const commodityTypes = useContext(CommodityTypes);
-  const pickupLocations = useContext(PickupLocations);
-  const chargeCodes = useContext(ChargeCodes);
+  }, [inputValue, normalize]);
 
-  const ports = useContext(Ports);
-  const carriers = useContext(Carriers);
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      setFreights(takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes));
+      !hasContainers &&
+        setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) =>
+        set(
+          'freightDetails',
+          takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes),
+        )(prevState as BookingRequest),
+      );
       handleClose();
     },
-    [setFreights, chargeCodes],
+    [hasContainers, setBookingRequest, handleClose, chargeCodes],
   );
-  const normalize = useMemo(() => {
-    const getContainerType = getEntity(containerTypes, containerType => containerType.id);
-    const getCommodityType = getEntity(commodityTypes, commodityType => commodityType.id);
-    const getPickupLocation = getEntity(pickupLocations, pickupLocation => pickupLocation.id);
-    const getPort = getEntity(ports, port => port.id);
-    const getCarrier = getEntity(carriers, carrier => carrier.name);
-
-    return normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
-  }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
@@ -836,7 +843,7 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
                   <Alert severity="warning">There are no quotes with booking request criteria.</Alert>
                 ) : (
                   fetchedResults.map(doc => (
-                    <Box onClick={() => handleSelectQuote(doc)} mx={-1}>
+                    <Box onClick={() => handleSelectQuote(doc)} mx={-1} key={doc.id}>
                       <QuickSearchQuotePreview quote={doc} />
                     </Box>
                   ))
@@ -846,21 +853,20 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
                   Want to see more quotes with similar charges.
                 </Typography>
               )}
-              <Button
-                color="primary"
-                onClick={() => {
-                  const [promise, containers] = fetchQuotes();
-                  promise.then(doc => {
-                    setFetchedResults(
-                      doc.docs
-                        .map(d => normalize(d.data()) as Quote)
-                        .filter(d => d.containers.some(c => containers.includes(c.containerType?.id || ''))),
-                    );
-                  });
-                }}
-              >
-                Load quotes
-              </Button>
+              {!fetchedResults && (
+                <Button
+                  color="primary"
+                  onClick={async () => {
+                    const [snapshot, containers] = await fetchQuotes();
+                    let docs = snapshot.docs.map(d => normalize(d.data()) as Quote);
+                    if (hasContainers)
+                      docs = docs.filter(d => d.containers.some(c => containers.includes(c.containerType?.id || '')));
+                    setFetchedResults(docs);
+                  }}
+                >
+                  Load quotes
+                </Button>
+              )}
             </Box>
           </Box>
         </DialogContent>
@@ -873,6 +879,9 @@ const QuotePickerModal: React.FC<ModalProps> = ({ isOpen, handleClose, setFreigh
 interface ModalProps {
   isOpen: boolean;
   handleClose: () => void;
-  setFreights: (freights: FreightDetail[]) => void;
-  fetchQuotes: () => [Promise<firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>>, string[]];
+  setBookingRequest:
+    | React.Dispatch<React.SetStateAction<BookingRequest>>
+    | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
+  fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
+  hasContainers?: boolean;
 }
