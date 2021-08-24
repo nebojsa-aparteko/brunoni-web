@@ -53,6 +53,8 @@ export interface BookingRequest {
   itinerary?: BookingRequestItinerary;
   checklistCheckedCount: number;
   checklistItemCount: number;
+  checklistCheckedCountCustomer: number;
+  checklistItemCountCustomer: number;
   pinnedCommentsCount?: number;
   bookingId?: string;
 }
