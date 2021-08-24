@@ -774,9 +774,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     editing={editing}
                     startEditing={() => setEditing(true)}
                   />
-                  <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
-                    <SupervisedUserCircleIcon />
-                  </IconButton>
+                  {isAdmin && (
+                    <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
+                      <SupervisedUserCircleIcon />
+                    </IconButton>
+                  )}
 
                   {isAdmin && (
                     <DropDownMenuWithItems

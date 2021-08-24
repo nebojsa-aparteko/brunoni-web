@@ -155,14 +155,7 @@ const getUpdatedFreightDetails = (
     const d = bookingRequest.freightDetails[index];
     bookingRequest.freightDetails[index] = flow(
       set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
-      set(
-        'Total',
-        d.Anz && d.UnitValue
-          ? ((field === 'Anz' ? parseFloat(value) || 0 : d.Anz) *
-              (field === 'UnitValue' ? parseFloat(value) : d.UnitValue)) /
-              (checkIfPercent(d) ? 100 : 1)
-          : 0.0,
-      ),
+      set('Total', calculateTotal(d)),
     )(d);
   }
   return bookingRequest.freightDetails;
@@ -182,6 +175,11 @@ export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string
   );
 
 const isAgencyCommission = (freightDetail: FreightDetail) => freightDetail.Txt === 'Agency Commission';
+
+export const calculateTotal = (freightDetail: FreightDetail) =>
+  freightDetail.Unit && freightDetail.Unit === '%'
+    ? ((freightDetail.Anz || 0) * (freightDetail.UnitValue || 0)) / 100
+    : (freightDetail.Anz || 0) * (freightDetail.UnitValue || 0);
 
 const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   freightDetail,
@@ -235,7 +233,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   // };
 
   const handleChangeFreightDetails = (value: any | undefined, fieldName: string) => {
-    console.log('VALUE', value, 'fieldName', fieldName);
     bookingRequest &&
       setBookingRequest &&
       compareValues(value, get(fieldName, freightDetail)) &&
@@ -454,7 +451,7 @@ export const generateCommission = (
       : schedule?.ComPercentI
       ? parseFloat(schedule?.ComPercentI)
       : 0
-    : 1;
+    : calculateContainers(containers).TEU || 1;
   const value =
     seaFreightDetails && seaFreightDetails.length > 0 && isPercent
       ? seaFreightTotal || 0
@@ -477,10 +474,7 @@ export const generateCommission = (
         Currency: seaFreightDetails[0].Currency,
         UnitValue: -value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: -(
-          ((quantity || 1) * (isPercent ? 1 : calculateContainers(containers).Total) * (value || 1)) /
-          (isPercent ? 100 : 1)
-        ),
+        Total: -(isPercent ? ((quantity || 1) * (value || 0)) / 100 : (quantity || 1) * (value || 0)),
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -625,7 +619,6 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
-      console.log(temp, result.source.index, destinationIndex, originIndex);
       return set(
         'freightDetails',
         temp.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),

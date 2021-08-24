@@ -23,7 +23,7 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
-import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { calculateTotal, generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
 import { compact, flow, get, isNil, map, omitBy, set, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
@@ -168,7 +168,7 @@ const transformFreightDetails = (
 ): FreightDetail[] =>
   freightDetails?.map((quoteDetail, index) =>
     omitBy(isNil)({
-      Anz: getQuantity(containers, quoteDetail.CostUnit),
+      Anz: getQuantity(containers, quoteDetail.CostUnit) || 1,
       SeqNr: index + 1,
       Txt: quoteDetail.Description,
       Currency: quoteDetail.Currency,
@@ -221,10 +221,10 @@ export const onContainersChange = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
 ) => flow(recalculateQuantity.bind(this, containers), updateFreightDetails.bind(this, containers))(freightDetails);
-const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
+// const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
 const recalculateFreightDetails = (freights: FreightDetail[]) =>
   freights.map(freightDetail => {
-    const total = (freightDetail.UnitValue * freightDetail.Anz) / (checkIfPercent(freightDetail) ? 100 : 1);
+    const total = calculateTotal(freightDetail);
     return set('Total', total)(freightDetail);
   });
 
