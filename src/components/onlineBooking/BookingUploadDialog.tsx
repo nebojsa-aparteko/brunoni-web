@@ -243,7 +243,12 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<Quote | undefined> => {
+interface LatestQuote {
+  quote: Quote | undefined;
+  showWarningMessage: boolean;
+}
+
+export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<LatestQuote> => {
   if (quoteSearchParams.agreementNo) {
     try {
       const quoteByAgreement = await firebase
@@ -252,7 +257,10 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
         .doc(quoteSearchParams.agreementNo)
         .get();
       if (quoteByAgreement.exists) {
-        return normalizeQuote(quoteByAgreement.data() as Quote);
+        return {
+          quote: normalizeQuote(quoteByAgreement.data() as Quote),
+          showWarningMessage: false,
+        };
       }
     } catch (e) {
       console.error('Error fetching quote by Agreement No.');
@@ -279,7 +287,10 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
       q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
     );
   }
-  return quotes[0] || undefined;
+  return {
+    quote: quotes[0] || undefined,
+    showWarningMessage: true,
+  };
 };
 
 export const normalizeQuote = (data: any) => {
@@ -347,7 +358,7 @@ const mapIntoBookingRequestModel = async (
   } as QuoteSearchParams;
 
   // Get the latest quote by origin and dest
-  const quote = await getLatestQuote(quoteSearchParams);
+  const { quote, showWarningMessage } = await getLatestQuote(quoteSearchParams);
   const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
 
   const voyageInfo = getVoyageInfo(schedule);
@@ -371,7 +382,9 @@ const mapIntoBookingRequestModel = async (
     hold: false,
     intraRefNumber,
     origin,
+    quoteNumber: quote?.id,
     schedule,
+    showWarningMessage,
     statusCode: BookingRequestStatusCode.REQUESTED,
     statusText: BookingRequestStatusText.REQUESTED,
     vessel: voyageInfo?.VesselName,
