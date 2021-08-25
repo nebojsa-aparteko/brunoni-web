@@ -770,7 +770,8 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   handleClose,
   setBookingRequest,
   fetchQuotes,
-  hasContainers = true,
+  //todo. Check
+  setContainers = false,
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
@@ -793,7 +794,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
 
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      !hasContainers &&
+      setContainers &&
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
       setBookingRequest((prevState: any) =>
         set(
@@ -803,7 +804,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
       );
       handleClose();
     },
-    [hasContainers, setBookingRequest, handleClose, chargeCodes],
+    [setContainers, setBookingRequest, handleClose, chargeCodes],
   );
 
   return (
@@ -869,8 +870,10 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
                   onClick={async () => {
                     const [snapshot, containers] = await fetchQuotes();
                     let docs = snapshot.docs.map(d => normalize(d.data()) as Quote);
-                    if (hasContainers)
+                    //todo. Check if we should set containers on booking req if containers are defined.
+                    if (!setContainers) {
                       docs = docs.filter(d => d.containers.some(c => containers.includes(c.containerType?.id || '')));
+                    }
                     setFetchedResults(docs);
                   }}
                 >
@@ -893,5 +896,5 @@ interface ModalProps {
     | React.Dispatch<React.SetStateAction<BookingRequest>>
     | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
   fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
-  hasContainers?: boolean;
+  setContainers?: boolean;
 }

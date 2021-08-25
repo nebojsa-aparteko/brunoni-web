@@ -277,7 +277,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         <QuotePickerModal
           isOpen={isOpen}
           handleClose={closeModal}
-          hasContainers={!!bookingRequest?.containers}
+          setContainers={true}
           setBookingRequest={setBookingRequest}
           // @ts-ignore
           fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
