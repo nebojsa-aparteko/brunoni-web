@@ -57,17 +57,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const getQuoteDoc = async (quoteId: string) =>
-  (
-    await firebase
-      .firestore()
-      .collection('quotes')
-      .doc(quoteId)
-      .get()
-  ).data();
+export const getQuoteDocRef = async (quoteId: string) =>
+  await firebase
+    .firestore()
+    .collection('quotes')
+    .doc(quoteId)
+    .get();
 
 const validQuote = async (bookingRequest: BookingRequest) => {
-  const quote = bookingRequest.quoteNumber && (await getQuoteDoc(`${bookingRequest.quoteNumber}`));
+  const quote = bookingRequest.quoteNumber && (await getQuoteDocRef(`${bookingRequest.quoteNumber}`)).data();
   const quoteNormalized = normalizeQuote(quote) as Quote;
 
   const quoteValidityDate = quoteNormalized?.validityPeriod.to ? quoteNormalized?.validityPeriod.to : undefined;

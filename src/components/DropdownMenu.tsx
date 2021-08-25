@@ -28,9 +28,9 @@ export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
         </IconButton>
       </Tooltip>
       <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-        {items.map(item => {
+        {items.map((item, i) => {
           return (
-            <MenuItem onClick={item.onClick}>
+            <MenuItem onClick={item.onClick} key={i}>
               {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
               <ListItemText primary={item.label} />
             </MenuItem>

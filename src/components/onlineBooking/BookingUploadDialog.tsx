@@ -243,7 +243,12 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<Quote | undefined> => {
+interface LatestQuote {
+  quote: Quote | undefined;
+  showWarningMessage: boolean;
+}
+
+export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<LatestQuote> => {
   if (quoteSearchParams.agreementNo) {
     try {
       const quoteByAgreement = await firebase
@@ -252,7 +257,10 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
         .doc(quoteSearchParams.agreementNo)
         .get();
       if (quoteByAgreement.exists) {
-        return normalizeQuote(quoteByAgreement.data() as Quote);
+        return {
+          quote: normalizeQuote(quoteByAgreement.data() as Quote),
+          showWarningMessage: false,
+        };
       }
     } catch (e) {
       console.error('Error fetching quote by Agreement No.');
@@ -272,19 +280,17 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
   if (quoteSearchParams.clientId) {
     query = query.where('clientId', '==', quoteSearchParams.clientId);
   }
-  const quotesRef = await query
-    .orderBy('dateIssued', 'desc')
-    .limit(100)
-    .get();
+  const quotesRef = await query.orderBy('dateIssued', 'desc').get();
   let quotes = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
   if (quoteSearchParams.containers) {
-    quotes = quotes.filter(q => q.containers.length === quoteSearchParams.containers!.length);
     quotes = quotes.filter(q =>
-      q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
+      q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
     );
   }
-
-  return quotes[0] || undefined;
+  return {
+    quote: quotes[0] || undefined,
+    showWarningMessage: true,
+  };
 };
 
 export const normalizeQuote = (data: any) => {
@@ -352,14 +358,14 @@ const mapIntoBookingRequestModel = async (
   } as QuoteSearchParams;
 
   // Get the latest quote by origin and dest
-  const quote = await getLatestQuote(quoteSearchParams);
+  const { quote, showWarningMessage } = await getLatestQuote(quoteSearchParams);
   const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
 
   const voyageInfo = getVoyageInfo(schedule);
 
   const commission = generateCommission(schedule, freightDetails, carrier?.id, containers);
 
-  const bookingRequest = {
+  return {
     agreementNo,
     archived: false,
     carrier,
@@ -376,15 +382,15 @@ const mapIntoBookingRequestModel = async (
     hold: false,
     intraRefNumber,
     origin,
+    quoteNumber: quote?.id,
     schedule,
+    showWarningMessage,
     statusCode: BookingRequestStatusCode.REQUESTED,
     statusText: BookingRequestStatusText.REQUESTED,
     vessel: voyageInfo?.VesselName,
     vgmSubmittedBy,
     voyage: voyageInfo?.VoyageNr,
   } as BookingRequest;
-
-  return bookingRequest;
 };
 
 export const readAndParseFile = (
@@ -409,6 +415,7 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
+      console.log(object);
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
@@ -430,7 +437,7 @@ export const readAndParseFile = (
         pickupLocations,
         chargeCodes,
       );
-
+      console.log(bookingRequest);
       // remove undefined fields
       bookingRequest = omitBy(isNil)(bookingRequest) as BookingRequest;
       setFiles([file]);
