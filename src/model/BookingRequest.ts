@@ -57,6 +57,7 @@ export interface BookingRequest {
   checklistItemCountCustomer: number;
   pinnedCommentsCount?: number;
   bookingId?: string;
+  showWarningMessage?: boolean;
 }
 
 export interface BookingRequestItinerary {

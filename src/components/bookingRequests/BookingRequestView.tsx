@@ -350,6 +350,14 @@ const setChecklistItem = async (bookingReqId: string, itemType: string, checked:
     .set({ checked }, { merge: true });
 };
 
+const setBookingRequestField = async (bookingReqId: string, newFieldValue: any) => {
+  await firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingReqId)
+    .set(newFieldValue, { merge: true });
+};
+
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, isAdmin] = useUser();
   const classes = useStyles();
@@ -363,6 +371,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
+
+  const showWarningMessage = !!bookingRequest.showWarningMessage;
 
   const [agreementNumber, setAgreementNumber] = useState<string>(
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
@@ -655,8 +665,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   const handleFieldsEditActivity = async () => {
     //todo. without freight details for now?... Because it change at beggining
-    const oldObject = diff(omit('freightDetails')(bookingRequestState), omit('freightDetails')(bookingRequest));
-    const newObject = diff(omit('freightDetails')(bookingRequest), omit('freightDetails')(bookingRequestState));
+    const oldObject = diff(omit('updatedAt')(bookingRequestState), omit('updatedAt')(bookingRequest));
+    const newObject = diff(omit('updatedAt')(bookingRequest), omit('updatedAt')(bookingRequestState));
 
     if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
     // console.log('oldObject')
@@ -664,8 +674,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // console.log('new Object')
     // console.log(newObject)
     const changedKeys = keys(newObject);
-    // console.log('changedKeys')
-    // console.log(changedKeys)
+
+    if (changedKeys.includes('freightDetails'))
+      await setBookingRequestField(bookingRequest.id!, { showWarningMessage: false });
+
     const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
     // console.log('changedFields')
     // console.log(changedFields)
@@ -816,7 +828,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               </Box>
             </Box>
             <Grid item xs={12}>
-              <BookingRequestViewMainContent isPrintWithCost={isPrintWithCost} />
+              <BookingRequestViewMainContent
+                isPrintWithCost={isPrintWithCost}
+                showWarningMessage={showWarningMessage}
+              />
             </Grid>
           </Paper>
         </Page>

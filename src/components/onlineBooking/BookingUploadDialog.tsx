@@ -272,18 +272,13 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
   if (quoteSearchParams.clientId) {
     query = query.where('clientId', '==', quoteSearchParams.clientId);
   }
-  const quotesRef = await query
-    .orderBy('dateIssued', 'desc')
-    .limit(100)
-    .get();
+  const quotesRef = await query.orderBy('dateIssued', 'desc').get();
   let quotes = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
   if (quoteSearchParams.containers) {
-    quotes = quotes.filter(q => q.containers.length === quoteSearchParams.containers!.length);
     quotes = quotes.filter(q =>
-      q.containers.filter((c, i) => c.containerType === quoteSearchParams.containers![i].containerType),
+      q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
     );
   }
-
   return quotes[0] || undefined;
 };
 
@@ -359,7 +354,7 @@ const mapIntoBookingRequestModel = async (
 
   const commission = generateCommission(schedule, freightDetails, carrier?.id, containers);
 
-  const bookingRequest = {
+  return {
     agreementNo,
     archived: false,
     carrier,
@@ -383,8 +378,6 @@ const mapIntoBookingRequestModel = async (
     vgmSubmittedBy,
     voyage: voyageInfo?.VoyageNr,
   } as BookingRequest;
-
-  return bookingRequest;
 };
 
 export const readAndParseFile = (
@@ -409,6 +402,7 @@ export const readAndParseFile = (
     try {
       // Parse HTML
       const object = Parse(reader.result as string) as HtmlBookingRequest;
+      console.log(object);
       // throw error of no object
       if (!object) {
         setBookingRequest(undefined);
@@ -430,7 +424,7 @@ export const readAndParseFile = (
         pickupLocations,
         chargeCodes,
       );
-
+      console.log(bookingRequest);
       // remove undefined fields
       bookingRequest = omitBy(isNil)(bookingRequest) as BookingRequest;
       setFiles([file]);

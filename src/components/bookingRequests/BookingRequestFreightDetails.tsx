@@ -28,7 +28,6 @@ import { cloneDeep, flow, get, set, uniq } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
-import Paper from '@material-ui/core/Paper';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import { a11yProps } from '../../pages/BookingsPage';
 import { CarrierId, FreightDetailGroup } from '../../model/Booking';
@@ -63,6 +62,7 @@ import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { calculateContainers, onContainersChange, takeQuoteDetails } from '../onlineBooking/Summary';
 import EditingInput from '../EditingInput';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
+import theme from '../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -500,7 +500,7 @@ export const getRelatedQuotes = async (bookingRequest: BookingRequest) => {
   return [quotesRef, uniq(bookingRequest.containers?.map(d => d.containerType?.id)) as string[]];
 };
 
-const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
+const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWarningMessage }) => {
   const classes = useStyles();
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
@@ -638,11 +638,20 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
   return (
     <Fragment>
       <Grid item xs={12}>
-        <TableContainer component={Paper} className={classes.tableWrapper}>
+        <TableContainer
+          component={Box}
+          className={classes.tableWrapper}
+          style={{ border: showWarningMessage ? '4px solid #ff604f' : '' }}
+        >
+          {showWarningMessage && (
+            <Typography color={'error'} variant={'h4'} style={{ whiteSpace: 'pre-line', padding: theme.spacing(1) }}>
+              {'This is an approximation of freight details. Please check.'}
+            </Typography>
+          )}
           {isDashboardUser(userRecord) && (
             <AppBar
               position="static"
-              style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
+              style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
             >
               <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
                 <Tab label="External" {...a11yProps(0)} />
@@ -751,6 +760,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails }) => {
 
 interface Props {
   freightDetails?: FreightDetail[];
+  showWarningMessage?: boolean;
 }
 
 export default BookingRequestFreightDetails;

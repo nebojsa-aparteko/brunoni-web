@@ -36,7 +36,7 @@ const remark =
   '\n' +
   'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
 
-const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
+const BookingRequestViewMainContent: React.FC<Props> = ({ isPrintWithCost, showWarningMessage }) => {
   const classes = useStyles();
   const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
@@ -73,7 +73,10 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
       <Box marginTop="2em" marginBottom="2em">
         <Divider />
       </Box>
-      <BookingRequestFreightDetails freightDetails={bookingRequestState.freightDetails} />
+      <BookingRequestFreightDetails
+        freightDetails={bookingRequestState.freightDetails}
+        showWarningMessage={showWarningMessage}
+      />
       <Typography variant="body2" className={classes.remark}>
         {remark}
       </Typography>
@@ -83,6 +86,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
 
 interface Props {
   isPrintWithCost: boolean;
+  showWarningMessage?: boolean;
 }
 
 export default BookingRequestViewMainContent;
