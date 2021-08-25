@@ -128,7 +128,6 @@ export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
     // nothing
   }
 };
-const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 
 const isRelevantFreight = (
   freightDetail: FreightDetail,
@@ -155,10 +154,16 @@ const getRelevantFreightDetailsFromQuote = (quoteDetails: QuoteDetail[]) =>
       ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
   );
 
-const findChargeCode = (chargeCodes: ChargeCode[], chargeId?: string) => {
+const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) => {
   if (!chargeId) return undefined;
   const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId);
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
+};
+
+const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string) => {
+  if (!chargeId) return undefined;
+  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId && code.language === 'E');
+  return chargeCode && chargeCode.text;
 };
 
 const transformFreightDetails = (
@@ -170,13 +175,13 @@ const transformFreightDetails = (
     omitBy(isNil)({
       Anz: getQuantity(containers, quoteDetail.CostUnit) || 1,
       SeqNr: index + 1,
-      Txt: quoteDetail.Description,
+      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID),
       Currency: quoteDetail.Currency,
       UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Unit: quoteDetail.CostUnit,
       Group: FreightDetailGroup.EXTERNAL,
       Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-      Internal1: findChargeCode(chargeCodes, quoteDetail.ChargeID),
+      Internal1: findIsChargeCodeInternal(chargeCodes, quoteDetail.ChargeID),
     }),
   ) as FreightDetail[];
 
