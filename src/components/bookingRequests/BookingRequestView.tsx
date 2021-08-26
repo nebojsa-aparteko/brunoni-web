@@ -70,6 +70,7 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import { useHistory } from 'react-router';
 import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
 import CompareWithInitialButton from '../CompareWithInitialButton';
+import CommodityTypes from '../../contexts/CommodityTypes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -364,6 +365,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, isAdmin] = useUser();
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
+  const commodityTypes = useContext(CommodityTypes);
   const { isOpen, openModal, closeModal } = useModal();
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const {
@@ -387,6 +389,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
   const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
 
+  //TODO CHECK IF THERE IS A BETTER OPTION THAN useMemo THAT SUPPORTS ASYNC FUNCTIONS
   useMemo(async () => {
     const fileURL =
       filePath &&
@@ -398,7 +401,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setInitialBookingRequest(
       initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
     );
-  }, [filePath]).then(() => console.log('Successfully fetched the initial booking request'));
+  }, [filePath]).then(() => {});
 
   const tags = useFirestoreCollection(
     'bookings-requests',
@@ -553,6 +556,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       const f = freight?.pop();
       if (!f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+
       try {
         dispatch({ type: 'START_GLOBAL_LOADING' });
         const token = await user.getIdToken();
@@ -567,7 +571,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             'Content-Disposition': 'attachment; filename=test.json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes)),
+          body: JSON.stringify(
+            await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes, commodityTypes),
+          ),
         });
 
         if (response.ok) {
