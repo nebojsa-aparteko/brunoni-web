@@ -68,6 +68,8 @@ import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import { useHistory } from 'react-router';
+import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
+import CompareWithInitialButton from '../CompareWithInitialButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -363,6 +365,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
   const { isOpen, openModal, closeModal } = useModal();
+  const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const {
     isOpen: isOpenAssignmentModal,
     closeModal: closeAssignmentModal,
@@ -380,6 +383,22 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [, dispatch] = useGlobalAppState();
   const history = useHistory();
   const getActivityLogUserData = useActivityLogUserData();
+
+  const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
+  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
+
+  useMemo(async () => {
+    const fileURL =
+      filePath &&
+      (await firebase
+        .storage()
+        .ref(filePath)
+        .getDownloadURL());
+    const initialBookingRequestJson = await fetch(fileURL).then(res => res.json().then(res => JSON.stringify(res)));
+    setInitialBookingRequest(
+      initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
+    );
+  }, [filePath]).then(() => console.log('Successfully fetched the initial booking request'));
 
   const tags = useFirestoreCollection(
     'bookings-requests',
@@ -786,6 +805,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     editing={editing}
                     startEditing={() => setEditing(true)}
                   />
+                  <CompareWithInitialButton onClick={() => setIsComparisonOpen(true)} />
                   {isAdmin && (
                     <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                       <SupervisedUserCircleIcon />
@@ -849,6 +869,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             closeModal();
           }}
           handleClose={closeModal}
+        />
+      )}
+      {isComparisonOpen && bookingRequestState.id && initialBookingRequest && (
+        <BookingRequestComparisonDialog
+          bookingRequestId={bookingRequestState.id}
+          secondBookingRequest={initialBookingRequest}
+          isOpen={isComparisonOpen}
+          handleClose={() => setIsComparisonOpen(false)}
         />
       )}
     </Grid>
