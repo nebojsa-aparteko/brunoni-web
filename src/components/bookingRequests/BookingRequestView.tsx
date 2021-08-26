@@ -389,6 +389,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
   const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
 
+  //TODO CHECK IF THERE IS A BETTER OPTION THAN useMemo THAT SUPPORTS ASYNC FUNCTIONS
   useMemo(async () => {
     const fileURL =
       filePath &&
@@ -400,7 +401,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     setInitialBookingRequest(
       initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
     );
-  }, [filePath]).then(() => console.log('Successfully fetched the initial booking request'));
+  }, [filePath]).then(() => {});
 
   const tags = useFirestoreCollection(
     'bookings-requests',
