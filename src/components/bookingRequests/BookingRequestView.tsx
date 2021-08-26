@@ -712,6 +712,18 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   };
 
+  const getCorrectBackRoute = () => {
+    if (!bookingRequest.archived && !bookingRequest.hold) {
+      return '/bookings?tab=requests';
+    } else if (!bookingRequest.archived && bookingRequest.hold) {
+      return '/bookings?tab=on-hold';
+    } else if (bookingRequest.archived && !bookingRequest.hold) {
+      return '/bookings?tab=archived-requests';
+    } else {
+      return '/bookings';
+    }
+  };
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {/*<Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>*/}
@@ -768,7 +780,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 justifyContent="space-between"
               >
                 <QuoteNav
-                  backTo="/bookings"
+                  backTo={getCorrectBackRoute()}
                   title={`Booking Request - ${getBookingRequestTitle(bookingRequest)}`}
                   subtitle={`File No. ${bookingRequest.id}`}
                 />
