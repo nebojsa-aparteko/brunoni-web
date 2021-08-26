@@ -60,6 +60,7 @@ import safeInvoke from '../../utilities/safeInvoke';
 import ContainerDetails from '../../model/ContainerDetails';
 import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
+import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -312,6 +313,7 @@ const mapIntoBookingRequestModel = async (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
   chargeCodes: ChargeCode[] | undefined,
+  normalize: (...args: any[]) => any,
 ): Promise<BookingRequest> => {
   const createdBy = object.BOOKER_CONTACT_EMAIL
     ? // todo. Could there be duplicates?
@@ -359,7 +361,9 @@ const mapIntoBookingRequestModel = async (
 
   // Get the latest quote by origin and dest
   const { quote, showWarningMessage } = await getLatestQuote(quoteSearchParams);
-  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
+
+  const normalizedQuote = quote && (normalize(quote) as Quote);
+  const freightDetails = normalizedQuote && takeQuoteDetails(normalizedQuote?.quoteDetails, containers, chargeCodes);
 
   const voyageInfo = getVoyageInfo(schedule);
 
@@ -382,7 +386,7 @@ const mapIntoBookingRequestModel = async (
     hold: false,
     intraRefNumber,
     origin,
-    quoteNumber: quote?.id,
+    quoteNumber: normalizedQuote?.id,
     schedule,
     showWarningMessage,
     statusCode: BookingRequestStatusCode.REQUESTED,
@@ -406,6 +410,7 @@ export const readAndParseFile = (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
   chargeCodes: ChargeCode[] | undefined,
+  normalize: (...args: any[]) => any,
 ) => {
   const reader = new FileReader();
   // accepting only single booking 4 now...
@@ -436,6 +441,7 @@ export const readAndParseFile = (
         commodityTypes,
         pickupLocations,
         chargeCodes,
+        normalize,
       );
       console.log(bookingRequest);
       // remove undefined fields
@@ -466,6 +472,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
   const chargeCodes = useContext(ChargeCodes);
+  const normalize = useNormalizeQuote();
 
   const storageBasePath = useMemo((): string => {
     return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
@@ -487,6 +494,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       commodityTypes,
       pickupLocations,
       chargeCodes,
+      normalize,
     );
   };
 

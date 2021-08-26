@@ -293,6 +293,16 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     }
   }, [printRequested]);
 
+  const getCorrectBackRoute = () => {
+    if (!booking.archived && booking.pendingPayment) {
+      return '/bookings?tab=pending-payment';
+    } else if (booking.archived && !booking.pendingPayment) {
+      return '/bookings?tab=archived';
+    } else {
+      return '/bookings';
+    }
+  };
+
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       {normalizedPinnedActivities === undefined && (
@@ -375,7 +385,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 justifyContent="space-between"
               >
                 <QuoteNav
-                  backTo="/bookings"
+                  backTo={getCorrectBackRoute()}
                   title={`Booking - ${getBookingTitle(booking)}`}
                   subtitle={`File No. ${booking.id}`}
                 />
