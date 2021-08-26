@@ -43,6 +43,8 @@ import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -175,7 +177,11 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   );
 
   return (
-    <Fragment>
+    <FirestoreCollectionProvider
+      name="charge-codes"
+      context={ChargeCodes}
+      query={query => query.where('language', '==', 'E')}
+    >
       <Meta title={`Booking Requests`} />
 
       <BookingsFiltersBar filters={filters} setFilters={setFilters} showAssigneeFilter={isAdmin} />
@@ -265,7 +271,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           </Paper>
         )}
       </div>
-    </Fragment>
+    </FirestoreCollectionProvider>
   );
 };
 
