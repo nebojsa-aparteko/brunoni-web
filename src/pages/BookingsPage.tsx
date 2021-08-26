@@ -226,7 +226,6 @@ const BookingsPageContainer: React.FC = () => {
               setFilters(prevState =>
                 flow(
                   set('archived', true),
-                  set('hold', false),
                   set('minStatusCode', BookingRequestStatusCode.CONFIRMED),
                   set('maxStatusCode', undefined),
                 )(prevState),
@@ -280,7 +279,7 @@ const BookingsPageContainer: React.FC = () => {
             setFilters &&
               setFilters(prevState =>
                 flow(
-                  set('clientFilter', actingAs?.company),
+                  set('archived', true),
                   set('minStatusCode', BookingRequestStatusCode.CONFIRMED),
                   set('maxStatusCode', undefined),
                 )(prevState),
