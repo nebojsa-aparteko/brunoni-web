@@ -10,6 +10,7 @@ import { getRepresentationFromClient } from '../components/bookingRequests/Booki
 import { formatDateSafe } from './formattingHelpers';
 import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
 import IMO from '../model/IMO';
+import CommodityType from '../model/CommodityType';
 
 const getTariffs = (container: Container & ContainerDetails) => {
   const tariffs = [];
@@ -56,7 +57,11 @@ const fetchClientByAlphacomId = async (alphacomId: string) =>
     .doc(alphacomId)
     .get();
 
-export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undefined) => {
+export default async (
+  request: BookingRequest,
+  chargeCodes: ChargeCode[] | undefined,
+  commodityTypes: CommodityType[] | undefined,
+) => {
   const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str => str.trim()) || [
     undefined,
     undefined,
@@ -193,7 +198,10 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
               ItemNo: index + 1,
               CtrQuantity: value.quantity,
               CtypID: value.containerType?.id,
-              CommodityID: value.commodityType?.id === value.commodityType?.name ? null : value.commodityType?.id,
+              CommodityID:
+                commodityTypes && commodityTypes.some(commodity => commodity.id === value.commodityType?.id)
+                  ? value.commodityType?.id
+                  : null,
               CommodityTXT:
                 value.commodityType?.name && value.commodityType?.name !== ''
                   ? value.commodityType?.name
