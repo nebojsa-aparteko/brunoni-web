@@ -67,7 +67,6 @@ import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
-import { useHistory } from 'react-router';
 import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
 import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
@@ -383,7 +382,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
   );
   const [, dispatch] = useGlobalAppState();
-  const history = useHistory();
   const getActivityLogUserData = useActivityLogUserData();
 
   const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
@@ -582,11 +580,13 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             await onBookingCreate(body.FileID);
             await timeout(1000);
             if (await urlExists(`/bookings/${body.FileID}`)) {
-              history.push(`/bookings/${body.FileID}`);
+              const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
+              win && win.focus();
             } else {
-              await timeout(2000);
+              await timeout(4000);
               if (await urlExists(`/bookings/${body.FileID}`)) {
-                history.push(`/bookings/${body.FileID}`);
+                const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
+                win && win.focus();
               } else {
                 dispatch({
                   type: 'SHOW_SUCCESS_SNACKBAR',
@@ -597,6 +597,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               }
             }
           } else {
+            dispatch({
+              type: 'SHOW_ERROR_SNACKBAR',
+              message: 'Unable to create booking',
+            });
             console.log('No booking ID received, unable to redirect');
           }
         } else {
