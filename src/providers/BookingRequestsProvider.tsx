@@ -40,8 +40,10 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
     () => (collection: firebase.firestore.Query) => {
       setIsLoading(true);
       let query = collection;
-      query = query.where('archived', '==', filters.archived);
       query = query.where('hold', '==', filters.hold);
+      if (filters.archived !== undefined) {
+        query = query.where('archived', '==', filters.archived);
+      }
       if (filters.minStatusCode) {
         query = query.where('statusCode', '>=', filters.minStatusCode.valueOf());
       }

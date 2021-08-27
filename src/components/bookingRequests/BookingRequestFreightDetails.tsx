@@ -63,6 +63,7 @@ import { calculateContainers, onContainersChange, takeQuoteDetails } from '../on
 import EditingInput from '../EditingInput';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import theme from '../../theme';
+import CurrencyInput from '../inputs/CurrencyInput';
 import { useFormContext } from 'react-hook-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -197,7 +198,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     [freightDetail, selectedTab],
   );
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
-  const [currency, setCurrency] = useState<string | undefined>(freightDetail.Currency);
   const [unitValue, setUnitValue] = useState<number | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
   const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
@@ -218,7 +218,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
 
   useEffect(() => {
     setQuantity(freightDetail.Anz);
-    setCurrency(freightDetail.Currency);
     setUnitValue(freightDetail.UnitValue);
     setCostUnit(freightDetail.Unit);
     setChargeCodeText(freightDetail.Txt);
@@ -335,14 +334,10 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
             </TableCell>
             <TableCell align="right">
               {editing && isDashboardUser(userRecord) ? (
-                <TextField
-                  label=""
+                <CurrencyInput
+                  value={freightDetail.Currency || ''}
+                  onChange={value => handleChangeFreightDetails(value, 'Currency')}
                   margin="dense"
-                  variant="outlined"
-                  fullWidth
-                  value={currency || ''}
-                  onChange={event => setCurrency(event.target.value)}
-                  onBlur={event => handleChangeFreightDetails(event.target.value, 'Currency')}
                 />
               ) : (
                 freightDetail.Currency
