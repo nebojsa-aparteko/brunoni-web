@@ -35,6 +35,7 @@ import ContainerDetails from '../../model/ContainerDetails';
 import Ctg from '../../model/Container';
 import ChargeCode from '../../model/ChargeCode';
 import ChargeCodes from '../../contexts/ChargeCodes';
+import { useClientById } from '../../hooks/useClient';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -254,6 +255,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const [, userRecord] = useUser();
   const [, dispatch] = useGlobalAppState();
   const chargeCodes = useContext(ChargeCodes);
+  const client = useClientById(userRecord.alphacomClientId);
 
   const activityLogUserData = useActivityLogUserData();
   const storageBasePath = useMemo(
@@ -276,6 +278,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       ...bookingRequest,
       createdAt: new Date(),
       createdBy: activityLogUserData,
+      client,
       statusCode: BookingRequestStatusCode.REQUESTED,
       statusText: BookingRequestStatusText.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
