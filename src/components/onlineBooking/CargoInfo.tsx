@@ -78,7 +78,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
       omitBy(isNil)({
         ...bookingRequest,
         containers: writableContainers,
-        freightDetails: containers && containers.length !== 0 ? bookingRequest?.freightDetails : null,
+        freightDetails: writableContainers.length === 0 ? null : bookingRequest?.freightDetails,
         imo: checkRequestForIMO(containers) || undefined,
         soc: checkRequestForSOC(containers) || undefined,
       }) as BookingRequest,

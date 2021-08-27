@@ -89,7 +89,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         customerReference: data.customerReference,
         client,
         schedule: schedule,
-        quoteDetails: quote?.quoteDetails,
+        quoteDetails: quote?.quoteDetails || bookingRequest?.quoteDetails,
       }) as BookingRequest,
     );
   };
@@ -102,9 +102,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
 
   const shouldGetQuote = (data: OnlineBookingInputs): boolean => {
     return (
-      !!data.quoteNumber &&
-      data.quoteNumber !== '' &&
-      ((!bookingRequest?.containers && bookingRequest?.containers?.length !== 0) || !bookingRequest.freightDetails)
+      !!data.quoteNumber && data.quoteNumber !== '' && data.quoteNumber !== bookingRequest?.quoteNumber?.toString()
     );
   };
 
@@ -113,11 +111,9 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     if (quoteRef.exists) {
       const normalizedQuote = normalize(quoteRef.data()) as Quote;
       setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) => set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest));
       setBookingRequest((prevState: any) =>
-        set(
-          'freightDetails',
-          takeQuoteDetails(normalizedQuote?.quoteDetails!, [], chargeCodes),
-        )(prevState as BookingRequest),
+        set('quoteDetails', normalizedQuote.quoteDetails)(prevState as BookingRequest),
       );
     }
   };
@@ -277,7 +273,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         <QuotePickerModal
           isOpen={isOpen}
           handleClose={closeModal}
-          setContainers={true}
+          onlineBooking={true}
           setBookingRequest={setBookingRequest}
           // @ts-ignore
           fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
