@@ -29,16 +29,15 @@ import useModal from '../../hooks/useModal';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRequestFreightDetails';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
-import { takeQuoteDetails } from './Summary';
-import ChargeCodes from '../../contexts/ChargeCodes';
+import useUser from '../../hooks/useUser';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
-  const client = useClientById(quote?.clientId);
+  const [, userRecord] = useUser();
+  const client = useClientById(quote?.clientId || userRecord.alphacomClientId);
   const { isOpen, closeModal, openModal } = useModal();
-  const chargeCodes = useContext(ChargeCodes);
   const normalize = useNormalizeQuote();
 
   const scheduleCarrier = useMemo(
