@@ -333,11 +333,6 @@ function timeout(delay: number) {
   return new Promise(res => setTimeout(res, delay));
 }
 
-async function urlExists(url: string) {
-  const result = await fetch(url, { method: 'HEAD' });
-  return result.ok;
-}
-
 const setChecked = async (bookingReqId: string, itemType: string, checked: boolean) => {
   await setChecklistItem(bookingReqId, itemType, checked);
 };
@@ -578,13 +573,27 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           const body = await response.json();
           if (body.FileID) {
             await onBookingCreate(body.FileID);
-            await timeout(1000);
-            if (await urlExists(`/bookings/${body.FileID}`)) {
+            await timeout(2000);
+            let bookingData = (
+              await firebase
+                .firestore()
+                .collection('bookings')
+                .doc(body.FileID)
+                .get()
+            ).data();
+            if (bookingData) {
               const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
               win && win.focus();
             } else {
-              await timeout(4000);
-              if (await urlExists(`/bookings/${body.FileID}`)) {
+              await timeout(5000);
+              bookingData = (
+                await firebase
+                  .firestore()
+                  .collection('bookings')
+                  .doc(body.FileID)
+                  .get()
+              ).data();
+              if (bookingData) {
                 const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
                 win && win.focus();
               } else {
