@@ -64,6 +64,7 @@ import EditingInput from '../EditingInput';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import theme from '../../theme';
 import CurrencyInput from '../inputs/CurrencyInput';
+import { useFormContext } from 'react-hook-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -473,7 +474,6 @@ export const generateCommission = (
 
 export const getRelatedQuotes = async (bookingRequest: BookingRequest) => {
   let query = (await firebase.firestore().collection('quotes')) as firebase.firestore.Query;
-  console.log(bookingRequest);
   if (bookingRequest.carrier?.name) {
     query = query.where('carrier', '==', bookingRequest.carrier?.name);
   }
@@ -766,7 +766,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   setBookingRequest,
   fetchQuotes,
   //todo. Check
-  setContainers = false,
+  isOnlineBookingProcess = false,
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
@@ -775,6 +775,8 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   const chargeCodes = useContext(ChargeCodes);
 
   const normalize = useNormalizeQuote();
+
+  const { setValue } = useFormContext();
 
   const handleQuoteSearch = useCallback(() => {
     firebase
@@ -789,17 +791,24 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
 
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      setContainers &&
+      if (isOnlineBookingProcess) {
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
-      setBookingRequest((prevState: any) =>
-        set(
-          'freightDetails',
-          takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes),
-        )(prevState as BookingRequest),
-      );
+        setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
+        setBookingRequest((prevState: any) =>
+          set('quoteDetails', searchResult.quoteDetails)(prevState as BookingRequest),
+        );
+        setValue('quoteNumber', searchResult.id);
+      } else {
+        setBookingRequest((prevState: any) =>
+          set(
+            'freightDetails',
+            takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes),
+          )(prevState as BookingRequest),
+        );
+      }
       handleClose();
     },
-    [setContainers, setBookingRequest, handleClose, chargeCodes],
+    [isOnlineBookingProcess, setBookingRequest, handleClose, setValue, chargeCodes],
   );
 
   return (
@@ -866,7 +875,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
                     const [snapshot, containers] = await fetchQuotes();
                     let docs = snapshot.docs.map(d => normalize(d.data()) as Quote);
                     //todo. Check if we should set containers on booking req if containers are defined.
-                    if (!setContainers) {
+                    if (!isOnlineBookingProcess) {
                       docs = docs.filter(d => d.containers.some(c => containers.includes(c.containerType?.id || '')));
                     }
                     setFetchedResults(docs);
@@ -891,5 +900,5 @@ interface ModalProps {
     | React.Dispatch<React.SetStateAction<BookingRequest>>
     | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
   fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
-  setContainers?: boolean;
+  isOnlineBookingProcess?: boolean;
 }

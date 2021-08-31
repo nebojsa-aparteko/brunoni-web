@@ -678,21 +678,19 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   }
                 />
               )}
-              {editing && (
-                <TableRowData
-                  label={BookingRequestLabels.customerReference}
-                  content={
-                    <EditingInput
-                      editing={editing}
-                      value={bookingRequest.customerReference}
-                      inputProps={{
-                        onChange: event => handleChangeBRField('customerReference', event.target.value),
-                        className: classes.blNumberInput,
-                      }}
-                    />
-                  }
-                />
-              )}
+              <TableRowData
+                label={BookingRequestLabels.customerReference}
+                content={
+                  <EditingInput
+                    editing={editing}
+                    value={bookingRequest.customerReference}
+                    inputProps={{
+                      onChange: event => handleChangeBRField('customerReference', event.target.value),
+                      className: classes.blNumberInput,
+                    }}
+                  />
+                }
+              />
               {bookingRequest.quoteNumber && (
                 <TableRowData
                   label={'Quote Reference'}
