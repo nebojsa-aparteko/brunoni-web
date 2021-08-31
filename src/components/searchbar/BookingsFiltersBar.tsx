@@ -21,6 +21,7 @@ import Tags from '../../contexts/Tags';
 import { Tag } from '../../model/Tag';
 import ExistingTagsMultiInput from '../inputs/ExistingTagsMultiInput';
 import asArray from '../../utilities/asArray';
+import ActingAs from '../../contexts/ActingAs';
 
 interface Props {
   filters: any;
@@ -45,9 +46,11 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const carriers = useContext(Carriers);
   const tags = useContext(Tags);
   const user = useUser()[1];
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const availableCarriers = useMemo(
-    () => (user ? carriers?.filter(carrier => user.carriers?.includes(carrier.id)) : []),
+    () => (isAdmin ? (user ? carriers?.filter(carrier => user.carriers?.includes(carrier.id)) : []) : carriers),
     [user, carriers],
   );
 
