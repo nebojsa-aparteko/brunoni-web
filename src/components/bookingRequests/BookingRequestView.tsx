@@ -543,9 +543,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // if not choose between eur and usd
     const freight = bookingRequestState?.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
 
-    if (freight && freight.length > 0) {
+    if (bookingRequestState.leadingCurrency || (freight && freight.length > 0)) {
       const f = freight?.pop();
-      if (!f?.Currency) return openModal();
+      if (!bookingRequestState.leadingCurrency && !f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
 
       try {
