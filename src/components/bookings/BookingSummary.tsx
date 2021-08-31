@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment } from 'react';
 import { Grid, makeStyles, Paper, Table, TableCell, TableRow, Typography } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { Booking } from '../../model/Booking';
@@ -6,6 +6,7 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import UserRecord from '../../model/UserRecord';
 import { useClientById } from '../../hooks/useClient';
+import Client from '../../model/Client';
 
 interface Props {
   booking: Booking;
@@ -119,23 +120,42 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
     </TableRow>
   );
 };
+
+interface ClientInfoProps {
+  client: Client | undefined;
+  forwAdrName?: string;
+  forwAdrCity?: string;
+  forwAdrId?: string;
+  forwarderPersTxt: string | null;
+  forwarder?: UserRecord | null;
+  bkgRef: string;
+}
+
+const ClientInfo: React.FC<ClientInfoProps> = ({
+  client,
+  forwAdrName,
+  forwAdrCity,
+  forwAdrId,
+  forwarderPersTxt,
+  bkgRef,
+  forwarder,
+}) => (
+  <Fragment>
+    {!client ? (
+      `${forwAdrName || ''} ${forwAdrCity} (${forwAdrId})`
+    ) : (
+      <Fragment>
+        {client.name}, {client.city}
+        <ClientDetails forwarder={forwarder} forwarderText={forwarderPersTxt} bkgRef={bkgRef} />
+      </Fragment>
+    )}
+  </Fragment>
+);
+
 const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
   const classes = useStyles();
   const client = useClientById(booking.ForwAdrId);
   const forwarder = useUserByAlphacomId(booking.ForwPersID);
-  const clientInfo = useMemo(() => {
-    console.log(forwarder);
-    if (!client) {
-      return `${booking.ForwAdrName || ''} ${booking.ForwAdrCity} (${booking.ForwAdrId})`;
-    }
-
-    return (
-      <Fragment>
-        {client.name}, {client.city}
-        <ClientDetails forwarder={forwarder} forwarderText={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
-      </Fragment>
-    );
-  }, [client, booking, forwarder]);
 
   return (
     <Grid container spacing={1} style={{ paddingTop: '0px', margin: '4px' }}>
@@ -216,7 +236,17 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
             </TableRow>
             <TableRow className={classes.tableRow}>
               <TableCell className={classes.tableCellLabel}>Client</TableCell>
-              <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
+              <TableCell className={classes.tableCell}>
+                <ClientInfo
+                  client={client}
+                  forwAdrCity={booking.ForwAdrCity}
+                  forwAdrId={booking.ForwAdrId}
+                  forwAdrName={booking.ForwAdrName}
+                  forwarderPersTxt={booking.ForwarderPersTxt}
+                  forwarder={forwarder}
+                  bkgRef={booking['Cust-BkgRef']}
+                />
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
