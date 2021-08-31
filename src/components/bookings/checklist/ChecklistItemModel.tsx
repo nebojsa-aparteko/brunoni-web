@@ -16,6 +16,13 @@ export interface ChecklistItemValueDocument extends DocumentValue {
   final?: boolean;
   isSelectedForComparison?: boolean;
   checklistId?: string;
+  documentType?: DocumentType;
+}
+
+export enum DocumentType {
+  IMO = 'IMO',
+  SOC = 'SOC',
+  ADDITIONAL_DOCUMENTS = 'ADDITIONAL_DOCUMENTS',
 }
 
 export enum ChecklistItemValueDocumentStatusType {

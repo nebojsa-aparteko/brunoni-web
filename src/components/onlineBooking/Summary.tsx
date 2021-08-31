@@ -9,7 +9,7 @@ import React, { Fragment, useContext, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistItemValueDocument, DocumentType } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
@@ -314,12 +314,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
         )
           .then(async docReference => {
             try {
-              const documents = (await saveFiles([
-                ...files.additional,
-                ...files.certificate,
-                ...files.imo,
-              ])) as ChecklistItemValueDocument[];
-              const values = documents.map(
+              const additional = (await saveFiles(files.additional)) as ChecklistItemValueDocument[];
+              const certificate = (await saveFiles(files.certificate)) as ChecklistItemValueDocument[];
+              const imo = (await saveFiles(files.imo)) as ChecklistItemValueDocument[];
+
+              const additionalValues = additional.map(
                 item =>
                   ({
                     uploadedBy: userRecord,
@@ -328,8 +327,34 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     url: item.url,
                     storedName: item.storedName,
                     isInternal: false,
+                    documentType: DocumentType.ADDITIONAL_DOCUMENTS,
                   } as ChecklistItemValueDocument),
               );
+              const certificateValues = certificate.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.SOC,
+                  } as ChecklistItemValueDocument),
+              );
+              const IMOValues = imo.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.IMO,
+                  } as ChecklistItemValueDocument),
+              );
+              const values = [...additionalValues, ...certificateValues, ...IMOValues];
               await Promise.all(values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)));
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
