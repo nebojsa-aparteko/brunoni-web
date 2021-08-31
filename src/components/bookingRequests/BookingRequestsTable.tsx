@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -37,9 +37,8 @@ import { getVoyageInfo } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import { Tag, TagCategory } from '../../model/Tag';
 import ActingAs from '../../contexts/ActingAs';
+import Tags from '../../contexts/Tags';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -228,23 +227,22 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
+  const availableTags = useContext(Tags);
+  const [tags, setTags] = useState(
+    availableTags &&
+      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+  );
+
   const [, userRecord] = useUser();
 
-  const tags = useFirestoreCollection(
-    'bookings-requests',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    bookingRequest.id,
-    'tags-booking-request',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+  useEffect(
+    () =>
+      setTags(
+        availableTags &&
+          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, bookingRequest.assignedTags],
+  );
 
   const handleRowClick = useCallback(
     (id: string) => {

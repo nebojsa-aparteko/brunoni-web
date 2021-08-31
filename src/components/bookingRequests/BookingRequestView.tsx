@@ -60,8 +60,7 @@ import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import TagsList from '../tags/TagsList';
-import { Tag, TagCategory } from '../../model/Tag';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { TagCategory } from '../../model/Tag';
 import { diff } from 'deep-object-diff';
 import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
@@ -70,6 +69,7 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
 import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
+import Tags from '../../contexts/Tags';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -360,6 +360,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
   const commodityTypes = useContext(CommodityTypes);
+  const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const {
@@ -369,6 +370,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [tags, setTags] = useState(
+    availableTags &&
+      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+  );
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
 
   const showWarningMessage = !!bookingRequest.showWarningMessage;
@@ -396,21 +401,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     );
   }, [filePath]).then(() => {});
 
-  const tags = useFirestoreCollection(
-    'bookings-requests',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING_REQUEST);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    bookingRequest.id,
-    'tags-booking-request',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+  useEffect(
+    () =>
+      setTags(
+        availableTags &&
+          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, bookingRequest.assignedTags],
+  );
 
   const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]);
 

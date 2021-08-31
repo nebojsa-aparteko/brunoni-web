@@ -58,6 +58,7 @@ export interface BookingRequest {
   pinnedCommentsCount?: number;
   bookingId?: string;
   showWarningMessage?: boolean;
+  assignedTags?: string[];
 }
 
 export interface BookingRequestItinerary {
