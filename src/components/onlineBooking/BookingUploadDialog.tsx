@@ -558,7 +558,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropZoneArea
               handleOnDrop={handleOnDrop}
               handleOnDelete={handleOnDelete}
-              filesLimit={100}
+              filesLimit={1}
               acceptedExtensions={['.html']}
               showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}

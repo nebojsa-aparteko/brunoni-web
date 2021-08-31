@@ -62,7 +62,7 @@ const AdditionalInfo: React.FC<Props> = ({
             <Grid item>
               <DropZoneArea
                 dropzoneClass={classes.dialogBody}
-                filesLimit={1}
+                filesLimit={10}
                 initialFiles={files.certificate}
                 handleOnDrop={file =>
                   setFiles(prevFiles => ({
