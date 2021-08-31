@@ -36,6 +36,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
   const [, userRecord] = useUser();
+  //todo. Check if logic is correct for client determination
   const client = useClientById(quote?.clientId || userRecord.alphacomClientId);
   const { isOpen, closeModal, openModal } = useModal();
   const normalize = useNormalizeQuote();
@@ -272,7 +273,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         <QuotePickerModal
           isOpen={isOpen}
           handleClose={closeModal}
-          onlineBooking={true}
+          isOnlineBookingProcess={true}
           setBookingRequest={setBookingRequest}
           // @ts-ignore
           fetchQuotes={() => getRelatedQuotes(bookingRequest!)}

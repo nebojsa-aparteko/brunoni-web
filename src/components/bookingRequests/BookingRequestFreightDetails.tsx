@@ -510,8 +510,6 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
 
   const containers = useMemo(() => calculateContainers(bookingRequest?.containers), [bookingRequest?.containers]);
 
-  console.log(bookingRequest);
-
   useEffect(() => {
     setBookingRequest(prevState =>
       prevState.freightDetails
@@ -768,7 +766,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   setBookingRequest,
   fetchQuotes,
   //todo. Check
-  onlineBooking = false,
+  isOnlineBookingProcess = false,
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
@@ -793,7 +791,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
 
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
-      if (onlineBooking) {
+      if (isOnlineBookingProcess) {
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
         setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
         setBookingRequest((prevState: any) =>
@@ -810,7 +808,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
       }
       handleClose();
     },
-    [onlineBooking, setBookingRequest, handleClose, setValue, chargeCodes],
+    [isOnlineBookingProcess, setBookingRequest, handleClose, setValue, chargeCodes],
   );
 
   return (
@@ -877,7 +875,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
                     const [snapshot, containers] = await fetchQuotes();
                     let docs = snapshot.docs.map(d => normalize(d.data()) as Quote);
                     //todo. Check if we should set containers on booking req if containers are defined.
-                    if (!onlineBooking) {
+                    if (!isOnlineBookingProcess) {
                       docs = docs.filter(d => d.containers.some(c => containers.includes(c.containerType?.id || '')));
                     }
                     setFetchedResults(docs);
@@ -902,5 +900,5 @@ interface ModalProps {
     | React.Dispatch<React.SetStateAction<BookingRequest>>
     | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
   fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
-  onlineBooking?: boolean;
+  isOnlineBookingProcess?: boolean;
 }
