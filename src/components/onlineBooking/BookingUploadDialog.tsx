@@ -371,7 +371,6 @@ const mapIntoBookingRequestModel = async (
 
   return {
     agreementNo,
-    archived: false,
     carrier,
     client,
     containers,
