@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
   Box,
@@ -32,9 +32,8 @@ import { DateFormats, formatDateSafe, formatDistanceToNowConfigured } from '../.
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import { Tag, TagCategory } from '../../model/Tag';
 import TagsPreviewList from '../tags/TagsPreviewList';
+import Tags from '../../contexts/Tags';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -195,6 +194,11 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   const classes = useStyles();
 
   const history = useHistory();
+  const availableTags = useContext(Tags);
+  const [tags, setTags] = useState(
+    availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+  );
+
   const handleRowClick = useCallback(
     (id: string) => {
       if (!preventDefaultClick) {
@@ -231,27 +235,21 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
     }),
   )(Box);
 
-  const tags = useFirestoreCollection(
-    'bookings',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    booking.id,
-    'tags-booking',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+  useEffect(
+    () =>
+      setTags(
+        availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, booking.assignedTags],
+  );
 
   return (
     <StyledTableRow tabIndex={-1} onClick={() => handleRowClick(booking.id)}>
-      <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
-        <TagsPreviewList tags={tags} />
-      </Box>
+      {tags && (
+        <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
+          <TagsPreviewList tags={tags} />
+        </Box>
+      )}
       <Grid container spacing={2} style={{ paddingTop: '10px' }}>
         <Grid item lg={12} xs={12}>
           {booking && booking['ERP-BkgRef'] ? (

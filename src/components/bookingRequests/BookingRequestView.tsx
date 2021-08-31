@@ -60,8 +60,7 @@ import useActivities from '../../hooks/useActivities';
 import PinnedActivities from '../bookings/PinnedActivities';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import TagsList from '../tags/TagsList';
-import { Tag, TagCategory } from '../../model/Tag';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import { TagCategory } from '../../model/Tag';
 import { diff } from 'deep-object-diff';
 import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
@@ -70,6 +69,7 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
 import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
+import Tags from '../../contexts/Tags';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -333,11 +333,6 @@ function timeout(delay: number) {
   return new Promise(res => setTimeout(res, delay));
 }
 
-async function urlExists(url: string) {
-  const result = await fetch(url, { method: 'HEAD' });
-  return result.ok;
-}
-
 const setChecked = async (bookingReqId: string, itemType: string, checked: boolean) => {
   await setChecklistItem(bookingReqId, itemType, checked);
 };
@@ -365,6 +360,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const classes = useStyles();
   const chargeCodes = useContext(ChargeCodes);
   const commodityTypes = useContext(CommodityTypes);
+  const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const {
@@ -374,6 +370,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   } = useModal();
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
+  const [tags, setTags] = useState(
+    availableTags &&
+      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+  );
   const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
 
   const showWarningMessage = !!bookingRequest.showWarningMessage;
@@ -401,21 +401,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     );
   }, [filePath]).then(() => {});
 
-  const tags = useFirestoreCollection(
-    'bookings-requests',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING_REQUEST);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    bookingRequest.id,
-    'tags-booking-request',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+  useEffect(
+    () =>
+      setTags(
+        availableTags &&
+          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, bookingRequest.assignedTags],
+  );
 
   const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]);
 
@@ -550,9 +543,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     // if not choose between eur and usd
     const freight = bookingRequestState?.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
 
-    if (freight && freight.length > 0) {
+    if (bookingRequestState.leadingCurrency || (freight && freight.length > 0)) {
       const f = freight?.pop();
-      if (!f?.Currency) return openModal();
+      if (!bookingRequestState.leadingCurrency && !f?.Currency) return openModal();
       setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
 
       try {
@@ -578,13 +571,27 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           const body = await response.json();
           if (body.FileID) {
             await onBookingCreate(body.FileID);
-            await timeout(1000);
-            if (await urlExists(`/bookings/${body.FileID}`)) {
+            await timeout(2000);
+            let bookingData = (
+              await firebase
+                .firestore()
+                .collection('bookings')
+                .doc(body.FileID)
+                .get()
+            ).data();
+            if (bookingData) {
               const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
               win && win.focus();
             } else {
-              await timeout(4000);
-              if (await urlExists(`/bookings/${body.FileID}`)) {
+              await timeout(5000);
+              bookingData = (
+                await firebase
+                  .firestore()
+                  .collection('bookings')
+                  .doc(body.FileID)
+                  .get()
+              ).data();
+              if (bookingData) {
                 const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
                 win && win.focus();
               } else {

@@ -62,6 +62,7 @@ export interface Booking {
   watchers: UserRecordMin[];
   assignedUser: UserRecordMin;
   assignedCustomerUser: UserRecordMin;
+  assignedTags?: string[];
 }
 
 export interface CheckListData {

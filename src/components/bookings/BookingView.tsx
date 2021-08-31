@@ -49,8 +49,9 @@ import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
 import TagsList from '../tags/TagsList';
-import { Tag, TagCategory } from '../../model/Tag';
+import { TagCategory } from '../../model/Tag';
 import PromoBox from '../PromoBox';
+import Tags from '../../contexts/Tags';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -153,6 +154,7 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
     );
 
 const BookingView: React.FC<Props> = ({ booking }) => {
+  const availableTags = useContext(Tags);
   const actingAs = useContext(ActingAs)[0];
   const isAdmin = !actingAs;
   const classes = useStyles();
@@ -162,24 +164,21 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
+  const [tags, setTags] = useState(
+    availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+  );
   const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
-  const tags = useFirestoreCollection(
-    'bookings',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    booking.id,
-    'tags-booking',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+
+  useEffect(
+    () =>
+      setTags(
+        availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, booking.assignedTags],
+  );
+
   const pinnedActivities = useFirestoreCollection(
     'bookings',
     useCallback(
