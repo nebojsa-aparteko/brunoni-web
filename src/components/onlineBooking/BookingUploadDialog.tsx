@@ -508,7 +508,11 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest({ ...bookingRequest, itinerary: getItineraryFromSchedule(bookingRequest?.schedule) })
+        createRequest({
+          ...bookingRequest,
+          assignedUser: null,
+          itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
+        })
           .then(async docReference => {
             // Save HTML file to storage
             try {

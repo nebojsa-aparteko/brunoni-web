@@ -464,7 +464,7 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-export const userRepresentation = (user: UserRecordMin | undefined) => {
+export const userRepresentation = (user: UserRecordMin | undefined | null) => {
   return (
     <React.Fragment>
       {user && user.alphacomId ? (

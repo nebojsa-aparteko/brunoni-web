@@ -88,7 +88,7 @@ export const getBookingRequestId = async () => {
 };
 
 export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
-  if (!schedule) return undefined;
+  if (!schedule) return null;
   if (schedule.IntermediatePortInfos.length === 0) {
     // pol - pod
     return { portOfLoading: schedule.OriginInfo, portOfDischarge: schedule.DestinationInfo };
@@ -279,7 +279,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       bookingRequest?.carrier?.id,
       bookingRequest?.containers,
     );
-    const writableRequest = {
+    let writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
       createdBy: activityLogUserData,
@@ -293,6 +293,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
+    // Setting assignedUser: null for filtering purposes
+    writableRequest = {
+      ...writableRequest,
+      assignedUser: null,
+    } as BookingRequest;
     setBookingRequest(
       update(
         'containers',

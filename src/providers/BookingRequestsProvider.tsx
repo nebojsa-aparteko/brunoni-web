@@ -41,6 +41,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       setIsLoading(true);
       let query = collection;
       query = query.where('hold', '==', filters.hold);
+      if (filters.assignee?.alphacomId) {
+        query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
+      }
       if (filters.minStatusCode) {
         query = query.where('statusCode', '>=', filters.minStatusCode.valueOf());
       }
@@ -59,13 +62,13 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.destinationPort) {
         query = query.where('destination.id', '==', filters.destinationPort.id);
       }
-      if (filters.assignee?.alphacomId) {
-        query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
-      }
       if (filters.assignedTags && filters.assignedTags.length > 0) {
         query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
       }
-      return query.orderBy('statusCode', 'desc').orderBy('createdAt', 'desc');
+      return query
+        .orderBy('statusCode', 'desc')
+        .orderBy('assignedUser', 'asc')
+        .orderBy('itinerary.portOfLoading.DepartureDate', 'desc');
     },
     [filters],
   );

@@ -43,13 +43,13 @@ export interface BookingRequest {
   statusCode: BookingRequestStatusCode;
   statusText: BookingRequestStatusText;
   schedule?: RouteSearchResult;
-  assignedUser?: UserRecordMin;
+  assignedUser?: UserRecordMin | null;
   statClient?: Client | null;
   vgmSubmittedBy?: VGMSubmittedBy;
   hold: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
-  itinerary?: BookingRequestItinerary;
+  itinerary?: BookingRequestItinerary | null;
   checklistCheckedCount: number;
   checklistItemCount: number;
   checklistCheckedCountCustomer: number;
