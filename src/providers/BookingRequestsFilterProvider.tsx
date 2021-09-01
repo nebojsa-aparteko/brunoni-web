@@ -12,7 +12,6 @@ interface BookingRequestContextFilters extends ContextFilters {
 
 const BOOKING_REQUESTS_FILTERS_INITIAL_STATE = {
   hold: false,
-  archived: false,
   carrier: undefined,
 } as BookingContextFilters;
 

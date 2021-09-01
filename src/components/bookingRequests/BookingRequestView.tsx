@@ -479,7 +479,20 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         .firestore()
         .collection('bookings-requests')
         .doc(bookingRequest?.id)
-        .update('archived', !bookingRequest.archived),
+        .update(
+          'statusCode',
+          bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
+            ? bookingRequest.assignedUser
+              ? BookingRequestStatusCode.IN_PROGRESS
+              : BookingRequestStatusCode.REQUESTED
+            : BookingRequestStatusCode.ARCHIVED,
+          'statusText',
+          bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
+            ? bookingRequest.assignedUser
+              ? BookingRequestStatusText.IN_PROGRESS
+              : BookingRequestStatusText.REQUESTED
+            : BookingRequestStatusText.ARCHIVED,
+        ),
     [bookingRequest],
   );
 
@@ -638,7 +651,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         'bookings-requests',
         bookingRequest.id!,
         createActivityObject({
-          changeType: !bookingRequest.archived ? ActivityChangeType.ARCHIVED : ActivityChangeType.UNARCHIVED,
+          changeType:
+            bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED
+              ? ActivityChangeType.ARCHIVED
+              : ActivityChangeType.UNARCHIVED,
           by: getActivityLogUserData,
         }),
       ),
@@ -730,11 +746,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   };
 
   const getCorrectBackRoute = () => {
-    if (!bookingRequest.archived && !bookingRequest.hold) {
+    if (bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED && !bookingRequest.hold) {
       return '/bookings?tab=requests';
-    } else if (!bookingRequest.archived && bookingRequest.hold) {
+    } else if (bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED && bookingRequest.hold) {
       return '/bookings?tab=on-hold';
-    } else if (bookingRequest.archived && !bookingRequest.hold) {
+    } else if (bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED && !bookingRequest.hold) {
       return '/bookings?tab=archived-requests';
     } else {
       return '/bookings';
@@ -743,7 +759,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      {/*<Button onClick={() => createAlphacomReq(bookingRequest, []).then(result => console.log(result))}>Test</Button>*/}
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields bookingRequest={bookingRequest} />
@@ -846,8 +861,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                       items={[
                         {
                           onClick: () => storeActivity(archiveHandler),
-                          icon: bookingRequest.archived ? <UnarchiveIcon /> : <ArchiveIcon />,
-                          label: bookingRequest.archived ? 'Restore' : 'Archive',
+                          icon:
+                            bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED ? (
+                              <UnarchiveIcon />
+                            ) : (
+                              <ArchiveIcon />
+                            ),
+                          label:
+                            bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED ? 'Restore' : 'Archive',
                         },
                         {
                           onClick: () => storeActivity(holdHandler),
