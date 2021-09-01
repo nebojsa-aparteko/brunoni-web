@@ -177,11 +177,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   );
 
   return (
-    <FirestoreCollectionProvider
-      name="charge-codes"
-      context={ChargeCodes}
-      query={query => query.where('language', '==', 'E')}
-    >
+    <FirestoreCollectionProvider name="charge-codes" context={ChargeCodes}>
       <Meta title={`Booking Requests`} />
 
       <BookingsFiltersBar filters={filters} setFilters={setFilters} showAssigneeFilter={isAdmin} />

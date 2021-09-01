@@ -160,9 +160,16 @@ const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) 
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
 };
 
-const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string) => {
-  if (!chargeId) return undefined;
-  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId && code.language === 'E');
+const findChargeIdByDescription = (chargeCodes: ChargeCode[], description?: string): string | undefined => {
+  return chargeCodes?.find(code => code.text === description)?.chargeCodeId;
+};
+
+const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
+  let chargeCodeId = chargeId || findChargeIdByDescription(chargeCodes, description);
+  if (!chargeCodeId) {
+    return description;
+  }
+  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeCodeId && code.language === 'E');
   return chargeCode && chargeCode.text;
 };
 
@@ -175,7 +182,7 @@ const transformFreightDetails = (
     omitBy(isNil)({
       Anz: getQuantity(containers, quoteDetail.CostUnit) || 1,
       SeqNr: index + 1,
-      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID),
+      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID, quoteDetail.Description),
       Currency: quoteDetail.Currency,
       UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Unit: quoteDetail.CostUnit,
