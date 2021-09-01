@@ -9,7 +9,7 @@ import React, { Fragment, useContext, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistItemValueDocument, DocumentType } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
@@ -88,7 +88,7 @@ export const getBookingRequestId = async () => {
 };
 
 export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
-  if (!schedule) return undefined;
+  if (!schedule) return null;
   if (schedule.IntermediatePortInfos.length === 0) {
     // pol - pod
     return { portOfLoading: schedule.OriginInfo, portOfDischarge: schedule.DestinationInfo };
@@ -160,9 +160,16 @@ const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) 
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
 };
 
-const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string) => {
-  if (!chargeId) return undefined;
-  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId && code.language === 'E');
+const findChargeIdByDescription = (chargeCodes: ChargeCode[], description?: string): string | undefined => {
+  return chargeCodes?.find(code => code.text === description)?.chargeCodeId;
+};
+
+const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
+  let chargeCodeId = chargeId || findChargeIdByDescription(chargeCodes, description);
+  if (!chargeCodeId) {
+    return description;
+  }
+  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeCodeId && code.language === 'E');
   return chargeCode && chargeCode.text;
 };
 
@@ -175,7 +182,7 @@ const transformFreightDetails = (
     omitBy(isNil)({
       Anz: getQuantity(containers, quoteDetail.CostUnit) || 1,
       SeqNr: index + 1,
-      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID),
+      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID, quoteDetail.Description),
       Currency: quoteDetail.Currency,
       UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Unit: quoteDetail.CostUnit,
@@ -272,7 +279,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       bookingRequest?.carrier?.id,
       bookingRequest?.containers,
     );
-    const writableRequest = {
+    let writableRequest = {
       ...bookingRequest,
       createdAt: new Date(),
       createdBy: activityLogUserData,
@@ -286,6 +293,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
+    // Setting assignedUser: null for filtering purposes
+    writableRequest = {
+      ...writableRequest,
+      assignedUser: null,
+    } as BookingRequest;
     setBookingRequest(
       update(
         'containers',
@@ -313,12 +325,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
         )
           .then(async docReference => {
             try {
-              const documents = (await saveFiles([
-                ...files.additional,
-                ...files.certificate,
-                ...files.imo,
-              ])) as ChecklistItemValueDocument[];
-              const values = documents.map(
+              const additional = (await saveFiles(files.additional)) as ChecklistItemValueDocument[];
+              const certificate = (await saveFiles(files.certificate)) as ChecklistItemValueDocument[];
+              const imo = (await saveFiles(files.imo)) as ChecklistItemValueDocument[];
+
+              const additionalValues = additional.map(
                 item =>
                   ({
                     uploadedBy: userRecord,
@@ -327,8 +338,34 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     url: item.url,
                     storedName: item.storedName,
                     isInternal: false,
+                    documentType: DocumentType.ADDITIONAL_DOCUMENTS,
                   } as ChecklistItemValueDocument),
               );
+              const certificateValues = certificate.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.SOC,
+                  } as ChecklistItemValueDocument),
+              );
+              const IMOValues = imo.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.IMO,
+                  } as ChecklistItemValueDocument),
+              );
+              const values = [...additionalValues, ...certificateValues, ...IMOValues];
               await Promise.all(values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)));
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });

@@ -218,7 +218,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const userRecord = useUser()[1];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(bookingRequest.client?.id);
-  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined>(bookingRequest.assignedUser);
+  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined | null>(bookingRequest.assignedUser);
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
   const [, dispatch] = useGlobalAppState();
 
@@ -939,7 +939,7 @@ interface Props {
 
 export default BookingRequestView;
 
-export const getVoyageInfo = (schedule?: RouteSearchResult) => {
+export const getVoyageInfo = (schedule?: RouteSearchResult | null) => {
   if (!schedule) return undefined;
   if (hasPlaceOfReceipt(schedule)) {
     const [d] = getPortOfLoadingFromIntermediatePorts(schedule);

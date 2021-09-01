@@ -278,12 +278,14 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
   if (quoteSearchParams.carrier) {
     query = query.where('carrier', '==', quoteSearchParams.carrier);
   }
-  if (quoteSearchParams.clientId) {
+  const size = (await query.get()).size;
+  if (size > 1 && quoteSearchParams.clientId) {
     query = query.where('clientId', '==', quoteSearchParams.clientId);
   }
   const quotesRef = await query.orderBy('dateIssued', 'desc').get();
   let quotes = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
-  if (quoteSearchParams.containers) {
+
+  if (quoteSearchParams.containers?.[0].containerType) {
     quotes = quotes.filter(q =>
       q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
     );
@@ -363,6 +365,7 @@ const mapIntoBookingRequestModel = async (
   const { quote, showWarningMessage } = await getLatestQuote(quoteSearchParams);
 
   const normalizedQuote = quote && (normalize(quote) as Quote);
+
   const freightDetails = normalizedQuote && takeQuoteDetails(normalizedQuote?.quoteDetails, containers, chargeCodes);
 
   const voyageInfo = getVoyageInfo(schedule);
@@ -505,7 +508,11 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest({ ...bookingRequest, itinerary: getItineraryFromSchedule(bookingRequest?.schedule) })
+        createRequest({
+          ...bookingRequest,
+          assignedUser: null,
+          itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
+        })
           .then(async docReference => {
             // Save HTML file to storage
             try {
@@ -557,7 +564,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             <DropZoneArea
               handleOnDrop={handleOnDrop}
               handleOnDelete={handleOnDelete}
-              filesLimit={100}
+              filesLimit={1}
               acceptedExtensions={['.html']}
               showPreviews={!!bookingRequest}
               dropzoneProps={{ disabled: loading }}
