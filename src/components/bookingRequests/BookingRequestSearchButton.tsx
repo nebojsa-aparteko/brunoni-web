@@ -283,15 +283,6 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             setSearchValue={setSearchValue}
             closeModal={closeModal}
           />
-          {/*<SearchBookingRequest*/}
-          {/*  label="Status"*/}
-          {/*  fieldName={'statusCode'}*/}
-          {/*  searchField={searchField}*/}
-          {/*  setSearchField={setSearchField}*/}
-          {/*  searchValue={searchValue}*/}
-          {/*  setSearchValue={setSearchValue}*/}
-          {/*  closeModal={closeModal}*/}
-          {/*/>*/}
           <SearchBookingRequest
             label="Customer ref"
             fieldName={'customerReference'}
@@ -335,7 +326,10 @@ const BookingRequestSearchButton: React.FC<SearchButtonProps> = ({
 
   return (
     <Fragment>
-      <IconButton size="small" onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+      <IconButton
+        onClick={openModal}
+        style={{ backgroundColor: searchField || searchValue ? 'rgba(255,103,95,0.15)' : undefined }}
+      >
         <SearchIcon fontSize="large" />
       </IconButton>
       {isOpen && (
