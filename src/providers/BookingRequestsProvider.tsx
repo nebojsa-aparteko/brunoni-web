@@ -66,7 +66,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
         query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
       }
       return query
-        .orderBy('statusCode', 'desc')
+        .orderBy('statusCode', 'asc')
         .orderBy('assignedUser', 'asc')
         .orderBy('itinerary.portOfLoading.DepartureDate', 'desc');
     },
