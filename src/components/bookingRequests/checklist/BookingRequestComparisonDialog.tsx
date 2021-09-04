@@ -7,9 +7,11 @@ import {
   Grid,
   IconButton,
   makeStyles,
+  Paper,
+  TextField,
   Typography,
 } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ChecklistItemValueDocument } from '../../bookings/checklist/ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
 import BookingRequestViewMainContent, { remark } from '../BookingRequestViewMainContent';
@@ -25,6 +27,11 @@ import BookingRequestPortTerms from '../BookingRequestPortTerms';
 import BookingRequestClosings from '../BookingRequestClosings';
 import BookingRequestSpecialRemarks from '../BookingRequestSpecialRemarks';
 import BookingRequestFreightDetails from '../BookingRequestFreightDetails';
+import theme from '../../../theme';
+import { isDashboardUser } from '../../../model/UserRecord';
+import useUser from '../../../hooks/useUser';
+import EditButton from '../../EditButton';
+import useBookingRequest from '../../../hooks/useBookingRequest';
 
 const useStyles = makeStyles(() => ({
   dialogPaper: {
@@ -38,6 +45,8 @@ const useStyles = makeStyles(() => ({
   },
   fileNumber: {
     alignSelf: 'baseline',
+    margin: theme.spacing(2),
+    marginBottom: '0px',
   },
   closeModal: {
     position: 'absolute',
@@ -69,7 +78,6 @@ const BookingRequestRepresentation: React.FC<BookingRequestRepresentationProps> 
   showWarningMessage,
 }) => {
   const classes = useStyles();
-  // const [bookingRequestState, setBookingRequestState] = useState(bookingRequest);
 
   const [bookingRequestState, setBookingRequestState] = useBookingRequestContext();
 
@@ -151,25 +159,40 @@ const ComparisonDialogContent = ({ document, secondBookingRequest }: ContentProp
           style={{ flex: 1, overflow: 'hidden', width: '100%', minHeight: 0 }}
         >
           <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
-            <BookingRequestViewMainContent isPrintWithCost={false} />
+            <Box component={Paper} display={'column'}>
+              <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                Current Booking Request
+              </Typography>
+              <BookingRequestViewMainContent isPrintWithCost={false} />
+            </Box>
           </Grid>
 
           {document && (
             <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
-              {renderDocument(
-                document,
-                document?.name
-                  .split('.')
-                  .pop()
-                  ?.toLowerCase(),
-                'rightDocumentContainer',
-              )}
+              <Box component={Paper} display={'column'}>
+                <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                  File
+                </Typography>
+                {renderDocument(
+                  document,
+                  document?.name
+                    .split('.')
+                    .pop()
+                    ?.toLowerCase(),
+                  'rightDocumentContainer',
+                )}
+              </Box>
             </Grid>
           )}
           {!document && secondBookingRequest && (
             <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
               <BookingRequestProvider>
-                <BookingRequestRepresentation bookingRequest={secondBookingRequest} isPrintWithCost={false} />
+                <Box component={Paper} display={'column'}>
+                  <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                    Initial Booking Request
+                  </Typography>
+                  <BookingRequestRepresentation bookingRequest={secondBookingRequest} isPrintWithCost={false} />
+                </Box>
               </BookingRequestProvider>
             </Grid>
           )}
@@ -187,6 +210,9 @@ const BookingRequestComparisonDialog: React.FC<Props> = ({
   handleClose,
 }) => {
   const classes = useStyles();
+  const userRecord = useUser()[1];
+  const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
+  const { br } = useBookingRequest(bookingRequestId);
 
   return (
     <Dialog
@@ -203,7 +229,37 @@ const BookingRequestComparisonDialog: React.FC<Props> = ({
         className={classes.dialogTitleBar}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}
       >
-        <Typography variant="h4" className={classes.fileNumber}>{`File No: ${bookingRequestId}`}</Typography>
+        <Box display={'flex'} alignItems={'flex-end'}>
+          <Box display={'flex'} alignItems={'center'}>
+            <Typography variant="h4" className={classes.fileNumber}>{`File No: ${bookingRequestId}`}</Typography>
+            {editing && isDashboardUser(userRecord) ? (
+              <TextField
+                defaultValue={''}
+                label="Agreement No."
+                margin="dense"
+                variant="outlined"
+                value={bookingRequestState.agreementNo}
+                onChange={e =>
+                  setBookingRequestState(prev => ({
+                    ...prev,
+                    agreementNo: e.target.value,
+                  }))
+                }
+                autoFocus
+                className={classes.fileNumber}
+              />
+            ) : (
+              <Typography variant={'h4'} className={classes.fileNumber}>
+                {bookingRequestState.agreementNo !== ''
+                  ? 'Agreement No. ' + bookingRequestState.agreementNo
+                  : 'Agreement No. [To be assigned]'}
+              </Typography>
+            )}
+          </Box>
+          <Box display={'flex'} alignItems={'center'}>
+            <EditButton bookingRequest={br} />
+          </Box>
+        </Box>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>

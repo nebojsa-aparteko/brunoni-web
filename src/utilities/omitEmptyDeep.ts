@@ -1,6 +1,6 @@
-const omitEmptyDeep = (obj: any) => {
+const omitEmptyDeep = (obj: any, omitNull?: boolean) => {
   for (let prop in obj) {
-    if (obj[prop] === null || obj[prop] === undefined) {
+    if ((obj[prop] === null && omitNull) || obj[prop] === undefined) {
       delete obj[prop];
     } else if (typeof obj[prop] === 'object') {
       omitEmptyDeep(obj[prop]);

@@ -34,15 +34,14 @@ import UserRecord, {
   UserRecordMinProperties,
 } from '../../model/UserRecord';
 import firebase from '../../firebase';
-import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
+import { ActivityChangeType, ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
 import useUser from '../../hooks/useUser';
 import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import omitEmptyDeep, { removeEmptyDeep } from '../../utilities/omitEmptyDeep';
-import { flow, isEqual, isNil, keys, map, omit, pick, set, update } from 'lodash/fp';
+import { removeEmptyDeep } from '../../utilities/omitEmptyDeep';
+import { flow, isNil, keys, map, omit, pick, set, update } from 'lodash/fp';
 import useModal from '../../hooks/useModal';
 import ConfirmLeadingCurrencyDialog from './ConfirmLeadingCurrencyDialog';
-import Mousetrap from 'mousetrap';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import MissingFields from '../onlineBooking/MissingFields';
 import useClientUsers from '../../hooks/useClientUsers';
@@ -70,6 +69,7 @@ import BookingRequestComparisonDialog from './checklist/BookingRequestComparison
 import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import Tags from '../../contexts/Tags';
+import Container from '../../model/Container';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -164,7 +164,7 @@ interface AgentAssignmentDialogProps {
   handleClose: () => void;
 }
 
-const updateBookingRequest = (bookingRequest: BookingRequest) => {
+export const updateBookingRequest = (bookingRequest: BookingRequest) => {
   if (bookingRequest.id) {
     //console.log('Update Itinerary', bookingRequest.itinerary);
 
@@ -355,6 +355,76 @@ const setBookingRequestField = async (bookingReqId: string, newFieldValue: any) 
     .set(newFieldValue, { merge: true });
 };
 
+const checkForUpdatesInArray = async (obj: Container[], bookingRequest: BookingRequest) => {
+  //Commodity type
+  const hasCommodityType = obj.every(k => !isNil(k.commodityType));
+  await setChecked(bookingRequest.id!, ItemsOptions.COMMODITY_CHECK, hasCommodityType);
+  //Weight Change
+  const hasWeight = obj.every(k => !isNil(k.weight));
+  await setChecked(bookingRequest.id!, ItemsOptions.WEIGHT_CHECK, hasWeight);
+  //Weight Change
+  const hasPickUpAndDeliveryRef = obj.every(k => !isNil(k.pickupReference) && !isNil(k.deliveryReference));
+  await setChecked(bookingRequest.id!, ItemsOptions.PICKUP_AND_DELIVERY_REF, hasPickUpAndDeliveryRef);
+  // Terminal Change
+  const hasTerminal = obj.every(k => !isNil(k.pickupLocation));
+  await setChecked(bookingRequest.id!, ItemsOptions.TERMINAL_CHECK, hasTerminal);
+};
+
+const autoCheckList = async (oldObject: BookingRequest, newObject: BookingRequest) => {
+  if (newObject.containers) {
+    //containers
+    await checkForUpdatesInArray(newObject.containers, oldObject);
+  }
+};
+
+const createChangedFieldsObject = (changedKeys: string[], oldVal: any, newVal: any) => {
+  const changedFields: ChangedField[] = [];
+  changedKeys.forEach(key => {
+    const obj = removeEmptyDeep({
+      fieldName: key,
+      oldVal: oldVal[key],
+      newVal: newVal[key],
+    });
+    changedFields.push(obj as ChangedField);
+  });
+  return changedFields;
+};
+
+export const handleFieldsEditActivity = async (
+  bookingRequest: BookingRequest,
+  bookingRequestState: BookingRequest,
+  isAdmin: boolean,
+  getActivityLogUserData: ActivityLogUserData,
+) => {
+  const omitFields = ['updatedAt', 'checklistCheckedCount', 'showWarningMessage'];
+  const oldObject = diff(omit(omitFields)(bookingRequestState), omit(omitFields)(bookingRequest));
+  const newObject = diff(omit(omitFields)(bookingRequest), omit(omitFields)(bookingRequestState));
+
+  if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
+  // console.log('oldObject')
+  // console.log(oldObject)
+  // console.log('new Object')
+  // console.log(newObject)
+  const changedKeys = keys(newObject);
+
+  if (changedKeys.includes('freightDetails') && bookingRequestState.showWarningMessage !== false)
+    await setBookingRequestField(bookingRequest.id!, { showWarningMessage: false });
+
+  const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
+  // console.log('changedFields')
+  // console.log(changedFields)
+  const activityObject = createActivityObject({
+    changeType: ActivityChangeType.EDITED,
+    by: getActivityLogUserData,
+    changedFields,
+  });
+  // console.log('activityObject')
+  // console.log(activityObject)
+  if (changedKeys.length > 0) {
+    bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
+  }
+};
+
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, isAdmin] = useUser();
   const classes = useStyles();
@@ -374,13 +444,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     availableTags &&
       availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
   );
-  const [bookingRequestState, setBookingRequestState, editing, setEditing] = useBookingRequestContext();
+  const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
   const showWarningMessage = !!bookingRequest.showWarningMessage;
 
-  const [agreementNumber, setAgreementNumber] = useState<string>(
-    bookingRequestState?.agreementNo || bookingRequest.agreementNo || '',
-  );
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
 
@@ -400,6 +467,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
     );
   }, [filePath]).then(() => {});
+
+  useEffect(() => {
+    !editing && setBookingRequestState(bookingRequest);
+  }, [bookingRequest]);
 
   useEffect(
     () =>
@@ -422,56 +493,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       [isAdmin],
     ),
   );
-
-  const canEdit = useMemo(
-    () =>
-      !(
-        bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED ||
-        (BookingRequestStatusText.REQUESTED !== bookingRequest.statusText && !isDashboardUser(userRecord))
-      ),
-    [bookingRequest, userRecord],
-  );
-
-  useEffect(() => {
-    !editing && setBookingRequestState(bookingRequest);
-    !editing && setAgreementNumber(bookingRequest.agreementNo || '');
-  }, [bookingRequest]);
-
-  useEffect(() => {
-    Mousetrap.bind(['command+shift+e', 'ctrl+shift+e'], () => setEditing(prevState => !prevState));
-    return () => {
-      Mousetrap.unbind(['command+shift+e', 'ctrl+shift+e']);
-    };
-  }, []);
-
-  const handleSave = useCallback(() => {
-    const br = !isEqual(bookingRequest.schedule, bookingRequestState?.schedule)
-      ? ({ ...bookingRequestState, isScheduleChanged: true } as BookingRequest)
-      : bookingRequestState;
-    omitEmptyDeep(br);
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    if (br) {
-      updateBookingRequest({ ...br, agreementNo: agreementNumber })
-        ?.then(() => {
-          dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Saved changes!' });
-        })
-        .catch(error => {
-          console.error('error saving booking request', error);
-          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
-        })
-        .finally(async () => {
-          setEditing(false);
-          try {
-            await handleFieldsEditActivity();
-          } catch (error) {
-            console.error('error creating activity', error);
-            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
-          } finally {
-            dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          }
-        });
-    }
-  }, [bookingRequestState, bookingRequest?.schedule, agreementNumber]);
 
   const onArchiveClick = useCallback(
     () =>
@@ -536,20 +557,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     },
     [dispatch],
   );
-
-  const handleCancelEditing = useCallback(() => {
-    setBookingRequestState(bookingRequest);
-    setEditing(false);
-  }, [bookingRequest]);
-
-  useEffect(() => {
-    editing && Mousetrap.bind(['command+shift+s', 'ctrl+shift+s'], () => handleSave());
-    Mousetrap.stopCallback = () => false;
-
-    return () => {
-      Mousetrap.unbind(['command+shift+s', 'ctrl+shift+s']);
-    };
-  }, [editing, handleSave]);
 
   const bookNow = useCallback(async () => {
     // if freight has ocean freight create leading currency
@@ -621,7 +628,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               type: 'SHOW_ERROR_SNACKBAR',
               message: 'Unable to create booking',
             });
-            console.log('No booking ID received, unable to redirect');
+            console.error('No booking ID received, unable to redirect');
           }
         } else {
           const body = await response.json();
@@ -641,9 +648,15 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     }
   }, [bookingRequestState, user, chargeCodes]);
 
-  const handleChangeAgreementNumberText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setAgreementNumber(event.target.value);
-  }, []);
+  const handleChangeAgreementNumberText = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setBookingRequestState(prev => ({
+        ...prev,
+        agreementNo: event.target.value,
+      }));
+    },
+    [setBookingRequestState],
+  );
 
   const archiveHandler = () =>
     onArchiveClick().then(() =>
@@ -679,71 +692,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       setPrintRequested(false);
     }
   }, [printRequested]);
-
-  const createChangedFieldsObject = (changedKeys: string[], oldVal: any, newVal: any) => {
-    const changedFields: ChangedField[] = [];
-    changedKeys.forEach(key => {
-      const obj = removeEmptyDeep({
-        fieldName: key,
-        oldVal: oldVal[key],
-        newVal: newVal[key],
-      });
-      changedFields.push(obj as ChangedField);
-    });
-    return changedFields;
-  };
-
-  const checkForUpdatesInArray = async (obj: any[]) => {
-    //Commodity type
-    const hasCommodityType = obj.every(k => !isNil(k.commodityType));
-    await setChecked(bookingRequest.id!, ItemsOptions.COMMODITY_CHECK, hasCommodityType);
-    //Weight Change
-    const hasWeight = obj.every(k => !isNil(k.weight));
-    await setChecked(bookingRequest.id!, ItemsOptions.WEIGHT_CHECK, hasWeight);
-    //Weight Change
-    const hasPickUpAndDeliveryRef = obj.every(k => !isNil(k.pickupReference) && !isNil(k.deliveryReference));
-    await setChecked(bookingRequest.id!, ItemsOptions.PICKUP_AND_DELIVERY_REF, hasPickUpAndDeliveryRef);
-    // Terminal Change
-    const hasTerminal = obj.every(k => !isNil(k.pickupLocation));
-    await setChecked(bookingRequest.id!, ItemsOptions.TERMINAL_CHECK, hasTerminal);
-  };
-
-  const autoCheckList = async (oldObject: BookingRequest, newObject: BookingRequest) => {
-    if (newObject.containers) {
-      //containers
-      await checkForUpdatesInArray(newObject.containers);
-    }
-  };
-
-  const handleFieldsEditActivity = async () => {
-    //todo. without freight details for now?... Because it change at beggining
-    const oldObject = diff(omit('updatedAt')(bookingRequestState), omit('updatedAt')(bookingRequest));
-    const newObject = diff(omit('updatedAt')(bookingRequest), omit('updatedAt')(bookingRequestState));
-
-    if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
-    // console.log('oldObject')
-    // console.log(oldObject)
-    // console.log('new Object')
-    // console.log(newObject)
-    const changedKeys = keys(newObject);
-
-    if (changedKeys.includes('freightDetails'))
-      await setBookingRequestField(bookingRequest.id!, { showWarningMessage: false });
-
-    const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
-    // console.log('changedFields')
-    // console.log(changedFields)
-    const activityObject = createActivityObject({
-      changeType: ActivityChangeType.EDITED,
-      by: getActivityLogUserData,
-      changedFields,
-    });
-    // console.log('activityObject')
-    // console.log(activityObject)
-    if (changedKeys.length > 0) {
-      bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
-    }
-  };
 
   const getCorrectBackRoute = () => {
     if (bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED && !bookingRequest.hold) {
@@ -805,10 +753,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
               <Box
                 className={classes.actionBar}
-                mb={2}
                 display="flex"
                 flexDirection="row"
-                alignItems="end"
+                alignItems="center"
                 justifyContent="space-between"
               >
                 <QuoteNav
@@ -822,14 +769,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                     label="Agreement No."
                     margin="dense"
                     variant="outlined"
-                    value={agreementNumber}
+                    value={bookingRequestState.agreementNo}
                     onChange={handleChangeAgreementNumberText}
                     autoFocus
                     className={classes.agreementInput}
                   />
                 ) : (
                   <Typography variant={'h5'} style={{ paddingLeft: '20px' }}>
-                    {agreementNumber !== '' ? 'Agreement No. ' + agreementNumber : 'Agreement No. [To be assigned]'}
+                    {bookingRequestState.agreementNo && bookingRequestState.agreementNo !== ''
+                      ? 'Agreement No. ' + bookingRequestState.agreementNo
+                      : 'Agreement No. [To be assigned]'}
                   </Typography>
                 )}
               </Box>
@@ -842,13 +791,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                   />
                 )}
                 <Box className={classes.actions} displayPrint="none">
-                  <EditButton
-                    handleCancelEditing={handleCancelEditing}
-                    handleSave={handleSave}
-                    disabled={!canEdit}
-                    editing={editing}
-                    startEditing={() => setEditing(true)}
-                  />
+                  <EditButton bookingRequest={bookingRequest} />
                   <CompareWithInitialButton onClick={() => setIsComparisonOpen(true)} />
                   {isAdmin && (
                     <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
