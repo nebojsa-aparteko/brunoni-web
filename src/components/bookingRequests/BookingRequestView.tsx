@@ -750,12 +750,18 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               <Divider />
             </Box>
 
-            <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+            <Box
+              className={classes.actionBar}
+              mb={2}
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+            >
               <Box
                 className={classes.actionBar}
                 display="flex"
                 flexDirection="row"
-                alignItems="center"
+                alignItems="flex-start"
                 justifyContent="space-between"
               >
                 <QuoteNav
