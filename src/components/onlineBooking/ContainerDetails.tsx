@@ -125,7 +125,7 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {container.imo?.[0] && (
+      {container.imo?.[0] && container.imo?.[1] && (
         <TableRow>
           <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
           <TableCell className={classes.tableCell}>

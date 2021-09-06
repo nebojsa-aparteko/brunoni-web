@@ -43,7 +43,7 @@ export interface BookingRequest {
   statusCode: BookingRequestStatusCode;
   statusText: BookingRequestStatusText;
   schedule?: RouteSearchResult;
-  assignedUser?: UserRecordMin | null;
+  assignedUser: UserRecordMin | null;
   statClient?: Client | null;
   vgmSubmittedBy?: VGMSubmittedBy;
   hold: boolean;
@@ -89,6 +89,7 @@ export enum ISOCodesEdiAlphacom {
 }
 
 export const BookingRequestLabels: Object = {
+  agreementNo: 'Agreement No.',
   blNumber: 'B/L-NO',
   intBlNumber: 'INTBL',
   intraRefNumber: 'INTTRA Ref.',
