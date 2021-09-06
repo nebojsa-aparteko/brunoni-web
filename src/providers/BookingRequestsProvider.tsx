@@ -65,10 +65,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.assignedTags && filters.assignedTags.length > 0) {
         query = query.where('assignedTags', 'array-contains-any', filters.assignedTags);
       }
-      return query
-        .orderBy('statusCode', 'asc')
-        .orderBy('assignedUser', 'asc')
-        .orderBy('itinerary.portOfLoading.DepartureDate', 'desc');
+      return query;
     },
     [filters],
   );
@@ -83,7 +80,33 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       } as BookingRequest;
     }) as BookingRequest[] | undefined;
     setIsLoading(false);
-    return normalizeBookingRequests(bookingRequests) as BookingRequest[] | undefined;
+
+    const sortFunction = () => {
+      return (a: BookingRequest, b: BookingRequest) => {
+        if (a.statusCode === b.statusCode) {
+          if (!!a.assignedUser === !!b.assignedUser) {
+            if (a.itinerary?.placeOfReceipt?.DepartureDate && b.itinerary?.placeOfReceipt?.DepartureDate)
+              return a.itinerary.placeOfReceipt.DepartureDate < b.itinerary.placeOfReceipt.DepartureDate ? 1 : -1;
+            else if (a.itinerary?.portOfLoading?.DepartureDate && b.itinerary?.portOfLoading?.DepartureDate)
+              return a.itinerary?.portOfLoading?.DepartureDate < b.itinerary?.portOfLoading?.DepartureDate ? 1 : -1;
+            return a.itinerary?.placeOfReceipt
+              ? a.itinerary?.placeOfReceipt?.DepartureDate
+                ? 1
+                : -1
+              : a.itinerary?.portOfLoading?.DepartureDate
+              ? 1
+              : -1;
+          } else {
+            return a.assignedUser === null ? -1 : 1;
+          }
+        }
+        return a.statusCode < b.statusCode ? -1 : 1;
+      };
+    };
+
+    return normalizeBookingRequests(bookingRequests)
+      .filter(b => b.assignedUser !== undefined)
+      .sort(sortFunction()) as BookingRequest[];
   }, [bookingRequestsSnapshot]);
 
   return (

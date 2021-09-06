@@ -166,8 +166,6 @@ interface AgentAssignmentDialogProps {
 
 export const updateBookingRequest = (bookingRequest: BookingRequest) => {
   if (bookingRequest.id) {
-    //console.log('Update Itinerary', bookingRequest.itinerary);
-
     return firebase
       .firestore()
       .collection('bookings-requests')
@@ -241,7 +239,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         );
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Client!' });
     }
   };
@@ -266,7 +264,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
         );
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
     }
   };
@@ -401,25 +399,18 @@ export const handleFieldsEditActivity = async (
   const newObject = diff(omit(omitFields)(bookingRequest), omit(omitFields)(bookingRequestState));
 
   if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
-  // console.log('oldObject')
-  // console.log(oldObject)
-  // console.log('new Object')
-  // console.log(newObject)
   const changedKeys = keys(newObject);
 
   if (changedKeys.includes('freightDetails') && bookingRequestState.showWarningMessage !== false)
     await setBookingRequestField(bookingRequest.id!, { showWarningMessage: false });
 
   const changedFields = createChangedFieldsObject(changedKeys, oldObject, newObject);
-  // console.log('changedFields')
-  // console.log(changedFields)
+
   const activityObject = createActivityObject({
     changeType: ActivityChangeType.EDITED,
     by: getActivityLogUserData,
     changedFields,
   });
-  // console.log('activityObject')
-  // console.log(activityObject)
   if (changedKeys.length > 0) {
     bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
   }
@@ -922,8 +913,3 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
     </Paper>
   );
 };
-// const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
-//   console.log(bookingRequest, 'BR');
-//   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
-//   // throw new Error('Function not implemented.');
-// };
