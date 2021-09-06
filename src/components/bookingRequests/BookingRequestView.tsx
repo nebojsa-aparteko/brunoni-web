@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
@@ -19,6 +20,8 @@ import PrintIcon from '@material-ui/icons/Print';
 import QuoteNav from '../quotes/QuoteItemNav';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import Page from '../bookings/Page';
 import { BookingRequest, BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
@@ -65,8 +68,6 @@ import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
-import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
-import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import Tags from '../../contexts/Tags';
 import Container from '../../model/Container';
@@ -156,6 +157,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   saveBtn: {
     margin: theme.spacing(1),
   },
+  dialogActions: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
 }));
 
 interface AgentAssignmentDialogProps {
@@ -211,6 +217,17 @@ const changeAssignedClient = (id: string, user: UserRecord | null) =>
       },
       { merge: true },
     );
+export const changeBookingRequestUnreadStatus = (id: string, isUnread: boolean) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(id)
+    .set(
+      {
+        isUnread: isUnread,
+      },
+      { merge: true },
+    );
 const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRequest, isOpen, handleClose }) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
@@ -218,6 +235,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const assignableCustomers = useClientUsers(bookingRequest.client?.id);
   const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined | null>(bookingRequest.assignedUser);
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
+  const [showUnreadContent, setShowUnreadContent] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
 
   const handleChangeClient = async () => {
@@ -247,21 +265,23 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const handleChangeAgent = async () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
-      if (
-        bookingRequest.id &&
-        selectedAgent &&
-        bookingRequest.assignedUser?.emailAddress !== selectedAgent.emailAddress
-      ) {
-        await changeAssignedAgent(bookingRequest.id, selectedAgent);
-        await addActivityItem(
-          'bookings-requests',
-          bookingRequest.id,
-          createActivityObject({
-            changeType: ActivityChangeType.ASSIGNED_AGENT,
-            by: getActivityLogUserData(userRecord),
-            addedUsers: [getActivityLogUserData(selectedAgent)],
-          }),
-        );
+      if (bookingRequest.id) {
+        ((!selectedAgent && bookingRequest.assignedUser) ||
+          (selectedAgent && !bookingRequest.assignedUser) ||
+          (selectedAgent && bookingRequest.assignedUser?.emailAddress !== selectedAgent.emailAddress)) &&
+          changeAssignedAgent(bookingRequest.id, selectedAgent || null).then(async () => {
+            //TODO create activity types for removing the selected agent and client
+            bookingRequest.id &&
+              (await addActivityItem(
+                'bookings-requests',
+                bookingRequest.id,
+                createActivityObject({
+                  changeType: ActivityChangeType.ASSIGNED_AGENT,
+                  by: getActivityLogUserData(userRecord),
+                  addedUsers: selectedAgent ? [getActivityLogUserData(selectedAgent)] : undefined,
+                }),
+              ));
+          });
       }
     } catch (e) {
       console.error(e);
@@ -269,48 +289,79 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
     }
   };
 
+  const handleMarkAsUnread = () => {
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    try {
+      if (bookingRequest.id) {
+        changeBookingRequestUnreadStatus(bookingRequest.id, true)
+          .then(() => handleClose())
+          .then(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
+      }
+    } catch (e) {
+      console.log(e);
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to mark request as unread!' });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle disableTypography>
-        <Typography variant="h4">Watchers</Typography>
+        <Typography variant="h4">{showUnreadContent ? 'Mark booking request as unread' : 'Watchers'}</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-
-      <DialogContent className={classes.dialogContent}>
-        <Box my={1}>
-          <UserInput
-            value={selectedAgent}
-            label="Assigned Agent"
-            users={assignableUsers || []}
-            onChange={(_, user) => setSelectedAgent(user || undefined)}
-          />
-        </Box>
-        <Box my={1}>
-          <UserInput
-            value={selectedClient}
-            label="Assigned Client"
-            users={assignableCustomers || []}
-            onChange={(_, user) => setSelectedClient(user || undefined)}
-          />
-        </Box>
-      </DialogContent>
-      <Button
-        disabled={!(selectedAgent && selectedClient)}
-        onClick={async () => {
-          dispatch({ type: 'START_GLOBAL_LOADING' });
-          await handleChangeAgent();
-          await handleChangeClient();
-          dispatch({ type: 'STOP_GLOBAL_LOADING' });
-          handleClose();
-        }}
-        variant="contained"
-        className={classes.saveBtn}
-        color="primary"
-      >
-        Save
-      </Button>
+      {showUnreadContent ? (
+        <DialogActions className={classes.dialogActions}>
+          <Button onClick={handleClose} color="primary" variant="outlined">
+            No
+          </Button>
+          <Button onClick={handleMarkAsUnread} color="primary" variant="contained">
+            Yes
+          </Button>
+        </DialogActions>
+      ) : (
+        <React.Fragment>
+          <DialogContent className={classes.dialogContent}>
+            <React.Fragment>
+              <Box my={1}>
+                <UserInput
+                  value={selectedAgent}
+                  label="Assigned Agent"
+                  users={assignableUsers || []}
+                  onChange={(_, user) => setSelectedAgent(user || undefined)}
+                />
+              </Box>
+              <Box my={1}>
+                <UserInput
+                  value={selectedClient}
+                  label="Assigned Client"
+                  users={assignableCustomers || []}
+                  onChange={(_, user) => setSelectedClient(user || undefined)}
+                />
+              </Box>
+            </React.Fragment>
+          </DialogContent>
+          <Button
+            disabled={!selectedAgent && !selectedClient}
+            onClick={async event => {
+              event.stopPropagation();
+              dispatch({ type: 'START_GLOBAL_LOADING' });
+              await handleChangeAgent();
+              await handleChangeClient();
+              dispatch({ type: 'STOP_GLOBAL_LOADING' });
+              !selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread && setShowUnreadContent(true);
+              !(!selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread) && handleClose();
+            }}
+            variant="contained"
+            className={classes.saveBtn}
+            color="primary"
+          >
+            Save
+          </Button>
+        </React.Fragment>
+      )}
     </Dialog>
   );
 };
@@ -423,7 +474,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const commodityTypes = useContext(CommodityTypes);
   const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
-  const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] = useState<boolean>(true);
   const [isBookNowDisabled, setIsBookNowDisabled] = useState<boolean>(
     bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
@@ -452,23 +502,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
-
-  const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
-  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
-
-  //TODO CHECK IF THERE IS A BETTER OPTION THAN useMemo THAT SUPPORTS ASYNC FUNCTIONS
-  useMemo(async () => {
-    const fileURL =
-      filePath &&
-      (await firebase
-        .storage()
-        .ref(filePath)
-        .getDownloadURL());
-    const initialBookingRequestJson = await fetch(fileURL).then(res => res.json().then(res => JSON.stringify(res)));
-    setInitialBookingRequest(
-      initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
-    );
-  }, [filePath]).then(() => {});
 
   useEffect(() => {
     !editing && setBookingRequestState(bookingRequest);
@@ -800,7 +833,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
                 <Box className={classes.actions} displayPrint="none">
                   <EditButton bookingRequest={bookingRequest} />
-                  <CompareWithInitialButton onClick={() => setIsComparisonOpen(true)} />
                   {isAdmin && (
                     <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                       <SupervisedUserCircleIcon />
@@ -842,6 +874,34 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                           icon: <PrintIcon />,
                           label: 'Print with cost',
                         },
+                        {
+                          onClick: () => {
+                            dispatch({ type: 'START_GLOBAL_LOADING' });
+                            bookingRequest.id &&
+                              changeBookingRequestUnreadStatus(bookingRequest.id, !bookingRequest.isUnread)
+                                .then(() =>
+                                  dispatch({
+                                    type: 'SHOW_SUCCESS_SNACKBAR',
+                                    duration: 5000,
+                                    message: bookingRequest.isUnread
+                                      ? 'Booking request marked as read'
+                                      : 'Booking request marked as unread',
+                                  }),
+                                )
+                                .catch(() =>
+                                  dispatch({
+                                    type: 'SHOW_ERROR_SNACKBAR',
+                                    duration: 5000,
+                                    message: bookingRequest.isUnread
+                                      ? 'Marking as read failed'
+                                      : 'Marking as unread failed',
+                                  }),
+                                )
+                                .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
+                          },
+                          icon: bookingRequest.isUnread ? <VisibilityIcon /> : <VisibilityOffIcon />,
+                          label: bookingRequest.isUnread ? 'Mark as read' : 'Mark as unread',
+                        },
                       ]}
                     />
                   )}
@@ -870,14 +930,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             closeModal();
           }}
           handleClose={closeModal}
-        />
-      )}
-      {isComparisonOpen && bookingRequestState.id && initialBookingRequest && (
-        <BookingRequestComparisonDialog
-          bookingRequestId={bookingRequestState.id}
-          secondBookingRequest={initialBookingRequest}
-          isOpen={isComparisonOpen}
-          handleClose={() => setIsComparisonOpen(false)}
         />
       )}
     </Grid>

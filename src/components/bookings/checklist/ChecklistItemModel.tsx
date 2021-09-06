@@ -23,6 +23,7 @@ export enum DocumentType {
   IMO = 'IMO',
   SOC = 'SOC',
   ADDITIONAL_DOCUMENTS = 'ADDITIONAL_DOCUMENTS',
+  INITIAL_REQUEST = 'INITIAL_REQUEST',
 }
 
 export enum ChecklistItemValueDocumentStatusType {
