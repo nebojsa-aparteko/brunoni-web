@@ -68,8 +68,6 @@ import { ItemsOptions } from '../../model/Checklist';
 import PanToolIcon from '@material-ui/icons/PanTool';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
-import BookingRequestComparisonDialog from './checklist/BookingRequestComparisonDialog';
-import CompareWithInitialButton from '../CompareWithInitialButton';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import Tags from '../../contexts/Tags';
 import Container from '../../model/Container';
@@ -485,7 +483,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const commodityTypes = useContext(CommodityTypes);
   const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
-  const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
   const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] = useState<boolean>(true);
   const [isBookNowDisabled, setIsBookNowDisabled] = useState<boolean>(
     bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
@@ -514,23 +511,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   const [, dispatch] = useGlobalAppState();
   const getActivityLogUserData = useActivityLogUserData();
-
-  const filePath = bookingRequestState.id && `bookings-requests-initial/${bookingRequestState.id}/initial-request.json`;
-  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
-
-  //TODO CHECK IF THERE IS A BETTER OPTION THAN useMemo THAT SUPPORTS ASYNC FUNCTIONS
-  useMemo(async () => {
-    const fileURL =
-      filePath &&
-      (await firebase
-        .storage()
-        .ref(filePath)
-        .getDownloadURL());
-    const initialBookingRequestJson = await fetch(fileURL).then(res => res.json().then(res => JSON.stringify(res)));
-    setInitialBookingRequest(
-      initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
-    );
-  }, [filePath]).then(() => {});
 
   useEffect(() => {
     !editing && setBookingRequestState(bookingRequest);
@@ -862,7 +842,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
                 <Box className={classes.actions} displayPrint="none">
                   <EditButton bookingRequest={bookingRequest} />
-                  <CompareWithInitialButton onClick={() => setIsComparisonOpen(true)} />
                   {isAdmin && (
                     <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
                       <SupervisedUserCircleIcon />
@@ -962,14 +941,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           handleClose={closeModal}
         />
       )}
-      {isComparisonOpen && bookingRequestState.id && initialBookingRequest && (
-        <BookingRequestComparisonDialog
-          bookingRequestId={bookingRequestState.id}
-          secondBookingRequest={initialBookingRequest}
-          isOpen={isComparisonOpen}
-          handleClose={() => setIsComparisonOpen(false)}
-        />
-      )}
     </Grid>
   );
 };
@@ -1003,8 +974,3 @@ const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
     </Paper>
   );
 };
-// const createAlphacomReq = async (bookingRequest: BookingRequest, filteredChargeCodes: any) => {
-//   console.log(bookingRequest, 'BR');
-//   console.log(await createAlphacomRepresentationOfBooking(bookingRequest, filteredChargeCodes));
-//   // throw new Error('Function not implemented.');
-// };
