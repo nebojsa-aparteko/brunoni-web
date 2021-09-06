@@ -433,6 +433,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
   const [isComparisonOpen, setIsComparisonOpen] = useState<boolean>(false);
+  const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] = useState<boolean>(true);
+  const [isBookNowDisabled, setIsBookNowDisabled] = useState<boolean>(
+    bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
+  );
+
+  useEffect(() => {
+    setIsBookNowDisabled(
+      bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
+    );
+  }, [bookingRequest.statusCode, isBookNowAutomaticallyDisabled]);
+
   const {
     isOpen: isOpenAssignmentModal,
     closeModal: closeAssignmentModal,
@@ -709,7 +720,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
       <Grid item md={7} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
-          <MissingFields bookingRequest={bookingRequest} />
+          <MissingFields
+            bookingRequest={bookingRequest}
+            setIsBookNowButtonDisabled={value => setIsBookNowAutomaticallyDisabled(value)}
+          />
           {activities && activities?.length > 0 && (
             <Box my={2}>
               <Box displayPrint="none">
@@ -791,10 +805,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               <Box flex="1" />
               <Box display={'flex'} alignItems={'center'}>
                 {!editing && isDashboardUser(userRecord) && (
-                  <BookNowButton
-                    bookNow={bookNow}
-                    disabled={bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED}
-                  />
+                  <BookNowButton bookNow={bookNow} disabled={isBookNowDisabled} />
                 )}
                 <Box className={classes.actions} displayPrint="none">
                   <EditButton bookingRequest={bookingRequest} />

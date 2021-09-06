@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -45,6 +45,7 @@ import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
+import BookingRequestSearchButton from './BookingRequestSearchButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -91,6 +92,7 @@ const useStyles = makeStyles(theme => ({
 interface Props {
   isAdmin?: boolean;
 }
+
 const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
@@ -106,17 +108,26 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   const [bookingRequests, isLoading] = useBookingRequestsContext();
   const [filters, setFilters] = useBookingRequestsFilterContext();
+  const [fieldName, setFieldName] = useState<string | undefined>(undefined);
+  const [value, setValue] = useState(undefined);
+  const [filteredBookingRequests, setFilteredBookingRequests] = useState(bookingRequests);
+
+  useEffect(() => {
+    setFilteredBookingRequests(
+      !fieldName || !value ? bookingRequests : bookingRequests?.filter(request => get(fieldName, request) === value),
+    );
+  }, [bookingRequests, fieldName, value]);
 
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
 
-  const [filteredResults, setFilteredResults] = useState<BookingRequest[] | undefined | null>([]);
+  const [chinkifiedResults, setChunkifiedResults] = useState<BookingRequest[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    setFilteredResults(bookingRequests);
+    setChunkifiedResults(filteredBookingRequests);
 
-    return chunk(rowsPerPage)(bookingRequests);
-  }, [bookingRequests, rowsPerPage]);
+    return chunk(rowsPerPage)(filteredBookingRequests);
+  }, [filteredBookingRequests, rowsPerPage]);
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -183,7 +194,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
       <BookingsFiltersBar filters={filters} setFilters={setFilters} showAssigneeFilter={isAdmin} />
 
       <div>
-        {bookingRequests && !isLoading ? (
+        {filteredBookingRequests && !isLoading ? (
           <Fragment>
             <Card>
               <CardHeader
@@ -202,6 +213,12 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     </Box>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
+                    <BookingRequestSearchButton
+                      searchField={fieldName}
+                      setSearchField={setFieldName}
+                      searchValue={value}
+                      setSearchValue={setValue}
+                    />
                     {!actingAs && (
                       <Box display="flex" flexDirection="row">
                         <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={1} mr={1}>
@@ -230,11 +247,11 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
               />
             </Card>
 
-            {bookingRequests.length === 0 && (
+            {filteredBookingRequests && filteredBookingRequests.length === 0 && (
               <BookingsEmptyResults message={'There are no bookings that might need your attention at the moment. '} />
             )}
 
-            {bookingRequests.length > 0 && (
+            {filteredBookingRequests && filteredBookingRequests.length > 0 && (
               <Fragment>
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
@@ -246,17 +263,19 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                 </CardContent>
 
                 <CardActions className={classes.actions}>
-                  {bookingRequests && bookingRequests.length > 0 && bookingRequests.length > rowsPerPage && (
-                    <TablePagination
-                      component="div"
-                      count={filteredResults ? filteredResults.length : 0}
-                      onChangePage={handleChangePage}
-                      onChangeRowsPerPage={handleChangeRowsPerPage}
-                      page={page}
-                      rowsPerPage={rowsPerPage}
-                      rowsPerPageOptions={[10, 25, 50]}
-                    />
-                  )}
+                  {filteredBookingRequests &&
+                    filteredBookingRequests.length > 0 &&
+                    filteredBookingRequests.length > rowsPerPage && (
+                      <TablePagination
+                        component="div"
+                        count={chinkifiedResults ? chinkifiedResults.length : 0}
+                        onChangePage={handleChangePage}
+                        onChangeRowsPerPage={handleChangeRowsPerPage}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        rowsPerPageOptions={[10, 25, 50]}
+                      />
+                    )}
                 </CardActions>
               </Fragment>
             )}

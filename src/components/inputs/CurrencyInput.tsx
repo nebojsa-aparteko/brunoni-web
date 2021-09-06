@@ -11,7 +11,7 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const currencies = ['EUR', 'USD', 'CHF'];
+export const allowedCurrencies = ['EUR', 'USD', 'CHF'];
 
 const CurrencyInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
   const input = useRef();
@@ -28,7 +28,7 @@ const CurrencyInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       inputRef={input}
       label="Currency"
       margin={margin}
-      options={currencies || []}
+      options={allowedCurrencies || []}
       getOptionLabel={value => value}
       open={open}
       setOpen={setOpen}

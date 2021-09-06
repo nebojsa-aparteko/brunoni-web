@@ -26,6 +26,7 @@ import Container from '../../model/Container';
 import { normalizeQuote } from './BookingUploadDialog';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import firebase from '../../firebase';
+import { allowedCurrencies } from '../inputs/CurrencyInput';
 
 export interface Object {
   [key: string]: string;
@@ -47,8 +48,13 @@ export const ContainerWatchedFields: Object = {
   quantity: 'Quantity',
 };
 
+export const FreightDetailWatchedFields: Object = {
+  Currency: 'Currency',
+};
+
 export const defaultWatchedFields: string[] = Object.keys(WatchedFields);
 export const defaultContainerWatchedFields: string[] = Object.keys(ContainerWatchedFields);
+export const defaultFreightDetailWatchedFields: string[] = Object.keys(FreightDetailWatchedFields);
 
 const useStyles = makeStyles((theme: Theme) => ({
   additionalInfo: {
@@ -74,19 +80,23 @@ const validQuote = async (bookingRequest: BookingRequest) => {
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
     : undefined;
 
-  // console.log('quoteValidityDate', quoteValidityDate)
-  // console.log('scheduleDepartureDate', scheduleDepartureDate)
-
   if (quoteValidityDate && scheduleDepartureDate) {
     return isBefore(quoteValidityDate)(scheduleDepartureDate);
   }
   return true;
 };
 
+const isAllowedCurrency = (currency?: string) => {
+  if (!currency) return true;
+  return allowedCurrencies.includes(currency);
+};
+
 const MissingFields: React.FC<Props> = ({
   bookingRequest,
   watchedFields = defaultWatchedFields,
   containerWatchedFields = defaultContainerWatchedFields,
+  freightDetailWatchedFields = defaultFreightDetailWatchedFields,
+  setIsBookNowButtonDisabled,
 }) => {
   const classes = useStyles();
 
@@ -94,6 +104,7 @@ const MissingFields: React.FC<Props> = ({
 
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
+  const [freightDetailsNonMatchingFields, setFreightDetailsNonMatchingFields] = useState<string[][]>();
   const [validQuoteState, setValidQuoteState] = useState(true);
 
   const findNonMatchingFields = useCallback((): string[] => {
@@ -118,6 +129,19 @@ const MissingFields: React.FC<Props> = ({
     return containersNonMatchingFields;
   }, [bookingRequest.containers, containerWatchedFields]);
 
+  const findFreightDetailNonMatchingFields = useCallback((): string[][] => {
+    const freightDetailsNonMatchingFields: string[][] = [];
+    bookingRequest.freightDetails?.forEach(freightDetail => {
+      const freightDetailNonMatchingFields = freightDetailWatchedFields.filter(field => {
+        return field === 'Currency' ? !isAllowedCurrency(freightDetail.Currency) : !hasIn(field)(freightDetail);
+      });
+      // freightDetailNonMatchingFields && freightDetailNonMatchingFields?.length > 0 &&
+      freightDetailsNonMatchingFields.push(freightDetailNonMatchingFields);
+    });
+
+    return freightDetailsNonMatchingFields;
+  }, [bookingRequest.containers, containerWatchedFields]);
+
   /*
   Thanks for using our online services.
   Your booking request has been submitted and is in requested status.
@@ -126,13 +150,25 @@ const MissingFields: React.FC<Props> = ({
 */
 
   useEffect(() => {
+    if (setIsBookNowButtonDisabled) {
+      if (freightDetailsNonMatchingFields && freightDetailsNonMatchingFields?.some(fields => fields?.length > 0)) {
+        setIsBookNowButtonDisabled(true);
+      } else {
+        setIsBookNowButtonDisabled(false);
+      }
+    }
+  }, [freightDetailsNonMatchingFields]);
+
+  useEffect(() => {
     validQuote(bookingRequest).then(vq => setValidQuoteState(vq));
     setNonMatchingFields(findNonMatchingFields());
     setContainersNonMatchingFields(findContainerNonMatchingFields());
+    setFreightDetailsNonMatchingFields(findFreightDetailNonMatchingFields());
   }, [bookingRequest, findContainerNonMatchingFields, findNonMatchingFields]);
 
   return (nonMatchingFields && nonMatchingFields.length > 0) ||
-    (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
+    (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ||
+    (freightDetailsNonMatchingFields && !freightDetailsNonMatchingFields.every(isEmpty)) ? (
     <Paper className={classes.additionalInfo}>
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
@@ -192,6 +228,38 @@ const MissingFields: React.FC<Props> = ({
                     ))}
                   </Box>
                 )}
+              {isDashboardUser(userRecord) &&
+                freightDetailsNonMatchingFields &&
+                !freightDetailsNonMatchingFields.every(isEmpty) && (
+                  <Box display={'flex'} flexWrap={'wrap'}>
+                    {freightDetailsNonMatchingFields.map(
+                      (freightDetail, index) =>
+                        freightDetail.length > 0 && (
+                          <List key={index} disablePadding={true}>
+                            <ListItem>
+                              <ListItemText>
+                                <Typography variant="h5">Freight Detail {index + 1}: </Typography>
+                              </ListItemText>
+                            </ListItem>
+                            <List dense={true}>
+                              {freightDetail.map((field, index) => (
+                                <ListItem key={index}>
+                                  <ListItemIcon>
+                                    <FiberManualRecordIcon color={'error'} fontSize={'small'} />
+                                  </ListItemIcon>
+                                  <ListItemText>
+                                    {FreightDetailWatchedFields[field] === 'Currency'
+                                      ? 'Invalid or missing currency'
+                                      : FreightDetailWatchedFields[field]}
+                                  </ListItemText>
+                                </ListItem>
+                              ))}
+                            </List>
+                          </List>
+                        ),
+                    )}
+                  </Box>
+                )}
             </Box>
           </ExpansionPanelDetails>
         </ExpansionPanel>
@@ -206,4 +274,6 @@ interface Props {
   bookingRequest: BookingRequest;
   watchedFields?: string[];
   containerWatchedFields?: string[];
+  freightDetailWatchedFields?: string[];
+  setIsBookNowButtonDisabled?: (value: boolean) => void;
 }
