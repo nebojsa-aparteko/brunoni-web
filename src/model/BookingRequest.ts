@@ -58,6 +58,7 @@ export interface BookingRequest {
   bookingId?: string;
   showWarningMessage?: boolean;
   assignedTags?: string[];
+  isUnread?: boolean;
 }
 
 export interface BookingRequestItinerary {
