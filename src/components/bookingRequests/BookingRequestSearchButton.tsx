@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -21,6 +21,7 @@ import Client from '../../model/Client';
 import { BookingRequestStatusText } from '../../model/BookingRequest';
 import Mousetrap from 'mousetrap';
 import SelectInput from '../inputs/SelectInput';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -259,6 +260,8 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
   setSearchValue,
 }) => {
   const classes = useStyles();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const handleClearFields = () => {
     setSearchValue(undefined);
@@ -285,16 +288,18 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             setSearchValue={setSearchValue}
             closeModal={closeModal}
           />
-          <SearchClient
-            key="client.id"
-            label={'Client'}
-            fieldName={'client.id'}
-            searchField={searchField}
-            setSearchField={setSearchField}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            closeModal={closeModal}
-          />
+          {isAdmin && (
+            <SearchClient
+              key="client.id"
+              label={'Client'}
+              fieldName={'client.id'}
+              searchField={searchField}
+              setSearchField={setSearchField}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              closeModal={closeModal}
+            />
+          )}
           <SearchBookingRequest
             key="vessel"
             label="Vessel Name"
@@ -305,16 +310,18 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             setSearchValue={setSearchValue}
             closeModal={closeModal}
           />
-          <SearchBookingRequest
-            key="quoteNumber"
-            label="Quote Number"
-            fieldName={'quoteNumber'}
-            searchField={searchField}
-            setSearchField={setSearchField}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            closeModal={closeModal}
-          />
+          {isAdmin && (
+            <SearchBookingRequest
+              key="quoteNumber"
+              label="Quote Number"
+              fieldName={'quoteNumber'}
+              searchField={searchField}
+              setSearchField={setSearchField}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              closeModal={closeModal}
+            />
+          )}
           <SearchStatus
             key="statusText"
             label="Status"
