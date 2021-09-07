@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -8,10 +8,7 @@ import {
   DialogTitle,
   FormControl,
   IconButton,
-  InputLabel,
   makeStyles,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -22,6 +19,8 @@ import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
 import { BookingRequestStatusText } from '../../model/BookingRequest';
+import Mousetrap from 'mousetrap';
+import SelectInput from '../inputs/SelectInput';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -84,6 +83,21 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
     setInputValue(searchField === fieldName ? searchValue || '' : '');
   }, [fieldName, searchField]);
 
+  const inputRef = useRef();
+
+  useEffect(() => {
+    if (inputRef && inputRef) {
+      let mousetrapInstance = new Mousetrap(inputRef.current);
+      mousetrapInstance.stopCallback = function() {
+        return false;
+      };
+      mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
+      return () => {
+        mousetrapInstance?.unbind(['enter', 'enter']);
+      };
+    }
+  }, [inputRef, handleBookingSearch]);
+
   return (
     <Fragment>
       <FormControl className={classes.formControl}>
@@ -93,6 +107,7 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
           margin="normal"
           variant="outlined"
           defaultValue={inputValue}
+          inputRef={inputRef}
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
@@ -127,12 +142,28 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
     closeModal();
   };
 
+  const inputRef = useRef();
+
+  useEffect(() => {
+    if (inputRef) {
+      let mousetrapInstance = new Mousetrap(inputRef.current);
+      mousetrapInstance.stopCallback = function() {
+        return false;
+      };
+      mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
+      return () => {
+        mousetrapInstance?.unbind(['enter', 'enter']);
+      };
+    }
+  }, [inputRef, selectedClient?.id, handleBookingSearch]);
+
   return (
     <Fragment>
       <FormControl className={classes.formControl} style={{ paddingTop: 16, paddingBottom: 8 }}>
         <ClientInput
           label={label}
           clients={clients || []}
+          inputRef={inputRef}
           onChange={client => setSelectedClient(client || undefined)}
           value={selectedClient}
         />
@@ -154,14 +185,16 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   closeModal,
 }) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+  const statuses = Object.values(BookingRequestStatusText);
 
   useEffect(() => {
     setSelectedStatus(searchField === 'statusText' ? searchValue : undefined);
   }, [searchField, searchValue]);
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedStatus(event.target.value as string);
+  const handleChange = (value: string | null) => {
+    setSelectedStatus(value || undefined);
   };
 
   const handleBookingSearch = () => {
@@ -170,23 +203,36 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
     closeModal();
   };
 
+  const inputRef = useRef();
+
+  useEffect(() => {
+    if (inputRef) {
+      let mousetrapInstance = new Mousetrap(inputRef.current);
+      mousetrapInstance.stopCallback = function() {
+        return false;
+      };
+      mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
+      return () => {
+        mousetrapInstance?.unbind(['enter', 'enter']);
+      };
+    }
+  }, [inputRef, selectedStatus, handleBookingSearch]);
+
   return (
     <Fragment>
-      <FormControl variant="outlined" className={classes.formControl} style={{ marginTop: 16, marginBottom: 8 }}>
-        <InputLabel id="search-status-label">{label}</InputLabel>
-        <Select
-          labelId="search-status-label"
-          id="demo-simple-select-outlined"
-          value={selectedStatus || ''}
-          onChange={handleChange}
-          className={classes.searchInput}
-          // variant="outlined"
-          label={label}
-        >
-          {Object.values(BookingRequestStatusText).map(status => (
-            <MenuItem value={status}>{status}</MenuItem>
-          ))}
-        </Select>
+      <FormControl className={classes.formControl} style={{ marginTop: 16, marginBottom: 8 }}>
+        <Box flex={1}>
+          <SelectInput
+            label={label}
+            options={statuses}
+            getOptionLabel={event => event}
+            open={open}
+            setOpen={setOpen}
+            value={selectedStatus || ''}
+            onChange={handleChange}
+            inputRef={inputRef}
+          />
+        </Box>
         <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
           <SearchIcon />
         </IconButton>
@@ -230,6 +276,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <SearchBookingRequest
+            key="id"
             label="Request number"
             fieldName={'id'}
             searchField={searchField}
@@ -239,6 +286,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             closeModal={closeModal}
           />
           <SearchClient
+            key="client.id"
             label={'Client'}
             fieldName={'client.id'}
             searchField={searchField}
@@ -247,16 +295,8 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             setSearchValue={setSearchValue}
             closeModal={closeModal}
           />
-          {/*<SearchBookingRequest*/}
-          {/*  label="Customer"*/}
-          {/*  fieldName={'client.id'}*/}
-          {/*  searchField={searchField}*/}
-          {/*  setSearchField={setSearchField}*/}
-          {/*  searchValue={searchValue}*/}
-          {/*  setSearchValue={setSearchValue}*/}
-          {/*  closeModal={closeModal}*/}
-          {/*/>*/}
           <SearchBookingRequest
+            key="vessel"
             label="Vessel Name"
             fieldName={'vessel'}
             searchField={searchField}
@@ -266,6 +306,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             closeModal={closeModal}
           />
           <SearchBookingRequest
+            key="quoteNumber"
             label="Quote Number"
             fieldName={'quoteNumber'}
             searchField={searchField}
@@ -275,6 +316,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             closeModal={closeModal}
           />
           <SearchStatus
+            key="statusText"
             label="Status"
             fieldName={'statusText'}
             searchField={searchField}
@@ -284,6 +326,7 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             closeModal={closeModal}
           />
           <SearchBookingRequest
+            key="customerReference"
             label="Customer ref"
             fieldName={'customerReference'}
             searchField={searchField}
@@ -328,6 +371,7 @@ const BookingRequestSearchButton: React.FC<SearchButtonProps> = ({
     <Fragment>
       <IconButton
         onClick={openModal}
+        onMouseDown={e => e.preventDefault()}
         style={{ backgroundColor: searchField || searchValue ? 'rgba(255,103,95,0.15)' : undefined }}
       >
         <SearchIcon fontSize="large" />

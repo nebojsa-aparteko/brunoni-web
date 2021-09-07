@@ -114,7 +114,15 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   useEffect(() => {
     setFilteredBookingRequests(
-      !fieldName || !value ? bookingRequests : bookingRequests?.filter(request => get(fieldName, request) === value),
+      !fieldName || !value
+        ? bookingRequests
+        : bookingRequests?.filter(request => {
+            const requestValue = get(fieldName, request);
+            return typeof requestValue === 'string' && typeof value === 'string'
+              ? // @ts-ignore
+                requestValue && value && requestValue.trim().toLowerCase() === value.trim().toLowerCase()
+              : requestValue === value;
+          }),
     );
   }, [bookingRequests, fieldName, value]);
 
