@@ -83,10 +83,11 @@ export enum BookingRequestStatusText {
 }
 
 export enum ISOCodesEdiAlphacom {
-  '22G1' = '22G0',
-  '45G1' = '45G0',
-  '42G1' = '42G0',
-  '45R1' = '45R0',
+  '20G0' = '22G1',
+  '22G0' = '22G1',
+  '45G0' = '45G1',
+  '42G0' = '42G1',
+  '45R0' = '45R1',
 }
 
 export const BookingRequestLabels: Object = {

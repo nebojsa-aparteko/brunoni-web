@@ -1,6 +1,6 @@
 import cheerio from 'cheerio';
 import { isEqual, omit } from 'lodash/fp';
-import getEnumKeyByEnumValue from './getEnumKeyByEnumValue';
+import { getEnumValueByEnumKey } from './getEnumKeyByEnumValue';
 import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
 
 enum Types {
@@ -393,7 +393,7 @@ const getContainerData = (array: string[]) => {
 
   const SIZE_TYPE_CODE = getNeededData(array, NeededData.SIZE_TYPE_CODE);
   const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g)?.[0] || undefined;
-  const ISO_TYPE = (TYPE && getEnumKeyByEnumValue(ISOCodesEdiAlphacom, TYPE)) || undefined;
+  const ISO_TYPE = (TYPE && getEnumValueByEnumKey(ISOCodesEdiAlphacom, TYPE)) || undefined;
   const SIZE = TYPE
     ? SIZE_TYPE_CODE?.replace(TYPE, '')
         .replace(/[()]/g, '')
