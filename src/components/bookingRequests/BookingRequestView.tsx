@@ -476,14 +476,18 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const { isOpen, openModal, closeModal } = useModal();
   const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] = useState<boolean>(true);
   const [isBookNowDisabled, setIsBookNowDisabled] = useState<boolean>(
-    bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
+    bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED ||
+      isBookNowAutomaticallyDisabled ||
+      !bookingRequest.assignedUser,
   );
 
   useEffect(() => {
     setIsBookNowDisabled(
-      bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED || isBookNowAutomaticallyDisabled,
+      bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED ||
+        isBookNowAutomaticallyDisabled ||
+        !bookingRequest.assignedUser,
     );
-  }, [bookingRequest.statusCode, isBookNowAutomaticallyDisabled]);
+  }, [bookingRequest.statusCode, isBookNowAutomaticallyDisabled, bookingRequest.assignedUser]);
 
   const {
     isOpen: isOpenAssignmentModal,
