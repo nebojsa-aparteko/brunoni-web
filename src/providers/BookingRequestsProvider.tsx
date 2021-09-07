@@ -57,7 +57,8 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       } else {
-        if (isAdmin) query = query.where('carrier.id', 'in', userRecord.carriers || []);
+        if (isAdmin && userRecord.carriers && userRecord.carriers?.length > 0)
+          query = query.where('carrier.id', 'in', userRecord.carriers);
       }
       if (filters.clientFilter) {
         query = query.where('client.id', '==', filters.clientFilter.id);
