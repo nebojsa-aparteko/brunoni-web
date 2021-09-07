@@ -46,6 +46,7 @@ import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
 import ChargeCodes from '../../contexts/ChargeCodes';
 import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
 import BookingRequestSearchButton from './BookingRequestSearchButton';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -99,6 +100,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const { isOpen, openModal, closeModal } = useModal();
   const [, dispatch] = useContext(GlobalContext);
+  const [, userRecord] = useUser();
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
 
@@ -109,14 +111,28 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const [bookingRequests, isLoading] = useBookingRequestsContext();
   const [filters, setFilters] = useBookingRequestsFilterContext();
   const [fieldName, setFieldName] = useState<string | undefined>(undefined);
+  const [userCarriers, setUserCarriers] = useState<string[] | undefined>(undefined);
   const [value, setValue] = useState(undefined);
   const [filteredBookingRequests, setFilteredBookingRequests] = useState(bookingRequests);
 
   useEffect(() => {
+    // this is to prevent an error where the component updates between re-renders
+    setUserCarriers(userRecord.carriers);
+  }, [userRecord.carriers]);
+
+  useEffect(() => {
+    // Temporarily filter bookings by carrier on frontend if there are no selected carrier or if
+    // there are more than one carrier assigned to an admin;
+    // if it's not already filtered on the backend (because of limitation) than filter it here
+    const filteredByCarrier =
+      isAdmin && userCarriers && userCarriers?.length === 1
+        ? bookingRequests
+        : bookingRequests?.filter(request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id));
+
     setFilteredBookingRequests(
       !fieldName || !value
-        ? bookingRequests
-        : bookingRequests?.filter(request => {
+        ? filteredByCarrier
+        : filteredByCarrier?.filter(request => {
             const requestValue = get(fieldName, request);
             return typeof requestValue === 'string' && typeof value === 'string'
               ? // @ts-ignore
@@ -124,8 +140,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
               : requestValue === value;
           }),
     );
-  }, [bookingRequests, fieldName, value]);
-
+  }, [bookingRequests, fieldName, value, userCarriers]);
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
 
