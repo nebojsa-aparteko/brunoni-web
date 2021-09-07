@@ -114,7 +114,15 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   useEffect(() => {
     setFilteredBookingRequests(
-      !fieldName || !value ? bookingRequests : bookingRequests?.filter(request => get(fieldName, request) === value),
+      !fieldName || !value
+        ? bookingRequests
+        : bookingRequests?.filter(request => {
+            const requestValue = get(fieldName, request);
+            return typeof requestValue === 'string' && typeof value === 'string'
+              ? // @ts-ignore
+                requestValue && value && requestValue.trim().toLowerCase() === value.trim().toLowerCase()
+              : requestValue === value;
+          }),
     );
   }, [bookingRequests, fieldName, value]);
 
@@ -203,14 +211,16 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     <Typography variant="subtitle1" display="inline">
                       Bookings Requests
                     </Typography>
-                    <Box ml={2}>
-                      <Tooltip title="Add from a html file">
-                        <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
-                          <AddIcon fontSize="large" />
-                        </IconButton>
-                      </Tooltip>
-                      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
-                    </Box>
+                    {!actingAs && (
+                      <Box ml={2}>
+                        <Tooltip title="Add from a html file">
+                          <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <AddIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
+                        {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
+                      </Box>
+                    )}
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
                     <BookingRequestSearchButton

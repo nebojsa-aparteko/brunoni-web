@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
@@ -8,6 +8,8 @@ import firebase from '../firebase';
 import { BookingRequest } from '../model/BookingRequest';
 import safeInvoke from '../utilities/safeInvoke';
 import { useBookingRequestsFilterContext } from './BookingRequestsFilterProvider';
+import useUser from '../hooks/useUser';
+import ActingAs from '../contexts/ActingAs';
 
 interface Props {
   children: React.ReactNode;
@@ -33,8 +35,10 @@ export const useBookingRequestsContext = () => {
 
 const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [, userRecord] = useUser();
   const filters = useBookingRequestsFilterContext()[0];
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
@@ -52,6 +56,9 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       }
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
+      } else {
+        if (isAdmin && userRecord.carriers && userRecord.carriers?.length > 0)
+          query = query.where('carrier.id', 'in', userRecord.carriers);
       }
       if (filters.clientFilter) {
         query = query.where('client.id', '==', filters.clientFilter.id);
@@ -67,7 +74,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       }
       return query;
     },
-    [filters],
+    [filters, isAdmin, userRecord.carriers],
   );
 
   const bookingRequestsSnapshot = useFirestoreCollection('bookings-requests', query);
