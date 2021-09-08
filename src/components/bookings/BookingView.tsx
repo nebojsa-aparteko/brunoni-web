@@ -7,8 +7,6 @@ import {
   Grid,
   IconButton,
   makeStyles,
-  Menu,
-  MenuItem,
   Paper,
   Theme,
   Typography,
@@ -26,7 +24,6 @@ import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
-import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
@@ -52,6 +49,7 @@ import TagsList from '../tags/TagsList';
 import { TagCategory } from '../../model/Tag';
 import PromoBox from '../PromoBox';
 import Tags from '../../contexts/Tags';
+import { DropDownMenuWithItems } from '../DropdownMenu';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -159,7 +157,6 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
-  const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
@@ -208,7 +205,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     return tasks?.filter(task =>
       task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
     );
-  }, [tasks, userRecord]);
+  }, [selectedTab, tasks]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -222,8 +219,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     [userRecord],
   );
 
-  const onArchiveClick = useCallback(() => {
-    firebase
+  const onArchiveClick = useCallback(async () => {
+    await firebase
       .firestore()
       .collection('bookings')
       .doc(booking?.id)
@@ -232,7 +229,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     // if the booking was in dispute and action is to archive it
     // this is expected to be very rare so leave it as a separate call
     if (booking.inDispute && !booking.archived) {
-      firebase
+      await firebase
         .firestore()
         .collection('bookings')
         .doc(booking?.id)
@@ -240,8 +237,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     }
   }, [booking]);
 
-  const onDisputeClick = useCallback(() => {
-    firebase
+  const onDisputeClick = useCallback(async () => {
+    await firebase
       .firestore()
       .collection('bookings')
       .doc(booking?.id)
@@ -274,17 +271,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         })
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],
+    [booking.id, booking.watchers, userRecord, dispatch],
   );
-  const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClickMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   useLayoutEffect(() => {
     if (printRequested) {
       window.print();
@@ -435,30 +424,28 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                     handleWatch={onWatch}
                   />
                 )}
-
-                <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
-                  <PrintIcon />
-                </IconButton>
-                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(false);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print without costs
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(true);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print with cost
-                  </MenuItem>
-                </Menu>
+                <DropDownMenuWithItems
+                  toolTip={''}
+                  dropDownIcon={<PrintIcon />}
+                  items={[
+                    {
+                      onClick: () => {
+                        setPrintWithCost(false);
+                        setPrintRequested(true);
+                      },
+                      icon: <PrintIcon />,
+                      label: 'Print without costs',
+                    },
+                    {
+                      onClick: () => {
+                        setPrintWithCost(true);
+                        setPrintRequested(true);
+                      },
+                      icon: <PrintIcon />,
+                      label: 'Print with cost',
+                    },
+                  ]}
+                />
               </Box>
             </Box>
 

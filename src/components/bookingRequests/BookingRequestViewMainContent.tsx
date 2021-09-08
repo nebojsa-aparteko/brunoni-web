@@ -13,12 +13,12 @@ import SimpleExpansionPanel from '../SimpleExpansionPanel';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
-    ['@media print']: {
+    '@media print': {
       display: 'none',
     },
   },
   showPrint: {
-    ['@media print']: {
+    '@media print': {
       display: 'initial',
     },
   },
@@ -73,10 +73,12 @@ const BookingRequestViewMainContent: React.FC<Props> = ({ isPrintWithCost, showW
       <Box marginTop="2em" marginBottom="2em">
         <Divider />
       </Box>
-      <BookingRequestFreightDetails
-        freightDetails={bookingRequestState.freightDetails}
-        showWarningMessage={showWarningMessage}
-      />
+      <Box className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
+        <BookingRequestFreightDetails
+          freightDetails={bookingRequestState.freightDetails}
+          showWarningMessage={showWarningMessage}
+        />
+      </Box>
       <Typography variant="body2" className={classes.remark}>
         {remark}
       </Typography>

@@ -42,9 +42,14 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-start',
     flexDirection: 'column',
   },
+  hidePrint: {
+    '@media print': {
+      display: 'none',
+    },
+  },
 }));
 
-const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeModal, vesselVoyage }) => {
+const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage }) => {
   const classes = useStyles();
   const vessel = useVesselWithVoyageById(`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`);
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
@@ -149,6 +154,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModal> = ({ isOpen, closeM
 
 const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage }) => {
   const { closeModal, openModal, isOpen } = useModal();
+  const classes = useStyles();
 
   const handleOpenModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     openModal();
@@ -156,14 +162,14 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
   };
 
   return (
-    <>
+    <Box className={classes.hidePrint}>
       <IconButton color="primary" aria-label="check vessel space" onClick={event => handleOpenModal(event)}>
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (
         <VesselAllocationModal isOpen={isOpen} closeModal={closeModal} vesselVoyage={vesselVoyage} />
       )}
-    </>
+    </Box>
   );
 };
 
@@ -179,7 +185,7 @@ interface VesselAllocationButtonProps {
   vesselVoyage?: RouteSearchResultVoyageInfo;
 }
 
-interface VesselAllocationModal {
+interface VesselAllocationModalProps {
   isOpen: boolean;
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;

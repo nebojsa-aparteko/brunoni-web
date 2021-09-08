@@ -15,12 +15,7 @@ import {
 import React, { Fragment, useCallback, useContext } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import {
-  BookingRequest,
-  BookingRequestItinerary,
-  BookingRequestLabels,
-  FreightDetail,
-} from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestItinerary, BookingRequestLabels } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';

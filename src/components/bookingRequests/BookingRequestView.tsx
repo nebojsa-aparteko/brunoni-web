@@ -131,6 +131,11 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginLeft: theme.spacing(1),
     },
   },
+  button: {
+    '@media print': {
+      display: 'none',
+    },
+  },
   closeModal: {
     position: 'absolute',
     top: '5px',
@@ -161,6 +166,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+  },
+  hidePrint: {
+    '@media print': {
+      display: 'none',
+    },
+  },
+  showPrint: {
+    '@media print': {
+      display: 'initial',
+    },
   },
 }));
 
@@ -831,7 +846,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 )}
               </Box>
               <Box flex="1" />
-              <Box display={'flex'} alignItems={'center'}>
+              <Box display={'flex'} alignItems={'center'} className={classes.button}>
                 {!editing && isDashboardUser(userRecord) && (
                   <BookNowButton bookNow={bookNow} disabled={isBookNowDisabled} />
                 )}

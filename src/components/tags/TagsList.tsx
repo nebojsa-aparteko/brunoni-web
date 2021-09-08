@@ -22,6 +22,11 @@ const useStyles = makeStyles(() => ({
     marginTop: '1px',
     marginBottom: '1px',
   },
+  hidePrint: {
+    '@media print': {
+      display: 'none',
+    },
+  },
 }));
 
 interface TagItemProps {
@@ -48,6 +53,7 @@ const TagsList: React.FC<TagsListProps> = ({ tags, tagCategory, documentId }) =>
       border="1px solid rgba(0,0,0,0.15)"
       p={1}
       maxWidth="100%"
+      className={classes.hidePrint}
     >
       <Typography variant="subtitle2">Tags:</Typography>
       <Box display="flex" flexDirection="row" className={classes.tagList} mx={1}>

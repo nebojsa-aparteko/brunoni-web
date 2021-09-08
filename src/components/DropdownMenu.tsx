@@ -7,6 +7,7 @@ export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
   items,
   toolTip = 'More',
   dropDownIcon = <MoreVertIcon />,
+  onClose,
 }) => {
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -18,6 +19,7 @@ export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
 
   const handleClose = () => {
     setMoreAnchorEl(null);
+    if (onClose) onClose();
   };
 
   return (
@@ -45,6 +47,7 @@ interface WithItemsProps {
   items: MenuWithItemsProps[];
   dropDownIcon?: React.ReactNode;
   toolTip?: string;
+  onClose?: () => void;
 }
 
 interface MenuWithItemsProps {
