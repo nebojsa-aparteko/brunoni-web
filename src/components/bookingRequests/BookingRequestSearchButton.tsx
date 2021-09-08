@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,10 +18,11 @@ import SearchIcon from '@material-ui/icons/Search';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
-import { BookingRequestStatusText } from '../../model/BookingRequest';
+import { BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
 import Mousetrap from 'mousetrap';
 import SelectInput from '../inputs/SelectInput';
 import ActingAs from '../../contexts/ActingAs';
+import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -188,7 +189,16 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
-  const statuses = Object.values(BookingRequestStatusText);
+  const [filters] = useBookingRequestsFilterContext();
+  const statuses = useMemo(
+    () =>
+      filters.maxStatusCode && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS
+        ? [BookingRequestStatusText.REQUESTED, BookingRequestStatusText.IN_PROGRESS]
+        : filters.minStatusCode && filters.minStatusCode === BookingRequestStatusCode.CONFIRMED
+        ? [BookingRequestStatusText.CONFIRMED, BookingRequestStatusText.ARCHIVED]
+        : Object.values(BookingRequestStatusText),
+    [filters.minStatusCode, filters.maxStatusCode],
+  );
 
   useEffect(() => {
     setSelectedStatus(searchField === 'statusText' ? searchValue : undefined);
