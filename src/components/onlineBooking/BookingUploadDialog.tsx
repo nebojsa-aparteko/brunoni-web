@@ -192,24 +192,40 @@ const matchAndFetchSchedule = async (
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
+  let schedules = data.Routes;
 
-  let schedules = data.Routes.filter(schedule =>
-    object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
-  );
-  // only filter more if more than 1
   if (schedules.length > 1 && object.VOYAGE)
     schedules = schedules.filter(schedule =>
       object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+    );
+  // only filter more if more than 1
+  if (schedules.length > 1 && object.VESSEL)
+    schedules = schedules.filter(schedule =>
+      object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
     );
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
+    schedules = data.Routes;
 
-    schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-    // only filter more if more than 1
     if (schedules.length > 1 && object.VOYAGE)
-      schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+      schedules = schedules.filter(schedule =>
+        object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+      );
+
+    // only filter more if more than 1
+    if (schedules.length > 1 && object.VESSEL)
+      schedules = schedules.filter(schedule =>
+        object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
+      );
+
+    if (schedules.length === 0 && data.Routes.length > 0 && object.VOYAGE) {
+      schedules = data.Routes.filter(schedule =>
+        object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+      );
+      return schedules[0];
+    }
   }
   // if still more than 1 check for intermediate ports
   if (schedules.length > 1) {
@@ -223,7 +239,7 @@ const matchAndFetchSchedule = async (
       schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id));
     }
   }
-  return schedules?.length === 1 ? schedules?.[0] : undefined;
+  return schedules?.length === 1 ? schedules[0] : undefined;
 };
 
 const getClientById = async (id: string): Promise<Client> => {
