@@ -191,6 +191,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
   const [container, setContainer] = useState<Container & ContainerDetails>(value);
   const [temperatureFocused, setTemperatureFocused] = useState<boolean>(false);
+  const [temperature, setTemperature] = useState<string | undefined>(container.temperature?.toString());
   const [bookingRequest] = useBookingRequestContext();
 
   const tariffs = useCodebook({
@@ -204,6 +205,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   useEffect(() => {
     setContainer(value);
   }, [value]);
+
+  useEffect(() => {
+    setTemperature(container.temperature?.toString());
+  }, [container.temperature]);
 
   useEffect(() => {
     if (isContainerSO(container)) {
@@ -450,14 +455,17 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 <Grid item md={2} xs={12}>
                   <TextField
                     label="Temperature (°C)"
-                    type="number"
+                    inputProps={{ pattern: '/\\d+|-\\d+/g' }}
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={container.temperature}
-                    onChange={event => handleTemperatureChange(parseInt(event.target.value))}
+                    value={temperature || ''}
+                    onChange={event => setTemperature(event.target.value.replace(/[^0-9.\-]$/, ''))}
                     onFocus={() => setTemperatureFocused(true)}
-                    onBlur={() => setTemperatureFocused(false)}
+                    onBlur={event => {
+                      handleTemperatureChange(event.target.value === '-' ? null : parseInt(event.target.value));
+                      setTemperatureFocused(false);
+                    }}
                     helperText={
                       !temperatureFocused && container.temperature && container.temperature < 0
                         ? 'Below zero °C'
@@ -466,8 +474,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="start">
-                          {container.temperature ? (
-                            container.temperature < 0 ? (
+                          {temperature && temperature !== '-' ? (
+                            parseInt(temperature) < 0 ? (
                               <AcUnitIcon htmlColor={'#8bddff'} />
                             ) : (
                               <WbSunnyIcon htmlColor={'#ffd904'} />

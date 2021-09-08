@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,10 +18,11 @@ import SearchIcon from '@material-ui/icons/Search';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
-import { BookingRequestStatusText } from '../../model/BookingRequest';
+import { BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
 import Mousetrap from 'mousetrap';
 import SelectInput from '../inputs/SelectInput';
 import ActingAs from '../../contexts/ActingAs';
+import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -74,15 +75,15 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
   const classes = useStyles();
   const [inputValue, setInputValue] = useState(searchField === fieldName ? searchValue || '' : '');
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(inputValue && inputValue !== '' ? fieldName : undefined);
     setSearchValue(inputValue);
     closeModal();
-  };
+  }, [fieldName, inputValue, setSearchField, setSearchValue, closeModal]);
 
   useEffect(() => {
     setInputValue(searchField === fieldName ? searchValue || '' : '');
-  }, [fieldName, searchField]);
+  }, [fieldName, searchField, searchValue]);
 
   const inputRef = useRef();
 
@@ -112,7 +113,7 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>
@@ -135,13 +136,13 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
 
   useEffect(() => {
     setSelectedClient(searchField === 'client.id' ? clients?.find(client => client.id === searchValue) : undefined);
-  }, [searchField, searchValue]);
+  }, [searchField, searchValue, clients]);
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(selectedClient ? fieldName : undefined);
     setSearchValue(selectedClient?.id);
     closeModal();
-  };
+  }, [fieldName, selectedClient?.id, setSearchField, setSearchValue, closeModal]);
 
   const inputRef = useRef();
 
@@ -168,7 +169,7 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
           onChange={client => setSelectedClient(client || undefined)}
           value={selectedClient}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>
@@ -188,7 +189,16 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
-  const statuses = Object.values(BookingRequestStatusText);
+  const [filters] = useBookingRequestsFilterContext();
+  const statuses = useMemo(
+    () =>
+      filters.maxStatusCode && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS
+        ? [BookingRequestStatusText.REQUESTED, BookingRequestStatusText.IN_PROGRESS]
+        : filters.minStatusCode && filters.minStatusCode === BookingRequestStatusCode.CONFIRMED
+        ? [BookingRequestStatusText.CONFIRMED, BookingRequestStatusText.ARCHIVED]
+        : Object.values(BookingRequestStatusText),
+    [filters.minStatusCode, filters.maxStatusCode],
+  );
 
   useEffect(() => {
     setSelectedStatus(searchField === 'statusText' ? searchValue : undefined);
@@ -198,11 +208,11 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
     setSelectedStatus(value || undefined);
   };
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(selectedStatus ? fieldName : undefined);
     setSearchValue(selectedStatus);
     closeModal();
-  };
+  }, [fieldName, selectedStatus, setSearchField, setSearchValue, closeModal]);
 
   const inputRef = useRef();
 
@@ -234,7 +244,7 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
             inputRef={inputRef}
           />
         </Box>
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>

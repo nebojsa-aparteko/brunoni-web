@@ -135,8 +135,12 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
         : filteredByCarrier?.filter(request => {
             const requestValue = get(fieldName, request);
             return typeof requestValue === 'string' && typeof value === 'string'
-              ? // @ts-ignore
-                requestValue && value && requestValue.trim().toLowerCase() === value.trim().toLowerCase()
+              ? requestValue &&
+                  value &&
+                  requestValue
+                    .trim()
+                    .toLowerCase() // @ts-ignore
+                    .includes(value.trim().toLowerCase())
               : requestValue === value;
           }),
     );
