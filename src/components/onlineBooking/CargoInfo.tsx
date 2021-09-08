@@ -97,6 +97,7 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
           isDetailedInput: true,
           showLessDetailedInput: !actingAs,
           shouldShowAllDepots: isDashboardUser(userRecord),
+          commodityFreeSolo: true,
         }}
         addText="Add Container"
         defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}
