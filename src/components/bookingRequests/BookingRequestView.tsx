@@ -645,7 +645,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           const body = await response.json();
           if (body.FileID) {
             await onBookingCreate(body.FileID);
-            await timeout(2000);
+            await timeout(3000);
             let bookingData = (
               await firebase
                 .firestore()
@@ -657,7 +657,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
               const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
               win && win.focus();
             } else {
-              await timeout(5000);
+              await timeout(10000);
               bookingData = (
                 await firebase
                   .firestore()
