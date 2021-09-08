@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -75,15 +75,15 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
   const classes = useStyles();
   const [inputValue, setInputValue] = useState(searchField === fieldName ? searchValue || '' : '');
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(inputValue && inputValue !== '' ? fieldName : undefined);
     setSearchValue(inputValue);
     closeModal();
-  };
+  }, [fieldName, inputValue, setSearchField, setSearchValue, closeModal]);
 
   useEffect(() => {
     setInputValue(searchField === fieldName ? searchValue || '' : '');
-  }, [fieldName, searchField]);
+  }, [fieldName, searchField, searchValue]);
 
   const inputRef = useRef();
 
@@ -113,7 +113,7 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>
@@ -136,13 +136,13 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
 
   useEffect(() => {
     setSelectedClient(searchField === 'client.id' ? clients?.find(client => client.id === searchValue) : undefined);
-  }, [searchField, searchValue]);
+  }, [searchField, searchValue, clients]);
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(selectedClient ? fieldName : undefined);
     setSearchValue(selectedClient?.id);
     closeModal();
-  };
+  }, [fieldName, selectedClient?.id, setSearchField, setSearchValue, closeModal]);
 
   const inputRef = useRef();
 
@@ -169,7 +169,7 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
           onChange={client => setSelectedClient(client || undefined)}
           value={selectedClient}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>
@@ -208,11 +208,11 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
     setSelectedStatus(value || undefined);
   };
 
-  const handleBookingSearch = () => {
-    setSearchField(fieldName);
+  const handleBookingSearch = useCallback(() => {
+    setSearchField(selectedStatus ? fieldName : undefined);
     setSearchValue(selectedStatus);
     closeModal();
-  };
+  }, [fieldName, selectedStatus, setSearchField, setSearchValue, closeModal]);
 
   const inputRef = useRef();
 
@@ -244,7 +244,7 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
             inputRef={inputRef}
           />
         </Box>
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={handleBookingSearch}>
           <SearchIcon />
         </IconButton>
       </FormControl>
