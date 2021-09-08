@@ -93,16 +93,16 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
         if (a.statusCode === b.statusCode) {
           if (!!a.assignedUser === !!b.assignedUser) {
             if (a.itinerary?.placeOfReceipt?.DepartureDate && b.itinerary?.placeOfReceipt?.DepartureDate)
-              return a.itinerary.placeOfReceipt.DepartureDate < b.itinerary.placeOfReceipt.DepartureDate ? 1 : -1;
+              return a.itinerary.placeOfReceipt.DepartureDate < b.itinerary.placeOfReceipt.DepartureDate ? -1 : 1;
             else if (a.itinerary?.portOfLoading?.DepartureDate && b.itinerary?.portOfLoading?.DepartureDate)
-              return a.itinerary?.portOfLoading?.DepartureDate < b.itinerary?.portOfLoading?.DepartureDate ? 1 : -1;
+              return a.itinerary?.portOfLoading?.DepartureDate < b.itinerary?.portOfLoading?.DepartureDate ? -1 : 1;
             return a.itinerary?.placeOfReceipt
               ? a.itinerary?.placeOfReceipt?.DepartureDate
-                ? 1
-                : -1
+                ? -1
+                : 1
               : a.itinerary?.portOfLoading?.DepartureDate
-              ? 1
-              : -1;
+              ? -1
+              : 1;
           } else {
             return a.assignedUser === null ? -1 : 1;
           }
