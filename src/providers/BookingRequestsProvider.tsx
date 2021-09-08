@@ -111,9 +111,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       };
     };
 
-    return normalizeBookingRequests(bookingRequests)
-      .filter(b => b.assignedUser !== undefined)
-      .sort(sortFunction()) as BookingRequest[];
+    return normalizeBookingRequests(bookingRequests).sort(sortFunction()) as BookingRequest[];
   }, [bookingRequestsSnapshot]);
 
   return (
