@@ -765,7 +765,6 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   handleClose,
   setBookingRequest,
   fetchQuotes,
-  //todo. Check
   isOnlineBookingProcess = false,
 }) => {
   const classes = useStyles();
@@ -776,7 +775,9 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
 
   const normalize = useNormalizeQuote();
 
-  const { setValue } = useFormContext();
+  const form = useFormContext();
+
+  const setValue = form?.setValue;
 
   const handleQuoteSearch = useCallback(() => {
     firebase
