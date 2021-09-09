@@ -402,7 +402,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             onChange={handleCommodityTypeChange}
             value={container.commodityType!}
             margin="dense"
-            freeSolo={true}
+            freeSolo={get('commodityFreeSolo')(rest)}
             inputRef={commodityTypeInput}
           />
         </Grid>

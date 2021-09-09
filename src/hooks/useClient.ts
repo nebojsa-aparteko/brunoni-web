@@ -13,7 +13,7 @@ export default function useClient() {
 export function useClientById(id?: string) {
   const clientDoc = useFirestoreDocument('clients', id);
 
-  return clientDoc?.data() as Client;
+  return useMemo(() => clientDoc?.data() as Client, [clientDoc]);
 }
 
 export function useClientByIdFromCache(clientId?: string) {

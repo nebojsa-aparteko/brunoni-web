@@ -150,11 +150,9 @@ const getUpdatedFreightDetails = (
   if (bookingRequest.freightDetails) {
     const index = bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos);
     if (index < 0) return bookingRequest.freightDetails;
-    const d = bookingRequest.freightDetails[index];
-    bookingRequest.freightDetails[index] = flow(
-      set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value),
-      set('Total', calculateTotal(d)),
-    )(d);
+    let d = bookingRequest.freightDetails[index];
+    d = set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value)(d);
+    bookingRequest.freightDetails[index] = flow(set(field, get(field)(d)), set('Total', calculateTotal(d)))(d);
   }
   return bookingRequest.freightDetails;
 };
