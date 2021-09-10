@@ -1,17 +1,13 @@
-import React, { useCallback, useContext, useMemo } from 'react';
-import map from 'lodash/fp/map';
-import update from 'lodash/fp/update';
-import invoke from 'lodash/fp/invoke';
+import React, { useCallback } from 'react';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import { MentionItem } from 'react-mentions';
 import ActivityLogView from '../bookings/checklist/ActivityLogView';
 import { ActivityType, QuoteActivityModel } from '../bookings/checklist/ActivityModel';
-import UserRecordContext from '../../contexts/UserRecordContext';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
-import ActingAs from '../../contexts/ActingAs';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import firebase from '../../firebase';
+import useActivities from '../../hooks/useActivities';
+import useUser from '../../hooks/useUser';
+import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 
 interface Props {
   quoteId: string;
@@ -19,44 +15,25 @@ interface Props {
 }
 
 const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId, quote }) => {
-  const [actingAs] = useContext(ActingAs);
-
-  const quoteActivityLogCollection = useFirestoreCollection(
-    'quotes',
+  const [, , isAdmin] = useUser();
+  const activities = useActivities(
+    `/quotes/${quoteId}/activity`,
     useCallback(
-      q => {
-        let query = q;
-        if (actingAs) {
-          query = query.where('isInternal', '==', false);
+      query => {
+        let q = query;
+        if (!isAdmin) {
+          q = q.where('isInternal', '==', false);
         }
-        return query.orderBy('at', 'desc');
+        return q.orderBy('at', 'desc');
       },
-      [actingAs],
+      [isAdmin],
     ),
-    quoteId,
-    'activity',
   );
 
-  const quoteActivityCollection = quoteActivityLogCollection?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as QuoteActivityModel[];
-
-  const normalizedActivityLog = useMemo(() => map(update('at', invoke('toDate')))(quoteActivityCollection), [
-    quoteActivityCollection,
-  ]);
-
-  const userRecord = useContext(UserRecordContext);
+  const userActivityLogData = useActivityLogUserData();
 
   const handleCommentSave = useCallback(
     (messageBody: string, mentions: MentionItem[], customerMessage: boolean) => {
-      const userActivityLogData = {
-        firstName: userRecord?.firstName,
-        lastName: userRecord?.lastName,
-        alphacomClientId: userRecord?.alphacomClientId,
-        alphacomId: userRecord?.alphacomId,
-        emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData;
       firebase
         .firestore()
         .collection('quotes')
@@ -77,16 +54,11 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId, quote }) => {
         })
         .catch(err => console.log(err));
     },
-    [quoteId, userRecord],
+    [quoteId, userActivityLogData],
   );
 
   return (
-    <ActivityLogView
-      activityLog={normalizedActivityLog}
-      onCommentSave={handleCommentSave}
-      quoteActivityLog={true}
-      quote={quote}
-    />
+    <ActivityLogView activityLog={activities} onCommentSave={handleCommentSave} quoteActivityLog={true} quote={quote} />
   );
 };
 

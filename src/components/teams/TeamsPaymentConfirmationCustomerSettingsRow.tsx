@@ -14,8 +14,7 @@ import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
 import CarrierInput from '../inputs/CarrierInput';
 import ClientInput from '../inputs/ClientInput';
 import MultipleEmailInput from '../inputs/MultipleEmailInput';
-import CategoryMultiSelect from '../CategoryMultiSelect';
-import { BookingCategory } from '../../model/Booking';
+import CategoryFilter from '../CategoryFilter';
 
 interface Props {
   paymentConfirmation: CustomerSettingsRule;
@@ -78,24 +77,26 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
     setPaymentConfirmationState(prevState => set(path, value)(prevState));
   }, []);
 
+  // const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   let categoryArray: BookingCategory[] = category;
+  //   switch (event.target.name) {
+  //     case BookingCategory.Export:
+  //       event.target.checked
+  //         ? categoryArray.push(BookingCategory.Export)
+  //         : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
+  //       changeData('category', categoryArray);
+  //       return;
+  //     case BookingCategory.Import:
+  //       event.target.checked
+  //         ? categoryArray.push(BookingCategory.Import)
+  //         : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
+  //       changeData('category', categoryArray);
+  //       return;
+  //   }
+  // };
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let categoryArray: BookingCategory[] = category;
-    switch (event.target.name) {
-      case BookingCategory.Export:
-        event.target.checked
-          ? categoryArray.push(BookingCategory.Export)
-          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
-        changeData('category', categoryArray);
-        return;
-      case BookingCategory.Import:
-        event.target.checked
-          ? categoryArray.push(BookingCategory.Import)
-          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
-        changeData('category', categoryArray);
-        return;
-    }
+    changeData('category', (event.target as HTMLInputElement).value);
   };
-
   return (
     <TableRow {...other}>
       <TableCell align="left" padding="checkbox">
@@ -110,7 +111,8 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
       </TableCell>
       <TableCell align="left">
-        <CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />
+        {/*<CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />*/}
+        <CategoryFilter value={category} onChange={handleImportOrExportChange} />
       </TableCell>
       <TableCell align="left">
         <ClientInput

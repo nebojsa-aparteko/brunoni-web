@@ -118,7 +118,7 @@ const ActivityLogView: React.FC<Props> = ({
                 />
               </Box>
             ))
-          : bookingRequest &&
+          : (bookingRequest || quote) &&
             activityLog?.map((activity: ActivityLogItem) => (
               <Box id={activity.id} key={`act-${activity.id}`}>
                 <ActivityLogItemView activityItem={activity} />
