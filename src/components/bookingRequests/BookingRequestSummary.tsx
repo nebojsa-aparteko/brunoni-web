@@ -575,6 +575,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
             origin={bookingRequest.origin}
             destination={bookingRequest.destination}
             handleBookNow={handleChangeSchedule}
+            carrier={bookingRequest.carrier}
           />
         )}
         <Grid item md={5} xs={12} className={classes.firstColumn}>

@@ -105,7 +105,15 @@ const InternalStorage: React.FC<Props> = ({
   showComparison,
 }) => {
   const classes = useStyles();
-  const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
+  const query = useCallback(
+    q => {
+      let query = q;
+      // todo needs to be redone, because we changed from internal storage to storage => so basically we should add isInternal field anywhere we are using this component
+      if (collection === 'bookings-requests') query = query.where('isInternal', '==', isInternal);
+      return query.orderBy('uploadedAt', 'desc');
+    },
+    [isInternal, collection],
+  );
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
@@ -121,7 +129,7 @@ const InternalStorage: React.FC<Props> = ({
     (filesCollection?.docs.map(doc => {
       return { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
     }) as ChecklistItemValueDocument[]) || [];
-
+  console.log('FILESSSSSSS', normalizedFiles);
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
 

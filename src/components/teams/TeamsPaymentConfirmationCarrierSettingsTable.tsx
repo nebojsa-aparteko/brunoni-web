@@ -31,6 +31,7 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
   const classes = useStyles();
 
   const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CARRIER_SETTINGS);
+  console.log('PYMNT', paymentConfirmations);
   const [selectedPaymentConfirmations, setSelectedPaymentConfirmations] = useState<string[]>([]);
   const [isPaymentConfirmationDialogOpen, setIsPaymentConfirmationDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);

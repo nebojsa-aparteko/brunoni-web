@@ -22,8 +22,9 @@ import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import Client from '../../model/Client';
 import { useSnackbar } from 'notistack';
-import CategoryMultiSelect from '../CategoryMultiSelect';
+// import CategoryMultiSelect from '../CategoryMultiSelect';
 import { BookingCategory } from '../../model/Booking';
+import CategoryFilter from '../CategoryFilter';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,29 +61,31 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   // TODO CLEAR STATE AFTER CLOSING DIALOG???
   // TODO REFACTOR AND CREATE MORE REUSABLE COMPONENTS ???
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | undefined>(undefined);
-  const [selectedCategory, setSelectedCategory] = useState<BookingCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<BookingCategory>(BookingCategory.Import);
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>(undefined);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
   const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<Client | undefined | null>(undefined);
 
+  // const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   let categoryArray: BookingCategory[] = selectedCategory;
+  //   switch (event.target.name) {
+  //     case BookingCategory.Export:
+  //       event.target.checked
+  //         ? categoryArray.push(BookingCategory.Export)
+  //         : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
+  //       setSelectedCategory([...categoryArray]);
+  //       return;
+  //     case BookingCategory.Import:
+  //       event.target.checked
+  //         ? categoryArray.push(BookingCategory.Import)
+  //         : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
+  //       setSelectedCategory([...categoryArray]);
+  //       return;
+  //   }
+  // };
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let categoryArray: BookingCategory[] = selectedCategory;
-    switch (event.target.name) {
-      case BookingCategory.Export:
-        event.target.checked
-          ? categoryArray.push(BookingCategory.Export)
-          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Export));
-        setSelectedCategory([...categoryArray]);
-        return;
-      case BookingCategory.Import:
-        event.target.checked
-          ? categoryArray.push(BookingCategory.Import)
-          : (categoryArray = categoryArray.filter(c => c !== BookingCategory.Import));
-        setSelectedCategory([...categoryArray]);
-        return;
-    }
+    setSelectedCategory((event.target as HTMLInputElement).value as BookingCategory);
   };
-
   const handleAddCustomerSetting = useCallback(async () => {
     //TODO FORM VALIDATION
     if (!selectedCarrier || !selectedClient || !selectedStatisticsClient) return;
@@ -151,7 +154,8 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
           />
         </Box>
         <Box maxWidth={250}>
-          <CategoryMultiSelect value={selectedCategory} onChange={handleImportOrExportChange} />
+          {/*<CategoryMultiSelect value={selectedCategory} onChange={handleImportOrExportChange} />*/}
+          <CategoryFilter value={selectedCategory} onChange={handleImportOrExportChange} />
         </Box>
         <Box minWidth={250} maxWidth={300} margin={2}>
           <ClientInput
