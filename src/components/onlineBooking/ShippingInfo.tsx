@@ -30,16 +30,17 @@ import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRequestFreightDetails';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import useUser from '../../hooks/useUser';
-import ActingAs from '../../contexts/ActingAs';
-import { isEligibleForQuote } from '../../utilities/antiTrustHelpers';
+import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
-  const actingAs = useContext(ActingAs)[0];
+
   const userRecord = useUser()[1];
-  const isAdmin = !actingAs;
+
+  const isEligibleForQuote = useIsEligibleForQuote();
+
   //todo. Check if logic is correct for client determination
   const client = useClientById(quote?.clientId || userRecord?.alphacomClientId);
   const { isOpen, closeModal, openModal } = useModal();
@@ -111,7 +112,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const getQuote = async (data: OnlineBookingInputs): Promise<boolean> => {
     const quoteRef = await getQuoteDocRef(data.quoteNumber);
     const quote = quoteRef.data() as Quote;
-    if (quoteRef.exists && isEligibleForQuote(userRecord, quote, isAdmin)) {
+    if (quoteRef.exists && isEligibleForQuote(quote)) {
       const normalizedQuote = normalize(quote) as Quote;
       setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
       setBookingRequest((prevState: any) => set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest));
