@@ -761,6 +761,7 @@ interface Props {
 
 export default BookingRequestFreightDetails;
 
+// todo we need to refactor this component and not to use isOnlineBookingProcess
 export const QuotePickerModal: React.FC<ModalProps> = ({
   isOpen,
   handleClose,
