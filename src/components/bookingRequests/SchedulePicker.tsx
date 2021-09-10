@@ -7,6 +7,7 @@ import { Quote } from '../../providers/QuoteGroupsProvider';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import Box from '@material-ui/core/Box';
 import Port from '../../model/Port';
+import Carrier from '../../model/Carrier';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -40,9 +41,18 @@ interface Props {
   handleBookNow: (schedule?: RouteSearchResult) => void;
   origin?: Port;
   destination?: Port;
+  carrier?: Carrier;
 }
 
-const SchedulePicker: React.FC<Props> = ({ isOpen, handleClose, quote, handleBookNow, origin, destination }) => {
+const SchedulePicker: React.FC<Props> = ({
+  isOpen,
+  handleClose,
+  quote,
+  handleBookNow,
+  origin,
+  destination,
+  carrier,
+}) => {
   const classes = useStyles();
 
   return (
@@ -57,10 +67,10 @@ const SchedulePicker: React.FC<Props> = ({ isOpen, handleClose, quote, handleBoo
         <Box width="100%">
           <RouteSearch
             isPicker={true}
-            origin={quote ? quote.origin : origin || undefined}
-            destination={quote ? quote.destination : destination || undefined}
+            origin={quote && quote.origin ? quote.origin : origin || undefined}
+            destination={quote && quote.destination ? quote.destination : destination || undefined}
             handleBookNow={handleBookNow}
-            carrier={quote?.carrier}
+            carrier={carrier || quote?.carrier}
           />
         </Box>
       </DialogContent>
