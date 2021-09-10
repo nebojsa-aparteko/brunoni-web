@@ -65,6 +65,8 @@ import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import theme from '../../theme';
 import CurrencyInput from '../inputs/CurrencyInput';
 import { useFormContext } from 'react-hook-form';
+import useUser from '../../hooks/useUser';
+import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -763,7 +765,6 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   handleClose,
   setBookingRequest,
   fetchQuotes,
-  //todo. Check
   isOnlineBookingProcess = false,
 }) => {
   const classes = useStyles();
@@ -772,9 +773,13 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   const [fetchedResults, setFetchedResults] = useState<Quote[] | undefined>();
   const chargeCodes = useContext(ChargeCodes);
 
+  const isEligibleForQuote = useIsEligibleForQuote();
+
   const normalize = useNormalizeQuote();
 
-  const { setValue } = useFormContext();
+  const form = useFormContext();
+
+  const setValue = form?.setValue;
 
   const handleQuoteSearch = useCallback(() => {
     firebase
@@ -783,7 +788,12 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
       .doc(inputValue)
       .get()
       .then(doc => {
-        setSearchResult(doc.exists ? (normalize(doc.data()) as Quote) : null);
+        const quote = normalize(doc.data()) as Quote;
+        if (doc.exists && isEligibleForQuote(quote)) {
+          setSearchResult(quote);
+          return;
+        }
+        setSearchResult(null);
       });
   }, [inputValue, normalize]);
 

@@ -30,14 +30,19 @@ import ImportContactsIcon from '@material-ui/icons/ImportContacts';
 import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRequestFreightDetails';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import useUser from '../../hooks/useUser';
+import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
-  const [, userRecord] = useUser();
+
+  const userRecord = useUser()[1];
+
+  const isEligibleForQuote = useIsEligibleForQuote();
+
   //todo. Check if logic is correct for client determination
-  const client = useClientById(quote?.clientId || userRecord.alphacomClientId);
+  const client = useClientById(quote?.clientId || userRecord?.alphacomClientId);
   const { isOpen, closeModal, openModal } = useModal();
   const normalize = useNormalizeQuote();
 
@@ -75,6 +80,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     handleSubmit,
     watch,
     getValues,
+    setError,
     formState: { errors },
   } = useFormContext();
 
@@ -100,30 +106,36 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     return res.every(e => !isNil(e) && e !== '') && !watch('quoteNumber');
   };
 
-  const shouldGetQuote = (data: OnlineBookingInputs): boolean => {
-    return (
-      !!data.quoteNumber && data.quoteNumber !== '' && data.quoteNumber !== bookingRequest?.quoteNumber?.toString()
-    );
-  };
+  const shouldGetQuote = (data: OnlineBookingInputs): boolean =>
+    !!data.quoteNumber && data.quoteNumber !== '' && data.quoteNumber !== bookingRequest?.quoteNumber?.toString();
 
-  const getQuote = async (data: OnlineBookingInputs) => {
+  const getQuote = async (data: OnlineBookingInputs): Promise<boolean> => {
     const quoteRef = await getQuoteDocRef(data.quoteNumber);
-    if (quoteRef.exists) {
-      const normalizedQuote = normalize(quoteRef.data()) as Quote;
+    const quote = quoteRef.data() as Quote;
+    if (quoteRef.exists && isEligibleForQuote(quote)) {
+      const normalizedQuote = normalize(quote) as Quote;
       setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
       setBookingRequest((prevState: any) => set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest));
       setBookingRequest((prevState: any) =>
         set('quoteDetails', normalizedQuote.quoteDetails)(prevState as BookingRequest),
       );
+      return true;
     }
+    return false;
   };
 
   const handleContinue = async (data: OnlineBookingInputs) => {
+    let hasQuote = !!bookingRequest?.quoteNumber;
     updateBookingRequest(data);
     if (shouldGetQuote(data)) {
-      await getQuote(data);
+      hasQuote = await getQuote(data);
     }
-    handleNext();
+    if (hasQuote || data.quoteNumber === '') handleNext();
+    else
+      setError('quoteNumber', {
+        type: 'manual',
+        message: 'You provided invalid quote number. Please either remove it or add a valid one.',
+      });
   };
 
   return (
@@ -209,6 +221,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
                 margin="dense"
                 value={value}
                 onChange={onChange}
+                error={!!errors.quoteNumber}
+                helperText={errors.quoteNumber ? errors.quoteNumber.message : null}
               />
             )}
           />
@@ -269,16 +283,14 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
           Next
         </Button>
       </Grid>
-      {isOpen && (
-        <QuotePickerModal
-          isOpen={isOpen}
-          handleClose={closeModal}
-          isOnlineBookingProcess={true}
-          setBookingRequest={setBookingRequest}
-          // @ts-ignore
-          fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
-        />
-      )}
+      <QuotePickerModal
+        isOpen={isOpen}
+        handleClose={closeModal}
+        isOnlineBookingProcess={true}
+        setBookingRequest={setBookingRequest}
+        // @ts-ignore
+        fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+      />
     </Grid>
   );
 };

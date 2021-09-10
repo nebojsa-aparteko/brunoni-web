@@ -7,6 +7,8 @@ import { Quote } from '../../providers/QuoteGroupsProvider';
 import QuickSearchQuotePreview from './QuickSearchQuotePreview';
 import Mousetrap from 'mousetrap';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
+import { Alert } from '@material-ui/lab';
+import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -25,9 +27,11 @@ const useStyles = makeStyles(theme => ({
 const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
-  const [searchResult, setSearchResult] = useState<Quote | undefined>(undefined);
+  const [searchResult, setSearchResult] = useState<Quote | undefined | null>();
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
+
+  const isEligibleForQuote = useIsEligibleForQuote();
 
   const normalize = useNormalizeQuote();
 
@@ -47,10 +51,14 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
           .collection('quotes')
           .doc(inputValue.trim().toLowerCase())
           .get()
-          .then(result => {
-            if (result) {
-              setSearchResult(normalize(result.data()));
+          .then(doc => {
+            const quote = normalize(doc.data()) as Quote;
+            if (doc.exists && isEligibleForQuote(quote)) {
+              setSearchResult(quote);
+              setIsLoading(false);
+              return;
             }
+            setSearchResult(null);
             setIsLoading(false);
           });
       } else {
@@ -68,11 +76,11 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
           );
       }
     },
-    [inputValue, normalize],
+    [inputValue, isEligibleForQuote, normalize],
   );
 
   useEffect(() => {
-    if (inputRef && inputRef.current) {
+    if (inputRef && inputRef.current && inputValue !== '') {
       inputRef.current?.focus();
       let moustrapInstance = new Mousetrap(inputRef?.current);
       moustrapInstance.stopCallback = function() {
@@ -102,17 +110,20 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
           tabIndex={-1}
           aria-label="delete"
           color="primary"
+          disabled={inputValue === ''}
           onClick={() => handleQuoteSearch(fieldPath)}
         >
           <SearchIcon />
         </IconButton>
       </FormControl>
       {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
-      {!isLoading && searchResult && (
+      {searchResult ? (
         <Box onClick={handleQuoteClick}>
           <QuickSearchQuotePreview quote={searchResult} />
         </Box>
-      )}
+      ) : searchResult === null ? (
+        <Alert severity="error">There is no quote with this ID</Alert>
+      ) : null}
     </Fragment>
   );
 };
