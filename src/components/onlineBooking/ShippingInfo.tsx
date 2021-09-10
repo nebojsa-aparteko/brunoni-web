@@ -38,7 +38,6 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
 
   const userRecord = useUser()[1];
-
   const isEligibleForQuote = useIsEligibleForQuote();
 
   //todo. Check if logic is correct for client determination
@@ -111,8 +110,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
 
   const getQuote = async (data: OnlineBookingInputs): Promise<boolean> => {
     const quoteRef = await getQuoteDocRef(data.quoteNumber);
-    const quote = quoteRef.data() as Quote;
-    if (quoteRef.exists && isEligibleForQuote(quote)) {
+    const quote = quoteRef ? (quoteRef.data() as Quote) : undefined;
+    if (quote && isEligibleForQuote(quote, scheduleCarrier)) {
       const normalizedQuote = normalize(quote) as Quote;
       setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
       setBookingRequest((prevState: any) => set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest));
@@ -290,6 +289,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         setBookingRequest={setBookingRequest}
         // @ts-ignore
         fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+        carrier={bookingRequest?.carrier}
       />
     </Grid>
   );

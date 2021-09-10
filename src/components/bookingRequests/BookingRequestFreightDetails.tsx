@@ -65,8 +65,8 @@ import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import theme from '../../theme';
 import CurrencyInput from '../inputs/CurrencyInput';
 import { useFormContext } from 'react-hook-form';
-import useUser from '../../hooks/useUser';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
+import Carrier from '../../model/Carrier';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -667,6 +667,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
               setBookingRequest={setBookingRequest}
               // @ts-ignore
               fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+              carrier={bookingRequest?.carrier}
             />
           )}
           {editing && isDashboardUser(userRecord) && (
@@ -766,6 +767,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   setBookingRequest,
   fetchQuotes,
   isOnlineBookingProcess = false,
+  carrier,
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
@@ -789,7 +791,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
       .get()
       .then(doc => {
         const quote = normalize(doc.data()) as Quote;
-        if (doc.exists && isEligibleForQuote(quote)) {
+        if (doc.exists && isEligibleForQuote(quote, carrier)) {
           setSearchResult(quote);
           return;
         }
@@ -845,7 +847,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
                 <IconButton
                   aria-label="delete"
                   color="primary"
-                  onClick={handleQuoteSearch}
+                  onClick={() => handleQuoteSearch()}
                   disabled={inputValue === ''}
                 >
                   <SearchIcon />
@@ -909,4 +911,5 @@ interface ModalProps {
     | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
   fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
   isOnlineBookingProcess?: boolean;
+  carrier?: Carrier;
 }
