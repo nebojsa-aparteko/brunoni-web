@@ -404,7 +404,7 @@ const mapIntoBookingRequestModel = async (
     hold: false,
     intraRefNumber,
     origin,
-    quoteNumber: normalizedQuote?.id,
+    quoteNumber: showWarningMessage ? null : normalizedQuote?.id,
     schedule,
     showWarningMessage,
     statusCode: BookingRequestStatusCode.REQUESTED,
