@@ -53,7 +53,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import firebase from '../../firebase';
 import QuickSearchQuotePreview from '../quickSearch/QuickSearchQuotePreview';
-import { Alert } from '@material-ui/lab';
+import Alert from '@material-ui/lab/Alert';
 import { formatCurrencyAmount } from '../../utilities/currencyFormatter';
 import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
@@ -62,11 +62,11 @@ import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { calculateContainers, onContainersChange, takeQuoteDetails } from '../onlineBooking/Summary';
 import EditingInput from '../EditingInput';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
-import theme from '../../theme';
 import CurrencyInput from '../inputs/CurrencyInput';
 import { useFormContext } from 'react-hook-form';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 import Carrier from '../../model/Carrier';
+import AlertTitle from '@material-ui/lab/AlertTitle';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -633,122 +633,123 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   return (
     <Fragment>
       <Grid item xs={12}>
-        <TableContainer
-          component={Box}
-          className={classes.tableWrapper}
-          style={{ border: showWarningMessage ? '4px solid #ff604f' : '' }}
-        >
+        <Box p={2} border={1} borderColor="warning.main" borderRadius={2}>
           {showWarningMessage && (
-            <Typography color={'error'} variant={'h4'} style={{ whiteSpace: 'pre-line', padding: theme.spacing(1) }}>
-              {'This is an approximation of freight details. Please check.'}
-            </Typography>
+            <Box mb={2}>
+              <Alert severity="warning">
+                <AlertTitle>Please check</AlertTitle>
+                This is an approximation of freight details. Please check.
+              </Alert>
+            </Box>
           )}
-          {isDashboardUser(userRecord) && (
-            <AppBar
-              position="static"
-              style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
-                <Tab label="External" {...a11yProps(0)} />
-                <Tab label="Internal 1" {...a11yProps(1)} />
-                <Tab label="Internal 2" {...a11yProps(2)} />
-              </Tabs>
-              {editing && (
-                <IconButton onClick={openModal}>
-                  <ImportContactsIcon style={{ color: 'white' }} />
-                </IconButton>
-              )}
-            </AppBar>
-          )}
-          {isOpen && (
-            <QuotePickerModal
-              isOpen={isOpen}
-              handleClose={closeModal}
-              setBookingRequest={setBookingRequest}
-              // @ts-ignore
-              fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
-              carrier={bookingRequest?.carrier}
-            />
-          )}
-          {editing && isDashboardUser(userRecord) && (
-            <EnhancedTableToolbar
-              numSelected={selectedDetails.length}
-              handleAdd={onAdd}
-              handleDelete={onDelete}
-              labelWhenSelected={
-                selectedDetails.length === 1
-                  ? `${selectedDetails.length} details selected`
-                  : `${selectedDetails.length} details selected`
-              }
-              labelWhenNotSelected={''}
-              addButtonLabel={'Add new detail'}
-              deleteButtonLabel={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
-            />
-          )}
-          {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
-            <Table className={classes.table} size="small">
-              <colgroup>
-                {editing && <col style={{ width: '3%' }} />}
-                <col style={{ width: '30%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '2%' }} />
-              </colgroup>
-              <TableHead className={classes.tableHead}>
-                <TableRow className={classes.tableRow}>
-                  {editing && isDashboardUser(userRecord) && (
-                    <TableCell align="left" style={{ paddingLeft: 4 }}>
-                      <Checkbox
-                        checked={
-                          filteredFreightDetails.length === 0
-                            ? false
-                            : selectedDetails.length === filteredFreightDetails.length
-                        }
-                        onClick={handleSelectDeselectAll}
-                        onFocus={event => event.stopPropagation()}
-                        disabled={filteredFreightDetails.length === 0}
-                        color="primary"
-                      />
-                    </TableCell>
-                  )}
-                  <TableCell>Description</TableCell>
-                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Quantity</TableCell>
-                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Currency</TableCell>
-                  <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
-                  <TableCell align="left">Cost Unit</TableCell>
-                  <TableCell>Total</TableCell>
-                  {editing && isAdmin && selectedTab === 0 && <TableCell>Internal</TableCell>}
-                </TableRow>
-              </TableHead>
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="droppable" direction="vertical">
-                  {(droppableProvided: DroppableProvided) => (
-                    <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-                      {filteredFreightDetails.map((freightDetail, index) => (
-                        <BookingRequestFreightDetailsRow
-                          key={index}
-                          freightDetail={freightDetail}
-                          selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
-                          onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
-                          selectedTab={selectedTab}
-                          index={index}
+          <TableContainer className={classes.tableWrapper}>
+            {isDashboardUser(userRecord) && (
+              <AppBar
+                position="static"
+                style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
+                  <Tab label="External" {...a11yProps(0)} />
+                  <Tab label="Internal 1" {...a11yProps(1)} />
+                  <Tab label="Internal 2" {...a11yProps(2)} />
+                </Tabs>
+                {editing && (
+                  <IconButton onClick={openModal}>
+                    <ImportContactsIcon style={{ color: 'white' }} />
+                  </IconButton>
+                )}
+              </AppBar>
+            )}
+            {isOpen && (
+              <QuotePickerModal
+                isOpen={isOpen}
+                handleClose={closeModal}
+                setBookingRequest={setBookingRequest}
+                // @ts-ignore
+                fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
+                carrier={bookingRequest?.carrier}
+              />
+            )}
+            {editing && isDashboardUser(userRecord) && (
+              <EnhancedTableToolbar
+                numSelected={selectedDetails.length}
+                handleAdd={onAdd}
+                handleDelete={onDelete}
+                labelWhenSelected={
+                  selectedDetails.length === 1
+                    ? `${selectedDetails.length} details selected`
+                    : `${selectedDetails.length} details selected`
+                }
+                labelWhenNotSelected={''}
+                addButtonLabel={'Add new detail'}
+                deleteButtonLabel={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
+              />
+            )}
+            {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
+              <Table className={classes.table} size="small">
+                <colgroup>
+                  {editing && <col style={{ width: '3%' }} />}
+                  <col style={{ width: '30%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '2%' }} />
+                </colgroup>
+                <TableHead className={classes.tableHead}>
+                  <TableRow className={classes.tableRow}>
+                    {editing && isDashboardUser(userRecord) && (
+                      <TableCell align="left" style={{ paddingLeft: 4 }}>
+                        <Checkbox
+                          checked={
+                            filteredFreightDetails.length === 0
+                              ? false
+                              : selectedDetails.length === filteredFreightDetails.length
+                          }
+                          onClick={handleSelectDeselectAll}
+                          onFocus={event => event.stopPropagation()}
+                          disabled={filteredFreightDetails.length === 0}
+                          color="primary"
                         />
-                      ))}
-                      {droppableProvided.placeholder}
-                    </TableBody>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </Table>
-          ) : (
-            <Typography variant="h3" className={classes.emptyState}>
-              No Freight Details to show
-            </Typography>
-          )}
-        </TableContainer>
+                      </TableCell>
+                    )}
+                    <TableCell>Description</TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Quantity</TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Currency</TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
+                    <TableCell align="left">Cost Unit</TableCell>
+                    <TableCell>Total</TableCell>
+                    {editing && isAdmin && selectedTab === 0 && <TableCell>Internal</TableCell>}
+                  </TableRow>
+                </TableHead>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="droppable" direction="vertical">
+                    {(droppableProvided: DroppableProvided) => (
+                      <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                        {filteredFreightDetails.map((freightDetail, index) => (
+                          <BookingRequestFreightDetailsRow
+                            key={index}
+                            freightDetail={freightDetail}
+                            selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
+                            onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
+                            selectedTab={selectedTab}
+                            index={index}
+                          />
+                        ))}
+                        {droppableProvided.placeholder}
+                      </TableBody>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </Table>
+            ) : (
+              <Typography variant="h3" className={classes.emptyState}>
+                No Freight Details to show
+              </Typography>
+            )}
+          </TableContainer>
+        </Box>
       </Grid>
     </Fragment>
   );
