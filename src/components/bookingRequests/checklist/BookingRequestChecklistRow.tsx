@@ -1,4 +1,18 @@
-import { Box, Checkbox, createStyles, IconButton, LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  createStyles,
+  IconButton,
+  LinearProgress,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import {
   ActivityChangeType,
   ActivityLogUserData,
@@ -11,7 +25,7 @@ import {
 import { ActivityLogItem, ActivityType, PaymentActivityData } from '../../bookings/checklist/ActivityModel';
 import { MentionItem } from 'react-mentions';
 import { flow, isNil, omitBy } from 'lodash/fp';
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
 import firebase from '../../../firebase';
@@ -27,6 +41,7 @@ import BookingRequestDocumentList from '../BookingRequestDocumentList';
 import CloseIcon from '@material-ui/icons/Close';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import { useActivityLogState } from '../../bookings/checklist/ActivityLogContext';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -329,13 +344,7 @@ const BookingRequestChecklistRow = ({
   });
 
   return (
-    <Box
-      id={'checklistItemRow_' + checklistItem.id}
-      display="flex"
-      justifyContent="space-between"
-      my={1}
-      flexDirection={isAdmin && checklistItem.valuesAdmin?.length === 0 ? 'row' : 'column'}
-    >
+    <Fragment>
       <Box
         className={isDragActive ? classes.dropZone : classes.root}
         display="flex"
@@ -344,29 +353,9 @@ const BookingRequestChecklistRow = ({
         flex={1}
         {...getRootProps()}
       >
-        <input {...getInputProps()} />
-        {uploadProgress > 0 && (
-          <Box display="flex">
-            <div style={{ width: '100%', paddingTop: '14px' }}>
-              <LinearProgress variant="determinate" value={uploadProgress} />
-            </div>
-            <IconButton
-              className={classes.tinyIconButton}
-              aria-label="cancel upload"
-              onClick={() => {
-                uploadTask?.cancel();
-                setUploadTask(undefined);
-                setUploadProgress(0);
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        )}
-
-        <Box display="flex" flexDirection="row">
-          <Box flexDirection="row" alignContent="center">
-            <a id={checklistItem.id} />
+        <ListItem id={'checklistItemRow_' + checklistItem.id}>
+          <a id={checklistItem.id} />
+          <ListItemIcon>
             {isAdmin ? (
               <Checkbox
                 checked={checklistItem.checked || false}
@@ -376,15 +365,42 @@ const BookingRequestChecklistRow = ({
             ) : (
               checklistItem.checked && <DoneIcon />
             )}
-            <Typography display="inline">{checklistItem.label}</Typography>
-          </Box>
-          <Box flex="1" />
+          </ListItemIcon>
+          <ListItemText primary={checklistItem.label} />
           {!isCommentIconHidden && (
-            <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-            </IconButton>
+            <ListItemSecondaryAction>
+              <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
+                <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              </IconButton>
+            </ListItemSecondaryAction>
           )}
-        </Box>
+
+          <input {...getInputProps()} />
+        </ListItem>
+
+        {uploadProgress > 0 && (
+          <Alert
+            severity="info"
+            icon={<CircularProgress size={22} variant="determinate" value={uploadProgress} />}
+            action={
+              <Button
+                aria-label="cancel upload"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  uploadTask?.cancel();
+                  setUploadTask(undefined);
+                  setUploadProgress(0);
+                }}
+              >
+                Cancel Upload
+              </Button>
+            }
+          >
+            Uploading...
+          </Alert>
+        )}
+
         <BookingRequestDocumentList
           collectionPath={`bookings-requests/${bookingRequest.id}/checklist/${checklistItem.id}/documents`}
           storageBasePath={storageBasePath}
@@ -394,7 +410,7 @@ const BookingRequestChecklistRow = ({
           documentsCount={checklistItem.documentsCount}
         />
       </Box>
-    </Box>
+    </Fragment>
   );
 };
 

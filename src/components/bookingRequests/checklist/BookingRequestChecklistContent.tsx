@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { Fragment, useContext } from 'react';
 import ActingAs from '../../../contexts/ActingAs';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container, Divider, List } from '@material-ui/core';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import { BookingRequest } from '../../../model/BookingRequest';
 import BookingRequestChecklistRow from './BookingRequestChecklistRow';
@@ -24,20 +24,23 @@ const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ booki
   }
 
   return (
-    <Box display="flex" flexDirection="column" style={{ flex: 1 }}>
+    <List>
       {checklistItems?.map(item =>
         !(actingAs && item.isInternal) ? (
-          <BookingRequestChecklistRow
-            key={`chkitem-${bookingRequest.id}-${item.id}`}
-            bookingRequest={bookingRequest}
-            isAdmin={!actingAs}
-            checklistItem={item}
-            comparableDocuments={[]}
-            isCommentIconHidden={isCommentIconHidden}
-          />
+          <Fragment>
+            <BookingRequestChecklistRow
+              key={`chkitem-${bookingRequest.id}-${item.id}`}
+              bookingRequest={bookingRequest}
+              isAdmin={!actingAs}
+              checklistItem={item}
+              comparableDocuments={[]}
+              isCommentIconHidden={isCommentIconHidden}
+            />
+            <Divider />
+          </Fragment>
         ) : null,
       )}
-    </Box>
+    </List>
   );
 };
 
