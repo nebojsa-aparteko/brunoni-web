@@ -630,7 +630,12 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   return (
     <Fragment>
       <Grid item xs={12}>
-        <Box p={2} border={1} borderColor="warning.main" borderRadius={2}>
+        <Box
+          p={showWarningMessage ? 2 : 0}
+          border={showWarningMessage ? 1 : 0}
+          borderColor="warning.main"
+          borderRadius={2}
+        >
           {showWarningMessage && (
             <Box mb={2}>
               <Alert severity="warning">
