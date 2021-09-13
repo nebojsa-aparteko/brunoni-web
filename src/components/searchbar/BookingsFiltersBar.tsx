@@ -10,7 +10,7 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
 import UserInput from '../inputs/UserInput';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
 import Carrier from '../../model/Carrier';
@@ -48,9 +48,15 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const user = useUser()[1];
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
+  const [, userRecord] = useUser();
 
   const availableCarriers = useMemo(
-    () => (isAdmin ? (user ? carriers?.filter(carrier => user.carriers?.includes(carrier.id)) : []) : carriers),
+    () =>
+      isAdmin && !isSuperAdmin(userRecord)
+        ? user
+          ? carriers?.filter(carrier => user.carriers?.includes(carrier.id))
+          : []
+        : carriers,
     [user, carriers],
   );
 

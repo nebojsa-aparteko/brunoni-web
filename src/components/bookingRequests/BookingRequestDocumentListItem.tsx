@@ -6,6 +6,7 @@ import {
   IconButton,
   ListItem,
   ListItemAvatar,
+  ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
   makeStyles,
@@ -40,14 +41,12 @@ import { green } from '@material-ui/core/colors';
 import theme from '../../theme/index';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import useUser from '../../hooks/useUser';
+import { DescriptionOutlined } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     fileItemLink: {
-      textDecoration: 'none',
-      color: 'inherit',
-      cursor: 'pointer',
-      display: 'flex',
+      paddingLeft: theme.spacing(7),
     },
     progressWrapper: {
       margin: theme.spacing(1),
@@ -211,44 +210,42 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
   };
 
   return (
-    <ListItem>
-      <a
-        href={item.url}
-        download={item.name}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={classes.fileItemLink}
-      >
-        <ListItemAvatar>
-          <Avatar color="primary" className={findClassName(item.status, classes)}>
-            <DescriptionIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          id={`filelistitem-${item.storedName}`}
-          disableTypography
-          primary={
-            <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
-          }
-          secondary={
-            <span>
+    <ListItem
+      button
+      component="a"
+      href={item.url}
+      download={item.name}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={classes.fileItemLink}
+    >
+      <ListItemIcon>
+        <DescriptionIcon color="disabled" />
+      </ListItemIcon>
+      <ListItemText
+        id={`filelistitem-${item.storedName}`}
+        disableTypography
+        primary={
+          <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+        }
+        secondary={
+          <span>
+            <Typography variant="caption">
+              {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
+                isAdmin ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}` : ''
+              }`}
+            </Typography>
+            <br />
+            {item.status?.at && (
               <Typography variant="caption">
-                {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
-                  isAdmin ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}` : ''
-                }`}
+                {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNowConfigured(
+                  invoke('toDate')(item.status.at),
+                )} by ${item.status?.by?.firstName}`}
               </Typography>
-              <br />
-              {item.status?.at && (
-                <Typography variant="caption">
-                  {`${findTextForStatusType(item.status?.type)} ${formatDistanceToNowConfigured(
-                    invoke('toDate')(item.status.at),
-                  )} by ${item.status?.by?.firstName}`}
-                </Typography>
-              )}
-            </span>
-          }
-        />
-      </a>
+            )}
+          </span>
+        }
+      />
       <ListItemSecondaryAction>
         <div className={classes.progressWrapper}>
           <IconButton size="small" onClick={copyFilenameToClipboard}>

@@ -10,6 +10,7 @@ import safeInvoke from '../utilities/safeInvoke';
 import { useBookingRequestsFilterContext } from './BookingRequestsFilterProvider';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
+import { isSuperAdmin } from '../model/UserRecord';
 
 interface Props {
   children: React.ReactNode;
@@ -57,7 +58,7 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       } else {
-        if (isAdmin && userRecord.carriers && userRecord.carriers?.length === 1)
+        if (isAdmin && !isSuperAdmin(userRecord) && userRecord.carriers && userRecord.carriers?.length === 1)
           query = query.where('carrier.id', '==', userRecord.carriers[0]);
       }
       if (filters.clientFilter) {

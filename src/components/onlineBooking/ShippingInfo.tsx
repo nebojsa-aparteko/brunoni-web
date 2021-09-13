@@ -189,6 +189,7 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
               value={value}
               margin="dense"
               formError={errors.carrier}
+              disabled={!!(scheduleCarrier || quote?.carrier)}
             />
           )}
         />
