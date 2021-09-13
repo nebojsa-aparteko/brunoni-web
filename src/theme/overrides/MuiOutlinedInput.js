@@ -1,3 +1,8 @@
+import { spacing } from '../spacing';
+
 export default {
-  notchedOutline: {},
+  input: {
+    paddingLeft: spacing(1.25),
+    paddingRight: spacing(1.25),
+  },
 };

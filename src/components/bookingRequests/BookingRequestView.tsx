@@ -761,7 +761,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
 
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
-      <Grid item md={7} xs={12}>
+      <Grid item md={8} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields
             bookingRequest={bookingRequest}

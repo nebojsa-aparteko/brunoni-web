@@ -73,9 +73,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     minWidth: 650,
     overflowX: 'auto',
   },
-  tableHead: {
-    fontWeight: theme.typography.fontWeightBold,
-  },
   tableRow: {
     '& td': {
       whiteSpace: 'nowrap',
@@ -332,7 +329,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
               {/*  '0,00'*/}
               {/*)}*/}
             </TableCell>
-            <TableCell align="right">
+            <TableCell>
               {editing && isDashboardUser(userRecord) ? (
                 <CurrencyInput
                   value={freightDetail.Currency || ''}
@@ -688,16 +685,16 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
             {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
               <Table className={classes.table} size="small">
                 <colgroup>
-                  {editing && <col style={{ width: '3%' }} />}
+                  {editing && <col style={{ width: 0 }} />}
                   <col style={{ width: '30%' }} />
                   <col style={{ width: '10%' }} />
                   <col style={{ width: '10%' }} />
-                  <col style={{ width: '15%' }} />
-                  <col style={{ width: '15%' }} />
                   <col style={{ width: '10%' }} />
-                  <col style={{ width: '2%' }} />
+                  <col style={{ width: '30%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: 0 }} />
                 </colgroup>
-                <TableHead className={classes.tableHead}>
+                <TableHead>
                   <TableRow className={classes.tableRow}>
                     {editing && isDashboardUser(userRecord) && (
                       <TableCell align="left" style={{ paddingLeft: 4 }}>
