@@ -294,17 +294,23 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
   if (quoteSearchParams.carrier) {
     query = query.where('carrier', '==', quoteSearchParams.carrier);
   }
-  const size = (await query.get()).size;
-  if (size > 1 && quoteSearchParams.clientId) {
-    query = query.where('clientId', '==', quoteSearchParams.clientId);
-  }
-  const quotesRef = await query.orderBy('dateIssued', 'desc').get();
-  let quotes = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
 
-  if (quoteSearchParams.containers?.[0].containerType) {
-    quotes = quotes.filter(q =>
-      q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
-    );
+  let quotesRef = await query.orderBy('dateIssued', 'desc').get();
+  let quotes: Quote[] = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
+
+  if (quotes.length > 1) {
+    if (quoteSearchParams.clientId) {
+      const clientFilteredQuotes = quotes.filter(q => q.clientId === quoteSearchParams.clientId);
+      // Apply client filter if size > 0, otherwise no
+      quotes = clientFilteredQuotes.length === 0 ? quotes : clientFilteredQuotes;
+      if (quoteSearchParams.containers?.[0].containerType) {
+        const containerFilteredQuotes = quotes.filter(q =>
+          q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
+        );
+        // Apply container filter if size > 0, otherwise no
+        quotes = containerFilteredQuotes.length === 0 ? quotes : containerFilteredQuotes;
+      }
+    }
   }
   return {
     quote: quotes[0] || undefined,
