@@ -18,6 +18,7 @@ import MuiTableRow from './MuiTableRow';
 import MuiToggleButton from './MuiToggleButton';
 import MuiTypography from './MuiTypography';
 import MuiExpansionPanelSummary from './MuiExpansionPanelSummary';
+import MuiCssBaseline from './MuiCssBaseline';
 
 export default {
   MuiButton,
@@ -25,6 +26,7 @@ export default {
   MuiCardContent,
   MuiCardHeader,
   MuiChip,
+  MuiCssBaseline,
   MuiIconButton,
   MuiInputBase,
   MuiLinearProgress,
