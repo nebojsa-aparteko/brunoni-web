@@ -22,7 +22,7 @@ import BookingRequestsTable from './BookingRequestsTable';
 import UserInput from '../inputs/UserInput';
 import ActingAs from '../../contexts/ActingAs';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import { CUSTOMER_FACING_ROLES, isSuperAdmin, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import theme from '../../theme';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
@@ -125,7 +125,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
     // there are more than one carrier assigned to an admin;
     // if it's not already filtered on the backend (because of limitation) than filter it here
     const filteredByCarrier =
-      isAdmin && userCarriers && userCarriers?.length === 1
+      (isAdmin && userCarriers && userCarriers?.length === 1) || isSuperAdmin(userRecord)
         ? bookingRequests
         : bookingRequests?.filter(request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id));
 
