@@ -24,6 +24,7 @@ import { TagCategory } from '../model/Tag';
 import { BookingRequestStatusCode } from '../model/BookingRequest';
 import QueryString from 'querystring';
 import { useHistory } from 'react-router';
+import useUser from '../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -81,11 +82,18 @@ export function TabPanel(props: TabPanelProps) {
 const BookingsPageContainer: React.FC = () => {
   const classes = useTabStyles();
   const actingAs = useContext(ActingAs)[0];
+  const userRecord = useUser()[1];
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
   const setFilters = useBookingRequestsFilterContext()[1];
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
-  const [bookingRequestCount, setBookingRequestCount] = useState(0);
+  const [bookingRequestCountsPerCarrier, setBookingRequestCountsPerCarrier] = useState<number[]>(
+    actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
+  );
+  const [bookingRequestCount, setBookingRequestCount] = useState(
+    bookingRequestCountsPerCarrier?.reduce((a, b) => a + (b || 0), 0),
+  );
+
   const selectedTab = bookingPaginationContextData.activeTab;
 
   const history = useHistory();
@@ -122,11 +130,26 @@ const BookingsPageContainer: React.FC = () => {
       };
 
   useEffect(() => {
-    firebase
-      .database()
-      .ref('/booking-requests-count')
-      .on('value', a => setBookingRequestCount(+a.val()));
-  }, []);
+    !actingAs &&
+      userRecord.carriers &&
+      userRecord.carriers.length > 0 &&
+      userRecord.carriers?.forEach((carrier, index) => {
+        firebase
+          .database()
+          .ref(`/booking-requests-count-per-carrier/${carrier.toUpperCase()}`)
+          .on('value', a =>
+            setBookingRequestCountsPerCarrier(prevState => {
+              return prevState.map((v, i) => (i === index ? a.val() : v));
+            }),
+          );
+      });
+  }, [userRecord.carriers, actingAs]);
+
+  useEffect(() => {
+    setBookingRequestCount(
+      bookingRequestCountsPerCarrier ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0) : 0,
+    );
+  }, [bookingRequestCountsPerCarrier]);
 
   // Remember scroll position
   // useEffect(() => {
@@ -377,15 +400,7 @@ const BookingsPageContainer: React.FC = () => {
             >
               <Tab icon={<FileCopyIcon />} label="Active" {...a11yProps(0)} />
               <Tab icon={<ArchiveIcon />} label="History" {...a11yProps(1)} />
-              <Tab
-                icon={
-                  <Badge badgeContent={bookingRequestCount} color="primary">
-                    <AssessmentIcon />
-                  </Badge>
-                }
-                label="Requests"
-                {...a11yProps(2)}
-              />
+              <Tab icon={<AssessmentIcon />} label="Requests" {...a11yProps(2)} />
               <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(3)} />
             </Tabs>
           </div>

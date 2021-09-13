@@ -129,7 +129,6 @@ const InternalStorage: React.FC<Props> = ({
     (filesCollection?.docs.map(doc => {
       return { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
     }) as ChecklistItemValueDocument[]) || [];
-  console.log('FILESSSSSSS', normalizedFiles);
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
 
