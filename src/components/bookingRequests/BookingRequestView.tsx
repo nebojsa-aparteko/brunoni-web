@@ -463,8 +463,8 @@ export const handleFieldsEditActivity = async (
   const omitFields = ['updatedAt', 'checklistCheckedCount', 'showWarningMessage'];
   const oldObject = diff(omit(omitFields)(bookingRequestState), omit(omitFields)(bookingRequest));
   const newObject = diff(omit(omitFields)(bookingRequest), omit(omitFields)(bookingRequestState));
-
-  if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
+  // we disabled this line of code because Nenad wanted to define this auto check feature better https://trello.com/c/uIjgPCSr
+  // if (isAdmin) await autoCheckList(bookingRequest, bookingRequestState);
   const changedKeys = keys(newObject);
 
   if (changedKeys.includes('freightDetails') && bookingRequestState.showWarningMessage !== false)

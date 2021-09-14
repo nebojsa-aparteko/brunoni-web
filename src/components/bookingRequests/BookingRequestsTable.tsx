@@ -421,7 +421,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <Grid item md={2} xs={12}>
               <InfoBoxItem
                 title="Created On"
-                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy') : ''}
+                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm') : ''}
                 gutterBottom
               />
             </Grid>
