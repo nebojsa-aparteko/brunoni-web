@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Checkbox, createStyles, FormControlLabel, IconButton, makeStyles, Theme } from '@material-ui/core';
-import Avatar from 'react-avatar';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import SendIcon from '@material-ui/icons/Send';
 import Mousetrap from 'mousetrap';
@@ -17,6 +16,7 @@ import UserRecord from '../../../model/UserRecord';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { TeamType } from '../../../model/Teams';
 import { BookingRequest } from '../../../model/BookingRequest';
+import { ActivityLogAvatar } from './ActivityLogAvatar';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      padding: theme.spacing(1),
+      padding: theme.spacing(1, 2),
       flexDirection: 'row',
     },
     writeComment: {
@@ -200,12 +200,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
   return (
     <Box id="commentInputField" display="flex" flexDirection="column">
       <Box className={classes.writeCommentContainer}>
-        <Avatar
-          name={`${userRecord?.firstName} ${userRecord?.lastName}`}
-          title={`${userRecord?.firstName} ${userRecord?.lastName}`}
-          size="30"
-          round={true}
-        />
+        <ActivityLogAvatar name={`${userRecord?.firstName} ${userRecord?.lastName}`} />
         <MentionsInput
           classNames={mentionsClassNames}
           className="mentions"
@@ -231,24 +226,26 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
         </IconButton>
       </Box>
       {isAdmin && !isAccounting && (
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={isCustomerMessage}
-              disabled={activityLogContext.state?.internal}
-              onChange={_ => {
-                setIsCustomerMessage(prevState => !prevState);
-              }}
-              name="customerCommentCheckbox"
-              color="primary"
-            />
-          }
-          label={
-            activityLogContext.state?.internal
-              ? 'To share publicly, remove internal document mention'
-              : 'Share publicly'
-          }
-        />
+        <Box px={3}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isCustomerMessage}
+                disabled={activityLogContext.state?.internal}
+                onChange={_ => {
+                  setIsCustomerMessage(prevState => !prevState);
+                }}
+                name="customerCommentCheckbox"
+                color="primary"
+              />
+            }
+            label={
+              activityLogContext.state?.internal
+                ? 'To share publicly, remove internal document mention'
+                : 'Share publicly'
+            }
+          />
+        </Box>
       )}
       {activityLogContext.state?.checklistReference && (
         <Box>

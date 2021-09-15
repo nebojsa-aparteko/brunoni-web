@@ -1,7 +1,6 @@
-import React from 'react';
-import { Box,Button, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { Box, Button, ListItemText, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import { ActivityLogItem } from './ActivityModel';
-import classNames from 'classnames';
 import asArray from '../../../utilities/asArray';
 import DateFormattedText from '../../DateFormattedText';
 import { getFullName } from '../../../utilities/activityHelper';
@@ -22,9 +21,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     flex: 1,
     whiteSpace: 'normal',
   },
-  adminMessage: {
-    backgroundColor: '#eee',
-  },
 }));
 
 const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, booking }: ActivityWithCommentProp) => {
@@ -36,48 +32,56 @@ const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, boo
   };
 
   return (
-    <Paper className={classNames(classes.comment, activity.isInternal ? classes.adminMessage : '')}>
-      <Box className={classes.rowContainer}>
-        <Typography className={classes.name} color="textPrimary">
-          {getFullName(activity)}
-        </Typography>
-        <DateFormattedText date={activity.at} />
-      </Box>
-      {showInput && booking && setShowInput && setNewComment ? (
-        <Box style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-          <CommentInput
-            booking={booking}
-            onInputChange={message => setNewComment(message.messagePlain)}
-            // previousMessage={activity.comment}
-          />
-          <Box style={{ display: 'flex', flexDirection: 'row', marginRight: 8, marginLeft: 'auto' }}>
-            <Button size="small" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button size="small" variant="contained" color="primary" onClick={() => setShowInput(false)}>
-              Save
-            </Button>
+    <Fragment>
+      <ListItemText
+        primary={
+          <Box display="flex">
+            {getFullName(activity)}{' '}
+            <Box ml={0.5}>
+              <DateFormattedText date={activity.at} />
+            </Box>
           </Box>
-        </Box>
-      ) : (
-        <Typography style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{activity?.comment}</Typography>
-      )}
-      {activity.checklistItem && (
-        <Box>
-          Ref - <a href={`#${activity.checklistItem?.id}`}>{activity.checklistItem?.label}</a>
-        </Box>
-      )}
-      {activity.documents && (
-        <Box>
-          Doc -{' '}
-          {asArray(activity.documents).map(item => (
-            <a href={`${item.url}`} key={`doc-${item.url}`} target="_blank" rel="noopener noreferrer">
-              {item.name}
-            </a>
-          ))}
-        </Box>
-      )}
-    </Paper>
+        }
+        secondary={
+          <Paper className={classes.comment}>
+            {showInput && booking && setShowInput && setNewComment ? (
+              <Box style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                <CommentInput
+                  booking={booking}
+                  onInputChange={message => setNewComment(message.messagePlain)}
+                  // previousMessage={activity.comment}
+                />
+                <Box style={{ display: 'flex', flexDirection: 'row', marginRight: 8, marginLeft: 'auto' }}>
+                  <Button size="small" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                  <Button size="small" variant="contained" color="primary" onClick={() => setShowInput(false)}>
+                    Save
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Typography>{activity?.comment}</Typography>
+            )}
+            {activity.checklistItem && (
+              <Box>
+                Ref - <a href={`#${activity.checklistItem?.id}`}>{activity.checklistItem?.label}</a>
+              </Box>
+            )}
+            {activity.documents && (
+              <Box>
+                Doc -{' '}
+                {asArray(activity.documents).map(item => (
+                  <a href={`${item.url}`} key={`doc-${item.url}`} target="_blank" rel="noopener noreferrer">
+                    {item.name}
+                  </a>
+                ))}
+              </Box>
+            )}
+          </Paper>
+        }
+      />
+    </Fragment>
   );
 };
 

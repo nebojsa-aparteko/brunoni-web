@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
-import { Box, Link, Typography } from '@material-ui/core';
-import Avatar from 'react-avatar';
+import { Box, Link, ListItem, ListItemAvatar, ListItemText, Typography } from '@material-ui/core';
 import { ActivityLogItem } from './ActivityModel';
 import {
   ActivityChangeType,
@@ -15,6 +14,7 @@ import { BookingRequestLabels } from '../../../model/BookingRequest';
 import isString from '../../../utilities/isString';
 import { isNil } from 'lodash/fp';
 import { TaskDescription } from '../../../model/Task';
+import { ActivityLogAvatar } from './ActivityLogAvatar';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -260,13 +260,15 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 
 const Activity = ({ activity, ...other }: Props) => {
   return (
-    <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
-      <Avatar name={getFullName(activity)} title={getFullName(activity)} size="40" round={true} />
-      <Box display="flex" flexDirection="column" ml={1}>
-        {makeActivityRepresentation(activity)}
-        <DateFormattedText date={activity.at} />
-      </Box>
-    </Box>
+    <ListItem {...other}>
+      <ListItemAvatar>
+        <ActivityLogAvatar name={getFullName(activity)} />
+      </ListItemAvatar>
+      <ListItemText
+        primary={makeActivityRepresentation(activity)}
+        secondary={<DateFormattedText date={activity.at} />}
+      />
+    </ListItem>
   );
 };
 
