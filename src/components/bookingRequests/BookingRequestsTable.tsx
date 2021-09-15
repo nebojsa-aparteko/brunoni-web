@@ -374,7 +374,17 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
             </Grid>
             <Grid item md={2} xs={12}>
-              <InfoBoxItem title="Quote Number" label1={bookingRequest.quoteNumber || '-'} gutterBottom />
+              <InfoBoxItem
+                title={
+                  bookingRequest.quoteNumber
+                    ? 'Quote Number'
+                    : bookingRequest.agreementNo
+                    ? 'Agreement No.'
+                    : 'Quote Number'
+                }
+                label1={bookingRequest.quoteNumber ? bookingRequest.quoteNumber : bookingRequest.agreementNo || '-'}
+                gutterBottom
+              />
             </Grid>
             <Grid item md={3} xs={12}>
               <InfoBoxItem

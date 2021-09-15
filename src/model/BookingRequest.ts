@@ -87,6 +87,7 @@ export enum ISOCodesEdiAlphacom {
   '22G0' = '22G1',
   '45G0' = '45G1',
   '42G0' = '42G1',
+  '42R1' = '45R1',
   '45R0' = '45R1',
 }
 

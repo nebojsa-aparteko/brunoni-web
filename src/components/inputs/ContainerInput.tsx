@@ -438,7 +438,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             )}
             <Grid item md={2} xs={12}>
               <TextField
-                label="Weight (Kg)"
+                label="Total Weight (Kg)"
                 type="number"
                 margin="dense"
                 variant="outlined"

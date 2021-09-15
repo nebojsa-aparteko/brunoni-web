@@ -255,19 +255,17 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
 
   const handleChangeClient = async () => {
     try {
-      if (
-        bookingRequest.id &&
-        selectedClient &&
-        bookingRequest.createdBy?.emailAddress !== selectedClient.emailAddress
-      ) {
-        await changeAssignedClient(bookingRequest.id, selectedClient);
+      if (bookingRequest.id && bookingRequest.createdBy?.emailAddress !== selectedClient?.emailAddress) {
+        await changeAssignedClient(bookingRequest.id, selectedClient || null);
         await addActivityItem(
           'bookings-requests',
           bookingRequest.id,
           createActivityObject({
-            changeType: ActivityChangeType.ASSIGNED_CLIENT,
+            changeType: selectedClient ? ActivityChangeType.ASSIGNED_CLIENT : ActivityChangeType.UNASSIGNED_CLIENT,
             by: getActivityLogUserData(userRecord),
-            addedUsers: [getActivityLogUserData(selectedClient)],
+            addedUsers: selectedClient
+              ? [getActivityLogUserData(selectedClient)]
+              : [getActivityLogUserData(bookingRequest.createdBy)],
           }),
         );
       }
@@ -291,9 +289,11 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
                 'bookings-requests',
                 bookingRequest.id,
                 createActivityObject({
-                  changeType: ActivityChangeType.ASSIGNED_AGENT,
+                  changeType: selectedAgent ? ActivityChangeType.ASSIGNED_AGENT : ActivityChangeType.UNASSIGNED_AGENT,
                   by: getActivityLogUserData(userRecord),
-                  addedUsers: selectedAgent ? [getActivityLogUserData(selectedAgent)] : undefined,
+                  addedUsers: selectedAgent
+                    ? [getActivityLogUserData(selectedAgent)]
+                    : [getActivityLogUserData(bookingRequest.assignedUser)],
                 }),
               ));
           });
@@ -359,7 +359,6 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
             </React.Fragment>
           </DialogContent>
           <Button
-            disabled={!selectedAgent && !selectedClient}
             onClick={async event => {
               event.stopPropagation();
               dispatch({ type: 'START_GLOBAL_LOADING' });

@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
-import { Box, Link, Typography } from '@material-ui/core';
-import Avatar from 'react-avatar';
+import { Box, Link, ListItem, ListItemAvatar, ListItemText, Typography } from '@material-ui/core';
 import { ActivityLogItem } from './ActivityModel';
 import {
   ActivityChangeType,
@@ -15,6 +14,7 @@ import { BookingRequestLabels } from '../../../model/BookingRequest';
 import isString from '../../../utilities/isString';
 import { isNil } from 'lodash/fp';
 import { TaskDescription } from '../../../model/Task';
+import { ActivityLogAvatar } from './ActivityLogAvatar';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -95,6 +95,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.ASSIGNED_AGENT;
       case ActivityChangeType.ASSIGNED_CLIENT:
         return ActivityText.ASSIGNED_CLIENT;
+      case ActivityChangeType.UNASSIGNED_AGENT:
+        return ActivityText.UNASSIGNED_AGENT;
+      case ActivityChangeType.UNASSIGNED_CLIENT:
+        return ActivityText.UNASSIGNED_CLIENT;
       case ActivityChangeType.SET_WATCHERS:
         return ActivityText.SET_WATCHERS;
       case ActivityChangeType.CLEAR_PAYMENT:
@@ -128,6 +132,11 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         {activity.stage && ` '${activity.stage?.label}' stage `}
         {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
           activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&
+        activity.addedUsers
+          ? createUsersRepresentation(activity.addedUsers)
+          : null}
+        {(activity.changeType === ActivityChangeType.UNASSIGNED_AGENT ||
+          activity.changeType === ActivityChangeType.UNASSIGNED_CLIENT) &&
         activity.addedUsers
           ? createUsersRepresentation(activity.addedUsers)
           : null}
@@ -251,13 +260,15 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 
 const Activity = ({ activity, ...other }: Props) => {
   return (
-    <Box display="flex" flexDirection="row" mx={1} my={2} alignContent="center" {...other}>
-      <Avatar name={getFullName(activity)} title={getFullName(activity)} size="40" round={true} />
-      <Box display="flex" flexDirection="column" ml={1}>
-        {makeActivityRepresentation(activity)}
-        <DateFormattedText date={activity.at} />
-      </Box>
-    </Box>
+    <ListItem {...other}>
+      <ListItemAvatar>
+        <ActivityLogAvatar name={getFullName(activity)} />
+      </ListItemAvatar>
+      <ListItemText
+        primary={makeActivityRepresentation(activity)}
+        secondary={<DateFormattedText date={activity.at} />}
+      />
+    </ListItem>
   );
 };
 
