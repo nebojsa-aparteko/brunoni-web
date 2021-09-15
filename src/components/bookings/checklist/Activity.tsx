@@ -95,6 +95,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.ASSIGNED_AGENT;
       case ActivityChangeType.ASSIGNED_CLIENT:
         return ActivityText.ASSIGNED_CLIENT;
+      case ActivityChangeType.UNASSIGNED_AGENT:
+        return ActivityText.UNASSIGNED_AGENT;
+      case ActivityChangeType.UNASSIGNED_CLIENT:
+        return ActivityText.UNASSIGNED_CLIENT;
       case ActivityChangeType.SET_WATCHERS:
         return ActivityText.SET_WATCHERS;
       case ActivityChangeType.CLEAR_PAYMENT:
@@ -128,6 +132,11 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         {activity.stage && ` '${activity.stage?.label}' stage `}
         {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
           activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&
+        activity.addedUsers
+          ? createUsersRepresentation(activity.addedUsers)
+          : null}
+        {(activity.changeType === ActivityChangeType.UNASSIGNED_AGENT ||
+          activity.changeType === ActivityChangeType.UNASSIGNED_CLIENT) &&
         activity.addedUsers
           ? createUsersRepresentation(activity.addedUsers)
           : null}

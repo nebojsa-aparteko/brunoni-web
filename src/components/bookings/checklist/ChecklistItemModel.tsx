@@ -125,6 +125,8 @@ export enum ActivityText {
   UNSET_WATCHING = ' has stopped watching this booking.',
   ASSIGNED_AGENT = ' has assigned agent ',
   ASSIGNED_CLIENT = ' has assigned client ',
+  UNASSIGNED_AGENT = ' has unassigned agent ',
+  UNASSIGNED_CLIENT = ' has unassigned client ',
   ASSIGNED_ON_TASK = ' has assigned ',
   SET_WATCHERS = ' has ',
   CLEAR_PAYMENT = ' has cleared payment ',
@@ -168,6 +170,8 @@ export enum ActivityChangeType {
   PUT_ON_HOLD_BOOKING_REQ,
   REVERT_PUT_ON_HOLD_BOOKING_REQ,
   SENT_PAYMENT_CONFIRMATION_EMAIL,
+  UNASSIGNED_AGENT,
+  UNASSIGNED_CLIENT,
 }
 
 export enum ChecklistNames {
