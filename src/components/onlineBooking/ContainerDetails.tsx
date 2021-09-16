@@ -454,6 +454,7 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
               isDetailedInput: true,
               shouldShowAllDepots: isDashboardUser(userRecord),
               commodityFreeSolo: true,
+              removeAllKindType: true,
             }}
             addText="Add Container"
             defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}

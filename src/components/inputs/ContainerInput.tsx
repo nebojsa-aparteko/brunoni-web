@@ -45,7 +45,9 @@ import TariffsInput from './TariffInput';
 import BrunoniCodes from '../../model/BrunoniCodes';
 import CommodityTypeInput from './CommodityTypeInput';
 
-interface Props extends InputProps<Container & ContainerDetails> {}
+interface Props extends InputProps<Container & ContainerDetails> {
+  removeAllKindType?: boolean;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   containerFormGroup: {
@@ -180,7 +182,7 @@ const getArrayOfCorrectLength = (containerNumbers: string[] | undefined, quantit
   return newContainerNumbers.slice(undefined, quantity);
 };
 
-const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
+const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, removeAllKindType, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
@@ -403,6 +405,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             value={container.commodityType!}
             margin="dense"
             freeSolo={get('commodityFreeSolo')(rest)}
+            removeAllKindType={removeAllKindType}
             inputRef={commodityTypeInput}
           />
         </Grid>
