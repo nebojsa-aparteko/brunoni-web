@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   Drawer,
+  Grid,
   List,
   ListItem,
   ListItemIcon,
@@ -16,6 +17,7 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
+import { format, utcToZonedTime } from 'date-fns-tz';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import IdentityWidget from './IdentityWidget';
@@ -64,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   toolbar: {
-    height: 100,
+    height: theme.spacing(9),
   },
   toolbarItem: {},
   logo: {
@@ -75,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         brunoni: {
           position: 'relative',
 
-          height: 58,
+          height: 45,
         },
         allmarine: {
           maxHeight: 80,
@@ -122,6 +124,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   menu: {
     textTransform: 'uppercase',
+  },
+  worldClock: {
+    backgroundColor: '#2c3c50',
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    color: theme.palette.getContrastText('#2c3c50'),
   },
 }));
 
@@ -228,6 +236,73 @@ function MenuItemLink(props: ListItemLinkProps) {
   );
 }
 
+const clocks = [
+  {
+    city: 'New York',
+    timeZone: 'America/New_York',
+  },
+  {
+    city: 'Sydney',
+    timeZone: 'Australia/Sydney',
+  },
+  {
+    city: 'Tokyo',
+    timeZone: 'Asia/Tokyo',
+  },
+  {
+    city: 'Shanghai',
+    timeZone: 'Asia/Shanghai',
+  },
+  // {
+  //   city: 'Ningbo',
+  //   timeZone: 'Asia/Ningbo',
+  // },
+  {
+    city: 'Singapore',
+    timeZone: 'Asia/Singapore',
+  },
+  {
+    city: 'Dubai',
+    timeZone: 'Asia/Dubai',
+  },
+  {
+    city: 'Istanbul',
+    timeZone: 'Europe/Istanbul',
+  },
+  // {
+  //   city: 'Durban',
+  //   timeZone: 'Africa/Durban',
+  // },
+  {
+    city: 'Hamburg',
+    timeZone: 'Europe/Hamburg',
+  },
+  {
+    city: 'Zurich',
+    timeZone: 'Europe/Zurich',
+  },
+  {
+    city: 'London',
+    timeZone: 'Europe/London',
+  },
+  {
+    city: 'Lagos',
+    timeZone: 'Africa/Lagos',
+  },
+  // {
+  //   city: 'Santos',
+  //   timeZone: 'America/Santos',
+  // },
+  // {
+  //   city: 'Houston',
+  //   timeZone: 'America/Houston',
+  // },
+  {
+    city: 'Los Angeles',
+    timeZone: 'America/Los_Angeles',
+  },
+];
+
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
@@ -271,6 +346,27 @@ const Navbar: React.FC = () => {
     <Fragment>
       <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
+          <Container maxWidth={false} className={classes.worldClock}>
+            <Grid container spacing={3} style={{ flexWrap: 'nowrap' }}>
+              {clocks.map((clock, i) => {
+                const date = new Date();
+                const timeZone = clock.timeZone;
+                const zonedDate = utcToZonedTime(date, timeZone);
+                const pattern = 'EEE HH:mm';
+                const output = format(zonedDate, pattern, { timeZone: timeZone });
+
+                return (
+                  <Grid item key={i}>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" color="inherit">
+                        {clock.city} • <strong style={{ whiteSpace: 'nowrap' }}>{output}</strong>
+                      </Typography>
+                    </Box>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Container>
           <Container maxWidth="xl">
             <Toolbar className={classes.toolbar} disableGutters>
               <Link className={classes.logo} to="/">
