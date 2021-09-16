@@ -67,6 +67,7 @@ import { useFormContext } from 'react-hook-form';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 import Carrier from '../../model/Carrier';
 import AlertTitle from '@material-ui/lab/AlertTitle';
+import { arrayMove } from '../../utilities/asArray';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -458,7 +459,7 @@ export const generateCommission = (
         0;
   return seaFreightDetails && seaFreightDetails.length > 0
     ? ({
-        SeqNr: freightDetails ? 1000 : 0,
+        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
         Anz: quantity,
         Txt: 'Agency Commission',
         Currency: seaFreightDetails[0].Currency,
@@ -619,6 +620,10 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
+
+      const indexOfComission = temp.findIndex(e => e.Txt === 'Agency Commission');
+      arrayMove(temp, indexOfComission, temp.length - 1);
+
       return set(
         'freightDetails',
         temp.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
