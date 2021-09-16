@@ -235,6 +235,22 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
 
   const [, userRecord] = useUser();
 
+  const showDeliveryRef = () => {
+    if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference)) return null;
+    return (
+      <Box display={'flex'} alignItems={'flex-end'} mr={'auto'} ml={'1.5em'}>
+        <Typography style={{ marginRight: '.5em' }} variant={'body2'}>
+          {bookingRequest.containers.length > 1 ? 'Delivery Refs.' : 'Delivery Ref.'}
+        </Typography>
+        {bookingRequest.containers?.map((c, i) => (
+          <Typography key={i} variant={'body2'} style={{ marginRight: '.2em' }}>
+            {i === bookingRequest.containers!.length - 1 ? c.deliveryReference : c.deliveryReference + ' / '}
+          </Typography>
+        ))}
+      </Box>
+    );
+  };
+
   useEffect(
     () =>
       setTags(
@@ -284,6 +300,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <span className={classes.tableRowHeader}>
               <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
             </span>
+            {showDeliveryRef()}
             {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
           </Box>
         </Grid>

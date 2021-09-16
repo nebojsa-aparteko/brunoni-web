@@ -401,6 +401,7 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
   for (let i in freightDetails) {
+    if (freightDetails[i].Txt === 'Agency Commission') continue;
     const value = freightDetails[i].SeqNr;
     if (value >= pos) pos = value + 1;
   }
@@ -457,7 +458,7 @@ export const generateCommission = (
         0;
   return seaFreightDetails && seaFreightDetails.length > 0
     ? ({
-        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+        SeqNr: freightDetails ? 1000 : 0,
         Anz: quantity,
         Txt: 'Agency Commission',
         Currency: seaFreightDetails[0].Currency,

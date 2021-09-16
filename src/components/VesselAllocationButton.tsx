@@ -100,7 +100,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked ? parseFloat(vessel.weightBooked) / 1000 : 0}{' '}
+                      {vessel.weightBooked ? parseFloat(vessel.weightBooked) : 0}{' '}
                       {vessel.weightPercent ? (
                         <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
                       ) : null}
@@ -139,7 +139,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                     <TableCell component="th" scope="row">
                       Left to Book
                     </TableCell>
-                    <TableCell align="right">{allocation.difference.teu || 'On Request'}</TableCell>
+                    <TableCell align="right">{allocation.difference.teu || '0'}</TableCell>
                     <TableCell align="right">{allocation.difference.ton || 'On Request'}</TableCell>
                   </TableRow>
                 </TableBody>
