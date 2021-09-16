@@ -182,6 +182,20 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
   return (await res.json()) as RouteSearchResults;
 };
 
+const filterScheduleByVoyage = (schedules: RouteSearchResult[], voyage: string) => {
+  const voySchedules = schedules.filter(schedule =>
+    voyage.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+  );
+  return voySchedules.length === 0 ? schedules : voySchedules;
+};
+
+const filterScheduleByVessel = (schedules: RouteSearchResult[], vessel: string) => {
+  const vesselSchedules = schedules.filter(schedule =>
+    vessel.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
+  );
+  return vesselSchedules.length === 0 ? schedules : vesselSchedules;
+};
+
 const matchAndFetchSchedule = async (
   scheduleSearchParams: RouteSearchParams,
   object: HtmlBookingRequest,
@@ -194,37 +208,25 @@ const matchAndFetchSchedule = async (
   let data = await fetchSchedule(scheduleSearchParams, date);
   let schedules = data.Routes;
 
-  if (schedules.length > 1 && object.VOYAGE)
-    schedules = schedules.filter(schedule =>
-      object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
-    );
+  if (schedules.length > 1 && object.VOYAGE) {
+    schedules = filterScheduleByVoyage(schedules, object.VOYAGE);
+  }
   // only filter more if more than 1
-  if (schedules.length > 1 && object.VESSEL)
-    schedules = schedules.filter(schedule =>
-      object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
-    );
+  if (schedules.length > 1 && object.VESSEL) {
+    schedules = filterScheduleByVessel(schedules, object.VESSEL);
+  }
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
     schedules = data.Routes;
 
-    if (schedules.length > 1 && object.VOYAGE)
-      schedules = schedules.filter(schedule =>
-        object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
-      );
+    if (schedules.length > 1 && object.VOYAGE) {
+      schedules = filterScheduleByVoyage(schedules, object.VOYAGE);
+    }
 
-    // only filter more if more than 1
-    if (schedules.length > 1 && object.VESSEL)
-      schedules = schedules.filter(schedule =>
-        object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
-      );
-
-    if (schedules.length === 0 && data.Routes.length > 0 && object.VOYAGE) {
-      schedules = data.Routes.filter(schedule =>
-        object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
-      );
-      return schedules[0];
+    if (schedules.length > 1 && object.VESSEL) {
+      schedules = filterScheduleByVessel(schedules, object.VESSEL);
     }
   }
   // if still more than 1 check for intermediate ports
@@ -233,13 +235,19 @@ const matchAndFetchSchedule = async (
     const POD = ports?.find(port => object.MAIN_PORT_OF_DISCHARGE?.includes(port.id));
 
     if (POL?.id !== scheduleSearchParams.originPort?.id) {
-      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POL?.id));
+      const polSchedules = schedules.filter(schedule =>
+        schedule.IntermediatePortInfos.find(port => port.Port.ID === POL?.id),
+      );
+      schedules = polSchedules.length === 0 ? schedules : polSchedules;
     }
     if (POD?.id !== scheduleSearchParams.destinationPort?.id) {
-      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id));
+      const podSchedules = schedules.filter(schedule =>
+        schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id),
+      );
+      schedules = podSchedules.length === 0 ? schedules : podSchedules;
     }
   }
-  return schedules?.length === 1 ? schedules[0] : undefined;
+  return schedules[0];
 };
 
 const getClientById = async (id: string): Promise<Client> => {

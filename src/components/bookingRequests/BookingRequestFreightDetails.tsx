@@ -67,6 +67,7 @@ import { useFormContext } from 'react-hook-form';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 import Carrier from '../../model/Carrier';
 import AlertTitle from '@material-ui/lab/AlertTitle';
+import { arrayMove } from '../../utilities/asArray';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -401,6 +402,7 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
   for (let i in freightDetails) {
+    if (freightDetails[i].Txt === 'Agency Commission') continue;
     const value = freightDetails[i].SeqNr;
     if (value >= pos) pos = value + 1;
   }
@@ -618,6 +620,10 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
+
+      const indexOfComission = temp.findIndex(e => e.Txt === 'Agency Commission');
+      arrayMove(temp, indexOfComission, temp.length - 1);
+
       return set(
         'freightDetails',
         temp.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
