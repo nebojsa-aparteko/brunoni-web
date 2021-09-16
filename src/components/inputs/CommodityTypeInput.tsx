@@ -1,5 +1,5 @@
 import 'isomorphic-fetch';
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref, useContext } from 'react';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref, useContext, useEffect, useState } from 'react';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
@@ -24,6 +24,7 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: 'none' | 'dense' | 'normal';
   freeSolo?: boolean;
+  removeAllKindType?: boolean;
 }
 
 const useStyles = makeStyles({
@@ -42,10 +43,28 @@ const CommodityTypeInput: React.FC<Props> = ({
   onClose,
   margin,
   freeSolo,
+  removeAllKindType,
 }) => {
   const commodityTypes = useContext(CommodityTypes);
   const classes = useStyles();
   const loading = open && !commodityTypes;
+  const [filteredCommodityTypes, setFilteredCommodityTypes] = useState(
+    removeAllKindType
+      ? commodityTypes
+        ? commodityTypes.filter(type => !type.name.toUpperCase().includes('FREIGHT ALL KIND'))
+        : undefined
+      : commodityTypes,
+  );
+
+  useEffect(() => {
+    setFilteredCommodityTypes(
+      removeAllKindType
+        ? commodityTypes
+          ? commodityTypes.filter(type => !type.name.toUpperCase().includes('FREIGHT ALL KIND'))
+          : undefined
+        : commodityTypes,
+    );
+  }, [removeAllKindType, commodityTypes]);
 
   return (
     <Autocomplete
@@ -70,7 +89,7 @@ const CommodityTypeInput: React.FC<Props> = ({
             }
           : undefined
       }
-      options={commodityTypes || []}
+      options={filteredCommodityTypes || []}
       freeSolo={freeSolo}
       loading={loading}
       renderInput={params => (
