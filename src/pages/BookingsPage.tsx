@@ -90,8 +90,15 @@ const BookingsPageContainer: React.FC = () => {
   const [bookingRequestCountsPerCarrier, setBookingRequestCountsPerCarrier] = useState<number[]>(
     actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
   );
+  const [bookingRequestCountsPerCarrierOnHold, setBookingRequestCountsPerCarrierOnHold] = useState<number[]>(
+    actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
+  );
   const [bookingRequestCount, setBookingRequestCount] = useState(
     bookingRequestCountsPerCarrier?.reduce((a, b) => a + (b || 0), 0),
+  );
+
+  const [bookingRequestCountOnHold, setBookingRequestCountOnHold] = useState(
+    bookingRequestCountsPerCarrierOnHold?.reduce((a, b) => a + (b || 0), 0),
   );
 
   const selectedTab = bookingPaginationContextData.activeTab;
@@ -142,6 +149,14 @@ const BookingsPageContainer: React.FC = () => {
               return prevState.map((v, i) => (i === index ? a.val() : v));
             }),
           );
+        firebase
+          .database()
+          .ref(`/booking-requests-count-per-carrier-on-hold/${carrier.toUpperCase()}`)
+          .on('value', a =>
+            setBookingRequestCountsPerCarrierOnHold(prevState => {
+              return prevState.map((v, i) => (i === index ? a.val() : v));
+            }),
+          );
       });
   }, [userRecord.carriers, actingAs]);
 
@@ -150,6 +165,14 @@ const BookingsPageContainer: React.FC = () => {
       bookingRequestCountsPerCarrier ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0) : 0,
     );
   }, [bookingRequestCountsPerCarrier]);
+
+  useEffect(() => {
+    setBookingRequestCountOnHold(
+      bookingRequestCountsPerCarrierOnHold
+        ? Array.from(bookingRequestCountsPerCarrierOnHold).reduce((a, b) => a + (b || 0), 0)
+        : 0,
+    );
+  }, [bookingRequestCountsPerCarrierOnHold]);
 
   // Remember scroll position
   // useEffect(() => {
@@ -354,7 +377,15 @@ const BookingsPageContainer: React.FC = () => {
               label="Requests"
               {...a11yProps(3)}
             />
-            <Tab icon={<InputIcon />} label="On Hold" {...a11yProps(4)} />
+            <Tab
+              icon={
+                <Badge badgeContent={bookingRequestCountOnHold} color="primary">
+                  <InputIcon />
+                </Badge>
+              }
+              label="On Hold"
+              {...a11yProps(4)}
+            />
             <Tab icon={<InputIcon />} label="Archived Requests" {...a11yProps(5)} />
           </Tabs>
           <FirestoreCollectionProvider

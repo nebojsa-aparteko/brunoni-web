@@ -5,7 +5,7 @@ import flow from 'lodash/fp/flow';
 import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import firebase from '../firebase';
-import { BookingRequest } from '../model/BookingRequest';
+import { BookingRequest, BookingRequestStatusCode } from '../model/BookingRequest';
 import safeInvoke from '../utilities/safeInvoke';
 import { useBookingRequestsFilterContext } from './BookingRequestsFilterProvider';
 import useUser from '../hooks/useUser';
@@ -46,8 +46,11 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       setIsLoading(true);
       let query = collection;
       query = query.where('hold', '==', filters.hold);
+      // for admin: if user filter is in use, show active bookings that are assigned to the filtered user; otherwise only show unassigned requests
       if (filters.assignee?.alphacomId) {
         query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
+      } else if (isAdmin && !filters.hold && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS) {
+        query = query.where('assignedUser', '==', null);
       }
       if (filters.minStatusCode) {
         query = query.where('statusCode', '>=', filters.minStatusCode.valueOf());

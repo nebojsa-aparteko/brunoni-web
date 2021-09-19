@@ -11,6 +11,7 @@ import { formatDateSafe } from './formattingHelpers';
 import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
 import IMO from '../model/IMO';
 import CommodityType from '../model/CommodityType';
+import parseDate from 'date-fns/parse';
 
 const getTariffs = (container: Container & ContainerDetails) => {
   const tariffs = [];
@@ -127,14 +128,28 @@ export default async (
     ),
     set(
       'PlaceOfReceiptETS',
-      itinerary?.placeOfReceipt ? itinerary?.placeOfReceipt?.DepartureDate : itinerary?.portOfLoading?.DepartureDate,
+      itinerary?.placeOfReceipt
+        ? formatDateSafe(parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : itinerary?.portOfLoading?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
     ),
     set('POL', itinerary?.portOfLoading?.Port.ID),
     set('POLName', itinerary?.portOfLoading?.Port.HarbourName),
-    set('POLETS', itinerary?.portOfLoading?.DepartureDate),
+    set(
+      'POLETS',
+      itinerary?.portOfLoading?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
+    ),
     set('POD', itinerary?.portOfDischarge?.Port.ID),
     set('PODName', itinerary?.portOfDischarge?.Port.HarbourName),
-    set('PODETS', itinerary?.portOfDischarge?.DepartureDate), //TODO check if ETA or ETS is needed
+    set(
+      'PODETS',
+      itinerary?.portOfDischarge?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
+    ), //TODO check if ETA or ETS is needed
     set(
       'FinalDestinationISO',
       itinerary?.finalDestinationPort ? itinerary?.finalDestinationPort?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
@@ -148,8 +163,13 @@ export default async (
     set(
       'FinalDestinationETA',
       itinerary?.finalDestinationPort
-        ? itinerary?.finalDestinationPort?.ArrivalDate
-        : itinerary?.portOfDischarge?.ArrivalDate,
+        ? formatDateSafe(
+            parseDate(itinerary?.finalDestinationPort?.ArrivalDate, 'yyyy-MM-dd', new Date()),
+            'dd.MM.yyyy',
+          )
+        : itinerary?.portOfDischarge?.ArrivalDate
+        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.ArrivalDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
     ),
     set(
       'Remarks',

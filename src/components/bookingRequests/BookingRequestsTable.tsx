@@ -291,11 +291,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
       style={{
         position: 'relative',
         display: 'flex',
-        backgroundColor: bookingRequest.isUnread
-          ? 'rgba(161,213,255,0.25)'
-          : !bookingRequest.assignedUser
-          ? 'rgba(161,213,255,0.1)'
-          : undefined,
+        backgroundColor: bookingRequest.isUnread ? 'rgba(161,213,255,0.25)' : undefined,
+        border: !bookingRequest.assignedUser && '2px solid #00b0ff',
+        borderRadius: !bookingRequest.assignedUser && '7px',
       }}
     >
       <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>

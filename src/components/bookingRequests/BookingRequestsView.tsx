@@ -284,7 +284,13 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
               <Fragment>
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
-                    bookingRequests={resultChunks && (get(page)(resultChunks) || [])}
+                    bookingRequests={
+                      resultChunks && resultChunks.length > 0
+                        ? resultChunks.length > 1
+                          ? get(page)(resultChunks) || []
+                          : resultChunks[0] || []
+                        : undefined
+                    }
                     isAdmin={isAdmin}
                     selectedRequests={selectedRequests}
                     onSelectRequest={onSelectRequest}
