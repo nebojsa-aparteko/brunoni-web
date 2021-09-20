@@ -17,7 +17,6 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
-import { format, utcToZonedTime } from 'date-fns-tz';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Link from './Link';
 import IdentityWidget from './IdentityWidget';
@@ -52,6 +51,7 @@ import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
 import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 import brunoniLogo from '../assets/logo.brunoni.svg';
 import allmarineLogo from '../assets/logo.allmarine.png';
+import useZonedTime, { CLOCKS } from '../hooks/useZonedTime';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -236,73 +236,6 @@ function MenuItemLink(props: ListItemLinkProps) {
   );
 }
 
-const clocks = [
-  {
-    city: 'New York',
-    timeZone: 'America/New_York',
-  },
-  {
-    city: 'Sydney',
-    timeZone: 'Australia/Sydney',
-  },
-  {
-    city: 'Tokyo',
-    timeZone: 'Asia/Tokyo',
-  },
-  {
-    city: 'Shanghai',
-    timeZone: 'Asia/Shanghai',
-  },
-  // {
-  //   city: 'Ningbo',
-  //   timeZone: 'Asia/Ningbo',
-  // },
-  {
-    city: 'Singapore',
-    timeZone: 'Asia/Singapore',
-  },
-  {
-    city: 'Dubai',
-    timeZone: 'Asia/Dubai',
-  },
-  {
-    city: 'Istanbul',
-    timeZone: 'Europe/Istanbul',
-  },
-  // {
-  //   city: 'Durban',
-  //   timeZone: 'Africa/Durban',
-  // },
-  {
-    city: 'Hamburg',
-    timeZone: 'Europe/Hamburg',
-  },
-  {
-    city: 'Zurich',
-    timeZone: 'Europe/Zurich',
-  },
-  {
-    city: 'London',
-    timeZone: 'Europe/London',
-  },
-  {
-    city: 'Lagos',
-    timeZone: 'Africa/Lagos',
-  },
-  // {
-  //   city: 'Santos',
-  //   timeZone: 'America/Santos',
-  // },
-  // {
-  //   city: 'Houston',
-  //   timeZone: 'America/Houston',
-  // },
-  {
-    city: 'Los Angeles',
-    timeZone: 'America/Los_Angeles',
-  },
-];
-
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
@@ -315,6 +248,8 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [guide, setGuide] = useState<Shepherd.Tour | undefined>(undefined);
+
+  const zonedTime = useZonedTime();
 
   useEffect(() => {
     setGuide(getPageGuide());
@@ -348,18 +283,13 @@ const Navbar: React.FC = () => {
         <AppBar position="relative" className={classes.appBar}>
           <Container maxWidth={false} className={classes.worldClock}>
             <Grid container spacing={3} style={{ flexWrap: 'nowrap' }}>
-              {clocks.map((clock, i) => {
-                const date = new Date();
-                const timeZone = clock.timeZone;
-                const zonedDate = utcToZonedTime(date, timeZone);
-                const pattern = 'EEE HH:mm';
-                const output = format(zonedDate, pattern, { timeZone: timeZone });
-
+              {CLOCKS.map((clock, i) => {
+                const { formattedDate } = zonedTime(clock.timeZone);
                 return (
                   <Grid item key={i}>
                     <Box display="flex" alignItems="center">
                       <Typography variant="body2" color="inherit">
-                        {clock.city} • <strong style={{ whiteSpace: 'nowrap' }}>{output}</strong>
+                        {clock.city} • <strong style={{ whiteSpace: 'nowrap' }}>{formattedDate}</strong>
                       </Typography>
                     </Box>
                   </Grid>
