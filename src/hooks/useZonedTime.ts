@@ -8,8 +8,68 @@ interface Timezone {
 
 export const CLOCKS: Timezone[] = [
   {
+    city: 'Auckland',
+    timeZone: 'Pacific/Auckland',
+  },
+  {
+    city: 'Dubai',
+    timeZone: 'Asia/Dubai',
+  },
+  {
+    city: 'Durban',
+    timeZone: 'Africa/Durban',
+  },
+  {
+    city: 'Hamburg',
+    timeZone: 'Europe/Hamburg',
+  },
+  {
+    city: 'Houston',
+    timeZone: 'America/Houston',
+  },
+  {
+    city: 'Istanbul',
+    timeZone: 'Europe/Istanbul',
+  },
+  {
+    city: 'Lagos',
+    timeZone: 'Africa/Lagos',
+  },
+  {
+    city: 'London',
+    timeZone: 'Europe/London',
+  },
+  {
+    city: 'Los Angeles',
+    timeZone: 'America/Los_Angeles',
+  },
+  {
+    city: 'Mumbai',
+    timeZone: 'Asia/Calcutta',
+  },
+  {
     city: 'New York',
     timeZone: 'America/New_York',
+  },
+  {
+    city: 'Ningbo',
+    timeZone: 'Asia/Ningbo',
+  },
+  {
+    city: 'Santos',
+    timeZone: 'America/Santos',
+  },
+  {
+    city: 'San Antonio (Chile)',
+    timeZone: 'America/Santiago',
+  },
+  {
+    city: 'Shanghai',
+    timeZone: 'Asia/Shanghai',
+  },
+  {
+    city: 'Singapore',
+    timeZone: 'Asia/Singapore',
   },
   {
     city: 'Sydney',
@@ -20,56 +80,8 @@ export const CLOCKS: Timezone[] = [
     timeZone: 'Asia/Tokyo',
   },
   {
-    city: 'Shanghai',
-    timeZone: 'Asia/Shanghai',
-  },
-  // {
-  //   city: 'Ningbo',
-  //   timeZone: 'Asia/Ningbo',
-  // },
-  {
-    city: 'Singapore',
-    timeZone: 'Asia/Singapore',
-  },
-  {
-    city: 'Dubai',
-    timeZone: 'Asia/Dubai',
-  },
-  {
-    city: 'Istanbul',
-    timeZone: 'Europe/Istanbul',
-  },
-  // {
-  //   city: 'Durban',
-  //   timeZone: 'Africa/Durban',
-  // },
-  {
-    city: 'Hamburg',
-    timeZone: 'Europe/Hamburg',
-  },
-  {
     city: 'Zurich',
     timeZone: 'Europe/Zurich',
-  },
-  {
-    city: 'London',
-    timeZone: 'Europe/London',
-  },
-  {
-    city: 'Lagos',
-    timeZone: 'Africa/Lagos',
-  },
-  // {
-  //   city: 'Santos',
-  //   timeZone: 'America/Santos',
-  // },
-  // {
-  //   city: 'Houston',
-  //   timeZone: 'America/Houston',
-  // },
-  {
-    city: 'Los Angeles',
-    timeZone: 'America/Los_Angeles',
   },
 ];
 
