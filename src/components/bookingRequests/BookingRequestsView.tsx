@@ -125,7 +125,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
     // there are more than one carrier assigned to an admin;
     // if it's not already filtered on the backend (because of limitation) than filter it here
     const filteredByCarrier =
-      (isAdmin && userCarriers && userCarriers?.length === 1) || isSuperAdmin(userRecord)
+      (isAdmin && userCarriers && userCarriers?.length === 1) || isSuperAdmin(userRecord) || !isAdmin
         ? bookingRequests
         : bookingRequests?.filter(request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id));
 
