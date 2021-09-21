@@ -39,6 +39,7 @@ import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
 import ActingAs from '../../contexts/ActingAs';
 import Tags from '../../contexts/Tags';
+import { ItineraryItem } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -269,6 +270,20 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     [history, preventDefaultClick],
   );
 
+  const getOriginPort = () => {
+    return (bookingRequest.itinerary?.placeOfReceipt
+      ? bookingRequest.itinerary.placeOfReceipt
+      : bookingRequest.itinerary?.portOfLoading && bookingRequest.itinerary.portOfLoading) as ItineraryItem | undefined;
+  };
+
+  const getDestinationPort = () => {
+    return (bookingRequest.itinerary?.finalDestinationPort
+      ? bookingRequest.itinerary.finalDestinationPort
+      : bookingRequest.itinerary?.portOfDischarge && bookingRequest.itinerary.portOfDischarge) as
+      | ItineraryItem
+      | undefined;
+  };
+
   return (
     <StyledTableRow
       tabIndex={-1}
@@ -413,15 +428,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={ChevronRightIcon}
                   title="Origin"
-                  label1={bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
-                  label2={
-                    bookingRequest.itinerary &&
-                    `ETS: ${
-                      bookingRequest.itinerary.placeOfReceipt
-                        ? bookingRequest.itinerary.placeOfReceipt.DepartureDate
-                        : bookingRequest.itinerary.portOfLoading && bookingRequest.itinerary.portOfLoading.DepartureDate
-                    }`
-                  }
+                  label1={getOriginPort()?.Port.HarbourName + ', ' + getOriginPort()?.Port.Land}
+                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort()?.DepartureDate}`}
                   gutterBottom
                 />
               </Grid>
@@ -429,16 +437,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={LastPageIcon}
                   title="Destination"
-                  label1={bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
-                  label2={
-                    bookingRequest.itinerary &&
-                    `ETA: ${
-                      bookingRequest.itinerary.finalDestinationPort
-                        ? bookingRequest.itinerary.finalDestinationPort.ArrivalDate
-                        : bookingRequest.itinerary.portOfDischarge &&
-                          bookingRequest.itinerary.portOfDischarge.ArrivalDate
-                    }`
-                  }
+                  label1={getDestinationPort()?.Port.HarbourName + ', ' + getDestinationPort()?.Port.Land}
+                  label2={bookingRequest.itinerary && `ETA: ${getDestinationPort()?.ArrivalDate}`}
                   gutterBottom
                 />
               </Grid>

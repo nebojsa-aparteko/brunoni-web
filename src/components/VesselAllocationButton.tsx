@@ -113,7 +113,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       </TableCell>
                       <TableCell align="right">{vessel.requested.quantity}</TableCell>
                       <TableCell align="right">
-                        {vessel.requested.weight ? vessel.requested.weight / 1000 : 0}
+                        {vessel.requested.weight ? (vessel.requested.weight / 1000).toFixed(1) : 0}
                       </TableCell>
                     </TableRow>
                   )}
@@ -124,7 +124,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       </TableCell>
                       <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                       <TableCell align="right">
-                        {vessel.inProgress.weight ? vessel.inProgress.weight / 1000 : 0}
+                        {vessel.inProgress.weight ? (vessel.inProgress.weight / 1000).toFixed(1) : 0}
                       </TableCell>
                     </TableRow>
                   )}
@@ -133,14 +133,14 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       Total
                     </TableCell>
                     <TableCell align="right">{allocation.total.teu || 0}</TableCell>
-                    <TableCell align="right">{allocation.total.ton || 0}</TableCell>
+                    <TableCell align="right">{allocation.total.ton.toFixed(1) || 0}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
                       Left to Book
                     </TableCell>
                     <TableCell align="right">{allocation.difference.teu || '0'}</TableCell>
-                    <TableCell align="right">{allocation.difference.ton || 'On Request'}</TableCell>
+                    <TableCell align="right">{allocation.difference.ton.toFixed(1) || 'On Request'}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
