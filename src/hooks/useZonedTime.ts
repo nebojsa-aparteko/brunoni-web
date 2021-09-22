@@ -8,80 +8,68 @@ interface Timezone {
 
 export const CLOCKS: Timezone[] = [
   {
-    city: 'Auckland',
-    timeZone: 'Pacific/Auckland',
-  },
-  {
-    city: 'Dubai',
-    timeZone: 'Asia/Dubai',
-  },
-  {
-    city: 'Durban',
-    timeZone: 'Africa/Durban',
-  },
-  {
-    city: 'Hamburg',
-    timeZone: 'Europe/Hamburg',
+    city: 'L.A',
+    timeZone: 'America/Los_Angeles',
   },
   {
     city: 'Houston',
-    timeZone: 'America/Houston',
+    timeZone: 'US/Indiana-Starke',
   },
   {
-    city: 'Istanbul',
-    timeZone: 'Europe/Istanbul',
+    city: 'N.Y',
+    timeZone: 'America/New_York',
   },
   {
-    city: 'Lagos',
-    timeZone: 'Africa/Lagos',
+    city: 'San Antonio',
+    timeZone: 'America/Santiago',
+  },
+  {
+    city: 'Santos',
+    timeZone: 'America/Sao_Paulo',
   },
   {
     city: 'London',
     timeZone: 'Europe/London',
   },
   {
-    city: 'Los Angeles',
-    timeZone: 'America/Los_Angeles',
+    city: 'Zurich',
+    timeZone: 'Europe/Zurich',
+  },
+  {
+    city: 'Durban',
+    timeZone: 'Africa/Bujumbura',
+  },
+  {
+    city: 'Istanbul',
+    timeZone: 'Europe/Istanbul',
+  },
+  {
+    city: 'Dubai',
+    timeZone: 'Asia/Dubai',
   },
   {
     city: 'Mumbai',
     timeZone: 'Asia/Calcutta',
   },
   {
-    city: 'New York',
-    timeZone: 'America/New_York',
-  },
-  {
-    city: 'Ningbo',
-    timeZone: 'Asia/Ningbo',
-  },
-  {
-    city: 'Santos',
-    timeZone: 'America/Santos',
-  },
-  {
-    city: 'San Antonio (Chile)',
-    timeZone: 'America/Santiago',
+    city: 'Singapore',
+    timeZone: 'Asia/Singapore',
   },
   {
     city: 'Shanghai',
     timeZone: 'Asia/Shanghai',
   },
   {
-    city: 'Singapore',
-    timeZone: 'Asia/Singapore',
+    city: 'Tokyo',
+    timeZone: 'Asia/Tokyo',
   },
   {
     city: 'Sydney',
     timeZone: 'Australia/Sydney',
   },
   {
-    city: 'Tokyo',
-    timeZone: 'Asia/Tokyo',
-  },
-  {
-    city: 'Zurich',
-    timeZone: 'Europe/Zurich',
+    city: 'Auckland',
+    timeZone: 'Pacific/Auckland',
   },
 ];
 

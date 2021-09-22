@@ -282,7 +282,7 @@ const Navbar: React.FC = () => {
       <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
           <Container maxWidth={false} className={classes.worldClock}>
-            <Grid container spacing={3} style={{ flexWrap: 'nowrap' }}>
+            <Grid container justify={'center'} spacing={3} style={{ flexWrap: 'nowrap' }}>
               {CLOCKS.map((clock, i) => {
                 const { formattedDate } = zonedTime(clock.timeZone);
                 return (
