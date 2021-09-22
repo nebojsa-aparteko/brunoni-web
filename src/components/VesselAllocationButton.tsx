@@ -8,6 +8,7 @@ import {
   IconButton,
   makeStyles,
   Paper,
+  PaperProps,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +22,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { RouteSearchResultVoyageInfo } from '../model/route-search/RouteSearchResults';
 import useVesselWithVoyageById from '../hooks/useVesselWithVoyageById';
 import VesselAllocation from '../model/VesselAllocation';
+import Draggable from 'react-draggable';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -49,20 +51,39 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+function PaperComponent(props: PaperProps) {
+  return (
+    <Draggable handle="#dialog-vessel-allocation" cancel={'[class*="MuiDialogContent-root"]'}>
+      <Paper {...props} />
+    </Draggable>
+  );
+}
+
 const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage }) => {
   const classes = useStyles();
   const vessel = useVesselWithVoyageById(`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`);
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
 
   const handleCloseModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    closeModal();
     event.stopPropagation();
+    closeModal();
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleCloseModal} aria-labelledby="dialog-vessel-allocation" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleCloseModal}
+      PaperComponent={PaperComponent}
+      aria-labelledby="dialog-vessel-allocation"
+      maxWidth="md"
+    >
       <Box className={classes.dialogBody}>
-        <DialogTitle disableTypography id="dialog-title-check-list">
+        <DialogTitle
+          disableTypography
+          id="dialog-vessel-allocation"
+          style={{ cursor: 'move' }}
+          onClick={event => event.stopPropagation()}
+        >
           <Typography variant="h4">Vessel Allocation</Typography>
           <IconButton onClick={handleCloseModal} className={classes.closeModal}>
             <CloseIcon />
@@ -157,8 +178,8 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
   const classes = useStyles();
 
   const handleOpenModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    openModal();
     event.stopPropagation();
+    openModal();
   };
 
   return (
