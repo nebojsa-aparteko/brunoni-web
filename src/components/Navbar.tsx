@@ -289,7 +289,7 @@ const Navbar: React.FC = () => {
                   <Grid item key={i}>
                     <Box display="flex" alignItems="center">
                       <Typography variant="body2" color="inherit">
-                        {clock.city} • <strong style={{ whiteSpace: 'nowrap' }}>{formattedDate}</strong>
+                        <span>{clock.city}</span> • <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
                       </Typography>
                     </Box>
                   </Grid>

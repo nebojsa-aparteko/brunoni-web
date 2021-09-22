@@ -16,7 +16,7 @@ export const CLOCKS: Timezone[] = [
     timeZone: 'US/Indiana-Starke',
   },
   {
-    city: 'N.Y',
+    city: 'New York',
     timeZone: 'America/New_York',
   },
   {
