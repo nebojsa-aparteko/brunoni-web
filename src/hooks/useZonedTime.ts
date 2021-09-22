@@ -8,7 +8,7 @@ interface Timezone {
 
 export const CLOCKS: Timezone[] = [
   {
-    city: 'L.A',
+    city: 'Los Angeles',
     timeZone: 'America/Los_Angeles',
   },
   {
