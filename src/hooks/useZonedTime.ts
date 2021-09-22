@@ -8,7 +8,7 @@ interface Timezone {
 
 export const CLOCKS: Timezone[] = [
   {
-    city: 'L.A',
+    city: 'Los Angeles',
     timeZone: 'America/Los_Angeles',
   },
   {
@@ -32,12 +32,12 @@ export const CLOCKS: Timezone[] = [
     timeZone: 'Europe/London',
   },
   {
-    city: 'Zurich',
-    timeZone: 'Europe/Zurich',
-  },
-  {
     city: 'Durban',
     timeZone: 'Africa/Bujumbura',
+  },
+  {
+    city: 'Zurich',
+    timeZone: 'Europe/Zurich',
   },
   {
     city: 'Istanbul',
