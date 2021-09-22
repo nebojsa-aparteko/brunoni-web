@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) => ({
           height: 45,
         },
         allmarine: {
-          maxHeight: 80,
+          maxHeight: 45,
           width: 'auto',
         },
       } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
