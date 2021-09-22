@@ -94,6 +94,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(1),
   },
   specialRequests: {
+    border: '2px solid #00b0ff',
     padding: theme.spacing(2),
   },
   root: {
