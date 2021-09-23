@@ -591,8 +591,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   content={
                     <Box>
                       {[
-                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                        bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName,
+                        bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr,
                       ].join(' VOY. ')}
                       {isDashboardUser(userRecord) && (
                         <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />

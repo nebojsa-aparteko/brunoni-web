@@ -1,3 +1,3 @@
-const $crisp: {
+let $crisp: {
   push: (arg: any) => any;
 };
