@@ -348,13 +348,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            {bookingRequest.vessel && (
+            {(bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName ||
+              bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr) && (
               <Grid item container md={3} xs={12} direction={'row'}>
                 <Grid item>
                   <InfoBoxItem
                     title="Vessel"
-                    label1={bookingRequest.vessel ? bookingRequest.vessel.toUpperCase() : ''}
-                    label2={bookingRequest.voyage ? bookingRequest.voyage.toUpperCase() : ''}
+                    label1={bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName}
+                    label2={bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr}
                     gutterBottom
                   />
                 </Grid>
