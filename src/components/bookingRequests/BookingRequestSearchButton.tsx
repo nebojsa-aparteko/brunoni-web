@@ -23,6 +23,7 @@ import Mousetrap from 'mousetrap';
 import SelectInput from '../inputs/SelectInput';
 import ActingAs from '../../contexts/ActingAs';
 import { useBookingRequestsFilterContext } from '../../providers/BookingRequestsFilterProvider';
+import { useBookingListPaginationContext } from '../../providers/BookingListPaginationProvider';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -74,8 +75,14 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState(searchField === fieldName ? searchValue || '' : '');
+  const [, setBookingPaginationContextData] = useBookingListPaginationContext();
 
   const handleBookingSearch = useCallback(() => {
+    setBookingPaginationContextData &&
+      setBookingPaginationContextData(prevState => ({
+        ...prevState,
+        page: 0,
+      }));
     setSearchField(inputValue && inputValue !== '' ? fieldName : undefined);
     setSearchValue(inputValue);
     closeModal();
@@ -133,16 +140,22 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
   const classes = useStyles();
   const clients = useClients();
   const [selectedClient, setSelectedClient] = useState<Client | undefined>(undefined);
+  const [, setBookingPaginationContextData] = useBookingListPaginationContext();
 
   useEffect(() => {
     setSelectedClient(searchField === 'client.id' ? clients?.find(client => client.id === searchValue) : undefined);
   }, [searchField, searchValue, clients]);
 
   const handleBookingSearch = useCallback(() => {
+    setBookingPaginationContextData &&
+      setBookingPaginationContextData(prevState => ({
+        ...prevState,
+        page: 0,
+      }));
     setSearchField(selectedClient ? fieldName : undefined);
     setSearchValue(selectedClient?.id);
     closeModal();
-  }, [fieldName, selectedClient?.id, setSearchField, setSearchValue, closeModal]);
+  }, [setBookingPaginationContextData, setSearchField, selectedClient, fieldName, setSearchValue, closeModal]);
 
   const inputRef = useRef();
 
@@ -190,6 +203,8 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
   const [filters] = useBookingRequestsFilterContext();
+  const [, setBookingPaginationContextData] = useBookingListPaginationContext();
+
   const statuses = useMemo(
     () =>
       filters.maxStatusCode && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS
@@ -209,6 +224,11 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   };
 
   const handleBookingSearch = useCallback(() => {
+    setBookingPaginationContextData &&
+      setBookingPaginationContextData(prevState => ({
+        ...prevState,
+        page: 0,
+      }));
     setSearchField(selectedStatus ? fieldName : undefined);
     setSearchValue(selectedStatus);
     closeModal();
@@ -272,8 +292,14 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
   const classes = useStyles();
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
+  const [, setBookingPaginationContextData] = useBookingListPaginationContext();
 
   const handleClearFields = () => {
+    setBookingPaginationContextData &&
+      setBookingPaginationContextData(prevState => ({
+        ...prevState,
+        page: 0,
+      }));
     setSearchValue(undefined);
     setSearchField(undefined);
     closeModal();
