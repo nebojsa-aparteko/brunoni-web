@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Avatar,
+  Box,
   CircularProgress,
   IconButton,
   ListItem,
@@ -17,10 +18,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import safeInvoke from '../../utilities/safeInvoke';
-import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import theme from '../../theme';
 import { isPlatformActivity } from '../../utilities/activityHelper';
 import CompareIcon from '@material-ui/icons/Compare';
+import DateFormattedText from '../DateFormattedText';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -67,11 +68,17 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
             <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
           }
           secondary={
-            <Typography variant="caption">
-              {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
-                isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName
-              }`}
-            </Typography>
+            <Box style={{ cursor: 'default' }} onClick={e => e.preventDefault()} display={'flex'} alignItems={'center'}>
+              <DateFormattedText date={safeInvoke('toDate')(item.uploadedAt)} />
+              <Typography style={{ marginLeft: '.2em' }} variant="caption">
+                {isPlatformActivity(item.uploadedBy) ? 'by Platform' : `by ${item.uploadedBy.firstName}`}
+              </Typography>
+            </Box>
+            // <Typography variant="caption">
+            //   {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
+            //     isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName
+            //   }`}
+            // </Typography>
           }
         />
       </a>

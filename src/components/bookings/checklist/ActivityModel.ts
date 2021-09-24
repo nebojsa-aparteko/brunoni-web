@@ -35,6 +35,7 @@ export interface ActivityLogItem {
   changedFields?: ChangedField[];
   path?: string;
   task?: Task;
+  carrierId?: string;
 }
 
 export interface ChangedField {

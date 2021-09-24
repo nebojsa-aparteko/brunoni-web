@@ -11,7 +11,7 @@ const DateFormattedText: React.FC<Props> = ({ date }) => {
       <Typography
         variant="caption"
         onClick={() => setIsFullDateFormat(prevState => !prevState)}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'default' }}
       >
         {isFullDateFormat ? `${formatDate(date, 'dd.MM.yyyy HH:mm:ss')}` : `${formatDistanceToNowConfigured(date)}`}
       </Typography>
