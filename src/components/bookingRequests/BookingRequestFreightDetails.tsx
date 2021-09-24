@@ -578,17 +578,22 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
     [selectedTab],
   );
   const onAdd = useCallback(() => {
-    setBookingRequest(prevState =>
-      set(
+    setBookingRequest(prevState => {
+      let newDetails = (freightDetails || []).concat({
+        ...emptyFreightDetail,
+        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+        Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
+        Group: selectedGroup,
+      } as FreightDetail);
+
+      const indexOfComission = newDetails.findIndex(e => e.Txt === 'Agency Commission');
+      indexOfComission && arrayMove(newDetails, indexOfComission, newDetails.length - 1);
+
+      return set(
         'freightDetails',
-        (freightDetails || []).concat({
-          ...emptyFreightDetail,
-          SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
-          Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
-          Group: selectedGroup,
-        } as FreightDetail),
-      )(prevState!),
-    );
+        newDetails.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
+      )(prevState!);
+    });
   }, [setBookingRequest, freightDetails, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
