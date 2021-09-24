@@ -15,6 +15,7 @@ import isString from '../../../utilities/isString';
 import { isNil } from 'lodash/fp';
 import { TaskDescription } from '../../../model/Task';
 import { ActivityLogAvatar } from './ActivityLogAvatar';
+import getTermsForCarrier from '../../../utilities/getTermsForCarrier';
 
 const createUsersRepresentation = (users: ActivityLogUserData[]) => {
   return users.map((user, index) => {
@@ -117,6 +118,8 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
         return ActivityText.ASSIGNED_ON_TASK;
       case ActivityChangeType.SENT_PAYMENT_CONFIRMATION_EMAIL:
         return ActivityText.SENT_PAYMENT_CONFIRMATION_EMAIL;
+      case ActivityChangeType.BOOKING_CREATION:
+        return ActivityText.BOOKING_CREATION;
     }
   };
 
@@ -129,6 +132,11 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
           <Link href={`mailto:${activity.by.emailAddress}`}>{getFullName(activity)}</Link>
         )}
         {mapChangeTypeToText()}
+        {activity.changeType === ActivityChangeType.BOOKING_CREATION && (
+          <Link target="_blank" href={getTermsForCarrier(activity.carrierId)} color={'primary'}>
+            Terms and Conditions
+          </Link>
+        )}
         {activity.stage && ` '${activity.stage?.label}' stage `}
         {(activity.changeType === ActivityChangeType.ASSIGNED_AGENT ||
           activity.changeType === ActivityChangeType.ASSIGNED_CLIENT) &&

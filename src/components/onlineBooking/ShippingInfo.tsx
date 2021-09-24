@@ -31,6 +31,7 @@ import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRe
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import useUser from '../../hooks/useUser';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
+import Carrier from '../../model/Carrier';
 
 const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
   const ports = useContext(Ports);
@@ -69,10 +70,6 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
         : undefined,
     [ports, quote, schedule],
   );
-  const carrier = useMemo(() => (scheduleCarrier ? scheduleCarrier : quote ? quote.carrier : undefined), [
-    quote,
-    scheduleCarrier,
-  ]);
 
   const {
     control,
@@ -82,6 +79,11 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
     setError,
     formState: { errors },
   } = useFormContext();
+
+  const carrier: Carrier = useMemo(
+    () => (scheduleCarrier ? scheduleCarrier : quote ? quote.carrier : watch('carrier')),
+    [quote, scheduleCarrier, watch],
+  );
 
   const updateBookingRequest = (data: OnlineBookingInputs) => {
     setBookingRequest(
