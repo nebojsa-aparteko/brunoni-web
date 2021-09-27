@@ -198,7 +198,6 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
   const [unitValue, setUnitValue] = useState<number | undefined>(freightDetail.UnitValue);
   const [costUnit, setCostUnit] = useState<string | undefined>(freightDetail.Unit);
-  const [chargeCodeText, setChargeCodeText] = useState<string | undefined>(freightDetail.Unit);
   const [containerTypeNames, setContainerTypeNames] = useState(
     containerTypes?.map(containerType => containerType.name),
   );
@@ -218,13 +217,7 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     setQuantity(freightDetail.Anz);
     setUnitValue(freightDetail.UnitValue);
     setCostUnit(freightDetail.Unit);
-    setChargeCodeText(freightDetail.Txt);
   }, [freightDetail]);
-
-  // const handleChangeChargeCode = (code: ChargeCode | undefined) => {
-  //   handleChangeFreightDetails(code?.text, 'Txt');
-  //   handleChangeFreightDetails(code?.chargeCodeId, 'ChargeID');
-  // };
 
   const handleChangeFreightDetails = (value: any | undefined, fieldName: string) => {
     bookingRequest &&
@@ -271,24 +264,12 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
             )}
             <TableCell component="th" scope="row">
               {editing && isDashboardUser(userRecord) ? (
-                selectedTab !== 2 ? (
-                  <ChargeCodeInput
-                    chargeCodeText={freightDetail.Txt}
-                    group={freightDetail.Group}
-                    handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
-                    margin="dense"
-                  />
-                ) : (
-                  <TextField
-                    label=""
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={chargeCodeText || ''}
-                    onChange={event => setChargeCodeText(event.target.value)}
-                    onBlur={event => handleChangeFreightDetails(event.target.value, 'Txt')}
-                  />
-                )
+                <ChargeCodeInput
+                  chargeCodeText={freightDetail.Txt}
+                  group={freightDetail.Group}
+                  handleChange={code => handleChangeFreightDetails(code?.text, 'Txt')}
+                  margin="dense"
+                />
               ) : (
                 freightDetail.Txt
               )}
@@ -578,17 +559,22 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
     [selectedTab],
   );
   const onAdd = useCallback(() => {
-    setBookingRequest(prevState =>
-      set(
+    setBookingRequest(prevState => {
+      let newDetails = (freightDetails || []).concat({
+        ...emptyFreightDetail,
+        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
+        Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
+        Group: selectedGroup,
+      } as FreightDetail);
+
+      const indexOfComission = newDetails.findIndex(e => e.Txt === 'Agency Commission');
+      indexOfComission && arrayMove(newDetails, indexOfComission, newDetails.length - 1);
+
+      return set(
         'freightDetails',
-        (freightDetails || []).concat({
-          ...emptyFreightDetail,
-          SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
-          Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
-          Group: selectedGroup,
-        } as FreightDetail),
-      )(prevState!),
-    );
+        newDetails.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
+      )(prevState!);
+    });
   }, [setBookingRequest, freightDetails, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
