@@ -109,8 +109,12 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                     <TableCell component="th" scope="row">
                       Allocation
                     </TableCell>
-                    <TableCell align="right">{vessel.teuAllocation || 'On Request'}</TableCell>
-                    <TableCell align="right">{vessel.weightAllocation || 'On Request'}</TableCell>
+                    <TableCell align="right">
+                      {allocation.initial.teu !== 0 ? allocation.initial.teu : 'On Request'}
+                    </TableCell>
+                    <TableCell align="right">
+                      {allocation.initial.weight !== 0 ? allocation.initial.weight : 'On Request'}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
@@ -121,7 +125,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
                     </TableCell>
                     <TableCell align="right">
-                      {vessel.weightBooked ? parseFloat(vessel.weightBooked) : 0}{' '}
+                      {vessel.weightBooked ? parseFloat(vessel.weightBooked).toFixed(2) : 0}{' '}
                       {vessel.weightPercent ? (
                         <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
                       ) : null}
@@ -134,7 +138,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       </TableCell>
                       <TableCell align="right">{vessel.requested.quantity}</TableCell>
                       <TableCell align="right">
-                        {vessel.requested.weight ? vessel.requested.weight.toFixed(1) : 0}
+                        {vessel.requested.weight ? (vessel.requested.weight / 1000).toFixed(2) : 0}
                       </TableCell>
                     </TableRow>
                   )}
@@ -145,7 +149,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       </TableCell>
                       <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                       <TableCell align="right">
-                        {vessel.inProgress.weight ? vessel.inProgress.weight.toFixed(1) : 0}
+                        {vessel.inProgress.weight ? (vessel.inProgress.weight / 1000).toFixed(2) : 0}
                       </TableCell>
                     </TableRow>
                   )}
@@ -154,15 +158,17 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       Total
                     </TableCell>
                     <TableCell align="right">{allocation.total.teu || 0}</TableCell>
-                    <TableCell align="right">{allocation.total.ton.toFixed(1) || 0}</TableCell>
+                    <TableCell align="right">{allocation.total.ton.toFixed(2) || 0}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell component="th" scope="row">
                       Left to Book
                     </TableCell>
-                    <TableCell align="right">{allocation.difference.teu || 'On Request'}</TableCell>
                     <TableCell align="right">
-                      {allocation.difference.ton ? allocation.difference.ton.toFixed(1) : 'On Request'}
+                      {allocation.difference.teu !== 0 ? allocation.difference.teu : 'On Request'}
+                    </TableCell>
+                    <TableCell align="right">
+                      {allocation.difference.ton !== 0 ? allocation.difference.ton.toFixed(2) : 'On Request'}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -215,21 +221,34 @@ interface VesselAllocationModalProps {
 }
 
 const countAllocation = (allocation?: VesselAllocation) => {
-  if (!allocation) return { total: { teu: 0, ton: 0 }, difference: { teu: 0, ton: 0 } };
+  if (!allocation) return { initial: { teu: 0, weight: 0 }, total: { teu: 0, ton: 0 }, difference: { teu: 0, ton: 0 } };
+
+  const initial = {
+    teu: !isNaN(+allocation.teuAllocation) && +allocation.teuAllocation !== 0 ? +allocation.teuAllocation : 0,
+    weight:
+      !isNaN(+allocation.weightAllocation) && +allocation.weightAllocation !== 0 ? +allocation.weightAllocation : 0,
+  };
+
   const allocationTotal = {
     teu: (allocation.inProgress?.quantity || 0) + (allocation.requested?.quantity || 0) + +(allocation.teuBooked || 0),
-    ton: (allocation.inProgress?.weight || 0) + (allocation.requested?.weight || 0) + +(allocation.weightBooked || 0),
+    ton:
+      ((allocation.inProgress && allocation.inProgress.weight / 1000) || 0) +
+      ((allocation.requested && allocation.requested.weight / 1000) || 0) +
+      +(allocation.weightBooked || 0),
   };
 
   return {
+    initial,
     total: allocationTotal,
     difference: {
-      teu: !isNaN(+allocation.teuAllocation - allocationTotal.teu)
-        ? +allocation.teuAllocation - allocationTotal.teu
-        : 0,
-      ton: !isNaN(+allocation.weightAllocation - allocationTotal.ton)
-        ? +allocation.weightAllocation - allocationTotal.ton
-        : 0,
+      teu:
+        !isNaN(initial.teu - allocationTotal.teu) && initial.teu !== 0
+          ? +allocation.teuAllocation - allocationTotal.teu
+          : 0,
+      ton:
+        !isNaN(initial.weight - allocationTotal.ton) && initial.weight !== 0
+          ? +allocation.weightAllocation - allocationTotal.ton
+          : 0,
     },
   };
 };
