@@ -166,9 +166,17 @@ const MissingFields: React.FC<Props> = ({
     setFreightDetailsNonMatchingFields(findFreightDetailNonMatchingFields());
   }, [bookingRequest, findContainerNonMatchingFields, findNonMatchingFields]);
 
-  return (nonMatchingFields && nonMatchingFields.length > 0) ||
-    (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ||
-    (freightDetailsNonMatchingFields && !freightDetailsNonMatchingFields.every(isEmpty)) ? (
+  const hasMissingFields = () => {
+    return (
+      (nonMatchingFields && nonMatchingFields.length > 0) ||
+      (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ||
+      (freightDetailsNonMatchingFields && !freightDetailsNonMatchingFields.every(isEmpty))
+    );
+  };
+
+  const hasExpiredQuote = () => !validQuoteState && bookingRequest.schedule;
+
+  return hasMissingFields() || hasExpiredQuote() ? (
     <Paper className={classes.additionalInfo}>
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
@@ -177,14 +185,14 @@ const MissingFields: React.FC<Props> = ({
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
-              {!validQuoteState && bookingRequest.schedule && (
+              {hasExpiredQuote() && (
                 <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
                   {`You are booking on a vessel with an expired quotation date`}
                 </Typography>
               )}
               <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
                 {isDashboardUser(userRecord)
-                  ? 'These fields were not found on booking:'
+                  ? hasMissingFields() && 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +
                     '  Your booking request has been submitted and is in requested status.\n' +
                     '  You are allowed to make changes as long as the booking is not in status: In Progress.\n\n' +
