@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../../components/dashboard/ChartsCircularProgress';
@@ -13,6 +13,7 @@ import useBookingRequest from '../../hooks/useBookingRequest';
 import { map, update, flow } from 'lodash/fp';
 import Tags from '../../contexts/Tags';
 import { TagCategory } from '../../model/Tag';
+import ActingAs from '../../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -74,10 +75,14 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
 interface Props extends RouteComponentProps<{ id: string }> {}
 
 const BookingRequestContainer: React.FC<Props> = ({ match }) => {
+  const [actingAs] = useContext(ActingAs);
+
   const history = useHistory();
   const bookingRequest = useBookingRequest(match.params.id);
 
-  if (!bookingRequest.exists) {
+  const isEligible = !actingAs || actingAs?.company?.id === bookingRequest.br.client?.id;
+
+  if (!bookingRequest.exists || !isEligible) {
     history.push('/not-found');
   }
 
