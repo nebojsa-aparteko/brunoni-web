@@ -9,7 +9,10 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
   const chargeCodes = useContext(ChargeCodes);
   const filteredChargeCodes = useMemo(
     () =>
-      chargeCodes?.filter(code => (group && group === FreightDetailGroup.INTERNAL1 ? code.internal1 === 'TRUE' : true)),
+      chargeCodes?.filter(
+        code =>
+          (group && group === FreightDetailGroup.INTERNAL1 ? code.internal1 === 'TRUE' : true) && code.language === 'E',
+      ),
     [chargeCodes, group],
   );
 

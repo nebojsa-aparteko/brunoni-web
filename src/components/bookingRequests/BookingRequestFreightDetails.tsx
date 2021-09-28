@@ -799,19 +799,15 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
     (searchResult: Quote) => {
       if (isOnlineBookingProcess) {
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
-        setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
-        setBookingRequest((prevState: any) =>
-          set('quoteDetails', searchResult.quoteDetails)(prevState as BookingRequest),
-        );
         setValue('quoteNumber', searchResult.id);
       } else {
-        setBookingRequest((prevState: any) =>
-          set(
-            'freightDetails',
-            takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes),
-          )(prevState as BookingRequest),
-        );
+        const freightdetails = takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes);
+        setBookingRequest((prevState: any) => set('freightDetails', freightdetails)(prevState as BookingRequest));
       }
+      setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) =>
+        set('quoteDetails', searchResult.quoteDetails)(prevState as BookingRequest),
+      );
       handleClose();
     },
     [isOnlineBookingProcess, setBookingRequest, handleClose, setValue, chargeCodes],

@@ -160,12 +160,12 @@ const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) 
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
 };
 
-const findChargeIdByDescription = (chargeCodes: ChargeCode[], description?: string): string | undefined => {
-  return chargeCodes?.find(code => code.text === description)?.chargeCodeId;
+const findChargeIdByDescription = (chargeCodes: ChargeCode[], description: string): string | undefined => {
+  return chargeCodes.find(code => code.text === description)?.chargeCodeId;
 };
 
-const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
-  let chargeCodeId = chargeId || findChargeIdByDescription(chargeCodes, description);
+export const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
+  let chargeCodeId = chargeId || (description && findChargeIdByDescription(chargeCodes, description));
   if (!chargeCodeId) {
     return description;
   }
