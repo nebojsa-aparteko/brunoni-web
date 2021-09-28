@@ -5,11 +5,21 @@ import ChargeCode from '../../model/ChargeCode';
 import { FreightDetailGroup } from '../../model/Booking';
 import { Autocomplete } from '@material-ui/lab';
 
+const commissionChargeCode = {
+  id: 'COMMISSION',
+  text: 'Agency Commission',
+  internal1: 'TRUE',
+  chargeCodeId: '',
+  language: 'E',
+} as ChargeCode;
+
 const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group, margin }) => {
   const chargeCodes = useContext(ChargeCodes);
   const filteredChargeCodes = useMemo(
     () =>
-      chargeCodes?.filter(code => (group && group === FreightDetailGroup.INTERNAL1 ? code.internal1 === 'TRUE' : true)),
+      group && group === FreightDetailGroup.INTERNAL1
+        ? chargeCodes?.filter(code => code.internal1 === 'TRUE').concat(commissionChargeCode)
+        : chargeCodes,
     [chargeCodes, group],
   );
 
@@ -18,11 +28,17 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
   );
 
   useEffect(() => {
-    setChargeCode(chargeCodes ? chargeCodes.find(code => code.text === chargeCodeText) : undefined);
+    setChargeCode(
+      chargeCodes ? chargeCodes.concat(commissionChargeCode).find(code => code.text === chargeCodeText) : undefined,
+    );
   }, [chargeCodeText, chargeCodes]);
 
   const handleSetSelectedValue = (event: React.ChangeEvent<{}>, value: ChargeCode | null) => {
-    const selectedSpecialRemark = value ? chargeCodes?.find(code => code.id === value.id) : undefined;
+    const selectedSpecialRemark = value
+      ? value.id === 'COMMISSION'
+        ? commissionChargeCode
+        : chargeCodes?.find(code => code.id === value.id)
+      : undefined;
     selectedSpecialRemark && handleChange && handleChange(selectedSpecialRemark);
   };
 

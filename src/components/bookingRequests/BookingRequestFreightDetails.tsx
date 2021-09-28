@@ -151,6 +151,9 @@ const getUpdatedFreightDetails = (
     const index = bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos);
     if (index < 0) return bookingRequest.freightDetails;
     let d = bookingRequest.freightDetails[index];
+    if (field === 'Txt' && value === 'Agency Commission') {
+      d = flow(set('Group', FreightDetailGroup.INTERNAL1), set('isManual', true))(d);
+    }
     d = set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value)(d);
     bookingRequest.freightDetails[index] = flow(set(field, get(field)(d)), set('Total', calculateTotal(d)))(d);
   }
@@ -170,7 +173,7 @@ export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string
       'PER ' + containerName.toUpperCase() === costUnit.toUpperCase(),
   );
 
-const isAgencyCommission = (freightDetail: FreightDetail) => freightDetail.Txt === 'Agency Commission';
+export const isAgencyCommission = (freightDetail: FreightDetail) => freightDetail.Txt === 'Agency Commission';
 
 export const calculateTotal = (freightDetail: FreightDetail) =>
   freightDetail.Unit && freightDetail.Unit === '%'
@@ -383,9 +386,9 @@ const findNextPos = (freightDetails: FreightDetail[]) => {
   //TODO probably needs to be edited because of concurrency
   let pos = 0;
   for (let i in freightDetails) {
-    if (freightDetails[i].Txt === 'Agency Commission') continue;
+    if (isAgencyCommission(freightDetails[i])) continue;
     const value = freightDetails[i].SeqNr;
-    if (value >= pos) pos = value + 1;
+    if (value >= pos) pos = typeof value === 'string' ? parseInt(value) + 1 : value + 1;
   }
   return pos;
 };
@@ -560,22 +563,21 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   );
   const onAdd = useCallback(() => {
     setBookingRequest(prevState => {
-      let newDetails = (freightDetails || []).concat({
+      const emptyDetail = {
         ...emptyFreightDetail,
-        SeqNr: freightDetails ? findNextPos(freightDetails) : 0,
-        Txt: (selectedGroup !== FreightDetailGroup.INTERNAL2 ? chargeCodes?.[0].text : '') || '',
+        SeqNr: prevState.freightDetails ? findNextPos(prevState.freightDetails) : 0,
+        Txt: chargeCodes?.[0]?.text || '',
         Group: selectedGroup,
-      } as FreightDetail);
-
-      const indexOfComission = newDetails.findIndex(e => e.Txt === 'Agency Commission');
-      indexOfComission && arrayMove(newDetails, indexOfComission, newDetails.length - 1);
-
+      } as FreightDetail;
+      let newDetails = (prevState.freightDetails || []).concat(emptyDetail);
+      const indexOfCommission = newDetails.findIndex(e => isAgencyCommission(e));
+      indexOfCommission && indexOfCommission !== -1 && arrayMove(newDetails, indexOfCommission, newDetails.length - 1);
       return set(
         'freightDetails',
         newDetails.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
       )(prevState!);
     });
-  }, [setBookingRequest, freightDetails, selectedGroup, chargeCodes]);
+  }, [setBookingRequest, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
     setBookingRequest(prevState =>
@@ -607,8 +609,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
 
-      const indexOfComission = temp.findIndex(e => e.Txt === 'Agency Commission');
-      arrayMove(temp, indexOfComission, temp.length - 1);
+      const indexOfCommission = temp.findIndex(e => isAgencyCommission(e));
+      arrayMove(temp, indexOfCommission, temp.length - 1);
 
       return set(
         'freightDetails',
