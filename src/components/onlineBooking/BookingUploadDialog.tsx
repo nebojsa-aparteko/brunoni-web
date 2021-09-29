@@ -58,7 +58,7 @@ import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
 import ContainerDetails from '../../model/ContainerDetails';
-import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { generateCommission, isAgencyCommission } from '../bookingRequests/BookingRequestFreightDetails';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 
@@ -411,10 +411,7 @@ const mapIntoBookingRequestModel = async (
     createdBy,
     customerReference,
     destination,
-    freightDetails: compact([
-      ...(freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
-      commission,
-    ]),
+    freightDetails: compact([...(freightDetails?.filter(value => !isAgencyCommission(value)) || []), commission]),
     hold: false,
     intraRefNumber,
     origin,

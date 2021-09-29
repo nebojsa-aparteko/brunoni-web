@@ -23,7 +23,11 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
-import { calculateTotal, generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import {
+  calculateTotal,
+  generateCommission,
+  isAgencyCommission,
+} from '../bookingRequests/BookingRequestFreightDetails';
 import { compact, flow, get, isNil, map, omitBy, set, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
@@ -290,7 +294,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
-      freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
+      freightDetails: compact([...(freights?.filter(value => !isAgencyCommission(value)) || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     // Setting assignedUser: null for filtering purposes

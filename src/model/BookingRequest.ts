@@ -121,6 +121,7 @@ export interface FreightDetail {
   Invoice: string;
   SeqNr: number;
   Internal1?: boolean;
+  isManual?: boolean;
 }
 
 export const commissionRelatedFreights = ['Seafreight', 'Seefracht', 'Fret Maritime'];

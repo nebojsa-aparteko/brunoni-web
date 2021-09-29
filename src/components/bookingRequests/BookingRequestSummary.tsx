@@ -46,7 +46,7 @@ import { getVoyageInfo } from './BookingRequestView';
 import EditingInput from '../EditingInput';
 import useUser from '../../hooks/useUser';
 import useModal from '../../hooks/useModal';
-import { generateCommission } from './BookingRequestFreightDetails';
+import { generateCommission, isAgencyCommission } from './BookingRequestFreightDetails';
 import isString from '../../utilities/isString';
 import theme from '../../theme';
 import { getItineraryFromSchedule } from '../onlineBooking/Summary';
@@ -519,7 +519,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
           vessel: voyageInfo?.VesselName,
           voyage: voyageInfo?.VoyageNr,
           freightDetails: compact([
-            ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+            ...(bookingRequest?.freightDetails?.filter(value => !isAgencyCommission(value)) || []),
             commission,
           ]),
         }),
