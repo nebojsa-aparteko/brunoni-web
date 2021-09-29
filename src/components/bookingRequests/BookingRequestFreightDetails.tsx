@@ -24,7 +24,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest, emptyFreightDetail, FreightDetail } from '../../model/BookingRequest';
 import ChargeCodeInput from '../inputs/ChargeCodeInput';
-import { cloneDeep, flow, get, set, uniq } from 'lodash/fp';
+import { cloneDeep, compact, flow, get, set, uniq } from 'lodash/fp';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -803,11 +803,21 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
         setValue('quoteNumber', searchResult.id);
       } else {
-        const freightdetails = takeQuoteDetails(
+        let freightdetails = takeQuoteDetails(
           searchResult?.quoteDetails!,
           bookingRequestState?.containers,
           chargeCodes,
         );
+        const commission = generateCommission(
+          bookingRequestState?.schedule,
+          freightdetails,
+          bookingRequestState?.carrier?.id,
+          bookingRequestState?.containers,
+        );
+        freightdetails = compact([
+          ...(freightdetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+          commission,
+        ]);
         setBookingRequest((prevState: any) => set('freightDetails', freightdetails)(prevState as BookingRequest));
       }
       setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
