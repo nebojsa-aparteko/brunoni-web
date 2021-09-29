@@ -662,6 +662,7 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
                 // @ts-ignore
                 fetchQuotes={() => getRelatedQuotes(bookingRequest!)}
                 carrier={bookingRequest?.carrier}
+                bookingRequestState={bookingRequest}
               />
             )}
             {editing && isDashboardUser(userRecord) && (
@@ -764,6 +765,7 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   fetchQuotes,
   isOnlineBookingProcess = false,
   carrier,
+  bookingRequestState,
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
@@ -801,7 +803,11 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
         setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
         setValue('quoteNumber', searchResult.id);
       } else {
-        const freightdetails = takeQuoteDetails(searchResult?.quoteDetails!, [], chargeCodes);
+        const freightdetails = takeQuoteDetails(
+          searchResult?.quoteDetails!,
+          bookingRequestState?.containers,
+          chargeCodes,
+        );
         setBookingRequest((prevState: any) => set('freightDetails', freightdetails)(prevState as BookingRequest));
       }
       setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
@@ -904,4 +910,5 @@ interface ModalProps {
   fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
   isOnlineBookingProcess?: boolean;
   carrier?: Carrier;
+  bookingRequestState?: BookingRequest;
 }

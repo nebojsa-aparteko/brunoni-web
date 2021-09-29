@@ -203,7 +203,7 @@ const recalculateQuantity = (
 };
 
 const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
-  switch (costUnit) {
+  switch (costUnit?.toUpperCase()) {
     case 'PRO TEU':
     case 'PER TEU':
       return containers.TEU;
