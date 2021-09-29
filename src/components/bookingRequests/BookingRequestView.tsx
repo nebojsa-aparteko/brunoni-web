@@ -482,6 +482,56 @@ export const handleFieldsEditActivity = async (
   }
 };
 
+const onArchiveClick = (bookingRequest: BookingRequest) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingRequest?.id)
+    .update(
+      'statusCode',
+      bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
+        ? bookingRequest.assignedUser
+          ? BookingRequestStatusCode.IN_PROGRESS
+          : BookingRequestStatusCode.REQUESTED
+        : BookingRequestStatusCode.ARCHIVED,
+      'statusText',
+      bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
+        ? bookingRequest.assignedUser
+          ? BookingRequestStatusText.IN_PROGRESS
+          : BookingRequestStatusText.REQUESTED
+        : BookingRequestStatusText.ARCHIVED,
+    );
+
+const onHoldClick = (bookingRequest: BookingRequest) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingRequest?.id)
+    .update('hold', !bookingRequest.hold);
+
+const onBookingCreate = (bookingRequest: BookingRequest, bookingId: string) =>
+  firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(bookingRequest?.id)
+    .update(
+      'bookingId',
+      bookingId,
+      'statusCode',
+      BookingRequestStatusCode.CONFIRMED,
+      'statusText',
+      BookingRequestStatusText.CONFIRMED,
+    );
+
+const getBookingData = async (bookingId: string) =>
+  (
+    await firebase
+      .firestore()
+      .collection('bookings')
+      .doc(bookingId)
+      .get()
+  ).data();
+
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, isAdmin] = useUser();
   const classes = useStyles();
@@ -548,56 +598,6 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     ),
   );
 
-  const onArchiveClick = useCallback(
-    () =>
-      firebase
-        .firestore()
-        .collection('bookings-requests')
-        .doc(bookingRequest?.id)
-        .update(
-          'statusCode',
-          bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
-            ? bookingRequest.assignedUser
-              ? BookingRequestStatusCode.IN_PROGRESS
-              : BookingRequestStatusCode.REQUESTED
-            : BookingRequestStatusCode.ARCHIVED,
-          'statusText',
-          bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
-            ? bookingRequest.assignedUser
-              ? BookingRequestStatusText.IN_PROGRESS
-              : BookingRequestStatusText.REQUESTED
-            : BookingRequestStatusText.ARCHIVED,
-        ),
-    [bookingRequest],
-  );
-
-  const onHoldClick = useCallback(
-    () =>
-      firebase
-        .firestore()
-        .collection('bookings-requests')
-        .doc(bookingRequest?.id)
-        .update('hold', !bookingRequest.hold),
-    [bookingRequest],
-  );
-
-  const onBookingCreate = useCallback(
-    (bookingId: string) =>
-      firebase
-        .firestore()
-        .collection('bookings-requests')
-        .doc(bookingRequest?.id)
-        .update(
-          'bookingId',
-          bookingId,
-          'statusCode',
-          BookingRequestStatusCode.CONFIRMED,
-          'statusText',
-          BookingRequestStatusText.CONFIRMED,
-        ),
-    [bookingRequest],
-  );
-
   const storeActivity = useCallback(
     (checklistItemActivityHandler: () => Promise<void | any>) => {
       checklistItemActivityHandler()
@@ -644,28 +644,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         if (response.ok) {
           const body = await response.json();
           if (body.FileID) {
-            await onBookingCreate(body.FileID);
             await timeout(3000);
-            let bookingData = (
-              await firebase
-                .firestore()
-                .collection('bookings')
-                .doc(body.FileID)
-                .get()
-            ).data();
+            let bookingData = await getBookingData(body.FileID);
             if (bookingData) {
+              await onBookingCreate(bookingRequest, body.FileID);
               const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
               win && win.focus();
             } else {
               await timeout(10000);
-              bookingData = (
-                await firebase
-                  .firestore()
-                  .collection('bookings')
-                  .doc(body.FileID)
-                  .get()
-              ).data();
+              bookingData = await getBookingData(body.FileID);
               if (bookingData) {
+                await onBookingCreate(bookingRequest, body.FileID);
                 const win: Window | null = window.open(`/bookings/${body.FileID}`, '_blank');
                 win && win.focus();
               } else {
@@ -713,7 +702,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   );
 
   const archiveHandler = () =>
-    onArchiveClick().then(() =>
+    onArchiveClick(bookingRequest).then(() =>
       addActivityItem(
         'bookings-requests',
         bookingRequest.id!,
@@ -727,7 +716,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       ),
     );
   const holdHandler = () =>
-    onHoldClick().then(() =>
+    onHoldClick(bookingRequest).then(() =>
       addActivityItem(
         'bookings-requests',
         bookingRequest.id!,
