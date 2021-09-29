@@ -147,7 +147,7 @@ const getUpdatedFreightDetails = (
   pos: number,
   field: string,
 ) => {
-  if (bookingRequest.freightDetails) {
+  if (bookingRequest.freightDetails && bookingRequest.freightDetails.length > 0) {
     const index = bookingRequest.freightDetails?.findIndex(value1 => value1.SeqNr === pos);
     if (index < 0) return bookingRequest.freightDetails;
     let d = bookingRequest.freightDetails[index];
@@ -156,6 +156,24 @@ const getUpdatedFreightDetails = (
     }
     d = set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value)(d);
     bookingRequest.freightDetails[index] = flow(set(field, get(field)(d)), set('Total', calculateTotal(d)))(d);
+    if (isDetailSeafreight(d)) {
+      const indexOfCommission = bookingRequest.freightDetails.findIndex(e => isAgencyCommission(e));
+      if (indexOfCommission && indexOfCommission !== -1 && !bookingRequest.freightDetails[indexOfCommission].isManual) {
+        const newCommission = generateCommission(
+          bookingRequest.schedule,
+          bookingRequest.freightDetails,
+          bookingRequest.itinerary?.portOfLoading.VoyageInfo.Carrier,
+          bookingRequest.containers,
+        );
+        if (newCommission) {
+          bookingRequest.freightDetails[indexOfCommission] = {
+            ...bookingRequest.freightDetails[indexOfCommission],
+            UnitValue: newCommission.UnitValue,
+            Total: newCommission.Total,
+          } as FreightDetail;
+        }
+      }
+    }
   }
   return bookingRequest.freightDetails;
 };
@@ -401,16 +419,16 @@ const sortBySeqNr = (a: FreightDetail, b: FreightDetail) => {
   return 0;
 };
 
+const isDetailSeafreight = (detail: FreightDetail) =>
+  detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime';
+
 export const generateCommission = (
   schedule: RouteSearchResult | undefined,
   freightDetails: FreightDetail[] | undefined,
   carrierId?: string,
   containers?: (Container & ContainerDetails)[],
 ) => {
-  const seaFreightDetails = freightDetails?.filter(
-    (detail: FreightDetail) =>
-      detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-  );
+  const seaFreightDetails = freightDetails?.filter((detail: FreightDetail) => isDetailSeafreight(detail));
   const seaFreightTotal = seaFreightDetails?.reduce((a, b) => a + (b?.Total || 0), 0);
   const isHMM = carrierId && carrierId === CarrierId.HMM;
   const isPercent = schedule?.ComPercentE
@@ -580,12 +598,43 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   }, [setBookingRequest, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
-    setBookingRequest(prevState =>
-      set(
-        'freightDetails',
-        freightDetails?.filter(detail => !selectedDetails.includes(detail.SeqNr)),
-      )(prevState!),
-    );
+    const filteredFreightDetails = freightDetails?.filter(detail => !selectedDetails.includes(detail.SeqNr));
+    // check if we deleted some seafreight details and update the commission
+    if (
+      selectedDetails.some(detailSeqNr => {
+        const freightDetail = freightDetails?.find(detail => detail.SeqNr === detailSeqNr);
+        return freightDetail && isDetailSeafreight(freightDetail);
+      })
+    ) {
+      const indexOfCommission = filteredFreightDetails?.findIndex(e => isAgencyCommission(e));
+      if (
+        filteredFreightDetails &&
+        indexOfCommission &&
+        indexOfCommission !== -1 &&
+        !filteredFreightDetails[indexOfCommission].isManual
+      ) {
+        const newCommission = generateCommission(
+          bookingRequest.schedule,
+          filteredFreightDetails,
+          bookingRequest.itinerary?.portOfLoading.VoyageInfo.Carrier,
+          bookingRequest.containers,
+        );
+        if (newCommission) {
+          filteredFreightDetails[indexOfCommission] = {
+            ...filteredFreightDetails[indexOfCommission],
+            UnitValue: newCommission.UnitValue,
+            Total: newCommission.Total,
+          } as FreightDetail;
+        } else if (filteredFreightDetails[indexOfCommission].Unit === '%') {
+          filteredFreightDetails[indexOfCommission] = {
+            ...filteredFreightDetails[indexOfCommission],
+            UnitValue: 0,
+            Total: 0,
+          } as FreightDetail;
+        }
+      }
+    }
+    setBookingRequest(prevState => set('freightDetails', filteredFreightDetails)(prevState!));
     setSelectedDetails([]);
   }, [selectedDetails]);
 
