@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { RouteComponentProps } from 'react-router';
 import BookingView from '../components/bookings/BookingView';
 import { normalizeBooking } from '../providers/BookingsProvider';
@@ -10,7 +10,6 @@ import { useHistory } from 'react-router';
 import Tags from '../contexts/Tags';
 import { TagCategory } from '../model/Tag';
 import FirestoreCollectionProvider from '../providers/FirestoreCollection';
-import ActingAs from '../contexts/ActingAs';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -23,25 +22,15 @@ interface Props extends RouteComponentProps<{ id: string }> {}
 const BookingContainer: React.FC<Props> = ({ match }) => {
   const classes = useStyles();
   const bookingId = match.params.id;
-  const [actingAs] = useContext(ActingAs);
 
   const history = useHistory();
   const bookingSnapshot = useFirestoreDocument('bookings', bookingId);
 
-  const bookingDoc = useMemo(
-    () => (bookingSnapshot ? ({ id: bookingSnapshot.id, ...bookingSnapshot.data() } as Booking) : undefined),
-    [bookingSnapshot],
-  );
+  const bookingDoc = bookingSnapshot ? ({ id: bookingSnapshot.id, ...bookingSnapshot.data() } as Booking) : undefined;
 
-  const booking = useMemo(() => (bookingDoc ? normalizeBooking(bookingDoc) : undefined), [bookingDoc]) as Booking;
+  const booking = useMemo(() => (bookingDoc ? normalizeBooking(bookingDoc) : undefined), [bookingDoc]);
 
-  const isEligible = !actingAs || actingAs?.company?.id === booking?.ForwAdrId;
-
-  if (
-    bookingSnapshot === null ||
-    (bookingSnapshot && !bookingSnapshot.exists) ||
-    (bookingSnapshot && bookingSnapshot.exists && !isEligible)
-  ) {
+  if (bookingSnapshot === null || (bookingSnapshot && !bookingSnapshot.exists)) {
     history.push('/not-found');
   }
 
