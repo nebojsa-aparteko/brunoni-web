@@ -64,7 +64,6 @@ import { useHistory } from 'react-router';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import BookNowButton from './BookNowButton';
-import ActingAs from '../contexts/ActingAs';
 
 interface Props {
   id: string;
@@ -208,7 +207,6 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const history = useHistory();
 
-  const [actingAs] = useContext(ActingAs);
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
@@ -327,9 +325,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
     );
   }
 
-  const isEligible = !actingAs || quoteGroup?.quotes[0].clientId === actingAs?.company?.id;
-
-  if (!isLoading && (!quoteGroup || !isEligible)) {
+  if (!isLoading && !quoteGroup) {
     history.push('/not-found');
   }
 
