@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Fragment, useCallback, useContext } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
 import { BookingRequest, BookingRequestItinerary, BookingRequestLabels } from '../../model/BookingRequest';
@@ -502,6 +502,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const clients = useClients();
   const [, userRecord] = useUser();
 
+  const vesselVoyage = useMemo(() => getVoyageInfo(bookingRequest.schedule), [bookingRequest.schedule]);
+
   const handleChangeSchedule = useCallback(
     (schedule: RouteSearchResult | undefined) => {
       const voyageInfo = getVoyageInfo(schedule);
@@ -594,9 +596,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                         bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName,
                         bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr,
                       ].join(' VOY. ')}
-                      {isDashboardUser(userRecord) && (
-                        <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
-                      )}
+                      {isDashboardUser(userRecord) && <VesselAllocationButton vesselVoyage={vesselVoyage} />}
                     </Box>
                   }
                 />
