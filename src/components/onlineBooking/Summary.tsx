@@ -236,7 +236,12 @@ const updateFreightDetails = (
 export const onContainersChange = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
-) => flow(recalculateQuantity.bind(this, containers), updateFreightDetails.bind(this, containers))(freightDetails);
+) =>
+  flow(
+    recalculateQuantity.bind(this, containers),
+    updateFreightDetails.bind(this, containers),
+    recalculateFreightDetails.bind(this),
+  )(freightDetails);
 // const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
 const recalculateFreightDetails = (freights: FreightDetail[]) =>
   freights.map(freightDetail => {
