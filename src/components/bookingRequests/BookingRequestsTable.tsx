@@ -24,7 +24,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestItinerary } from '../../model/BookingRequest';
 import Avatar from 'react-avatar';
 import { useHistory } from 'react-router';
 import CloseIcon from '@material-ui/icons/Close';
@@ -129,7 +129,7 @@ interface BookingRequestRowProps {
   onProgressClick?: any;
 }
 
-const StyledTableRow = withStyles((theme: Theme) =>
+export const StyledTableRow = withStyles((theme: Theme) =>
   createStyles({
     root: {
       cursor: 'pointer',
@@ -218,6 +218,38 @@ export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
   );
 };
 
+export const getOriginPort = (itinerary: BookingRequestItinerary | null | undefined) => {
+  return itinerary
+    ? ((itinerary?.placeOfReceipt ? itinerary.placeOfReceipt : itinerary?.portOfLoading && itinerary.portOfLoading) as
+        | ItineraryItem
+        | undefined)
+    : undefined;
+};
+
+export const getDestinationPort = (itinerary: BookingRequestItinerary | null | undefined) => {
+  return itinerary
+    ? ((itinerary?.finalDestinationPort
+        ? itinerary.finalDestinationPort
+        : itinerary?.portOfDischarge && itinerary.portOfDischarge) as ItineraryItem | undefined)
+    : undefined;
+};
+
+export const showDeliveryRef = (bookingRequest: BookingRequest) => {
+  if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference)) return null;
+  return (
+    <Box display={'flex'} alignItems={'flex-end'} mr={'auto'} ml={'1.5em'}>
+      <Typography style={{ marginRight: '.5em' }} variant={'body2'}>
+        {bookingRequest.containers.length > 1 ? 'Delivery Refs.' : 'Delivery Ref.'}
+      </Typography>
+      {bookingRequest.containers?.map((c, i) => (
+        <Typography key={i} variant={'body2'} style={{ marginRight: '.2em' }}>
+          {i === bookingRequest.containers!.length - 1 ? c.deliveryReference : c.deliveryReference + ' / '}
+        </Typography>
+      ))}
+    </Box>
+  );
+};
+
 export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   isAdmin,
   bookingRequest,
@@ -236,22 +268,6 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
 
   const [, userRecord] = useUser();
 
-  const showDeliveryRef = () => {
-    if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference)) return null;
-    return (
-      <Box display={'flex'} alignItems={'flex-end'} mr={'auto'} ml={'1.5em'}>
-        <Typography style={{ marginRight: '.5em' }} variant={'body2'}>
-          {bookingRequest.containers.length > 1 ? 'Delivery Refs.' : 'Delivery Ref.'}
-        </Typography>
-        {bookingRequest.containers?.map((c, i) => (
-          <Typography key={i} variant={'body2'} style={{ marginRight: '.2em' }}>
-            {i === bookingRequest.containers!.length - 1 ? c.deliveryReference : c.deliveryReference + ' / '}
-          </Typography>
-        ))}
-      </Box>
-    );
-  };
-
   useEffect(
     () =>
       setTags(
@@ -269,20 +285,6 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     },
     [history, preventDefaultClick],
   );
-
-  const getOriginPort = () => {
-    return (bookingRequest.itinerary?.placeOfReceipt
-      ? bookingRequest.itinerary.placeOfReceipt
-      : bookingRequest.itinerary?.portOfLoading && bookingRequest.itinerary.portOfLoading) as ItineraryItem | undefined;
-  };
-
-  const getDestinationPort = () => {
-    return (bookingRequest.itinerary?.finalDestinationPort
-      ? bookingRequest.itinerary.finalDestinationPort
-      : bookingRequest.itinerary?.portOfDischarge && bookingRequest.itinerary.portOfDischarge) as
-      | ItineraryItem
-      | undefined;
-  };
 
   return (
     <StyledTableRow
@@ -313,7 +315,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <span className={classes.tableRowHeader}>
               <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
             </span>
-            {showDeliveryRef()}
+            {bookingRequest && showDeliveryRef(bookingRequest)}
             {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
           </Box>
         </Grid>
@@ -429,8 +431,12 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={ChevronRightIcon}
                   title="Origin"
-                  label1={getOriginPort()?.Port.HarbourName + ', ' + getOriginPort()?.Port.Land}
-                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort()?.DepartureDate}`}
+                  label1={
+                    getOriginPort(bookingRequest.itinerary)?.Port.HarbourName +
+                    ', ' +
+                    getOriginPort(bookingRequest.itinerary)?.Port.Land
+                  }
+                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`}
                   gutterBottom
                 />
               </Grid>
@@ -438,8 +444,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={LastPageIcon}
                   title="Destination"
-                  label1={getDestinationPort()?.Port.HarbourName + ', ' + getDestinationPort()?.Port.Land}
-                  label2={bookingRequest.itinerary && `ETA: ${getDestinationPort()?.ArrivalDate}`}
+                  label1={
+                    getDestinationPort(bookingRequest.itinerary)?.Port.HarbourName +
+                    ', ' +
+                    getDestinationPort(bookingRequest.itinerary)?.Port.Land
+                  }
+                  label2={
+                    bookingRequest.itinerary && `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
+                  }
                   gutterBottom
                 />
               </Grid>

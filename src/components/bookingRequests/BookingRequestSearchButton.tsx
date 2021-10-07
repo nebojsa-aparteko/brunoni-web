@@ -347,16 +347,28 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
             closeModal={closeModal}
           />
           {isAdmin && (
-            <SearchBookingRequest
-              key="quoteNumber"
-              label="Quote Number"
-              fieldName={'quoteNumber'}
-              searchField={searchField}
-              setSearchField={setSearchField}
-              searchValue={searchValue}
-              setSearchValue={setSearchValue}
-              closeModal={closeModal}
-            />
+            <React.Fragment>
+              <SearchBookingRequest
+                key="quoteNumber"
+                label="Quote Number"
+                fieldName={'quoteNumber'}
+                searchField={searchField}
+                setSearchField={setSearchField}
+                searchValue={searchValue}
+                setSearchValue={setSearchValue}
+                closeModal={closeModal}
+              />
+              <SearchBookingRequest
+                key="agreementNo"
+                label="Agreement Number"
+                fieldName={'agreementNo'}
+                searchField={searchField}
+                setSearchField={setSearchField}
+                searchValue={searchValue}
+                setSearchValue={setSearchValue}
+                closeModal={closeModal}
+              />
+            </React.Fragment>
           )}
           <SearchStatus
             key="statusText"
