@@ -47,6 +47,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import formatDate from 'date-fns/format';
 import { formatDistanceToNowConfigured } from '../utilities/formattingHelpers';
 import PinnedCommentsButton from './bookingRequests/PinnedCommentsButton';
+import theme from '../theme';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -126,8 +127,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({ bookingReq
       style={{
         position: 'relative',
         display: 'flex',
-        backgroundColor: bookingRequest.isUnread ? 'rgba(161,213,255,0.25)' : undefined,
-        border: !bookingRequest.assignedUser && '2px solid #00b0ff',
+        backgroundColor: bookingRequest.isUnread ? 'rgba(161,213,255,0.25)' : 'white',
+        border: !bookingRequest.assignedUser ? '2px solid #00b0ff' : `2px solid ${theme.palette.grey[400]}`,
+        marginBottom: theme.spacing(1),
       }}
     >
       <Grid container item xs={12}>
@@ -408,7 +410,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                     </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell style={{ padding: 0, backgroundColor: '#f5f5f5' }} colSpan={4}>
+                    <TableCell style={{ padding: 0 }} colSpan={4}>
                       {confirmedRequests && (
                         <Collapse in={openConfirmed} timeout="auto" unmountOnExit>
                           <BookingsOverviewTable bookingRequests={confirmedRequests} />

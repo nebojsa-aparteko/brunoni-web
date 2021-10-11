@@ -463,13 +463,15 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            <Grid item md={1} xs={12}>
-              <InfoBoxItem
-                title="Last updated"
-                label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
-                gutterBottom
-              />
-            </Grid>
+            {bookingRequest.updatedAt && (
+              <Grid item md={1} xs={12}>
+                <InfoBoxItem
+                  title="Last updated"
+                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  gutterBottom
+                />
+              </Grid>
+            )}
             {isDashboardUser(userRecord) &&
               bookingRequest.pinnedCommentsCount &&
               bookingRequest.pinnedCommentsCount > 0 && (

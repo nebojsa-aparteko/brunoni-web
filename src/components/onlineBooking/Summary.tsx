@@ -288,9 +288,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       bookingRequest?.carrier?.id,
       bookingRequest?.containers,
     );
+    const createdAt = new Date();
     let writableRequest = {
       ...bookingRequest,
-      createdAt: new Date(),
+      createdAt,
+      updatedAt: createdAt,
       createdBy: activityLogUserData,
       statusCode: BookingRequestStatusCode.REQUESTED,
       statusText: BookingRequestStatusText.REQUESTED,

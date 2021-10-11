@@ -402,12 +402,15 @@ const mapIntoBookingRequestModel = async (
 
   const commission = generateCommission(schedule, freightDetails, carrier?.id, containers);
 
+  const createdAt = new Date();
+
   return {
     agreementNo,
     carrier,
     client,
     containers,
-    createdAt: new Date(),
+    createdAt,
+    updatedAt: createdAt,
     createdBy,
     customerReference,
     destination,
