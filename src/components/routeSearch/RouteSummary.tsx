@@ -11,6 +11,8 @@ import ShareIcon from '@material-ui/icons/Share';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { getItineraryFromSchedule } from '../onlineBooking/Summary';
 import VesselAllocationButton from '../VesselAllocationButton';
+import { isDashboardUser } from '../../model/UserRecord';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -27,6 +29,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 const RouteSummary: React.FC<Props> = ({ route }) => {
   const routeItinerary = useMemo(() => getItineraryFromSchedule(route), [route]);
   const classes = useStyles();
+  const [, userRecord] = useUser();
+
   return (
     <Grid item xs={12}>
       <Grid container spacing={2}>
@@ -50,14 +54,23 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
             </Box>
           </Typography>
         </Grid>
-        <Grid item md={3} xs={12}>
-          <InfoBoxItem
-            title="Vessel"
-            label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
-            label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
-            gutterBottom
-          />
-          <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} />
+        <Grid item container md={3} xs={12} direction={'row'}>
+          <Grid item md={3} xs={12} direction={'row'}>
+            <Grid item>
+              <InfoBoxItem
+                title="Vessel"
+                label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
+                label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
+                gutterBottom
+              />
+            </Grid>
+            {isDashboardUser(userRecord) && (
+              <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+                <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} />
+              </Grid>
+            )}
+          </Grid>
+          <Box></Box>
         </Grid>
         {route?.SpaceInfo && (
           <Grid item md={3} xs={12}>
