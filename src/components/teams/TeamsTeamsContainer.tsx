@@ -2,13 +2,13 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import OperationsTeamsTable from './OperationsTeamsTable';
-import AccountingTeamsTable from './AccountingTeamsTable';
 import { TeamType } from '../../model/Teams';
 import firebase from '../../firebase';
+import TeamsContainer from './redesign/TeamsContainer';
 
 const useStyles = makeStyles({
   expansionPanel: {
+    padding: 0,
     marginBottom: 8,
   },
   expansionPanelSummary: {
@@ -57,8 +57,8 @@ const TeamsTeamsContainer: React.FC = () => {
             Accounting teams
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <AccountingTeamsTable onAdd={onAdd} />
+        <ExpansionPanelDetails className={classes.expansionPanel}>
+          <TeamsContainer type={TeamType.ACCOUNTING} />
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
@@ -67,8 +67,8 @@ const TeamsTeamsContainer: React.FC = () => {
             Operations teams
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <OperationsTeamsTable onAdd={onAdd} />
+        <ExpansionPanelDetails className={classes.expansionPanel}>
+          <TeamsContainer type={TeamType.OPERATIONS} />
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </Box>

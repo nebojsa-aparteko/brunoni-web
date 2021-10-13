@@ -26,7 +26,7 @@ import { useSnackbar } from 'notistack';
 import { BookingCategory } from '../../model/Booking';
 import CategoryFilter from '../CategoryFilter';
 
-const useStyles = makeStyles((theme: Theme) =>
+export const useDialog = makeStyles((theme: Theme) =>
   createStyles({
     dialogContent: {
       paddingBottom: theme.spacing(3),
@@ -52,7 +52,7 @@ interface Props {
 }
 
 const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
-  const classes = useStyles();
+  const classes = useDialog();
   const carriers = useContext(Carriers);
   const clients = useClients();
   const [, dispatch] = useContext(GlobalContext);

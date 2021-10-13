@@ -13,19 +13,31 @@ import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentC
 import { useHistory } from 'react-router';
 import QueryString from 'querystring';
 
-const useStyles = makeStyles((theme: Theme) => ({
+export const tabStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
+    display: 'flex',
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
-    display: 'flex',
     width: '100%',
+    fontSize: theme.typography.body1.fontSize,
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
+  subList: {
+    '& > *': {
+      paddingLeft: theme.spacing(3),
+    },
+  },
+  row: {
+    '&:hover': {
+      backgroundColor: 'rgba(161,213,255,0.20) !important',
+    },
+    cursor: 'pointer',
+  },
 }));
 
-function a11yProps(index: any) {
+export function a11yProps(index: any) {
   return {
     id: `scrollable-prevent-tab-${index}`,
     'aria-controls': `scrollable-prevent-tabpanel-${index}`,
@@ -33,7 +45,7 @@ function a11yProps(index: any) {
 }
 
 const TeamManagementPage: React.FC = () => {
-  const classes = useStyles();
+  const classes = tabStyles();
   const history = useHistory();
   const params = QueryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
