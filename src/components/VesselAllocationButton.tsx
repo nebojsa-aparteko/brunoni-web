@@ -103,7 +103,10 @@ interface BookingRequestRowProps {
   preventDefaultClick?: boolean;
 }
 
-export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({ bookingRequest, preventDefaultClick }) => {
+export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
+  bookingRequest,
+  preventDefaultClick,
+}) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -268,7 +271,7 @@ const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookingRe
     <Table size="small" aria-label="requests">
       <TableBody>
         {bookingRequests.map(request => (
-          <BookingRequestRow bookingRequest={request} />
+          <BookingRequestSimplifiedRow bookingRequest={request} />
         ))}
       </TableBody>
     </Table>

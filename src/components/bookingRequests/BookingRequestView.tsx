@@ -949,7 +949,7 @@ interface Props {
 }
 
 export default BookingRequestView;
-
+//TODO should be removed or changed to take the vessel and voyage from Port of Loading
 export const getVoyageInfo = (schedule?: RouteSearchResult | null) => {
   if (!schedule) return undefined;
   if (hasPlaceOfReceipt(schedule)) {
@@ -960,6 +960,10 @@ export const getVoyageInfo = (schedule?: RouteSearchResult | null) => {
   return schedule.OriginInfo.VoyageInfo;
 };
 
+export const getVoyageInfoFromBookingRequest = (bookingRequest?: BookingRequest | null) => {
+  if (!bookingRequest) return undefined;
+  return bookingRequest.itinerary?.portOfLoading.VoyageInfo;
+};
 const AdditionalInfoView = ({ additionalInfo }: { additionalInfo: string }) => {
   const classes = useStyles();
   return (

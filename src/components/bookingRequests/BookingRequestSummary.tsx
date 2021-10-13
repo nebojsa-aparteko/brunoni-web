@@ -42,7 +42,7 @@ import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
 import { CarrierId } from '../../model/Booking';
 import VesselAllocationButton from '../VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import { getVoyageInfo, getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import EditingInput from '../EditingInput';
 import useUser from '../../hooks/useUser';
 import useModal from '../../hooks/useModal';
@@ -502,7 +502,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const clients = useClients();
   const [, userRecord] = useUser();
 
-  const vesselVoyage = useMemo(() => getVoyageInfo(bookingRequest.schedule), [bookingRequest.schedule]);
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
 
   const handleChangeSchedule = useCallback(
     (schedule: RouteSearchResult | undefined) => {

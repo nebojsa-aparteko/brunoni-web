@@ -33,7 +33,7 @@ import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
 import VesselAllocationButton from '../VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import { getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
@@ -363,7 +363,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                    <VesselAllocationButton vesselVoyage={getVoyageInfoFromBookingRequest(bookingRequest)} />
                   </Grid>
                 )}
               </Grid>
