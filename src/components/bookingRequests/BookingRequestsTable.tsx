@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -265,6 +265,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     availableTags &&
       availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
   );
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
 
   const [, userRecord] = useUser();
 
@@ -363,7 +364,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={getVoyageInfoFromBookingRequest(bookingRequest)} />
+                    <VesselAllocationButton vesselVoyage={vesselVoyage} />
                   </Grid>
                 )}
               </Grid>

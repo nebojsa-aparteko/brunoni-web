@@ -1,5 +1,5 @@
 import { Box, Chip, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { Skeleton } from '@material-ui/lab';
 import TextSkeleton from '../TextSkeleton';
 import InfoBoxItem from '../InfoBoxItem';
@@ -9,6 +9,8 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
 import ShareIcon from '@material-ui/icons/Share';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { getItineraryFromSchedule } from '../onlineBooking/Summary';
+import VesselAllocationButton from '../VesselAllocationButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -23,6 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const RouteSummary: React.FC<Props> = ({ route }) => {
+  const routeItinerary = useMemo(() => getItineraryFromSchedule(route), [route]);
   const classes = useStyles();
   return (
     <Grid item xs={12}>
@@ -50,10 +53,11 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
         <Grid item md={3} xs={12}>
           <InfoBoxItem
             title="Vessel"
-            label1={route?.OriginInfo.VoyageInfo.VesselName}
-            label2={route?.OriginInfo.VoyageInfo.VoyageNr}
+            label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
+            label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
             gutterBottom
           />
+          <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} />
         </Grid>
         {route?.SpaceInfo && (
           <Grid item md={3} xs={12}>

@@ -284,6 +284,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
     vesselVoyage?.VesselName,
     vesselVoyage?.VoyageNr,
   ]);
+  const vesselName = useMemo(() => vesselVoyage?.VesselName, [vesselVoyage?.VesselName]);
+
+  const voyageNumber = useMemo(() => vesselVoyage?.VoyageNr, [vesselVoyage?.VoyageNr]);
   const vessel = useVesselWithVoyageById(vesselVoyageString);
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
 
@@ -298,27 +301,34 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
   const relevantBookingRequests = useBookingRequests(
     useCallback(
       query => {
-        if (!vessel || !vessel?.vesselName || !vessel?.voyageNumber) return null;
-        return query
-          .where('itinerary.portOfLoading.VoyageInfo.VesselName', '==', vessel?.vesselName)
-          .where('itinerary.portOfLoading.VoyageInfo.VoyageNr', '==', vessel?.voyageNumber)
-          .where('statusCode', '<', BookingRequestStatusCode.ARCHIVED)
+        const q = query;
+        if (!vesselName || !voyageNumber) return undefined;
+        return q
+          .where('itinerary.portOfLoading.VoyageInfo.VesselName', '==', vesselName)
+          .where('itinerary.portOfLoading.VoyageInfo.VoyageNr', '==', voyageNumber)
+          .where('statusCode', '<=', BookingRequestStatusCode.CONFIRMED)
           .orderBy('statusCode', 'asc')
           .orderBy('createdAt', 'desc');
       },
-      [vessel?.vesselName, vessel?.voyageNumber],
+      [vesselName, voyageNumber],
     ),
   );
 
   useEffect(() => {
     setConfirmedRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.CONFIRMED),
+      relevantBookingRequests
+        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.CONFIRMED)
+        : [],
     );
     setRequestedRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED),
+      relevantBookingRequests
+        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED)
+        : [],
     );
     setInProgressRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS),
+      relevantBookingRequests
+        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS)
+        : [],
     );
   }, [relevantBookingRequests]);
 
@@ -397,7 +407,11 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                       </IconButton>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      Confirmed Bookings
+                      {`Confirmed Bookings ${
+                        confirmedRequests && confirmedRequests?.length > 0
+                          ? '(' + confirmedRequests?.length + ' requests)'
+                          : ''
+                      }`}
                     </TableCell>
                     <TableCell align="right">
                       {vessel.teuBooked || 0}{' '}
@@ -436,7 +450,11 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                           </IconButton>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          Requested Bookings
+                          {`Requested Bookings ${
+                            requestedRequests && requestedRequests?.length > 0
+                              ? '(' + requestedRequests?.length + ' requests)'
+                              : ''
+                          }`}
                         </TableCell>
                         <TableCell align="right">{vessel.requested.quantity}</TableCell>
                         <TableCell align="right">
@@ -471,7 +489,11 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                           </IconButton>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          In Progress Bookings
+                          {`In Progress Bookings ${
+                            inProgressRequests && inProgressRequests?.length > 0
+                              ? '(' + inProgressRequests?.length + ' requests)'
+                              : ''
+                          }`}
                         </TableCell>
                         <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                         <TableCell align="right">
