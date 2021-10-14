@@ -47,6 +47,9 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import formatDate from 'date-fns/format';
 import { formatDistanceToNowConfigured } from '../utilities/formattingHelpers';
 import PinnedCommentsButton from './bookingRequests/PinnedCommentsButton';
+import useBookings from '../hooks/useBookings';
+import { BookingRow } from './bookings/BookingsTable';
+import { Booking } from '../model/Booking';
 
 const useStyles = makeStyles(theme => ({
   closeModal: {
@@ -87,6 +90,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface BookingsOverviewTableProps {
+  bookings: Booking[];
+}
+
+interface BookingRequestsOverviewTableProps {
   bookingRequests: BookingRequest[];
 }
 
@@ -266,7 +273,19 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
   );
 };
 
-const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookingRequests }) => {
+const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookings }) => {
+  return (
+    <Table size="small" aria-label="requests">
+      <TableBody>
+        {bookings.map(booking => (
+          <BookingRow booking={booking} />
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> = ({ bookingRequests }) => {
   return (
     <Table size="small" aria-label="requests">
       <TableBody>
@@ -294,7 +313,6 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
   const [openRequested, setOpenRequested] = useState(false);
   const [openInProgress, setOpenInProgress] = useState(false);
 
-  const [confirmedRequests, setConfirmedRequests] = useState<BookingRequest[] | undefined>(undefined);
   const [requestedRequests, setRequestedRequests] = useState<BookingRequest[] | undefined>(undefined);
   const [inProgressRequests, setInProgressRequests] = useState<BookingRequest[] | undefined>(undefined);
 
@@ -306,20 +324,28 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
         return q
           .where('itinerary.portOfLoading.VoyageInfo.VesselName', '==', vesselName)
           .where('itinerary.portOfLoading.VoyageInfo.VoyageNr', '==', voyageNumber)
-          .where('statusCode', '<=', BookingRequestStatusCode.CONFIRMED)
+          .where('statusCode', '<=', BookingRequestStatusCode.IN_PROGRESS)
           .orderBy('statusCode', 'asc')
           .orderBy('createdAt', 'desc');
       },
       [vesselName, voyageNumber],
     ),
   );
+  const relevantBookings = useBookings(
+    useCallback(
+      query => {
+        const q = query;
+        if (!vesselName || !voyageNumber) return undefined;
+        return q
+          .where('Vessel', '==', vesselName)
+          .where('Voyage', '==', voyageNumber)
+          .orderBy('BkgCreateTimeStamp', 'desc');
+      },
+      [vesselName, voyageNumber],
+    ),
+  );
 
   useEffect(() => {
-    setConfirmedRequests(
-      relevantBookingRequests
-        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.CONFIRMED)
-        : [],
-    );
     setRequestedRequests(
       relevantBookingRequests
         ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED)
@@ -401,15 +427,15 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                           event.stopPropagation();
                           setOpenConfirmed(!openConfirmed);
                         }}
-                        disabled={!confirmedRequests || confirmedRequests.length === 0}
+                        disabled={!relevantBookings || relevantBookings.length === 0}
                       >
                         {openConfirmed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                       </IconButton>
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {`Confirmed Bookings ${
-                        confirmedRequests && confirmedRequests?.length > 0
-                          ? '(' + confirmedRequests?.length + ' requests)'
+                        relevantBookings && relevantBookings?.length > 0
+                          ? '(' + relevantBookings?.length + ' bookings)'
                           : ''
                       }`}
                     </TableCell>
@@ -426,9 +452,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                   </TableRow>
                   <TableRow>
                     <TableCell style={{ padding: 0, backgroundColor: '#f5f5f5' }} colSpan={4}>
-                      {confirmedRequests && (
+                      {relevantBookings && (
                         <Collapse in={openConfirmed} timeout="auto" unmountOnExit>
-                          <BookingsOverviewTable bookingRequests={confirmedRequests} />
+                          <BookingsOverviewTable bookings={relevantBookings} />
                         </Collapse>
                       )}
                     </TableCell>
@@ -465,7 +491,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                         <TableCell style={{ padding: 0, backgroundColor: '#f5f5f5' }} colSpan={6}>
                           {requestedRequests && (
                             <Collapse in={openRequested} timeout="auto" unmountOnExit>
-                              <BookingsOverviewTable bookingRequests={requestedRequests} />
+                              <BookingRequestsOverviewTable bookingRequests={requestedRequests} />
                             </Collapse>
                           )}
                         </TableCell>
@@ -510,7 +536,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                         >
                           {inProgressRequests && (
                             <Collapse in={openInProgress} timeout="auto" unmountOnExit>
-                              <BookingsOverviewTable bookingRequests={inProgressRequests} />
+                              <BookingRequestsOverviewTable bookingRequests={inProgressRequests} />
                             </Collapse>
                           )}
                         </TableCell>
