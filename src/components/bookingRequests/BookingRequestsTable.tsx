@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -33,7 +33,7 @@ import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
 import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import { getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
@@ -265,6 +265,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     availableTags &&
       availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
   );
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
 
   const [, userRecord] = useUser();
 
@@ -363,7 +364,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                    <VesselAllocationButton vesselVoyage={vesselVoyage} />
                   </Grid>
                 )}
               </Grid>
