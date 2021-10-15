@@ -13,6 +13,8 @@ import { getItineraryFromSchedule } from '../onlineBooking/Summary';
 import VesselAllocationButton from '../VesselAllocationButton';
 import { isDashboardUser } from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
+import Carrier from '../../model/Carrier';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSummary: React.FC<Props> = ({ route }) => {
+const RouteSummary: React.FC<Props> = ({ route, carrier }) => {
   const routeItinerary = useMemo(() => getItineraryFromSchedule(route), [route]);
   const classes = useStyles();
   const [, userRecord] = useUser();
@@ -42,7 +44,11 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
             <Box display="flex" alignItems="center" lineHeight="normal">
               {route ? (
                 <Fragment>
-                  <Skeleton variant="circle" className={classes.carrierAvatar} />
+                  {carrier ? (
+                    <FiberManualRecordIcon className={classes.carrierAvatar} style={{ color: carrier!.color }} />
+                  ) : (
+                    <Skeleton variant="circle" className={classes.carrierAvatar} />
+                  )}
                   <span>{route.OriginInfo.VoyageInfo.Carrier}</span>
                 </Fragment>
               ) : (
@@ -157,6 +163,7 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
 
 interface Props {
   route: RouteSearchResult;
+  carrier?: Carrier;
 }
 
 export default RouteSummary;

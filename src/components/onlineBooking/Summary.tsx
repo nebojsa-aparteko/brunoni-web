@@ -400,7 +400,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       {bookingRequest && bookingRequest?.schedule && (
         <Grid container spacing={4} xs={12}>
           <Grid item xs={12} title={'General Information'}>
-            <RouteSummary route={bookingRequest?.schedule} />
+            <RouteSummary route={bookingRequest?.schedule} carrier={bookingRequest?.carrier} />
           </Grid>
           <Grid item xs={12}>
             <Divider />
