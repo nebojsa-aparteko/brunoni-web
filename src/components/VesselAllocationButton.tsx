@@ -297,7 +297,7 @@ const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> 
   );
 };
 
-const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage }) => {
+const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage, service }) => {
   const classes = useStyles();
   const vesselVoyageString = useMemo(() => `${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`, [
     vesselVoyage?.VesselName,
@@ -385,7 +385,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Typography style={{ textAlign: 'center' }}>
-            Vessel: {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})`}
+            Vessel:{' '}
+            {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})` +
+              (service ? ` / ${service}` : '')}
           </Typography>
           <Box mb={2} />
           {vessel && (
@@ -573,7 +575,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
   );
 };
 
-const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage }) => {
+const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage, service }) => {
   const { closeModal, openModal, isOpen } = useModal();
   const classes = useStyles();
 
@@ -588,7 +590,7 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (
-        <VesselAllocationModal isOpen={isOpen} closeModal={closeModal} vesselVoyage={vesselVoyage} />
+        <VesselAllocationModal isOpen={isOpen} closeModal={closeModal} vesselVoyage={vesselVoyage} service={service} />
       )}
     </Box>
   );
@@ -604,12 +606,14 @@ const PercentData = ({ percent }: { percent: string }) => (
 
 interface VesselAllocationButtonProps {
   vesselVoyage?: RouteSearchResultVoyageInfo;
+  service?: string;
 }
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;
+  service?: string;
 }
 
 const countAllocation = (allocation?: VesselAllocation) => {

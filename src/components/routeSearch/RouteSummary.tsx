@@ -66,7 +66,10 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
             </Grid>
             {isDashboardUser(userRecord) && (
               <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} />
+                <VesselAllocationButton
+                  vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo}
+                  service={route.Service}
+                />
               </Grid>
             )}
           </Grid>

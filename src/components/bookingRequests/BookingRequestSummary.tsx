@@ -596,7 +596,12 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                         bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName,
                         bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr,
                       ].join(' VOY. ')}
-                      {isDashboardUser(userRecord) && <VesselAllocationButton vesselVoyage={vesselVoyage} />}
+                      {isDashboardUser(userRecord) && (
+                        <VesselAllocationButton
+                          vesselVoyage={vesselVoyage}
+                          service={bookingRequest?.schedule?.Service}
+                        />
+                      )}
                     </Box>
                   }
                 />
