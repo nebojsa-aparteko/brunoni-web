@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
     documentList: {
       width: '100%',
       backgroundColor: theme.palette.background.paper,
+      paddingTop: 0,
     },
   }),
 );
@@ -31,7 +32,7 @@ const BookingRequestDocumentList: React.FC<BookingRequestDocumentListProps> = ({
     collectionPath,
     shouldShowAllDocuments: shouldShowPrevious,
   });
-  return (
+  return documents && documents.length !== 0 ? (
     <List className={classes.documentList}>
       {documents?.map(document => (
         <BookingRequestDocumentListItem
@@ -59,7 +60,7 @@ const BookingRequestDocumentList: React.FC<BookingRequestDocumentListProps> = ({
         </Box>
       )}
     </List>
-  );
+  ) : null;
 };
 
 export default BookingRequestDocumentList;

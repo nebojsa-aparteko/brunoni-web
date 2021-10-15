@@ -1,5 +1,5 @@
 import { Box, Chip, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
-import React, { Fragment } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { Skeleton } from '@material-ui/lab';
 import TextSkeleton from '../TextSkeleton';
 import InfoBoxItem from '../InfoBoxItem';
@@ -9,6 +9,12 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import WavesIcon from '@material-ui/icons/Waves';
 import ShareIcon from '@material-ui/icons/Share';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
+import { getItineraryFromSchedule } from '../onlineBooking/Summary';
+import VesselAllocationButton from '../VesselAllocationButton';
+import { isDashboardUser } from '../../model/UserRecord';
+import useUser from '../../hooks/useUser';
+import Carrier from '../../model/Carrier';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {
@@ -22,8 +28,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSummary: React.FC<Props> = ({ route }) => {
+const RouteSummary: React.FC<Props> = ({ route, carrier }) => {
+  const routeItinerary = useMemo(() => getItineraryFromSchedule(route), [route]);
   const classes = useStyles();
+  const [, userRecord] = useUser();
+
   return (
     <Grid item xs={12}>
       <Grid container spacing={2}>
@@ -35,7 +44,11 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
             <Box display="flex" alignItems="center" lineHeight="normal">
               {route ? (
                 <Fragment>
-                  <Skeleton variant="circle" className={classes.carrierAvatar} />
+                  {carrier ? (
+                    <FiberManualRecordIcon className={classes.carrierAvatar} style={{ color: carrier!.color }} />
+                  ) : (
+                    <Skeleton variant="circle" className={classes.carrierAvatar} />
+                  )}
                   <span>{route.OriginInfo.VoyageInfo.Carrier}</span>
                 </Fragment>
               ) : (
@@ -47,13 +60,20 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
             </Box>
           </Typography>
         </Grid>
-        <Grid item md={3} xs={12}>
-          <InfoBoxItem
-            title="Vessel"
-            label1={route?.OriginInfo.VoyageInfo.VesselName}
-            label2={route?.OriginInfo.VoyageInfo.VoyageNr}
-            gutterBottom
-          />
+        <Grid item container md={3} xs={12} direction={'row'}>
+          <Grid item md={9}>
+            <InfoBoxItem
+              title="Vessel"
+              label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
+              label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
+              gutterBottom
+            />
+          </Grid>
+          {isDashboardUser(userRecord) && (
+            <Grid item md={3} style={{ display: 'flex', alignItems: 'center' }}>
+              <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} service={route.Service} />
+            </Grid>
+          )}
         </Grid>
         {route?.SpaceInfo && (
           <Grid item md={3} xs={12}>
@@ -143,6 +163,7 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
 
 interface Props {
   route: RouteSearchResult;
+  carrier?: Carrier;
 }
 
 export default RouteSummary;

@@ -631,7 +631,6 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
         <Box display="flex" flexDirection="row">
           <Box flexDirection="row" alignContent="center">
-            <button id={checklistItem.id} />
             {isAdmin ? (
               <Checkbox
                 checked={checklistItem.checked}

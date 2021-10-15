@@ -9,6 +9,9 @@ import { BookingCategory, BookingVersion } from '../model/Booking';
 import { getRepresentationFromClient } from '../components/bookingRequests/BookingRequestPortTerms';
 import { formatDateSafe } from './formattingHelpers';
 import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
+import IMO from '../model/IMO';
+import CommodityType from '../model/CommodityType';
+import parseDate from 'date-fns/parse';
 
 const getTariffs = (container: Container & ContainerDetails) => {
   const tariffs = [];
@@ -38,7 +41,7 @@ const fortyFootContainers = ["40'DC", "40'SO", "40'FR", "40'PF", "40'SR", "40'OT
 
 const getRelevantUnit = (unit: string) => {
   if (unit === 'PRO CONTAINER' || unit === 'PER CONTAINER') return 'CTR';
-  if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT') return 'FEE';
+  if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT' || unit === 'PRO SHIPMENT') return 'FEE';
   if (unit === 'PRO SET' || unit === 'PER SET') return 'SET';
   if (unit === 'PRO TEU' || unit === 'PER TEU') return 'TEU';
   if (twentyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
@@ -55,7 +58,11 @@ const fetchClientByAlphacomId = async (alphacomId: string) =>
     .doc(alphacomId)
     .get();
 
-export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undefined) => {
+export default async (
+  request: BookingRequest,
+  chargeCodes: ChargeCode[] | undefined,
+  commodityTypes: CommodityType[] | undefined,
+) => {
   const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str => str.trim()) || [
     undefined,
     undefined,
@@ -100,7 +107,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
         request.freightDetails?.map(detail => ({
           ...detail,
           Unit: detail.Unit ? getRelevantUnit(detail.Unit.trim().toUpperCase()) : undefined,
-          // ChgCode: chargeCodes ? chargeCodes?.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
+          ChgCode: chargeCodes ? chargeCodes?.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
         })),
       )({}),
     ),
@@ -121,14 +128,28 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
     ),
     set(
       'PlaceOfReceiptETS',
-      itinerary?.placeOfReceipt ? itinerary?.placeOfReceipt?.DepartureDate : itinerary?.portOfLoading?.DepartureDate,
+      itinerary?.placeOfReceipt
+        ? formatDateSafe(parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : itinerary?.portOfLoading?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
     ),
     set('POL', itinerary?.portOfLoading?.Port.ID),
     set('POLName', itinerary?.portOfLoading?.Port.HarbourName),
-    set('POLETS', itinerary?.portOfLoading?.DepartureDate),
+    set(
+      'POLETS',
+      itinerary?.portOfLoading?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
+    ),
     set('POD', itinerary?.portOfDischarge?.Port.ID),
     set('PODName', itinerary?.portOfDischarge?.Port.HarbourName),
-    set('PODETS', itinerary?.portOfDischarge?.DepartureDate), //TODO check if ETA or ETS is needed
+    set(
+      'PODETS',
+      itinerary?.portOfDischarge?.DepartureDate
+        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
+    ), //TODO check if ETA or ETS is needed
     set(
       'FinalDestinationISO',
       itinerary?.finalDestinationPort ? itinerary?.finalDestinationPort?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
@@ -142,8 +163,13 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
     set(
       'FinalDestinationETA',
       itinerary?.finalDestinationPort
-        ? itinerary?.finalDestinationPort?.ArrivalDate
-        : itinerary?.portOfDischarge?.ArrivalDate,
+        ? formatDateSafe(
+            parseDate(itinerary?.finalDestinationPort?.ArrivalDate, 'yyyy-MM-dd', new Date()),
+            'dd.MM.yyyy',
+          )
+        : itinerary?.portOfDischarge?.ArrivalDate
+        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.ArrivalDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        : null,
     ),
     set(
       'Remarks',
@@ -159,7 +185,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
         set('RelevantPort', 'POL'), //For export this is always POL, for import it is always POD
         set('LinerPortAgent', portOfLoading?.Port.PortAgent),
         set('LinerPortAgentID', portOfLoading?.Port.PortAgentID),
-        set('FOBDeliveryBy', portOfLoading?.Port.PortAgent.split('<br/>')[0]),
+        set('FOBDeliveryBy', portOfLoading?.Port.PortAgent?.split('<br/>')[0]),
         set('VGMSubmByID', vgmSubmittedByClient && vgmSubmittedByClient?.id),
         set('VGMSubmByTxt', vgmSubmittedByClient && getRepresentationFromClient(vgmSubmittedByClient)),
         set(
@@ -192,7 +218,10 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
               ItemNo: index + 1,
               CtrQuantity: value.quantity,
               CtypID: value.containerType?.id,
-              CommodityID: value.commodityType?.id,
+              CommodityID:
+                commodityTypes && commodityTypes.some(commodity => commodity.id === value.commodityType?.id)
+                  ? value.commodityType?.id
+                  : null,
               CommodityTXT:
                 value.commodityType?.name && value.commodityType?.name !== ''
                   ? value.commodityType?.name
@@ -214,7 +243,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                     LocType: 'DEPOT',
                     LocID: value.pickupLocation?.id,
                     LocRef: value.pickupReference,
-                    LocDate: value.pickupDate && formatDateSafe(value.pickupDate, 'dd.mm.yyyy'),
+                    LocDate: value.pickupDate && formatDateSafe(value.pickupDate, 'dd.MM.yyyy'),
                   },
                   {
                     LocType: 'TERMINAL',
@@ -224,30 +253,33 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                   },
                 ],
               },
-              IMCO: value.imo?.length > 0 ? 'Yes' : 'No',
-              IMCOs: {
-                IMCO: value.imo?.map((imco: any) => ({
-                  IMOClass: imco?.IMOClass,
-                  UNNumber: imco?.UNNumber,
-                  PackingNumber: imco?.PGNumber,
-                  FlashPoint: null,
-                })),
-              },
-              Overdimension: value.oog?.length > 0 ? 'Yes' : 'No',
-              Overwidth: value.oog?.length > 0 ? (value.oog[0] as any).diffWidth : null,
-              Overheight: value.oog?.length > 0 ? (value.oog[0] as any).diffHeight : null,
-              Overlength: value.oog?.length > 0 ? (value.oog[0] as any).diffLength : null,
-              Overweight: value.oog?.length > 0 ? (value.oog[0] as any).diffWeight : null,
-              EmptySlots: value.oog?.length > 0 ? (value.oog[0] as any).displacement : null,
+              IMCO: value.imo?.length > 0 && value.imo?.[0] ? 'Yes' : 'No',
+              IMCOs:
+                value.imo?.length > 1 && value.imo?.[1] && (value.imo?.[1] as IMO[]).length > 0
+                  ? {
+                      IMCO: (value.imo?.[1] as IMO[]).map((imco: any) => ({
+                        IMOClass: imco.IMOClass,
+                        UNNumber: imco.UNNumber,
+                        PackingNumber: imco.PGNumber,
+                        FlashPoint: null,
+                      })),
+                    }
+                  : null,
+              Overdimension: value.oog?.length > 0 && value.oog[0] ? 'Yes' : 'No',
+              Overwidth: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).diffWidth : null,
+              Overheight: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).diffHeight : null,
+              Overlength: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).diffLength : null,
+              Overweight: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).diffWeight : null,
+              EmptySlots: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).displacement : null,
               CtrMaxCaseDim: value.oog
                 ? {
-                    MaxWidth: value.oog?.length > 0 ? (value.oog[0] as any).width : null,
-                    MaxHeight: value.oog?.length > 0 ? (value.oog[0] as any).height : null,
-                    MaxLength: value.oog?.length > 0 ? (value.oog[0] as any).length : null,
-                    MaxWeight: value.oog?.length > 0 ? (value.oog[0] as any).weight : null,
+                    MaxWidth: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).width : null,
+                    MaxHeight: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).height : null,
+                    MaxLength: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).length : null,
+                    MaxWeight: value.oog?.length > 1 ? (value.oog[1]?.[0] as any).weight : null,
                   }
                 : null,
-              CtrOverDimRemark: value.oog ? 'OUT-OF-GAUGE' : null,
+              CtrOverDimRemark: value.oog?.length > 0 && value.oog[0] ? 'OUT-OF-GAUGE' : null,
               BBQuantity: null,
               BBWeight: null,
               BBVolume: null,
@@ -258,7 +290,7 @@ export default async (request: BookingRequest, chargeCodes: ChargeCode[] | undef
                 EquipmentDetail: request.containers?.map(ctg => ({
                   ContainerNumber: ctg.containerNumbers ? ctg.containerNumbers : 'NOT AVAILABLE',
                   CtypID: value.containerType?.id,
-                  PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.mm.yyyy'),
+                  PickUpDate: ctg.pickupDate && formatDateSafe(ctg.pickupDate, 'dd.MM.yyyy'),
                   GateInDate: null,
                   GateOutDate: null,
                   DropOffDate: null,

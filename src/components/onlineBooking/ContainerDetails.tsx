@@ -125,7 +125,7 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
   const classes = useStyles();
   return (
     <React.Fragment>
-      {container.imo?.[0] && (
+      {container.imo?.[0] && container.imo?.[1] && (
         <TableRow>
           <TableCell className={classes.tableCellLabel}>IMCO</TableCell>
           <TableCell className={classes.tableCell}>
@@ -287,7 +287,7 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
           </colgroup>
           <TableBody>
             {!isContainerSO(container) && (
-              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be assigned]'} />
+              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be advised]'} />
             )}
             {container.pickupDate && (
               <TableRowData
@@ -298,12 +298,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
             {pickupLocation && pickupLocation.name && (
               <TableRowData label={'Pick Up Location'} content={createAddressString(pickupLocation)} />
             )}
-            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be assigned]'} />
+            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be advised]'} />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
               <TableRowData label={'Delivery Address'} content={bookingRequest.schedule.OriginInfo.Port.PortName} />
             )}
 
-            <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be assigned]'} />
+            <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be advised]'} />
             {container.oog?.[0] && (
               <TableRowData label={'Remarks'} content={container.oog?.[0] ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />
             )}
@@ -453,6 +453,8 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
               showLocations: true,
               isDetailedInput: true,
               shouldShowAllDepots: isDashboardUser(userRecord),
+              commodityFreeSolo: true,
+              removeAllKindType: true,
             }}
             addText="Add Container"
             defaultItemValue={{ quantity: 1, imo: [false], oog: [false] }}

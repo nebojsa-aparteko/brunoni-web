@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -22,7 +22,7 @@ import BookingRequestsTable from './BookingRequestsTable';
 import UserInput from '../inputs/UserInput';
 import ActingAs from '../../contexts/ActingAs';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import { CUSTOMER_FACING_ROLES, isSuperAdmin, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
 import theme from '../../theme';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
@@ -43,6 +43,10 @@ import { createActivityObject } from '../bookings/checklist/ChecklistItemRow';
 import { ActivityChangeType } from '../bookings/checklist/ChecklistItemModel';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
 import { getActivityLogUserData } from '../../utilities/getActivityLogUserData';
+import ChargeCodes from '../../contexts/ChargeCodes';
+import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
+import BookingRequestSearchButton from './BookingRequestSearchButton';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -89,12 +93,14 @@ const useStyles = makeStyles(theme => ({
 interface Props {
   isAdmin?: boolean;
 }
+
 const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const { isOpen, openModal, closeModal } = useModal();
   const [, dispatch] = useContext(GlobalContext);
+  const [, userRecord] = useUser();
 
   const [assignTo, setAssignTo] = useState<UserRecordMin | undefined>(undefined);
 
@@ -104,17 +110,51 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
 
   const [bookingRequests, isLoading] = useBookingRequestsContext();
   const [filters, setFilters] = useBookingRequestsFilterContext();
+  const [fieldName, setFieldName] = useState<string | undefined>(undefined);
+  const [userCarriers, setUserCarriers] = useState<string[] | undefined>(undefined);
+  const [value, setValue] = useState(undefined);
+  const [filteredBookingRequests, setFilteredBookingRequests] = useState(bookingRequests);
 
+  useEffect(() => {
+    // this is to prevent an error where the component updates between re-renders
+    setUserCarriers(userRecord.carriers);
+  }, [userRecord.carriers]);
+
+  useEffect(() => {
+    // Temporarily filter bookings by carrier on frontend if there are no selected carrier or if
+    // there are more than one carrier assigned to an admin;
+    // if it's not already filtered on the backend (because of limitation) than filter it here
+    const filteredByCarrier =
+      (isAdmin && userCarriers && userCarriers?.length === 1) || isSuperAdmin(userRecord) || !isAdmin
+        ? bookingRequests
+        : bookingRequests?.filter(request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id));
+
+    setFilteredBookingRequests(
+      !fieldName || !value
+        ? filteredByCarrier
+        : filteredByCarrier?.filter(request => {
+            const requestValue = get(fieldName, request);
+            return typeof requestValue === 'string' && typeof value === 'string'
+              ? requestValue &&
+                  value &&
+                  requestValue
+                    .trim()
+                    .toLowerCase() // @ts-ignore
+                    .includes(value.trim().toLowerCase())
+              : requestValue === value;
+          }),
+    );
+  }, [bookingRequests, fieldName, value, userCarriers]);
   const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
 
-  const [filteredResults, setFilteredResults] = useState<BookingRequest[] | undefined | null>([]);
+  const [chinkifiedResults, setChunkifiedResults] = useState<BookingRequest[] | undefined | null>([]);
 
   const resultChunks = useMemo(() => {
-    setFilteredResults(bookingRequests);
+    setChunkifiedResults(filteredBookingRequests);
 
-    return chunk(rowsPerPage)(bookingRequests);
-  }, [bookingRequests, rowsPerPage]);
+    return chunk(rowsPerPage)(filteredBookingRequests);
+  }, [filteredBookingRequests, rowsPerPage]);
 
   const handleChangePage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
@@ -175,13 +215,13 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
   );
 
   return (
-    <Fragment>
+    <FirestoreCollectionProvider name="charge-codes" context={ChargeCodes}>
       <Meta title={`Booking Requests`} />
 
       <BookingsFiltersBar filters={filters} setFilters={setFilters} showAssigneeFilter={isAdmin} />
 
       <div>
-        {bookingRequests && !isLoading ? (
+        {filteredBookingRequests && !isLoading ? (
           <Fragment>
             <Card>
               <CardHeader
@@ -190,16 +230,24 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     <Typography variant="subtitle1" display="inline">
                       Bookings Requests
                     </Typography>
-                    <Box ml={2}>
-                      <Tooltip title="Add from a html file">
-                        <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
-                          <AddIcon fontSize="large" />
-                        </IconButton>
-                      </Tooltip>
-                      {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
-                    </Box>
+                    {!actingAs && (
+                      <Box ml={2}>
+                        <Tooltip title="Add from a html file">
+                          <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <AddIcon fontSize="large" />
+                          </IconButton>
+                        </Tooltip>
+                        {isOpen && <BookingUploadDialog isOpen={isOpen} handleClose={closeModal} />}
+                      </Box>
+                    )}
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <Box flex={1} />
+                    <BookingRequestSearchButton
+                      searchField={fieldName}
+                      setSearchField={setFieldName}
+                      searchValue={value}
+                      setSearchValue={setValue}
+                    />
                     {!actingAs && (
                       <Box display="flex" flexDirection="row">
                         <Box display="flex" style={{ minWidth: theme.spacing(35) }} ml={1} mr={1}>
@@ -228,15 +276,21 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
               />
             </Card>
 
-            {bookingRequests.length === 0 && (
+            {filteredBookingRequests && filteredBookingRequests.length === 0 && (
               <BookingsEmptyResults message={'There are no bookings that might need your attention at the moment. '} />
             )}
 
-            {bookingRequests.length > 0 && (
+            {filteredBookingRequests && filteredBookingRequests.length > 0 && (
               <Fragment>
                 <CardContent className={classes.content}>
                   <BookingRequestsTable
-                    bookingRequests={resultChunks && (get(page)(resultChunks) || [])}
+                    bookingRequests={
+                      resultChunks && resultChunks.length > 0
+                        ? resultChunks.length > 1
+                          ? get(page)(resultChunks) || []
+                          : resultChunks[0] || []
+                        : undefined
+                    }
                     isAdmin={isAdmin}
                     selectedRequests={selectedRequests}
                     onSelectRequest={onSelectRequest}
@@ -244,17 +298,19 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                 </CardContent>
 
                 <CardActions className={classes.actions}>
-                  {bookingRequests && bookingRequests.length > 0 && bookingRequests.length > rowsPerPage && (
-                    <TablePagination
-                      component="div"
-                      count={filteredResults ? filteredResults.length : 0}
-                      onChangePage={handleChangePage}
-                      onChangeRowsPerPage={handleChangeRowsPerPage}
-                      page={page}
-                      rowsPerPage={rowsPerPage}
-                      rowsPerPageOptions={[10, 25, 50]}
-                    />
-                  )}
+                  {filteredBookingRequests &&
+                    filteredBookingRequests.length > 0 &&
+                    filteredBookingRequests.length > rowsPerPage && (
+                      <TablePagination
+                        component="div"
+                        count={chinkifiedResults ? chinkifiedResults.length : 0}
+                        onChangePage={handleChangePage}
+                        onChangeRowsPerPage={handleChangeRowsPerPage}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        rowsPerPageOptions={[10, 25, 50]}
+                      />
+                    )}
                 </CardActions>
               </Fragment>
             )}
@@ -265,7 +321,7 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           </Paper>
         )}
       </div>
-    </Fragment>
+    </FirestoreCollectionProvider>
   );
 };
 

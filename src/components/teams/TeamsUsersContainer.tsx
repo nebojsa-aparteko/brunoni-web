@@ -198,7 +198,7 @@ const TeamsUsersContainer: React.FC = () => {
   }, [selectedUsers, enqueueSnackbar, dispatch]);
 
   return (
-    <Fragment>
+    <Box flexGrow={1}>
       {!adminUsers ? (
         <ChartsCircularProgress />
       ) : (
@@ -269,7 +269,7 @@ const TeamsUsersContainer: React.FC = () => {
         handleClose={() => setIsConfirmationDialogOpen(false)}
         description="Are you sure you want remove admin rights from selected users?"
       />
-    </Fragment>
+    </Box>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -216,7 +216,7 @@ const ReassignUsersContainer: React.FC = () => {
   }, [selectedRules, enqueueSnackbar, dispatch]);
 
   return (
-    <Fragment>
+    <Box flexGrow={1}>
       {!adminUsers || !reassignmentRules ? (
         <ChartsCircularProgress />
       ) : (
@@ -277,7 +277,7 @@ const ReassignUsersContainer: React.FC = () => {
         handleClose={() => setIsConfirmationDialogOpen(false)}
         description="Are you sure you want remove this rule?"
       />
-    </Fragment>
+    </Box>
   );
 };
 

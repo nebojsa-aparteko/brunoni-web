@@ -8,6 +8,8 @@ import ExportFlowsContainer from './ExportFlowsContainer';
 import OverviewsContainer from './OverviewsContainer';
 import BookingsVsStockContainer from './BookingsVsStockContainer';
 import EquipmentBookingDetailsContainer from './EquipmentBookingDetailsContainer';
+import { useHistory } from 'react-router';
+import QueryString from 'querystring';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -50,12 +52,42 @@ function a11yProps(index: any) {
 }
 
 const EquipmentControlContainer = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
-
   const classes = useStyles();
+
+  const history = useHistory();
+  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const tab = params.tab as string | undefined;
+
+  const tabToIndex: any = {
+    'export-flows': 1,
+    overviews: 2,
+    'bookings-vs-stock': 3,
+    'booking-details': 4,
+  };
+
+  const [selectedTab, setSelectedTab] = useState(tab && tabToIndex[tab] ? tabToIndex[tab] : 0);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
+    switch (newValue) {
+      case 0:
+        history.push('/equipment-control');
+        break;
+      case 1:
+        history.push('/equipment-control?tab=export-flows');
+        break;
+      case 2:
+        history.push('/equipment-control?tab=overviews');
+        break;
+      case 3:
+        history.push('/equipment-control?tab=bookings-vs-stock');
+        break;
+      case 4:
+        history.push('/equipment-control?tab=booking-details');
+        break;
+      default:
+        break;
+    }
   };
 
   return (

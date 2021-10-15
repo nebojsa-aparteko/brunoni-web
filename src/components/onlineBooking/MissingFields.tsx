@@ -26,6 +26,7 @@ import Container from '../../model/Container';
 import { normalizeQuote } from './BookingUploadDialog';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import firebase from '../../firebase';
+import { allowedCurrencies } from '../inputs/CurrencyInput';
 
 export interface Object {
   [key: string]: string;
@@ -47,8 +48,13 @@ export const ContainerWatchedFields: Object = {
   quantity: 'Quantity',
 };
 
+export const FreightDetailWatchedFields: Object = {
+  Currency: 'Currency',
+};
+
 export const defaultWatchedFields: string[] = Object.keys(WatchedFields);
 export const defaultContainerWatchedFields: string[] = Object.keys(ContainerWatchedFields);
+export const defaultFreightDetailWatchedFields: string[] = Object.keys(FreightDetailWatchedFields);
 
 const useStyles = makeStyles((theme: Theme) => ({
   additionalInfo: {
@@ -57,17 +63,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const getQuoteDoc = async (quoteId: string) =>
-  (
-    await firebase
-      .firestore()
-      .collection('quotes')
-      .doc(quoteId)
-      .get()
-  ).data();
+export const getQuoteDocRef = async (quoteId: string) =>
+  await firebase
+    .firestore()
+    .collection('quotes')
+    .doc(quoteId)
+    .get();
 
 const validQuote = async (bookingRequest: BookingRequest) => {
-  const quote = bookingRequest.quoteNumber && (await getQuoteDoc(`${bookingRequest.quoteNumber}`));
+  const quote = bookingRequest.quoteNumber && (await getQuoteDocRef(`${bookingRequest.quoteNumber}`)).data();
   const quoteNormalized = normalizeQuote(quote) as Quote;
 
   const quoteValidityDate = quoteNormalized?.validityPeriod.to ? quoteNormalized?.validityPeriod.to : undefined;
@@ -76,19 +80,23 @@ const validQuote = async (bookingRequest: BookingRequest) => {
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
     : undefined;
 
-  // console.log('quoteValidityDate', quoteValidityDate)
-  // console.log('scheduleDepartureDate', scheduleDepartureDate)
-
   if (quoteValidityDate && scheduleDepartureDate) {
     return isBefore(quoteValidityDate)(scheduleDepartureDate);
   }
   return true;
 };
 
+const isAllowedCurrency = (currency?: string) => {
+  if (!currency) return true;
+  return allowedCurrencies.includes(currency);
+};
+
 const MissingFields: React.FC<Props> = ({
   bookingRequest,
   watchedFields = defaultWatchedFields,
   containerWatchedFields = defaultContainerWatchedFields,
+  freightDetailWatchedFields = defaultFreightDetailWatchedFields,
+  setIsBookNowButtonDisabled,
 }) => {
   const classes = useStyles();
 
@@ -96,6 +104,7 @@ const MissingFields: React.FC<Props> = ({
 
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
+  const [freightDetailsNonMatchingFields, setFreightDetailsNonMatchingFields] = useState<string[][]>();
   const [validQuoteState, setValidQuoteState] = useState(true);
 
   const findNonMatchingFields = useCallback((): string[] => {
@@ -120,6 +129,19 @@ const MissingFields: React.FC<Props> = ({
     return containersNonMatchingFields;
   }, [bookingRequest.containers, containerWatchedFields]);
 
+  const findFreightDetailNonMatchingFields = useCallback((): string[][] => {
+    const freightDetailsNonMatchingFields: string[][] = [];
+    bookingRequest.freightDetails?.forEach(freightDetail => {
+      const freightDetailNonMatchingFields = freightDetailWatchedFields.filter(field => {
+        return field === 'Currency' ? !isAllowedCurrency(freightDetail.Currency) : !hasIn(field)(freightDetail);
+      });
+      // freightDetailNonMatchingFields && freightDetailNonMatchingFields?.length > 0 &&
+      freightDetailsNonMatchingFields.push(freightDetailNonMatchingFields);
+    });
+
+    return freightDetailsNonMatchingFields;
+  }, [bookingRequest.containers, containerWatchedFields]);
+
   /*
   Thanks for using our online services.
   Your booking request has been submitted and is in requested status.
@@ -128,13 +150,33 @@ const MissingFields: React.FC<Props> = ({
 */
 
   useEffect(() => {
+    if (setIsBookNowButtonDisabled) {
+      if (freightDetailsNonMatchingFields && freightDetailsNonMatchingFields?.some(fields => fields?.length > 0)) {
+        setIsBookNowButtonDisabled(true);
+      } else {
+        setIsBookNowButtonDisabled(false);
+      }
+    }
+  }, [freightDetailsNonMatchingFields]);
+
+  useEffect(() => {
     validQuote(bookingRequest).then(vq => setValidQuoteState(vq));
     setNonMatchingFields(findNonMatchingFields());
     setContainersNonMatchingFields(findContainerNonMatchingFields());
+    setFreightDetailsNonMatchingFields(findFreightDetailNonMatchingFields());
   }, [bookingRequest, findContainerNonMatchingFields, findNonMatchingFields]);
 
-  return (nonMatchingFields && nonMatchingFields.length > 0) ||
-    (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ? (
+  const hasMissingFields = () => {
+    return (
+      (nonMatchingFields && nonMatchingFields.length > 0) ||
+      (containersNonMatchingFields && !containersNonMatchingFields.every(isEmpty)) ||
+      (freightDetailsNonMatchingFields && !freightDetailsNonMatchingFields.every(isEmpty))
+    );
+  };
+
+  const hasExpiredQuote = () => !validQuoteState && bookingRequest.schedule;
+
+  return hasMissingFields() || hasExpiredQuote() ? (
     <Paper className={classes.additionalInfo}>
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
@@ -143,17 +185,17 @@ const MissingFields: React.FC<Props> = ({
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
-              {!validQuoteState && bookingRequest.schedule && (
+              {hasExpiredQuote() && (
                 <Typography color={'error'} style={{ marginBottom: theme.spacing(2) }}>
                   {`You are booking on a vessel with an expired quotation date`}
                 </Typography>
               )}
               <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
                 {isDashboardUser(userRecord)
-                  ? 'These fields were not found on booking:'
+                  ? hasMissingFields() && 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +
                     '  Your booking request has been submitted and is in requested status.\n' +
-                    '  You are allowed to make changes as long the booking is not in status: In Progress.\n\n' +
+                    '  You are allowed to make changes as long as the booking is not in status: In Progress.\n\n' +
                     '  The next available booking agent will take care and check the availabilities. Thank you.'}
               </Typography>
               {nonMatchingFields && nonMatchingFields.length > 0 && (
@@ -194,6 +236,38 @@ const MissingFields: React.FC<Props> = ({
                     ))}
                   </Box>
                 )}
+              {isDashboardUser(userRecord) &&
+                freightDetailsNonMatchingFields &&
+                !freightDetailsNonMatchingFields.every(isEmpty) && (
+                  <Box display={'flex'} flexWrap={'wrap'}>
+                    {freightDetailsNonMatchingFields.map(
+                      (freightDetail, index) =>
+                        freightDetail.length > 0 && (
+                          <List key={index} disablePadding={true}>
+                            <ListItem>
+                              <ListItemText>
+                                <Typography variant="h5">Freight Detail {index + 1}: </Typography>
+                              </ListItemText>
+                            </ListItem>
+                            <List dense={true}>
+                              {freightDetail.map((field, index) => (
+                                <ListItem key={index}>
+                                  <ListItemIcon>
+                                    <FiberManualRecordIcon color={'error'} fontSize={'small'} />
+                                  </ListItemIcon>
+                                  <ListItemText>
+                                    {FreightDetailWatchedFields[field] === 'Currency'
+                                      ? 'Invalid or missing currency'
+                                      : FreightDetailWatchedFields[field]}
+                                  </ListItemText>
+                                </ListItem>
+                              ))}
+                            </List>
+                          </List>
+                        ),
+                    )}
+                  </Box>
+                )}
             </Box>
           </ExpansionPanelDetails>
         </ExpansionPanel>
@@ -208,4 +282,6 @@ interface Props {
   bookingRequest: BookingRequest;
   watchedFields?: string[];
   containerWatchedFields?: string[];
+  freightDetailWatchedFields?: string[];
+  setIsBookNowButtonDisabled?: (value: boolean) => void;
 }

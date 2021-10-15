@@ -12,15 +12,10 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import React, { Fragment, useCallback, useContext } from 'react';
+import React, { Fragment, useCallback, useContext, useMemo } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import {
-  BookingRequest,
-  BookingRequestItinerary,
-  BookingRequestLabels,
-  FreightDetail,
-} from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestItinerary, BookingRequestLabels } from '../../model/BookingRequest';
 import { ClientDetails } from '../bookings/BookingSummary';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
@@ -47,11 +42,11 @@ import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
 import { CarrierId } from '../../model/Booking';
 import VesselAllocationButton from '../VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import { getVoyageInfo, getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import EditingInput from '../EditingInput';
 import useUser from '../../hooks/useUser';
 import useModal from '../../hooks/useModal';
-import { generateCommission } from './BookingRequestFreightDetails';
+import { generateCommission, isAgencyCommission } from './BookingRequestFreightDetails';
 import isString from '../../utilities/isString';
 import theme from '../../theme';
 import { getItineraryFromSchedule } from '../onlineBooking/Summary';
@@ -464,7 +459,7 @@ export const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
   );
 };
 
-export const userRepresentation = (user: UserRecordMin | undefined) => {
+export const userRepresentation = (user: UserRecordMin | undefined | null) => {
   return (
     <React.Fragment>
       {user && user.alphacomId ? (
@@ -507,16 +502,16 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const clients = useClients();
   const [, userRecord] = useUser();
 
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
+
   const handleChangeSchedule = useCallback(
     (schedule: RouteSearchResult | undefined) => {
       const voyageInfo = getVoyageInfo(schedule);
       const commission = generateCommission(
         bookingRequest?.schedule,
-        bookingRequest?.freightDetails?.find(
-          (detail: FreightDetail) =>
-            detail.Txt === 'Seafreight' || detail.Txt === 'Seefracht' || detail.Txt === 'Fret Maritime',
-        ),
         bookingRequest?.freightDetails,
+        bookingRequest.carrier?.id,
+        bookingRequest.containers,
       );
 
       setBookingRequest(prevState =>
@@ -526,7 +521,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
           vessel: voyageInfo?.VesselName,
           voyage: voyageInfo?.VoyageNr,
           freightDetails: compact([
-            ...(bookingRequest?.freightDetails?.filter(value => value.Txt !== 'Agency Commission') || []),
+            ...(bookingRequest?.freightDetails?.filter(value => !isAgencyCommission(value)) || []),
             commission,
           ]),
         }),
@@ -582,6 +577,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
             origin={bookingRequest.origin}
             destination={bookingRequest.destination}
             handleBookNow={handleChangeSchedule}
+            carrier={bookingRequest.carrier}
           />
         )}
         <Grid item md={5} xs={12} className={classes.firstColumn}>
@@ -597,11 +593,14 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   content={
                     <Box>
                       {[
-                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VesselName,
-                        bookingRequest.schedule?.OriginInfo.VoyageInfo.VoyageNr,
+                        bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName,
+                        bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr,
                       ].join(' VOY. ')}
                       {isDashboardUser(userRecord) && (
-                        <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                        <VesselAllocationButton
+                          vesselVoyage={vesselVoyage}
+                          service={bookingRequest?.schedule?.Service}
+                        />
                       )}
                     </Box>
                   }
@@ -680,21 +679,19 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                   }
                 />
               )}
-              {editing && (
-                <TableRowData
-                  label={BookingRequestLabels.customerReference}
-                  content={
-                    <EditingInput
-                      editing={editing}
-                      value={bookingRequest.customerReference}
-                      inputProps={{
-                        onChange: event => handleChangeBRField('customerReference', event.target.value),
-                        className: classes.blNumberInput,
-                      }}
-                    />
-                  }
-                />
-              )}
+              <TableRowData
+                label={BookingRequestLabels.customerReference}
+                content={
+                  <EditingInput
+                    editing={editing}
+                    value={bookingRequest.customerReference}
+                    inputProps={{
+                      onChange: event => handleChangeBRField('customerReference', event.target.value),
+                      className: classes.blNumberInput,
+                    }}
+                  />
+                }
+              />
               {bookingRequest.quoteNumber && (
                 <TableRowData
                   label={'Quote Reference'}

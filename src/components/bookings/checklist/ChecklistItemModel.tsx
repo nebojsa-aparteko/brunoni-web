@@ -16,6 +16,14 @@ export interface ChecklistItemValueDocument extends DocumentValue {
   final?: boolean;
   isSelectedForComparison?: boolean;
   checklistId?: string;
+  documentType?: DocumentType;
+}
+
+export enum DocumentType {
+  IMO = 'IMO',
+  SOC = 'SOC',
+  ADDITIONAL_DOCUMENTS = 'ADDITIONAL_DOCUMENTS',
+  INITIAL_REQUEST = 'INITIAL_REQUEST',
 }
 
 export enum ChecklistItemValueDocumentStatusType {
@@ -117,6 +125,8 @@ export enum ActivityText {
   UNSET_WATCHING = ' has stopped watching this booking.',
   ASSIGNED_AGENT = ' has assigned agent ',
   ASSIGNED_CLIENT = ' has assigned client ',
+  UNASSIGNED_AGENT = ' has unassigned agent ',
+  UNASSIGNED_CLIENT = ' has unassigned client ',
   ASSIGNED_ON_TASK = ' has assigned ',
   SET_WATCHERS = ' has ',
   CLEAR_PAYMENT = ' has cleared payment ',
@@ -126,6 +136,7 @@ export enum ActivityText {
   UNARCHIVED = ' has unarchived booking request.',
   EDITED = ' has edited these following fields: ',
   SENT_PAYMENT_CONFIRMATION_EMAIL = ' has sent payment confirmation to this emails: ',
+  BOOKING_CREATION = ' has created this booking request and accepted following ',
 }
 
 export enum ActivityChangeType {
@@ -160,6 +171,9 @@ export enum ActivityChangeType {
   PUT_ON_HOLD_BOOKING_REQ,
   REVERT_PUT_ON_HOLD_BOOKING_REQ,
   SENT_PAYMENT_CONFIRMATION_EMAIL,
+  UNASSIGNED_AGENT,
+  UNASSIGNED_CLIENT,
+  BOOKING_CREATION,
 }
 
 export enum ChecklistNames {

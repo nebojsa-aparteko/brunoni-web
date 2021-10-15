@@ -7,8 +7,6 @@ import {
   Grid,
   IconButton,
   makeStyles,
-  Menu,
-  MenuItem,
   Paper,
   Theme,
   Typography,
@@ -26,7 +24,6 @@ import WatchersDialog from '../watchers/WatchersDialog';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import useUser from '../../hooks/useUser';
 import UserRecord, { isDashboardUser, UserRecordMinProperties } from '../../model/UserRecord';
-import { useSnackbar } from 'notistack';
 import WatcherIconButton from '../watchers/WatcherIconButton';
 import WarningIcon from '@material-ui/icons/Warning';
 import useTasksPerBooking from '../../hooks/useTasksPerBooking';
@@ -49,8 +46,10 @@ import update from 'lodash/fp/update';
 import invoke from 'lodash/fp/invoke';
 import { normalizePaymentActivityData } from './documentApproval/ComparisonDialogContent';
 import TagsList from '../tags/TagsList';
-import { Tag, TagCategory } from '../../model/Tag';
+import { TagCategory } from '../../model/Tag';
 import PromoBox from '../PromoBox';
+import Tags from '../../contexts/Tags';
+import { DropDownMenuWithItems } from '../DropdownMenu';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -153,33 +152,30 @@ const handleWatch = (id: string, watchers: UserRecord[]) =>
     );
 
 const BookingView: React.FC<Props> = ({ booking }) => {
+  const availableTags = useContext(Tags);
   const actingAs = useContext(ActingAs)[0];
   const isAdmin = !actingAs;
   const classes = useStyles();
   const userRecord = useUser()[1];
-  const { enqueueSnackbar } = useSnackbar();
   const [, dispatch] = useContext(GlobalContext);
   const [printRequested, setPrintRequested] = useState(false);
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
+  const [tags, setTags] = useState(
+    availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+  );
   const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
   const handleCloseWatcherDialog = () => setIsOpenWatcherDialog(false);
-  const tags = useFirestoreCollection(
-    'bookings',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    booking.id,
-    'tags-booking',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+
+  useEffect(
+    () =>
+      setTags(
+        availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, booking.assignedTags],
+  );
+
   const pinnedActivities = useFirestoreCollection(
     'bookings',
     useCallback(
@@ -209,7 +205,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     return tasks?.filter(task =>
       task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
     );
-  }, [tasks, userRecord]);
+  }, [selectedTab, tasks]);
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -223,8 +219,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     [userRecord],
   );
 
-  const onArchiveClick = useCallback(() => {
-    firebase
+  const onArchiveClick = useCallback(async () => {
+    await firebase
       .firestore()
       .collection('bookings')
       .doc(booking?.id)
@@ -233,7 +229,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     // if the booking was in dispute and action is to archive it
     // this is expected to be very rare so leave it as a separate call
     if (booking.inDispute && !booking.archived) {
-      firebase
+      await firebase
         .firestore()
         .collection('bookings')
         .doc(booking?.id)
@@ -241,8 +237,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     }
   }, [booking]);
 
-  const onDisputeClick = useCallback(() => {
-    firebase
+  const onDisputeClick = useCallback(async () => {
+    await firebase
       .firestore()
       .collection('bookings')
       .doc(booking?.id)
@@ -275,23 +271,25 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         })
         .catch(err => console.log(err));
     },
-    [booking.id, booking.watchers, userRecord, enqueueSnackbar, dispatch],
+    [booking.id, booking.watchers, userRecord, dispatch],
   );
-  const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClickMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   useLayoutEffect(() => {
     if (printRequested) {
       window.print();
       setPrintRequested(false);
     }
   }, [printRequested]);
+
+  const getCorrectBackRoute = () => {
+    if (!booking.archived && booking.pendingPayment) {
+      return '/bookings?tab=pending-payment';
+    } else if (booking.archived && !booking.pendingPayment) {
+      return '/bookings?tab=archived';
+    } else {
+      return '/bookings';
+    }
+  };
 
   return (
     <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
@@ -329,21 +327,22 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       )}
       <Grid container item md={7} xs={12}>
         <Grid item xs={12}>
-          {tags ? (
-            <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
-          ) : (
-            <Box
-              display="flex"
-              flexDirection="row"
-              mb={1}
-              alignItems="center"
-              border="1px solid rgba(0,0,0,0.15)"
-              p={1}
-              maxWidth="100%"
-            >
-              <CircularProgress size={20} style={{ margin: 'auto' }} />
-            </Box>
-          )}
+          {isAdmin &&
+            (tags ? (
+              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
+            ) : (
+              <Box
+                display="flex"
+                flexDirection="row"
+                mb={1}
+                alignItems="center"
+                border="1px solid rgba(0,0,0,0.15)"
+                p={1}
+                maxWidth="100%"
+              >
+                <CircularProgress size={20} style={{ margin: 'auto' }} />
+              </Box>
+            ))}
         </Grid>
 
         <Page title={getBookingTitle(booking)}>
@@ -374,7 +373,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 justifyContent="space-between"
               >
                 <QuoteNav
-                  backTo="/bookings"
+                  backTo={getCorrectBackRoute()}
                   title={`Booking - ${getBookingTitle(booking)}`}
                   subtitle={`File No. ${booking.id}`}
                 />
@@ -425,30 +424,28 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                     handleWatch={onWatch}
                   />
                 )}
-
-                <IconButton aria-label="print" size="small" onClick={handleClickMenu}>
-                  <PrintIcon />
-                </IconButton>
-                <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(false);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print without costs
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setPrintWithCost(true);
-                      setPrintRequested(true);
-                      handleClose();
-                    }}
-                  >
-                    Print with cost
-                  </MenuItem>
-                </Menu>
+                <DropDownMenuWithItems
+                  toolTip={''}
+                  dropDownIcon={<PrintIcon />}
+                  items={[
+                    {
+                      onClick: () => {
+                        setPrintWithCost(false);
+                        setPrintRequested(true);
+                      },
+                      icon: <PrintIcon />,
+                      label: 'Print without costs',
+                    },
+                    {
+                      onClick: () => {
+                        setPrintWithCost(true);
+                        setPrintRequested(true);
+                      },
+                      icon: <PrintIcon />,
+                      label: 'Print with cost',
+                    },
+                  ]}
+                />
               </Box>
             </Box>
 

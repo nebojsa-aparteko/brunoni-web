@@ -187,7 +187,7 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
         >
           <Grid container spacing={2}>
             <Grid item xs={10}>
-              {route && <RouteSummary route={route} />}
+              {route && <RouteSummary route={route} carrier={carrier} />}
             </Grid>
             <Grid item xs={2} className={classes.actionBarGridItem}>
               <Box

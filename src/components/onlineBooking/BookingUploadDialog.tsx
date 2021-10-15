@@ -35,7 +35,7 @@ import ContainerType from '../../model/ContainerType';
 import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
-import { flow, isNil, omitBy, update } from 'lodash/fp';
+import { compact, flow, isNil, omitBy, update } from 'lodash/fp';
 import { useHistory } from 'react-router';
 import querySting from 'querystring';
 import formatDate from 'date-fns/format';
@@ -58,6 +58,9 @@ import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
 import ContainerDetails from '../../model/ContainerDetails';
+import { generateCommission, isAgencyCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
+import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -179,6 +182,20 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
   return (await res.json()) as RouteSearchResults;
 };
 
+const filterScheduleByVoyage = (schedules: RouteSearchResult[], voyage: string) => {
+  const voySchedules = schedules.filter(schedule =>
+    voyage.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
+  );
+  return voySchedules.length === 0 ? schedules : voySchedules;
+};
+
+const filterScheduleByVessel = (schedules: RouteSearchResult[], vessel: string) => {
+  const vesselSchedules = schedules.filter(schedule =>
+    vessel.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
+  );
+  return vesselSchedules.length === 0 ? schedules : vesselSchedules;
+};
+
 const matchAndFetchSchedule = async (
   scheduleSearchParams: RouteSearchParams,
   object: HtmlBookingRequest,
@@ -189,24 +206,28 @@ const matchAndFetchSchedule = async (
 
   let date = scheduleSearchParams?.date && formatDate(scheduleSearchParams?.date, 'yyyy-MM-dd');
   let data = await fetchSchedule(scheduleSearchParams, date);
+  let schedules = data.Routes;
 
-  let schedules = data.Routes.filter(schedule =>
-    object.VESSEL?.toUpperCase()?.includes(schedule.OriginInfo.VoyageInfo.VesselName),
-  );
+  if (schedules.length > 1 && object.VOYAGE) {
+    schedules = filterScheduleByVoyage(schedules, object.VOYAGE);
+  }
   // only filter more if more than 1
-  if (schedules.length > 1 && object.VOYAGE)
-    schedules = schedules.filter(schedule =>
-      object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr.replace(/ /g, '')),
-    );
+  if (schedules.length > 1 && object.VESSEL) {
+    schedules = filterScheduleByVessel(schedules, object.VESSEL);
+  }
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
     date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
+    schedules = data.Routes;
 
-    schedules = data.Routes.filter(schedule => object.VESSEL?.includes(schedule.OriginInfo.VoyageInfo.VesselName));
-    // only filter more if more than 1
-    if (schedules.length > 1 && object.VOYAGE)
-      schedules = schedules.filter(schedule => object.VOYAGE?.includes(schedule.OriginInfo.VoyageInfo.VoyageNr));
+    if (schedules.length > 1 && object.VOYAGE) {
+      schedules = filterScheduleByVoyage(schedules, object.VOYAGE);
+    }
+
+    if (schedules.length > 1 && object.VESSEL) {
+      schedules = filterScheduleByVessel(schedules, object.VESSEL);
+    }
   }
   // if still more than 1 check for intermediate ports
   if (schedules.length > 1) {
@@ -214,13 +235,19 @@ const matchAndFetchSchedule = async (
     const POD = ports?.find(port => object.MAIN_PORT_OF_DISCHARGE?.includes(port.id));
 
     if (POL?.id !== scheduleSearchParams.originPort?.id) {
-      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POL?.id));
+      const polSchedules = schedules.filter(schedule =>
+        schedule.IntermediatePortInfos.find(port => port.Port.ID === POL?.id),
+      );
+      schedules = polSchedules.length === 0 ? schedules : polSchedules;
     }
     if (POD?.id !== scheduleSearchParams.destinationPort?.id) {
-      schedules = schedules.filter(schedule => schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id));
+      const podSchedules = schedules.filter(schedule =>
+        schedule.IntermediatePortInfos.find(port => port.Port.ID === POD?.id),
+      );
+      schedules = podSchedules.length === 0 ? schedules : podSchedules;
     }
   }
-  return schedules?.length === 1 ? schedules?.[0] : undefined;
+  return schedules[0];
 };
 
 const getClientById = async (id: string): Promise<Client> => {
@@ -241,29 +268,73 @@ const getUserByEmail = async (email: string): Promise<UserRecord> => {
   return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
 };
 
-export const getLatestQuote = async (originId: string, destinationId: string, agreementNo: string = '') => {
-  const quoteByAgreement = await firebase
-    .firestore()
-    .collection('quotes')
-    .doc(agreementNo)
-    .get();
-  if (quoteByAgreement.exists) {
-    return normalizeQuote(quoteByAgreement.data() as Quote);
+interface LatestQuote {
+  quote: Quote | undefined;
+  showWarningMessage: boolean;
+}
+
+export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<LatestQuote> => {
+  if (quoteSearchParams.agreementNo) {
+    try {
+      const quoteByAgreement = await firebase
+        .firestore()
+        .collection('quotes')
+        .doc(quoteSearchParams.agreementNo)
+        .get();
+      if (quoteByAgreement.exists) {
+        return {
+          quote: normalizeQuote(quoteByAgreement.data() as Quote),
+          showWarningMessage: false,
+        };
+      }
+    } catch (e) {
+      console.error('Error fetching quote by Agreement No.');
+    }
   }
-  const quotesRef = await firebase
-    .firestore()
-    .collection('quotes')
-    .where('origin', '==', originId)
-    .where('destination', '==', destinationId)
-    .orderBy('dateIssued', 'desc')
-    .limit(1)
-    .get();
-  return (quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[])?.[0] || undefined;
+  let query = (await firebase.firestore().collection('quotes')) as firebase.firestore.Query;
+
+  if (quoteSearchParams.originPort) {
+    query = query.where('origin', '==', quoteSearchParams.originPort.id);
+  }
+  if (quoteSearchParams.destinationPort) {
+    query = query.where('destination', '==', quoteSearchParams.destinationPort.id);
+  }
+  if (quoteSearchParams.carrier) {
+    query = query.where('carrier', '==', quoteSearchParams.carrier);
+  }
+
+  let quotesRef = await query.orderBy('dateIssued', 'desc').get();
+  let quotes: Quote[] = quotesRef.docs.map(quote => normalizeQuote(quote.data())) as Quote[];
+
+  if (quotes.length > 1) {
+    if (quoteSearchParams.clientId) {
+      const clientFilteredQuotes = quotes.filter(q => q.clientId === quoteSearchParams.clientId);
+      // Apply client filter if size > 0, otherwise no
+      quotes = clientFilteredQuotes.length === 0 ? quotes : clientFilteredQuotes;
+      if (quoteSearchParams.containers?.[0].containerType) {
+        const containerFilteredQuotes = quotes.filter(q =>
+          q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
+        );
+        // Apply container filter if size > 0, otherwise no
+        quotes = containerFilteredQuotes.length === 0 ? quotes : containerFilteredQuotes;
+      }
+    }
+  }
+  return {
+    quote: quotes[0] || undefined,
+    showWarningMessage: true,
+  };
 };
 
 export const normalizeQuote = (data: any) => {
   return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
 };
+
+interface QuoteSearchParams extends Omit<RouteSearchParams, 'date' | 'weeks'> {
+  agreementNo: string | undefined;
+  clientId: string | undefined;
+  containers: (Container & ContainerDetails)[] | undefined;
+}
 
 const mapIntoBookingRequestModel = async (
   object: HtmlBookingRequest,
@@ -274,6 +345,7 @@ const mapIntoBookingRequestModel = async (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
   chargeCodes: ChargeCode[] | undefined,
+  normalize: (...args: any[]) => any,
 ): Promise<BookingRequest> => {
   const createdBy = object.BOOKER_CONTACT_EMAIL
     ? // todo. Could there be duplicates?
@@ -308,15 +380,30 @@ const mapIntoBookingRequestModel = async (
     weeks: 4,
   } as RouteSearchParams;
 
-  // Get the latest quote by origin and dest
-  const quote = origin && destination && (await getLatestQuote(origin.id, destination.id, agreementNo));
-  const freightDetails = quote && takeQuoteDetails(quote.quoteDetails, containers, chargeCodes);
   const schedule = await matchAndFetchSchedule(scheduleSearchParams, object, ports);
 
-  const bookingRequest = {
+  const quoteSearchParams = {
+    originPort: origin,
+    destinationPort: destination,
+    carrier: carrier?.name,
     agreementNo,
-    archived: false,
-    hold: false,
+    clientId: client?.id,
+    containers: containers,
+  } as QuoteSearchParams;
+
+  // Get the latest quote by origin and dest
+  const { quote, showWarningMessage } = await getLatestQuote(quoteSearchParams);
+
+  const normalizedQuote = quote && (normalize(quote) as Quote);
+
+  const freightDetails = normalizedQuote && takeQuoteDetails(normalizedQuote?.quoteDetails, containers, chargeCodes);
+
+  const voyageInfo = getVoyageInfo(schedule);
+
+  const commission = generateCommission(schedule, freightDetails, carrier?.id, containers);
+
+  return {
+    agreementNo,
     carrier,
     client,
     containers,
@@ -324,18 +411,19 @@ const mapIntoBookingRequestModel = async (
     createdBy,
     customerReference,
     destination,
-    freightDetails,
+    freightDetails: compact([...(freightDetails?.filter(value => !isAgencyCommission(value)) || []), commission]),
+    hold: false,
     intraRefNumber,
     origin,
+    quoteNumber: showWarningMessage ? null : normalizedQuote?.id,
     schedule,
+    showWarningMessage,
     statusCode: BookingRequestStatusCode.REQUESTED,
     statusText: BookingRequestStatusText.REQUESTED,
+    vessel: voyageInfo?.VesselName,
     vgmSubmittedBy,
+    voyage: voyageInfo?.VoyageNr,
   } as BookingRequest;
-
-  console.log(bookingRequest);
-
-  return bookingRequest;
 };
 
 export const readAndParseFile = (
@@ -351,6 +439,7 @@ export const readAndParseFile = (
   commodityTypes: CommodityType[] | undefined,
   pickupLocations: PickupLocation[] | undefined,
   chargeCodes: ChargeCode[] | undefined,
+  normalize: (...args: any[]) => any,
 ) => {
   const reader = new FileReader();
   // accepting only single booking 4 now...
@@ -381,8 +470,9 @@ export const readAndParseFile = (
         commodityTypes,
         pickupLocations,
         chargeCodes,
+        normalize,
       );
-
+      console.log(bookingRequest);
       // remove undefined fields
       bookingRequest = omitBy(isNil)(bookingRequest) as BookingRequest;
       setFiles([file]);
@@ -411,6 +501,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const commodityTypes = useContext(CommodityTypes);
   const pickupLocations = useContext(PickupLocations);
   const chargeCodes = useContext(ChargeCodes);
+  const normalize = useNormalizeQuote();
 
   const storageBasePath = useMemo((): string => {
     return [`bookings-requests-documents-internal`, bookingRequest?.id].join('/');
@@ -432,6 +523,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
       commodityTypes,
       pickupLocations,
       chargeCodes,
+      normalize,
     );
   };
 
@@ -443,7 +535,11 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       bookingRequest &&
-        createRequest({ ...bookingRequest, itinerary: getItineraryFromSchedule(bookingRequest?.schedule) })
+        createRequest({
+          ...bookingRequest,
+          assignedUser: null,
+          itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
+        })
           .then(async docReference => {
             // Save HTML file to storage
             try {
@@ -461,6 +557,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               );
               values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
             } catch (e) {
+              dispatch({ type: 'STOP_GLOBAL_LOADING' });
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
               history.push(`/booking-requests/${docReference}`);
@@ -474,6 +571,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             dispatch({ type: 'STOP_GLOBAL_LOADING' });
           });
     } catch (e) {
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
       console.error('Booking Upload Dialog - FirestoreCollection threw an error', e);
       return null;
     }

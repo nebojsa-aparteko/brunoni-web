@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
   const classes = useStyles();
   const client = useClientById(quote.clientId);
-  const clientUser = useUserByAlphacomId(quote.userId) as UserRecord;
+  const clientUser = useUserByAlphacomId(quote.userId) as UserRecord | undefined;
 
   const handlePropagation = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -82,9 +82,11 @@ const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
           title="Customer"
           label1={client && `${client.name}, ${client.city}`}
           label2={
-            <a href={'mailto:' + clientUser.emailAddress} onClick={handlePropagation}>
-              {(clientUser.firstName + ' ' + clientUser.lastName).toUpperCase()}
-            </a>
+            clientUser && (
+              <a href={'mailto:' + clientUser?.emailAddress} onClick={handlePropagation}>
+                {(clientUser.firstName + ' ' + clientUser.lastName).toUpperCase()}
+              </a>
+            )
           }
         />
       </Grid>

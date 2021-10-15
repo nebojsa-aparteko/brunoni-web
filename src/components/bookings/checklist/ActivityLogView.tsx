@@ -1,6 +1,5 @@
 import React, { useLayoutEffect } from 'react';
 import {
-  Box,
   Card,
   CardContent,
   CardHeader,
@@ -20,6 +19,7 @@ import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router-dom';
 import QueryString from 'querystring';
 import { BookingRequest } from '../../../model/BookingRequest';
+import List from '@material-ui/core/List';
 
 interface Props {
   activityLog?: ActivityLogItem[];
@@ -37,6 +37,9 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) => ({
   spacing: {
     marginTop: theme.spacing(2),
+  },
+  cardContent: {
+    padding: 0,
   },
 }));
 
@@ -98,7 +101,7 @@ const ActivityLogView: React.FC<Props> = ({
         }
         title={<Typography variant="subtitle1">Activity</Typography>}
       />
-      <CardContent>
+      <CardContent className={classes.cardContent}>
         {quoteActivityLog ? (
           <ActivityLogProvider>
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
@@ -108,22 +111,24 @@ const ActivityLogView: React.FC<Props> = ({
         ) : (
           bookingRequest && <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
         )}
-        {booking
-          ? activityLog?.map((activity: ActivityLogItem) => (
-              <Box id={activity.id} key={`act-${activity.id}`}>
-                <ActivityLogItemView
-                  activityItem={activity}
-                  booking={booking}
-                  pinnedCommentsCount={pinnedCommentsCount}
-                />
-              </Box>
-            ))
-          : bookingRequest &&
-            activityLog?.map((activity: ActivityLogItem) => (
-              <Box id={activity.id} key={`act-${activity.id}`}>
-                <ActivityLogItemView activityItem={activity} />
-              </Box>
-            ))}
+        <List>
+          {booking
+            ? activityLog?.map((activity: ActivityLogItem) => (
+                <div id={activity.id} key={`act-${activity.id}`}>
+                  <ActivityLogItemView
+                    activityItem={activity}
+                    booking={booking}
+                    pinnedCommentsCount={pinnedCommentsCount}
+                  />
+                </div>
+              ))
+            : (bookingRequest || quote) &&
+              activityLog?.map((activity: ActivityLogItem) => (
+                <div id={activity.id} key={`act-${activity.id}`}>
+                  <ActivityLogItemView activityItem={activity} />
+                </div>
+              ))}
+        </List>
       </CardContent>
     </Card>
   );

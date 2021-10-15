@@ -54,7 +54,7 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
         <FirestoreCollectionProvider
           name="charge-codes"
           context={ChargeCodes}
-          query={query => query.where('language', '==', 'E')}
+          // query={query => query.where('language', '==', 'E')}
         >
           <FirestoreCollectionProvider
             name="tags"
