@@ -50,6 +50,7 @@ import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
 import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 import BookingRequestsFilterProvider from './providers/BookingRequestsFilterProvider';
+import useAntiTrust from './hooks/useAntiTrust';
 
 const anonymousRoutes = (
   <Switch>
@@ -118,6 +119,8 @@ const userRoutes = (
 const UserRoutes: React.FC = () => {
   const userRecord = useContext(UserRecord);
   const [actingAs] = useContext(ActingAs);
+
+  useAntiTrust().then(() => {});
 
   switch (actingAs) {
     case undefined:

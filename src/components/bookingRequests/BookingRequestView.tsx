@@ -523,7 +523,7 @@ const onBookingCreate = (bookingRequest: BookingRequest, bookingId: string) =>
       BookingRequestStatusText.CONFIRMED,
     );
 
-const getBookingData = async (bookingId: string) =>
+export const getBookingData = async (bookingId: string) =>
   (
     await firebase
       .firestore()

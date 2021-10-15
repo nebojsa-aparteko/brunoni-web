@@ -32,7 +32,7 @@ import BookingRequestChecklistContent from './checklist/BookingRequestChecklistC
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
-import VesselAllocationButton from '../VesselAllocationButton';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
@@ -464,13 +464,15 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            <Grid item md={1} xs={12}>
-              <InfoBoxItem
-                title="Last updated"
-                label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
-                gutterBottom
-              />
-            </Grid>
+            {bookingRequest.updatedAt && (
+              <Grid item md={1} xs={12}>
+                <InfoBoxItem
+                  title="Last updated"
+                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  gutterBottom
+                />
+              </Grid>
+            )}
             {isDashboardUser(userRecord) &&
               bookingRequest.pinnedCommentsCount &&
               bookingRequest.pinnedCommentsCount > 0 && (
