@@ -50,6 +50,7 @@ import EquipmentControlPage from './pages/EquipmentControlPage';
 import OnlineBookingPage from './pages/OnlineBookingPage';
 import BookingRequestContainer from './components/bookingRequests/BookingRequestContainer';
 import BookingRequestsFilterProvider from './providers/BookingRequestsFilterProvider';
+import LandTransportPage from './pages/LandTransportPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -81,7 +82,7 @@ const adminRoutes = (
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     {/*TODO uncomment this once it's ready*/}
-    {/*<Route exact path="/land-transport" component={LandTransportPage} />*/}
+    <Route exact path="/land-transport" component={LandTransportPage} />
     <Route exact path="/loadList" component={LoadListPage} />
     <Route exact path="/equipment-control" component={EquipmentControlPage} />
     <Route exact path="/my-day" component={MyDayPage} />
