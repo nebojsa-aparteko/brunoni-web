@@ -32,7 +32,7 @@ import BookingRequestChecklistContent from './checklist/BookingRequestChecklistC
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
-import VesselAllocationButton from '../VesselAllocationButton';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { getVoyageInfo } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';

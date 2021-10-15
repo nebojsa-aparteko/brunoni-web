@@ -41,7 +41,7 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import PortInput from '../inputs/PortInput';
 import { CarrierId } from '../../model/Booking';
-import VesselAllocationButton from '../VesselAllocationButton';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { getVoyageInfo } from './BookingRequestView';
 import EditingInput from '../EditingInput';
 import useUser from '../../hooks/useUser';
