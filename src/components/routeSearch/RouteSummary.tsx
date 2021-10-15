@@ -55,25 +55,19 @@ const RouteSummary: React.FC<Props> = ({ route }) => {
           </Typography>
         </Grid>
         <Grid item container md={3} xs={12} direction={'row'}>
-          <Grid item md={3} xs={12} direction={'row'}>
-            <Grid item>
-              <InfoBoxItem
-                title="Vessel"
-                label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
-                label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
-                gutterBottom
-              />
-            </Grid>
-            {isDashboardUser(userRecord) && (
-              <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                <VesselAllocationButton
-                  vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo}
-                  service={route.Service}
-                />
-              </Grid>
-            )}
+          <Grid item md={9}>
+            <InfoBoxItem
+              title="Vessel"
+              label1={routeItinerary?.portOfLoading.VoyageInfo.VesselName}
+              label2={routeItinerary?.portOfLoading.VoyageInfo.VoyageNr}
+              gutterBottom
+            />
           </Grid>
-          <Box></Box>
+          {isDashboardUser(userRecord) && (
+            <Grid item md={3} style={{ display: 'flex', alignItems: 'center' }}>
+              <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} service={route.Service} />
+            </Grid>
+          )}
         </Grid>
         {route?.SpaceInfo && (
           <Grid item md={3} xs={12}>
