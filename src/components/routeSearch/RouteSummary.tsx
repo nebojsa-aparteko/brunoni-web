@@ -10,11 +10,11 @@ import WavesIcon from '@material-ui/icons/Waves';
 import ShareIcon from '@material-ui/icons/Share';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
 import { getItineraryFromSchedule } from '../onlineBooking/Summary';
-import VesselAllocationButton from '../VesselAllocationButton';
 import { isDashboardUser } from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
 import Carrier from '../../model/Carrier';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: {

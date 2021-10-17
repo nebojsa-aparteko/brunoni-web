@@ -16,8 +16,12 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { BookingRequest, BookingRequestStatusCode } from '../../model/BookingRequest';
 import VesselAllocation from '../../model/VesselAllocation';
-import { BookingRequestRow } from './VesselAllocationButton';
 import useBookingRequests from '../../hooks/useBookingRequests';
+import { BookingRequestSimplifiedRow } from './BookingRequestSimplifiedRow';
+import useBookings from '../../hooks/useBookings';
+import { Booking } from '../../model/Booking';
+import { BookingRow } from '../bookings/BookingsTable';
+import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
 
 const PercentData = ({ percent }: { percent: string }) => (
   <Box>
@@ -58,12 +62,24 @@ const countAllocation = (allocation?: VesselAllocation) => {
   };
 };
 
-const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookingRequests }) => {
+const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookings }) => {
+  return (
+    <Table size="small" aria-label="requests">
+      <TableBody>
+        {bookings.map(booking => (
+          <BookingRow booking={booking} />
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> = ({ bookingRequests }) => {
   return (
     <Table size="small" aria-label="requests">
       <TableBody>
         {bookingRequests.map(request => (
-          <BookingRequestRow bookingRequest={request} />
+          <BookingRequestSimplifiedRow bookingRequest={request} />
         ))}
       </TableBody>
     </Table>
@@ -71,48 +87,71 @@ const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookingRe
 };
 
 interface BookingsOverviewTableProps {
+  bookings: Booking[];
+}
+
+interface BookingRequestsOverviewTableProps {
   bookingRequests: BookingRequest[];
 }
 
 export interface AllocationProps {
   vessel: VesselAllocation;
+  vesselVoyage?: RouteSearchResultVoyageInfo;
 }
 
-const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
+const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage }) => {
   const allocation = useMemo(() => countAllocation(vessel), [vessel]);
+
+  const vesselName = useMemo(() => vesselVoyage?.VesselName, [vesselVoyage?.VesselName]);
+  const voyageNumber = useMemo(() => vesselVoyage?.VoyageNr, [vesselVoyage?.VoyageNr]);
 
   const [openConfirmed, setOpenConfirmed] = useState(false);
   const [openRequested, setOpenRequested] = useState(false);
   const [openInProgress, setOpenInProgress] = useState(false);
 
-  const [confirmedRequests, setConfirmedRequests] = useState<BookingRequest[] | undefined>(undefined);
   const [requestedRequests, setRequestedRequests] = useState<BookingRequest[] | undefined>(undefined);
   const [inProgressRequests, setInProgressRequests] = useState<BookingRequest[] | undefined>(undefined);
 
   const relevantBookingRequests = useBookingRequests(
     useCallback(
       query => {
-        if (!vessel || !vessel?.vesselName || !vessel?.voyageNumber) return null;
-        return query
-          .where('itinerary.portOfLoading.VoyageInfo.VesselName', '==', vessel?.vesselName)
-          .where('itinerary.portOfLoading.VoyageInfo.VoyageNr', '==', vessel?.voyageNumber)
-          .where('statusCode', '<', BookingRequestStatusCode.ARCHIVED)
+        const q = query;
+        if (!vesselName || !voyageNumber) return undefined;
+        return q
+          .where('itinerary.portOfLoading.VoyageInfo.VesselName', '==', vesselName)
+          .where('itinerary.portOfLoading.VoyageInfo.VoyageNr', '==', voyageNumber)
+          .where('statusCode', '<=', BookingRequestStatusCode.IN_PROGRESS)
           .orderBy('statusCode', 'asc')
           .orderBy('createdAt', 'desc');
       },
-      [vessel],
+      [vesselName, voyageNumber],
+    ),
+  );
+
+  const relevantBookings = useBookings(
+    useCallback(
+      query => {
+        const q = query;
+        if (!vesselName || !voyageNumber) return undefined;
+        return q
+          .where('Vessel', '==', vesselName)
+          .where('Voyage', '==', voyageNumber)
+          .orderBy('BkgCreateTimeStamp', 'desc');
+      },
+      [vesselName, voyageNumber],
     ),
   );
 
   useEffect(() => {
-    setConfirmedRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.CONFIRMED),
-    );
     setRequestedRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED),
+      relevantBookingRequests
+        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED)
+        : [],
     );
     setInProgressRequests(
-      relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS),
+      relevantBookingRequests
+        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS)
+        : [],
     );
   }, [relevantBookingRequests]);
 
@@ -153,13 +192,15 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
                   event.stopPropagation();
                   setOpenConfirmed(!openConfirmed);
                 }}
-                disabled={!confirmedRequests || confirmedRequests.length === 0}
+                disabled={!relevantBookings || relevantBookings.length === 0}
               >
                 {openConfirmed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             </TableCell>
             <TableCell component="th" scope="row">
-              Confirmed Bookings
+              {`Confirmed Bookings ${
+                relevantBookings && relevantBookings?.length > 0 ? '(' + relevantBookings?.length + ' bookings)' : ''
+              }`}
             </TableCell>
             <TableCell align="right">
               {vessel.teuBooked || 0}{' '}
@@ -172,9 +213,9 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
           </TableRow>
           <TableRow>
             <TableCell style={{ padding: 0 }} colSpan={4}>
-              {confirmedRequests && (
+              {relevantBookings && (
                 <Collapse in={openConfirmed} timeout="auto" unmountOnExit>
-                  <BookingsOverviewTable bookingRequests={confirmedRequests} />
+                  <BookingsOverviewTable bookings={relevantBookings} />
                 </Collapse>
               )}
             </TableCell>
@@ -196,7 +237,11 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
                   </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  Requested Bookings
+                  {`Requested Bookings ${
+                    requestedRequests && requestedRequests?.length > 0
+                      ? '(' + requestedRequests?.length + ' requests)'
+                      : ''
+                  }`}
                 </TableCell>
                 <TableCell align="right">{vessel.requested.quantity}</TableCell>
                 <TableCell align="right">
@@ -204,10 +249,10 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell style={{ padding: 0, backgroundColor: '#f5f5f5' }} colSpan={6}>
+                <TableCell style={{ padding: 0 }} colSpan={6}>
                   {requestedRequests && (
                     <Collapse in={openRequested} timeout="auto" unmountOnExit>
-                      <BookingsOverviewTable bookingRequests={requestedRequests} />
+                      <BookingRequestsOverviewTable bookingRequests={requestedRequests} />
                     </Collapse>
                   )}
                 </TableCell>
@@ -231,7 +276,11 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
                   </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  In Progress Bookings
+                  {`In Progress Bookings ${
+                    inProgressRequests && inProgressRequests?.length > 0
+                      ? '(' + inProgressRequests?.length + ' requests)'
+                      : ''
+                  }`}
                 </TableCell>
                 <TableCell align="right">{vessel.inProgress.quantity}</TableCell>
                 <TableCell align="right">
@@ -246,9 +295,9 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel }) => {
                   }}
                   colSpan={6}
                 >
-                  {inProgressRequests && (
+                  {requestedRequests && (
                     <Collapse in={openInProgress} timeout="auto" unmountOnExit>
-                      <BookingsOverviewTable bookingRequests={inProgressRequests} />
+                      <BookingRequestsOverviewTable bookingRequests={requestedRequests} />
                     </Collapse>
                   )}
                 </TableCell>

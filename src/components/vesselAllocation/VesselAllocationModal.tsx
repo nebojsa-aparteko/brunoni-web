@@ -25,6 +25,7 @@ interface VesselAllocationModalProps {
   isOpen: boolean;
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;
+  service?: string;
 }
 
 function PaperComponent(props: PaperProps) {
@@ -35,7 +36,7 @@ function PaperComponent(props: PaperProps) {
   );
 }
 
-const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage }) => {
+const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage, service }) => {
   const classes = useVesselAllocationStyles();
 
   const vesselVoyageString = useMemo(() => `${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`, [
@@ -71,7 +72,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Typography style={{ textAlign: 'center' }}>
-            Vessel: {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})`}
+            Vessel:{' '}
+            {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})` +
+              (service ? ` / ${service}` : '')}
           </Typography>
           <Box mb={2} />
           <Box flex={1} display="flex" flexDirection="column" m={1}>
@@ -79,7 +82,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
               <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h5">Allocation</Typography>
               </ExpansionPanelSummary>
-              <ExpansionPanelDetails>{vessel && <VesselAllocationTable vessel={vessel} />}</ExpansionPanelDetails>
+              <ExpansionPanelDetails>
+                {vessel && <VesselAllocationTable vessel={vessel} vesselVoyage={vesselVoyage} />}
+              </ExpansionPanelDetails>
             </ExpansionPanel>
             <Box mb={2} />
             <ExpansionPanel TransitionProps={{ mountOnEnter: true }}>
