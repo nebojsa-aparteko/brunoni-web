@@ -291,7 +291,6 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
                 <TableCell
                   style={{
                     padding: 0,
-                    backgroundColor: '#f5f5f5',
                   }}
                   colSpan={6}
                 >
