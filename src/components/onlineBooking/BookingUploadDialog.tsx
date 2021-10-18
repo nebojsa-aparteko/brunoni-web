@@ -347,9 +347,10 @@ const mapIntoBookingRequestModel = async (
   chargeCodes: ChargeCode[] | undefined,
   normalize: (...args: any[]) => any,
 ): Promise<BookingRequest> => {
-  const createdBy = object.BOOKER_CONTACT_EMAIL
-    ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
-    : user;
+  let createdBy = object.BOOKER_CONTACT_EMAIL ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase()) : user;
+
+  if (!createdBy) createdBy = user;
+
   const vgmSubmittedBy = VGMSubmittedBy.CLIENT;
   const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
 
