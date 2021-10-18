@@ -30,18 +30,12 @@ interface Props {
   name?: string;
 }
 
-const LandLocationInput: React.FC<Props> = ({
-  value,
-  locations = defaultLocations,
-  onChange,
-  onBlur,
-  label = 'locations',
-}) => {
+const LandLocationInput: React.FC<Props> = ({ value, locations, onChange, onBlur, label = 'locations' }) => {
   return (
     <Autocomplete
       fullWidth
       id={`transport-modes-input-${label}`}
-      options={locations}
+      options={locations || []}
       onChange={(_: ChangeEvent<{}>, mode: string | null) => onChange(mode)}
       onBlur={onBlur}
       value={value || null}

@@ -316,7 +316,7 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="My day" to="/my-day" />
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
                     {/*TODO uncomment this once it's ready*/}
-                    {/*{isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Land" to="/land-transport" />}*/}
+                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Land" to="/land-transport" />}
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
                     {isDashboardUser(userRecord) && !actingAs && (

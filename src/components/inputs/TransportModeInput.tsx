@@ -4,7 +4,7 @@ import { TextField } from '@material-ui/core';
 import FitContentPopper from '../FitContentPopper';
 import { Controller, useFormContext } from 'react-hook-form';
 
-const defaultTransportModes = ['Barge', 'Barge + Truck', 'Rail + Barge', 'Rail + Truck'];
+const defaultTransportModes = ['Barge', 'Truck', 'Barge + Truck', 'Rail + Truck'];
 
 interface Props {
   value?: string | null;

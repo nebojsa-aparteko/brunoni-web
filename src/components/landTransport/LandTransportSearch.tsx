@@ -9,9 +9,9 @@ import UserRecordContext from '../../contexts/UserRecordContext';
 import ContainerDetails from '../../model/ContainerDetails';
 import LoadingButton from '../LoadingButton';
 import { useFormContext } from 'react-hook-form';
-import { DATA } from './landtransport.data';
 import { LandTransportContext } from '../../providers/LandTransportProvider';
 import LandTransportRouteSearchParams from '../../model/land-transport/RouteSearchParams';
+import useUser from '../../hooks/useUser';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -48,15 +48,20 @@ const LandTransportSearch = () => {
   const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
 
   const [, setLandTransport] = useContext(LandTransportContext);
+  const [user] = useUser();
+  const { watch } = useFormContext();
 
-  const handleSearch = (data: LandTransportRouteSearchParams) => {
+  const handleSearch = async (data: LandTransportRouteSearchParams) => {
     setLoading(true);
-    setTimeout(() => {
-      console.log(data);
-      console.log('searched!');
-      setLandTransport(DATA);
-      setLoading(false);
-    }, 500);
+    const token = await user.getIdToken();
+    const result = await getLandTransportRecords(
+      token,
+      watch('from'),
+      watch('to'),
+      watch('transportMode').toUpperCase(),
+    );
+    setLandTransport(result);
+    setLoading(false);
   };
 
   return (
@@ -93,3 +98,93 @@ const LandTransportSearch = () => {
 };
 
 export default LandTransportSearch;
+
+const getLandTransportRecords = async (
+  token: string,
+  fromLocationName: string,
+  toLocationName: string,
+  transportMode: string,
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/landTransport?toLocationName=${toLocationName}&fromLocationName=${fromLocationName}&transportMode=${transportMode}`,
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.ok) {
+      const body = await response.json();
+      return body;
+    } else {
+      const body = await response.json();
+      console.error(`Failed to request`, response, body);
+      return body;
+    }
+  } catch (e) {
+    console.error('Failed to perform request', e);
+  } finally {
+  }
+};
+export interface StartOrEnd {
+  identity: IdentityOrStartOrEnd;
+  labels?: string[] | null;
+  properties: Properties;
+}
+export interface IdentityOrStartOrEnd {
+  low: number;
+  high: number;
+}
+export interface Properties {
+  name: string;
+}
+export interface SegmentsEntity {
+  start: StartOrEnd;
+  relationship: Relationship;
+  end: StartOrEnd;
+}
+export interface Relationship {
+  identity: IdentityOrStartOrEnd;
+  start: IdentityOrStartOrEnd;
+  end: IdentityOrStartOrEnd;
+  type: string;
+  properties: HeadsTo;
+}
+
+export interface HeadsTo {
+  weightRangeMin: string;
+  tliNo: string;
+  negot: string;
+  relType: string;
+  validFrom: string;
+  float: string;
+  equGroup: string;
+  weightRangeMax: string;
+  toState: string;
+  rate: string;
+  tliEffDate: string;
+  curr: string;
+  tariffReference: string;
+  validTo: string;
+  viaFacility: string;
+  fromState: string;
+  fromCountry: string;
+  tliExpDate: string;
+  tradeShortName: string;
+  equSize: string;
+  toCountry: string;
+  fromGeoUnit: string;
+  transportMode: string;
+  fmc: string;
+  remarks: string;
+  weightUnit: string;
+  status: string;
+}
