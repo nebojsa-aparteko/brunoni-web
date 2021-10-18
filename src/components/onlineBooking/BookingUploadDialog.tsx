@@ -348,9 +348,8 @@ const mapIntoBookingRequestModel = async (
   normalize: (...args: any[]) => any,
 ): Promise<BookingRequest> => {
   const createdBy = object.BOOKER_CONTACT_EMAIL
-    ? // todo. Could there be duplicates?
-      await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
-    : undefined;
+    ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
+    : user;
   const vgmSubmittedBy = VGMSubmittedBy.CLIENT;
   const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
 
