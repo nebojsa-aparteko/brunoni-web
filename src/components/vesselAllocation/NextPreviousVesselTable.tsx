@@ -13,7 +13,6 @@ import {
 } from '@material-ui/core';
 import { AllocationProps } from './VesselAllocationTable';
 import { format } from 'date-fns';
-import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
 import { PrevNextVesselResponse, VesselResponse } from '../../model/VesselAllocation';
 import useAPI from '../../hooks/useAPI';
 import { useVesselAllocationStyles } from './VesselAllocationButton';
@@ -32,9 +31,8 @@ const TeuTon: React.FC<TeuTonProps> = ({ teu, ton }) => {
   );
 };
 
-const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel }) => {
+const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel, bookingRequest }) => {
   const classes = useVesselAllocationStyles();
-  const [bookingRequest] = useBookingRequestContext();
   const { get, loading } = useAPI();
   const [nextPrevVessels, setNextPrevVessels] = useState<PrevNextVesselResponse | null>(null);
 
@@ -46,12 +44,15 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel }) => {
 
   useEffect(() => {
     const getVesselAllocationSchedule = async () => {
-      const response = (await get('vesselAllocationSchedule', {
-        carrierId: bookingRequest.carrier?.name!,
+      const params = {
+        carrierId: bookingRequest?.carrier?.name,
         service: vessel.service,
-        POL: bookingRequest.itinerary?.portOfLoading.Port?.ID!,
-        etsDate: format(new Date(bookingRequest.itinerary?.portOfLoading.DepartureDate!), 'dd/MM/yyyy'),
-      })) as PrevNextVesselResponse | null;
+        POL: bookingRequest?.itinerary?.portOfLoading.Port?.ID,
+        etsDate: bookingRequest?.itinerary?.portOfLoading.DepartureDate
+          ? format(new Date(bookingRequest?.itinerary?.portOfLoading.DepartureDate), 'dd/MM/yyyy')
+          : undefined,
+      };
+      const response = (await get('vesselAllocationSchedule', params)) as PrevNextVesselResponse | null;
       if (response) {
         setNextPrevVessels(response);
       }
@@ -62,7 +63,7 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel }) => {
 
   return loading ? (
     <CircularProgress />
-  ) : (
+  ) : nextPrevVessels ? (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
@@ -79,7 +80,7 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {nextPrevVessels?.BookingSpace.map((vessel, index) => {
+          {nextPrevVessels.BookingSpace.map((vessel, index) => {
             return (
               <TableRow
                 key={index}
@@ -109,6 +110,10 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel }) => {
         </TableBody>
       </Table>
     </TableContainer>
+  ) : (
+    <Box display={'flex'} alignItems={'center'}>
+      <Typography>Not Found</Typography>
+    </Box>
   );
 };
 

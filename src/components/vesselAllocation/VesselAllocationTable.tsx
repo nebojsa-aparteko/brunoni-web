@@ -97,6 +97,7 @@ interface BookingRequestsOverviewTableProps {
 export interface AllocationProps {
   vessel: VesselAllocation;
   vesselVoyage?: RouteSearchResultVoyageInfo;
+  bookingRequest?: BookingRequest;
 }
 
 const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage }) => {

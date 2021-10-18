@@ -20,12 +20,14 @@ import VesselAllocationTable from './VesselAllocationTable';
 import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
 import NextPreviousVesselTable from './NextPreviousVesselTable';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { BookingRequest } from '../../model/BookingRequest';
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;
   service?: string;
+  bookingRequest?: BookingRequest;
 }
 
 function PaperComponent(props: PaperProps) {
@@ -36,7 +38,13 @@ function PaperComponent(props: PaperProps) {
   );
 }
 
-const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, closeModal, vesselVoyage, service }) => {
+const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
+  isOpen,
+  closeModal,
+  vesselVoyage,
+  service,
+  bookingRequest,
+}) => {
   const classes = useVesselAllocationStyles();
 
   const vesselVoyageString = useMemo(() => `${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`, [
@@ -92,7 +100,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({ isOpen, c
                 <Typography variant="h5">Previous & Next Vessel</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center' }}>
-                {vessel && <NextPreviousVesselTable vessel={vessel} />}
+                {vessel && <NextPreviousVesselTable vessel={vessel} bookingRequest={bookingRequest} />}
               </ExpansionPanelDetails>
             </ExpansionPanel>
           </Box>

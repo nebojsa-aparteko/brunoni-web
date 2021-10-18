@@ -364,7 +364,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={vesselVoyage} service={bookingRequest?.schedule?.Service} />
+                    <VesselAllocationButton
+                      vesselVoyage={vesselVoyage}
+                      service={bookingRequest?.schedule?.Service}
+                      bookingRequest={bookingRequest}
+                    />
                   </Grid>
                 )}
               </Grid>

@@ -4,6 +4,7 @@ import { Box, IconButton, makeStyles } from '@material-ui/core';
 import useModal from '../../hooks/useModal';
 import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
 import VesselAllocationModal from './VesselAllocationModal';
+import { BookingRequest } from '../../model/BookingRequest';
 
 export const useVesselAllocationStyles = makeStyles(theme => ({
   closeModal: {
@@ -51,7 +52,7 @@ export const useVesselAllocationStyles = makeStyles(theme => ({
   },
 }));
 
-const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage, service }) => {
+const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage, service, bookingRequest }) => {
   const { closeModal, openModal, isOpen } = useModal();
   const classes = useVesselAllocationStyles();
 
@@ -66,7 +67,13 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (
-        <VesselAllocationModal isOpen={isOpen} closeModal={closeModal} vesselVoyage={vesselVoyage} service={service} />
+        <VesselAllocationModal
+          isOpen={isOpen}
+          closeModal={closeModal}
+          vesselVoyage={vesselVoyage}
+          service={service}
+          bookingRequest={bookingRequest}
+        />
       )}
     </Box>
   );
@@ -75,6 +82,7 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
 export default VesselAllocationButton;
 
 interface VesselAllocationButtonProps {
+  bookingRequest?: BookingRequest;
   vesselVoyage?: RouteSearchResultVoyageInfo;
   service?: string;
 }

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import useUser from './useUser';
-import { Object } from '../components/onlineBooking/MissingFields';
+
+interface Object {
+  [key: string]: any;
+}
 
 const useAPI = () => {
   const [loading, setLoading] = useState(false);
