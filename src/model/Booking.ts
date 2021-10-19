@@ -63,6 +63,8 @@ export interface Booking {
   assignedUser: UserRecordMin;
   assignedCustomerUser: UserRecordMin;
   assignedTags?: string[];
+  RebookedToFile?: string;
+  RebookedFromFile?: string;
 }
 
 export interface CheckListData {

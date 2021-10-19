@@ -15,6 +15,27 @@ interface VesselAllocation {
   inProgress?: Allocation;
 }
 
+export interface PrevNextVesselResponse {
+  BookingSpace: VesselResponse[];
+}
+
+export interface VesselResponse {
+  CarrierCode: string;
+  CarrierID: string;
+  ETS: string;
+  Port: string;
+  Service: string;
+  'TEU-Allocation': string;
+  'TEU-Booked': string;
+  'TEU-Percent': string;
+  VesselCode: string;
+  VesselName: string;
+  VoyageNr: string;
+  'Weight-Allocation': string;
+  'Weight-Booked': string;
+  'Weight-Percent': string;
+}
+
 export default VesselAllocation;
 
 interface Allocation {

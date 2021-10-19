@@ -213,6 +213,21 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
                 </Paper>
               </TableCell>
             </TableRow>
+            {(booking.RebookedToFile || booking.RebookedFromFile) && (
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>
+                  Rebooked {booking.RebookedToFile ? 'to' : 'from'}
+                </TableCell>
+                <TableCell className={classes.tableCell}>
+                  <Link
+                    to={`/bookings/${booking.RebookedToFile ? booking.RebookedToFile : booking.RebookedFromFile}`}
+                    target="_blank"
+                  >
+                    {booking.RebookedToFile ? booking.RebookedToFile : booking.RebookedFromFile}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
             {booking.requestId && (
               <TableRow>

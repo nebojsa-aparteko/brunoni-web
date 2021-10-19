@@ -17,6 +17,8 @@ export interface ChecklistItemValueDocument extends DocumentValue {
   isSelectedForComparison?: boolean;
   checklistId?: string;
   documentType?: DocumentType;
+  bookingEmlStatus?: string;
+  bookingTimestamp?: string;
 }
 
 export enum DocumentType {
