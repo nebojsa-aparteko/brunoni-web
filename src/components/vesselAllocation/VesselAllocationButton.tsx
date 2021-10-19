@@ -15,8 +15,7 @@ export const useVesselAllocationStyles = makeStyles(theme => ({
     height: '47px',
   },
   dialogBody: {
-    minWidth: theme.spacing(100),
-    width: 'auto',
+    minWidth: theme.spacing(120),
   },
   dialogContent: {
     paddingBottom: theme.spacing(3),

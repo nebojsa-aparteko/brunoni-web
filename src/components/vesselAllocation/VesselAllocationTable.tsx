@@ -2,7 +2,6 @@ import {
   Box,
   Collapse,
   IconButton,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -66,8 +65,8 @@ const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookings 
   return (
     <Table size="small" aria-label="requests">
       <TableBody>
-        {bookings.map(booking => (
-          <BookingRow booking={booking} />
+        {bookings.map((booking, index) => (
+          <BookingRow booking={booking} key={index} />
         ))}
       </TableBody>
     </Table>
@@ -78,8 +77,8 @@ const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> 
   return (
     <Table size="small" aria-label="requests">
       <TableBody>
-        {bookingRequests.map(request => (
-          <BookingRequestSimplifiedRow bookingRequest={request} />
+        {bookingRequests.map((request, index) => (
+          <BookingRequestSimplifiedRow bookingRequest={request} key={index} />
         ))}
       </TableBody>
     </Table>
@@ -157,7 +156,7 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
   }, [relevantBookingRequests]);
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer>
       <Table aria-label="simple table">
         <colgroup>
           <col style={{ width: '10%' }} />
@@ -295,9 +294,9 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
                   }}
                   colSpan={6}
                 >
-                  {requestedRequests && (
+                  {inProgressRequests && (
                     <Collapse in={openInProgress} timeout="auto" unmountOnExit>
-                      <BookingRequestsOverviewTable bookingRequests={requestedRequests} />
+                      <BookingRequestsOverviewTable bookingRequests={inProgressRequests} />
                     </Collapse>
                   )}
                 </TableCell>

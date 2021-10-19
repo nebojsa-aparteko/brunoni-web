@@ -64,7 +64,7 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel, bookingReq
   return loading ? (
     <CircularProgress />
   ) : nextPrevVessels ? (
-    <TableContainer component={Paper}>
+    <TableContainer>
       <Table>
         <TableHead>
           <TableRow>
