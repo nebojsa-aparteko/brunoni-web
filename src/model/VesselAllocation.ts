@@ -13,6 +13,7 @@ interface VesselAllocation {
   weightPercent: string;
   requested?: Allocation;
   inProgress?: Allocation;
+  isFullyBooked?: boolean;
 }
 
 export interface PrevNextVesselResponse {
