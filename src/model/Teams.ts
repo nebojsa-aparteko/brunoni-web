@@ -16,4 +16,13 @@ export interface Team {
   checklistItems?: string[];
   teamType?: TeamType;
   taskTypes?: TaskType[];
+  groupType?: GroupType;
+}
+
+export enum GroupType {
+  BOOKINGS = 'BOOKINGS',
+  BOOKING_REQUESTS = 'BOOKING_REQUESTS',
+  QUOTES = 'QUOTES',
+  LAND_TRANSPORT = 'LAND_TRANSPORT',
+  VESSEL = 'VESSEL',
 }
