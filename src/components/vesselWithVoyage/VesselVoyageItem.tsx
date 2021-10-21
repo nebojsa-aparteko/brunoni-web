@@ -51,8 +51,14 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
     () =>
       vesselItems && vesselItems.length > 0
         ? ({
-            VesselName: vesselItems[0].vesselWithVoyage?.slice(0, -7),
-            VoyageNr: vesselItems[0].vesselWithVoyage?.slice(-6),
+            VesselName: vesselItems[0].vesselWithVoyage
+              ?.split(' ')
+              .slice(0, -2)
+              .join(' '),
+            VoyageNr: vesselItems[0].vesselWithVoyage
+              ?.split(' ')
+              .slice(-2)
+              .join(' '),
             Carrier: vesselItems[0].carrier,
           } as RouteSearchResultVoyageInfo)
         : undefined,
