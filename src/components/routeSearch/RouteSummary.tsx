@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSummary: React.FC<Props> = ({ route, carrier }) => {
+const RouteSummary: React.FC<Props> = ({ route, carrier, isFullyBooked }) => {
   const routeItinerary = useMemo(() => getItineraryFromSchedule(route), [route]);
   const classes = useStyles();
   const [, userRecord] = useUser();
@@ -80,12 +80,21 @@ const RouteSummary: React.FC<Props> = ({ route, carrier }) => {
             <Typography variant="subtitle2" display="block" gutterBottom>
               <Box fontWeight="fontWeightBold">Space Availability</Box>
             </Typography>
-            <Chip
-              size="small"
-              label={route?.SpaceInfo}
-              style={{ backgroundColor: route?.SpaceInfoColor }}
-              className={classes.chip}
-            />
+            {isFullyBooked ? (
+              <Chip
+                size="small"
+                label={'FULLY BOOKED'}
+                style={{ backgroundColor: '#bf0000' }}
+                className={classes.chip}
+              />
+            ) : (
+              <Chip
+                size="small"
+                label={route?.SpaceInfo}
+                style={{ backgroundColor: route?.SpaceInfoColor }}
+                className={classes.chip}
+              />
+            )}
           </Grid>
         )}
 
@@ -164,6 +173,7 @@ const RouteSummary: React.FC<Props> = ({ route, carrier }) => {
 interface Props {
   route: RouteSearchResult;
   carrier?: Carrier;
+  isFullyBooked?: boolean;
 }
 
 export default RouteSummary;

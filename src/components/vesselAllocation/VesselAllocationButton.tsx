@@ -49,6 +49,17 @@ export const useVesselAllocationStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.background.default,
     },
   },
+  fullyBookedWarning: {
+    position: 'absolute',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    left: 0,
+    right: 0,
+    top: '5px',
+    maxWidth: 230,
+    display: 'flex',
+    justifyContent: 'center',
+  },
 }));
 
 const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage, service, bookingRequest }) => {

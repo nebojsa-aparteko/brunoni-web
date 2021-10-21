@@ -20,6 +20,7 @@ import VesselAllocationTable from './VesselAllocationTable';
 import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { BookingRequest } from '../../model/BookingRequest';
+import { Alert } from '@material-ui/lab';
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
     vesselVoyage?.VesselName,
     vesselVoyage?.VoyageNr,
   ]);
-  const vessel = useVesselWithVoyageById(vesselVoyageString);
+  const vesselAllocation = useVesselWithVoyageById(vesselVoyageString);
 
   const handleCloseModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
@@ -73,6 +74,11 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
           onClick={event => event.stopPropagation()}
         >
           <Typography variant="h4">Vessel Allocation</Typography>
+          {vesselAllocation && vesselAllocation.isFullyBooked && (
+            <Alert severity="warning" className={classes.fullyBookedWarning}>
+              This vessel is fully booked!
+            </Alert>
+          )}
           <IconButton onClick={handleCloseModal} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
@@ -90,7 +96,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 <Typography variant="h5">Allocation</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails style={{ padding: 0 }}>
-                {vessel && <VesselAllocationTable vessel={vessel} vesselVoyage={vesselVoyage} />}
+                {vesselAllocation && <VesselAllocationTable vessel={vesselAllocation} vesselVoyage={vesselVoyage} />}
               </ExpansionPanelDetails>
             </ExpansionPanel>
             {/*<Box mb={2} />*/}
