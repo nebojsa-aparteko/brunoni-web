@@ -87,7 +87,7 @@ const validQuote = async (bookingRequest: BookingRequest) => {
 };
 
 const isAllowedCurrency = (currency?: string) => {
-  if (!currency) return true;
+  if (!currency) return false;
   return allowedCurrencies.includes(currency);
 };
 
