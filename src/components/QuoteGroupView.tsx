@@ -51,7 +51,7 @@ import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
 import Carriers from '../contexts/Carriers';
 import QuoteGroupActivityLogContainer from './activities/QuoteGroupActivityLogContainer';
-import UserRecord from '../model/UserRecord';
+import UserRecord, { isSuperAdmin } from '../model/UserRecord';
 import firebase from '../firebase';
 import UserAssignment from './UserAssignment';
 import { ActivityLogProvider } from './bookings/checklist/ActivityLogContext';
@@ -206,6 +206,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const [selectedPanel, setSelectedPanel] = useState('');
 
   const history = useHistory();
+  const [, userRecord] = useUser();
 
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
@@ -217,9 +218,24 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
     'quotes',
     useCallback(
       q => {
-        return q.where('groupId', '==', id);
+        q = q.where('groupId', '==', id);
+        if (isSuperAdmin(userRecord)) {
+          return q;
+        }
+        return q.where(
+          'carrier',
+          'in',
+          carriers && carriers.length > 0 && userRecord.carriers && userRecord.carriers.length > 0
+            ? userRecord.carriers?.map(carrierId => {
+                const carrier = carriers?.find(carrier => carrier.id === carrierId);
+                if (carrier) {
+                  return carrier.name;
+                }
+              })
+            : ['NONE FOUND'], //This should always fail and we won't fetch any results, if a better solution is found please change this
+        );
       },
-      [id],
+      [id, carriers, userRecord],
     ),
   );
 
