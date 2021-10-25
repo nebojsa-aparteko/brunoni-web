@@ -232,6 +232,7 @@ const Navbar: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
   const { open } = useContext(LoginDialog);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
   const handleDialogClose = useCallback(() => {
@@ -471,6 +472,9 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Dashboard" to="/" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
+                  {isAdmin && (
+                    <ListItemLink primary="Land Transport" to="/land-transport" onClick={handleDrawerToggle} />
+                  )}
                   {/*<ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />*/}
 
                   <ListItemLink primary="My day" to="/my-day" onClick={handleDrawerToggle} />
