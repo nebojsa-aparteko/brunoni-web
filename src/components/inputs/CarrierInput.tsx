@@ -21,6 +21,7 @@ interface Props {
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: 'none' | 'dense' | 'normal';
   formError?: FieldError;
+  disabled?: boolean;
 }
 
 const useStyles = makeStyles(() => ({
@@ -43,6 +44,7 @@ const CarrierInput: React.FC<Props> = ({
   onClose,
   margin,
   formError,
+  disabled,
   ...rest
 }) => {
   const classes = useStyles();
@@ -63,6 +65,7 @@ const CarrierInput: React.FC<Props> = ({
       getOptionLabel={getOptionLabel}
       options={carriers || []}
       loading={loading}
+      disabled={disabled}
       renderInput={params => (
         <TextField
           {...params}
@@ -71,6 +74,7 @@ const CarrierInput: React.FC<Props> = ({
           inputRef={inputRef}
           label={label}
           margin={margin}
+          disabled={disabled}
           fullWidth
           variant="outlined"
           InputProps={{

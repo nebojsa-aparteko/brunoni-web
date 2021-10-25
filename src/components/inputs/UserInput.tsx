@@ -13,7 +13,7 @@ interface Props {
   label: string;
   users: UserRecordMin[];
   inputRef?: MutableRefObject<HTMLInputElement | undefined>;
-  value?: UserRecordMin;
+  value?: UserRecordMin | null;
   onChange: (event: ChangeEvent<{}>, user: UserRecordMin | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;

@@ -101,12 +101,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
 
   return (
     <Fragment {...other}>
-      <Box
-        className={classes.container}
-        {...other}
-        onMouseEnter={() => setShowPinButton(true)}
-        onMouseLeave={() => setShowPinButton(false)}
-      >
+      <div {...other} onMouseEnter={() => setShowPinButton(true)} onMouseLeave={() => setShowPinButton(false)}>
         {activityItem.type === ActivityType.COMMENT ? (
           <Comment activity={activityItem} booking={booking} />
         ) : activityItem.type === ActivityType.ACTIVITY_WITH_COMMENT ? (
@@ -130,7 +125,7 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
             </IconButton>
           </Box>
         ) : null}
-      </Box>
+      </div>
     </Fragment>
   );
 };

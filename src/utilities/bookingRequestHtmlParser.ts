@@ -1,6 +1,6 @@
 import cheerio from 'cheerio';
 import { isEqual, omit } from 'lodash/fp';
-import getEnumKeyByEnumValue from './getEnumKeyByEnumValue';
+import { getEnumValueByEnumKey } from './getEnumKeyByEnumValue';
 import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
 
 enum Types {
@@ -242,7 +242,8 @@ const extractDataOddTable = (object: DataOddTable) => {
   const INTTRA_REFERENCE_NUMBER = findDataOddTable(object, Titles.INTTRA_REFERENCE_NUMBER);
   const CUSTOMER_SHIPMENT_ID = findDataOddTable(object, Titles.CUSTOMER_SHIPMENT_ID);
   const BOOKING_OFFICE = findDataOddTable(object, Titles.BOOKING_OFFICE);
-  const CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER);
+  let CONTRACT_NUMBER = findDataOddTable(object, Titles.CONTRACT_NUMBER) as string | undefined;
+  CONTRACT_NUMBER = CONTRACT_NUMBER?.split('/')[0];
   const FREIGHT_FORWARDERS_REFERENCE_NUMBERS = findDataOddTable(
     object,
     Titles.FREIGHT_FORWARDERS_REFERENCE_NUMBERS,
@@ -392,7 +393,7 @@ const getContainerData = (array: string[]) => {
 
   const SIZE_TYPE_CODE = getNeededData(array, NeededData.SIZE_TYPE_CODE);
   const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g)?.[0] || undefined;
-  const ISO_TYPE = (TYPE && getEnumKeyByEnumValue(ISOCodesEdiAlphacom, TYPE)) || undefined;
+  const ISO_TYPE = (TYPE && getEnumValueByEnumKey(ISOCodesEdiAlphacom, TYPE)) || undefined;
   const SIZE = TYPE
     ? SIZE_TYPE_CODE?.replace(TYPE, '')
         .replace(/[()]/g, '')

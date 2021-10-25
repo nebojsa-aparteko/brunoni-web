@@ -13,12 +13,12 @@ import SimpleExpansionPanel from '../SimpleExpansionPanel';
 
 const useStyles = makeStyles(() => ({
   hidePrint: {
-    ['@media print']: {
+    '@media print': {
       display: 'none',
     },
   },
   showPrint: {
-    ['@media print']: {
+    '@media print': {
       display: 'initial',
     },
   },
@@ -31,12 +31,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const remark =
+export const remark =
   'FOR FCL BOOKINGS ONLY: WITH RECEIPT OF THIS BOOKING CONFIRMATION, THE SHIPPER OR OTHER CARGO INTERESTED PARTY UNDERTAKES TO SEAL THE CONTAINER(S) WITH HIGH-SECURITY SEAL(S) (MEETING THE SPECIFICATIONS OF ISO/PAS 17712DD. JANUARY 17,2003) IMMEDIATELY AFTER STUFFING IS COMPLETED AND BEFORE IT IS DELIVERED TO US AND,AS PART OF THE SHIPPING INSTRUCTIONS, TO FORWARD THE SEAL NUMBER TOGETHER WITH THE PRECISE CONTENTS OF THE CONTAINER TO THE CARRIER.\n' +
   '\n' +
   'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
 
-const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
+const BookingRequestViewMainContent: React.FC<Props> = ({ isPrintWithCost, showWarningMessage }) => {
   const classes = useStyles();
   const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
@@ -73,7 +73,12 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
       <Box marginTop="2em" marginBottom="2em">
         <Divider />
       </Box>
-      <BookingRequestFreightDetails freightDetails={bookingRequestState.freightDetails} />
+      <Box className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
+        <BookingRequestFreightDetails
+          freightDetails={bookingRequestState.freightDetails}
+          showWarningMessage={showWarningMessage}
+        />
+      </Box>
       <Typography variant="body2" className={classes.remark}>
         {remark}
       </Typography>
@@ -83,6 +88,7 @@ const BookingRequestViewMainContent = ({ isPrintWithCost }: Props) => {
 
 interface Props {
   isPrintWithCost: boolean;
+  showWarningMessage?: boolean;
 }
 
 export default BookingRequestViewMainContent;

@@ -8,7 +8,6 @@ import firebase from '../../firebase';
 import { Checkbox } from '@material-ui/core';
 import { ReassignmentRule } from '../../model/ReassignmentRule';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 const ReassignUserRow: React.FC<Props> = ({ rule, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
@@ -33,9 +32,7 @@ const ReassignUserRow: React.FC<Props> = ({ rule, selected, onSelectRow, ...othe
 
   return (
     <TableRow {...other}>
-      {!adminUser ? (
-        <ChartsCircularProgress />
-      ) : (
+      {adminUser && (
         <>
           <TableCell padding="checkbox">
             <Checkbox

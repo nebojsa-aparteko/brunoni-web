@@ -23,6 +23,8 @@ export interface Booking {
   Category: BookingCategory;
   CtrTariffsDetails: CtrTariffDetail[];
   Agreement: string | null;
+  requestId?: string;
+  StatClient?: string;
   StatClientRef: string | null;
   BkgAgentContact?: string;
   ForwAdrId: string;
@@ -60,6 +62,9 @@ export interface Booking {
   watchers: UserRecordMin[];
   assignedUser: UserRecordMin;
   assignedCustomerUser: UserRecordMin;
+  assignedTags?: string[];
+  RebookedToFile?: string;
+  RebookedFromFile?: string;
 }
 
 export interface CheckListData {

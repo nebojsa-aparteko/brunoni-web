@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Avatar,
+  Box,
   CircularProgress,
   IconButton,
   ListItem,
@@ -9,6 +10,7 @@ import {
   ListItemText,
   makeStyles,
   Theme,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
 import DescriptionIcon from '@material-ui/icons/Description';
@@ -17,10 +19,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
 import { green } from '@material-ui/core/colors';
 import safeInvoke from '../../utilities/safeInvoke';
-import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import theme from '../../theme';
 import { isPlatformActivity } from '../../utilities/activityHelper';
 import CompareIcon from '@material-ui/icons/Compare';
+import DateFormattedText from '../DateFormattedText';
+import EmailIcon from '@material-ui/icons/Email';
 
 const useStyles = makeStyles((theme: Theme) => ({
   fileItemLink: {
@@ -67,16 +70,35 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
             <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
           }
           secondary={
-            <Typography variant="caption">
-              {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
-                isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName
-              }`}
-            </Typography>
+            <Box style={{ cursor: 'default' }} onClick={e => e.preventDefault()} display={'flex'} alignItems={'center'}>
+              <DateFormattedText date={safeInvoke('toDate')(item.uploadedAt)} />
+              <Typography style={{ marginLeft: '.2em' }} variant="caption">
+                {isPlatformActivity(item.uploadedBy) ? 'by Platform' : `by ${item.uploadedBy.firstName}`}
+              </Typography>
+              {item.bookingEmlStatus && (
+                <Box ml={1}>
+                  {item.bookingEmlStatus === 'sent' ? (
+                    <Tooltip title={`Email sent ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}>
+                      <EmailIcon htmlColor={'rgba(0,200,81)'} />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={`Email failed ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}>
+                      <EmailIcon htmlColor={'rgba(200,0,0)'} />
+                    </Tooltip>
+                  )}
+                </Box>
+              )}
+            </Box>
+            // <Typography variant="caption">
+            //   {`${formatDistanceToNowConfigured(safeInvoke('toDate')(item.uploadedAt))} by ${
+            //     isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName
+            //   }`}
+            // </Typography>
           }
         />
       </a>
       <ListItemSecondaryAction>
-        <div className={classes.progressWrapper}>
+        <Box display={'flex'} alignItems={'center'} className={classes.progressWrapper}>
           {handleDialogOpen && (
             <IconButton size="small" aria-label="Add to Comparison" onClick={() => handleDialogOpen(item)}>
               <CompareIcon />
@@ -108,7 +130,7 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
             <DeleteIcon />
           </IconButton>
           {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
-        </div>
+        </Box>
       </ListItemSecondaryAction>
     </ListItem>
   );

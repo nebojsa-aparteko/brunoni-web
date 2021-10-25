@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   Drawer,
+  Grid,
   List,
   ListItem,
   ListItemIcon,
@@ -50,6 +51,7 @@ import { quotesGroupShepherdTour } from './guides/QuotesGroupGuide';
 import { getQuotesShepherdTour } from './guides/GetQuoteGuide';
 import brunoniLogo from '../assets/logo.brunoni.svg';
 import allmarineLogo from '../assets/logo.allmarine.png';
+import useZonedTime, { CLOCKS } from '../hooks/useZonedTime';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -64,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   toolbar: {
-    height: 100,
+    height: theme.spacing(9),
   },
   toolbarItem: {},
   logo: {
@@ -75,10 +77,10 @@ const useStyles = makeStyles((theme: Theme) => ({
         brunoni: {
           position: 'relative',
 
-          height: 58,
+          height: 45,
         },
         allmarine: {
-          maxHeight: 80,
+          maxHeight: 45,
           width: 'auto',
         },
       } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
@@ -122,6 +124,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   menu: {
     textTransform: 'uppercase',
+  },
+  worldClock: {
+    backgroundColor: '#2c3c50',
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    color: theme.palette.getContrastText('#2c3c50'),
   },
 }));
 
@@ -242,6 +250,8 @@ const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [guide, setGuide] = useState<Shepherd.Tour | undefined>(undefined);
 
+  const zonedTime = useZonedTime();
+
   useEffect(() => {
     setGuide(getPageGuide());
   }, [window.location.pathname]);
@@ -272,6 +282,22 @@ const Navbar: React.FC = () => {
     <Fragment>
       <Hidden smDown>
         <AppBar position="relative" className={classes.appBar}>
+          <Container maxWidth={false} className={classes.worldClock}>
+            <Grid container justify={'center'} spacing={3} style={{ flexWrap: 'nowrap' }}>
+              {CLOCKS.map((clock, i) => {
+                const { formattedDate } = zonedTime(clock.timeZone);
+                return (
+                  <Grid item key={i}>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" color="inherit">
+                        <span>{clock.city}</span> • <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
+                      </Typography>
+                    </Box>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Container>
           <Container maxWidth="xl">
             <Toolbar className={classes.toolbar} disableGutters>
               <Link className={classes.logo} to="/">
@@ -290,6 +316,7 @@ const Navbar: React.FC = () => {
 
                     <ButtonMenuItem primary="My day" to="/my-day" />
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
+                    {/*TODO uncomment this once it's ready*/}
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Land" to="/land-transport" />}
 
                     {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
@@ -304,27 +331,8 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <div id="otherMenuNav" className={classes.item}>
-                          <Button
-                            endIcon={<KeyboardArrowDownIcon />}
-                            aria-controls="simple-menu"
-                            aria-haspopup="true"
-                            onClick={handleMenuClick}
-                          >
-                            <Typography variant="body1">Other</Typography>
-                          </Button>
-                        </div>
-                        <Menu
-                          id="simple-menu"
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={handleMenuClose}
-                          className={classes.menu}
-                          getContentAnchorEl={null}
-                        >
-                          <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="Equipment Situation" />
-                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
-                        </Menu>
+                        <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="EQUIPMENT SITUATION" />
+                        <MenuItemLink onClick={handleMenuClose} to="/charges" primary="SIDE CHARGES" />
                       </Fragment>
                     )}
 

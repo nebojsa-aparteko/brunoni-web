@@ -11,7 +11,12 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useDropzone } from 'react-dropzone';
-import { ActivityChangeType, ActivityLogUserData, ChecklistItemValueDocument } from './checklist/ChecklistItemModel';
+import {
+  ActivityChangeType,
+  ActivityLogUserData,
+  ChecklistItemValueDocument,
+  DocumentType,
+} from './checklist/ChecklistItemModel';
 import { orderBy } from 'lodash/fp';
 import InternalStorageItem from './InternalStorageItem';
 import firebase from '../../firebase';
@@ -25,6 +30,8 @@ import AttachFileIcon from '@material-ui/icons/AttachFile';
 import { ActivityLogItem, ActivityType } from './checklist/ActivityModel';
 import { showCrispChat } from '../../index';
 import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
+import { BookingRequest } from '../../model/BookingRequest';
+import useGlobalAppState from '../../hooks/useGlobalAppState';
 
 const useStyles = makeStyles(() => ({
   rootEmpty: {
@@ -98,12 +105,22 @@ const InternalStorage: React.FC<Props> = ({
   showComparison,
 }) => {
   const classes = useStyles();
-  const query = useCallback(q => q.where('isInternal', '==', isInternal).orderBy('uploadedAt', 'desc'), [isInternal]);
+  const query = useCallback(
+    q => {
+      let query = q;
+      // todo needs to be redone, because we changed from internal storage to storage => so basically we should add isInternal field anywhere we are using this component
+      if (collection === 'bookings-requests') query = query.where('isInternal', '==', isInternal);
+      return query.orderBy('uploadedAt', 'desc');
+    },
+    [isInternal, collection],
+  );
   // status indicators
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<ChecklistItemValueDocument | undefined>(undefined);
+  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
+  const [, dispatch] = useGlobalAppState();
 
   const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
   const activityLogContext = useActivityLogState();
@@ -112,7 +129,6 @@ const InternalStorage: React.FC<Props> = ({
     (filesCollection?.docs.map(doc => {
       return { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
     }) as ChecklistItemValueDocument[]) || [];
-
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
 
@@ -123,12 +139,24 @@ const InternalStorage: React.FC<Props> = ({
   }, [setIsDialogOpen]);
 
   const handleDialogOpen = useCallback(
-    (document: ChecklistItemValueDocument) => {
-      setSelectedDocument(document);
+    async (document: ChecklistItemValueDocument) => {
+      if (document.documentType === DocumentType.INITIAL_REQUEST) {
+        dispatch({ type: 'START_GLOBAL_LOADING' });
+        const initialBookingRequestJson = await fetch(document.url).then(res =>
+          res.json().then(res => JSON.stringify(res)),
+        );
+        setInitialBookingRequest(
+          initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
+        );
+        setSelectedDocument(undefined);
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      } else {
+        setSelectedDocument(document);
+      }
       showCrispChat(false);
       setIsDialogOpen(true);
     },
-    [setIsDialogOpen],
+    [setIsDialogOpen, setIsDialogOpen],
   );
 
   const storageBasePath = useMemo((): string => {
@@ -357,8 +385,9 @@ const InternalStorage: React.FC<Props> = ({
             </Box>
           )}
         </Box>
-        {showComparison && selectedDocument && (
+        {showComparison && (selectedDocument || initialBookingRequest) && (
           <BookingRequestComparisonDialog
+            secondBookingRequest={initialBookingRequest}
             document={selectedDocument}
             isOpen={isDialogOpen}
             handleClose={handleDialogClose}

@@ -2,7 +2,6 @@ import {
   BookingRequest,
   BookingRequestStatusCode,
   BookingRequestStatusText,
-  commissionRelatedFreights,
   FreightDetail,
   VGMSubmittedBy,
 } from '../../model/BookingRequest';
@@ -10,7 +9,7 @@ import React, { Fragment, useContext, useMemo } from 'react';
 import useUser from '../../hooks/useUser';
 import { Box, Button, Divider, Grid, makeStyles, Theme, Typography } from '@material-ui/core';
 import omitEmptyDeep from '../../utilities/omitEmptyDeep';
-import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemModel';
+import { ChecklistItemValueDocument, DocumentType } from '../bookings/checklist/ChecklistItemModel';
 import Stepper from '@material-ui/core/Stepper';
 import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
@@ -24,7 +23,11 @@ import { saveFilesToFirestore } from '../bookings/InternalStorage';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { BookingReqFiles } from './OnlineBookingContainer';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
-import { generateCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import {
+  calculateTotal,
+  generateCommission,
+  isAgencyCommission,
+} from '../bookingRequests/BookingRequestFreightDetails';
 import { compact, flow, get, isNil, map, omitBy, set, update } from 'lodash/fp';
 import Container from '@material-ui/core/Container';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
@@ -89,7 +92,7 @@ export const getBookingRequestId = async () => {
 };
 
 export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
-  if (!schedule) return undefined;
+  if (!schedule) return null;
   if (schedule.IntermediatePortInfos.length === 0) {
     // pol - pod
     return { portOfLoading: schedule.OriginInfo, portOfDischarge: schedule.DestinationInfo };
@@ -129,7 +132,6 @@ export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
     // nothing
   }
 };
-const automaticCostUnits = ['PER CONTAINER', 'PRO CONTAINER', 'PRO TEU', 'PER TEU'];
 
 const isRelevantFreight = (
   freightDetail: FreightDetail,
@@ -156,10 +158,23 @@ const getRelevantFreightDetailsFromQuote = (quoteDetails: QuoteDetail[]) =>
       ].includes(detail.Description) && !['Inkl.', 'incl.'].includes(detail.Currency),
   );
 
-const findChargeCode = (chargeCodes: ChargeCode[], chargeId?: string) => {
+const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) => {
   if (!chargeId) return undefined;
   const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeId);
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
+};
+
+const findChargeIdByDescription = (chargeCodes: ChargeCode[], description: string): string | undefined => {
+  return chargeCodes.find(code => code.text === description)?.chargeCodeId;
+};
+
+export const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
+  let chargeCodeId = chargeId || (description && findChargeIdByDescription(chargeCodes, description));
+  if (!chargeCodeId) {
+    return description;
+  }
+  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeCodeId && code.language === 'E');
+  return chargeCode && chargeCode.text;
 };
 
 const transformFreightDetails = (
@@ -169,25 +184,30 @@ const transformFreightDetails = (
 ): FreightDetail[] =>
   freightDetails?.map((quoteDetail, index) =>
     omitBy(isNil)({
-      Anz: getQuantity(containers, quoteDetail.CostUnit),
+      Anz: getQuantity(containers, quoteDetail.CostUnit) || 1,
       SeqNr: index + 1,
-      Txt: quoteDetail.Description,
+      Txt: findChargeCodeTextInEnglish(chargeCodes, quoteDetail.ChargeID, quoteDetail.Description),
       Currency: quoteDetail.Currency,
       UnitValue: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
       Unit: quoteDetail.CostUnit,
       Group: FreightDetailGroup.EXTERNAL,
       Total: quoteDetail.CostValue && parseFloat(quoteDetail.CostValue.replaceAll(',', '')),
-      Internal1: findChargeCode(chargeCodes, quoteDetail.ChargeID),
+      Internal1: findIsChargeCodeInternal(chargeCodes, quoteDetail.ChargeID),
     }),
   ) as FreightDetail[];
 
 const recalculateQuantity = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
-) => freightDetails.map(detail => set('Anz', getQuantity(containers, detail.Unit))(detail));
+) => {
+  return freightDetails.map(detail => {
+    const newQuantity = getQuantity(containers, detail.Unit?.toUpperCase());
+    return set('Anz', newQuantity || detail.Anz || 1)(detail);
+  });
+};
 
 const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
-  switch (costUnit) {
+  switch (costUnit?.toUpperCase()) {
     case 'PRO TEU':
     case 'PER TEU':
       return containers.TEU;
@@ -195,7 +215,7 @@ const getQuantity = (containers: { TEU: number; Total: number; [key: string]: nu
     case 'PRO CONTAINER':
       return containers.Total;
     default:
-      return containers[costUnit?.split(' ')?.pop() || ''] || 1;
+      return containers[costUnit?.split(' ')?.pop() || ''] || undefined;
   }
 };
 
@@ -216,11 +236,16 @@ const updateFreightDetails = (
 export const onContainersChange = (
   containers: { TEU: number; Total: number; [key: string]: number },
   freightDetails: FreightDetail[],
-) => flow(recalculateQuantity.bind(this, containers), updateFreightDetails.bind(this, containers))(freightDetails);
-const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
+) =>
+  flow(
+    recalculateQuantity.bind(this, containers),
+    updateFreightDetails.bind(this, containers),
+    recalculateFreightDetails.bind(this),
+  )(freightDetails);
+// const checkIfPercent = (freightDetail: FreightDetail) => freightDetail.Unit?.trim() === '%';
 const recalculateFreightDetails = (freights: FreightDetail[]) =>
   freights.map(freightDetail => {
-    const total = (freightDetail.UnitValue * freightDetail.Anz) / (checkIfPercent(freightDetail) ? 100 : 1);
+    const total = calculateTotal(freightDetail);
     return set('Total', total)(freightDetail);
   });
 
@@ -259,24 +284,31 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
     const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers, chargeCodes);
     const commission = generateCommission(
       bookingRequest?.schedule,
-      freights?.find((detail: FreightDetail) => commissionRelatedFreights.includes(detail.Txt)),
       freights,
+      bookingRequest?.carrier?.id,
+      bookingRequest?.containers,
     );
-    const writableRequest = {
+    const createdAt = new Date();
+    let writableRequest = {
       ...bookingRequest,
-      createdAt: new Date(),
+      createdAt,
+      updatedAt: createdAt,
       createdBy: activityLogUserData,
       statusCode: BookingRequestStatusCode.REQUESTED,
       statusText: BookingRequestStatusText.REQUESTED,
       vgmSubmittedBy: VGMSubmittedBy.CLIENT,
-      archived: false,
       hold: false,
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
-      freightDetails: compact([...(freights?.filter(value => value.Txt !== 'Agency Commission') || []), commission]),
+      freightDetails: compact([...(freights?.filter(value => !isAgencyCommission(value)) || []), commission]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
+    // Setting assignedUser: null for filtering purposes
+    writableRequest = {
+      ...writableRequest,
+      assignedUser: null,
+    } as BookingRequest;
     setBookingRequest(
       update(
         'containers',
@@ -304,12 +336,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
         )
           .then(async docReference => {
             try {
-              const documents = (await saveFiles([
-                ...files.additional,
-                ...files.certificate,
-                ...files.imo,
-              ])) as ChecklistItemValueDocument[];
-              const values = documents.map(
+              const additional = (await saveFiles(files.additional)) as ChecklistItemValueDocument[];
+              const certificate = (await saveFiles(files.certificate)) as ChecklistItemValueDocument[];
+              const imo = (await saveFiles(files.imo)) as ChecklistItemValueDocument[];
+
+              const additionalValues = additional.map(
                 item =>
                   ({
                     uploadedBy: userRecord,
@@ -318,8 +349,34 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     url: item.url,
                     storedName: item.storedName,
                     isInternal: false,
+                    documentType: DocumentType.ADDITIONAL_DOCUMENTS,
                   } as ChecklistItemValueDocument),
               );
+              const certificateValues = certificate.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.SOC,
+                  } as ChecklistItemValueDocument),
+              );
+              const IMOValues = imo.map(
+                item =>
+                  ({
+                    uploadedBy: userRecord,
+                    uploadedAt: new Date(),
+                    name: item.name,
+                    url: item.url,
+                    storedName: item.storedName,
+                    isInternal: false,
+                    documentType: DocumentType.IMO,
+                  } as ChecklistItemValueDocument),
+              );
+              const values = [...additionalValues, ...certificateValues, ...IMOValues];
               await Promise.all(values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)));
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
@@ -345,7 +402,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       {bookingRequest && bookingRequest?.schedule && (
         <Grid container spacing={4} xs={12}>
           <Grid item xs={12} title={'General Information'}>
-            <RouteSummary route={bookingRequest?.schedule} />
+            <RouteSummary route={bookingRequest?.schedule} carrier={bookingRequest?.carrier} />
           </Grid>
           <Grid item xs={12}>
             <Divider />

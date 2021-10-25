@@ -18,6 +18,9 @@ import MuiTableRow from './MuiTableRow';
 import MuiToggleButton from './MuiToggleButton';
 import MuiTypography from './MuiTypography';
 import MuiExpansionPanelSummary from './MuiExpansionPanelSummary';
+import MuiCssBaseline from './MuiCssBaseline';
+import MuiInputLabel from './MuiInputLabel';
+import PrivateNotchedOutline from './PrivateNotchedOutline';
 
 export default {
   MuiButton,
@@ -25,8 +28,10 @@ export default {
   MuiCardContent,
   MuiCardHeader,
   MuiChip,
+  MuiCssBaseline,
   MuiIconButton,
   MuiInputBase,
+  MuiInputLabel,
   MuiLinearProgress,
   MuiListItem,
   MuiListItemIcon,
@@ -40,4 +45,5 @@ export default {
   MuiToggleButton,
   MuiTypography,
   MuiExpansionPanelSummary,
+  PrivateNotchedOutline,
 };

@@ -40,6 +40,8 @@ import RouteDeadlines from './RouteDeaadlines';
 import RouteItinerary from './RouteItinerary';
 import RouteSummary from './RouteSummary';
 import BookNowButton from '../BookNowButton';
+import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
+import { getItineraryFromSchedule } from '../onlineBooking/Summary';
 
 interface Props {
   route?: RouteSearchResult;
@@ -97,6 +99,13 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
       carriers?.find(carrier => carrier.id.toLowerCase() === carrierName),
     [carrierName, carriers],
   );
+  const vesselWithVoyage = useMemo(() => {
+    const routeItinerary = getItineraryFromSchedule(route);
+    return (
+      routeItinerary?.portOfLoading.VoyageInfo.VesselName + ' ' + routeItinerary?.portOfLoading.VoyageInfo.VoyageNr
+    );
+  }, [route]);
+  const vesselAllocation = useVesselWithVoyageById(vesselWithVoyage);
 
   const disabled = !route;
 
@@ -187,7 +196,9 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
         >
           <Grid container spacing={2}>
             <Grid item xs={10}>
-              {route && <RouteSummary route={route} />}
+              {route && (
+                <RouteSummary route={route} carrier={carrier} isFullyBooked={vesselAllocation?.isFullyBooked} />
+              )}
             </Grid>
             <Grid item xs={2} className={classes.actionBarGridItem}>
               <Box

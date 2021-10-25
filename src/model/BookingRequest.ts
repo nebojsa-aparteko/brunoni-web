@@ -43,18 +43,22 @@ export interface BookingRequest {
   statusCode: BookingRequestStatusCode;
   statusText: BookingRequestStatusText;
   schedule?: RouteSearchResult;
-  assignedUser?: UserRecordMin;
+  assignedUser: UserRecordMin | null;
   statClient?: Client | null;
   vgmSubmittedBy?: VGMSubmittedBy;
-  archived: boolean;
   hold: boolean;
   leadingCurrency?: Currency;
   isScheduleChanged?: boolean;
-  itinerary?: BookingRequestItinerary;
+  itinerary?: BookingRequestItinerary | null;
   checklistCheckedCount: number;
   checklistItemCount: number;
+  checklistCheckedCountCustomer: number;
+  checklistItemCountCustomer: number;
   pinnedCommentsCount?: number;
   bookingId?: string;
+  showWarningMessage?: boolean;
+  assignedTags?: string[];
+  isUnread?: boolean;
 }
 
 export interface BookingRequestItinerary {
@@ -79,13 +83,16 @@ export enum BookingRequestStatusText {
 }
 
 export enum ISOCodesEdiAlphacom {
-  '22G1' = '22G0',
-  '45G1' = '45G0',
-  '42G1' = '42G0',
-  '45R1' = '45R0',
+  '20G0' = '22G1',
+  '22G0' = '22G1',
+  '45G0' = '45G1',
+  '42G0' = '42G1',
+  '42R1' = '45R1',
+  '45R0' = '45R1',
 }
 
 export const BookingRequestLabels: Object = {
+  agreementNo: 'Agreement No.',
   blNumber: 'B/L-NO',
   intBlNumber: 'INTBL',
   intraRefNumber: 'INTTRA Ref.',
@@ -114,6 +121,7 @@ export interface FreightDetail {
   Invoice: string;
   SeqNr: number;
   Internal1?: boolean;
+  isManual?: boolean;
 }
 
 export const commissionRelatedFreights = ['Seafreight', 'Seefracht', 'Fret Maritime'];

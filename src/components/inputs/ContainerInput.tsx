@@ -45,7 +45,9 @@ import TariffsInput from './TariffInput';
 import BrunoniCodes from '../../model/BrunoniCodes';
 import CommodityTypeInput from './CommodityTypeInput';
 
-interface Props extends InputProps<Container & ContainerDetails> {}
+interface Props extends InputProps<Container & ContainerDetails> {
+  removeAllKindType?: boolean;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   containerFormGroup: {
@@ -180,7 +182,7 @@ const getArrayOfCorrectLength = (containerNumbers: string[] | undefined, quantit
   return newContainerNumbers.slice(undefined, quantity);
 };
 
-const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, ...rest }, ref) => {
+const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, removeAllKindType, ...rest }, ref) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
@@ -191,6 +193,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
   const [container, setContainer] = useState<Container & ContainerDetails>(value);
   const [temperatureFocused, setTemperatureFocused] = useState<boolean>(false);
+  const [temperature, setTemperature] = useState<string | undefined>(container.temperature?.toString());
   const [bookingRequest] = useBookingRequestContext();
 
   const tariffs = useCodebook({
@@ -204,6 +207,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   useEffect(() => {
     setContainer(value);
   }, [value]);
+
+  useEffect(() => {
+    setTemperature(container.temperature?.toString());
+  }, [container.temperature]);
 
   useEffect(() => {
     if (isContainerSO(container)) {
@@ -279,9 +286,14 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
     onChange(set('pickupDate', isContainerSO(container) ? undefined : v)(container));
   };
 
-  const handleWeightTextChange = (v: number | null) => {
+  const getWeight = (v: number | null) => {
     let res = v && v < 0 ? 0 : v;
     res = res && isNaN(res) ? null : res;
+    return res;
+  };
+
+  const handleWeightTextChange = (v: number | null) => {
+    const res = getWeight(v);
     setContainer(set('weight', res)(container));
     onChange(set('weight', v)(container));
   };
@@ -392,7 +404,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             onChange={handleCommodityTypeChange}
             value={container.commodityType!}
             margin="dense"
-            freeSolo={true}
+            freeSolo={get('commodityFreeSolo')(rest)}
+            removeAllKindType={removeAllKindType}
             inputRef={commodityTypeInput}
           />
         </Grid>
@@ -428,12 +441,12 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             )}
             <Grid item md={2} xs={12}>
               <TextField
-                label="Weight (Kg)"
+                label="Total Weight (Kg)"
                 type="number"
                 margin="dense"
                 variant="outlined"
                 fullWidth
-                value={container.weight || null}
+                value={container.weight || ''}
                 onChange={event =>
                   handleWeightTextChange(event.target.value === '' ? null : parseInt(event.target.value))
                 }
@@ -445,14 +458,17 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 <Grid item md={2} xs={12}>
                   <TextField
                     label="Temperature (°C)"
-                    type="number"
+                    inputProps={{ pattern: '/\\d+|-\\d+/g' }}
                     margin="dense"
                     variant="outlined"
                     fullWidth
-                    value={container.temperature}
-                    onChange={event => handleTemperatureChange(parseInt(event.target.value))}
+                    value={temperature || ''}
+                    onChange={event => setTemperature(event.target.value.replace(/[^0-9.\-]$/, ''))}
                     onFocus={() => setTemperatureFocused(true)}
-                    onBlur={() => setTemperatureFocused(false)}
+                    onBlur={event => {
+                      handleTemperatureChange(event.target.value === '-' ? null : parseInt(event.target.value));
+                      setTemperatureFocused(false);
+                    }}
                     helperText={
                       !temperatureFocused && container.temperature && container.temperature < 0
                         ? 'Below zero °C'
@@ -461,8 +477,8 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="start">
-                          {container.temperature ? (
-                            container.temperature < 0 ? (
+                          {temperature && temperature !== '-' ? (
+                            parseInt(temperature) < 0 ? (
                               <AcUnitIcon htmlColor={'#8bddff'} />
                             ) : (
                               <WbSunnyIcon htmlColor={'#ffd904'} />
@@ -489,92 +505,96 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 </Grid>
               </React.Fragment>
             )}
-            <React.Fragment>
-              {!isContainerSO(container) && isAdmin && (
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.pickupReference || ''}
-                    onChange={event =>
-                      handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
-                    }
-                    onBlur={event => handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)}
-                  />
-                </Grid>
-              )}
-              {isAdmin && (
-                <Grid item md={3} xs={12}>
-                  <TextField
-                    label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.deliveryReference || ''}
-                    onChange={event =>
-                      handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
-                    }
-                    onBlur={event =>
-                      handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
-                    }
-                  />
-                </Grid>
-              )}
-              {isAdmin && (
-                <Grid item md={3} xs={12} style={{ display: 'flex' }}>
-                  <TextField
-                    label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
-                    margin="dense"
-                    variant="outlined"
-                    fullWidth
-                    value={container.vgmPin || ''}
-                    onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
-                    onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
-                  />
-                  <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
-                    {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
-                  </IconButton>
-                </Grid>
-              )}
-              {isContainerSO(container) && container.quantity > 0
-                ? getContainerNumberInputs(container, handleChangeContainerNumbers)
-                : null}
-              {tariffs && tariffs.demurrage && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangeDemDetTariffs}
-                    availableTariffs={tariffs.demurrage}
-                    tariffs={container.demDetTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-              {tariffs && tariffs.storage && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Storage tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangeStorageTariffs}
-                    availableTariffs={tariffs.storage}
-                    tariffs={container.storageTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-              {tariffs && tariffs.plugin && isAdmin && (
-                <Grid item md={12} xs={12}>
-                  <Typography style={{ fontWeight: 700 }}>Plug-in tariffs</Typography>
-                  <TariffsInput
-                    handleChange={handleChangePluginTariffs}
-                    availableTariffs={tariffs.plugin}
-                    tariffs={container.pluginTariffs}
-                    margin="dense"
-                  />
-                </Grid>
-              )}
-            </React.Fragment>
+            {!get('showLessDetailedInput')(rest) && (
+              <React.Fragment>
+                {!isContainerSO(container) && isAdmin && (
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      label={linkedReferences ? 'Pickup Reference (Linked)' : 'Pickup Reference'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.pickupReference || ''}
+                      onChange={event =>
+                        handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                      }
+                      onBlur={event =>
+                        handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)
+                      }
+                    />
+                  </Grid>
+                )}
+                {isAdmin && (
+                  <Grid item md={3} xs={12}>
+                    <TextField
+                      label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.deliveryReference || ''}
+                      onChange={event =>
+                        handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                      }
+                      onBlur={event =>
+                        handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
+                      }
+                    />
+                  </Grid>
+                )}
+                {isAdmin && (
+                  <Grid item md={3} xs={12} style={{ display: 'flex' }}>
+                    <TextField
+                      label={linkedReferences ? 'VGM Pin (Linked)' : 'VGM Pin'}
+                      margin="dense"
+                      variant="outlined"
+                      fullWidth
+                      value={container.vgmPin || ''}
+                      onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
+                      onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
+                    />
+                    <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
+                      {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
+                    </IconButton>
+                  </Grid>
+                )}
+                {isContainerSO(container) && container.quantity > 0
+                  ? getContainerNumberInputs(container, handleChangeContainerNumbers)
+                  : null}
+                {tariffs && tariffs.demurrage && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Dem./Det. tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeDemDetTariffs}
+                      availableTariffs={tariffs.demurrage}
+                      tariffs={container.demDetTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.storage && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Storage tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangeStorageTariffs}
+                      availableTariffs={tariffs.storage}
+                      tariffs={container.storageTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+                {tariffs && tariffs.plugin && isAdmin && (
+                  <Grid item md={12} xs={12}>
+                    <Typography style={{ fontWeight: 700 }}>Plug-in tariffs</Typography>
+                    <TariffsInput
+                      handleChange={handleChangePluginTariffs}
+                      availableTariffs={tariffs.plugin}
+                      tariffs={container.pluginTariffs}
+                      margin="dense"
+                    />
+                  </Grid>
+                )}
+              </React.Fragment>
+            )}
           </>
         )}
       </Grid>

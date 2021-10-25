@@ -10,7 +10,7 @@ import Ports from '../../contexts/Ports';
 import Port from '../../model/Port';
 import Client from '../../model/Client';
 import UserInput from '../inputs/UserInput';
-import UserRecord from '../../model/UserRecord';
+import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import set from 'lodash/fp/set';
 import Carrier from '../../model/Carrier';
@@ -21,6 +21,7 @@ import Tags from '../../contexts/Tags';
 import { Tag } from '../../model/Tag';
 import ExistingTagsMultiInput from '../inputs/ExistingTagsMultiInput';
 import asArray from '../../utilities/asArray';
+import ActingAs from '../../contexts/ActingAs';
 
 interface Props {
   filters: any;
@@ -45,11 +46,19 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const carriers = useContext(Carriers);
   const tags = useContext(Tags);
   const user = useUser()[1];
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
+  const [, userRecord] = useUser();
 
-  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const availableCarriers = useMemo(
+    () =>
+      isAdmin && !isSuperAdmin(userRecord)
+        ? user
+          ? carriers?.filter(carrier => user.carriers?.includes(carrier.id))
+          : []
+        : carriers,
+    [user, carriers],
+  );
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 

@@ -1,40 +1,57 @@
-import React, { forwardRef, ForwardRefRenderFunction, useCallback, useImperativeHandle, useState } from 'react';
-import { Menu, MenuItem } from '@material-ui/core';
+import React from 'react';
+import { IconButton, ListItemText, Menu, MenuItem, Tooltip } from '@material-ui/core';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 
-const DropdownMenu: ForwardRefRenderFunction<any, Props> = ({ items }, ref) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleClose = useCallback(() => {
-    setAnchorEl(null);
-  }, []);
-  useImperativeHandle(ref, () => ({
-    openMenu(event: any) {
-      setAnchorEl(event.currentTarget);
-    },
-  }));
+export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
+  items,
+  toolTip = 'More',
+  dropDownIcon = <MoreVertIcon />,
+  onClose,
+}) => {
+  const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const onMoreButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setMoreAnchorEl(null);
+    if (onClose) onClose();
+  };
+
   return (
-    <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-      {items.map((item, index) => (
-        <MenuItem
-          key={index}
-          onClick={() => {
-            item.onClick();
-            handleClose();
-          }}
-        >
-          {item.label}
-        </MenuItem>
-      ))}
-    </Menu>
+    <>
+      <Tooltip title={toolTip} placement={'top'}>
+        <IconButton size="small" aria-label="actions" onClick={onMoreButtonClick}>
+          {dropDownIcon}
+        </IconButton>
+      </Tooltip>
+      <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
+        {items.map((item, i) => {
+          return (
+            <MenuItem onClick={item.onClick} key={i}>
+              {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
+              <ListItemText primary={item.label} />
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </>
   );
 };
 
-export default forwardRef(DropdownMenu);
-
-interface Props {
-  items: MenuItemProps[];
+interface WithItemsProps {
+  items: MenuWithItemsProps[];
+  dropDownIcon?: React.ReactNode;
+  toolTip?: string;
+  onClose?: () => void;
 }
 
-interface MenuItemProps {
+interface MenuWithItemsProps {
   onClick: () => void;
   label: string;
+  icon?: React.ReactNode;
 }

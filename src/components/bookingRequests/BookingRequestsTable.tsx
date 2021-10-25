@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -24,7 +24,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import { BookingRequest } from '../../model/BookingRequest';
+import { BookingRequest, BookingRequestItinerary } from '../../model/BookingRequest';
 import Avatar from 'react-avatar';
 import { useHistory } from 'react-router';
 import CloseIcon from '@material-ui/icons/Close';
@@ -32,13 +32,14 @@ import BookingRequestChecklistContent from './checklist/BookingRequestChecklistC
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
-import VesselAllocationButton from '../VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
+import { getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
-import useFirestoreCollection from '../../hooks/useFirestoreCollection';
-import { Tag, TagCategory } from '../../model/Tag';
+import ActingAs from '../../contexts/ActingAs';
+import Tags from '../../contexts/Tags';
+import { ItineraryItem } from '../../model/route-search/RouteSearchResults';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -128,7 +129,7 @@ interface BookingRequestRowProps {
   onProgressClick?: any;
 }
 
-const StyledTableRow = withStyles((theme: Theme) =>
+export const StyledTableRow = withStyles((theme: Theme) =>
   createStyles({
     root: {
       cursor: 'pointer',
@@ -161,21 +162,31 @@ interface ShipmentProgressProps {
 
 export const BookingRequestProgress: React.FC<ShipmentProgressProps> = ({ bookingRequest }) => {
   const classes = useStyles();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const { checklistItemCount, checklistCheckedCount } = bookingRequest;
+  const { checklistItemCountCustomer, checklistCheckedCountCustomer } = bookingRequest;
+
+  const getProgress = () => {
+    let bar: string;
+    let count: string;
+    if (isAdmin) {
+      bar = `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%`;
+      count = `${checklistCheckedCount || 0}/${checklistItemCount || 1}`;
+    } else {
+      bar = `${((checklistCheckedCountCustomer || 0) / (checklistItemCountCustomer || 1)) * 100}%`;
+      count = `${checklistCheckedCountCustomer || 0}/${checklistItemCountCustomer || 1}`;
+    }
+    return [bar, count];
+  };
 
   return (
     <div>
       <div className={classes.progress}>
-        <div
-          className={classes.progressBar}
-          role="progressbar"
-          style={{ width: `${((checklistCheckedCount || 0) / (checklistItemCount || 1)) * 100}%` }}
-        />
+        <div className={classes.progressBar} role="progressbar" style={{ width: getProgress()[0] }} />
       </div>
-      <Typography variant="subtitle2">
-        {checklistCheckedCount || 0}/{checklistItemCount || 1}
-      </Typography>
+      <Typography variant="subtitle2">{getProgress()[1]}</Typography>
     </div>
   );
 };
@@ -207,6 +218,38 @@ export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
   );
 };
 
+export const getOriginPort = (itinerary: BookingRequestItinerary | null | undefined) => {
+  return itinerary
+    ? ((itinerary?.placeOfReceipt ? itinerary.placeOfReceipt : itinerary?.portOfLoading && itinerary.portOfLoading) as
+        | ItineraryItem
+        | undefined)
+    : undefined;
+};
+
+export const getDestinationPort = (itinerary: BookingRequestItinerary | null | undefined) => {
+  return itinerary
+    ? ((itinerary?.finalDestinationPort
+        ? itinerary.finalDestinationPort
+        : itinerary?.portOfDischarge && itinerary.portOfDischarge) as ItineraryItem | undefined)
+    : undefined;
+};
+
+export const showDeliveryRef = (bookingRequest: BookingRequest) => {
+  if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference)) return null;
+  return (
+    <Box display={'flex'} alignItems={'flex-end'} mr={'auto'} ml={'1.5em'}>
+      <Typography style={{ marginRight: '.5em' }} variant={'body2'}>
+        {bookingRequest.containers.length > 1 ? 'Delivery Refs.' : 'Delivery Ref.'}
+      </Typography>
+      {bookingRequest.containers?.map((c, i) => (
+        <Typography key={i} variant={'body2'} style={{ marginRight: '.2em' }}>
+          {i === bookingRequest.containers!.length - 1 ? c.deliveryReference : c.deliveryReference + ' / '}
+        </Typography>
+      ))}
+    </Box>
+  );
+};
+
 export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   isAdmin,
   bookingRequest,
@@ -217,23 +260,23 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
+  const availableTags = useContext(Tags);
+  const [tags, setTags] = useState(
+    availableTags &&
+      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+  );
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
+
   const [, userRecord] = useUser();
 
-  const tags = useFirestoreCollection(
-    'bookings-requests',
-    useCallback(
-      query => {
-        const queryByCategory = isAdmin ? query : query.where('category', '==', TagCategory.BOOKING);
-        return queryByCategory.orderBy('createdAt', 'asc');
-      },
-      [isAdmin],
-    ),
-    bookingRequest.id,
-    'tags-booking-request',
-  )?.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Tag[];
+  useEffect(
+    () =>
+      setTags(
+        availableTags &&
+          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      ),
+    [availableTags, bookingRequest.assignedTags],
+  );
 
   const handleRowClick = useCallback(
     (id: string) => {
@@ -251,7 +294,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
       style={{
         position: 'relative',
         display: 'flex',
-        backgroundColor: !bookingRequest.assignedUser && 'rgba(161,213,255,0.1)',
+        backgroundColor: bookingRequest.isUnread ? 'rgba(161,213,255,0.25)' : undefined,
+        border: !bookingRequest.assignedUser && '2px solid #00b0ff',
+        borderRadius: !bookingRequest.assignedUser && '7px',
       }}
     >
       <Box style={{ position: 'absolute', right: 28, left: 'auto' }}>
@@ -271,6 +316,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <span className={classes.tableRowHeader}>
               <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
             </span>
+            {bookingRequest && showDeliveryRef(bookingRequest)}
             {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
           </Box>
         </Grid>
@@ -305,19 +351,24 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            {bookingRequest.vessel && (
+            {(bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName ||
+              bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr) && (
               <Grid item container md={3} xs={12} direction={'row'}>
                 <Grid item>
                   <InfoBoxItem
                     title="Vessel"
-                    label1={bookingRequest.vessel ? bookingRequest.vessel.toUpperCase() : ''}
-                    label2={bookingRequest.voyage ? bookingRequest.voyage.toUpperCase() : ''}
+                    label1={bookingRequest.itinerary?.portOfLoading.VoyageInfo.VesselName}
+                    label2={bookingRequest.itinerary?.portOfLoading.VoyageInfo.VoyageNr}
                     gutterBottom
                   />
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                    <VesselAllocationButton
+                      vesselVoyage={vesselVoyage}
+                      service={bookingRequest?.schedule?.Service}
+                      bookingRequest={bookingRequest}
+                    />
                   </Grid>
                 )}
               </Grid>
@@ -361,7 +412,17 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />
             </Grid>
             <Grid item md={2} xs={12}>
-              <InfoBoxItem title="Quote Number" label1={bookingRequest.quoteNumber || '-'} gutterBottom />
+              <InfoBoxItem
+                title={
+                  bookingRequest.quoteNumber
+                    ? 'Quote Number'
+                    : bookingRequest.agreementNo
+                    ? 'Agreement No.'
+                    : 'Quote Number'
+                }
+                label1={bookingRequest.quoteNumber ? bookingRequest.quoteNumber : bookingRequest.agreementNo || '-'}
+                gutterBottom
+              />
             </Grid>
             <Grid item md={3} xs={12}>
               <InfoBoxItem
@@ -375,15 +436,12 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={ChevronRightIcon}
                   title="Origin"
-                  label1={bookingRequest.origin?.city + ', ' + bookingRequest.origin?.country}
-                  label2={
-                    bookingRequest.itinerary &&
-                    `ETS: ${
-                      bookingRequest.itinerary.placeOfReceipt
-                        ? bookingRequest.itinerary.placeOfReceipt.DepartureDate
-                        : bookingRequest.itinerary.portOfLoading && bookingRequest.itinerary.portOfLoading.DepartureDate
-                    }`
+                  label1={
+                    getOriginPort(bookingRequest.itinerary)?.Port.HarbourName +
+                    ', ' +
+                    getOriginPort(bookingRequest.itinerary)?.Port.Land
                   }
+                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`}
                   gutterBottom
                 />
               </Grid>
@@ -391,15 +449,13 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 <InfoBoxItem
                   IconComponent={LastPageIcon}
                   title="Destination"
-                  label1={bookingRequest.destination?.city + ', ' + bookingRequest.destination?.country}
+                  label1={
+                    getDestinationPort(bookingRequest.itinerary)?.Port.HarbourName +
+                    ', ' +
+                    getDestinationPort(bookingRequest.itinerary)?.Port.Land
+                  }
                   label2={
-                    bookingRequest.itinerary &&
-                    `ETA: ${
-                      bookingRequest.itinerary.finalDestinationPort
-                        ? bookingRequest.itinerary.finalDestinationPort.ArrivalDate
-                        : bookingRequest.itinerary.portOfDischarge &&
-                          bookingRequest.itinerary.portOfDischarge.ArrivalDate
-                    }`
+                    bookingRequest.itinerary && `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
                   }
                   gutterBottom
                 />
@@ -408,17 +464,19 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <Grid item md={2} xs={12}>
               <InfoBoxItem
                 title="Created On"
-                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy') : ''}
+                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm') : ''}
                 gutterBottom
               />
             </Grid>
-            <Grid item md={1} xs={12}>
-              <InfoBoxItem
-                title="Last updated"
-                label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
-                gutterBottom
-              />
-            </Grid>
+            {bookingRequest.updatedAt && (
+              <Grid item md={1} xs={12}>
+                <InfoBoxItem
+                  title="Last updated"
+                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  gutterBottom
+                />
+              </Grid>
+            )}
             {isDashboardUser(userRecord) &&
               bookingRequest.pinnedCommentsCount &&
               bookingRequest.pinnedCommentsCount > 0 && (

@@ -12,7 +12,7 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
   return (
     <Grid container spacing={2}>
       {containers.map(container => (
-        <Grid item md={6} key={container}>
+        <Grid item md={6} key={container} lg={12}>
           <Box display="flex" alignItems="center" mb={2}>
             <Box mr={2}>
               <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
@@ -74,7 +74,7 @@ const ContainersList: React.FC<Props> = ({ containers }) => {
                   {container.containerType &&
                     container.containerType?.description &&
                     container.containerType?.description.includes('S.O.') &&
-                    'Container is shipper owned'}
+                    'Container is shipper owned '}
                   {container.imo &&
                     container.imo?.[0] &&
                     container.imo?.[1]?.map(

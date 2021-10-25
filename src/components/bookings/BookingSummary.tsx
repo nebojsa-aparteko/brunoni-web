@@ -6,6 +6,7 @@ import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import UserRecord from '../../model/UserRecord';
 import { useClientById } from '../../hooks/useClient';
+import { Link } from 'react-router-dom';
 
 interface Props {
   booking: Booking;
@@ -124,9 +125,9 @@ const TableRowData: React.FC<TableRowProps> = ({ label, content }) => {
 const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
   const classes = useStyles();
   const client = useClientById(booking.ForwAdrId);
+  const statClient = useClientById(booking.StatClient);
   const forwarder = useUserByAlphacomId(booking.ForwPersID);
   const clientInfo = useMemo(() => {
-    console.log(forwarder);
     if (!client) {
       return `${booking.ForwAdrName || ''} ${booking.ForwAdrCity} (${booking.ForwAdrId})`;
     }
@@ -135,6 +136,15 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
       <Fragment>
         {client.name}, {client.city}
         <ClientDetails forwarder={forwarder} forwarderText={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
+      </Fragment>
+    );
+  }, [client, booking, forwarder]);
+
+  const statClientInfo = useMemo(() => {
+    if (!statClient) return null;
+    return (
+      <Fragment>
+        {statClient.name}, {statClient.city}
       </Fragment>
     );
   }, [client, booking, forwarder]);
@@ -203,7 +213,32 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
                 </Paper>
               </TableCell>
             </TableRow>
+            {(booking.RebookedToFile || booking.RebookedFromFile) && (
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>
+                  Rebooked {booking.RebookedToFile ? 'to' : 'from'}
+                </TableCell>
+                <TableCell className={classes.tableCell}>
+                  <Link
+                    to={`/bookings/${booking.RebookedToFile ? booking.RebookedToFile : booking.RebookedFromFile}`}
+                    target="_blank"
+                  >
+                    {booking.RebookedToFile ? booking.RebookedToFile : booking.RebookedFromFile}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRowData label={'B/L-NO'} content={booking['BL-No']} />
+            {booking.requestId && (
+              <TableRow>
+                <TableCell className={classes.tableCellLabel}>Request</TableCell>
+                <TableCell className={classes.tableCell}>
+                  <Link to={`/booking-requests/${booking.requestId}`} target="_blank">
+                    {booking.requestId}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow>
               <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
               <TableCell className={classes.tableCell}>
@@ -220,6 +255,12 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
               <TableCell className={classes.tableCellLabel}>Client</TableCell>
               <TableCell className={classes.tableCell}>{clientInfo}</TableCell>
             </TableRow>
+            {statClientInfo && (
+              <TableRow className={classes.tableRow}>
+                <TableCell className={classes.tableCellLabel}>Statistical Client</TableCell>
+                <TableCell className={classes.tableCell}>{statClientInfo}</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Grid>

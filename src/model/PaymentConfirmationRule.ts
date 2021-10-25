@@ -21,7 +21,8 @@ export interface CarrierSettingsRule extends PaymentConfirmation {
 }
 export interface CustomerSettingsRule extends PaymentConfirmation {
   contact: string[];
-  category: BookingCategory[];
+  category: BookingCategory;
+  // category: BookingCategory[];
   client: Client;
   statisticClient: Client;
   type: PaymentConfirmationType.CUSTOMER_SETTINGS;

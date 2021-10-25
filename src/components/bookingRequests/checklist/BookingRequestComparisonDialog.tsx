@@ -1,9 +1,37 @@
-import { Dialog, DialogContent, DialogTitle, Grid, IconButton, makeStyles, Typography } from '@material-ui/core';
-import React from 'react';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  makeStyles,
+  Paper,
+  TextField,
+  Typography,
+} from '@material-ui/core';
+import React, { useEffect } from 'react';
 import { ChecklistItemValueDocument } from '../../bookings/checklist/ChecklistItemModel';
 import CloseIcon from '@material-ui/icons/Close';
-import BookingRequestViewMainContent from '../BookingRequestViewMainContent';
+import BookingRequestViewMainContent, { remark } from '../BookingRequestViewMainContent';
 import { renderDocument } from '../../bookings/documentApproval/ComparisonDialogContent';
+import { BookingRequest } from '../../../model/BookingRequest';
+import BookingRequestProvider, { useBookingRequestContext } from '../../../providers/BookingRequestProvider';
+import Page from '../../bookings/Page';
+import { getBookingRequestTitle } from '../BookingRequestView';
+import SimpleExpansionPanel from '../../SimpleExpansionPanel';
+import BookingRequestSummary from '../BookingRequestSummary';
+import ContainerDetails from '../../onlineBooking/ContainerDetails';
+import BookingRequestPortTerms from '../BookingRequestPortTerms';
+import BookingRequestClosings from '../BookingRequestClosings';
+import BookingRequestSpecialRemarks from '../BookingRequestSpecialRemarks';
+import BookingRequestFreightDetails from '../BookingRequestFreightDetails';
+import theme from '../../../theme';
+import { isDashboardUser } from '../../../model/UserRecord';
+import useUser from '../../../hooks/useUser';
+import EditButton from '../../EditButton';
+import useBookingRequest from '../../../hooks/useBookingRequest';
 
 const useStyles = makeStyles(() => ({
   dialogPaper: {
@@ -17,6 +45,8 @@ const useStyles = makeStyles(() => ({
   },
   fileNumber: {
     alignSelf: 'baseline',
+    margin: theme.spacing(2),
+    marginBottom: '0px',
   },
   closeModal: {
     position: 'absolute',
@@ -36,13 +66,81 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     overflow: 'scroll',
   },
+  remark: {
+    whiteSpace: 'pre-wrap',
+    marginTop: 8,
+  },
 }));
 
-interface ContentProps {
-  document: ChecklistItemValueDocument;
+const BookingRequestRepresentation: React.FC<BookingRequestRepresentationProps> = ({
+  bookingRequest,
+  isPrintWithCost,
+  showWarningMessage,
+}) => {
+  const classes = useStyles();
+
+  const [bookingRequestState, setBookingRequestState] = useBookingRequestContext();
+
+  useEffect(() => {
+    bookingRequest && setBookingRequestState(bookingRequest);
+  }, [bookingRequest]);
+
+  return bookingRequestState ? (
+    <Page title={getBookingRequestTitle(bookingRequestState)}>
+      <SimpleExpansionPanel label={'Booking Request Summary'} defaultExpanded={true}>
+        <BookingRequestSummary editing={false} />
+      </SimpleExpansionPanel>
+      <SimpleExpansionPanel label={'Cargo Details'} defaultExpanded={true}>
+        {bookingRequestState.containers && (
+          <>
+            <Box marginTop="2em" marginBottom="2em">
+              <Divider />
+            </Box>
+            <ContainerDetails
+              containers={bookingRequestState.containers}
+              bookingRequest={bookingRequestState}
+              setBookingRequest={setBookingRequestState}
+              editing={false}
+            />
+          </>
+        )}
+      </SimpleExpansionPanel>
+      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'} defaultExpanded={true}>
+        <Box flex={1} display="flex" flexDirection="column">
+          <BookingRequestPortTerms />
+
+          <BookingRequestClosings />
+
+          <BookingRequestSpecialRemarks />
+        </Box>
+      </SimpleExpansionPanel>
+
+      <Box marginTop="2em" marginBottom="2em">
+        <Divider />
+      </Box>
+      <BookingRequestFreightDetails
+        freightDetails={bookingRequestState.freightDetails}
+        showWarningMessage={showWarningMessage}
+      />
+      <Typography variant="body2" className={classes.remark}>
+        {remark}
+      </Typography>
+    </Page>
+  ) : null;
+};
+
+interface BookingRequestRepresentationProps {
+  bookingRequest: BookingRequest;
+  isPrintWithCost: boolean;
+  showWarningMessage?: boolean;
 }
 
-const ComparisonDialogContent = ({ document }: ContentProps) => {
+interface ContentProps {
+  document?: ChecklistItemValueDocument;
+  secondBookingRequest?: BookingRequest;
+}
+
+const ComparisonDialogContent = ({ document, secondBookingRequest }: ContentProps) => {
   const classes = useStyles();
 
   return (
@@ -61,27 +159,60 @@ const ComparisonDialogContent = ({ document }: ContentProps) => {
           style={{ flex: 1, overflow: 'hidden', width: '100%', minHeight: 0 }}
         >
           <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
-            <BookingRequestViewMainContent isPrintWithCost={false} />
+            <Box component={Paper} display={'column'}>
+              <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                Current Booking Request
+              </Typography>
+              <BookingRequestViewMainContent isPrintWithCost={false} />
+            </Box>
           </Grid>
 
-          <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
-            {renderDocument(
-              document,
-              document?.name
-                .split('.')
-                .pop()
-                ?.toLowerCase(),
-              'rightDocumentContainer',
-            )}
-          </Grid>
+          {document && (
+            <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
+              <Box component={Paper} display={'column'}>
+                <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                  File
+                </Typography>
+                {renderDocument(
+                  document,
+                  document?.name
+                    .split('.')
+                    .pop()
+                    ?.toLowerCase(),
+                  'rightDocumentContainer',
+                )}
+              </Box>
+            </Grid>
+          )}
+          {!document && secondBookingRequest && (
+            <Grid item xs={12} md={6} className={classes.bookingViewContainer}>
+              <BookingRequestProvider>
+                <Box component={Paper} display={'column'}>
+                  <Typography variant={'h3'} style={{ margin: '.5em' }}>
+                    Initial Booking Request
+                  </Typography>
+                  <BookingRequestRepresentation bookingRequest={secondBookingRequest} isPrintWithCost={false} />
+                </Box>
+              </BookingRequestProvider>
+            </Grid>
+          )}
         </Grid>
       </Grid>
     </Grid>
   );
 };
 
-const BookingRequestComparisonDialog: React.FC<Props> = ({ document, isOpen, bookingRequestId, handleClose }) => {
+const BookingRequestComparisonDialog: React.FC<Props> = ({
+  document,
+  secondBookingRequest,
+  isOpen,
+  bookingRequestId,
+  handleClose,
+}) => {
   const classes = useStyles();
+  const userRecord = useUser()[1];
+  const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
+  const { br } = useBookingRequest(bookingRequestId);
 
   return (
     <Dialog
@@ -98,13 +229,43 @@ const BookingRequestComparisonDialog: React.FC<Props> = ({ document, isOpen, boo
         className={classes.dialogTitleBar}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}
       >
-        <Typography variant="h4" className={classes.fileNumber}>{`File No: ${bookingRequestId}`}</Typography>
+        <Box display={'flex'} alignItems={'flex-end'}>
+          <Box display={'flex'} alignItems={'center'}>
+            <Typography variant="h4" className={classes.fileNumber}>{`File No: ${bookingRequestId}`}</Typography>
+            {editing && isDashboardUser(userRecord) ? (
+              <TextField
+                defaultValue={''}
+                label="Agreement No."
+                margin="dense"
+                variant="outlined"
+                value={bookingRequestState.agreementNo}
+                onChange={e =>
+                  setBookingRequestState(prev => ({
+                    ...prev,
+                    agreementNo: e.target.value,
+                  }))
+                }
+                autoFocus
+                className={classes.fileNumber}
+              />
+            ) : (
+              <Typography variant={'h4'} className={classes.fileNumber}>
+                {bookingRequestState.agreementNo !== ''
+                  ? 'Agreement No. ' + bookingRequestState.agreementNo
+                  : 'Agreement No. [To be assigned]'}
+              </Typography>
+            )}
+          </Box>
+          <Box display={'flex'} alignItems={'center'}>
+            <EditButton bookingRequest={br} />
+          </Box>
+        </Box>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
-        <ComparisonDialogContent document={document} />
+        <ComparisonDialogContent document={document} secondBookingRequest={secondBookingRequest} />
       </DialogContent>
     </Dialog>
   );
@@ -113,7 +274,8 @@ const BookingRequestComparisonDialog: React.FC<Props> = ({ document, isOpen, boo
 export default BookingRequestComparisonDialog;
 
 interface Props {
-  document: ChecklistItemValueDocument;
+  document?: ChecklistItemValueDocument;
+  secondBookingRequest?: BookingRequest;
   isOpen: boolean;
   handleClose: () => void;
   bookingRequestId: string;
