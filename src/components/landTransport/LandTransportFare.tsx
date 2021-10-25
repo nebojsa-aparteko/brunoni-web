@@ -53,7 +53,8 @@ const LandTransportFare: React.FC<SegmentsEntity> = props => {
 
 const FareHeader: React.FC = () => {
   return (
-    <Box display={'flex'} justifyContent={'flex-end'}>
+    <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+      <Typography variant={'h4'}>Hamburg Süd</Typography>
       <Box>
         <Alert icon={null} color={'success'}>
           <AlertTitle>{'CHEAPEST'}</AlertTitle>
@@ -121,7 +122,7 @@ const FareFooter: React.FC<SegmentsEntity> = ({
         </Typography>
         <Typography variant={'h4'}>{rate || '1000'}€</Typography>
       </Box>
-      <Typography variant={'h4'}>Hamburg Süd</Typography>
+      <Typography variant={'h4'}>Truck</Typography>
       <Button style={{ margin: '.5em' }} color="primary" variant="contained" onClick={() => console.log('clicked')}>
         Book now
       </Button>
