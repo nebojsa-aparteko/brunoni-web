@@ -58,7 +58,7 @@ const useAntiTrust = async () => {
   const isAdmin = !actingAs;
   const normalize = useNormalizeQuote();
 
-  if (!userRecord || !userRecord.alphacomClientId || !isAdmin) return;
+  if (!userRecord || !userRecord.alphacomClientId || isAdmin) return;
 
   const { location } = history;
   const { pathname } = location;
