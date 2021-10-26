@@ -64,6 +64,7 @@ import { useHistory } from 'react-router';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import BookNowButton from './BookNowButton';
+import ActingAs from '../contexts/ActingAs';
 
 interface Props {
   id: string;
@@ -207,6 +208,8 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const history = useHistory();
   const [, userRecord] = useUser();
+  const [actingAs] = useContext(ActingAs);
+  const isAdmin = !actingAs;
 
   const containerTypes = useContext(ContainerTypes);
   const commodityTypes = useContext(CommodityTypes);
@@ -219,7 +222,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
     useCallback(
       q => {
         q = q.where('groupId', '==', id);
-        if (isSuperAdmin(userRecord)) {
+        if (isSuperAdmin(userRecord) || !isAdmin) {
           return q;
         }
         return q.where(

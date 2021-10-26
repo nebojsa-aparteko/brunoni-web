@@ -28,14 +28,17 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
   const carriers = useContext(Carriers);
+  const isAdmin = !actingAs;
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [filters, setFilters] = useState<QuoteContextFilters>(defaultFilters);
   const [availableCarriers, setAvailableCarriers] = useState(
-    carriers && userRecord.carriers
-      ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
-      : [],
+    isAdmin
+      ? carriers && userRecord.carriers
+        ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
+        : []
+      : carriers,
   );
 
   const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(undefined);
@@ -70,7 +73,7 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       if (actingAs && userRecord?.alphacomClientId) {
         query = collection.where('clientId', '==', userRecord!.alphacomClientId);
       }
-      if (!!availableCarriers && availableCarriers.length > 0 && !isSuperAdmin(userRecord)) {
+      if (!!availableCarriers && availableCarriers.length > 0 && !isSuperAdmin(userRecord) && isAdmin) {
         query = (query || collection).where('carrier', 'in', availableCarriers);
       }
 
