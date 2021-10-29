@@ -333,17 +333,19 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                   gutterBottom
                 />
               </Grid>
-              <Grid item style={{ width: '30%' }}>
-                <InfoBoxItem
-                  title="Progress"
-                  label1={
-                    <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
-                      <ShipmentProgress booking={booking!} />
-                    </Box>
-                  }
-                  gutterBottom
-                />
-              </Grid>
+              {onProgressClick && (
+                <Grid item style={{ width: '30%' }}>
+                  <InfoBoxItem
+                    title="Progress"
+                    label1={
+                      <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
+                        <ShipmentProgress booking={booking!} />
+                      </Box>
+                    }
+                    gutterBottom
+                  />
+                </Grid>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Divider style={{ paddingTop: '0px', paddingBottom: '0px' }} />

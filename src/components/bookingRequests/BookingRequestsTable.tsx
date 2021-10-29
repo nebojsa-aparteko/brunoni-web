@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import inttraLogo from '../../assets/inttra-vector-logo.svg';
 import {
   Box,
@@ -32,8 +32,8 @@ import BookingRequestChecklistContent from './checklist/BookingRequestChecklistC
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import { isDashboardUser } from '../../model/UserRecord';
-import VesselAllocationButton from '../VesselAllocationButton';
-import { getVoyageInfo } from './BookingRequestView';
+import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
+import { getVoyageInfoFromBookingRequest } from './BookingRequestView';
 import useUser from '../../hooks/useUser';
 import PinnedCommentsButton from './PinnedCommentsButton';
 import TagsPreviewList from '../tags/TagsPreviewList';
@@ -265,6 +265,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     availableTags &&
       availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
   );
+  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
 
   const [, userRecord] = useUser();
 
@@ -363,7 +364,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 </Grid>
                 {isDashboardUser(userRecord) && (
                   <Grid item style={{ display: 'flex', alignItems: 'center' }}>
-                    <VesselAllocationButton vesselVoyage={getVoyageInfo(bookingRequest.schedule)} />
+                    <VesselAllocationButton
+                      vesselVoyage={vesselVoyage}
+                      service={bookingRequest?.schedule?.Service}
+                      bookingRequest={bookingRequest}
+                    />
                   </Grid>
                 )}
               </Grid>
@@ -463,13 +468,15 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                 gutterBottom
               />
             </Grid>
-            <Grid item md={1} xs={12}>
-              <InfoBoxItem
-                title="Last updated"
-                label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
-                gutterBottom
-              />
-            </Grid>
+            {bookingRequest.updatedAt && (
+              <Grid item md={1} xs={12}>
+                <InfoBoxItem
+                  title="Last updated"
+                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  gutterBottom
+                />
+              </Grid>
+            )}
             {isDashboardUser(userRecord) &&
               bookingRequest.pinnedCommentsCount &&
               bookingRequest.pinnedCommentsCount > 0 && (

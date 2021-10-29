@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import { RouteSearchResult } from '../../model/land-transport/RouteSearchResult';
+import { SegmentsEntity } from './LandTransportSearch';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paperRoot: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const LandTransportFare: React.FC<RouteSearchResult> = props => {
+const LandTransportFare: React.FC<SegmentsEntity> = props => {
   const classes = useStyles();
 
   return (
@@ -53,7 +53,8 @@ const LandTransportFare: React.FC<RouteSearchResult> = props => {
 
 const FareHeader: React.FC = () => {
   return (
-    <Box display={'flex'} justifyContent={'flex-end'}>
+    <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+      <Typography variant={'h4'}>Hamburg Süd</Typography>
       <Box>
         <Alert icon={null} color={'success'}>
           <AlertTitle>{'CHEAPEST'}</AlertTitle>
@@ -63,7 +64,17 @@ const FareHeader: React.FC = () => {
   );
 };
 
-const FareBody: React.FC<RouteSearchResult> = ({ toLocationName }) => {
+const FareBody: React.FC<SegmentsEntity> = ({
+  start: {
+    properties: { name: startName },
+  },
+  end: {
+    properties: { name: endName },
+  },
+  relationship: {
+    properties: { equSize, weightRangeMin, weightRangeMax, weightUnit },
+  },
+}) => {
   const classes = useStyles();
 
   return (
@@ -72,27 +83,35 @@ const FareBody: React.FC<RouteSearchResult> = ({ toLocationName }) => {
         <Step>
           <StepLabel className={classes.firstLabel} icon={<FiberManualRecordIcon />}>
             <Box className={classes.container}>
-              <Typography variant={'h4'}>{'13:45'}</Typography>
-              <Typography>{'14-04-21'}</Typography>
-              <Typography variant={'h5'}>{'NL RTM'}</Typography>
+              <Typography variant={'h5'}>{startName}</Typography>
             </Box>
           </StepLabel>
         </Step>
         <Step>
           <StepLabel icon={<FiberManualRecordIcon />}>
             <Box className={classes.container}>
-              <Typography variant={'h4'}>{'16:20'}</Typography>
-              <Typography>{'18-04-21'}</Typography>
-              <Typography variant={'h5'}>{'BEANR'}</Typography>
+              {/*<Typography variant={'h4'}>{'16:20'}</Typography>*/}
+              {/*<Typography>{'18-04-21'}</Typography>*/}
+              <Typography variant={'h5'}>{endName}</Typography>
             </Box>
           </StepLabel>
         </Step>
       </Stepper>
+      <Box display="flex" flexDirection="row" justifyContent="space-around" my={1}>
+        <Typography variant={'h4'}>Equipment size: {equSize}</Typography>
+        <Typography variant={'h4'}>
+          Weight range: {weightRangeMin}-{weightRangeMax} {weightUnit}
+        </Typography>
+      </Box>
     </Box>
   );
 };
 
-const FareFooter: React.FC<RouteSearchResult> = ({ rate }) => {
+const FareFooter: React.FC<SegmentsEntity> = ({
+  relationship: {
+    properties: { rate },
+  },
+}) => {
   const classes = useStyles();
 
   return (
@@ -101,9 +120,9 @@ const FareFooter: React.FC<RouteSearchResult> = ({ rate }) => {
         <Typography variant={'h4'} style={{ paddingRight: '.5em' }}>
           Est. price
         </Typography>
-        <Typography variant={'h4'}>{rate}€</Typography>
+        <Typography variant={'h4'}>{rate || '1000'}€</Typography>
       </Box>
-      <Typography variant={'h4'}>Contargo</Typography>
+      <Typography variant={'h4'}>Truck</Typography>
       <Button style={{ margin: '.5em' }} color="primary" variant="contained" onClick={() => console.log('clicked')}>
         Book now
       </Button>

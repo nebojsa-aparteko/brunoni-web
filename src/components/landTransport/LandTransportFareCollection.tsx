@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LandTransportFareCollection: React.FC = () => {
   const classes = useStyles();
   const [landTransports] = useContext(LandTransportContext);
-
+  console.log(landTransports);
   return (
     <Box className={classes.container}>
-      {landTransports.map((fare, i) => (
-        <LandTransportFare key={`${fare.id}-${i}`} {...fare} />
-      ))}
+      {landTransports?.map((fare, i) =>
+        fare.map(f => (
+          // <Typography>
+          //   {f.start.properties.name} {f.end.properties.name}
+          // </Typography>
+          <LandTransportFare key={`${i}`} {...f} />
+        )),
+      )}
     </Box>
   );
 };

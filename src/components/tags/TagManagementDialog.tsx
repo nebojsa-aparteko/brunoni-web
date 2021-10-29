@@ -18,7 +18,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import firebase from '../../firebase';
-import { flow, isNil, omitBy, set } from 'lodash/fp';
+import { flow, isNil, omitBy } from 'lodash/fp';
 import { SHOW_SUCCESS_SNACKBAR } from '../../store/types/globalAppState';
 import { GlobalContext } from '../../store/GlobalStore';
 
@@ -242,23 +242,43 @@ interface TagRepresentationProps {
 }
 
 const addSelectedTag = (tagCategory: TagCategory, tag: Tag, documentId: string) => {
-  return firebase
-    .firestore()
-    .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
-    .doc(documentId)
-    .collection(tagCategory === TagCategory.BOOKING ? 'tags-booking' : 'tags-booking-request')
-    .doc(tag.id)
-    .set(flow(set('createdAt', new Date()), set('documentId', documentId))(tag));
+  return firebase.firestore().runTransaction(async transaction => {
+    const documentReference = firebase
+      .firestore()
+      .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
+      .doc(documentId);
+    const doc = (await transaction.get(documentReference)).data();
+    if (!doc) return null;
+    const updatedAssignedTags = doc.assignedTags?.includes(tag.id)
+      ? doc.assignedTags
+      : [...(doc.assignedTags || []), tag.id];
+
+    return transaction.set(
+      documentReference,
+      { assignedTags: updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null },
+      { merge: true },
+    );
+  });
 };
 
 const removeSelectedTag = (tagCategory: TagCategory, tagId: string, documentId: string) => {
-  return firebase
-    .firestore()
-    .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
-    .doc(documentId)
-    .collection(tagCategory === TagCategory.BOOKING ? 'tags-booking' : 'tags-booking-request')
-    .doc(tagId)
-    .delete();
+  return firebase.firestore().runTransaction(async transaction => {
+    const documentReference = firebase
+      .firestore()
+      .collection(tagCategory === TagCategory.BOOKING ? 'bookings' : 'bookings-requests')
+      .doc(documentId);
+    const doc = (await transaction.get(documentReference)).data();
+    if (!doc) return null;
+    const updatedAssignedTags = doc.assignedTags?.includes(tagId)
+      ? (doc.assignedTags as string[] | undefined)?.filter((id: string) => id !== tagId)
+      : doc.assignedTags;
+
+    return transaction.set(
+      documentReference,
+      { assignedTags: updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null },
+      { merge: true },
+    );
+  });
 };
 
 const TagRepresentation: React.FC<TagRepresentationProps> = ({

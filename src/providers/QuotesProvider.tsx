@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
+import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
@@ -7,6 +7,8 @@ import { Quote } from './QuoteGroupsProvider';
 import Carrier from '../model/Carrier';
 import firebase from '../firebase';
 import { isNumberOfAppliedFiltersLessThan } from '../utilities/isNumberOfAppliedFiltersLessThan';
+import Carriers from '../contexts/Carriers';
+import { isSuperAdmin } from '../model/UserRecord';
 
 interface Props {
   children: React.ReactNode;
@@ -25,12 +27,29 @@ export const QuotesContext = createContext<
 const QuotesProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
   const actingAs = useContext(ActingAs)[0];
+  const carriers = useContext(Carriers);
+  const isAdmin = !actingAs;
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [filters, setFilters] = useState<QuoteContextFilters>(defaultFilters);
+  const [availableCarriers, setAvailableCarriers] = useState(
+    isAdmin
+      ? carriers && userRecord.carriers
+        ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
+        : []
+      : carriers,
+  );
 
   const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(undefined);
+
+  useEffect(() => {
+    setAvailableCarriers(
+      carriers && userRecord.carriers
+        ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
+        : [],
+    );
+  }, [carriers, userRecord]);
 
   // in case of admins set assignee filter automatically
   // TODO activate this when it starts having sense :)
@@ -53,6 +72,9 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       if (actingAs && userRecord?.alphacomClientId) {
         query = collection.where('clientId', '==', userRecord!.alphacomClientId);
+      }
+      if (!!availableCarriers && availableCarriers.length > 0 && !isSuperAdmin(userRecord) && isAdmin) {
+        query = (query || collection).where('carrier', 'in', availableCarriers);
       }
 
       if (filters.archived) {
@@ -92,12 +114,12 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
 
       const watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier'];
       if (isNumberOfAppliedFiltersLessThan(filters, watchingFilters, 2)) {
-        query = query.limit(100);
+        query = query.limit(isSuperAdmin(userRecord) ? 300 : 100);
       }
 
       return query;
     },
-    [userRecord, filters, actingAs, filtersPreviousVal],
+    [userRecord, filters, actingAs, filtersPreviousVal, availableCarriers],
   );
 
   const quotesSnapshot = useFirestoreCollection('quotes', query);
