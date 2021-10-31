@@ -11,16 +11,16 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import CarrierInput from '../inputs/CarrierInput';
-import Carrier from '../../model/Carrier';
-import Carriers from '../../contexts/Carriers';
-import { GlobalContext } from '../../store/GlobalStore';
-import PortInput from '../inputs/PortInput';
-import Ports from '../../contexts/Ports';
-import Port from '../../model/Port';
-import MultipleEmailInput from '../inputs/MultipleEmailInput';
-import firebase from '../../firebase';
-import { CarrierSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
+import CarrierInput from '../../inputs/CarrierInput';
+import Carrier from '../../../model/Carrier';
+import Carriers from '../../../contexts/Carriers';
+import { GlobalContext } from '../../../store/GlobalStore';
+import PortInput from '../../inputs/PortInput';
+import Ports from '../../../contexts/Ports';
+import Port from '../../../model/Port';
+import MultipleEmailInput from '../../inputs/MultipleEmailInput';
+import firebase from '../../../firebase';
+import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) =>

@@ -6,10 +6,10 @@ import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
-import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
-import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
-import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
-import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
+import TeamsUsersContainer from '../components/teams/users/TeamsUsersContainer';
+import TeamsTeamsContainer from '../components/teams/teams/TeamsTeamsContainer';
+import ReassignUsersContainer from '../components/teams/reassign-users/ReassignUsersContainer';
+import TeamsPaymentConfirmationContainer from '../components/teams/payment-confirmation/TeamsPaymentConfirmationContainer';
 import { useHistory } from 'react-router';
 import QueryString from 'querystring';
 
@@ -34,6 +34,17 @@ export const tabStyles = makeStyles((theme: Theme) => ({
       backgroundColor: 'rgba(161,213,255,0.20) !important',
     },
     cursor: 'pointer',
+  },
+  avatarGroup: {
+    marginLeft: theme.spacing(1),
+  },
+  lastAvatar: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  carrierGroup: {
+    '& > *:not(:last-child)': {
+      marginLeft: theme.spacing(0.5),
+    },
   },
 }));
 

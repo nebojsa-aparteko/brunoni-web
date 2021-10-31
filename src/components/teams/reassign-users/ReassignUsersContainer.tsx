@@ -7,8 +7,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import useAdminUsers from '../../hooks/useAdminUsers';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import useAdminUsers from '../../../hooks/useAdminUsers';
+import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import {
   Box,
   Button,
@@ -21,20 +21,20 @@ import {
   IconButton,
   Typography,
 } from '@material-ui/core';
-import UserInput from '../inputs/UserInput';
-import UserRecord from '../../model/UserRecord';
-import firebase from '../../firebase';
+import UserInput from '../../inputs/UserInput';
+import UserRecord from '../../../model/UserRecord';
+import firebase from '../../../firebase';
 import CloseIcon from '@material-ui/icons/Close';
-import ConfirmationDialog from '../ConfirmationDialog';
-import { GlobalContext } from '../../store/GlobalStore';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import { GlobalContext } from '../../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
-import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import useReassignmentRules from '../../hooks/useReassignmentRules';
-import { ReassignmentRule } from '../../model/ReassignmentRule';
+import { EnhancedTableToolbar } from '../../EnhancedTableToolbar';
+import useReassignmentRules from '../../../hooks/useReassignmentRules';
+import { ReassignmentRule } from '../../../model/ReassignmentRule';
 import ReassignUserRow from './ReassignUsersRow';
-import CarrierInput from '../inputs/CarrierInput';
-import Carrier from '../../model/Carrier';
-import Carriers from '../../contexts/Carriers';
+import CarrierInput from '../../inputs/CarrierInput';
+import Carrier from '../../../model/Carrier';
+import Carriers from '../../../contexts/Carriers';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

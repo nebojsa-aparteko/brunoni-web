@@ -11,20 +11,20 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import CarrierInput from '../inputs/CarrierInput';
-import Carrier from '../../model/Carrier';
-import Carriers from '../../contexts/Carriers';
-import { GlobalContext } from '../../store/GlobalStore';
-import MultipleEmailInput from '../inputs/MultipleEmailInput';
-import firebase from '../../firebase';
-import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
-import ClientInput from '../inputs/ClientInput';
-import useClients from '../../hooks/useClients';
-import Client from '../../model/Client';
+import CarrierInput from '../../inputs/CarrierInput';
+import Carrier from '../../../model/Carrier';
+import Carriers from '../../../contexts/Carriers';
+import { GlobalContext } from '../../../store/GlobalStore';
+import MultipleEmailInput from '../../inputs/MultipleEmailInput';
+import firebase from '../../../firebase';
+import { CustomerSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
+import ClientInput from '../../inputs/ClientInput';
+import useClients from '../../../hooks/useClients';
+import Client from '../../../model/Client';
 import { useSnackbar } from 'notistack';
 // import CategoryMultiSelect from '../CategoryMultiSelect';
-import { BookingCategory } from '../../model/Booking';
-import CategoryFilter from '../CategoryFilter';
+import { BookingCategory } from '../../../model/Booking';
+import CategoryFilter from '../../CategoryFilter';
 
 export const useDialog = makeStyles((theme: Theme) =>
   createStyles({
