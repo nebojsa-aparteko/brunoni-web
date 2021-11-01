@@ -1,13 +1,13 @@
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import React, { useCallback, useMemo } from 'react';
-import { ADMIN_ROLES, UserRecordMin } from '../../model/UserRecord';
-import useAdminUsers from '../../hooks/useAdminUsers';
-import UserInput from '../inputs/UserInput';
-import firebase from '../../firebase';
+import { ADMIN_ROLES, UserRecordMin } from '../../../model/UserRecord';
+import useAdminUsers from '../../../hooks/useAdminUsers';
+import UserInput from '../../inputs/UserInput';
+import firebase from '../../../firebase';
 import { Checkbox } from '@material-ui/core';
-import { ReassignmentRule } from '../../model/ReassignmentRule';
-import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
+import { ReassignmentRule } from '../../../model/ReassignmentRule';
+import useUserByAlphacomId from '../../../hooks/useUserByAlphacomId';
 
 const ReassignUserRow: React.FC<Props> = ({ rule, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);

@@ -12,15 +12,13 @@ interface Props {
 }
 
 const WatchersChipMultiInput: React.FC<Props> = ({ options, values, fixedValues, onChange }) => {
-  const filteredOptions = useMemo(() => {
-    return options.filter(option => (values ? !values.some(value => option?.alphacomId === value?.alphacomId) : true));
-  }, [options, values]);
-
   return (
     <Autocomplete
       multiple
-      options={filteredOptions}
+      filterSelectedOptions={true}
+      options={options}
       getOptionLabel={option => `${option.firstName} ${option.lastName}`}
+      getOptionSelected={(option, value) => option.emailAddress === value.emailAddress}
       value={values}
       onChange={onChange}
       renderTags={(value, getTagProps) =>

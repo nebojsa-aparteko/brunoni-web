@@ -7,16 +7,16 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import { Checkbox, TableBody, Typography } from '@material-ui/core';
-import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import ConfirmationDialog from '../ConfirmationDialog';
-import { GlobalContext } from '../../store/GlobalStore';
-import firebase from '../../firebase';
-import usePaymentConfirmation from '../../hooks/usePaymentConfirmation';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { EnhancedTableToolbar } from '../../EnhancedTableToolbar';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import { GlobalContext } from '../../../store/GlobalStore';
+import firebase from '../../../firebase';
+import usePaymentConfirmation from '../../../hooks/usePaymentConfirmation';
+import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
+import TeamPaymentConfirmationCarrierSettingsRow from './TeamsPaymentConfirmationCarrierSettingsRow';
 import { useSnackbar } from 'notistack';
-import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
-import TeamsPaymentConfirmationCustomerSettingsAddDialog from './TeamsPaymentConfirmationCustomerSettingsAddDialog';
-import TeamPaymentConfirmationCustomerSettingsRow from './TeamsPaymentConfirmationCustomerSettingsRow';
+import TeamsPaymentConfirmationCarrierSettingsAddDialog from './TeamsPaymentConfirmationCarrierSettingsAddDialog';
+import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
 import { addSeconds } from 'date-fns';
 
 const useStyles = makeStyles(() =>
@@ -27,10 +27,11 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
+const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
   const classes = useStyles();
 
-  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CUSTOMER_SETTINGS);
+  const paymentConfirmations = usePaymentConfirmation(PaymentConfirmationType.CARRIER_SETTINGS);
+  console.log('PYMNT', paymentConfirmations);
   const [selectedPaymentConfirmations, setSelectedPaymentConfirmations] = useState<string[]>([]);
   const [isPaymentConfirmationDialogOpen, setIsPaymentConfirmationDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
@@ -90,7 +91,7 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
       const collectionRef = firebase.firestore().collection('payment-confirmation-config');
       try {
         const exitingPaymentConfirmation = await collectionRef.doc(id).get();
-        const dataCopy = exitingPaymentConfirmation.data() as CustomerSettingsRule;
+        const dataCopy = exitingPaymentConfirmation.data() as CarrierSettingsRule;
         if (exitingPaymentConfirmation) {
           const ref = collectionRef.doc();
           const createdAt = firebase.firestore.Timestamp.fromDate(addSeconds(dataCopy.createdAt.toDate(), 2));
@@ -122,18 +123,17 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
                 ? `${selectedPaymentConfirmations.length} setting selected`
                 : `${selectedPaymentConfirmations.length} settings selected`
             }
-            addButtonLabel={'Add customer setting'}
-            deleteButtonLabel={selectedPaymentConfirmations.length === 1 ? `Delete setting` : `Delete settings`}
             labelWhenNotSelected={''}
+            addButtonLabel={'Add carrier setting'}
+            deleteButtonLabel={selectedPaymentConfirmations.length === 1 ? `Delete setting` : `Delete settings`}
           />
           <Table aria-label="a dense table">
             <colgroup>
               <col style={{ width: '2.5%' }} />
-              <col style={{ width: '15%' }} />
-              <col style={{ width: '15%' }} />
-              <col style={{ width: '15%' }} />
               <col style={{ width: '20%' }} />
-              <col style={{ width: '15%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '20%' }} />
               <col style={{ width: '10%' }} />
               <col style={{ width: '7.5%' }} />
             </colgroup>
@@ -148,17 +148,16 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell align="left">Carrier</TableCell>
-                <TableCell align="left">Direction</TableCell>
-                <TableCell align="left">Client</TableCell>
-                <TableCell align="left">Contact</TableCell>
-                <TableCell align="left">Statistic client</TableCell>
+                <TableCell align="left">Contact To</TableCell>
+                <TableCell align="left">Contact CC</TableCell>
+                <TableCell align="left">Port of discharge</TableCell>
                 <TableCell align="left">Send message</TableCell>
                 <TableCell align="left" />
               </TableRow>
             </TableHead>
             <TableBody>
               {paymentConfirmations.map((paymentConfirmation, index) => (
-                <TeamPaymentConfirmationCustomerSettingsRow
+                <TeamPaymentConfirmationCarrierSettingsRow
                   paymentConfirmation={paymentConfirmation}
                   key={`payment-confirmation-${paymentConfirmation.id}-${index}`}
                   selected={
@@ -172,7 +171,7 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
           </Table>
         </TableContainer>
       )}
-      <TeamsPaymentConfirmationCustomerSettingsAddDialog
+      <TeamsPaymentConfirmationCarrierSettingsAddDialog
         isOpen={isPaymentConfirmationDialogOpen}
         handleClose={() => setIsPaymentConfirmationDialogOpen(false)}
       />
@@ -189,4 +188,4 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
   );
 };
 
-export default TeamsPaymentConfirmationCustomerSettingsTable;
+export default TeamsPaymentConfirmationCarrierSettingsTable;
