@@ -71,30 +71,32 @@ const TeamsRowForm: React.FC<Props> = ({ team, handleClose }) => {
 
   return (
     <>
-      <Box
-        px={4}
-        py={1}
-        mb={2}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        borderBottom={1}
-        borderColor="grey.300"
-      >
-        <Typography style={{ marginRight: theme.spacing(1) }} variant="h4">
-          {teamState?.name ? `Team ${teamState.name}` : 'Create new team'}
-        </Typography>
-        <IconButton
-          aria-label="close-button-notification-center"
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            event.stopPropagation();
-            handleClose();
-          }}
+      <Box>
+        <Box
+          px={4}
+          py={1}
+          mb={2}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          borderBottom={1}
+          borderColor="grey.300"
         >
-          <CloseIcon />
-        </IconButton>
+          <Typography style={{ marginRight: theme.spacing(1) }} variant="h4">
+            {teamState?.name ? `Team ${teamState.name}` : 'Create new team'}
+          </Typography>
+          <IconButton
+            aria-label="close-button-notification-center"
+            onClick={(event: React.MouseEvent<HTMLElement>) => {
+              event.stopPropagation();
+              handleClose();
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <TeamsInputList teamState={teamState} setTeamState={setTeamState} />
       </Box>
-      <TeamsInputList teamState={teamState} setTeamState={setTeamState} />
       <Button color="primary" variant="contained" onClick={onSave} style={{ margin: theme.spacing(2) }}>
         {teamState ? 'Edit team' : 'Add team'}
       </Button>

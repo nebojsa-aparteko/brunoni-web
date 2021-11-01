@@ -64,9 +64,10 @@ const TeamRow: React.FC<Props> = ({ team, selected, onSelectRow }) => {
               label1={
                 <Box display={'flex'} alignItems={'center'} flexWrap={'wrap'}>
                   {team.carriers.map((carrier, index) => (
-                    <Typography key={index} style={{ marginRight: index < team.carriers!.length - 1 ? '4px' : '' }}>
-                      {`${carrier.name}${index < team.carriers!.length - 1 ? ',' : ''}`}
-                    </Typography>
+                    <Chip key={index} label={carrier.id} variant="outlined" />
+                    // <Typography key={index} style={{ marginRight: index < team.carriers!.length - 1 ? '4px' : '' }}>
+                    //   {`${carrier.name}${index < team.carriers!.length - 1 ? ',' : ''}`}
+                    // </Typography>
                   ))}
                 </Box>
               }
@@ -79,9 +80,10 @@ const TeamRow: React.FC<Props> = ({ team, selected, onSelectRow }) => {
               label1={
                 <Box display={'flex'} alignItems={'center'} flexWrap={'wrap'}>
                   {team.categories.map((category, index) => (
-                    <Typography key={index} style={{ marginRight: index < team.categories!.length - 1 ? '4px' : '' }}>
-                      {`${category}${index < team.categories!.length - 1 ? ',' : ''}`}
-                    </Typography>
+                    <Chip key={index} label={category} variant="outlined" />
+                    // <Typography key={index} style={{ marginRight: index < team.categories!.length - 1 ? '4px' : '' }}>
+                    //   {`${category}${index < team.categories!.length - 1 ? ',' : ''}`}
+                    // </Typography>
                   ))}
                 </Box>
               }

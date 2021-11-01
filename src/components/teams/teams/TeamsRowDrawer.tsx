@@ -14,6 +14,7 @@ const useStyles = makeStyles({
   paper: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'space-between',
   },
 });
 

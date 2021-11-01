@@ -1,6 +1,6 @@
 import React from 'react';
 import { GroupType, Team, TeamType } from '../../../model/Teams';
-import { Box, TextField, Theme } from '@material-ui/core';
+import { Box, IconButton, TextField, Theme, Tooltip } from '@material-ui/core';
 import TeamsUsersChipMultiInput from '../../inputs/TeamsUsersChipMultiInput';
 import UserRecord from '../../../model/UserRecord';
 import CarriersMultiInput from '../../inputs/CarriersMultiInput';
@@ -13,6 +13,8 @@ import { TaskType } from '../../../model/Task';
 import { makeStyles } from '@material-ui/core/styles';
 import theme from '../../../theme';
 import { useTeamsContext } from '../../../providers/TeamsContextProvider';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme: Theme) => ({
   inputContainer: {
@@ -47,10 +49,12 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
               value={teamState?.carriers}
               onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
             />
-            <MultipleCategoryInput
-              value={teamState?.categories}
-              onChange={(_, value) => setTeamState(prev => ({ ...prev, categories: value as BookingCategory[] }))}
-            />
+            <InputWrapper>
+              <MultipleCategoryInput
+                value={teamState?.categories}
+                onChange={(_, value) => setTeamState(prev => ({ ...prev, categories: value as BookingCategory[] }))}
+              />
+            </InputWrapper>
             {teamType === TeamType.OPERATIONS ? (
               <MultipleChecklistInput
                 value={teamState?.checklistItems}
@@ -85,10 +89,12 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
       case GroupType.VESSEL:
         return (
           <>
-            <CarriersMultiInput
-              value={teamState?.carriers}
-              onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
-            />
+            <InputWrapper>
+              <CarriersMultiInput
+                value={teamState?.carriers}
+                onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
+              />
+            </InputWrapper>
           </>
         );
       case GroupType.LAND_TRANSPORT:
@@ -97,7 +103,7 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
   };
 
   return (
-    <Box className={classes.inputContainer} flexDirection="column" justifyContent="center" p={4}>
+    <Box className={classes.inputContainer} flexDirection="column" justifyContent="center" alignItems={'center'} p={4}>
       <TextField
         fullWidth={true}
         variant="outlined"
@@ -111,6 +117,34 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
         onChange={(_, value) => setTeamState(prev => ({ ...prev, users: value as UserRecord[] }))}
       />
       {renderSwitch(groupType)}
+      <InputMenuButton />
+    </Box>
+  );
+};
+
+interface InputWrapperProps {}
+
+const InputWrapper: React.FC<InputWrapperProps> = ({ children }) => {
+  return (
+    <Box display={'flex'} alignItems={'center'}>
+      <Box width={'100%'}>{children}</Box>
+      <IconButton aria-label="delete" onClick={() => console.log('deleting')}>
+        <DeleteIcon />
+      </IconButton>
+    </Box>
+  );
+};
+
+interface InputMenuProps {}
+
+const InputMenuButton: React.FC<InputMenuProps> = ({}) => {
+  return (
+    <Box display={'flex'} justifyContent={'center'}>
+      <Tooltip title={'Add Input'}>
+        <IconButton aria-label="filter list" onClick={() => console.log('add')}>
+          <AddIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };
