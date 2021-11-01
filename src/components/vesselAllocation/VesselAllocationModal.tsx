@@ -21,6 +21,8 @@ import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { BookingRequest } from '../../model/BookingRequest';
 import { Alert } from '@material-ui/lab';
+import NextPreviousVesselTable from './NextPreviousVesselTable';
+import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
@@ -43,7 +45,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
   closeModal,
   vesselVoyage,
   service,
-  // bookingRequest,
+  bookingRequest,
 }) => {
   const classes = useVesselAllocationStyles();
 
@@ -88,6 +90,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
             Vessel:{' '}
             {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})` +
               (service ? ` / ${service}` : '')}
+            <VesselFullyBookedSwitch vessel={vesselVoyageString} />
           </Typography>
           <Box mb={2} />
           <Box flex={1} display="flex" flexDirection="column" m={1}>
@@ -99,15 +102,17 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 {vesselAllocation && <VesselAllocationTable vessel={vesselAllocation} vesselVoyage={vesselVoyage} />}
               </ExpansionPanelDetails>
             </ExpansionPanel>
-            {/*<Box mb={2} />*/}
-            {/*<ExpansionPanel TransitionProps={{ mountOnEnter: true }}>*/}
-            {/*  <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>*/}
-            {/*    <Typography variant="h5">Previous & Next Vessel</Typography>*/}
-            {/*  </ExpansionPanelSummary>*/}
-            {/*  <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center', padding: 0 }}>*/}
-            {/*    {vessel && <NextPreviousVesselTable vessel={vessel} bookingRequest={bookingRequest} />}*/}
-            {/*  </ExpansionPanelDetails>*/}
-            {/*</ExpansionPanel>*/}
+            <Box mb={2} />
+            <ExpansionPanel TransitionProps={{ mountOnEnter: true }}>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h5">Previous & Next Vessel</Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center', padding: 0 }}>
+                {vesselAllocation && (
+                  <NextPreviousVesselTable vessel={vesselAllocation} bookingRequest={bookingRequest} />
+                )}
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
           </Box>
         </DialogContent>
       </Box>
