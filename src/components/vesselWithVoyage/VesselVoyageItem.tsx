@@ -1,14 +1,12 @@
-import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
-import { Box, Paper, Switch, Typography } from '@material-ui/core';
+import React, { Fragment, useMemo } from 'react';
+import { Box, Paper, Typography } from '@material-ui/core';
 import theme from '../../theme';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import VesselWithVoyage from '../../model/VesselWithVoyage';
 import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
-import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
-import firebase from '../../firebase';
-import { GlobalContext } from '../../store/GlobalStore';
+import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
 
 const SeparatorArrow = () => (
   <Box mx={4} display="flex" flexDirection="column" alignItems="center">
@@ -16,28 +14,13 @@ const SeparatorArrow = () => (
   </Box>
 );
 
-const setFullyBookedStatus = (docId: string, newValue: boolean) => {
-  return firebase
-    .firestore()
-    .collection('vesselWithVoyage')
-    .doc(docId)
-    .update('isFullyBooked', newValue);
-};
-
 const findCarrierId = (items: any[]) => {
   const obj = items.find(u => u.erpCarrierId && u.erpServiceId);
   return obj ? `${obj.erpCarrierId} ${obj.erpServiceId}` : undefined;
 };
 
 const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) => {
-  const [, dispatch] = useContext(GlobalContext);
   const entries = useMemo(() => Object.entries(items), [items]);
-  const vesselWithVoyage = useVesselWithVoyageById(vessel);
-  const [isFullyBooked, setIsFullyBooked] = useState(vesselWithVoyage?.isFullyBooked || false);
-
-  useEffect(() => {
-    setIsFullyBooked(vesselWithVoyage?.isFullyBooked || false);
-  }, [vesselWithVoyage?.isFullyBooked]);
 
   const vesselItems = useMemo(
     () =>
@@ -69,14 +52,6 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
       vesselItems && vesselItems.length > 0 ? vesselItems.find(item => item.erpServiceId)?.erpServiceId : undefined,
     [vesselItems],
   );
-
-  const toggleFullyBooked = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    setFullyBookedStatus(vessel, !vesselWithVoyage.isFullyBooked).finally(() =>
-      dispatch({ type: 'STOP_GLOBAL_LOADING' }),
-    );
-  };
 
   return (
     <Paper
@@ -116,7 +91,7 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
         )}
         {voyageInfo && (
           <Box mr={4} ml="auto" display="flex">
-            <Switch color="primary" onClick={toggleFullyBooked} checked={isFullyBooked} />
+            <VesselFullyBookedSwitch vessel={vessel} />
             <VesselAllocationButton vesselVoyage={voyageInfo} service={service} />
           </Box>
         )}

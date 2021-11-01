@@ -22,6 +22,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { BookingRequest } from '../../model/BookingRequest';
 import { Alert } from '@material-ui/lab';
 import NextPreviousVesselTable from './NextPreviousVesselTable';
+import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
@@ -89,6 +90,7 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
             Vessel:{' '}
             {`${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr} (${vesselVoyage.Carrier})` +
               (service ? ` / ${service}` : '')}
+            <VesselFullyBookedSwitch vessel={vesselVoyageString} />
           </Typography>
           <Box mb={2} />
           <Box flex={1} display="flex" flexDirection="column" m={1}>
