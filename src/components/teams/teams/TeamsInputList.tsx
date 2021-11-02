@@ -99,7 +99,7 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
   };
 
   return (
-    <Box className={classes.inputContainer} flexDirection="column" justifyContent="center" alignItems={'center'} p={4}>
+    <Box className={classes.inputContainer} flexDirection="column" justifyContent="center" p={4}>
       <TextField
         fullWidth={true}
         variant="outlined"
