@@ -49,12 +49,10 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
               value={teamState?.carriers}
               onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
             />
-            <InputWrapper>
-              <MultipleCategoryInput
-                value={teamState?.categories}
-                onChange={(_, value) => setTeamState(prev => ({ ...prev, categories: value as BookingCategory[] }))}
-              />
-            </InputWrapper>
+            <MultipleCategoryInput
+              value={teamState?.categories}
+              onChange={(_, value) => setTeamState(prev => ({ ...prev, categories: value as BookingCategory[] }))}
+            />
             {teamType === TeamType.OPERATIONS ? (
               <MultipleChecklistInput
                 value={teamState?.checklistItems}
@@ -89,12 +87,10 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
       case GroupType.VESSEL:
         return (
           <>
-            <InputWrapper>
-              <CarriersMultiInput
-                value={teamState?.carriers}
-                onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
-              />
-            </InputWrapper>
+            <CarriersMultiInput
+              value={teamState?.carriers}
+              onChange={(_, value) => setTeamState(prev => ({ ...prev, carriers: value as Carrier[] }))}
+            />
           </>
         );
       case GroupType.LAND_TRANSPORT:
@@ -117,7 +113,7 @@ const TeamsInputList: React.FC<Props> = ({ teamState, setTeamState }) => {
         onChange={(_, value) => setTeamState(prev => ({ ...prev, users: value as UserRecord[] }))}
       />
       {renderSwitch(groupType)}
-      <InputMenuButton />
+      {/*<InputMenuButton />*/}
     </Box>
   );
 };
