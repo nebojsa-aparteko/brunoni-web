@@ -4,17 +4,17 @@ import firebase from 'firebase';
 import { isEqual, omit, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
-import Carriers from '../../contexts/Carriers';
-import useClients from '../../hooks/useClients';
-import Carrier from '../../model/Carrier';
-import Client from '../../model/Client';
-import { CarrierSettingsRule, CustomerSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
-import { GlobalContext } from '../../store/GlobalStore';
-import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
-import CarrierInput from '../inputs/CarrierInput';
-import ClientInput from '../inputs/ClientInput';
-import MultipleEmailInput from '../inputs/MultipleEmailInput';
-import CategoryFilter from '../CategoryFilter';
+import Carriers from '../../../contexts/Carriers';
+import useClients from '../../../hooks/useClients';
+import Carrier from '../../../model/Carrier';
+import Client from '../../../model/Client';
+import { CarrierSettingsRule, CustomerSettingsRule, ImpExp } from '../../../model/PaymentConfirmationRule';
+import { GlobalContext } from '../../../store/GlobalStore';
+import AutomaticEmailSendSwitch from '../../AutomaticEmailSendSwitch';
+import CarrierInput from '../../inputs/CarrierInput';
+import ClientInput from '../../inputs/ClientInput';
+import MultipleEmailInput from '../../inputs/MultipleEmailInput';
+import CategoryFilter from '../../CategoryFilter';
 
 interface Props {
   paymentConfirmation: CustomerSettingsRule;

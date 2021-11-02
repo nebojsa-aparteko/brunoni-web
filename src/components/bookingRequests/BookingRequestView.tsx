@@ -71,6 +71,7 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import CommodityTypes from '../../contexts/CommodityTypes';
 import Tags from '../../contexts/Tags';
 import Container from '../../model/Container';
+import WatchersChipMultiInput from '../watchers/WatchersChipMultiInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -211,8 +212,8 @@ export const updateBookingRequest = (bookingRequest: BookingRequest) => {
   return Promise.resolve();
 };
 
-const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
-  firebase
+const changeAssignedAgent = async (id: string, user: UserRecordMin | null) =>
+  await firebase
     .firestore()
     .collection('bookings-requests')
     .doc(id)
@@ -222,8 +223,8 @@ const changeAssignedAgent = (id: string, user: UserRecordMin | null) =>
       },
       { merge: true },
     );
-const changeAssignedClient = (id: string, user: UserRecord | null) =>
-  firebase
+const changeAssignedClient = async (id: string, user: UserRecord | null) =>
+  await firebase
     .firestore()
     .collection('bookings-requests')
     .doc(id)
@@ -233,6 +234,21 @@ const changeAssignedClient = (id: string, user: UserRecord | null) =>
       },
       { merge: true },
     );
+
+const changeWatchers = async (id: string, watchers: UserRecordMin[]) =>
+  await firebase
+    .firestore()
+    .collection('bookings-requests')
+    .doc(id)
+    .set(
+      {
+        watchers,
+      },
+      {
+        merge: true,
+      },
+    );
+
 export const changeBookingRequestUnreadStatus = (id: string, isUnread: boolean) =>
   firebase
     .firestore()
@@ -251,6 +267,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   const assignableCustomers = useClientUsers(bookingRequest.client?.id);
   const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined | null>(bookingRequest.assignedUser);
   const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
+  const [selectedWatchers, setSelectedWatchers] = useState<UserRecordMin[]>(bookingRequest.watchers || []);
   const [showUnreadContent, setShowUnreadContent] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
 
@@ -277,7 +294,6 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
   };
 
   const handleChangeAgent = async () => {
-    dispatch({ type: 'START_GLOBAL_LOADING' });
     try {
       if (bookingRequest.id) {
         ((!selectedAgent && bookingRequest.assignedUser) ||
@@ -302,6 +318,25 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
     } catch (e) {
       console.error(e);
       return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Agent!' });
+    }
+  };
+
+  const handleChangeWatchers = async () => {
+    try {
+      const sameWatchers =
+        (bookingRequest.watchers &&
+          selectedWatchers.length === bookingRequest.watchers.length &&
+          bookingRequest.watchers.every(
+            (watcher, index) => watcher.alphacomId === selectedWatchers[index].alphacomId,
+          )) ||
+        false;
+
+      if (bookingRequest.id && !sameWatchers) {
+        await changeWatchers(bookingRequest.id, selectedWatchers);
+      }
+    } catch (e) {
+      console.error(e);
+      return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to set Watchers!' });
     }
   };
 
@@ -357,6 +392,14 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
                   onChange={(_, user) => setSelectedClient(user || undefined)}
                 />
               </Box>
+              <Box my={1}>
+                <WatchersChipMultiInput
+                  options={assignableUsers || []}
+                  values={selectedWatchers}
+                  fixedValues={bookingRequest.assignedUser ? [bookingRequest.assignedUser] : []}
+                  onChange={(event, watchers) => setSelectedWatchers(watchers as UserRecord[])}
+                />
+              </Box>
             </React.Fragment>
           </DialogContent>
           <Button
@@ -365,6 +408,7 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
               dispatch({ type: 'START_GLOBAL_LOADING' });
               await handleChangeAgent();
               await handleChangeClient();
+              await handleChangeWatchers();
               dispatch({ type: 'STOP_GLOBAL_LOADING' });
               !selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread && setShowUnreadContent(true);
               !(!selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread) && handleClose();

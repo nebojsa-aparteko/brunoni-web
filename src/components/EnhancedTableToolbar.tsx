@@ -8,6 +8,7 @@ import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbarRoot: {
+      width: '100%',
       paddingLeft: theme.spacing(2),
       paddingRight: theme.spacing(1),
     },
