@@ -1,5 +1,5 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react';
-
+import { TransportModeLabels } from '../model/land-transport/TransportMode';
 const transfers = [
   {
     name: 'Show direct lines only',
@@ -53,6 +53,9 @@ const companies = [
 export const LAND_TRANSPORT_FILTERS_INITIAL_STATE = {
   transfers,
   companies,
+  transportModes: Object.values(TransportModeLabels).map(val => ({ checked: false, name: val })),
+  containerTypes: ["20'", "40'"].map(v => ({ checked: false, name: v })),
+  equipmentGroupTypes: ['GENERAL PURPOSE', 'REEFER', 'SPECIAL'].map(v => ({ checked: false, name: v })),
 } as LandTransportFilter;
 
 export const LandTransportFilterContext = createContext<
@@ -70,6 +73,9 @@ const LandTransportFilterProvider: React.FC = ({ children }) => {
 export interface LandTransportFilter {
   transfers: Collection[];
   companies: Collection[];
+  transportModes: Collection[];
+  containerTypes: Collection[];
+  equipmentGroupTypes: Collection[];
 }
 
 export interface Collection {

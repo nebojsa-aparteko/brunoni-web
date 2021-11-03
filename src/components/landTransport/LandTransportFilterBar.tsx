@@ -9,7 +9,7 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Collection,
   LandTransportFilter,
@@ -46,26 +46,41 @@ const LandTransportFilterBar = () => {
         label={'Company'}
         limit={5}
       />
+      <Filter
+        collection={filters.transportModes}
+        setCollection={setFilters}
+        name={'transportModes'}
+        label={'Transport Mode'}
+        limit={2}
+      />
+      <Filter
+        collection={filters.containerTypes}
+        setCollection={setFilters}
+        name={'containerTypes'}
+        label={'Container Types'}
+        limit={2}
+      />
+      <Filter
+        collection={filters.equipmentGroupTypes}
+        setCollection={setFilters}
+        name={'equipmentGroupTypes'}
+        label={'Equipment Group Types'}
+        limit={2}
+      />
     </Box>
   );
 };
 
-const Filter: React.FC<CompProps> = ({ collection, setCollection, name, label, limit }) => {
+const Filter: React.FC<CompProps> = ({ collection, setCollection, name, label, limit = 3 }) => {
   const classes = useStyles();
-  const [limited, setLimited] = useState(!!limit);
-  const [allSelected, setAllSelected] = useState(false);
-
-  useEffect(() => {
-    setAllSelected(collection.every(e => e.checked));
-  }, [collection]);
+  const [limited, setLimited] = useState(collection.length > limit);
+  const allSelected = useMemo(() => collection.every(e => e.checked), [collection]);
 
   const handleSelect = (i: number, checked: boolean) => {
     const newSelected = collection.slice();
     newSelected[i] = { ...newSelected[i], checked };
     setCollection(prev => ({ ...prev, [name]: newSelected }));
   };
-
-  // console.log('rendered')
 
   const handleSelectAll = (allSelected: boolean) => {
     const newSelected = collection.map(v => Object.assign({}, v, { checked: allSelected }));
@@ -96,7 +111,7 @@ const Filter: React.FC<CompProps> = ({ collection, setCollection, name, label, l
             />
           ))}
         </FormGroup>
-        {limit && (
+        {limit < collection.length && (
           <>
             {limited ? (
               <Button onClick={() => setLimited(false)} variant={'text'}>

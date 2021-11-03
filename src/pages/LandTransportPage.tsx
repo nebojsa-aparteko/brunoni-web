@@ -6,6 +6,7 @@ import LandTransportResults from '../components/landTransport/LandTransportResul
 import { useForm, FormProvider } from 'react-hook-form';
 import LandTransportProvider from '../providers/LandTransportProvider';
 import LandTransportRouteSearchParams from '../model/land-transport/RouteSearchParams';
+import LandTransportFilterProvider from '../providers/LandTransportFilterProvider';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -27,10 +28,12 @@ const LandTransportPage = () => {
       <Meta title="Land Transport" />
       <Box className={classes.container}>
         <FormProvider {...methods}>
-          <LandTransportProvider>
-            <LandTransportSearch />
-            <LandTransportResults />
-          </LandTransportProvider>
+          <LandTransportFilterProvider>
+            <LandTransportProvider>
+              <LandTransportSearch />
+              <LandTransportResults />
+            </LandTransportProvider>
+          </LandTransportFilterProvider>
         </FormProvider>
       </Box>
     </Fragment>
