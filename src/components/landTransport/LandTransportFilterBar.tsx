@@ -33,12 +33,12 @@ const LandTransportFilterBar = () => {
   const classes = useStyles();
   return (
     <Box className={classes.container}>
-      <Filter
-        collection={filters.transfers}
-        setCollection={setFilters}
-        name={'transfers'}
-        label={'Number of transfers'}
-      />
+      {/*<Filter*/}
+      {/*  collection={filters.transfers}*/}
+      {/*  setCollection={setFilters}*/}
+      {/*  name={'transfers'}*/}
+      {/*  label={'Number of transfers'}*/}
+      {/*/>*/}
       <Filter
         collection={filters.companies}
         setCollection={setFilters}
