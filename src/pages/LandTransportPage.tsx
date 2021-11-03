@@ -21,7 +21,7 @@ const useStyles = makeStyles(() =>
 const LandTransportPage = () => {
   const classes = useStyles();
 
-  const methods = useForm<LandTransportRouteSearchParams>();
+  const methods = useForm<LandTransportRouteSearchParams>({ defaultValues: { earliestDate: new Date() } });
 
   return (
     <Fragment>
