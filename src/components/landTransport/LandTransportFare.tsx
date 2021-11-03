@@ -9,12 +9,14 @@ import {
   StepConnector,
   StepLabel,
   Stepper,
+  SvgIcon,
   Theme,
   Typography,
 } from '@material-ui/core';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { SegmentsEntity } from './LandTransportSearch';
+import { ReactComponent as EcologyIconSVG } from '../../assets/ecology.svg';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paperRoot: {
@@ -55,11 +57,13 @@ const FareHeader: React.FC = () => {
   return (
     <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
       <Typography variant={'h4'}>Hamburg Süd</Typography>
-      <Box>
-        <Alert icon={null} color={'success'}>
-          <AlertTitle>{'CHEAPEST'}</AlertTitle>
-        </Alert>
-      </Box>
+      {false && (
+        <Box>
+          <Alert icon={null} color={'success'}>
+            <AlertTitle>{'CHEAPEST'}</AlertTitle>
+          </Alert>
+        </Box>
+      )}
     </Box>
   );
 };
@@ -72,7 +76,7 @@ const FareBody: React.FC<SegmentsEntity> = ({
     properties: { name: endName },
   },
   relationship: {
-    properties: { equSize, weightRangeMin, weightRangeMax, weightUnit },
+    properties: { equSize, weightRangeMin, weightRangeMax, weightUnit, equGroup },
   },
 }) => {
   const classes = useStyles();
@@ -90,18 +94,21 @@ const FareBody: React.FC<SegmentsEntity> = ({
         <Step>
           <StepLabel icon={<FiberManualRecordIcon />}>
             <Box className={classes.container}>
-              {/*<Typography variant={'h4'}>{'16:20'}</Typography>*/}
-              {/*<Typography>{'18-04-21'}</Typography>*/}
               <Typography variant={'h5'}>{endName}</Typography>
             </Box>
           </StepLabel>
         </Step>
       </Stepper>
       <Box display="flex" flexDirection="row" justifyContent="space-around" my={1}>
-        <Typography variant={'h4'}>Equipment size: {equSize}</Typography>
+        <Typography variant={'h4'}>
+          Equipment size: {equSize} {equGroup}
+        </Typography>
         <Typography variant={'h4'}>
           Weight range: {weightRangeMin}-{weightRangeMax} {weightUnit}
         </Typography>
+        <Box>
+          <SvgIcon component={EcologyIconSVG} viewBox="0 0 512 512" />
+        </Box>
       </Box>
     </Box>
   );
@@ -109,7 +116,7 @@ const FareBody: React.FC<SegmentsEntity> = ({
 
 const FareFooter: React.FC<SegmentsEntity> = ({
   relationship: {
-    properties: { rate },
+    properties: { rate, transportMode },
   },
 }) => {
   const classes = useStyles();
@@ -122,7 +129,7 @@ const FareFooter: React.FC<SegmentsEntity> = ({
         </Typography>
         <Typography variant={'h4'}>{rate || '1000'}€</Typography>
       </Box>
-      <Typography variant={'h4'}>Truck</Typography>
+      <Typography variant={'h4'}>{transportMode}</Typography>
       <Button style={{ margin: '.5em' }} color="primary" variant="contained" onClick={() => console.log('clicked')}>
         Book now
       </Button>
