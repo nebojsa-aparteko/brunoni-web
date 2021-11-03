@@ -39,20 +39,7 @@ const LandTransportFilterBar = () => {
       {/*  name={'transfers'}*/}
       {/*  label={'Number of transfers'}*/}
       {/*/>*/}
-      <Filter
-        collection={filters.companies}
-        setCollection={setFilters}
-        name={'companies'}
-        label={'Company'}
-        limit={5}
-      />
-      <Filter
-        collection={filters.transportModes}
-        setCollection={setFilters}
-        name={'transportModes'}
-        label={'Transport Mode'}
-        limit={2}
-      />
+
       <Filter
         collection={filters.containerTypes}
         setCollection={setFilters}
@@ -66,6 +53,20 @@ const LandTransportFilterBar = () => {
         name={'equipmentGroupTypes'}
         label={'Equipment Group Types'}
         limit={2}
+      />
+      <Filter
+        collection={filters.transportModes}
+        setCollection={setFilters}
+        name={'transportModes'}
+        label={'Transport Mode'}
+        limit={2}
+      />
+      <Filter
+        collection={filters.companies}
+        setCollection={setFilters}
+        name={'companies'}
+        label={'Company'}
+        limit={5}
       />
     </Box>
   );
