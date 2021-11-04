@@ -24,7 +24,7 @@ const VesselFullyBookedSwitch: React.FC<Props> = ({ vessel }) => {
   const toggleFullyBooked = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    setFullyBookedStatus(vessel, !vesselWithVoyage.isFullyBooked).finally(() =>
+    setFullyBookedStatus(vessel, !vesselWithVoyage?.isFullyBooked).finally(() =>
       dispatch({ type: 'STOP_GLOBAL_LOADING' }),
     );
   };
