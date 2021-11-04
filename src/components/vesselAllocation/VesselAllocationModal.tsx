@@ -23,6 +23,7 @@ import { BookingRequest } from '../../model/BookingRequest';
 import { Alert } from '@material-ui/lab';
 import NextPreviousVesselTable from './NextPreviousVesselTable';
 import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
+import SearchEmptyResults from '../routeSearch/SearchEmptyResults';
 
 interface VesselAllocationModalProps {
   isOpen: boolean;
@@ -99,7 +100,11 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 <Typography variant="h5">Allocation</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails style={{ padding: 0 }}>
-                {vesselAllocation && <VesselAllocationTable vessel={vesselAllocation} vesselVoyage={vesselVoyage} />}
+                {vesselAllocation ? (
+                  <VesselAllocationTable vessel={vesselAllocation} vesselVoyage={vesselVoyage} />
+                ) : (
+                  <SearchEmptyResults message={`Vessel & Voyage ${vesselVoyageString} was not found`} />
+                )}
               </ExpansionPanelDetails>
             </ExpansionPanel>
             <Box mb={2} />
@@ -108,8 +113,10 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 <Typography variant="h5">Previous & Next Vessel</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center', padding: 0 }}>
-                {vesselAllocation && (
+                {vesselAllocation ? (
                   <NextPreviousVesselTable vessel={vesselAllocation} bookingRequest={bookingRequest} />
+                ) : (
+                  <SearchEmptyResults message={`Vessel & Voyage ${vesselVoyageString} was not found`} />
                 )}
               </ExpansionPanelDetails>
             </ExpansionPanel>

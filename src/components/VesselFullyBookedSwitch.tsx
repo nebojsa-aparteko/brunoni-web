@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { GlobalContext } from '../store/GlobalStore';
+import React, { useEffect, useState } from 'react';
 import firebase from '../firebase';
-import { Switch } from '@material-ui/core';
+import { Switch, Typography } from '@material-ui/core';
 import useVesselWithVoyageById from '../hooks/useVesselWithVoyageById';
+import { useSnackbar } from 'notistack';
 
 const setFullyBookedStatus = (docId: string, newValue: boolean) => {
   return firebase
@@ -13,20 +13,25 @@ const setFullyBookedStatus = (docId: string, newValue: boolean) => {
 };
 
 const VesselFullyBookedSwitch: React.FC<Props> = ({ vessel }) => {
-  const [, dispatch] = useContext(GlobalContext);
   const vesselWithVoyage = useVesselWithVoyageById(vessel);
   const [isFullyBooked, setIsFullyBooked] = useState(vesselWithVoyage?.isFullyBooked || false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     setIsFullyBooked(vesselWithVoyage?.isFullyBooked || false);
   }, [vesselWithVoyage?.isFullyBooked]);
 
-  const toggleFullyBooked = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleFullyBooked = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-    setFullyBookedStatus(vessel, !vesselWithVoyage?.isFullyBooked).finally(() =>
-      dispatch({ type: 'STOP_GLOBAL_LOADING' }),
-    );
+    try {
+      await setFullyBookedStatus(vessel, !vesselWithVoyage?.isFullyBooked);
+    } catch (e) {
+      console.error('Failed to switch', e.message);
+      enqueueSnackbar(<Typography color="inherit"> {e.message}</Typography>, {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    }
   };
 
   return <Switch color="primary" onClick={toggleFullyBooked} checked={isFullyBooked} />;
