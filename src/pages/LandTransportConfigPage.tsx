@@ -7,6 +7,7 @@ import {
   ExpansionPanelDetails,
   ExpansionPanelSummary,
   makeStyles,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -17,6 +18,8 @@ import {
   TextField,
   Theme,
   Typography,
+  InputLabel,
+  Select,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useForm, Controller } from 'react-hook-form';
@@ -64,7 +67,6 @@ interface LandTransportData {
 
 const LandTransportConfigPage: React.FC = () => {
   const classes = useStyles();
-  const [inputData, setInputData] = React.useState('');
   const { control, handleSubmit } = useForm<LandTransportData>({
     defaultValues: { currency: '', price: '', containerType: '' },
   });
@@ -72,6 +74,7 @@ const LandTransportConfigPage: React.FC = () => {
 
   const onSubmit = (data: any) => {
     setRow(prevState => [...prevState, data]);
+    console.log(data);
   };
 
   return (
@@ -110,17 +113,15 @@ const LandTransportConfigPage: React.FC = () => {
                           <TableCell align="left">{item.currency}</TableCell>
                         </TableRow>
                       ))}
-                    <TableRow></TableRow>
-
                     <TableRow>
-                      <form onSubmit={handleSubmit(onSubmit)} id="row-form" style={{ width: '100%' }}>
-                        <Box>
+                      <Box>
+                        <form onSubmit={handleSubmit(onSubmit)} id="row-form">
                           <TableCell>
                             <Controller
                               name="containerType"
                               control={control}
                               defaultValue=""
-                              render={({ field }) => <TextField {...field} />}
+                              render={({ field }) => <TextField variant="outlined" label="Container Type" {...field} />}
                             />
                           </TableCell>
                           <TableCell>
@@ -128,7 +129,7 @@ const LandTransportConfigPage: React.FC = () => {
                               name="price"
                               control={control}
                               defaultValue=""
-                              render={({ field }) => <TextField {...field} />}
+                              render={({ field }) => <TextField variant="outlined" label="Price" {...field} />}
                             />
                           </TableCell>
                           <TableCell>
@@ -136,14 +137,23 @@ const LandTransportConfigPage: React.FC = () => {
                               name="currency"
                               control={control}
                               defaultValue=""
-                              render={({ field }) => <TextField label="Currency" {...field} />}
+                              render={({ field }) => (
+                                <Box>
+                                  <InputLabel id="currency-label">Currency</InputLabel>
+                                  <Select variant="outlined" labelId="currency-label" {...field}>
+                                    <MenuItem value="EUR">Eur</MenuItem>
+                                    <MenuItem value="USD">Usd</MenuItem>
+                                    <MenuItem value="CHF">Chf</MenuItem>
+                                  </Select>
+                                </Box>
+                              )}
                             />
                           </TableCell>
-                        </Box>
-                      </form>
-                      <Button form="row-form" color="primary" variant="contained" type="submit">
-                        Add row
-                      </Button>
+                        </form>
+                        <Button form="row-form" color="primary" variant="contained" type="submit">
+                          Add row
+                        </Button>
+                      </Box>
                     </TableRow>
                   </TableBody>
                 </Table>
