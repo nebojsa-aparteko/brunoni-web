@@ -1,5 +1,8 @@
-interface Provider {
+interface ProviderEntity {
+  id: string;
   name: string;
 }
 
-export default Provider;
+export type Provider = Omit<ProviderEntity, 'id'>;
+
+export default ProviderEntity;
