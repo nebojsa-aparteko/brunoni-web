@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { useForm, Controller } from 'react-hook-form';
 
 const useStyles = makeStyles((theme: Theme) => ({
   mainContainer: {
@@ -63,26 +64,14 @@ interface LandTransportData {
 
 const LandTransportConfigPage: React.FC = () => {
   const classes = useStyles();
-  const [inputData, setInputData] = React.useState<LandTransportData>();
+  const [inputData, setInputData] = React.useState('');
+  const { control, handleSubmit } = useForm<LandTransportData>({
+    defaultValues: { currency: '', price: '', containerType: '' },
+  });
   const [row, setRow] = React.useState<LandTransportData[]>([]);
 
-  const handleChange = (e: any) => {
-    setInputData(oldData => ({ ...oldData, [e.target.name]: e.target.value } as LandTransportData));
-  };
-
-  useEffect(() => {
-    console.log(inputData);
-  }, [inputData]);
-
-  const addRow = () => {
-    setRow(oldRow => [
-      ...oldRow,
-      {
-        containerType: inputData?.containerType,
-        price: inputData?.price,
-        currency: inputData?.currency,
-      },
-    ]);
+  const onSubmit = (data: any) => {
+    setRow(prevState => [...prevState, data]);
   };
 
   return (
@@ -124,35 +113,36 @@ const LandTransportConfigPage: React.FC = () => {
                     <TableRow></TableRow>
 
                     <TableRow>
-                      <TextField
-                        required
-                        type="text"
-                        name="containerType"
-                        label="Container Type"
-                        // className={classes.formInput}
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                      <TextField
-                        required
-                        type="text"
-                        name="price"
-                        label="Price"
-                        // className={classes.formInput}
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                      <TextField
-                        required
-                        type="text"
-                        name="currency"
-                        label="Currency"
-                        // className={classes.formInput}
-                        variant="outlined"
-                        onChange={handleChange}
-                      />
-                      <Button variant="contained" color="primary" onClick={addRow}>
-                        Add Row
+                      <form onSubmit={handleSubmit(onSubmit)} id="row-form" style={{ width: '100%' }}>
+                        <Box>
+                          <TableCell>
+                            <Controller
+                              name="containerType"
+                              control={control}
+                              defaultValue=""
+                              render={({ field }) => <TextField {...field} />}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Controller
+                              name="price"
+                              control={control}
+                              defaultValue=""
+                              render={({ field }) => <TextField {...field} />}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Controller
+                              name="currency"
+                              control={control}
+                              defaultValue=""
+                              render={({ field }) => <TextField label="Currency" {...field} />}
+                            />
+                          </TableCell>
+                        </Box>
+                      </form>
+                      <Button form="row-form" color="primary" variant="contained" type="submit">
+                        Add row
                       </Button>
                     </TableRow>
                   </TableBody>
