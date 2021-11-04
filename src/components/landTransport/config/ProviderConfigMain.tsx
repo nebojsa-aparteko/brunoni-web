@@ -55,7 +55,7 @@ const profitRows = [
   { price: '2999', currency: Currency.CHF, containerType: '40' },
 ] as LandTransportData[];
 
-const ProviderConfigMain = () => {
+const ProviderConfigMain = (props: any) => {
   const classes = useStyles();
 
   const { control, handleSubmit } = useForm<LandTransportData>({
@@ -70,7 +70,7 @@ const ProviderConfigMain = () => {
   return (
     <Box className={classes.accordionContainer}>
       <Typography className={classes.title} variant="h1">
-        Contargo
+        {props.name}
       </Typography>
       <SimpleExpansionPanel label="Profit" fullWidth>
         <TableContainer component={Paper}>
