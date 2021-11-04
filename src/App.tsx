@@ -52,6 +52,7 @@ import BookingRequestContainer from './components/bookingRequests/BookingRequest
 import BookingRequestsFilterProvider from './providers/BookingRequestsFilterProvider';
 import useAntiTrust from './hooks/useAntiTrust';
 import LandTransportPage from './pages/LandTransportPage';
+import LandTransportConfigPage from './pages/LandTransportConfigPage';
 
 const anonymousRoutes = (
   <Switch>
@@ -80,6 +81,7 @@ const adminRoutes = (
     <Route exact path="/bookings" component={BookingsPageContainer} />
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/teams" component={TeamManagementPage} />
+    <Route exact path="/land-transport-config" component={LandTransportConfigPage} />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     {/*TODO uncomment this once it's ready*/}
