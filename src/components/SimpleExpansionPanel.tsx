@@ -15,14 +15,17 @@ const useStyles = makeStyles(() =>
     elevatedComponent: {
       boxShadow: '0 0 0 1px rgba(63,63,68,0.05), 0 1px 3px 0 rgba(63,63,68,0.15)',
     },
+    fullWidth: {
+      width: '100%',
+    },
   }),
 );
 
-const SimpleExpansionPanel = ({ label, defaultExpanded, children }: Props) => {
+const SimpleExpansionPanel = ({ label, defaultExpanded, children, fullWidth = false }: Props) => {
   const classes = useStyles();
 
   return (
-    <ExpansionPanel defaultExpanded={defaultExpanded}>
+    <ExpansionPanel defaultExpanded={defaultExpanded} className={fullWidth ? classes.fullWidth : ''}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.elevatedComponent}>
         <Typography>{label}</Typography>
       </ExpansionPanelSummary>
@@ -34,6 +37,7 @@ const SimpleExpansionPanel = ({ label, defaultExpanded, children }: Props) => {
 interface Props {
   label: string;
   defaultExpanded?: boolean;
+  fullWidth?: boolean;
   children: ReactNode;
 }
 
