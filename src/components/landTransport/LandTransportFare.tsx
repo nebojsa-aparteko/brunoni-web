@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -152,7 +152,7 @@ const FareFooter: React.FC<DetailsProps> = ({ grouped }) => {
   const classes = useStyles();
   const [showDetails, setShowDetails] = useState(false);
   const transportMode = grouped[0].props.transportMode[0];
-  const co2 = CO2(transportMode);
+  const co2 = useMemo(() => CO2(transportMode), [transportMode]);
 
   return (
     <Box display={'flex'} flexDirection={'column'}>
@@ -184,18 +184,16 @@ interface DetailsProps {
 }
 
 const GroupedBySize: React.FC<DetailsProps> = ({ grouped }) => {
-  const groupedByContainerSize = groupBy(grouped, 'props.equSize[0]');
-  const groupedBySizeKeys = Object.keys(groupedByContainerSize);
-
+  const groupedByContainerSize = useMemo(() => Object.entries(groupBy(grouped, 'props.equSize[0]')), [grouped]);
   return (
     <>
-      {groupedBySizeKeys.map(key => (
+      {groupedByContainerSize.map(([key, groupedFare]) => (
         <ExpansionPanel key={key} defaultExpanded={true} TransitionProps={{ mountOnEnter: true }}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h5">{key}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <GroupedByType grouped={groupedByContainerSize[key]} />
+            <GroupedByType grouped={groupedFare} />
           </ExpansionPanelDetails>
         </ExpansionPanel>
       ))}
@@ -211,7 +209,7 @@ const GroupedByType: React.FC<DetailsProps> = ({ grouped }) => {
   return (
     <Grid container spacing={2} direction="row">
       {groupedByTypeKeys.map(key => (
-        <Grid item key={key}>
+        <Grid item key={key} md={6}>
           <Details grouped={groupedByContainerType[key]} />
         </Grid>
       ))}

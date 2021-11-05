@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import LandTransportFare from './LandTransportFare';
 import { Box, makeStyles, Theme } from '@material-ui/core';
 import { LandTransportContext } from '../../providers/LandTransportProvider';
@@ -18,14 +18,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LandTransportFareCollection: React.FC = () => {
   const classes = useStyles();
   const [landTransports] = useContext(LandTransportContext);
-  const grouped = groupBy(landTransports, 'props.transportMode[0]');
-  console.log(grouped);
-  const groupedKeys = Object.keys(grouped);
-  console.log(groupedKeys);
+  const grouped = useMemo(() => Object.entries(groupBy(landTransports, 'props.transportMode[0]')), [landTransports]);
   return (
     <Box className={classes.container}>
-      {groupedKeys.map((key, i) => {
-        return <LandTransportFare key={i} grouped={grouped[key]} />;
+      {grouped.map(([key, value], i) => {
+        return <LandTransportFare key={i} grouped={value} />;
       })}
     </Box>
   );
