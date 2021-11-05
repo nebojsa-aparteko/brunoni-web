@@ -3,8 +3,8 @@ import Meta from '../components/Meta';
 import { Box, Button, makeStyles, Tab, Tabs } from '@material-ui/core';
 import ProviderConfigMain from '../components/landTransport/config/ProviderConfigMain';
 import TabPanel from '../components/TabPanel';
-import useLandTransportProviders from '../hooks/useLandTransportProviders';
 import { addLandTransportProvider } from '../api/landTransportConfig';
+import useLandTransportProviders from '../hooks/useLandTransportProviders';
 
 const useStyles = makeStyles(() => ({
   mainContainer: {
@@ -56,12 +56,12 @@ const LandTransportConfigPage: React.FC = () => {
       <Box className={classes.mainContainer}>
         <Tabs className={classes.tabPanel} value={value} orientation="vertical" onChange={handleChange}>
           {providers?.map((provider, index) => (
-            <Tab label={provider.name} {...a11yProps(index)} />
+            <Tab key={provider.id} label={provider.name} {...a11yProps(index)} />
           ))}
         </Tabs>
         {providers?.map((provider, index) => (
-          <TabPanel index={index} value={value}>
-            <ProviderConfigMain name={provider.name} />
+          <TabPanel index={index} value={value} key={provider.id}>
+            <ProviderConfigMain provider={provider} />
           </TabPanel>
         ))}
       </Box>

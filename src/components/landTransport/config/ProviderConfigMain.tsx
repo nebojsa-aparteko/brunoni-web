@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import {
   Box,
   Button,
+  IconButton,
   makeStyles,
   MenuItem,
   Paper,
@@ -14,12 +15,14 @@ import {
   TableRow,
   TextField,
   Typography,
-  Icon,
 } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { Controller, useForm } from 'react-hook-form';
 import SimpleExpansionPanel from '../../SimpleExpansionPanel';
 import { Currency } from '../../../model/Payment';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import CheckIcon from '@material-ui/icons/Check';
+import { addLandTransportProfit } from '../../../api/landTransportConfig';
+import ProviderEntity from '../../../model/land-transport/providers/Provider';
 
 const useStyles = makeStyles(() => ({
   accordionContainer: {
@@ -59,67 +62,21 @@ interface LandTransportData {
   active?: boolean;
 }
 
-const profitRows = [
-  { price: '1999', currency: Currency.EUR, containerType: '20' },
-  { price: '2999', currency: Currency.CHF, containerType: '40' },
-] as LandTransportData[];
+const defaultItem = { price: '', currency: Currency.EUR, containerType: '' } as LandTransportData;
+/*
+  Is in edit mode? If yes, check if new Value, if yes, show add icon else show edit icon
 
-const ProviderConfigMain = (props: any) => {
+ */
+const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }) => {
   const classes = useStyles();
-
-  const { control, handleSubmit } = useForm<LandTransportData>({
-    defaultValues: { currency: Currency.CHF, price: '', containerType: '' },
-  });
-  const [row, setRow] = React.useState<LandTransportData[]>(profitRows);
-  const [toggleForm, setToggleForm] = React.useState<boolean>(false);
-  const [inEditMode, setInEditMode] = React.useState({
-    status: false,
-    rowKey: null,
-  });
-  const [unitPrice, setUnitPrice] = React.useState<string>();
-
-  const onEdit = ({ id, currentUnitPrice }: any) => {
-    setInEditMode({
-      status: true,
-      rowKey: id,
-    });
-    setUnitPrice(currentUnitPrice);
-  };
-
-  const onSave = ({ id, newUnitPrice }: any) => {};
-
-  const onCancel = () => {
-    // reset the inEditMode state value
-    setInEditMode({
-      status: false,
-      rowKey: null,
-    });
-    // reset the unit price state value
-    setUnitPrice(undefined);
-  };
-
-  const handleDelete = () => {};
-
-  const showForm = () => {
-    if (toggleForm) {
-      setToggleForm(false);
-    } else {
-      setToggleForm(true);
-    }
-  };
-
-  const onSubmit = (data: any) => {
-    setRow(prevState => [...prevState, data]);
-    setToggleForm(false);
-    console.log(data);
-  };
 
   return (
     <Box className={classes.accordionContainer}>
       <Typography className={classes.title} variant="h1">
-        {props.name}
+        {provider.name}
       </Typography>
       <SimpleExpansionPanel label="Profit" fullWidth>
+        <Button>Add row</Button>
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -127,90 +84,21 @@ const ProviderConfigMain = (props: any) => {
                 <TableCell>Container Type</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Currency</TableCell>
-                <TableCell>
-                  <Icon className={classes.icon} onClick={showForm} color="primary">
-                    add_circle
-                  </Icon>
-                </TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {row &&
-                row.map((item, i) => (
-                  <TableRow key={i}>
-                    <TableCell align="left">{item.containerType}</TableCell>
-
-                    <TableCell align="left">
-                      {inEditMode.status && inEditMode.rowKey === i ? (
-                        <input value={unitPrice} onChange={e => setUnitPrice(e.target.value)} />
-                      ) : (
-                        // {item.price}
-                        <p>{item.price}</p>
-                      )}
-                    </TableCell>
-                    <TableCell align="left">{item.currency}</TableCell>
-                    <TableCell align="left">
-                      {inEditMode.status && inEditMode.rowKey === i ? (
-                        <React.Fragment>
-                          <button className={'btn-success'} onClick={() => onSave({ id: i, newUnitPrice: unitPrice })}>
-                            save
-                          </button>
-                          <button className={'btn-secondary'} style={{ marginLeft: 8 }} onClick={() => onCancel()}>
-                            cancel
-                          </button>
-                        </React.Fragment>
-                      ) : (
-                        <button
-                          className={'btn-primary'}
-                          onClick={() => onEdit({ id: i, currentUnitPrice: item.price })}
-                        >
-                          edit
-                        </button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              <TableRow>
-                {toggleForm && (
-                  <Box className={classes.formContainer}>
-                    <form onSubmit={handleSubmit(onSubmit)} id="row-form">
-                      <TableCell>
-                        <Controller
-                          name="containerType"
-                          control={control}
-                          defaultValue=""
-                          render={({ field }) => <TextField variant="outlined" label="Container Type" {...field} />}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Controller
-                          name="price"
-                          control={control}
-                          defaultValue=""
-                          render={({ field }) => <TextField variant="outlined" label="Price" {...field} />}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Controller
-                          name="currency"
-                          control={control}
-                          defaultValue=""
-                          render={({ field }) => (
-                            <Select variant="outlined" label="Currency" {...field}>
-                              {Object.values(Currency).map(val => (
-                                <MenuItem value={val}>{val}</MenuItem>
-                              ))}
-                            </Select>
-                          )}
-                        />
-                      </TableCell>
-                    </form>
-                    <Button form="row-form" color="primary" variant="contained" type="submit">
-                      Add row
-                    </Button>
-                  </Box>
-                )}
-              </TableRow>
+              {[
+                { price: '100', currency: Currency.EUR, containerType: '20' },
+                { price: '20', currency: Currency.EUR, containerType: '40' },
+              ].map((item, i) => (
+                <ProviderProfitConfigTableRow
+                  item={item}
+                  key={i}
+                  saveItem={item1 => addLandTransportProfit(provider.id, item1)}
+                />
+              ))}
+              {/*<ProviderProfitConfigTableRow item={defaultItem} saveItem={item1 => {}} />*/}
             </TableBody>
           </Table>
         </TableContainer>
@@ -222,6 +110,82 @@ const ProviderConfigMain = (props: any) => {
         </Box>
       </SimpleExpansionPanel>
     </Box>
+  );
+};
+
+interface ProviderProfitConfigTableRowProps {
+  item: LandTransportData;
+  saveItem: (item: LandTransportData) => Promise<any>;
+  isAddMode?: boolean;
+}
+
+const ProviderProfitConfigTableRow: React.FC<ProviderProfitConfigTableRowProps> = ({ item, saveItem, isAddMode }) => {
+  const [isEditing, setEditing] = useState(false);
+  const [stateItem, setStateItem] = useState(item);
+  const handleInputChange = () => {};
+  const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
+    event.target?.name && setStateItem(prevState => ({ ...prevState, currency: event.target.value as Currency }));
+  };
+  return isEditing ? (
+    <TableRow>
+      <TableCell>
+        <TextField
+          variant="outlined"
+          label="Container Type"
+          value={stateItem.containerType}
+          name="containerType"
+          onChange={event => {}}
+        />
+      </TableCell>
+      <TableCell>
+        <TextField variant="outlined" label="Price" value={stateItem.price} name="price" onChange={event => {}} />
+      </TableCell>
+      <TableCell>
+        <Select
+          variant="outlined"
+          label="Currency"
+          value={stateItem.currency}
+          name="currency"
+          onChange={handleSelectChange}
+        >
+          {Object.values(Currency).map(val => (
+            <MenuItem value={val}>{val}</MenuItem>
+          ))}
+        </Select>
+      </TableCell>
+      <TableCell align="left">
+        {isEditing ? (
+          <IconButton
+            onClick={() => {
+              saveItem(stateItem).finally(() => setEditing(false));
+            }}
+          >
+            <CheckIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => setEditing(true)}>
+            <EditIcon />
+          </IconButton>
+        )}
+        <IconButton>
+          <DeleteIcon />
+        </IconButton>
+      </TableCell>
+    </TableRow>
+  ) : (
+    <TableRow>
+      <TableCell align="left">{stateItem.containerType}</TableCell>
+      <TableCell align="left">{stateItem.price}</TableCell>
+      <TableCell align="left">{stateItem.currency}</TableCell>
+      <TableCell align="left">
+        <IconButton onClick={() => setEditing(prevState => !prevState)}>
+          <EditIcon />
+        </IconButton>
+        <IconButton>
+          <DeleteIcon />
+        </IconButton>
+      </TableCell>
+    </TableRow>
   );
 };
 

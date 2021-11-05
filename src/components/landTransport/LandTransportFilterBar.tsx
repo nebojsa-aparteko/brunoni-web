@@ -9,7 +9,7 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import {
   Collection,
   LandTransportFilter,
