@@ -1,11 +1,10 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 import { LandTransportFilterContext } from './LandTransportFilterProvider';
-import { SegmentsEntity } from '../components/landTransport/LandTransportSearch';
+import { R } from '../components/landTransport/LandTransportSearch';
 import useUser from '../hooks/useUser';
 import useGlobalAppState from '../hooks/useGlobalAppState';
 
 export const LandTransportContext = createContext<[R[], Dispatch<SetStateAction<R[]>>, string[]]>([[], () => {}, []]);
-type R = { result: SegmentsEntity[]; props: { transportMode: []; equSize: []; equGroup: [] } };
 const LandTransportProvider: React.FC = ({ children }) => {
   const [state, setState] = useState<R[]>([]);
   const [locations, setLocations] = useState<string[]>([]);

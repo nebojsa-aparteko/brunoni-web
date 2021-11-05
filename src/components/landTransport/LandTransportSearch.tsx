@@ -6,6 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { LandTransportContext } from '../../providers/LandTransportProvider';
 import LandTransportRouteSearchParams from '../../model/land-transport/RouteSearchParams';
 import useUser from '../../hooks/useUser';
+import { TransportModeType } from '../../model/land-transport/TransportMode';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -96,11 +97,22 @@ const getLandTransportRecords = async (token: string, fromLocationName: string, 
   } finally {
   }
 };
+
+export interface R {
+  result: SegmentsEntity[];
+  props: {
+    transportMode: TransportModeType[];
+    equSize: [];
+    equGroup: [];
+  };
+}
+
 export interface StartOrEnd {
   identity: IdentityOrStartOrEnd;
   labels?: string[] | null;
   properties: Properties;
 }
+
 export interface IdentityOrStartOrEnd {
   low: number;
   high: number;
