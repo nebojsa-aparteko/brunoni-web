@@ -18,9 +18,7 @@ const LandTransportProvider: React.FC = ({ children }) => {
       .finally(() => console.log('Locations', locations));
   }, [getAllLocations]);
   const [filters] = useContext(LandTransportFilterContext);
-  useEffect(() => {
-    console.log(filters);
-  }, [filters]);
+
   const filteredRoutes = useMemo(() => {
     let temp = state;
     if (filters.transportModes.some(value => value.checked)) {

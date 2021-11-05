@@ -45,7 +45,7 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel, bookingReq
   useEffect(() => {
     const getVesselAllocationSchedule = async () => {
       const params = {
-        carrierId: bookingRequest?.carrier?.name,
+        carrierId: vessel.carrierCode,
         service: vessel.service,
         POL: bookingRequest?.itinerary?.portOfLoading.Port?.ID,
         etsDate: bookingRequest?.itinerary?.portOfLoading.DepartureDate

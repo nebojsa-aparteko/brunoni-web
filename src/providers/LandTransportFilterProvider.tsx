@@ -17,37 +17,37 @@ const transfers = [
 
 const companies = [
   {
-    name: 'Contargo',
+    name: 'Hamburg Süd',
     checked: false,
   },
-  {
-    name: 'Swissterminal AG',
-    checked: false,
-  },
-  {
-    name: 'Maritime transport Ltd.',
-    checked: false,
-  },
-  {
-    name: 'IBA logistics Group',
-    checked: false,
-  },
-  {
-    name: 'Distrifresh B.V',
-    checked: false,
-  },
-  {
-    name: 'Company 1',
-    checked: false,
-  },
-  {
-    name: 'Company 2',
-    checked: false,
-  },
-  {
-    name: 'Company 3',
-    checked: false,
-  },
+  // {
+  //   name: 'Swissterminal AG',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'Maritime transport Ltd.',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'IBA logistics Group',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'Distrifresh B.V',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'Company 1',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'Company 2',
+  //   checked: false,
+  // },
+  // {
+  //   name: 'Company 3',
+  //   checked: false,
+  // },
 ];
 
 export const LAND_TRANSPORT_FILTERS_INITIAL_STATE = {

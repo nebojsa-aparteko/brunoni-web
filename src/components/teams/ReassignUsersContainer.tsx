@@ -95,6 +95,11 @@ const AddRuleDialog: React.FC<AddRuleDialogProps> = ({ isOpen, handleClose, admi
           setSelectedUser(undefined);
           handleClose();
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
+        })
+        .finally(() => {
+          setSelectedUser(undefined);
+          setSelectedCarrier(undefined);
+          setReassignToUser(undefined);
         });
     }
   }, [selectedUser, selectedCarrier, reassignToUser, handleClose, dispatch]);
@@ -187,8 +192,8 @@ const ReassignUsersContainer: React.FC = () => {
   );
 
   const handleSelectDeselectAll = () => {
-    if (selectedRules.length !== adminUsers.length) {
-      setSelectedRules(adminUsers.map(user => user.id || ''));
+    if (selectedRules.length !== reassignmentRules.length) {
+      setSelectedRules(reassignmentRules.map(rule => rule.id || ''));
     } else {
       setSelectedRules([]);
     }
@@ -240,7 +245,7 @@ const ReassignUsersContainer: React.FC = () => {
                 <TableRow>
                   <TableCell align="left" style={{ paddingLeft: 4 }}>
                     <Checkbox
-                      checked={selectedRules.length === adminUsers.length}
+                      checked={selectedRules.length === reassignmentRules.length}
                       onClick={handleSelectDeselectAll}
                       onFocus={event => event.stopPropagation()}
                       color="primary"
