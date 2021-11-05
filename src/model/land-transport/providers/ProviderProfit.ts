@@ -1,7 +1,8 @@
 import { BookingCategory } from '../../Booking';
 import Price from '../../Price';
+import Entity from '../../Entity';
 
-interface ProviderProfit {
+interface ProviderProfitEntity extends Entity {
   type: ProviderProfitType;
   containerType: string;
   price: Price;
@@ -11,16 +12,19 @@ export enum ProviderProfitType {
   SPECIFIC = 'SPECIFIC',
 }
 
-export interface DefaultProviderProfit extends ProviderProfit {
+export interface DefaultProviderProfitEntity extends ProviderProfitEntity {
   type: ProviderProfitType.DEFAULT;
 }
-export interface SpecificProviderProfit extends ProviderProfit {
+export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
   type: ProviderProfitType.SPECIFIC;
   port: string;
   category: BookingCategory;
 }
+export type ProviderProfit = Omit<ProviderProfitEntity, 'id' | 'createdAt'>;
+export type DefaultProviderProfit = Omit<DefaultProviderProfitEntity, 'id' | 'createdAt'>;
+export type SpecificProviderProfit = Omit<SpecificProviderProfitEntity, 'id' | 'createdAt'>;
+export default ProviderProfitEntity;
 
-export default ProviderProfit;
 /*
   When we want to add on price, we fetch specific profit first, if there is no profit, after that we fetch default and add that on price, we do this on api
  */

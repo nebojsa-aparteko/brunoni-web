@@ -23,6 +23,14 @@ import EditIcon from '@material-ui/icons/Edit';
 import CheckIcon from '@material-ui/icons/Check';
 import { addLandTransportProfit } from '../../../api/landTransportConfig';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
+import ProviderProfitEntity, {
+  DefaultProviderProfit,
+  DefaultProviderProfitEntity,
+  ProviderProfit,
+  ProviderProfitType,
+} from '../../../model/land-transport/providers/ProviderProfit';
+import { set } from 'lodash/fp';
+import useLandTransportProfits from '../../../hooks/useLandTransportProfits';
 
 const useStyles = makeStyles(() => ({
   accordionContainer: {
@@ -53,22 +61,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface LandTransportData {
-  containerType?: string;
-  price?: string;
-  currency?: Currency;
-  version?: string;
-  date?: Date;
-  active?: boolean;
-}
+const defaultItem = {
+  price: { value: 0, currency: Currency.EUR },
+  containerType: '',
+  type: ProviderProfitType.DEFAULT,
+} as ProviderProfit;
 
-const defaultItem = { price: '', currency: Currency.EUR, containerType: '' } as LandTransportData;
 /*
   Is in edit mode? If yes, check if new Value, if yes, show add icon else show edit icon
 
  */
 const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }) => {
   const classes = useStyles();
+  const [newRow, setNewRow] = useState(false);
+  const profits = useLandTransportProfits(provider.id);
 
   return (
     <Box className={classes.accordionContainer}>
@@ -76,7 +82,13 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
         {provider.name}
       </Typography>
       <SimpleExpansionPanel label="Profit" fullWidth>
-        <Button>Add row</Button>
+        <Button
+          onClick={() => {
+            setNewRow(true);
+          }}
+        >
+          Add row
+        </Button>
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -88,17 +100,20 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               </TableRow>
             </TableHead>
             <TableBody>
-              {[
-                { price: '100', currency: Currency.EUR, containerType: '20' },
-                { price: '20', currency: Currency.EUR, containerType: '40' },
-              ].map((item, i) => (
+              {profits?.map((item, i) => (
                 <ProviderProfitConfigTableRow
                   item={item}
                   key={i}
                   saveItem={item1 => addLandTransportProfit(provider.id, item1)}
                 />
               ))}
-              {/*<ProviderProfitConfigTableRow item={defaultItem} saveItem={item1 => {}} />*/}
+              {newRow && (
+                <ProviderProfitConfigTableRow
+                  item={defaultItem}
+                  saveItem={item1 => addLandTransportProfit(provider.id, item1).finally(() => setNewRow(false))}
+                  isAddMode={true}
+                />
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -114,18 +129,27 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
 };
 
 interface ProviderProfitConfigTableRowProps {
-  item: LandTransportData;
-  saveItem: (item: LandTransportData) => Promise<any>;
+  item: ProviderProfitEntity | ProviderProfit;
+  saveItem: (item: ProviderProfit) => Promise<any>;
   isAddMode?: boolean;
 }
 
 const ProviderProfitConfigTableRow: React.FC<ProviderProfitConfigTableRowProps> = ({ item, saveItem, isAddMode }) => {
-  const [isEditing, setEditing] = useState(false);
+  const [isEditing, setEditing] = useState(isAddMode);
   const [stateItem, setStateItem] = useState(item);
-  const handleInputChange = () => {};
-  const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-    event.target?.name && setStateItem(prevState => ({ ...prevState, currency: event.target.value as Currency }));
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const key = event.target?.name;
+    const value = event.target.value;
+    key && setStateItem(prevState => set(key, value)(prevState));
   };
+  const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
+    event.target?.name &&
+      setStateItem(prevState => ({
+        ...prevState,
+        price: { ...prevState.price, currency: event.target.value as Currency },
+      }));
+  };
+
   return isEditing ? (
     <TableRow>
       <TableCell>
@@ -134,17 +158,23 @@ const ProviderProfitConfigTableRow: React.FC<ProviderProfitConfigTableRowProps> 
           label="Container Type"
           value={stateItem.containerType}
           name="containerType"
-          onChange={event => {}}
+          onChange={handleInputChange}
         />
       </TableCell>
       <TableCell>
-        <TextField variant="outlined" label="Price" value={stateItem.price} name="price" onChange={event => {}} />
+        <TextField
+          variant="outlined"
+          label="Price"
+          value={stateItem.price.value}
+          name="price.value"
+          onChange={handleInputChange}
+        />
       </TableCell>
       <TableCell>
         <Select
           variant="outlined"
           label="Currency"
-          value={stateItem.currency}
+          value={stateItem.price.currency}
           name="currency"
           onChange={handleSelectChange}
         >
@@ -175,8 +205,8 @@ const ProviderProfitConfigTableRow: React.FC<ProviderProfitConfigTableRowProps> 
   ) : (
     <TableRow>
       <TableCell align="left">{stateItem.containerType}</TableCell>
-      <TableCell align="left">{stateItem.price}</TableCell>
-      <TableCell align="left">{stateItem.currency}</TableCell>
+      <TableCell align="left">{`${stateItem.price.value}`}</TableCell>
+      <TableCell align="left">{stateItem.price.currency}</TableCell>
       <TableCell align="left">
         <IconButton onClick={() => setEditing(prevState => !prevState)}>
           <EditIcon />
