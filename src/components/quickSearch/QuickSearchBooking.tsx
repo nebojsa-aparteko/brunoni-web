@@ -148,7 +148,12 @@ const QuickSearchBooking: React.FC<Props> = ({ label, getBookingChunks }) => {
             {searchResult &&
               searchResult.map((result, index) => (
                 <Box key={index} onClick={() => handleBookingClick(index)}>
-                  <BookingRow booking={searchResult[index]} isAdmin={!actingAs} preventDefaultClick />
+                  <BookingRow
+                    booking={searchResult[index]}
+                    isAdmin={!actingAs}
+                    preventDefaultClick
+                    onProgressClick={() => {}}
+                  />
                   <Divider />
                 </Box>
               ))}

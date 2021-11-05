@@ -737,14 +737,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   }, [printRequested]);
 
   const getCorrectBackRoute = () => {
-    if (bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED && !bookingRequest.hold) {
+    if (bookingRequest.statusCode <= BookingRequestStatusCode.IN_PROGRESS && !bookingRequest.hold) {
       return '/bookings?tab=requests';
-    } else if (bookingRequest.statusCode !== BookingRequestStatusCode.ARCHIVED && bookingRequest.hold) {
+    } else if (bookingRequest.statusCode <= BookingRequestStatusCode.IN_PROGRESS && bookingRequest.hold) {
       return '/bookings?tab=on-hold';
-    } else if (bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED && !bookingRequest.hold) {
+    } else if (bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED) {
       return '/bookings?tab=archived-requests';
     } else {
-      return '/bookings';
+      return '/bookings?tab=requests';
     }
   };
 
