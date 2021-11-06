@@ -21,7 +21,7 @@ const LandTransportFareCollection: React.FC = () => {
   return (
     <Box className={classes.container}>
       {landTransports?.map((fare, i) =>
-        fare.map(f => (
+        fare.result.map(f => (
           // <Typography>
           //   {f.start.properties.name} {f.end.properties.name}
           // </Typography>

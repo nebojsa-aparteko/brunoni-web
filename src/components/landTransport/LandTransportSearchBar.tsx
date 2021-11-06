@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Box, createStyles, makeStyles } from '@material-ui/core';
 import { ControlledDateInput } from '../inputs/DateInput';
-import { ControlledTransportModeInput } from '../inputs/TransportModeInput';
 import { ControlledLandLocationInput } from '../inputs/LandLocationInput';
 import { ControlledCheckBox } from '../inputs/CheckBox';
 import { LandTransportContext } from '../../providers/LandTransportProvider';
@@ -32,15 +31,14 @@ const LandTransportSearchBar: React.FC = () => {
   return (
     <Box className={classes.root}>
       <Box className={classes.body}>
-        <ControlledLandLocationInput label={'from'} name={'from'} locations={locations} />
-        <ControlledLandLocationInput label={'to'} name={'to'} locations={locations} />
+        <ControlledLandLocationInput label={'From'} name={'from'} locations={locations} />
+        <ControlledLandLocationInput label={'To'} name={'to'} locations={locations} />
         <ControlledDateInput
           name={'earliestDate'}
           open={dateOpen}
           onOpen={() => setDateOpen(true)}
           onClose={() => setDateOpen(false)}
         />
-        <ControlledTransportModeInput name="transportMode" />
       </Box>
       <Box>
         <ControlledCheckBox label={'Show direct lines only'} name={'directLines'} />
