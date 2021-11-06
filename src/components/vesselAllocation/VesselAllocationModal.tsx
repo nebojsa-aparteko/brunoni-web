@@ -19,7 +19,6 @@ import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearc
 import VesselAllocationTable from './VesselAllocationTable';
 import useVesselWithVoyageById from '../../hooks/useVesselWithVoyageById';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { BookingRequest } from '../../model/BookingRequest';
 import { Alert } from '@material-ui/lab';
 import NextPreviousVesselTable from './NextPreviousVesselTable';
 import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
@@ -30,7 +29,8 @@ interface VesselAllocationModalProps {
   closeModal: () => void;
   vesselVoyage: RouteSearchResultVoyageInfo;
   service?: string;
-  bookingRequest?: BookingRequest;
+  POL?: string;
+  etsDate?: string;
 }
 
 function PaperComponent(props: PaperProps) {
@@ -46,7 +46,8 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
   closeModal,
   vesselVoyage,
   service,
-  bookingRequest,
+  POL,
+  etsDate,
 }) => {
   const classes = useVesselAllocationStyles();
 
@@ -113,8 +114,8 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 <Typography variant="h5">Previous & Next Vessel</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center', padding: 0 }}>
-                {vesselAllocation ? (
-                  <NextPreviousVesselTable vessel={vesselAllocation} bookingRequest={bookingRequest} />
+                {vesselAllocation && POL && etsDate ? (
+                  <NextPreviousVesselTable vessel={vesselAllocation} POL={POL} etsDate={etsDate} />
                 ) : (
                   <SearchEmptyResults message={`Vessel & Voyage ${vesselVoyageString} was not found`} />
                 )}

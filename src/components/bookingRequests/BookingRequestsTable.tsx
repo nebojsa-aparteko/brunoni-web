@@ -367,7 +367,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                     <VesselAllocationButton
                       vesselVoyage={vesselVoyage}
                       service={bookingRequest?.schedule?.Service}
-                      bookingRequest={bookingRequest}
+                      POL={bookingRequest.itinerary?.portOfLoading.Port.ID}
+                      etsDate={bookingRequest.itinerary?.portOfLoading.DepartureDate}
                     />
                   </Grid>
                 )}
