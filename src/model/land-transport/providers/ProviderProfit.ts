@@ -20,6 +20,7 @@ export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
   port: string;
   category: BookingCategory;
 }
+export const isProviderProfitEntity = (value: any): value is string => 'id' in value;
 export type ProviderProfit = Omit<ProviderProfitEntity, 'id' | 'createdAt'>;
 export type DefaultProviderProfit = Omit<DefaultProviderProfitEntity, 'id' | 'createdAt'>;
 export type SpecificProviderProfit = Omit<SpecificProviderProfitEntity, 'id' | 'createdAt'>;
