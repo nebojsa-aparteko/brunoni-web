@@ -6,6 +6,8 @@ interface ProviderProfitEntity extends Entity {
   type: ProviderProfitType;
   containerType: string;
   price: Price;
+  port: string;
+  category: BookingCategory;
 }
 export enum ProviderProfitType {
   DEFAULT = 'DEFAULT',
@@ -20,6 +22,7 @@ export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
   port: string;
   category: BookingCategory;
 }
+
 export const isProviderProfitEntity = (value: any): value is string => 'id' in value;
 export type ProviderProfit = Omit<ProviderProfitEntity, 'id' | 'createdAt'>;
 export type DefaultProviderProfit = Omit<DefaultProviderProfitEntity, 'id' | 'createdAt'>;
