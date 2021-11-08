@@ -10,6 +10,8 @@ interface VesselWithVoyage {
   clientId?: string;
   category?: string;
   carrier?: string;
+  checklistCheckedCount?: boolean;
+  checklistItemCount?: boolean;
 }
 
 export default VesselWithVoyage;

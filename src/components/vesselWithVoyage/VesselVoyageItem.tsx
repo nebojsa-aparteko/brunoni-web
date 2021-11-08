@@ -7,6 +7,8 @@ import VesselWithVoyage from '../../model/VesselWithVoyage';
 import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
 import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
+import useVesVoy from '../../hooks/useVesVoy';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const SeparatorArrow = () => (
   <Box mx={4} display="flex" flexDirection="column" alignItems="center">
@@ -21,7 +23,24 @@ const findCarrierId = (items: any[]) => {
 
 const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) => {
   const entries = useMemo(() => Object.entries(items), [items]);
+  const relevantAllocations = useVesVoy(vessel);
 
+  const entriesFullyCompleted = useMemo(
+    () =>
+      entries.map(([pol]) =>
+        relevantAllocations
+          ? relevantAllocations
+              .filter(allocation => allocation?.pol === pol)
+              .every(allocation =>
+                allocation?.checklistItemCount !== undefined && allocation?.checklistCheckedCount !== undefined
+                  ? allocation?.checklistItemCount === allocation?.checklistCheckedCount
+                  : false,
+              )
+          : false,
+      ),
+
+    [entries, relevantAllocations],
+  );
   const vesselItems = useMemo(
     () =>
       Object.entries(items)
@@ -75,9 +94,16 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
         {entries.map(([pol, items]: any, index: number) => (
           <Fragment key={`${vessel}-${pol}`}>
             {index > 0 && <SeparatorArrow />}
-            <Box display="flex" flexDirection="column" mx={2} style={{ width: theme.spacing(15) }}>
-              <Typography variant="subtitle1">{pol}</Typography>
-              <Typography variant="body1">{`ETS ${formatDateSafe(items?.[0].ets, DateFormats.LONG)}`}</Typography>
+            <Box display="flex" flexDirection="row" mx={2} alignItems="center" style={{ width: theme.spacing(15) }}>
+              <Box display="flex" flexDirection="column">
+                <Typography variant="subtitle1">{pol}</Typography>
+                <Typography variant="body1">{`ETS ${formatDateSafe(items?.[0].ets, DateFormats.LONG)}`}</Typography>
+              </Box>
+              {entriesFullyCompleted[index] ? (
+                <CheckCircleIcon style={{ color: 'green', position: 'absolute', marginLeft: '110px' }} />
+              ) : (
+                undefined
+              )}
             </Box>
           </Fragment>
         ))}
