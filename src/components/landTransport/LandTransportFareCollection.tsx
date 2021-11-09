@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LandTransportFareCollection: React.FC = () => {
   const classes = useStyles();
   const [landTransports] = useContext(LandTransportContext);
+
   const grouped = useMemo(() => Object.entries(groupBy(landTransports, 'props.transportMode[0]')), [landTransports]);
   return (
     <Box className={classes.container}>

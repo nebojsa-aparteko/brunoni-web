@@ -27,7 +27,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { R, SegmentsEntity } from './LandTransportSearch';
 import { ReactComponent as EcologyIconSVG } from '../../assets/ecology.svg';
-import { TransportModeType } from '../../model/land-transport/TransportMode';
+import { TransportModeLabels, TransportModeType } from '../../model/land-transport/TransportMode';
 import { groupBy } from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import BookNowButton from '../BookNowButton';
@@ -76,7 +76,7 @@ const LandTransportFare: React.FC<DetailsProps> = ({ grouped }) => {
   return (
     <Paper className={classes.paperRoot}>
       <Box className={classes.container}>
-        <FareHeader />
+        {/*<FareHeader />*/}
         <FareBody {...grouped[0].result[0]} />
         <Divider />
         <FareFooter grouped={grouped} />
@@ -138,11 +138,15 @@ const FareBody: React.FC<SegmentsEntity> = ({
 const CO2 = (type: TransportModeType) => {
   switch (type) {
     case TransportModeType.TRUCK:
-      return '65g CO2/ton-KM';
+      return '65g CO2/TON-KM';
     case TransportModeType.BARGE:
-      return '31.5g CO2/ton-KM';
+      return '31.5g CO2/TON-KM';
     case TransportModeType.RAIL:
-      return '22g CO2/ton-KM';
+      return '22g CO2/TON-KM';
+    case TransportModeType.BARGE_ROAD:
+      return '50g CO2/TON-KM';
+    case TransportModeType.BARGE_RAIL:
+      return '27g CO2/TON-KM';
     default:
       return false;
   }
@@ -164,7 +168,7 @@ const FareFooter: React.FC<DetailsProps> = ({ grouped }) => {
             </Box>
           </Tooltip>
         </Box>
-        <Typography variant={'h4'}>{transportMode}</Typography>
+        <Typography variant={'h4'}>{TransportModeLabels[transportMode]}</Typography>
         <Button
           style={{ margin: '.5em' }}
           color="primary"
@@ -205,7 +209,6 @@ const GroupedByType: React.FC<DetailsProps> = ({ grouped }) => {
   const groupedByContainerType = groupBy(grouped, 'props.equGroup[0]');
   const groupedByTypeKeys = Object.keys(groupedByContainerType);
 
-  console.log(groupedByContainerType, groupedByTypeKeys);
   return (
     <Grid container spacing={2} direction="row">
       {groupedByTypeKeys.map(key => (
@@ -234,10 +237,13 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
           {grouped.map(({ result }, i) => {
             const segment = result[0];
             const { properties } = segment.relationship;
+            if (!properties.weightRangeMin || !properties.weightRangeMax) return null;
             return (
               <TableRow key={i} className={classes.tableRow}>
                 <TableCell component="th" scope="row">
-                  {`${properties.weightRangeMin} - ${properties.weightRangeMax}`}
+                  {`${properties.weightRangeMin} - ${
+                    properties.weightRangeMax === '99' ? 'MAX' : properties.weightRangeMax
+                  }`}
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {properties.curr}
