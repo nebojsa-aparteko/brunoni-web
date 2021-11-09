@@ -183,10 +183,6 @@ const FareFooter: React.FC<DetailsProps> = ({ grouped }) => {
   );
 };
 
-interface DetailsProps {
-  grouped: R[];
-}
-
 const GroupedBySize: React.FC<DetailsProps> = ({ grouped }) => {
   const groupedByContainerSize = useMemo(() => Object.entries(groupBy(grouped, 'props.equSize[0]')), [grouped]);
   return (
@@ -220,6 +216,29 @@ const GroupedByType: React.FC<DetailsProps> = ({ grouped }) => {
   );
 };
 
+const SizeType = (size: string, type: string) => {
+  switch (`${type} ${size}`) {
+    case "GENERAL PURPOSE 20'":
+      return "20'DC";
+    case "GENERAL PURPOSE 40'":
+      return "40'DC/HC";
+    case "REEFER 20'":
+      return "20'RF";
+    case "REEFER 40'":
+      return "40'RH";
+    case "SPECIAL 20'":
+      return "20'OT";
+    case "SPECIAL 40'":
+      return "40'OT/OH";
+    default:
+      return undefined;
+  }
+};
+
+interface DetailsProps {
+  grouped: R[];
+}
+
 const Details: React.FC<DetailsProps> = ({ grouped }) => {
   const classes = useStyles();
   return (
@@ -238,6 +257,7 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
             const segment = result[0];
             const { properties } = segment.relationship;
             if (!properties.weightRangeMin || !properties.weightRangeMax) return null;
+            const containerType = SizeType(properties.equSize, properties.equGroup);
             return (
               <TableRow key={i} className={classes.tableRow}>
                 <TableCell component="th" scope="row">
@@ -252,7 +272,7 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
                   {properties.rate}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {`${properties.equGroup} ${properties.equSize}`}
+                  {`per ${containerType}`}
                 </TableCell>
               </TableRow>
             );
