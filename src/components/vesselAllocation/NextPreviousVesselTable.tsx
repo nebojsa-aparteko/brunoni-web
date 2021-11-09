@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   CircularProgress,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -11,9 +10,8 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { AllocationProps } from './VesselAllocationTable';
 import { format } from 'date-fns';
-import { PrevNextVesselResponse, VesselResponse } from '../../model/VesselAllocation';
+import VesselAllocation, { PrevNextVesselResponse, VesselResponse } from '../../model/VesselAllocation';
 import useAPI from '../../hooks/useAPI';
 import { useVesselAllocationStyles } from './VesselAllocationButton';
 
@@ -31,25 +29,28 @@ const TeuTon: React.FC<TeuTonProps> = ({ teu, ton }) => {
   );
 };
 
-const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel, bookingRequest }) => {
+interface NextPrevProps {
+  vessel: VesselAllocation;
+  POL: string;
+  etsDate: string;
+}
+
+const NextPreviousVesselTable: React.FC<NextPrevProps> = ({ vessel, POL, etsDate }) => {
   const classes = useVesselAllocationStyles();
   const { get, loading } = useAPI();
   const [nextPrevVessels, setNextPrevVessels] = useState<PrevNextVesselResponse | null>(null);
 
   const ifCurrentVessel = (v: VesselResponse) =>
-    v.VesselName === vessel.vesselName &&
-    v.VesselCode === vessel.vesselCode &&
-    v.VoyageNr === vessel.voyageNumber &&
-    v.Service === vessel.service;
+    v.VesselCode === vessel.vesselCode && v.VoyageNr === vessel.voyageNumber && v.Service === vessel.service;
 
   useEffect(() => {
     const getVesselAllocationSchedule = async () => {
       const params = {
         carrierId: vessel.carrierCode,
         service: vessel.service,
-        POL: bookingRequest?.itinerary?.portOfLoading.Port?.ID,
-        etsDate: bookingRequest?.itinerary?.portOfLoading.DepartureDate
-          ? format(new Date(bookingRequest?.itinerary?.portOfLoading.DepartureDate), 'dd/MM/yyyy')
+        POL: POL, //portOfLoading?.Port?.ID,
+        etsDate: etsDate //portOfLoading?.DepartureDate
+          ? format(new Date(etsDate), 'dd/MM/yyyy')
           : undefined,
       };
       const response = (await get('vesselAllocationSchedule', params)) as PrevNextVesselResponse | null;

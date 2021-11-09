@@ -310,12 +310,15 @@ const ItineraryInfo: React.FC = () => {
         return set('itinerary', itinerary)(prevState);
       });
     },
-    [],
+    [setBookingRequest],
   );
 
-  const handleDeleteItem = useCallback((field: keyof BookingRequestItinerary) => {
-    setBookingRequest(prevState => set('itinerary', omit([field])(get('itinerary')(prevState)))(prevState));
-  }, []);
+  const handleDeleteItem = useCallback(
+    (field: keyof BookingRequestItinerary) => {
+      setBookingRequest(prevState => set('itinerary', omit([field])(get('itinerary')(prevState)))(prevState));
+    },
+    [setBookingRequest],
+  );
   return (
     <React.Fragment>
       {bookingRequest.itinerary?.placeOfReceipt ? (
@@ -528,12 +531,22 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
       );
       closeModal();
     },
-    [closeModal, bookingRequest],
+    [
+      bookingRequest?.schedule,
+      bookingRequest?.freightDetails,
+      bookingRequest.carrier?.id,
+      bookingRequest.containers,
+      setBookingRequest,
+      closeModal,
+    ],
   );
 
-  const handleChangeBRField = useCallback((field: keyof BookingRequest, value?: string) => {
-    setBookingRequest(prevState => set(field, value)(prevState!));
-  }, []);
+  const handleChangeBRField = useCallback(
+    (field: keyof BookingRequest, value?: string) => {
+      setBookingRequest(prevState => set(field, value)(prevState!));
+    },
+    [setBookingRequest],
+  );
 
   const handleChangesAfterBLChange = useCallback(
     (value?: string) => {
@@ -559,7 +572,7 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
         );
       }
     },
-    [bookingRequest],
+    [bookingRequest.carrier?.id, setBookingRequest],
   );
 
   return bookingRequest ? (
@@ -600,6 +613,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                         <VesselAllocationButton
                           vesselVoyage={vesselVoyage}
                           service={bookingRequest?.schedule?.Service}
+                          POL={bookingRequest.itinerary?.portOfLoading.Port.ID}
+                          etsDate={bookingRequest.itinerary?.portOfLoading.DepartureDate}
                         />
                       )}
                     </Box>

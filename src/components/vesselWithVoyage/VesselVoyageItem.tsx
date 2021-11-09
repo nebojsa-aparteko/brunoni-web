@@ -53,6 +53,10 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
     [vesselItems],
   );
 
+  const etsDate = useMemo(() => formatDateSafe(entries[entries.length - 1][1][0].ets, 'yyyy-MM-dd') as string, [
+    entries,
+  ]);
+
   return (
     <Paper
       style={{ padding: 4, marginBottom: 4, cursor: 'pointer' }}
@@ -92,7 +96,12 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
         {voyageInfo && (
           <Box mr={4} ml="auto" display="flex">
             <VesselFullyBookedSwitch vessel={vessel} />
-            <VesselAllocationButton vesselVoyage={voyageInfo} service={service} />
+            <VesselAllocationButton
+              vesselVoyage={voyageInfo}
+              service={service}
+              POL={entries[entries.length - 1][1][0].pol}
+              etsDate={etsDate}
+            />
           </Box>
         )}
       </Box>
