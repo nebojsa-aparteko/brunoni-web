@@ -24,6 +24,12 @@ export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
 }
 
 export const isProviderProfitEntity = (value: any): value is string => 'id' in value;
+export const isDefaultProviderProfitEntity = (value: ProviderProfitEntity): value is DefaultProviderProfitEntity =>
+  value.type === ProviderProfitType.DEFAULT;
+
+export const isSpecificProviderProfitEntity = (value: ProviderProfitEntity): value is SpecificProviderProfitEntity =>
+  value.type === ProviderProfitType.SPECIFIC;
+
 export type ProviderProfit = Omit<ProviderProfitEntity, 'id' | 'createdAt'>;
 export type DefaultProviderProfit = Omit<DefaultProviderProfitEntity, 'id' | 'createdAt'>;
 export type SpecificProviderProfit = Omit<SpecificProviderProfitEntity, 'id' | 'createdAt'>;
