@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LandTransportFilterBar = () => {
   const [filters, setFilters] = useContext(LandTransportFilterContext);
 
+  console.log({ filters });
   const classes = useStyles();
   return (
     <Box className={classes.container}>
@@ -39,7 +40,6 @@ const LandTransportFilterBar = () => {
       {/*  name={'transfers'}*/}
       {/*  label={'Number of transfers'}*/}
       {/*/>*/}
-
       <Filter
         collection={filters.containerTypes}
         setCollection={setFilters}
@@ -76,6 +76,8 @@ const Filter: React.FC<CompProps> = ({ collection, setCollection, name, label, l
   const classes = useStyles();
   const [limited, setLimited] = useState(collection.length > limit);
   const allSelected = useMemo(() => collection.every(e => e.checked), [collection]);
+
+  if (collection.length === 0) return null;
 
   const handleSelect = (i: number, checked: boolean) => {
     const newSelected = collection.slice();
