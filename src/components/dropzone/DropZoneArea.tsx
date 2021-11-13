@@ -5,8 +5,9 @@ import { DropzoneProps } from 'react-dropzone';
 import { ChipProps } from '@material-ui/core';
 
 interface Props {
-  handleOnDrop: (file: File) => void;
-  handleOnDelete: (file: File) => void;
+  handleOnDrop: (file: File[]) => void;
+  handleOnDelete?: (file: File) => void;
+  currentFiles?: File[];
   filesLimit?: number;
   acceptedExtensions?: string[];
   showPreviews?: boolean;
@@ -20,6 +21,7 @@ interface Props {
 const DropZoneArea: React.FC<Props> = ({
   handleOnDrop,
   handleOnDelete,
+  currentFiles,
   filesLimit = 1,
   acceptedExtensions,
   showPreviews = true,
@@ -31,23 +33,35 @@ const DropZoneArea: React.FC<Props> = ({
 }) => {
   const [, dispatch] = useGlobalAppState();
 
+  const onChange = useCallback(
+    (currentFiles: File[]) => {
+      handleOnDrop(currentFiles);
+    },
+    [handleOnDrop],
+  );
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      if (
+      const hasUnacceptedExtensions =
         acceptedExtensions &&
-        !acceptedFiles.every(file => acceptedExtensions.includes(`.${file.name.split('.').pop()}` || ''))
-      ) {
+        !acceptedFiles.every(file => acceptedExtensions.includes(`.${file.name.split('.').pop()}` || ''));
+      const hasDuplicates = currentFiles?.map(f => f.name)?.some(f => acceptedFiles.map(f => f.name).includes(f));
+
+      if (hasUnacceptedExtensions) {
         return dispatch({
           type: 'SHOW_ERROR_SNACKBAR',
           duration: 4000,
-          message: `File must be of [${acceptedExtensions.join(', ')}] format!`,
+          message: `Files must be of [${acceptedExtensions?.join(', ')}] format!`,
+        });
+      } else if (hasDuplicates) {
+        return dispatch({
+          type: 'SHOW_ERROR_SNACKBAR',
+          duration: 4000,
+          message: `Duplicate Files`,
         });
       }
-      acceptedFiles.forEach(file => {
-        handleOnDrop(file);
-      });
     },
-    [acceptedExtensions, dispatch, handleOnDrop],
+    [acceptedExtensions, currentFiles, dispatch],
   );
 
   return (
@@ -67,9 +81,10 @@ const DropZoneArea: React.FC<Props> = ({
       previewChipProps={previewChipProps}
       previewGridProps={{ container: { spacing: 1, direction: 'row' } }}
       previewText="Selected files"
+      onChange={onChange}
       onDrop={onDrop}
       onDelete={file => {
-        handleOnDelete(file);
+        handleOnDelete && handleOnDelete(file);
       }}
     />
   );

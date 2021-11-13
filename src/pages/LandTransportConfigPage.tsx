@@ -47,8 +47,8 @@ const LandTransportConfigPage: React.FC = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => {
-          addLandTransportProvider({ name: 'Test' });
+        onClick={async () => {
+          await addLandTransportProvider({ name: 'Test' });
         }}
       >
         Add Provider

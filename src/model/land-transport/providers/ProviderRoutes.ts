@@ -1,27 +1,25 @@
 import Price from '../../Price';
+import firebase from 'firebase';
 
-interface ProviderRoutes {
+interface ProviderRoute {
+  id: string;
   type: ProviderRoutesType;
 }
 
-export interface AutomaticProviderRoutes extends ProviderRoutes {
-  type: ProviderRoutesType.AUTOMATIC;
-  version: string;
-  addedAt: Date;
+export interface AutomaticProviderRoute extends Omit<ProviderRoute, 'id'> {
+  version: string; //work as id
+  addedAt: firebase.firestore.Timestamp;
   active: boolean;
 }
 
-export interface ManualProviderRoutes extends ProviderRoutes {
-  type: ProviderRoutesType.MANUAL;
+export interface ManualProviderRoute extends ProviderRoute {
   origin: string;
   destination: string;
   transportMode: string;
   price: Price;
 }
 
-enum ProviderRoutesType {
+export enum ProviderRoutesType {
   AUTOMATIC = 'AUTOMATIC',
   MANUAL = 'MANUAL',
 }
-
-export default ProviderRoutes;

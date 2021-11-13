@@ -30,13 +30,13 @@ import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import ProviderProfitEntity, {
   ProviderProfit,
   ProviderProfitType,
-  SpecificProviderProfitEntity,
 } from '../../../model/land-transport/providers/ProviderProfit';
 import { omit, set } from 'lodash/fp';
 import useLandTransportProfits from '../../../hooks/useLandTransportProfits';
 import theme from '../../../theme';
 import AddIcon from '@material-ui/icons/Add';
 import { BookingCategory } from '../../../model/Booking';
+import RoutesTable from './routes/RoutesTable';
 
 const useStyles = makeStyles(() => ({
   accordionContainer: {
@@ -46,24 +46,6 @@ const useStyles = makeStyles(() => ({
   },
   title: {
     alignSelf: 'start',
-  },
-  expansionPanel: {
-    marginBottom: 8,
-    width: '1000px',
-  },
-  expansionPanelSummary: {
-    display: 'flex',
-  },
-  expansionPanelTitle: {
-    alignSelf: 'center',
-    marginRight: 16,
-  },
-  icon: {
-    cursor: 'pointer',
-  },
-  formContainer: {
-    display: 'flex',
-    flexDirection: 'row',
   },
 }));
 
@@ -100,7 +82,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
       <Typography className={classes.title} variant="h1">
         {provider.name}
       </Typography>
-      <SimpleExpansionPanel label="Profit" fullWidth>
+      <SimpleExpansionPanel label="Profit" fullWidth TransitionProps={{ mountOnEnter: true }}>
         <Box display="flex" flexDirection="column">
           <Button
             variant="contained"
@@ -185,7 +167,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
                     price: { value: 0, currency: Currency.EUR },
                     containerType: '20',
                     type: ProviderProfitType.SPECIFIC,
-                    id: '',
+                    id: '1',
                     createdAt: new Date(),
                   },
                   {
@@ -194,7 +176,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
                     price: { value: 0, currency: Currency.EUR },
                     containerType: '40',
                     type: ProviderProfitType.SPECIFIC,
-                    id: '',
+                    id: '2',
                     createdAt: new Date(),
                   },
                   {
@@ -203,7 +185,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
                     price: { value: 0, currency: Currency.EUR },
                     containerType: '50',
                     type: ProviderProfitType.SPECIFIC,
-                    id: '',
+                    id: '3',
                     createdAt: new Date(),
                   },
                 ].map(item => (
@@ -235,10 +217,8 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
         </Box>
       </SimpleExpansionPanel>
 
-      <SimpleExpansionPanel label="Routes" fullWidth>
-        <Box>
-          <Typography>Test</Typography>
-        </Box>
+      <SimpleExpansionPanel label="Routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
+        <RoutesTable provider={provider} />
       </SimpleExpansionPanel>
     </Box>
   );
@@ -269,6 +249,7 @@ const ProviderProfitConfigTableRow: React.FC<ProviderProfitConfigTableRowProps> 
     const value = event.target.value;
     key && setStateItem(prevState => set(key, value)(prevState));
   };
+
   const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
     event.target?.name &&
       setStateItem(prevState => ({

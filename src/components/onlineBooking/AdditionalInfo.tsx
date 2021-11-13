@@ -64,10 +64,10 @@ const AdditionalInfo: React.FC<Props> = ({
                 dropzoneClass={classes.dialogBody}
                 filesLimit={10}
                 initialFiles={files.certificate}
-                handleOnDrop={file =>
+                handleOnDrop={files =>
                   setFiles(prevFiles => ({
                     ...prevFiles,
-                    certificate: [...prevFiles.certificate, file],
+                    certificate: files,
                   }))
                 }
                 handleOnDelete={file =>
@@ -86,10 +86,10 @@ const AdditionalInfo: React.FC<Props> = ({
                 dropzoneClass={classes.dialogBody}
                 filesLimit={10}
                 initialFiles={files.imo}
-                handleOnDrop={file =>
+                handleOnDrop={files =>
                   setFiles(prevFiles => ({
                     ...prevFiles,
-                    imo: [...prevFiles.imo, file],
+                    imo: files,
                   }))
                 }
                 handleOnDelete={file =>
@@ -107,10 +107,10 @@ const AdditionalInfo: React.FC<Props> = ({
               dropzoneClass={classes.dialogBody}
               filesLimit={10}
               initialFiles={files.additional}
-              handleOnDrop={file =>
+              handleOnDrop={files =>
                 setFiles(prevFiles => ({
                   ...prevFiles,
-                  additional: [...prevFiles.additional, file],
+                  additional: files,
                 }))
               }
               handleOnDelete={file =>

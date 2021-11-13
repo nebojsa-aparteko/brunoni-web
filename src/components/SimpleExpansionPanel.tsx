@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { ReactNode } from 'react';
+import { TransitionProps } from '@material-ui/core/transitions';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -21,11 +22,15 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const SimpleExpansionPanel = ({ label, defaultExpanded, children, fullWidth = false }: Props) => {
+const SimpleExpansionPanel = ({ label, defaultExpanded, children, fullWidth = false, TransitionProps }: Props) => {
   const classes = useStyles();
 
   return (
-    <ExpansionPanel defaultExpanded={defaultExpanded} className={fullWidth ? classes.fullWidth : ''}>
+    <ExpansionPanel
+      defaultExpanded={defaultExpanded}
+      className={fullWidth ? classes.fullWidth : ''}
+      TransitionProps={TransitionProps}
+    >
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.elevatedComponent}>
         <Typography>{label}</Typography>
       </ExpansionPanelSummary>
@@ -39,6 +44,7 @@ interface Props {
   defaultExpanded?: boolean;
   fullWidth?: boolean;
   children: ReactNode;
+  TransitionProps?: TransitionProps;
 }
 
 export default SimpleExpansionPanel;
