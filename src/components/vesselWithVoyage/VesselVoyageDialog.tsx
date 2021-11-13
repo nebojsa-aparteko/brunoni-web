@@ -82,7 +82,7 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
                     component={Paper}
                     key={`${booking['ERP-BkgRef']}-${index}`}
                   >
-                    <BookingRow booking={booking} preventDefaultClick isAdmin={!actingAs} />
+                    <BookingRow booking={booking} preventDefaultClick isAdmin={!actingAs} onProgressClick={() => {}} />
                   </Box>
                 ))}
               </Box>

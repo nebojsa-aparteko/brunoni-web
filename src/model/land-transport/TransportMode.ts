@@ -8,12 +8,12 @@ enum TransportModeType {
 }
 
 enum TransportModeLabels {
-  TRUCK = 'Truck',
-  RAIL = 'Rail',
-  BARGE = 'Barge',
-  BARGE_ROAD = 'Barge road combined',
-  BARGE_RAIL = 'Barge rail combined',
-  RAIL_ROAD = 'Rail road combined',
+  TRUCK = 'TRUCK',
+  RAIL = 'RAIL',
+  BARGE = 'BARGE',
+  'BARGE ROAD COMBINED' = 'BARGE / TRUCK',
+  'BARGE RAIL COMBINED' = 'BARGE / RAIL',
+  'RAIL ROAD COMBINED' = 'RAIL / TRUCK',
 }
 
 export { TransportModeType, TransportModeLabels };

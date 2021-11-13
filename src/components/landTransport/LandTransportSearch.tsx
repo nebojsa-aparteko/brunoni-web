@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Box, createStyles, makeStyles, Paper, Typography } from '@material-ui/core';
 import LandTransportSearchBar from './LandTransportSearchBar';
 import LoadingButton from '../LoadingButton';
@@ -6,6 +6,13 @@ import { useFormContext } from 'react-hook-form';
 import { LandTransportContext } from '../../providers/LandTransportProvider';
 import LandTransportRouteSearchParams from '../../model/land-transport/RouteSearchParams';
 import useUser from '../../hooks/useUser';
+import { TransportModeType } from '../../model/land-transport/TransportMode';
+import {
+  LAND_TRANSPORT_FILTERS_INITIAL_STATE,
+  LandTransportFilter,
+  LandTransportFilterContext,
+} from '../../providers/LandTransportFilterProvider';
+import { uniqBy } from 'lodash';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -32,21 +39,63 @@ const useStyles = makeStyles(theme =>
   }),
 );
 
+const getRespectiveFilters = (results: R[]) => {
+  return results.reduce((previousValue, currentValue) => {
+    const transportMode = currentValue.props.transportMode[0];
+    const containerSize = currentValue.props.equSize[0];
+    const containerType = currentValue.props.equGroup[0];
+    return {
+      ...previousValue,
+      transportModes: uniqBy(
+        [
+          ...previousValue.transportModes,
+          {
+            checked: false,
+            name: transportMode.toUpperCase(),
+          },
+        ],
+        'name',
+      ),
+      containerTypes: uniqBy(
+        [
+          ...previousValue.containerTypes,
+          {
+            checked: false,
+            name: containerSize.toUpperCase(),
+          },
+        ],
+        'name',
+      ),
+      equipmentGroupTypes: uniqBy(
+        [
+          ...previousValue.equipmentGroupTypes,
+          {
+            checked: false,
+            name: containerType.toUpperCase(),
+          },
+        ],
+        'name',
+      ),
+    } as LandTransportFilter;
+  }, LAND_TRANSPORT_FILTERS_INITIAL_STATE);
+};
+
 const LandTransportSearch = () => {
   const classes = useStyles();
 
-  const [loading, setLoading] = useState(false);
-
   const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
 
-  const [, setLandTransport] = useContext(LandTransportContext);
+  const [, setLandTransport, , loading, setLoading] = useContext(LandTransportContext);
+  const [, setFilters] = useContext(LandTransportFilterContext);
   const [user] = useUser();
 
   const handleSearch = async (data: LandTransportRouteSearchParams) => {
     setLoading(true);
     const token = await user.getIdToken();
-    const result = await getLandTransportRecords(token, data.from, data.to);
-    setLandTransport(result);
+    const results = await getLandTransportRecords(token, data.from, data.to);
+    const filters = getRespectiveFilters(results);
+    setFilters(filters);
+    setLandTransport(results);
     setLoading(false);
   };
 
@@ -66,7 +115,11 @@ const LandTransportSearch = () => {
 
 export default LandTransportSearch;
 
-const getLandTransportRecords = async (token: string, fromLocationName: string, toLocationName: string) => {
+const getLandTransportRecords = async (
+  token: string,
+  fromLocationName: string,
+  toLocationName: string,
+): Promise<R[]> => {
   try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/landTransport?toLocationName=${toLocationName}&fromLocationName=${fromLocationName}`,
@@ -84,23 +137,34 @@ const getLandTransportRecords = async (token: string, fromLocationName: string, 
     );
 
     if (response.ok) {
-      const body = await response.json();
-      return body;
+      return await response.json();
     } else {
+      // todo. handle error?
       const body = await response.json();
       console.error(`Failed to request`, response, body);
-      return body;
+      return [];
     }
   } catch (e) {
     console.error('Failed to perform request', e);
-  } finally {
+    return [];
   }
 };
+
+export interface R {
+  result: SegmentsEntity[];
+  props: {
+    transportMode: TransportModeType[];
+    equSize: string[];
+    equGroup: string[];
+  };
+}
+
 export interface StartOrEnd {
   identity: IdentityOrStartOrEnd;
   labels?: string[] | null;
   properties: Properties;
 }
+
 export interface IdentityOrStartOrEnd {
   low: number;
   high: number;
