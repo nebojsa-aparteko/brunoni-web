@@ -1,15 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { EnhancedTableToolbar } from '../../../EnhancedTableToolbar';
 import ConfirmationDialog from '../../../ConfirmationDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import RoutesTableRow from './RoutesTableRow';
-import RoutesFileUploadDialog, { decrementRouteVersion } from './RoutesFileUploadDialog';
+import RoutesFileUploadDialog from './RoutesFileUploadDialog';
 import firebase from '../../../../firebase';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
-import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
 
 interface RoutesTableProps {
   provider: ProviderEntity;
@@ -22,14 +21,17 @@ const deleteRoute = async (providerId: string, routeVersion: string) =>
     .doc(routeVersion)
     .delete();
 
-const getRoute = async (providerId: string, routeVersion: string) => {
+const deleteVersionDocuments = async (providerId: string, routeVersion: string) => {
   return (
     await firebase
       .firestore()
-      .collection(`land-transport-config/${providerId}/routes`)
-      .doc(routeVersion)
+      .collection(`land-transport-config/${providerId}/routes/${routeVersion}/versionDocuments`)
       .get()
-  ).data() as AutomaticProviderRoute;
+  ).docs.map(d => {
+    const data = d.data() as ChecklistItemValueDocument;
+    d.ref.delete();
+    return data;
+  });
 };
 
 const deleteRoutes = async (
@@ -39,10 +41,9 @@ const deleteRoutes = async (
 ) => {
   return Promise.all(
     routeVersions.map(async version => {
-      const route = await getRoute(provider.id, version);
-      await deleteFiles(route.versionDocuments);
+      const documents = await deleteVersionDocuments(provider.id, version);
+      await deleteFiles(documents);
       await deleteRoute(provider.id, version);
-      await decrementRouteVersion(provider.name);
     }),
   );
 };
@@ -54,10 +55,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
 
   const routes = useLandTransportRoutes(provider.id);
 
-  const storageBasePath = useMemo((): string => {
-    return [`land-transport-config/routes/versions`, provider.name].join('/');
-  }, [provider.name]);
-  const { saveFiles, deleteFiles } = useSaveFiles(storageBasePath);
+  const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   const handleSelectDeselectAll = () => {
     if (selectedRoutes.length !== routes.length) {

@@ -18,32 +18,25 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import DropZoneArea from '../../../dropzone/DropZoneArea';
 
-const getRouteVersion = async (providerName: string) => {
+const getRouteVersion = async (providerId: string) => {
   return (
     await firebase
       .database()
-      .ref(`/land-transport-versions/${providerName}/version`)
+      .ref(`/land-transport-versions/${providerId}/version`)
       .get()
   ).val() as number;
 };
 
-export const incrementRouteVersion = async (providerName: string) => {
+export const incrementRouteVersion = async (providerId: string) => {
   await firebase
     .database()
-    .ref(`/land-transport-versions/${providerName}/version`)
+    .ref(`/land-transport-versions/${providerId}/version`)
     .transaction(value => value + 1);
 };
 
-export const decrementRouteVersion = async (providerName: string) => {
-  await firebase
-    .database()
-    .ref(`/land-transport-versions/${providerName}/version`)
-    .transaction(value => value - 1);
-};
-
 const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
-  await incrementRouteVersion(provider.name);
-  const autoIncrementVersion = await getRouteVersion(provider.name);
+  await incrementRouteVersion(provider.id);
+  const autoIncrementVersion = await getRouteVersion(provider.id);
   const version = `version-${autoIncrementVersion}`;
 
   let route = {
@@ -52,8 +45,6 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
     type: ProviderRoutesType.AUTOMATIC,
     version,
   } as Omit<AutomaticProviderRoute, 'versionDocuments'>;
-
-  if (autoIncrementVersion === 1) route['active'] = true;
 
   await firebase
     .firestore()
@@ -66,13 +57,15 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
 const saveRouteFilesToFirestore = async (
   provider: ProviderEntity,
   routeVersion: string,
-  versionDocuments: ChecklistItemValueDocument[],
+  versionDocument: ChecklistItemValueDocument,
 ) => {
   return await firebase
     .firestore()
     .collection(`land-transport-config/${provider.id}/routes`)
     .doc(routeVersion)
-    .set({ versionDocuments }, { merge: true });
+    .collection('versionDocuments')
+    .doc()
+    .set(versionDocument);
 };
 
 const useStyles = makeStyles(theme => ({
@@ -124,7 +117,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({ provider
             isInternal: false,
           } as ChecklistItemValueDocument),
       );
-      await saveRouteFilesToFirestore(provider, routeVersion, values);
+      values.map(async value => await saveRouteFilesToFirestore(provider, routeVersion, value));
     } catch (e) {
       console.error('Failed to Upload File', e);
     } finally {

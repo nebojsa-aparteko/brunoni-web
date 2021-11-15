@@ -1,6 +1,5 @@
 import Price from '../../Price';
 import firebase from 'firebase';
-import { ChecklistItemValueDocument } from '../../../components/bookings/checklist/ChecklistItemModel';
 
 interface ProviderRoute {
   id: string;
@@ -9,7 +8,6 @@ interface ProviderRoute {
 
 export interface AutomaticProviderRoute extends Omit<ProviderRoute, 'id'> {
   version: string; //work as id
-  versionDocuments: ChecklistItemValueDocument[];
   addedAt: firebase.firestore.Timestamp;
   active: boolean;
 }
