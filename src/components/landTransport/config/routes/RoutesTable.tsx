@@ -1,15 +1,51 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { EnhancedTableToolbar } from '../../../EnhancedTableToolbar';
 import ConfirmationDialog from '../../../ConfirmationDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import RoutesTableRow from './RoutesTableRow';
-import RoutesFileUploadDialog from './RoutesFileUploadDialog';
+import RoutesFileUploadDialog, { decrementRouteVersion } from './RoutesFileUploadDialog';
+import firebase from '../../../../firebase';
+import useSaveFiles from '../../../../hooks/useSaveFiles';
+import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
+import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
 
 interface RoutesTableProps {
   provider: ProviderEntity;
 }
+
+const deleteRoute = async (providerId: string, routeVersion: string) =>
+  await firebase
+    .firestore()
+    .collection(`land-transport-config/${providerId}/routes`)
+    .doc(routeVersion)
+    .delete();
+
+const getRoute = async (providerId: string, routeVersion: string) => {
+  return (
+    await firebase
+      .firestore()
+      .collection(`land-transport-config/${providerId}/routes`)
+      .doc(routeVersion)
+      .get()
+  ).data() as AutomaticProviderRoute;
+};
+
+const deleteRoutes = async (
+  provider: ProviderEntity,
+  routeVersions: string[],
+  deleteFiles: (files: ChecklistItemValueDocument[]) => Promise<any>,
+) => {
+  return Promise.all(
+    routeVersions.map(async version => {
+      const route = await getRoute(provider.id, version);
+      await deleteFiles(route.versionDocuments);
+      await deleteRoute(provider.id, version);
+      await decrementRouteVersion(provider.name);
+    }),
+  );
+};
 
 const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
@@ -18,7 +54,10 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
 
   const routes = useLandTransportRoutes(provider.id);
 
-  console.log(routes);
+  const storageBasePath = useMemo((): string => {
+    return [`land-transport-config/routes/versions`, provider.name].join('/');
+  }, [provider.name]);
+  const { saveFiles, deleteFiles } = useSaveFiles(storageBasePath);
 
   const handleSelectDeselectAll = () => {
     if (selectedRoutes.length !== routes.length) {
@@ -35,8 +74,10 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
     );
   };
 
-  const handleDeleteRoute = () => {
-    console.log('deleting', selectedRoutes);
+  const handleDeleteRoute = async () => {
+    await deleteRoutes(provider, selectedRoutes, deleteFiles);
+    setIsDeleteDialogOpen(false);
+    setSelectedRoutes([]);
   };
 
   return (
@@ -87,6 +128,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
         provider={provider}
         isOpen={isAddDialogOpen}
         handleClose={() => setIsAddDialogOpen(false)}
+        saveFiles={saveFiles}
       />
       <ConfirmationDialog
         isOpen={isDeleteDialogOpen}
