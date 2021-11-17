@@ -6,26 +6,49 @@ import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
-import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
-import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
-import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
-import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
+import TeamsUsersContainer from '../components/teams/users/TeamsUsersContainer';
+import TeamsTeamsContainer from '../components/teams/teams/TeamsTeamsContainer';
+import ReassignUsersContainer from '../components/teams/reassign-users/ReassignUsersContainer';
+import TeamsPaymentConfirmationContainer from '../components/teams/payment-confirmation/TeamsPaymentConfirmationContainer';
 import { useHistory } from 'react-router';
 import QueryString from 'querystring';
 
-const useStyles = makeStyles((theme: Theme) => ({
+export const tabStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
+    display: 'flex',
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
-    display: 'flex',
     width: '100%',
+    fontSize: theme.typography.body1.fontSize,
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
+  subList: {
+    '& > *': {
+      paddingLeft: theme.spacing(3),
+    },
+  },
+  row: {
+    '&:hover': {
+      backgroundColor: 'rgba(161,213,255,0.20) !important',
+    },
+    cursor: 'pointer',
+  },
+  avatarGroup: {
+    marginLeft: theme.spacing(1),
+  },
+  lastAvatar: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  carrierGroup: {
+    '& > *:not(:last-child)': {
+      marginLeft: theme.spacing(0.5),
+    },
+  },
 }));
 
-function a11yProps(index: any) {
+export function a11yProps(index: any) {
   return {
     id: `scrollable-prevent-tab-${index}`,
     'aria-controls': `scrollable-prevent-tabpanel-${index}`,
@@ -33,7 +56,7 @@ function a11yProps(index: any) {
 }
 
 const TeamManagementPage: React.FC = () => {
-  const classes = useStyles();
+  const classes = tabStyles();
   const history = useHistory();
   const params = QueryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;

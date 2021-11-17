@@ -59,6 +59,7 @@ export interface BookingRequest {
   showWarningMessage?: boolean;
   assignedTags?: string[];
   isUnread?: boolean;
+  watchers?: UserRecordMin[];
 }
 
 export interface BookingRequestItinerary {

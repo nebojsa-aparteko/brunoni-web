@@ -7,10 +7,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import useAdminUsers from '../../hooks/useAdminUsers';
+import useAdminUsers from '../../../hooks/useAdminUsers';
 import TeamUserRow from './TeamUserRow';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import useClientUsers from '../../hooks/useClientUsers';
+import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
+import useClientUsers from '../../../hooks/useClientUsers';
 import {
   Box,
   Button,
@@ -25,14 +25,14 @@ import {
   Select,
   Typography,
 } from '@material-ui/core';
-import UserInput from '../inputs/UserInput';
-import { ADMIN_ROLES, UserRecordMin } from '../../model/UserRecord';
-import firebase from '../../firebase';
+import UserInput from '../../inputs/UserInput';
+import { ADMIN_ROLES, UserRecordMin } from '../../../model/UserRecord';
+import firebase from '../../../firebase';
 import CloseIcon from '@material-ui/icons/Close';
-import ConfirmationDialog from '../ConfirmationDialog';
-import { GlobalContext } from '../../store/GlobalStore';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import { GlobalContext } from '../../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
-import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
+import { EnhancedTableToolbar } from '../../EnhancedTableToolbar';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {

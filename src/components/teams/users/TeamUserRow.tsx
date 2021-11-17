@@ -2,18 +2,18 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import React, { useCallback, useContext, useMemo } from 'react';
 import invoke from 'lodash/fp/invoke';
-import UserRecord, { ADMIN_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
-import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
-import useAdminUsers from '../../hooks/useAdminUsers';
-import UserInput from '../inputs/UserInput';
-import firebase from '../../firebase';
+import UserRecord, { ADMIN_ROLES, UserRecordMin, UserRecordMinProperties } from '../../../model/UserRecord';
+import { formatDistanceToNowConfigured } from '../../../utilities/formattingHelpers';
+import useAdminUsers from '../../../hooks/useAdminUsers';
+import UserInput from '../../inputs/UserInput';
+import firebase from '../../../firebase';
 import { pick } from 'lodash/fp';
-import UserNotificationRedirectionSwitch from '../UserNotificationRedirectionSwitch';
+import UserNotificationRedirectionSwitch from '../../UserNotificationRedirectionSwitch';
 import { Checkbox } from '@material-ui/core';
-import Carriers from '../../contexts/Carriers';
-import CarriersMultiInput from '../inputs/CarriersMultiInput';
-import Carrier from '../../model/Carrier';
-import asArray from '../../utilities/asArray';
+import Carriers from '../../../contexts/Carriers';
+import CarriersMultiInput from '../../inputs/CarriersMultiInput';
+import Carrier from '../../../model/Carrier';
+import asArray from '../../../utilities/asArray';
 
 const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
@@ -69,13 +69,7 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
       <TableCell align="right">
-        <CarriersMultiInput options={carriers || []} defaultValues={selectedCarriers} onChange={handleChangeCarriers} />
-        {/*<CarrierInput*/}
-        {/*  label={'Select Carrier'}*/}
-        {/*  carriers={carriers || []}*/}
-        {/*  onChange={carrier => handleChangeCarrier(carrier?.id)}*/}
-        {/*  value={userCarrier}*/}
-        {/*/>*/}
+        <CarriersMultiInput value={selectedCarriers} onChange={handleChangeCarriers} />
       </TableCell>
       <TableCell align="right">
         {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}

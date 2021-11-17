@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
 import firebase from 'firebase';
 import useFirestoreCollection from './useFirestoreCollection';
-import { Team, TeamType } from '../model/Teams';
+import { GroupType, Team, TeamType } from '../model/Teams';
 
-export default function useTeams(type: TeamType | undefined = undefined) {
-  const query = useMemo(() => (q: firebase.firestore.Query) => (type ? q.where('teamType', '==', type) : q), [type]);
+export default function useTeams(type?: TeamType, groupType?: GroupType) {
+  const query = useMemo(
+    () => (q: firebase.firestore.Query) => {
+      let query = q;
+      if (type) query = query.where('teamType', '==', type);
+      if (groupType) query = query.where('groupType', '==', groupType);
+      return query;
+    },
+    [groupType, type],
+  );
 
   const teamsCollection = useFirestoreCollection('teams', query);
 

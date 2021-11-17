@@ -26,7 +26,7 @@ import TaskClientFilterSwitch from '../TaskClientFilterSwitch';
 import TaskStatusInput from '../tasks/TaskStatusInput';
 import { getTaskFilter } from '../TaskStatusChip';
 import Task, { TaskCategory, UserRole } from '../../model/Task';
-import { Team, TeamType } from '../../model/Teams';
+import { GroupType, Team, TeamType } from '../../model/Teams';
 import { ChecklistNames } from '../bookings/checklist/ChecklistItemModel';
 import { showCrispChat } from '../../index';
 import PaymentOverviewDialog from '../finance/PaymentOverviewDialog';
@@ -394,6 +394,7 @@ export const getTeamsPerUser = (assignee: UserRecord) =>
   firebase
     .firestore()
     .collection('teams')
+    .where('groupType', '==', GroupType.BOOKINGS)
     .where('users', 'array-contains', pick(UserRecordMinProperties)(assignee))
     .get();
 

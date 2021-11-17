@@ -2,13 +2,15 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import OperationsTeamsTable from './OperationsTeamsTable';
-import AccountingTeamsTable from './AccountingTeamsTable';
-import { TeamType } from '../../model/Teams';
-import firebase from '../../firebase';
+import { GroupType, TeamType } from '../../../model/Teams';
+import firebase from '../../../firebase';
+import TeamsContainer from './TeamsContainer';
+import Paper from '@material-ui/core/Paper';
+import TeamsContextProvider from '../../../providers/TeamsContextProvider';
 
 const useStyles = makeStyles({
   expansionPanel: {
+    padding: 0,
     marginBottom: 8,
   },
   expansionPanelSummary: {
@@ -20,16 +22,16 @@ const useStyles = makeStyles({
   },
 });
 
-export const deleteTeam = (teamId: string) =>
-  firebase
+export const deleteTeam = async (teamId: string) =>
+  await firebase
     .firestore()
     .collection('teams')
     .doc(teamId)
     .delete();
 
 export const deleteTeams = async (teamIds: string[]): Promise<any> => {
-  const requests = teamIds.map((teamId: string) => {
-    return deleteTeam(teamId);
+  const requests = teamIds.map(async (teamId: string) => {
+    return await deleteTeam(teamId);
   });
 
   return Promise.all(requests);
@@ -38,37 +40,48 @@ export const deleteTeams = async (teamIds: string[]): Promise<any> => {
 const TeamsTeamsContainer: React.FC = () => {
   const classes = useStyles();
 
-  const onAdd = (isAccounting: boolean) => {
-    firebase
-      .firestore()
-      .collection('teams')
-      .add({ name: '', teamType: isAccounting ? TeamType.ACCOUNTING : TeamType.OPERATIONS })
-      .then(docRef => {
-        console.log('Added doc ref ', docRef.id);
-      })
-      .catch(err => console.error('Failed to add new item ', err));
-  };
-
   return (
     <Box flex={1} display="flex" flexDirection="column" m={1}>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+          component={Paper}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Accounting teams
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <AccountingTeamsTable onAdd={onAdd} />
+        <ExpansionPanelDetails className={classes.expansionPanel}>
+          <TeamsContextProvider
+            initialState={{
+              teamType: TeamType.ACCOUNTING,
+              groupType: GroupType.BOOKINGS, //first tab
+            }}
+          >
+            <TeamsContainer />
+          </TeamsContextProvider>
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+          component={Paper}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Operations teams
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <OperationsTeamsTable onAdd={onAdd} />
+        <ExpansionPanelDetails className={classes.expansionPanel}>
+          <TeamsContextProvider
+            initialState={{
+              teamType: TeamType.OPERATIONS,
+              groupType: GroupType.BOOKINGS, //second tab
+            }}
+          >
+            <TeamsContainer />
+          </TeamsContextProvider>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </Box>
