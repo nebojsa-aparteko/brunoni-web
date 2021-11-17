@@ -28,7 +28,9 @@ import useLandTransportPricelists from '../../../hooks/useLandTransportPricelist
 import ProviderPricelistEntity, {
   ProviderPricelistCategory,
 } from '../../../model/land-transport/providers/ProviderPricelists';
-
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { useHistory } from 'react-router';
+import ManualRoutesList from './routes/ManualRoutesList';
 const defaultItem = {
   price: { value: 0, currency: Currency.EUR },
   containerType: '',
@@ -71,7 +73,6 @@ const useStyles = makeStyles(() => ({
   accordionContainer: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
   },
   title: {
     alignSelf: 'start',
@@ -98,16 +99,22 @@ const useStyles = makeStyles(() => ({
 
 const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }) => {
   const classes = useStyles();
+  const history = useHistory();
   const profits = useLandTransportProfits(provider.id);
   const pricelists = useLandTransportPricelists(provider.id);
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
       <Box className={classes.accordionContainer}>
-        <Box display="flex" justifyContent="space-between">
-          <Typography className={classes.title} variant="h1">
-            {provider.name}
-          </Typography>
+        <Box display="flex" justifyContent="space-between" flex={1}>
+          <Box display="flex" flexDirection="row" alignSelf="flex-start">
+            <IconButton onClick={() => history.goBack()}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography className={classes.title} variant="h1">
+              {provider.name}
+            </Typography>
+          </Box>
           <IconButton onClick={openModal}>
             <SettingsIcon />
           </IconButton>
@@ -153,11 +160,11 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
           </Box>
         </SimpleExpansionPanel>
 
-        <SimpleExpansionPanel label="Routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
+        <SimpleExpansionPanel label="Automatic Routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
           <RoutesTable provider={provider} />
         </SimpleExpansionPanel>
 
-        <SimpleExpansionPanel label="Pricelists" fullWidth TransitionProps={{ mountOnEnter: true }}>
+        <SimpleExpansionPanel label="Semi-automatic routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
           <Box display="flex" flexDirection="column">
             Export
             <EditableTable
@@ -214,6 +221,9 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               deleteItem={id => deleteLandTransportPricelist(provider.id, id)}
             />
           </Box>
+        </SimpleExpansionPanel>
+        <SimpleExpansionPanel label="Manual routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
+          <ManualRoutesList providerId={provider.id} />
         </SimpleExpansionPanel>
       </Box>
       {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} />}

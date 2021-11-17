@@ -9,6 +9,7 @@ import RoutesFileUploadDialog from './RoutesFileUploadDialog';
 import firebase from '../../../../firebase';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
+import { ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
 
 interface RoutesTableProps {
   provider: ProviderEntity;
@@ -53,13 +54,13 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const routes = useLandTransportRoutes(provider.id);
+  const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.AUTOMATIC);
 
   const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   const handleSelectDeselectAll = () => {
-    if (selectedRoutes.length !== routes.length) {
-      setSelectedRoutes(routes.map(route => route.version || ''));
+    if (selectedRoutes.length !== routes?.length) {
+      setSelectedRoutes(routes?.map(route => route.version || '') || []);
     } else {
       setSelectedRoutes([]);
     }
@@ -99,7 +100,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
             <TableRow>
               <TableCell align="left" style={{ paddingLeft: 4 }}>
                 <Checkbox
-                  checked={selectedRoutes.length === routes.length}
+                  checked={selectedRoutes.length === routes?.length}
                   onClick={handleSelectDeselectAll}
                   onFocus={event => event.stopPropagation()}
                   color="primary"
@@ -111,7 +112,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {routes.map(route => (
+            {routes?.map(route => (
               <RoutesTableRow
                 key={route.version}
                 route={route}

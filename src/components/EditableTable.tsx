@@ -6,6 +6,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -17,13 +18,14 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import { get, omit, set } from 'lodash/fp';
 import theme from '../theme';
-import { Currency } from '../model/Payment';
 import EditingInput from './EditingInput';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { SelectProps } from '@material-ui/core/Select/Select';
 import { TextFieldProps } from '@material-ui/core/TextField/TextField';
+import CloseIcon from '@material-ui/icons/Close';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 type CellType =
   | {
@@ -33,15 +35,19 @@ type CellType =
       options: { key: string; label: string }[];
       selectProps?: SelectProps;
     }
-  | { label: string; fieldName: string; fieldType: 'input'; inputProps?: TextFieldProps };
+  | { label: string; fieldName: string; fieldType: 'input'; inputProps?: TextFieldProps }
+  | { label: string; fieldName: string; fieldType: 'date'; renderDate: (date: Date) => string }
+  | { label: string; fieldName: string; fieldType: 'switch' };
 
 interface EditableTableProps<T> {
   cells: CellType[];
-  data: T[];
+  data?: T[];
   defaultItem: T;
   addItem: (item: T) => Promise<any>;
+  onRowClick?: (item: T) => void;
   editItem: (id: string, item: T) => Promise<any>;
   deleteItem: (id: string) => Promise<any>;
+  canAddMore?: boolean;
 }
 const EditableTable = <T extends { id: string }>({
   deleteItem,
@@ -50,25 +56,28 @@ const EditableTable = <T extends { id: string }>({
   data,
   cells,
   defaultItem,
+  canAddMore = true,
   ...props
 }: EditableTableProps<T>) => {
   const [newRow, setNewRow] = useState(false);
 
   return (
     <Box my={2} display="flex" flexDirection="column">
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        startIcon={<AddIcon />}
-        onClick={() => {
-          setNewRow(true);
-        }}
-        style={{ alignSelf: 'flex-end', marginBottom: theme.spacing(2) }}
-        disabled={newRow}
-      >
-        Add row
-      </Button>
+      {canAddMore && (
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={() => {
+            setNewRow(true);
+          }}
+          style={{ alignSelf: 'flex-end', marginBottom: theme.spacing(2) }}
+          disabled={newRow}
+        >
+          Add row
+        </Button>
+      )}
       <TableContainer component={Paper}>
         <Table aria-label="simple table">
           <TableHead>
@@ -99,6 +108,7 @@ const EditableTable = <T extends { id: string }>({
                 deleteItem={deleteItem}
                 editItem={editItem}
                 cells={cells}
+                onCancel={() => setNewRow(false)}
                 {...props}
               />
             )}
@@ -116,9 +126,20 @@ interface EditableRowProps {
   editItem: (id: string, item: any) => Promise<any>;
   deleteItem: (id: string) => Promise<any>;
   isAddMode?: boolean;
+  onRowClick?: (item: any) => void;
+  onCancel?: () => void;
 }
 
-const EditableRow: React.FC<EditableRowProps> = ({ item, isAddMode, addItem, editItem, deleteItem, cells }) => {
+const EditableRow: React.FC<EditableRowProps> = ({
+  item,
+  isAddMode,
+  addItem,
+  editItem,
+  deleteItem,
+  cells,
+  onCancel,
+  onRowClick,
+}) => {
   const [isEditing, setEditing] = useState(!!isAddMode);
   const [stateItem, setStateItem] = useState(item);
 
@@ -129,24 +150,31 @@ const EditableRow: React.FC<EditableRowProps> = ({ item, isAddMode, addItem, edi
     key && setStateItem((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
   };
   const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-    event.target?.name &&
-      setStateItem((prevState: any) => ({
-        ...prevState,
-        price: { ...prevState.price, currency: event.target.value as Currency },
-      }));
+    const name = event.target?.name;
+    const value = event.target?.value;
+    if (name && value) {
+      setStateItem((prevState: any) => set(name, value)(prevState));
+    }
   };
   return (
-    <TableRow>
+    <TableRow
+      style={{ cursor: onRowClick ? 'pointer' : 'initial' }}
+      onClick={() => !isAddMode && !isEditing && onRowClick?.(item)}
+    >
       {cells.map(cell => (
         <TableCell>
           {cell.fieldType === 'input' ? (
             <EditingInput
+              noDefaultLabel
               editing={isEditing}
               inputProps={{
                 variant: 'outlined',
-                label: cell.label,
                 name: cell.fieldName,
                 onChange: handleInputChange,
+                onClick: event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                },
                 ...(cell.inputProps || {}),
               }}
               value={get(cell.fieldName)(stateItem)}
@@ -159,6 +187,10 @@ const EditableRow: React.FC<EditableRowProps> = ({ item, isAddMode, addItem, edi
                 value={get(cell.fieldName)(stateItem)}
                 name={cell.fieldName}
                 onChange={handleSelectChange}
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
                 {...cell.selectProps}
               >
                 {cell.options.map(val => (
@@ -168,13 +200,33 @@ const EditableRow: React.FC<EditableRowProps> = ({ item, isAddMode, addItem, edi
             ) : (
               <Typography>{get(cell.fieldName)(stateItem)}</Typography>
             )
+          ) : cell.fieldType === 'date' ? (
+            <Typography>{cell.renderDate(get(cell.fieldName)(stateItem))}</Typography>
+          ) : cell.fieldType === 'switch' ? (
+            isEditing ? (
+              <Switch
+                name="active"
+                checked={get('active')(stateItem)}
+                onChange={event => {
+                  setStateItem((prevState: any) => set(event.target.name, event.target.checked)(prevState));
+                }}
+                onClick={event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                }}
+              />
+            ) : (
+              <FiberManualRecordIcon color={stateItem.active ? 'secondary' : 'error'} />
+            )
           ) : null}
         </TableCell>
       ))}
       <TableCell>
         {isEditing ? (
           <IconButton
-            onClick={() => {
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
               (isAddMode ? addItem(removeEntityFields(stateItem)) : editItem(item.id, stateItem)).finally(() =>
                 setEditing(false),
               );
@@ -183,20 +235,40 @@ const EditableRow: React.FC<EditableRowProps> = ({ item, isAddMode, addItem, edi
             <CheckIcon />
           </IconButton>
         ) : (
-          <IconButton onClick={() => setEditing(true)}>
+          <IconButton
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+              setEditing(true);
+            }}
+          >
             <EditIcon />
           </IconButton>
         )}
-        <IconButton
-          onClick={() => {
-            deleteItem(item.id).finally(() => {
-              console.log('Test');
-              console.log();
-            });
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
+        {isEditing ? (
+          <IconButton
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+              isAddMode ? onCancel?.() : setEditing(false);
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={event => {
+              event.preventDefault();
+              event.stopPropagation();
+              deleteItem(item.id).finally(() => {
+                console.log('Test');
+                console.log();
+              });
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        )}
       </TableCell>
     </TableRow>
   );
