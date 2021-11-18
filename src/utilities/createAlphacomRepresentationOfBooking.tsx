@@ -8,7 +8,6 @@ import { flow, get, omit, set } from 'lodash/fp';
 import { BookingCategory, BookingVersion } from '../model/Booking';
 import { getRepresentationFromClient } from '../components/bookingRequests/BookingRequestPortTerms';
 import { formatDateSafe } from './formattingHelpers';
-import { getItineraryFromSchedule } from '../components/onlineBooking/Summary';
 import IMO from '../model/IMO';
 import CommodityType from '../model/CommodityType';
 import parseDate from 'date-fns/parse';
@@ -72,7 +71,7 @@ export default async (
       ? request.client
       : request.assignedUser?.alphacomClientId &&
         ((await fetchClientByAlphacomId(request.assignedUser?.alphacomClientId)).data() as Client);
-  const itinerary = getItineraryFromSchedule(request.schedule);
+  const itinerary = request.itinerary;
   const portOfLoading = itinerary?.portOfLoading;
 
   return flow(
@@ -129,7 +128,9 @@ export default async (
     set(
       'PlaceOfReceiptETS',
       itinerary?.placeOfReceipt
-        ? formatDateSafe(parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        ? itinerary?.placeOfReceipt?.DepartureDate
+          ? formatDateSafe(parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+          : null
         : itinerary?.portOfLoading?.DepartureDate
         ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
         : null,
@@ -163,10 +164,12 @@ export default async (
     set(
       'FinalDestinationETA',
       itinerary?.finalDestinationPort
-        ? formatDateSafe(
-            parseDate(itinerary?.finalDestinationPort?.ArrivalDate, 'yyyy-MM-dd', new Date()),
-            'dd.MM.yyyy',
-          )
+        ? itinerary?.finalDestinationPort?.ArrivalDate
+          ? formatDateSafe(
+              parseDate(itinerary?.finalDestinationPort?.ArrivalDate, 'yyyy-MM-dd', new Date()),
+              'dd.MM.yyyy',
+            )
+          : null
         : itinerary?.portOfDischarge?.ArrivalDate
         ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.ArrivalDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
         : null,
@@ -193,7 +196,12 @@ export default async (
           set(
             'Closing',
             request.schedule?.Deadlines.map(closing => {
-              const [date, time] = closing.Time?.split('-')?.map(str => str.trim()) || [undefined, undefined];
+              const [date, time] = (closing.Time && (closing.Time?.endsWith('h') || closing.Time?.endsWith('H'))
+                ? closing.Time?.slice(0, -1)
+                : closing.Time
+              )
+                .split('-')
+                ?.map(str => str.trim()) || [undefined, undefined];
               return {
                 ClosingType: closing.Typ,
                 ClosingDate: date,
