@@ -437,9 +437,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                   IconComponent={ChevronRightIcon}
                   title="Origin"
                   label1={
-                    getOriginPort(bookingRequest.itinerary)?.Port.HarbourName +
+                    getOriginPort(bookingRequest.itinerary)?.Port?.HarbourName +
                     ', ' +
-                    getOriginPort(bookingRequest.itinerary)?.Port.Land
+                    getOriginPort(bookingRequest.itinerary)?.Port?.Land
                   }
                   label2={bookingRequest.itinerary && `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`}
                   gutterBottom
