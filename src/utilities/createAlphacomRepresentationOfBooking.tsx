@@ -193,7 +193,12 @@ export default async (
           set(
             'Closing',
             request.schedule?.Deadlines.map(closing => {
-              const [date, time] = closing.Time?.split('-')?.map(str => str.trim()) || [undefined, undefined];
+              const [date, time] = (closing.Time && (closing.Time?.endsWith('h') || closing.Time?.endsWith('H'))
+                ? closing.Time?.slice(0, -1)
+                : closing.Time
+              )
+                .split('-')
+                ?.map(str => str.trim()) || [undefined, undefined];
               return {
                 ClosingType: closing.Typ,
                 ClosingDate: date,
