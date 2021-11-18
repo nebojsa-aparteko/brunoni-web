@@ -104,18 +104,20 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
               <CompareIcon />
             </IconButton>
           )}
-          <IconButton
-            size="small"
-            aria-label="Add Comment"
-            onClick={event => {
-              event.stopPropagation();
-              handleMention(item);
-            }}
-          >
-            {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
-            <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
-            {/*</Badge>*/}
-          </IconButton>
+          {handleMention && (
+            <IconButton
+              size="small"
+              aria-label="Add Comment"
+              onClick={event => {
+                event.stopPropagation();
+                handleMention(item);
+              }}
+            >
+              {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
+              <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              {/*</Badge>*/}
+            </IconButton>
+          )}
 
           <IconButton
             edge="end"
@@ -141,6 +143,6 @@ export default InternalStorageItem;
 interface Props {
   item: ChecklistItemValueDocument;
   handleDelete: (item: ChecklistItemValueDocument, setProgress: any) => void;
-  handleMention: (item: ChecklistItemValueDocument) => void;
+  handleMention?: (item: ChecklistItemValueDocument) => void;
   handleDialogOpen?: (document: ChecklistItemValueDocument) => void;
 }

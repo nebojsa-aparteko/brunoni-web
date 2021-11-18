@@ -9,8 +9,8 @@ import {
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import theme from '../../../../theme';
 import { addLandTransportRoute, editLandTransportRoute } from '../../../../api/landTransportConfig';
-import useLandTransportProviders from '../../../../hooks/useLandTransportRoutes';
 import { set } from 'lodash/fp';
+import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 
 //@ts-ignore
 const defaultItem = {
@@ -27,7 +27,7 @@ interface Props {
 }
 const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
   const [newRow, setNewRow] = useState(false);
-  const routes = useLandTransportProviders(providerId, ProviderRoutesType.MANUAL);
+  const routes = useLandTransportRoutes(providerId, ProviderRoutesType.MANUAL);
   return (
     <Box display="flex" flexDirection="column" flex={1}>
       <Button

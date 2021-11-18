@@ -1,18 +1,35 @@
 import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
-import React from 'react';
+import React, { useState } from 'react';
 import { Checkbox, TableCell, TableRow } from '@material-ui/core';
 import { format } from 'date-fns';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import RouteDetailsModal from './RouteDetailsModal';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import palette from '../../../../theme/palette';
+import ProviderEntity from '../../../../model/land-transport/providers/Provider';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  tableRow: {
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: palette.background.hover,
+    },
+  },
+}));
 
 interface RoutesTableRowProps {
   route: AutomaticProviderRoute;
+  provider: ProviderEntity;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, selected, onSelectRow }) => {
+const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, selected, onSelectRow }) => {
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
+
   return (
-    <TableRow>
+    <TableRow className={classes.tableRow} onClick={() => setOpen(true)}>
       <TableCell padding="checkbox">
         <Checkbox
           checked={selected}
@@ -29,6 +46,9 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, selected, onSele
         ) : (
           <FiberManualRecordIcon color={'error'} />
         )}
+      </TableCell>
+      <TableCell style={{ display: 'none' }}>
+        <RouteDetailsModal provider={provider} route={route} open={open} setOpen={setOpen} />
       </TableCell>
     </TableRow>
   );

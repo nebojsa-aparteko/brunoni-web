@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { EnhancedTableToolbar } from '../../../EnhancedTableToolbar';
 import ConfirmationDialog from '../../../ConfirmationDialog';
@@ -10,10 +9,7 @@ import firebase from '../../../../firebase';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
 import { ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
-
-interface RoutesTableProps {
-  provider: ProviderEntity;
-}
+import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 
 const deleteRoute = async (providerId: string, routeVersion: string) =>
   await firebase
@@ -38,16 +34,20 @@ const deleteVersionDocuments = async (providerId: string, routeVersion: string) 
 const deleteRoutes = async (
   provider: ProviderEntity,
   routeVersions: string[],
-  deleteFiles: (files: ChecklistItemValueDocument[]) => Promise<any>,
+  deleteFiles: (files: string[]) => Promise<any>,
 ) => {
   return Promise.all(
     routeVersions.map(async version => {
       const documents = await deleteVersionDocuments(provider.id, version);
-      await deleteFiles(documents);
+      await deleteFiles(documents.map(d => d.url));
       await deleteRoute(provider.id, version);
     }),
   );
 };
+
+interface RoutesTableProps {
+  provider: ProviderEntity;
+}
 
 const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
@@ -116,6 +116,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
               <RoutesTableRow
                 key={route.version}
                 route={route}
+                provider={provider}
                 selected={selectedRoutes.includes(route.version)}
                 onSelectRow={event => onSelectRow(event, route.version)}
               />

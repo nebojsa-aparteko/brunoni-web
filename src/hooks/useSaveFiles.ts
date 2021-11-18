@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import { fileWithExt } from '../components/bookings/checklist/ChecklistItemRow';
 import firebase from '../firebase';
 import useGlobalAppState from './useGlobalAppState';
-import { ChecklistItemValueDocument } from '../components/bookings/checklist/ChecklistItemModel';
 
 const useSaveFiles = (storageBasePath: string) => {
   const [, dispatch] = useGlobalAppState();
@@ -56,13 +55,13 @@ const useSaveFiles = (storageBasePath: string) => {
     [dispatch, storageBasePath],
   );
 
-  const deleteFiles = useCallback(async (files: ChecklistItemValueDocument[]): Promise<any> => {
-    const deleteFile = async (file: ChecklistItemValueDocument): Promise<any> => {
-      let storageRef = firebase.storage().refFromURL(file.url);
+  const deleteFiles = useCallback(async (filesUrls: string[]): Promise<any> => {
+    const deleteFile = async (fileUrl: string): Promise<any> => {
+      let storageRef = firebase.storage().refFromURL(fileUrl);
       return await storageRef.delete();
     };
 
-    const requests = files.map((file: ChecklistItemValueDocument) => {
+    const requests = filesUrls.map((file: string) => {
       return deleteFile(file).then(storedItem => {
         return storedItem;
       });

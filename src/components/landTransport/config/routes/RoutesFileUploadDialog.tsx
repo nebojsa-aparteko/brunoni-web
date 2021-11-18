@@ -39,12 +39,15 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   const autoIncrementVersion = await getRouteVersion(provider.id);
   const version = `version-${autoIncrementVersion}`;
 
+  const addedAt = firebase.firestore.Timestamp.fromDate(new Date());
+
   let route = {
     active: false,
-    addedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+    addedAt,
+    updatedAt: addedAt,
     type: ProviderRoutesType.AUTOMATIC,
     version,
-  } as Omit<AutomaticProviderRoute, 'versionDocuments'>;
+  } as AutomaticProviderRoute;
 
   await firebase
     .firestore()
@@ -59,13 +62,14 @@ const saveRouteFilesToFirestore = async (
   routeVersion: string,
   versionDocument: ChecklistItemValueDocument,
 ) => {
-  return await firebase
+  const ref = firebase
     .firestore()
     .collection(`land-transport-config/${provider.id}/routes`)
     .doc(routeVersion)
     .collection('versionDocuments')
-    .doc()
-    .set(versionDocument);
+    .doc();
+  const id = ref.id;
+  return await ref.set({ ...versionDocument, id });
 };
 
 const useStyles = makeStyles(theme => ({
@@ -90,11 +94,18 @@ const useStyles = makeStyles(theme => ({
 interface RouteFileUploadDialogProps {
   provider: ProviderEntity;
   isOpen: boolean;
+  route?: AutomaticProviderRoute;
   handleClose: () => void;
   saveFiles: (files: File[]) => Promise<any>;
 }
 
-const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({ provider, isOpen, handleClose, saveFiles }) => {
+const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
+  provider,
+  isOpen,
+  route,
+  handleClose,
+  saveFiles,
+}) => {
   const classes = useStyles();
   const [loading, setLoading] = useState<boolean>(false);
   const [filesState, setFilesState] = useState<File[]>([]);
@@ -104,7 +115,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({ provider
   const handleSave = async () => {
     try {
       setLoading(true);
-      const routeVersion = await createAutomaticRouteVersion(provider);
+      const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       const documents = (await saveFiles(filesState)) as ChecklistItemValueDocument[];
       const values = documents.map(
         item =>

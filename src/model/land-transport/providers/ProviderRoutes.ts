@@ -13,6 +13,7 @@ export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.AUTOMATIC;
   version: string; //work as id
   addedAt: firebase.firestore.Timestamp;
+  updatedAt: firebase.firestore.Timestamp;
   active: boolean;
 }
 

@@ -1,10 +1,12 @@
 import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { Fragment } from 'react';
 import { SvgIconProps } from '@material-ui/core/SvgIcon';
+import { Variant } from '@material-ui/core/styles/createTypography';
 
 interface Props {
   IconComponent?: React.ComponentType<SvgIconProps>;
   title?: React.ReactNode;
+  titleVariant?: 'inherit' | Variant | undefined;
   label1?: React.ReactNode | string;
   label1HTML?: any;
   label2?: React.ReactNode;
@@ -27,6 +29,7 @@ const useStyles = makeStyles(() => ({
 const InfoBoxItem: React.FC<Props> = ({
   IconComponent,
   title,
+  titleVariant = 'subtitle2',
   label1,
   label1HTML,
   label2,
@@ -38,7 +41,7 @@ const InfoBoxItem: React.FC<Props> = ({
   return (
     <Fragment>
       {title && (
-        <Typography variant="subtitle2" display="block" gutterBottom className={classes.printText}>
+        <Typography variant={titleVariant} display="block" gutterBottom className={classes.printText}>
           <Box display="flex" alignItems="center" fontWeight="fontWeightBold">
             {IconComponent && <IconComponent fontSize="small" color="secondary" />}
             <Box ml={IconComponent && '.5em'}>{title}</Box>
