@@ -47,17 +47,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-// const deactivateOthers = async (providerId: string) => {
-//   (await firebase
-//     .firestore()
-//     .collection(`land-transport-config/${providerId}/routes`)
-//     .get()).docs.forEach(d => {
-//       const route = d.data() as AutomaticProviderRoute
-//       if(route.active){
-//         d.ref.set({ active: false }, { merge: true })
-//       }
-//     })
-// }
+const deactivateOthers = async (providerId: string, activeRouteVersion: string) => {
+  (
+    await firebase
+      .firestore()
+      .collection(`land-transport-config/${providerId}/routes`)
+      .get()
+  ).docs.forEach(d => {
+    const route = d.data() as AutomaticProviderRoute;
+    if (route.active && route.version !== activeRouteVersion) {
+      d.ref.set({ active: false }, { merge: true });
+    }
+  });
+};
 
 const updateRoute = async (providerId: string, route: AutomaticProviderRoute) => {
   const updatedAt = firebase.firestore.Timestamp.fromDate(new Date());
@@ -100,6 +102,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
     await updateRoute(provider.id, { ...route, active: event.target.checked });
+    await deactivateOthers(provider.id, route.version);
   };
 
   const handleDeleteDocument = async (item: ChecklistItemValueDocument) => {
