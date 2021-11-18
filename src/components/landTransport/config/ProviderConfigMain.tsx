@@ -106,7 +106,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
   return (
     <>
       <Box className={classes.accordionContainer}>
-        <Box display="flex" justifyContent="space-between" flex={1}>
+        <Box display="flex" justifyContent="space-between" flex={1} my={2}>
           <Box display="flex" flexDirection="row" alignSelf="flex-start">
             <IconButton onClick={() => history.goBack()}>
               <ArrowBackIcon />

@@ -63,7 +63,7 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             name: 'origin',
             onChange: handleInputChange,
           }}
-          typographyProps={{ variant: 'h4' }}
+          typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
           value={get('origin')(stateRoute)}
         />
         <EditingInput
@@ -74,7 +74,7 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             name: 'destination',
             onChange: handleInputChange,
           }}
-          typographyProps={{ variant: 'h4' }}
+          typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
           value={get('destination')(stateRoute)}
         />
         <EditingInput
@@ -85,11 +85,14 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             name: 'transportMode',
             onChange: handleInputChange,
           }}
-          typographyProps={{ variant: 'h4' }}
+          typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
           value={get('transportMode')(stateRoute)}
         />
 
-        <Typography variant="h5" style={{ whiteSpace: 'nowrap' }}>
+        <Typography
+          variant="h5"
+          style={{ whiteSpace: 'nowrap', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
           {getPriceRangeText(route.priceRange)}
         </Typography>
         {isEditing ? (
