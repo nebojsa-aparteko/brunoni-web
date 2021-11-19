@@ -27,7 +27,7 @@ import { TextFieldProps } from '@material-ui/core/TextField/TextField';
 import CloseIcon from '@material-ui/icons/Close';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
-type CellType =
+export type CellType =
   | {
       fieldType: 'select';
       label: string;
@@ -35,7 +35,13 @@ type CellType =
       options: { key: string; label: string }[];
       selectProps?: SelectProps;
     }
-  | { label: string; fieldName: string; fieldType: 'input'; inputProps?: TextFieldProps }
+  | {
+      label: string;
+      fieldName: string;
+      fieldType: 'input';
+      inputProps?: TextFieldProps;
+      renderValue?: (value: any) => string;
+    }
   | { label: string; fieldName: string; fieldType: 'date'; renderDate: (date: Date) => string }
   | { label: string; fieldName: string; fieldType: 'switch' };
 
@@ -162,7 +168,7 @@ const EditableRow: React.FC<EditableRowProps> = ({
       onClick={() => !isAddMode && !isEditing && onRowClick?.(item)}
     >
       {cells.map(cell => (
-        <TableCell>
+        <TableCell style={{ flex: 1 }}>
           {cell.fieldType === 'input' ? (
             <EditingInput
               noDefaultLabel
@@ -177,6 +183,7 @@ const EditableRow: React.FC<EditableRowProps> = ({
                 },
                 ...(cell.inputProps || {}),
               }}
+              renderValue={cell.renderValue}
               value={get(cell.fieldName)(stateItem)}
             />
           ) : cell.fieldType === 'select' ? (
@@ -221,7 +228,7 @@ const EditableRow: React.FC<EditableRowProps> = ({
           ) : null}
         </TableCell>
       ))}
-      <TableCell>
+      <TableCell style={{ flex: 1 }}>
         {isEditing ? (
           <IconButton
             onClick={event => {
