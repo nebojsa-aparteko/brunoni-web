@@ -37,7 +37,7 @@ export const incrementRouteVersion = async (providerId: string) => {
 const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   await incrementRouteVersion(provider.id);
   const autoIncrementVersion = await getRouteVersion(provider.id);
-  const version = `version-${autoIncrementVersion}`;
+  const version = `Version-${autoIncrementVersion}`;
 
   const addedAt = firebase.firestore.Timestamp.fromDate(new Date());
 
