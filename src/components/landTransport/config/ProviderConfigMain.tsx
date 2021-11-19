@@ -9,11 +9,8 @@ import PredefinedAddOnRatesModal from './PredefinedAddOnRatesModal';
 import RoutesTable from './routes/RoutesTable';
 import EditableTable from '../../EditableTable';
 import {
-  addLandTransportPricelist,
   addLandTransportProfit,
-  deleteLandTransportPricelist,
   deleteLandTransportProfit,
-  editLandTransportPricelist,
   editLandTransportProfit,
 } from '../../../api/landTransportConfig';
 import { Currency } from '../../../model/Payment';
@@ -24,13 +21,11 @@ import {
   SpecificProviderProfitEntity,
 } from '../../../model/land-transport/providers/ProviderProfit';
 import { BookingCategory } from '../../../model/Booking';
-import useLandTransportPricelists from '../../../hooks/useLandTransportPricelists';
-import ProviderPricelistEntity, {
-  ProviderPricelistCategory,
-} from '../../../model/land-transport/providers/ProviderPricelists';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router';
 import ManualRoutesList from './routes/ManualRoutesList';
+import PricelistConfig from './PricelistConfig';
+
 const defaultItem = {
   price: { value: 0, currency: Currency.EUR },
   containerType: '',
@@ -48,26 +43,6 @@ const specificItem = {
   port: '',
   category: BookingCategory.Import,
 } as SpecificProviderProfitEntity;
-
-const defaultExportPricelistItem = {
-  prices: [
-    { value: 0, currency: Currency.EUR },
-    { value: 0, currency: Currency.EUR },
-  ],
-  category: ProviderPricelistCategory.EXPORT,
-  id: '',
-  createdAt: new Date(),
-} as ProviderPricelistEntity;
-
-const defaultImportPricelistItem = {
-  prices: [
-    { value: 0, currency: Currency.EUR },
-    { value: 0, currency: Currency.EUR },
-  ],
-  category: ProviderPricelistCategory.IMPORT,
-  id: '',
-  createdAt: new Date(),
-} as ProviderPricelistEntity;
 
 const useStyles = makeStyles(() => ({
   accordionContainer: {
@@ -101,7 +76,6 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
   const classes = useStyles();
   const history = useHistory();
   const profits = useLandTransportProfits(provider.id);
-  const pricelists = useLandTransportPricelists(provider.id);
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
@@ -166,60 +140,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
 
         <SimpleExpansionPanel label="Semi-automatic routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
           <Box display="flex" flexDirection="column">
-            Export
-            <EditableTable
-              cells={[
-                { label: 'Distance', fieldType: 'input', fieldName: 'distance' },
-                { label: "20' DV", fieldType: 'input', fieldName: 'prices[0].value', inputProps: { type: 'number' } },
-                //currency is not working currently, waiting on prices list refactor
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'prices[0].currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-                { label: "40' DV", fieldType: 'input', fieldName: 'prices[1].value', inputProps: { type: 'number' } },
-                //currency is not working currently, waiting on prices list refactor
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'prices[1].currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-              ]}
-              defaultItem={defaultExportPricelistItem}
-              data={pricelists?.exportPricelistEntities}
-              addItem={item => addLandTransportPricelist(provider.id, item)}
-              editItem={(id, item) => editLandTransportPricelist(provider.id, id, item)}
-              deleteItem={id => deleteLandTransportPricelist(provider.id, id)}
-            />
-            Import
-            <EditableTable
-              cells={[
-                { label: 'Distance', fieldType: 'input', fieldName: 'distance' },
-                { label: "20' DV", fieldType: 'input', fieldName: 'prices[0].value', inputProps: { type: 'number' } },
-                //currency is not working currently, waiting on prices list refactor
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'prices[0].currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-                { label: "40' DV", fieldType: 'input', fieldName: 'prices[1].value', inputProps: { type: 'number' } },
-                //currency is not working currently, waiting on prices list refactor
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'prices[1].currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-              ]}
-              defaultItem={defaultImportPricelistItem}
-              data={pricelists?.importPricelistEntities}
-              addItem={item => addLandTransportPricelist(provider.id, item)}
-              editItem={(id, item) => editLandTransportPricelist(provider.id, id, item)}
-              deleteItem={id => deleteLandTransportPricelist(provider.id, id)}
-            />
+            <PricelistConfig provider={provider} />
           </Box>
         </SimpleExpansionPanel>
         <SimpleExpansionPanel label="Manual routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
