@@ -513,21 +513,23 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const { saveFiles } = useSaveFiles(storageBasePath);
 
   const handleOnDrop = (files: File[]) => {
-    readAndParseFile(
-      files[0],
-      dispatch,
-      setBookingRequest,
-      setLoading,
-      setFiles,
-      userRecord,
-      ports,
-      carriers,
-      containerTypes,
-      commodityTypes,
-      pickupLocations,
-      chargeCodes,
-      normalize,
-    );
+    if (files.length > 0) {
+      readAndParseFile(
+        files[0],
+        dispatch,
+        setBookingRequest,
+        setLoading,
+        setFiles,
+        userRecord,
+        ports,
+        carriers,
+        containerTypes,
+        commodityTypes,
+        pickupLocations,
+        chargeCodes,
+        normalize,
+      );
+    }
   };
 
   const handleOnDelete = () => {
