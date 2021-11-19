@@ -212,7 +212,7 @@ const PortPresentation: React.FC<{
   relevantDate: RelevantDate;
 }> = ({ port, relevantDate }) => (
   <Box display="flex" flexDirection="column">
-    {port.Port.HarbourName}
+    {port.Port?.HarbourName}
     {relevantDate === 'ArrivalDate' && port.ArrivalDate && (
       <Typography>{`ETA: ${formatDateString(port.ArrivalDate)}`}</Typography>
     )}
