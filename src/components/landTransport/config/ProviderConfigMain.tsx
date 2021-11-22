@@ -24,24 +24,24 @@ import { BookingCategory } from '../../../model/Booking';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router';
 import ManualRoutesList from './routes/ManualRoutesList';
-import PricelistConfig from './PricelistConfig';
+import PricelistConfig, { containersCells } from './PricelistConfig';
 
 const defaultItem = {
-  price: { value: 0, currency: Currency.EUR },
-  containerType: '',
   type: ProviderProfitType.DEFAULT,
   id: '',
   createdAt: new Date(),
+  pricePerContainer: {},
+  currency: Currency.EUR,
 } as DefaultProviderProfitEntity;
 
 const specificItem = {
-  price: { value: 0, currency: Currency.EUR },
-  containerType: '',
   type: ProviderProfitType.SPECIFIC,
   id: '',
   createdAt: new Date(),
+  pricePerContainer: {},
+  currency: Currency.EUR,
   port: '',
-  category: BookingCategory.Import,
+  category: BookingCategory.Export,
 } as SpecificProviderProfitEntity;
 
 const useStyles = makeStyles(() => ({
@@ -97,14 +97,13 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
           <Box display="flex" flexDirection="column">
             <EditableTable
               cells={[
-                { label: 'Container type', fieldType: 'input', fieldName: 'containerType' },
-                { label: 'Price', fieldType: 'input', fieldName: 'price.value', inputProps: { type: 'number' } },
                 {
                   label: 'Currency',
                   fieldType: 'select',
-                  fieldName: 'price.currency',
+                  fieldName: 'currency',
                   options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
                 },
+                ...containersCells,
               ]}
               defaultItem={defaultItem}
               data={profits?.defaultProfit}
@@ -116,14 +115,13 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               cells={[
                 { label: 'Category', fieldType: 'input', fieldName: 'category' },
                 { label: 'Port', fieldType: 'input', fieldName: 'port' },
-                { label: 'Container type', fieldType: 'input', fieldName: 'containerType' },
-                { label: 'Price', fieldType: 'input', fieldName: 'price.value', inputProps: { type: 'number' } },
                 {
                   label: 'Currency',
                   fieldType: 'select',
-                  fieldName: 'price.currency',
+                  fieldName: 'currency',
                   options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
                 },
+                ...containersCells,
               ]}
               defaultItem={specificItem}
               data={profits?.specificProfit}
@@ -147,7 +145,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
           <ManualRoutesList providerId={provider.id} />
         </SimpleExpansionPanel>
       </Box>
-      {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} />}
+      {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId={provider.id} />}
     </>
   );
 };

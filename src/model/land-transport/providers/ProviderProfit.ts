@@ -1,13 +1,12 @@
 import { BookingCategory } from '../../Booking';
-import Price from '../../Price';
 import Entity from '../../Entity';
+import { Currency } from '../../Payment';
+import { PricePerContainer } from './ProviderRoutes';
 
 interface ProviderProfitEntity extends Entity {
   type: ProviderProfitType;
-  containerType: string;
-  price: Price;
-  port: string;
-  category: BookingCategory;
+  currency: Currency;
+  pricePerContainer: PricePerContainer;
 }
 export enum ProviderProfitType {
   DEFAULT = 'DEFAULT',

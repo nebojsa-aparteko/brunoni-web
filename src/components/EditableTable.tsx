@@ -89,7 +89,7 @@ const EditableTable = <T extends { id: string }>({
           <TableHead>
             <TableRow>
               {cells.map(item => (
-                <TableCell>{item.label}</TableCell>
+                <TableCell key={`cell-header-${item.label}`}>{item.label}</TableCell>
               ))}
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -110,7 +110,7 @@ const EditableTable = <T extends { id: string }>({
               <EditableRow
                 item={defaultItem}
                 isAddMode
-                addItem={item => addItem(item).finally(() => setNewRow(false))}
+                addItem={item => addItem(item).then(() => setNewRow(false))}
                 deleteItem={deleteItem}
                 editItem={editItem}
                 cells={cells}
@@ -168,7 +168,7 @@ const EditableRow: React.FC<EditableRowProps> = ({
       onClick={() => !isAddMode && !isEditing && onRowClick?.(item)}
     >
       {cells.map(cell => (
-        <TableCell style={{ flex: 1 }}>
+        <TableCell style={{ flex: 1 }} key={`editable-row-${cell.fieldName}`}>
           {cell.fieldType === 'input' ? (
             <EditingInput
               noDefaultLabel
@@ -234,9 +234,9 @@ const EditableRow: React.FC<EditableRowProps> = ({
             onClick={event => {
               event.preventDefault();
               event.stopPropagation();
-              (isAddMode ? addItem(removeEntityFields(stateItem)) : editItem(item.id, stateItem)).finally(() =>
-                setEditing(false),
-              );
+              isAddMode
+                ? addItem(removeEntityFields(stateItem))
+                : editItem(item.id, stateItem).then(() => setEditing(false));
             }}
           >
             <CheckIcon />

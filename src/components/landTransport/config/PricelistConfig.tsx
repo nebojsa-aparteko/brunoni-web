@@ -41,7 +41,7 @@ interface TableProps {
   category: ProviderPricelistCategory;
 }
 
-const containersCells = Object.keys(EquipmentControlContainerTypes).map(value => ({
+export const containersCells = Object.keys(EquipmentControlContainerTypes).map(value => ({
   label: get(value)(EquipmentControlContainerTypes),
   fieldType: 'input',
   fieldName: `pricePerContainer.${value}.value`,

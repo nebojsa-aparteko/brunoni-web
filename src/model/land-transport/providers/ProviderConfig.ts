@@ -1,7 +1,12 @@
 import Price from '../../Price';
+import Entity from '../../Entity';
 
 interface ProviderConfig {
   type: ProviderConfigType;
+}
+
+export interface ProviderExtensionEntity extends Entity {
+  name: string;
 }
 
 export interface OfferProviderConfig extends ProviderConfig {
@@ -33,5 +38,7 @@ export enum OfferProviderConfigType {
   INCLUDED = 'INCLUDED',
   EXCLUDED = 'EXCLUDED',
 }
+
+export type ProviderExtension = Omit<ProviderExtensionEntity, 'id' | 'createdAt'>;
 
 export default ProviderConfig;
