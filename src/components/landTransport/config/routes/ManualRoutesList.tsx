@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ManualRouteShortView from './ManualRouteShortView';
-import { Box, Button } from '@material-ui/core';
+import { Box, Button, Paper } from '@material-ui/core';
 import { Currency } from '../../../../model/Payment';
 import {
   ManualProviderRouteEntity,
@@ -11,6 +11,8 @@ import theme from '../../../../theme';
 import { addLandTransportRoute, editLandTransportRoute } from '../../../../api/landTransportConfig';
 import { set } from 'lodash/fp';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
+import AddIcon from '@material-ui/icons/Add';
+import EmptyStatePanel from '../../../EmptyStatePanel';
 
 //@ts-ignore
 const defaultItem = {
@@ -28,18 +30,21 @@ interface Props {
 const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
   const [newRow, setNewRow] = useState(false);
   const routes = useLandTransportRoutes(providerId, ProviderRoutesType.MANUAL);
+
   return (
     <Box display="flex" flexDirection="column" flex={1}>
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        style={{ alignSelf: 'flex-end', marginBottom: theme.spacing(2) }}
-        disabled={newRow}
-        onClick={() => setNewRow(true)}
-      >
-        Add route
-      </Button>
+      {routes?.length !== 0 && (
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          style={{ alignSelf: 'flex-end', marginBottom: theme.spacing(2) }}
+          disabled={newRow}
+          onClick={() => setNewRow(true)}
+        >
+          Add route
+        </Button>
+      )}
 
       <Box display="flex" flexDirection="column" flex={1} style={{ gap: theme.spacing(2) }}>
         {newRow && (
@@ -62,25 +67,37 @@ const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
             }
           />
         )}
-        {routes?.map(v => (
-          <ManualRouteShortView
-            route={v}
-            key={v.id}
-            addItem={item =>
-              addLandTransportRoute(
-                providerId,
-                set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-              )
-            }
-            editItem={(id, item) =>
-              editLandTransportRoute(
-                providerId,
-                id,
-                set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-              )
-            }
-          />
-        ))}
+        {routes?.length !== 0 ? (
+          routes?.map(v => (
+            <ManualRouteShortView
+              route={v}
+              key={v.id}
+              addItem={item =>
+                addLandTransportRoute(
+                  providerId,
+                  set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                )
+              }
+              editItem={(id, item) =>
+                editLandTransportRoute(
+                  providerId,
+                  id,
+                  set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                )
+              }
+            />
+          ))
+        ) : (
+          <Box mt={3} component={Paper}>
+            <EmptyStatePanel
+              title="No manual routes"
+              subtitle="Click the button below to create the first manual route"
+              actionLabel="Add route"
+              actionIcon={<AddIcon />}
+              action={() => setNewRow(true)}
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );

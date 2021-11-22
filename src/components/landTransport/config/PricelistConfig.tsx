@@ -36,6 +36,7 @@ const defaultImportPricelistItem = {
 } as ProviderPricelistEntity;
 
 interface TableProps {
+  tableTitle?: string;
   provider: ProviderEntity;
   pricelists: ProviderPricelistEntity[];
   category: ProviderPricelistCategory;
@@ -50,9 +51,10 @@ export const containersCells = Object.keys(EquipmentControlContainerTypes).map(v
   },
 })) as CellType[];
 
-const PricelistTable: React.FC<TableProps> = ({ provider, pricelists, category }) => {
+const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category }) => {
   return (
     <EditableTable
+      tableTitle={tableTitle}
       cells={[
         {
           label: 'Distance',
@@ -99,17 +101,19 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
   );
 
   return (
-    <Box display="flex" flexDirection="column" p={2}>
+    <Box display="flex" flexDirection="column">
       {pricelists ? (
         <React.Fragment>
-          Export
+          <Box mb={4}>
+            <PricelistTable
+              tableTitle="Export"
+              provider={provider}
+              pricelists={exportPricelists}
+              category={ProviderPricelistCategory.EXPORT}
+            />
+          </Box>
           <PricelistTable
-            provider={provider}
-            pricelists={exportPricelists}
-            category={ProviderPricelistCategory.EXPORT}
-          />
-          Import
-          <PricelistTable
+            tableTitle="Import"
             provider={provider}
             pricelists={importPricelists}
             category={ProviderPricelistCategory.IMPORT}

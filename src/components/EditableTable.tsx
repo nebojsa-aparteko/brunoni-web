@@ -29,6 +29,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import Paper from '@material-ui/core/Paper';
 import palette from '../theme/palette';
+import EmptyStatePanel from './EmptyStatePanel';
 
 export type CellType =
   | {
@@ -59,6 +60,11 @@ interface EditableTableProps<T> {
   canAddMore?: boolean;
   tableTitle?: string;
   actionLabel?: string;
+  emptyStateTitle?: string;
+  emptyStateSubtitle?: string;
+  emptyStateActionLabel?: string;
+  emptyStateActionIcon?: any;
+  emptyStateAction?: any;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -99,10 +105,16 @@ const EditableTable = <T extends { id: string }>({
   canAddMore = true,
   tableTitle,
   actionLabel,
+  emptyStateTitle,
+  emptyStateSubtitle,
+  emptyStateActionLabel,
+  emptyStateActionIcon,
+  emptyStateAction,
   ...props
 }: EditableTableProps<T>) => {
   const classes = useStyles();
   const [newRow, setNewRow] = useState(false);
+  const hasData = data?.length !== 0;
 
   return (
     <Box display="flex" flexDirection="column">
@@ -112,7 +124,7 @@ const EditableTable = <T extends { id: string }>({
             {tableTitle || ''}
           </Typography>
 
-          {canAddMore && (
+          {canAddMore && (hasData || (!hasData && !emptyStateAction)) && (
             <Button
               variant="contained"
               color="primary"
@@ -139,17 +151,31 @@ const EditableTable = <T extends { id: string }>({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.map(dataItem => (
-              <EditableRow
-                key={dataItem.id}
-                item={dataItem}
-                addItem={addItem}
-                deleteItem={deleteItem}
-                editItem={editItem}
-                cells={cells}
-                {...props}
-              />
-            ))}
+            {hasData ? (
+              data?.map(dataItem => (
+                <EditableRow
+                  key={dataItem.id}
+                  item={dataItem}
+                  addItem={addItem}
+                  deleteItem={deleteItem}
+                  editItem={editItem}
+                  cells={cells}
+                  {...props}
+                />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={cells?.length + 1}>
+                  <EmptyStatePanel
+                    title={emptyStateTitle}
+                    subtitle={emptyStateSubtitle}
+                    actionLabel={emptyStateActionLabel}
+                    actionIcon={emptyStateActionIcon}
+                    action={emptyStateAction}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
             {newRow && (
               <EditableRow
                 item={defaultItem}
