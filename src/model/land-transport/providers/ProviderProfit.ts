@@ -22,7 +22,6 @@ export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
   category: BookingCategory;
 }
 
-export const isProviderProfitEntity = (value: any): value is string => 'id' in value;
 export const isDefaultProviderProfitEntity = (value: ProviderProfitEntity): value is DefaultProviderProfitEntity =>
   value.type === ProviderProfitType.DEFAULT;
 
