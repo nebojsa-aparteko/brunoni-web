@@ -91,14 +91,14 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
               ? `${selectedRoutes.length} route selected`
               : `${selectedRoutes.length} routes selected`
           }
-          labelWhenNotSelected={''}
+          labelWhenNotSelected={'Automatic Routes'}
           addButtonLabel={'Add new route'}
           deleteButtonLabel={selectedRoutes.length === 1 ? `Delete route` : `Delete routes`}
         />
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="left" style={{ paddingLeft: 4 }}>
+              <TableCell padding="checkbox">
                 <Checkbox
                   checked={selectedRoutes.length === routes?.length}
                   onClick={handleSelectDeselectAll}

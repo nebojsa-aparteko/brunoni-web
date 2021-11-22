@@ -3,8 +3,9 @@ import {
   Box,
   Button,
   IconButton,
+  lighten,
+  makeStyles,
   MenuItem,
-  Paper,
   Select,
   Switch,
   Table,
@@ -13,11 +14,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Toolbar,
   Typography,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import { get, omit, set } from 'lodash/fp';
-import theme from '../theme';
 import EditingInput from './EditingInput';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
@@ -26,6 +27,8 @@ import { SelectProps } from '@material-ui/core/Select/Select';
 import { TextFieldProps } from '@material-ui/core/TextField/TextField';
 import CloseIcon from '@material-ui/icons/Close';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import Paper from '@material-ui/core/Paper';
+import palette from '../theme/palette';
 
 export type CellType =
   | {
@@ -54,7 +57,38 @@ interface EditableTableProps<T> {
   editItem: (id: string, item: T) => Promise<any>;
   deleteItem: (id: string) => Promise<any>;
   canAddMore?: boolean;
+  tableTitle?: string;
+  actionLabel?: string;
 }
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
+  highlight:
+    theme.palette.type === 'light'
+      ? {
+          color: theme.palette.secondary.main,
+          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        }
+      : {
+          color: theme.palette.text.primary,
+          backgroundColor: theme.palette.secondary.dark,
+        },
+  toolbar: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    backgroundColor: palette.background.hover,
+  },
+  title: {
+    flex: '1 1 100%',
+  },
+  button: {
+    flexShrink: 0,
+  },
+}));
+
 const EditableTable = <T extends { id: string }>({
   deleteItem,
   addItem,
@@ -63,28 +97,38 @@ const EditableTable = <T extends { id: string }>({
   cells,
   defaultItem,
   canAddMore = true,
+  tableTitle,
+  actionLabel,
   ...props
 }: EditableTableProps<T>) => {
+  const classes = useStyles();
   const [newRow, setNewRow] = useState(false);
 
   return (
-    <Box my={2} display="flex" flexDirection="column">
-      {canAddMore && (
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          startIcon={<AddIcon />}
-          onClick={() => {
-            setNewRow(true);
-          }}
-          style={{ alignSelf: 'flex-end', marginBottom: theme.spacing(2) }}
-          disabled={newRow}
-        >
-          Add row
-        </Button>
-      )}
+    <Box display="flex" flexDirection="column">
       <TableContainer component={Paper}>
+        <Toolbar className={classes.toolbar}>
+          <Typography className={classes.title} variant="h4" id="tableTitle" component="div">
+            {tableTitle || ''}
+          </Typography>
+
+          {canAddMore && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              className={classes.button}
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setNewRow(true);
+              }}
+              disabled={newRow}
+            >
+              {actionLabel || 'Add Row'}
+            </Button>
+          )}
+        </Toolbar>
+
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -229,53 +273,55 @@ const EditableRow: React.FC<EditableRowProps> = ({
         </TableCell>
       ))}
       <TableCell style={{ flex: 1 }}>
-        {isEditing ? (
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              isAddMode
-                ? addItem(removeEntityFields(stateItem))
-                : editItem(item.id, stateItem).then(() => setEditing(false));
-            }}
-          >
-            <CheckIcon />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              setEditing(true);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        )}
-        {isEditing ? (
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              isAddMode ? onCancel?.() : setEditing(false);
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              deleteItem(item.id).finally(() => {
-                console.log('Test');
-                console.log();
-              });
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        )}
+        <Box my={-1.5}>
+          {isEditing ? (
+            <IconButton
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                isAddMode
+                  ? addItem(removeEntityFields(stateItem))
+                  : editItem(item.id, stateItem).then(() => setEditing(false));
+              }}
+            >
+              <CheckIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setEditing(true);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+          {isEditing ? (
+            <IconButton
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                isAddMode ? onCancel?.() : setEditing(false);
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={event => {
+                event.preventDefault();
+                event.stopPropagation();
+                deleteItem(item.id).finally(() => {
+                  console.log('Test');
+                  console.log();
+                });
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
+        </Box>
       </TableCell>
     </TableRow>
   );

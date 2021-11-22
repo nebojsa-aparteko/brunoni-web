@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, IconButton, makeStyles, Typography } from '@material-ui/core';
-import SimpleExpansionPanel from '../../SimpleExpansionPanel';
+import { Box, Button, IconButton, makeStyles, Typography } from '@material-ui/core';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import useLandTransportProfits from '../../../hooks/useLandTransportProfits';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -49,9 +48,6 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  title: {
-    alignSelf: 'start',
-  },
   expansionPanel: {
     marginBottom: 8,
     width: '1000px',
@@ -80,22 +76,32 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
   return (
     <>
       <Box className={classes.accordionContainer}>
-        <Box display="flex" justifyContent="space-between" flex={1} my={2}>
-          <Box display="flex" flexDirection="row" alignSelf="flex-start">
-            <IconButton onClick={() => history.goBack()}>
-              <ArrowBackIcon />
+        <Box display="flex" justifyContent="space-between" alignItems="flex-end" flex={1} my={4}>
+          <Box px={2} display="flex" flexDirection="column" alignSelf="flex-start">
+            <Box ml={-0.5}>
+              <Button startIcon={<ArrowBackIcon />} color="primary" onClick={() => history.goBack()}>
+                All providers
+              </Button>
+            </Box>
+            <Typography variant="h1">{provider.name}</Typography>
+          </Box>
+          <Box>
+            <IconButton onClick={openModal}>
+              <SettingsIcon />
             </IconButton>
-            <Typography className={classes.title} variant="h1">
-              {provider.name}
+          </Box>
+        </Box>
+
+        <Box>
+          <Box pl={2}>
+            <Typography variant="h2" gutterBottom>
+              Profit
             </Typography>
           </Box>
-          <IconButton onClick={openModal}>
-            <SettingsIcon />
-          </IconButton>
-        </Box>
-        <SimpleExpansionPanel label="Profit" fullWidth TransitionProps={{ mountOnEnter: true }}>
-          <Box display="flex" flexDirection="column">
+          <Box my={4}>
             <EditableTable
+              tableTitle="Containers"
+              actionLabel="Add Container"
               cells={[
                 {
                   label: 'Currency',
@@ -111,7 +117,12 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               editItem={(id, item) => editLandTransportProfit(provider.id, id, item)}
               deleteItem={id => deleteLandTransportProfit(provider.id, id)}
             />
+          </Box>
+
+          <Box>
             <EditableTable
+              tableTitle="Categories"
+              actionLabel="Add Category"
               cells={[
                 { label: 'Category', fieldType: 'input', fieldName: 'category' },
                 { label: 'Port', fieldType: 'input', fieldName: 'port' },
@@ -130,20 +141,34 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               deleteItem={id => deleteLandTransportProfit(provider.id, id)}
             />
           </Box>
-        </SimpleExpansionPanel>
+        </Box>
 
-        <SimpleExpansionPanel label="Automatic Routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
+        <Box mt={10}>
+          <Box pl={2} mb={4}>
+            <Typography variant="h2" gutterBottom>
+              Automatic Routes
+            </Typography>
+          </Box>
           <RoutesTable provider={provider} />
-        </SimpleExpansionPanel>
+        </Box>
 
-        <SimpleExpansionPanel label="Semi-automatic routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
-          <Box display="flex" flexDirection="column">
+        <Box mt={10}>
+          <Box pl={2}>
+            <Typography variant="h2">Semi-automatic routes</Typography>
+          </Box>
+          <Box display="flex" flexDirection="column" mt={4}>
             <PricelistConfig provider={provider} />
           </Box>
-        </SimpleExpansionPanel>
-        <SimpleExpansionPanel label="Manual routes" fullWidth TransitionProps={{ mountOnEnter: true }}>
+        </Box>
+
+        <Box my={10}>
+          <Box pl={2}>
+            <Typography variant="h2" gutterBottom>
+              Manual routes
+            </Typography>
+          </Box>
           <ManualRoutesList providerId={provider.id} />
-        </SimpleExpansionPanel>
+        </Box>
       </Box>
       {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId={provider.id} />}
     </>
