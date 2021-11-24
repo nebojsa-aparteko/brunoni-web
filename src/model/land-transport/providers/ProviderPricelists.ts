@@ -1,9 +1,11 @@
-import Price from '../../Price';
 import Entity from '../../Entity';
+import { PricePerContainer } from './ProviderRoutes';
+import { Currency } from '../../Payment';
 
 interface ProviderPricelistEntity extends Entity {
-  prices: Price[];
-  distance: string;
+  pricePerContainer: PricePerContainer;
+  distance: number;
+  currency: Currency;
   category: ProviderPricelistCategory;
 }
 

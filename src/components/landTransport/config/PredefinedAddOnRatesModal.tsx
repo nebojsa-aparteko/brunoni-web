@@ -1,25 +1,14 @@
 import React from 'react';
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  makeStyles,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Theme,
-  Typography,
-} from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Theme, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { Currency } from '../../../model/Payment';
+import EditableTable from '../../EditableTable';
+import {
+  addLandTransportExtensionConfig,
+  deleteLandTransportExtensionConfig,
+  editLandTransportExtensionConfig,
+} from '../../../api/landTransportConfig';
+import useLandTransportExtensionConfig from '../../../hooks/useLandTransportExtensionConfig';
+import theme from '../../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   closeModal: {
@@ -40,52 +29,33 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
+  providerId: string;
   isOpen: boolean;
   handleClose: () => void;
 }
 
-const PredefinedAddOnRatesModal: React.FC<Props> = ({ isOpen, handleClose }) => {
+const PredefinedAddOnRatesModal: React.FC<Props> = ({ providerId, isOpen, handleClose }) => {
   const classes = useStyles();
-
+  const extensions = useLandTransportExtensionConfig(providerId);
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
       <Box>
         <DialogTitle disableTypography>
-          <Typography variant="h4">Add on Rates</Typography>
+          <Typography variant="h4">Extension labels (Included/Excluded/Add-ons)</Typography>
           <IconButton onClick={handleClose} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <TableContainer component={Paper}>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Currency</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {[{ label: 'Test 1', price: { value: 20, currency: Currency.EUR } }].map(item => (
-                  <TableRow>
-                    <TableCell align="left"> {item.label}</TableCell>
-                    <TableCell align="left">{`${item.price.value}`}</TableCell>
-                    <TableCell align="left">{item.price.currency}</TableCell>
-                    <TableCell align="left">
-                      <IconButton>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <DialogContent style={{ margin: theme.spacing(2) }}>
+          <EditableTable
+            tableTitle="Extension labels"
+            data={extensions}
+            cells={[{ fieldName: 'name', fieldType: 'input', label: 'Name' }]}
+            defaultItem={{ id: '', name: '', createdAt: new Date() }}
+            addItem={item => addLandTransportExtensionConfig(providerId, item)}
+            editItem={(id, item) => editLandTransportExtensionConfig(providerId, id, item)}
+            deleteItem={id => deleteLandTransportExtensionConfig(providerId, id)}
+          />
         </DialogContent>
       </Box>
     </Dialog>

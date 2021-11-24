@@ -4,18 +4,19 @@ import { Checkbox, TableCell, TableRow } from '@material-ui/core';
 import { format } from 'date-fns';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import RouteDetailsModal from './RouteDetailsModal';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import palette from '../../../../theme/palette';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
+import green from '@material-ui/core/colors/green';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles({
   tableRow: {
     cursor: 'pointer',
     '&:hover': {
       backgroundColor: palette.background.hover,
     },
   },
-}));
+});
 
 interface RoutesTableRowProps {
   route: AutomaticProviderRoute;
@@ -42,9 +43,9 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
       <TableCell>{format(route.addedAt.toDate(), 'dd-MM-yyyy HH:mm')}</TableCell>
       <TableCell>
         {route.active ? (
-          <FiberManualRecordIcon style={{ fill: 'lightgreen' }} />
+          <FiberManualRecordIcon style={{ color: green[500], verticalAlign: 'middle' }} />
         ) : (
-          <FiberManualRecordIcon color={'error'} />
+          <FiberManualRecordIcon color={'error'} style={{ verticalAlign: 'middle' }} />
         )}
       </TableCell>
       <TableCell style={{ display: 'none' }}>

@@ -1,15 +1,17 @@
-import { createStyles, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core';
+import { Button, createStyles, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core';
 import clsx from 'clsx';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import React from 'react';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
+import palette from '../theme/palette';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbarRoot: {
       paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
+      paddingRight: theme.spacing(2),
+      backgroundColor: palette.background.hover,
     },
     toolbarHighlight:
       theme.palette.type === 'light'
@@ -60,7 +62,7 @@ export const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           {labelWhenSelected}
         </Typography>
       ) : (
-        <Typography className={classes.toolbarTitle} variant="h5" id="tableTitle" component="div">
+        <Typography className={classes.toolbarTitle} variant="h4" id="tableTitle" component="div">
           {labelWhenNotSelected}
         </Typography>
       )}
@@ -71,11 +73,17 @@ export const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title={addButtonLabel}>
-          <IconButton aria-label="filter list" onClick={handleAdd}>
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          startIcon={<AddIcon />}
+          aria-label="filter list"
+          onClick={handleAdd}
+          style={{ flexShrink: 0 }}
+        >
+          {addButtonLabel || 'Add'}
+        </Button>
       )}
     </Toolbar>
   );

@@ -10,11 +10,12 @@ const EditingInput: React.FC<EditingInputProps> = ({
   canEdit = true,
   typographyProps = true,
   noDefaultLabel = false,
+  renderValue = value => value,
 }) =>
   editing && canEdit ? (
     <TextField margin="dense" variant="outlined" fullWidth value={value} {...inputProps} />
   ) : (
-    <Typography {...typographyProps}> {value || (noDefaultLabel ? '' : '[To be assigned]')}</Typography>
+    <Typography {...typographyProps}> {renderValue(value) || (noDefaultLabel ? '' : '[To be assigned]')}</Typography>
   );
 export default EditingInput;
 
@@ -25,4 +26,5 @@ interface EditingInputProps {
   value?: string | number;
   canEdit?: boolean;
   noDefaultLabel?: boolean;
+  renderValue?: (value: any) => string;
 }
