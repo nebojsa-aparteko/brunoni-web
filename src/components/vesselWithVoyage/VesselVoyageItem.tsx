@@ -8,7 +8,7 @@ import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
 import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
 
-const SeparatorArrow = () => (
+export const SeparatorArrow = () => (
   <Box mx={4} display="flex" flexDirection="column" alignItems="center">
     →
   </Box>

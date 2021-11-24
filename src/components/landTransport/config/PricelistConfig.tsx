@@ -16,6 +16,13 @@ import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import ChartsCircularProgress from '../../dashboard/ChartsCircularProgress';
 import EditableTable, { CellType } from '../../EditableTable';
 import { capitalCase } from 'change-case';
+import SemiAutomaticRoutes from './routes/SemiAutomaticRoutes';
+import FirestoreCollectionProvider from '../../../providers/FirestoreCollection';
+import Countries from '../../../contexts/Countries';
+import RouteFromCity from '../../../model/RouteFromCity';
+import firebase from '../../../firebase';
+import flatten from 'lodash/fp/flatten';
+import useGlobalAppState from '../../../hooks/useGlobalAppState';
 
 const defaultExportPricelistItem = {
   pricePerContainer: {},
@@ -84,12 +91,53 @@ const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists
     />
   );
 };
+const savePricelistRoutes = async (
+  provider: ProviderEntity,
+  selectedRoutes: RouteFromCity[],
+  selectedPricelists: {
+    exportPricelistEntities: ProviderPricelistEntity[];
+    importPricelistEntities: ProviderPricelistEntity[];
+  },
+) => {
+  const pricelistIds = selectedPricelists.exportPricelistEntities
+    .map(p => p.id)
+    .concat(selectedPricelists.importPricelistEntities.map(p => p.id));
+  const promisses = flatten(
+    pricelistIds.map(async id => {
+      const ref = firebase
+        .firestore()
+        .collection(`land-transport-config`)
+        .doc(provider.id)
+        .collection('pricelist')
+        .doc(id)
+        .collection('routes');
+
+      return Promise.all(selectedRoutes.map(route => ref.doc(route.id).set(route, { merge: true })));
+    }),
+  );
+  return Promise.all(promisses);
+};
 
 interface Props {
   provider: ProviderEntity;
 }
 const PricelistConfig: React.FC<Props> = ({ provider }) => {
   const pricelists = useLandTransportPricelists(provider.id);
+  const [, dispatch] = useGlobalAppState();
+
+  const handleSavePricelistRoutes = async (selectedRoutes: RouteFromCity[]) => {
+    return savePricelistRoutes(provider, selectedRoutes, pricelists)
+      .then(() => {
+        dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Successfully saved pricelists!', duration: 2500 });
+      })
+      .catch(e => {
+        dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: e, duration: 3500 });
+      })
+      .finally(() => {
+        console.log('Saved');
+        return;
+      });
+  };
 
   const exportPricelists = useMemo(
     () => pricelists?.exportPricelistEntities?.sort((a, b) => (a.distance > b.distance ? 1 : -1)),
@@ -105,6 +153,9 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
       {pricelists ? (
         <React.Fragment>
           <Box mb={4}>
+            <FirestoreCollectionProvider name="countries" context={Countries}>
+              <SemiAutomaticRoutes savePricelistRoutes={handleSavePricelistRoutes} />
+            </FirestoreCollectionProvider>
             <PricelistTable
               tableTitle="Export"
               provider={provider}

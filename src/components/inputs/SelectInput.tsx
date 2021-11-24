@@ -8,6 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 interface Props<T> extends InputProps<T> {
   label: string;
   margin?: any;
+  disabled?: boolean;
   options: T[];
   filterOptions?: any;
   getOptionLabel: (value: T) => string;
@@ -26,6 +27,7 @@ const useStyles = makeStyles({
 export default function SelectInput<T>({
   label,
   margin,
+  disabled,
   options,
   filterOptions,
   getOptionLabel,
@@ -47,6 +49,7 @@ export default function SelectInput<T>({
       autoSelect
       autoHighlight
       open={open}
+      disabled={disabled}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
       getOptionLabel={getOptionLabel}
@@ -59,6 +62,7 @@ export default function SelectInput<T>({
           inputRef={inputRef}
           label={label}
           margin={margin}
+          disabled={disabled}
           fullWidth
           variant="outlined"
           InputProps={{
