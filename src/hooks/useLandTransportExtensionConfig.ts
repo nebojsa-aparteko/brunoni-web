@@ -4,7 +4,7 @@ import normalizeFirestoreDate from '../utilities/normalizeFirestoreDate';
 import { ProviderExtensionEntity } from '../model/land-transport/providers/ProviderConfig';
 
 const useLandTransportExtensionConfig = (providerId: string) => {
-  const landTransportExtensionsRef = useFirestoreCollection(`land-transport-config/${providerId}/extensions`);
+  const landTransportExtensionsRef = useFirestoreCollection(`land-transport-config/${providerId}/extension-config`);
   return landTransportExtensionsRef?.docs.map(v =>
     flow(update('createdAt', normalizeFirestoreDate))({
       ...v.data(),

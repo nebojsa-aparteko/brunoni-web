@@ -3,11 +3,12 @@ import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Theme,
 import CloseIcon from '@material-ui/icons/Close';
 import EditableTable from '../../EditableTable';
 import {
-  addLandTransportExtension,
-  deleteLandTransportExtension,
-  editLandTransportExtension,
+  addLandTransportExtensionConfig,
+  deleteLandTransportExtensionConfig,
+  editLandTransportExtensionConfig,
 } from '../../../api/landTransportConfig';
 import useLandTransportExtensionConfig from '../../../hooks/useLandTransportExtensionConfig';
+import theme from '../../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   closeModal: {
@@ -45,14 +46,15 @@ const PredefinedAddOnRatesModal: React.FC<Props> = ({ providerId, isOpen, handle
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent style={{ margin: theme.spacing(2) }}>
           <EditableTable
+            tableTitle="Extension labels"
             data={extensions}
             cells={[{ fieldName: 'name', fieldType: 'input', label: 'Name' }]}
             defaultItem={{ id: '', name: '', createdAt: new Date() }}
-            addItem={item => addLandTransportExtension(providerId, item)}
-            editItem={(id, item) => editLandTransportExtension(providerId, id, item)}
-            deleteItem={id => deleteLandTransportExtension(providerId, id)}
+            addItem={item => addLandTransportExtensionConfig(providerId, item)}
+            editItem={(id, item) => editLandTransportExtensionConfig(providerId, id, item)}
+            deleteItem={id => deleteLandTransportExtensionConfig(providerId, id)}
           />
         </DialogContent>
       </Box>

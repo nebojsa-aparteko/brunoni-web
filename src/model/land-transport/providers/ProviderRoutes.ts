@@ -18,6 +18,11 @@ export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
 }
 
 export type PriceRange = { max: Price; min: Price };
+export const getPriceRangeText = (range: PriceRange) => {
+  if (!range) return '-';
+  if (range.min.value === range.max.value) return `${range.min.value} ${range.min.currency}`;
+  return `${range.min.value} ${range.min.currency} - ${range.max.value} ${range.max.currency}`;
+};
 
 export interface ManualProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.MANUAL;

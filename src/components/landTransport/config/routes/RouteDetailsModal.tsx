@@ -29,6 +29,7 @@ import RoutesFileUploadDialog from './RoutesFileUploadDialog';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import firebase from '../../../../firebase';
 import ConfirmationDialog from '../../../ConfirmationDialog';
+import ExtensionTables from '../ExtensionTables';
 
 const useStyles = makeStyles((theme: Theme) => ({
   dialogContent: {
@@ -120,7 +121,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle disableTypography>
         <Box display={'flex'} alignItems={'baseLine'}>
           <Box>
@@ -156,7 +157,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
-        <Box display={'flex'} flexDirection={'column'} width={'100%'}>
+        <Box display={'flex'} flexDirection={'column'} width={'100%'} style={{ gap: '16px' }}>
           <CardContent component={Paper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Box width={'100%'}>
               <Typography variant={'h4'}>Version Documents</Typography>
@@ -172,6 +173,9 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
               </IconButton>
             </Tooltip>
           </CardContent>
+          <ExtensionTables providerId={provider.id} />
+          <ExtensionTables providerId={provider.id} />
+          <ExtensionTables providerId={provider.id} />
         </Box>
       </DialogContent>
       <RoutesFileUploadDialog

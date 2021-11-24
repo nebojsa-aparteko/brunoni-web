@@ -13,6 +13,7 @@ import { set } from 'lodash/fp';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import AddIcon from '@material-ui/icons/Add';
 import EmptyStatePanel from '../../../EmptyStatePanel';
+import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 
 //@ts-ignore
 const defaultItem = {
@@ -25,11 +26,11 @@ const defaultItem = {
   active: false,
 } as ManualProviderRouteEntity;
 interface Props {
-  providerId: string;
+  provider: ProviderEntity;
 }
-const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
+const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   const [newRow, setNewRow] = useState(false);
-  const routes = useLandTransportRoutes(providerId, ProviderRoutesType.MANUAL);
+  const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.MANUAL);
 
   return (
     <Box display="flex" flexDirection="column" flex={1}>
@@ -49,18 +50,19 @@ const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
       <Box display="flex" flexDirection="column" flex={1} style={{ gap: theme.spacing(2) }}>
         {newRow && (
           <ManualRouteShortView
+            provider={provider}
             route={defaultItem}
             isAddMode
             onCancel={() => setNewRow(false)}
             addItem={item =>
               addLandTransportRoute(
-                providerId,
+                provider.id,
                 set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
               )
             }
             editItem={(id, item) =>
               editLandTransportRoute(
-                providerId,
+                provider.id,
                 id,
                 set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
               )
@@ -70,17 +72,18 @@ const ManualRoutesList: React.FC<Props> = ({ providerId }) => {
         {routes?.length !== 0 ? (
           routes?.map(v => (
             <ManualRouteShortView
+              provider={provider}
               route={v}
               key={v.id}
               addItem={item =>
                 addLandTransportRoute(
-                  providerId,
+                  provider.id,
                   set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
                 )
               }
               editItem={(id, item) =>
                 editLandTransportRoute(
-                  providerId,
+                  provider.id,
                   id,
                   set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
                 )

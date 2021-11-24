@@ -3,7 +3,7 @@ import firebase from '../firebase';
 import { ProviderProfit } from '../model/land-transport/providers/ProviderProfit';
 import { ProviderPricelist } from '../model/land-transport/providers/ProviderPricelists';
 import { ProviderRoute } from '../model/land-transport/providers/ProviderRoutes';
-import { ProviderExtensionEntity } from '../model/land-transport/providers/ProviderConfig';
+import { OfferProviderConfig, ProviderExtensionEntity } from '../model/land-transport/providers/ProviderConfig';
 
 const landTransportRef = firebase.firestore().collection('land-transport-config');
 
@@ -76,20 +76,37 @@ export const deleteLandTransportPricelist = (providerId: string, pricelistId: st
   landTransportPricelistDocRef(providerId, pricelistId).delete();
 
 // Extensions book
+const landTransportExtensionsConfigRef = (providerId: string) =>
+  firebase.firestore().collection(`land-transport-config/${providerId}/extension-config`);
+
+const landTransportExtensionConfigDocRef = (providerId: string, extensionId: string) =>
+  landTransportExtensionsConfigRef(providerId).doc(extensionId);
+
+export const addLandTransportExtensionConfig = (providerId: string, extension: ProviderExtensionEntity) =>
+  landTransportExtensionsConfigRef(providerId).add({ ...extension, createdAt: new Date() });
+
+export const editLandTransportExtensionConfig = (
+  providerId: string,
+  extensionId: string,
+  extension: ProviderExtensionEntity,
+) => landTransportExtensionConfigDocRef(providerId, extensionId).set(extension, { merge: true });
+
+export const deleteLandTransportExtensionConfig = (providerId: string, extensionId: string) =>
+  landTransportExtensionConfigDocRef(providerId, extensionId).delete();
+
+// Extensions table
+
 const landTransportExtensionsRef = (providerId: string) =>
   firebase.firestore().collection(`land-transport-config/${providerId}/extensions`);
 
 const landTransportExtensionDocRef = (providerId: string, extensionId: string) =>
   landTransportExtensionsRef(providerId).doc(extensionId);
 
-export const addLandTransportExtension = (providerId: string, extension: ProviderExtensionEntity) =>
+export const addLandTransportExtension = (providerId: string, extension: OfferProviderConfig) =>
   landTransportExtensionsRef(providerId).add({ ...extension, createdAt: new Date() });
 
-export const editLandTransportExtension = (
-  providerId: string,
-  extensionId: string,
-  extension: ProviderExtensionEntity,
-) => landTransportExtensionDocRef(providerId, extensionId).set(extension, { merge: true });
+export const editLandTransportExtension = (providerId: string, extensionId: string, extension: OfferProviderConfig) =>
+  landTransportExtensionDocRef(providerId, extensionId).set(extension, { merge: true });
 
 export const deleteLandTransportExtension = (providerId: string, extensionId: string) =>
   landTransportExtensionDocRef(providerId, extensionId).delete();

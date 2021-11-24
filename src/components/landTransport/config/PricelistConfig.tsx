@@ -88,6 +88,8 @@ const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists
       editItem={(id, item) => editLandTransportPricelist(provider.id, id, item)}
       deleteItem={id => deleteLandTransportPricelist(provider.id, id)}
       data={pricelists}
+      emptyStateTitle="Test"
+      emptyStateActionLabel="Add row"
     />
   );
 };

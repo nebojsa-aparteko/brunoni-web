@@ -5,6 +5,7 @@ import SingleCountryInput from './SingleCountryInput';
 import { Box } from '@material-ui/core';
 import CityByCountryInput from './CityByCountryInput';
 import City from '../../model/City';
+import theme from '../../theme';
 
 interface Props {
   onSelect?: (selectedCity?: City) => void;
@@ -27,7 +28,7 @@ const CityInput: React.FC<Props> = ({ onSelect }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="row">
+    <Box display="flex" flexDirection="row" style={{ gap: theme.spacing(1) }}>
       <SingleCountryInput margin="dense" value={selectedCountry!} onChange={handleChangeSelectedCountry} />
       <CityByCountryInput
         margin="dense"

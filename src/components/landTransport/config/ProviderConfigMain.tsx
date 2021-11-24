@@ -1,47 +1,15 @@
 import React from 'react';
-import { Box, Button, IconButton, makeStyles, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, makeStyles, Paper, Typography } from '@material-ui/core';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
-import useLandTransportProfits from '../../../hooks/useLandTransportProfits';
 import SettingsIcon from '@material-ui/icons/Settings';
 import useModal from '../../../hooks/useModal';
 import PredefinedAddOnRatesModal from './PredefinedAddOnRatesModal';
 import RoutesTable from './routes/RoutesTable';
-import EditableTable from '../../EditableTable';
-import {
-  addLandTransportProfit,
-  deleteLandTransportProfit,
-  editLandTransportProfit,
-} from '../../../api/landTransportConfig';
-import { Currency } from '../../../model/Payment';
-import { capitalCase } from 'change-case';
-import {
-  DefaultProviderProfitEntity,
-  ProviderProfitType,
-  SpecificProviderProfitEntity,
-} from '../../../model/land-transport/providers/ProviderProfit';
-import { BookingCategory } from '../../../model/Booking';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router';
 import ManualRoutesList from './routes/ManualRoutesList';
-import PricelistConfig, { containersCells } from './PricelistConfig';
-
-const defaultItem = {
-  type: ProviderProfitType.DEFAULT,
-  id: '',
-  createdAt: new Date(),
-  pricePerContainer: {},
-  currency: Currency.EUR,
-} as DefaultProviderProfitEntity;
-
-const specificItem = {
-  type: ProviderProfitType.SPECIFIC,
-  id: '',
-  createdAt: new Date(),
-  pricePerContainer: {},
-  currency: Currency.EUR,
-  port: '',
-  category: BookingCategory.Export,
-} as SpecificProviderProfitEntity;
+import PricelistConfig from './PricelistConfig';
+import ProfitTables from './ProfitTables';
 
 const useStyles = makeStyles(() => ({
   accordionContainer: {
@@ -71,7 +39,6 @@ const useStyles = makeStyles(() => ({
 const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }) => {
   const classes = useStyles();
   const history = useHistory();
-  const profits = useLandTransportProfits(provider.id);
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
@@ -92,55 +59,11 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
           </Box>
         </Box>
 
-        <Box>
-          <Box pl={2}>
-            <Typography variant="h2" gutterBottom>
-              Profit
-            </Typography>
-          </Box>
-          <Box my={4}>
-            <EditableTable
-              tableTitle="Containers"
-              actionLabel="Add Container"
-              cells={[
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-                ...containersCells,
-              ]}
-              defaultItem={defaultItem}
-              data={profits?.defaultProfit}
-              addItem={item => addLandTransportProfit(provider.id, item)}
-              editItem={(id, item) => editLandTransportProfit(provider.id, id, item)}
-              deleteItem={id => deleteLandTransportProfit(provider.id, id)}
-            />
-          </Box>
-
-          <Box>
-            <EditableTable
-              tableTitle="Categories"
-              actionLabel="Add Category"
-              cells={[
-                { label: 'Category', fieldType: 'input', fieldName: 'category' },
-                { label: 'Port', fieldType: 'input', fieldName: 'port' },
-                {
-                  label: 'Currency',
-                  fieldType: 'select',
-                  fieldName: 'currency',
-                  options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
-                },
-                ...containersCells,
-              ]}
-              defaultItem={specificItem}
-              data={profits?.specificProfit}
-              addItem={item => addLandTransportProfit(provider.id, item)}
-              editItem={(id, item) => editLandTransportProfit(provider.id, id, item)}
-              deleteItem={id => deleteLandTransportProfit(provider.id, id)}
-            />
-          </Box>
+        <Box component={Paper} p={2}>
+          <Typography variant="h2" gutterBottom>
+            Profit
+          </Typography>
+          <ProfitTables providerId={provider.id} />
         </Box>
 
         <Box mt={10}>
@@ -167,7 +90,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
               Manual routes
             </Typography>
           </Box>
-          <ManualRoutesList providerId={provider.id} />
+          <ManualRoutesList provider={provider} />
         </Box>
       </Box>
       {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId={provider.id} />}

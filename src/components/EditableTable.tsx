@@ -14,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Toolbar,
   Typography,
 } from '@material-ui/core';
@@ -30,6 +31,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import Paper from '@material-ui/core/Paper';
 import palette from '../theme/palette';
 import EmptyStatePanel from './EmptyStatePanel';
+import { Autocomplete, AutocompleteProps } from '@material-ui/lab';
 
 export type CellType =
   | {
@@ -38,6 +40,14 @@ export type CellType =
       fieldName: string;
       options: { key: string; label: string }[];
       selectProps?: SelectProps;
+    }
+  | {
+      fieldType: 'autocomplete';
+      label: string;
+      fieldName: string;
+      options: any[];
+      autocompleteProps?: Omit<AutocompleteProps<any>, 'options' | 'renderInput'>;
+      renderValue: (value: any) => string;
     }
   | {
       label: string;
@@ -114,8 +124,7 @@ const EditableTable = <T extends { id: string }>({
 }: EditableTableProps<T>) => {
   const classes = useStyles();
   const [newRow, setNewRow] = useState(false);
-  const hasData = data?.length !== 0;
-
+  const hasData = data && data?.length !== 0;
   return (
     <Box display="flex" flexDirection="column">
       <TableContainer component={Paper}>
@@ -124,7 +133,7 @@ const EditableTable = <T extends { id: string }>({
             {tableTitle || ''}
           </Typography>
 
-          {canAddMore && (hasData || (!hasData && !emptyStateAction)) && (
+          {canAddMore && hasData && (
             <Button
               variant="contained"
               color="primary"
@@ -151,7 +160,7 @@ const EditableTable = <T extends { id: string }>({
             </TableRow>
           </TableHead>
           <TableBody>
-            {hasData ? (
+            {hasData &&
               data?.map(dataItem => (
                 <EditableRow
                   key={dataItem.id}
@@ -162,16 +171,16 @@ const EditableTable = <T extends { id: string }>({
                   cells={cells}
                   {...props}
                 />
-              ))
-            ) : (
+              ))}
+            {!hasData && !newRow && (
               <TableRow>
                 <TableCell colSpan={cells?.length + 1}>
                   <EmptyStatePanel
                     title={emptyStateTitle}
                     subtitle={emptyStateSubtitle}
-                    actionLabel={emptyStateActionLabel}
+                    actionLabel={actionLabel}
                     actionIcon={emptyStateActionIcon}
-                    action={emptyStateAction}
+                    action={emptyStateAction || (() => setNewRow(true))}
                   />
                 </TableCell>
               </TableRow>
@@ -294,6 +303,23 @@ const EditableRow: React.FC<EditableRowProps> = ({
               />
             ) : (
               <FiberManualRecordIcon color={stateItem.active ? 'secondary' : 'error'} />
+            )
+          ) : cell.fieldType === 'autocomplete' ? (
+            isEditing ? (
+              <Autocomplete
+                id={`editable-autocomplete-${cell.fieldName}`}
+                options={cell.options}
+                value={get(cell.fieldName)(stateItem)}
+                style={{ flex: 1 }}
+                //@ts-ignore
+                onChange={(event, value) => setStateItem((prevState: any) => set(cell.fieldName, value)(prevState))}
+                renderInput={params => (
+                  <TextField {...params} name={cell.fieldName} variant="outlined" margin="dense" />
+                )}
+                {...cell.autocompleteProps}
+              />
+            ) : (
+              <Typography>{cell.renderValue(get(cell.fieldName)(stateItem))}</Typography>
             )
           ) : null}
         </TableCell>
