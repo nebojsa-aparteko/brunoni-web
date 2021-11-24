@@ -4,41 +4,42 @@ import { TextField } from '@material-ui/core';
 import FitContentPopper from '../FitContentPopper';
 import { Controller, useFormContext } from 'react-hook-form';
 
-const defaultLocations = [
-  'ALTHOFEN',
-  'SANKT JAKOB (VOLKERMARKT)',
-  'SANKT STEFAN (KARNTEN)',
-  'ALTENMARKT',
-  'BAD ERLACH',
-  'HAAG',
-  'SCHREMS',
-  'WEISSENBACH',
-  'LAMBACH',
-  'SANKT AGATHA',
-  'SANKT PANTALEON',
-  'RAMSAU',
-  'UTTENDORF',
-  'RIEGERSDORF',
-];
-
 interface Props {
   value?: string | null;
+  inputValue?: string | undefined;
   onChange: (location: string | null) => void;
+  onInputChange?: (event: object, value: string, reason: string) => void;
   onBlur?: () => void;
   locations?: string[];
+  loading?: boolean;
   label?: string;
+  noOptionsText?: string;
   name?: string;
 }
 
-const LandLocationInput: React.FC<Props> = ({ value, locations, onChange, onBlur, label = 'locations' }) => {
+const LandLocationInput: React.FC<Props> = ({
+  loading,
+  value,
+  inputValue,
+  locations,
+  onChange,
+  onInputChange,
+  onBlur,
+  label = 'locations',
+  noOptionsText = 'No options',
+}) => {
   return (
     <Autocomplete
       fullWidth
-      id={`transport-modes-input-${label}`}
+      loading={loading}
+      id={`transport-locations-input-${label}`}
+      noOptionsText={noOptionsText}
       options={locations || []}
-      onChange={(_: ChangeEvent<{}>, mode: string | null) => onChange(mode)}
+      onChange={(_: ChangeEvent<{}>, location: string | null) => onChange(location)}
+      onInputChange={onInputChange}
       onBlur={onBlur}
       value={value || null}
+      inputValue={inputValue}
       getOptionLabel={option => option}
       renderInput={params => <TextField {...params} fullWidth label={label} variant="outlined" />}
       PopperComponent={FitContentPopper}
@@ -50,7 +51,15 @@ interface ControlledProps extends Omit<Props, 'onChange' | 'value' | 'onBlur'> {
   name: string;
 }
 
-const ControlledLandLocationInput: React.FC<ControlledProps> = ({ label, locations, name }) => {
+const ControlledLandLocationInput: React.FC<ControlledProps> = ({
+  loading,
+  label,
+  noOptionsText,
+  locations,
+  name,
+  inputValue,
+  onInputChange,
+}) => {
   const { control } = useFormContext();
 
   return (
@@ -58,7 +67,17 @@ const ControlledLandLocationInput: React.FC<ControlledProps> = ({ label, locatio
       control={control}
       name={name}
       render={({ field: { onChange, onBlur, value } }) => (
-        <LandLocationInput label={label} locations={locations} onChange={onChange} onBlur={onBlur} value={value} />
+        <LandLocationInput
+          label={label}
+          loading={loading}
+          noOptionsText={noOptionsText}
+          locations={locations}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={value}
+          inputValue={inputValue}
+          onInputChange={onInputChange}
+        />
       )}
     />
   );
