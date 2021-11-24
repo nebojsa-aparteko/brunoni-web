@@ -4,7 +4,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles';
 import { TransitionProps } from '@material-ui/core/transitions';
-import { ManualProviderRouteEntity } from '../../../../model/land-transport/providers/ProviderRoutes';
+import {
+  getPriceRangeText,
+  ManualProviderRouteEntity,
+} from '../../../../model/land-transport/providers/ProviderRoutes';
 import ExtensionTables from '../ExtensionTables';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import EditingInput from '../../../EditingInput';
@@ -16,6 +19,7 @@ import Container from '../../../Container';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { TableRowData } from '../../../bookingRequests/BookingRequestSummary';
 import SectionWithTitle from '../../../SectionWithTitle';
+import { ManualRouteTablePricing } from './ManualRouteShortView';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -111,62 +115,48 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                 />
 
                 <TableRowData
-                  label={'Origin'}
+                  label={'Destination'}
                   content={
                     <EditingInput
                       editing={isEditing}
                       inputProps={{
                         variant: 'outlined',
-                        label: 'Origin',
-                        name: 'origin',
+                        name: 'destination',
                         onChange: handleInputChange,
                       }}
                       typographyProps={{
                         style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
                       }}
-                      value={get('origin')(stateRoute)}
+                      value={get('destination')(stateRoute)}
                     />
                   }
                 />
                 <TableRowData
-                  label={'Origin'}
+                  label={'Transport Mode'}
                   content={
                     <EditingInput
                       editing={isEditing}
                       inputProps={{
                         variant: 'outlined',
-                        label: 'Origin',
-                        name: 'origin',
+                        name: 'transportMode',
                         onChange: handleInputChange,
                       }}
                       typographyProps={{
                         style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
                       }}
-                      value={get('origin')(stateRoute)}
-                    />
-                  }
-                />
-                <TableRowData
-                  label={'Origin'}
-                  content={
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        label: 'Origin',
-                        name: 'origin',
-                        onChange: handleInputChange,
-                      }}
-                      typographyProps={{
-                        style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                      }}
-                      value={get('origin')(stateRoute)}
+                      value={get('transportMode')(stateRoute)}
                     />
                   }
                 />
               </Box>
-              <Typography variant="h4">200 - 500 EUR</Typography>
+              <Typography variant="h4">{getPriceRangeText(stateRoute.priceRange)}</Typography>
             </Box>
+            <ManualRouteTablePricing
+              route={stateRoute}
+              handleInputChange={handleInputChange}
+              handleSelectChange={handleSelectChange}
+              isEditing={isEditing}
+            />
           </SectionWithTitle>
           <SectionWithTitle title="Description">
             <TextField variant="outlined" placeholder="Write some description here..." multiline rows={6} rowsMax={8} />

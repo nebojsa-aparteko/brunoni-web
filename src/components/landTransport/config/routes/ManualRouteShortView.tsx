@@ -169,59 +169,81 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             </Box>
           )}
         </Box>
-
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Currency</TableCell>
-                {Object.values(EquipmentControlContainerTypes).map(val => (
-                  <TableCell key={val}>{val}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  {isEditing ? (
-                    <Select
-                      margin="dense"
-                      variant="outlined"
-                      value={get('currency')(stateRoute)}
-                      name="currency"
-                      onChange={handleSelectChange}
-                    >
-                      {Object.keys(Currency).map(val => (
-                        <MenuItem key={val} value={val}>
-                          {val}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <Typography>{get('currency')(stateRoute)}</Typography>
-                  )}
-                </TableCell>
-                {Object.keys(EquipmentControlContainerTypes).map(key => (
-                  <TableCell key={key}>
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        name: `pricePerContainer.${key}.value`,
-                        onChange: handleInputChange,
-                        type: 'number',
-                      }}
-                      value={flow(get(key), get('value'))(stateRoute.pricePerContainer) || '-'}
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <ManualRouteTablePricing
+          route={stateRoute}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+          isEditing={isEditing}
+        />
       </Box>
       {isOpen && <ManualRouteDialog isOpen={isOpen} closeModal={closeModal} route={route} provider={provider} />}
     </>
+  );
+};
+
+interface ManualRouteTablePricingProps {
+  route: ManualProviderRouteEntity;
+  isEditing: boolean;
+  handleInputChange: (event: any) => void;
+  handleSelectChange: (event: any) => void;
+}
+
+export const ManualRouteTablePricing: React.FC<ManualRouteTablePricingProps> = ({
+  route: stateRoute,
+  isEditing,
+  handleInputChange,
+  handleSelectChange,
+}) => {
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Currency</TableCell>
+            {Object.values(EquipmentControlContainerTypes).map(val => (
+              <TableCell key={val}>{val}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              {isEditing ? (
+                <Select
+                  margin="dense"
+                  variant="outlined"
+                  value={get('currency')(stateRoute)}
+                  name="currency"
+                  onChange={handleSelectChange}
+                >
+                  {Object.keys(Currency).map(val => (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Typography>{get('currency')(stateRoute)}</Typography>
+              )}
+            </TableCell>
+            {Object.keys(EquipmentControlContainerTypes).map(key => (
+              <TableCell key={key}>
+                <EditingInput
+                  editing={isEditing}
+                  inputProps={{
+                    variant: 'outlined',
+                    name: `pricePerContainer.${key}.value`,
+                    onChange: handleInputChange,
+                    type: 'number',
+                  }}
+                  value={flow(get(key), get('value'))(stateRoute.pricePerContainer) || '-'}
+                />
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
