@@ -119,18 +119,20 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
             </IconButton>
           )}
 
-          <IconButton
-            edge="end"
-            size="small"
-            aria-label="Remove File"
-            onClick={event => {
-              event.stopPropagation();
-              handleDelete(item, setRemovalInProgress);
-            }}
-            aria-labelledby={`filelistitem-${item.storedName}`}
-          >
-            <DeleteIcon />
-          </IconButton>
+          {handleDelete && (
+            <IconButton
+              edge="end"
+              size="small"
+              aria-label="Remove File"
+              onClick={event => {
+                event.stopPropagation();
+                handleDelete(item, setRemovalInProgress);
+              }}
+              aria-labelledby={`filelistitem-${item.storedName}`}
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
           {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
         </Box>
       </ListItemSecondaryAction>
@@ -142,7 +144,7 @@ export default InternalStorageItem;
 
 interface Props {
   item: ChecklistItemValueDocument;
-  handleDelete: (item: ChecklistItemValueDocument, setProgress: any) => void;
+  handleDelete?: (item: ChecklistItemValueDocument, setProgress: any) => void;
   handleMention?: (item: ChecklistItemValueDocument) => void;
   handleDialogOpen?: (document: ChecklistItemValueDocument) => void;
 }

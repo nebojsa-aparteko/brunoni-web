@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import isString from '../utilities/isString';
+import SaveButton from './SaveButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   closeModal: {
@@ -40,6 +41,7 @@ export interface ConfirmationDialogProps {
   handleClose: () => void;
   description: string | ReactNode;
   confirmLabel?: string;
+  loading?: boolean;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -49,6 +51,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   handleConfirm,
   handleClose,
   confirmLabel = 'Confirm',
+  loading,
 }) => {
   const classes = useStyles();
 
@@ -70,9 +73,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <Button onClick={handleClose} color="primary" variant="outlined">
             Cancel
           </Button>
-          <Button onClick={handleConfirm} color="primary" variant="contained">
-            {confirmLabel}
-          </Button>
+          <SaveButton handleSave={handleConfirm} loading={loading} title={confirmLabel} />
         </DialogActions>
       </Box>
     </Dialog>

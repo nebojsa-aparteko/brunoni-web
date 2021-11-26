@@ -4,7 +4,7 @@ import theme from '../theme';
 
 interface Props extends PropsWithChildren<any> {
   title: string;
-  ActionElement?: React.ReactChild;
+  ActionElement?: React.ReactChild | null;
 }
 
 const SectionWithTitle: React.FC<Props> = ({ title, ActionElement, children }) => {

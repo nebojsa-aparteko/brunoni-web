@@ -32,7 +32,7 @@ const deleteVersionDocuments = async (providerId: string, routeVersion: string) 
   });
 };
 
-const deleteRoutes = async (
+export const deleteRoutes = async (
   provider: ProviderEntity,
   routeVersions: string[],
   deleteFiles: (files: string[]) => Promise<any>,
@@ -89,11 +89,11 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
           handleDelete={() => setIsDeleteDialogOpen(true)}
           labelWhenSelected={
             selectedRoutes.length === 1
-              ? `${selectedRoutes.length} route selected`
-              : `${selectedRoutes.length} routes selected`
+              ? `${selectedRoutes.length} version selected`
+              : `${selectedRoutes.length} versions selected`
           }
-          labelWhenNotSelected={'Automatic Routes'}
-          addButtonLabel={'Add new route'}
+          labelWhenNotSelected={''}
+          addButtonLabel={'Add new version'}
           deleteButtonLabel={selectedRoutes.length === 1 ? `Delete route` : `Delete routes`}
         />
         <Table aria-label="simple table">
@@ -145,7 +145,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
         label={'Please confirm deletion'}
         handleConfirm={handleDeleteRoute}
         handleClose={() => setIsDeleteDialogOpen(false)}
-        description={`Are you sure you want remove this selected route${selectedRoutes.length > 1 ? 's' : ''}?`}
+        description={`Are you sure you want remove this selected version${selectedRoutes.length > 1 ? 's' : ''}?`}
       />
     </>
   );

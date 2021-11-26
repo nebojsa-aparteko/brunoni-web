@@ -20,6 +20,8 @@ const useLandTransportRoutes = (providerId: string, type: ProviderRoutesType) =>
     flow(
       update('createdAt', normalizeFirestoreDate),
       update('updatedAt', normalizeFirestoreDate),
+      update('dateRange.startDate', normalizeFirestoreDate),
+      update('dateRange.endDate', normalizeFirestoreDate),
     )({
       ...v.data(),
       id: v.id,

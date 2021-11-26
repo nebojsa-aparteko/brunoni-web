@@ -19,6 +19,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import DropZoneArea from '../../../dropzone/DropZoneArea';
 import Draggable from 'react-draggable';
 import SaveButton from '../../../SaveButton';
+import { DateRange } from '../../../daterangepicker/types';
+import { addMonths, startOfDay, endOfDay } from 'date-fns';
 
 const getRouteVersion = async (providerId: string) => {
   return (
@@ -42,12 +44,13 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   const version = `Version-${autoIncrementVersion}`;
 
   const createdAt = new Date();
-
+  const dateRange = { startDate: startOfDay(createdAt), endDate: endOfDay(addMonths(createdAt, 1)) } as DateRange;
   let route = {
     active: false,
     createdAt,
     updatedAt: createdAt,
     description: '',
+    dateRange,
     type: ProviderRoutesType.AUTOMATIC,
     version,
   } as AutomaticProviderRoute;
@@ -60,7 +63,7 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   return version;
 };
 
-const saveRouteFilesToFirestore = async (
+export const saveRouteFilesToFirestore = async (
   provider: ProviderEntity,
   routeVersion: string,
   versionDocument: ChecklistItemValueDocument,
@@ -118,7 +121,6 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
   const handleSave = async () => {
     try {
       setLoading(true);
-      const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       const documents = (await saveFiles(filesState)) as ChecklistItemValueDocument[];
       const values = documents.map(
         item =>
@@ -131,6 +133,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
             isInternal: false,
           } as ChecklistItemValueDocument),
       );
+      const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       values.map(async value => await saveRouteFilesToFirestore(provider, routeVersion, value));
     } catch (e) {
       console.error('Failed to Upload File', e);
@@ -143,7 +146,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
   return (
     <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md" PaperComponent={PaperComponent}>
       <DialogTitle disableTypography id="dialog-automatic-route" style={{ cursor: 'move' }}>
-        <Typography variant="h4">Upload Documents</Typography>
+        <Typography variant="h4">Version creation</Typography>
         <IconButton onClick={handleClose} disabled={loading} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -160,7 +163,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
           />
           <Typography variant="caption">Hint: You can drag & drop files over input.</Typography>
           <Box display="flex">
-            <SaveButton handleSave={handleSave} loading={loading} />
+            <SaveButton handleSave={handleSave} loading={loading} title={'Create new version'} />
           </Box>
         </Box>
       </DialogContent>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   AppBar,
   Box,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -27,7 +28,7 @@ import InfoBoxItem from '../../../InfoBoxItem';
 import DateFormattedText from '../../../DateFormattedText';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import AddIcon from '@material-ui/icons/Add';
-import RoutesFileUploadDialog from './RoutesFileUploadDialog';
+import { saveRouteFilesToFirestore } from './RoutesFileUploadDialog';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import firebase from '../../../../firebase';
 import ConfirmationDialog from '../../../ConfirmationDialog';
@@ -37,10 +38,15 @@ import { Transition } from './ManualRouteDialog';
 import Container from '../../../Container';
 import DateRangeInput from '../../../inputs/DateRangeInput';
 import SectionWithTitle from '../../../SectionWithTitle';
-import SaveButton from '../../../SaveButton';
+import SaveButton, { CancelButton, SaveButtonProps } from '../../../SaveButton';
 import { diff } from 'deep-object-diff';
-import { keys, debounce } from 'lodash/fp';
-import { DateRange } from '../../../daterangepicker/types';
+import { keys } from 'lodash/fp';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { format } from 'date-fns';
+import { useDropzone } from 'react-dropzone';
+import useUser from '../../../../hooks/useUser';
+import { deleteRoutes } from './RoutesTable';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -52,18 +58,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     padding: theme.spacing(3),
-  },
-  closeModal: {
-    position: 'absolute',
-    top: '5px',
-    right: '12px',
-    width: '47px',
-    height: '47px',
-  },
-  validComponent: {
-    '& > *': {
-      marginRight: theme.spacing(1),
-    },
   },
 }));
 
@@ -111,26 +105,16 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const [dateRangeState, setDateRangeState] = useState(route.dateRange);
 
   const [changed, setChanged] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<ChecklistItemValueDocument>();
 
-  const versionDocs = useRouteVersionDocs(provider.id, route.version);
-
-  const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
+  const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   useEffect(() => {
     const dateRangeDifference = diff(route.dateRange, dateRangeState);
     const isChanged = keys(dateRangeDifference).length > 0 || route.description !== descriptionState;
-    console.log(
-      { desc: route.description, dateRange: route.dateRange },
-      {
-        descState: descriptionState,
-        dateRangeSate: dateRangeState,
-      },
-    );
     setChanged(isChanged);
   }, [dateRangeState, descriptionState, route.dateRange, route.description]);
 
@@ -141,6 +125,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
 
   const handleSave = async () => {
     setLoading(true);
+    setEditing(false);
     await updateRoute(provider.id, {
       ...route,
       description: descriptionState,
@@ -154,23 +139,10 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
     await deactivateOthers(provider.id, route.version);
   };
 
-  const handleDeleteDocument = async (item: ChecklistItemValueDocument) => {
-    setItemToDelete(item);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDocumentDeletion = async () => {
-    if (itemToDelete) {
-      await deleteVersionDocument(provider.id, route.version, itemToDelete.id);
-      await updateRoute(provider.id, route);
-      await deleteFiles([itemToDelete.url]);
-      setIsDeleteDialogOpen(false);
-    }
-  };
-
-  const dateRange: DateRange = {
-    startDate: new Date(),
-    endDate: new Date(),
+  const handleDeleteVersion = async () => {
+    await deleteRoutes(provider, [route.version], deleteFiles);
+    setIsDeleteDialogOpen(false);
+    setOpen(false);
   };
 
   return (
@@ -180,7 +152,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
           <Box width={'100%'} display="flex" alignItems="center" justifyContent="space-between">
             <Box display="flex" alignItems="center">
               <Typography variant={'h3'} color={'inherit'}>
-                Automatic Route
+                {`${provider.name} - Automatic Route`}
               </Typography>
             </Box>
             <IconButton onClick={handleClose} color="inherit">
@@ -191,104 +163,293 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
       </AppBar>
       <Container>
         <DialogTitle disableTypography>
-          <Box display={'flex'} alignItems={'baseLine'} justifyContent={'space-between'}>
-            <Box>
-              <InfoBoxItem title={route.version} titleVariant={'h2'} />
-              <Box display="flex" alignItems="center" justifyContent={'space-between'}>
-                <Box pl={0} p={2}>
-                  <InfoBoxItem label1={'Created on'} label2={<DateFormattedText date={route.createdAt} />} />
-                </Box>
-                <Box p={2}>
-                  <InfoBoxItem label1={'Last updated'} label2={<DateFormattedText date={route.updatedAt} />} />
-                </Box>
-              </Box>
-            </Box>
-            <Box>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      inputProps={{ 'aria-label': 'controlled' }}
-                      checked={route.active}
-                      onChange={handleChangeActive}
-                    />
-                  }
-                  label={''}
-                />
-              </FormGroup>
-              {route.active ? (
-                <FiberManualRecordIcon style={{ fill: 'lightgreen' }} />
-              ) : (
-                <FiberManualRecordIcon color={'error'} />
-              )}
-            </Box>
-            <Box style={{ opacity: changed ? 100 : 0 }}>
-              <SaveButton handleSave={handleSave} loading={loading} title={'Save changes'} />
-            </Box>
+          <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+            <Status editing={editing} active={route.active} handleChangeActive={handleChangeActive} />
+            <ActionButtons
+              editing={editing}
+              handleEdit={() => setEditing(true)}
+              handleCancel={() => {
+                setDateRangeState(route.dateRange);
+                setDescriptionState(route.description);
+                setEditing(false);
+              }}
+              handleDelete={() => setIsDeleteDialogOpen(true)}
+              showSaveButton={changed}
+              handleSave={handleSave}
+              loading={loading}
+              title={'Save changes'}
+            />
           </Box>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Box display={'flex'} flexDirection={'column'} width={'100%'} style={{ gap: '16px' }}>
-            <Box maxWidth={'50%'}>
-              <SectionWithTitle title="Validity">
-                <DateRangeInput
-                  onChange={dateRange => setDateRangeState(dateRange)}
-                  value={dateRangeState ? dateRangeState : dateRange}
-                />
-              </SectionWithTitle>
-            </Box>
-            <SectionWithTitle title="Description">
-              <TextField
-                placeholder="Write some description here..."
-                variant="outlined"
-                margin="dense"
-                name="description"
-                rows={8}
-                multiline
-                fullWidth
-                value={descriptionState ? descriptionState : ''}
-                onChange={e => setDescriptionState(e.target.value)}
-              />
-            </SectionWithTitle>
-            <SectionWithTitle
-              title="Version Documents"
-              ActionElement={
-                <Tooltip title={'Upload more Documents'}>
-                  <IconButton aria-label="filter list" onClick={() => setIsAddDialogOpen(true)}>
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
-              }
-            >
-              <List style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                {versionDocs.map((item: ChecklistItemValueDocument) => (
-                  <Box key={`${item.storedName}`} component={Paper} m={theme.spacing(0.1)} width={'33%'}>
-                    <InternalStorageItem item={item} handleDelete={handleDeleteDocument} />
+            <SectionWithTitle title="General Info">
+              <Box display={'flex'} flexDirection={'column'}>
+                <InfoBoxItem title={route.version} titleVariant={'h2'} />
+                <Box display="flex" alignItems="center">
+                  <Box pl={0} p={2}>
+                    <InfoBoxItem label1={'Created on'} label2={<DateFormattedText date={route.createdAt} />} />
                   </Box>
-                ))}
-              </List>
+                  <Box p={2}>
+                    <InfoBoxItem label1={'Last updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                  </Box>
+                </Box>
+              </Box>
             </SectionWithTitle>
+            <SectionWithTitle title="Validity">
+              {editing ? (
+                <DateRangeInput onChange={dateRange => setDateRangeState(dateRange)} value={dateRangeState} />
+              ) : (
+                <Typography>
+                  {`
+                  ${route.dateRange.startDate ? format(route.dateRange.startDate, 'dd-MM-yyyy') : 'Not defined'}
+                  -
+                  ${route.dateRange.endDate ? format(route.dateRange.endDate, 'dd-MM-yyyy') : 'Not defined'}
+                  `}
+                </Typography>
+              )}
+            </SectionWithTitle>
+            <SectionWithTitle title="Description">
+              {editing ? (
+                <TextField
+                  placeholder="Write some description here..."
+                  variant="outlined"
+                  margin="dense"
+                  name="description"
+                  rows={8}
+                  multiline
+                  fullWidth
+                  value={descriptionState ? descriptionState : ''}
+                  onChange={e => setDescriptionState(e.target.value)}
+                />
+              ) : (
+                <Typography>{route.description !== '' ? route.description : 'No description'}</Typography>
+              )}
+            </SectionWithTitle>
+            <DocumentsContainer route={route} provider={provider} editing={editing} />
             <ExtensionTables providerId={provider.id} />
             <ExtensionTables providerId={provider.id} />
             <ExtensionTables providerId={provider.id} />
           </Box>
         </DialogContent>
       </Container>
-      <RoutesFileUploadDialog
-        provider={provider}
-        route={route}
-        isOpen={isAddDialogOpen}
-        handleClose={() => setIsAddDialogOpen(false)}
-        saveFiles={saveFiles}
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        label={'Please confirm version deletion'}
+        handleConfirm={handleDeleteVersion}
+        handleClose={() => setIsDeleteDialogOpen(false)}
+        description={`Are you sure you want delete this version?`}
+        loading={loading}
       />
+    </Dialog>
+  );
+};
+
+interface StatusProps {
+  editing: boolean;
+  active: boolean;
+  handleChangeActive: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Status: React.FC<StatusProps> = ({ editing, active, handleChangeActive }) => {
+  return (
+    <Box style={{ gap: '16px' }} display={'flex'} alignItems={'center'}>
+      {active ? (
+        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
+          <FiberManualRecordIcon style={{ fill: 'lightgreen' }} />
+          <Typography>Active</Typography>
+        </Box>
+      ) : (
+        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
+          <FiberManualRecordIcon color={'error'} />
+          <Typography>Inactive</Typography>
+        </Box>
+      )}
+      {editing ? (
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Switch inputProps={{ 'aria-label': 'controlled' }} checked={active} onChange={handleChangeActive} />
+            }
+            label={''}
+          />
+        </FormGroup>
+      ) : null}
+    </Box>
+  );
+};
+
+interface ActionButtonsProps extends SaveButtonProps {
+  editing: boolean;
+  handleEdit: () => void;
+  handleCancel: () => void;
+  handleDelete: () => void;
+}
+
+const ActionButtons: React.FC<ActionButtonsProps> = ({
+  editing,
+  showSaveButton,
+  loading,
+  handleSave,
+  handleEdit,
+  handleCancel,
+  handleDelete,
+}) => {
+  return (
+    <Box display="flex" alignItems="center">
+      {editing ? (
+        <Box display="flex" alignItems="center" style={{ gap: '16px' }}>
+          <IconButton onClick={handleDelete}>
+            <DeleteIcon />
+          </IconButton>
+          <SaveButton
+            showSaveButton={showSaveButton}
+            handleSave={handleSave}
+            loading={loading}
+            title={'Save changes'}
+          />
+          <CancelButton handleCancel={handleCancel} />
+        </Box>
+      ) : loading ? (
+        <CircularProgress />
+      ) : (
+        <IconButton onClick={handleEdit}>
+          <EditIcon />
+        </IconButton>
+      )}
+    </Box>
+  );
+};
+
+const useDocumentsContainerStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+    '&:focus': {
+      outline: 'none',
+    },
+  },
+  dropZone: {
+    border: '1px dashed #ccc',
+    cursor: 'pointer',
+    borderColor: '#999',
+    '&:focus': {
+      outline: 'none',
+    },
+  },
+}));
+
+interface DocumentsContainerProps {
+  route: AutomaticProviderRoute;
+  provider: ProviderEntity;
+  editing: boolean;
+}
+
+const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider, editing }) => {
+  const classes = useDocumentsContainerStyles();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [itemToDelete, setItemToDelete] = useState<ChecklistItemValueDocument>();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const versionDocs = useRouteVersionDocs(provider.id, route.version);
+  const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
+
+  const [, userRecord] = useUser();
+
+  const handleSaveDocuments = useCallback(
+    async (files: File[]) => {
+      setLoading(true);
+      const documents = (await saveFiles(files)) as ChecklistItemValueDocument[];
+      const values = documents.map(
+        item =>
+          ({
+            uploadedBy: userRecord,
+            uploadedAt: new Date(),
+            name: item.name,
+            url: item.url,
+            storedName: item.storedName,
+            isInternal: false,
+          } as ChecklistItemValueDocument),
+      );
+      values.map(async value => await saveRouteFilesToFirestore(provider, route.version, value));
+      setLoading(false);
+    },
+    [provider, route.version, saveFiles, userRecord],
+  );
+
+  const handleDeleteDocument = async (item: ChecklistItemValueDocument) => {
+    setItemToDelete(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDocumentDeletion = async () => {
+    if (itemToDelete) {
+      setLoading(true);
+      await deleteVersionDocument(provider.id, route.version, itemToDelete.id);
+      await updateRoute(provider.id, route);
+      await deleteFiles([itemToDelete.url]);
+      setLoading(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      await handleSaveDocuments(acceptedFiles);
+    },
+    [handleSaveDocuments],
+  );
+
+  const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles),
+    noClick: true,
+    disabled: !editing,
+  });
+
+  return (
+    <SectionWithTitle
+      title="Version Documents"
+      ActionElement={
+        loading ? (
+          <CircularProgress />
+        ) : editing ? (
+          <Tooltip title={'Upload Documents'}>
+            <IconButton onClick={open}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        ) : null
+      }
+    >
+      <Box
+        {...getRootProps()}
+        className={isDragActive ? classes.dropZone : classes.root}
+        border={'1px dashed #ccc'}
+        p={5}
+      >
+        <input {...getInputProps()} />
+        {versionDocs.length > 0 ? (
+          <List style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            {versionDocs.map((item: ChecklistItemValueDocument) => (
+              <Box key={`${item.storedName}`} component={Paper} m={theme.spacing(0.1)} width={'33%'}>
+                <InternalStorageItem item={item} handleDelete={editing ? handleDeleteDocument : undefined} />
+              </Box>
+            ))}
+          </List>
+        ) : (
+          <Typography>No documents</Typography>
+        )}
+      </Box>
+      {editing && <Typography>Hint: You can drag & drop files over input</Typography>}
       <ConfirmationDialog
         isOpen={isDeleteDialogOpen}
         label={'Please confirm document deletion'}
         handleConfirm={handleConfirmDocumentDeletion}
         handleClose={() => setIsDeleteDialogOpen(false)}
         description={`Are you sure you want remove this document?`}
+        loading={loading}
       />
-    </Dialog>
+    </SectionWithTitle>
   );
 };
 
