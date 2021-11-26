@@ -52,7 +52,7 @@ const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersD
   );
 };
 
-const DateInput: React.FC<Props> = ({
+export const DateInput: React.FC<Props> = ({
   value,
   onChange,
   open,

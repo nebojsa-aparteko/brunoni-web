@@ -3,6 +3,7 @@ import firebase from 'firebase';
 import Entity from '../../Entity';
 import { EquipmentControlContainerTypes } from '../../EquipmentControl';
 import { Currency } from '../../Payment';
+import { DateRange } from '../../../components/daterangepicker/types';
 
 interface ProviderRouteEntity extends Entity {
   id: string;
@@ -12,8 +13,9 @@ interface ProviderRouteEntity extends Entity {
 export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.AUTOMATIC;
   version: string; //work as id
-  addedAt: firebase.firestore.Timestamp;
-  updatedAt: firebase.firestore.Timestamp;
+  updatedAt: Date;
+  dateRange: DateRange;
+  description: string;
   active: boolean;
 }
 
@@ -46,6 +48,6 @@ export enum ProviderRoutesType {
 
 export type ProviderRoute = Omit<ProviderRouteEntity, 'id' | 'createdAt'>;
 export type ManualProviderRoute = Omit<ManualProviderRouteEntity, 'id' | 'createdAt'>;
-export type AutomaticProviderRoute = Omit<AutomaticProviderRouteEntity, 'id' | 'createdAt'>;
+export type AutomaticProviderRoute = Omit<AutomaticProviderRouteEntity, 'id'>;
 
 export default ProviderRouteEntity;

@@ -40,7 +40,8 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
         />
       </TableCell>
       <TableCell>{route.version}</TableCell>
-      <TableCell>{format(route.addedAt.toDate(), 'dd-MM-yyyy HH:mm')}</TableCell>
+      <TableCell>{format(route.createdAt, 'dd-MM-yyyy HH:mm')}</TableCell>
+      <TableCell>{format(route.updatedAt, 'dd-MM-yyyy HH:mm')}</TableCell>
       <TableCell>
         {route.active ? (
           <FiberManualRecordIcon style={{ color: green[500], verticalAlign: 'middle' }} />

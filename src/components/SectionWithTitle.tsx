@@ -4,8 +4,10 @@ import theme from '../theme';
 
 interface Props extends PropsWithChildren<any> {
   title: string;
+  ActionElement?: React.ReactChild;
 }
-const SectionWithTitle: React.FC<Props> = ({ title, children }) => {
+
+const SectionWithTitle: React.FC<Props> = ({ title, ActionElement, children }) => {
   return (
     <Box
       component={Paper}
@@ -16,7 +18,10 @@ const SectionWithTitle: React.FC<Props> = ({ title, children }) => {
       style={{ gap: theme.spacing(2) }}
       bgcolor="white"
     >
-      <Typography variant="h3">{title}</Typography>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Typography variant="h3">{title}</Typography>
+        {ActionElement ? ActionElement : null}
+      </Box>
       {children}
     </Box>
   );

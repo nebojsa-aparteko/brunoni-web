@@ -10,6 +10,7 @@ import useSaveFiles from '../../../../hooks/useSaveFiles';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
 import { ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
+import EmptyStatePanel from '../../../EmptyStatePanel';
 
 const deleteRoute = async (providerId: string, routeVersion: string) =>
   await firebase
@@ -107,20 +108,29 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
                 />
               </TableCell>
               <TableCell>Version</TableCell>
-              <TableCell>Added At</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Last updated</TableCell>
               <TableCell>Active</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {routes?.map(route => (
-              <RoutesTableRow
-                key={route.version}
-                route={route}
-                provider={provider}
-                selected={selectedRoutes.includes(route.version)}
-                onSelectRow={event => onSelectRow(event, route.version)}
-              />
-            ))}
+            {routes && routes.length > 0 ? (
+              routes.map(route => (
+                <RoutesTableRow
+                  key={route.version}
+                  route={route}
+                  provider={provider}
+                  selected={selectedRoutes.includes(route.version)}
+                  onSelectRow={event => onSelectRow(event, route.version)}
+                />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5}>
+                  <EmptyStatePanel />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>

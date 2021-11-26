@@ -170,7 +170,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
   );
 };
 
-const Transition = React.forwardRef(function Transition(
+export const Transition = React.forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement },
   ref: React.Ref<unknown>,
 ) {

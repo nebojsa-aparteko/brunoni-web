@@ -17,7 +17,10 @@ const useLandTransportRoutes = (providerId: string, type: ProviderRoutesType) =>
     'routes',
   );
   return landTransportRoutesRef?.docs.map(v =>
-    flow(update('createdAt', normalizeFirestoreDate))({
+    flow(
+      update('createdAt', normalizeFirestoreDate),
+      update('updatedAt', normalizeFirestoreDate),
+    )({
       ...v.data(),
       id: v.id,
     } as ProviderRouteEntity),
