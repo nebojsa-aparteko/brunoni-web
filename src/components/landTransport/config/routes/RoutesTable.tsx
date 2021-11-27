@@ -108,8 +108,9 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
                 />
               </TableCell>
               <TableCell>Version</TableCell>
+              <TableCell>Validity</TableCell>
               <TableCell>Created At</TableCell>
-              <TableCell>Last updated</TableCell>
+              <TableCell>Last Updated</TableCell>
               <TableCell>Active</TableCell>
             </TableRow>
           </TableHead>

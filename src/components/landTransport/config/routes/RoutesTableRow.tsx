@@ -1,6 +1,6 @@
 import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
 import React, { useState } from 'react';
-import { Checkbox, TableCell, TableRow } from '@material-ui/core';
+import { Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
 import { format } from 'date-fns';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import RouteDetailsModal from './RouteDetailsModal';
@@ -40,6 +40,15 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
         />
       </TableCell>
       <TableCell>{route.version}</TableCell>
+      <TableCell>
+        <Typography>
+          {`
+                  ${route.dateRange.startDate ? format(route.dateRange.startDate, 'dd-MM-yyyy') : 'Not defined'}
+                  -
+                  ${route.dateRange.endDate ? format(route.dateRange.endDate, 'dd-MM-yyyy') : 'Not defined'}
+        `}
+        </Typography>
+      </TableCell>
       <TableCell>{format(route.createdAt, 'dd-MM-yyyy HH:mm')}</TableCell>
       <TableCell>{format(route.updatedAt, 'dd-MM-yyyy HH:mm')}</TableCell>
       <TableCell>

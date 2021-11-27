@@ -130,6 +130,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
       ...route,
       description: descriptionState,
       dateRange: dateRangeState,
+      active: false,
     });
     setLoading(false);
   };
@@ -188,10 +189,10 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
                 <InfoBoxItem title={route.version} titleVariant={'h2'} />
                 <Box display="flex" alignItems="center">
                   <Box pl={0} p={2}>
-                    <InfoBoxItem label1={'Created on'} label2={<DateFormattedText date={route.createdAt} />} />
+                    <InfoBoxItem label1={'Created At'} label2={<DateFormattedText date={route.createdAt} />} />
                   </Box>
                   <Box p={2}>
-                    <InfoBoxItem label1={'Last updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                    <InfoBoxItem label1={'Last Updated'} label2={<DateFormattedText date={route.updatedAt} />} />
                   </Box>
                 </Box>
               </Box>
@@ -372,9 +373,13 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
           } as ChecklistItemValueDocument),
       );
       values.map(async value => await saveRouteFilesToFirestore(provider, route.version, value));
+      await updateRoute(provider.id, {
+        ...route,
+        active: false,
+      });
       setLoading(false);
     },
-    [provider, route.version, saveFiles, userRecord],
+    [provider, route, saveFiles, userRecord],
   );
 
   const handleDeleteDocument = async (item: ChecklistItemValueDocument) => {
@@ -386,7 +391,10 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
     if (itemToDelete) {
       setLoading(true);
       await deleteVersionDocument(provider.id, route.version, itemToDelete.id);
-      await updateRoute(provider.id, route);
+      await updateRoute(provider.id, {
+        ...route,
+        active: false,
+      });
       await deleteFiles([itemToDelete.url]);
       setLoading(false);
       setIsDeleteDialogOpen(false);
@@ -424,7 +432,7 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
       <Box
         {...getRootProps()}
         className={isDragActive ? classes.dropZone : classes.root}
-        border={'1px dashed #ccc'}
+        border={editing ? '1px dashed #ccc' : ''}
         p={5}
       >
         <input {...getInputProps()} />
