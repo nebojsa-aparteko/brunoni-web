@@ -1,6 +1,10 @@
 import firebase from 'firebase';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
-import { AutomaticProviderRoute, ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
+import {
+  AutomaticProviderRoute,
+  ProviderRoutesType,
+  RouteValidity,
+} from '../../../../model/land-transport/providers/ProviderRoutes';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
 import React, { useState } from 'react';
 import useUser from '../../../../hooks/useUser';
@@ -19,7 +23,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import DropZoneArea from '../../../dropzone/DropZoneArea';
 import Draggable from 'react-draggable';
 import SaveButton from '../../../SaveButton';
-import { DateRange } from '../../../daterangepicker/types';
 import { addMonths, startOfDay, endOfDay } from 'date-fns';
 
 const getRouteVersion = async (providerId: string) => {
@@ -44,13 +47,14 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   const version = `Version-${autoIncrementVersion}`;
 
   const createdAt = new Date();
-  const dateRange = { startDate: startOfDay(createdAt), endDate: endOfDay(addMonths(createdAt, 1)) } as DateRange;
+  // Default validity is dateOfCreation (00:00) -> DateOfCreation + 1 month (23:59)
+  const validity: RouteValidity = { startDate: startOfDay(createdAt), endDate: endOfDay(addMonths(createdAt, 1)) };
   let route = {
     active: false,
     createdAt,
     updatedAt: createdAt,
     description: '',
-    dateRange,
+    validity,
     type: ProviderRoutesType.AUTOMATIC,
     version,
   } as AutomaticProviderRoute;

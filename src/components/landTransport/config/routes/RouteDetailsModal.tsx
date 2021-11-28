@@ -19,7 +19,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
+import { AutomaticProviderRoute, RouteValidity } from '../../../../model/land-transport/providers/ProviderRoutes';
 import useRouteVersionDocs from '../../../../hooks/useRouteVersionDocs';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
@@ -102,7 +102,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const classes = useStyles();
 
   const [descriptionState, setDescriptionState] = useState(route.description);
-  const [dateRangeState, setDateRangeState] = useState(route.dateRange);
+  const [validityState, setValidityState] = useState(route.validity);
 
   const [changed, setChanged] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -113,10 +113,10 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   useEffect(() => {
-    const dateRangeDifference = diff(route.dateRange, dateRangeState);
-    const isChanged = keys(dateRangeDifference).length > 0 || route.description !== descriptionState;
+    const validityDifference = diff(route.validity, validityState);
+    const isChanged = keys(validityDifference).length > 0 || route.description !== descriptionState;
     setChanged(isChanged);
-  }, [dateRangeState, descriptionState, route.dateRange, route.description]);
+  }, [validityState, descriptionState, route.validity, route.description]);
 
   const handleClose = (event: React.MouseEvent<unknown>) => {
     event.stopPropagation();
@@ -129,7 +129,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
     await updateRoute(provider.id, {
       ...route,
       description: descriptionState,
-      dateRange: dateRangeState,
+      validity: validityState,
       active: false,
     });
     setLoading(false);
@@ -170,7 +170,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
               editing={editing}
               handleEdit={() => setEditing(true)}
               handleCancel={() => {
-                setDateRangeState(route.dateRange);
+                setValidityState(route.validity);
                 setDescriptionState(route.description);
                 setEditing(false);
               }}
@@ -199,14 +199,16 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
             </SectionWithTitle>
             <SectionWithTitle title="Validity">
               {editing ? (
-                <DateRangeInput onChange={dateRange => setDateRangeState(dateRange)} value={dateRangeState} />
+                <DateRangeInput
+                  onChange={dateRange => setValidityState(dateRange as RouteValidity)}
+                  value={validityState}
+                />
               ) : (
                 <Typography>
-                  {`
-                  ${route.dateRange.startDate ? format(route.dateRange.startDate, 'dd-MM-yyyy') : 'Not defined'}
-                  -
-                  ${route.dateRange.endDate ? format(route.dateRange.endDate, 'dd-MM-yyyy') : 'Not defined'}
-                  `}
+                  {`${format(route.validity.startDate, 'dd-MM-yyyy')} - ${format(
+                    route.validity.endDate,
+                    'dd-MM-yyyy',
+                  )}`}
                 </Typography>
               )}
             </SectionWithTitle>

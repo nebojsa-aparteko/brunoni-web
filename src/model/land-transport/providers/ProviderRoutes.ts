@@ -1,20 +1,23 @@
 import Price from '../../Price';
-import firebase from 'firebase';
 import Entity from '../../Entity';
 import { EquipmentControlContainerTypes } from '../../EquipmentControl';
 import { Currency } from '../../Payment';
-import { DateRange } from '../../../components/daterangepicker/types';
 
 interface ProviderRouteEntity extends Entity {
   id: string;
   type: ProviderRoutesType;
 }
 
+export interface RouteValidity {
+  startDate: Date;
+  endDate: Date;
+}
+
 export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.AUTOMATIC;
   version: string; //work as id
   updatedAt: Date;
-  dateRange: DateRange;
+  validity: RouteValidity;
   description: string;
   active: boolean;
 }

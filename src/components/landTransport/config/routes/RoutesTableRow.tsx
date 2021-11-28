@@ -43,9 +43,9 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
       <TableCell>
         <Typography>
           {`
-                  ${route.dateRange.startDate ? format(route.dateRange.startDate, 'dd-MM-yyyy') : 'Not defined'}
+                  ${route.validity.startDate ? format(route.validity.startDate, 'dd-MM-yyyy') : 'Not defined'}
                   -
-                  ${route.dateRange.endDate ? format(route.dateRange.endDate, 'dd-MM-yyyy') : 'Not defined'}
+                  ${route.validity.endDate ? format(route.validity.endDate, 'dd-MM-yyyy') : 'Not defined'}
         `}
         </Typography>
       </TableCell>
