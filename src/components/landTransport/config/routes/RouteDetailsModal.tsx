@@ -314,7 +314,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <CancelButton handleCancel={handleCancel} />
         </Box>
       ) : loading ? (
-        <CircularProgress />
+        <CircularProgress style={{ margin: '3px' }} />
       ) : (
         <IconButton onClick={handleEdit}>
           <EditIcon />
