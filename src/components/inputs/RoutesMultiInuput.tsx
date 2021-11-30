@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardHeader,
   Checkbox,
   Dialog,
@@ -17,6 +18,7 @@ import {
   ListItemIcon,
   ListItemText,
   makeStyles,
+  TablePagination,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -25,6 +27,9 @@ import firebase from '../../firebase';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import sortBy from 'lodash/sortBy';
+import SingleCountryInput from './SingleCountryInput';
+import Country from '../../model/Country';
+import SimpleSearch from '../SimpleSearch';
 
 const useStyles = makeStyles(() => ({
   closeModal: {
@@ -36,7 +41,12 @@ const useStyles = makeStyles(() => ({
   },
   dialogContent: {
     display: 'flex',
-    maxHeight: '80vh',
+    height: '85vh',
+  },
+  actions: {
+    padding: 0,
+    margin: 0,
+    justifyContent: 'flex-end',
   },
 }));
 
@@ -48,9 +58,46 @@ interface RoutesListProps {
   setSelected: Dispatch<SetStateAction<RouteFromCity[]>>;
 }
 
+// TODO Make this searchable and selectable list component reusable
 const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, onSelect, setSelected }) => {
+  const classes = useStyles();
+  const [filteredItems, setFilteredItems] = useState(items);
+  const [searchStringState, setSearchStringState] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [pageItems, setPageItems] = useState(items);
+  const [page, setPage] = useState<number>(0);
+  const [numberOfResults, setNumberOfResults] = useState(0);
+
   const handleToggleAll = () => {
-    setSelected(prevState => (prevState.length === items?.length ? [] : items || []));
+    setSelected(prevState => (prevState.length === filteredItems?.length ? [] : filteredItems || []));
+  };
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
+    event?.stopPropagation();
+    setPage(page);
+  };
+
+  useEffect(() => {
+    setPage(0);
+    setFilteredItems(
+      items?.filter(item =>
+        selectedCountry
+          ? item.countryCode === selectedCountry.countryCode &&
+            item.name.toLowerCase().includes(searchStringState.toLowerCase())
+          : item.name.toLowerCase().includes(searchStringState.toLowerCase()),
+      ),
+    );
+  }, [items, selectedCountry, setFilteredItems, searchStringState, setPage]);
+
+  useEffect(() => {
+    setNumberOfResults(filteredItems?.length || 0);
+    setPageItems(
+      filteredItems && filteredItems.length > 10 ? filteredItems?.slice(page * 10, page * 10 + 9) : filteredItems,
+    );
+  }, [filteredItems, page]);
+
+  const handleSearch = (searchString: string) => {
+    setSearchStringState(searchString);
   };
 
   return (
@@ -69,13 +116,15 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
           />
         }
         title={title}
-        subheader={`${selectedItems.length}/${items?.length} selected`}
+        subheader={`${selectedItems.length} routes selected`}
+        action={<SingleCountryInput margin="dense" value={(selectedCountry || null)!} onChange={setSelectedCountry} />}
       />
       <Divider />
-      {items ? (
+      <SimpleSearch onSearch={handleSearch} localStorageKey={`semiAutomaticRoutes${title}`} style={{ width: '100%' }} />
+      <Divider />
+      {pageItems ? (
         <List
           style={{
-            // width: 200,
             maxHeight: '100%',
             backgroundColor: 'background.paper',
             overflow: 'scroll',
@@ -84,7 +133,7 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
           component="div"
           role="list"
         >
-          {items.map(value => {
+          {pageItems.map(value => {
             const labelId = `transfer-list-all-item-${value}-label`;
 
             return (
@@ -112,6 +161,20 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
       ) : (
         <ChartsCircularProgress />
       )}
+      <CardActions className={classes.actions}>
+        {filteredItems && filteredItems.length > 0 && numberOfResults > 10 && (
+          <TablePagination
+            component="div"
+            count={numberOfResults}
+            onChangePage={handleChangePage}
+            page={page}
+            rowsPerPage={10}
+            rowsPerPageOptions={[10]}
+            variant="footer"
+            size="small"
+          />
+        )}
+      </CardActions>
     </Card>
   );
 };
@@ -174,7 +237,7 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
 
   const closeDialog = () => setIsDialogOpen(false);
 
-  const handleCheckedRight = () => {
+  const handleAddCheckedToSelected = () => {
     setSelectedRoutes(prevState => sortBy(prevState.concat(checkedAvailableRoutes), ['name']));
     setRoutesState(prevState =>
       prevState?.filter(route => !checkedAvailableRoutes.some((r: RouteFromCity) => r.id === route.id)),
@@ -182,7 +245,7 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
     setCheckedAvailableRoutes([]);
   };
 
-  const handleCheckedLeft = () => {
+  const handleRemoveSelected = () => {
     setRoutesState(prevState => sortBy((prevState || []).concat(checkedSelectedRoutes), ['name']));
     setSelectedRoutes(prevState =>
       prevState?.filter(route => !checkedSelectedRoutes.some((r: RouteFromCity) => r.id === route.id)),
@@ -190,11 +253,12 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
     setCheckedSelectedRoutes([]);
   };
 
-  const handleSelectLeft = (value: RouteFromCity) => {
+  const handleCheckLeft = (value: RouteFromCity) => {
     setCheckedAvailableRoutes(prevState =>
       prevState.includes(value) ? prevState.filter(a => a.id !== value.id) : prevState.concat(value),
     );
   };
+
   const handleSelectRight = (value: RouteFromCity) => {
     setCheckedSelectedRoutes(prevState =>
       prevState.includes(value) ? prevState.filter(a => a.id !== value.id) : prevState.concat(value),
@@ -218,7 +282,7 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
           open={isDialogOpen}
           keepMounted
           onClose={closeDialog}
-          maxWidth="md"
+          maxWidth="lg"
           fullWidth
           aria-labelledby="alert-dialog-slide-title"
           aria-describedby="alert-dialog-slide-description"
@@ -230,13 +294,13 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
             </IconButton>
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
-            <Grid container spacing={2} style={{ display: 'flex', flex: 1, maxHeight: '100%' }}>
+            <Grid container spacing={2} style={{ display: 'flex', flex: 1, height: '100%' }}>
               <Grid item xs={5} style={{ maxHeight: '100%' }}>
                 <RoutesList
                   title={'Available Routes'}
                   items={routesState || []}
                   selectedItems={checkedAvailableRoutes}
-                  onSelect={handleSelectLeft}
+                  onSelect={handleCheckLeft}
                   setSelected={setCheckedAvailableRoutes}
                 />
               </Grid>
@@ -249,7 +313,7 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={handleCheckedRight}
+                    onClick={handleAddCheckedToSelected}
                     disabled={checkedAvailableRoutes.length === 0}
                     aria-label="move selected right"
                   >
@@ -258,8 +322,8 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={() => handleCheckedLeft()}
-                    disabled={selectedRoutes.length === 0}
+                    onClick={handleRemoveSelected}
+                    disabled={checkedSelectedRoutes.length === 0}
                     aria-label="move selected left"
                   >
                     &lt;
