@@ -8,8 +8,8 @@ import VesselAllocationButton from '../vesselAllocation/VesselAllocationButton';
 import { RouteSearchResultVoyageInfo } from '../../model/route-search/RouteSearchResults';
 import VesselFullyBookedSwitch from '../VesselFullyBookedSwitch';
 
-export const SeparatorArrow = () => (
-  <Box mx={4} display="flex" flexDirection="column" alignItems="center">
+export const SeparatorArrow: React.FC<{ margin?: number }> = ({ margin }) => (
+  <Box mx={margin || 4} display="flex" flexDirection="column" alignItems="center">
     →
   </Box>
 );

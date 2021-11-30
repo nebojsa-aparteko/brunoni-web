@@ -34,7 +34,7 @@ const SemiAutomaticRoutes: React.FC<{ savePricelistRoutes: (selectedRoutes: Rout
   return (
     <Box display="flex" flexDirection="row" alignItems="center">
       <CityInput onSelect={city => setSelectedCity(city || null)} />
-      <SeparatorArrow />
+      <SeparatorArrow margin={2} />
       <RoutesMultiInput
         startingCity={selectedCity || undefined}
         selectedRoutes={selectedRoutes}
