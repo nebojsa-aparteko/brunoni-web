@@ -12,6 +12,7 @@ interface Props {
   onBlur?: () => void;
   transportModes?: string[];
   label?: string;
+  margin?: any;
 }
 
 const TransportModeInput: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const TransportModeInput: React.FC<Props> = ({
   onChange,
   onBlur,
   label = 'Transport mode',
+  margin,
 }) => {
   return (
     <Autocomplete
@@ -30,7 +32,7 @@ const TransportModeInput: React.FC<Props> = ({
       onChange={(_: ChangeEvent<{}>, mode: string | null) => onChange(mode)}
       onBlur={onBlur}
       getOptionLabel={option => option}
-      renderInput={params => <TextField {...params} label={label} fullWidth variant="outlined" />}
+      renderInput={params => <TextField {...params} margin={margin} label={label} fullWidth variant="outlined" />}
       PopperComponent={FitContentPopper}
     />
   );

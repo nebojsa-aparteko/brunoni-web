@@ -104,7 +104,7 @@ const savePricelistRoutes = async (
   const pricelistIds = selectedPricelists.exportPricelistEntities
     .map(p => p.id)
     .concat(selectedPricelists.importPricelistEntities.map(p => p.id));
-  const promisses = flatten(
+  const promises = flatten(
     pricelistIds.map(async id => {
       const ref = firebase
         .firestore()
@@ -117,7 +117,7 @@ const savePricelistRoutes = async (
       return Promise.all(selectedRoutes.map(route => ref.doc(route.id).set(route, { merge: true })));
     }),
   );
-  return Promise.all(promisses);
+  return Promise.all(promises);
 };
 
 interface Props {
