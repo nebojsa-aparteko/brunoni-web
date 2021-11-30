@@ -19,7 +19,11 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { AutomaticProviderRoute, RouteValidity } from '../../../../model/land-transport/providers/ProviderRoutes';
+import {
+  AutomaticProviderRoute,
+  ProviderRoutesType,
+  RouteValidity,
+} from '../../../../model/land-transport/providers/ProviderRoutes';
 import useRouteVersionDocs from '../../../../hooks/useRouteVersionDocs';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
@@ -61,18 +65,30 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const deactivateOthers = async (providerId: string, activeRouteVersion: string) => {
-  (
-    await firebase
+const activateRoute = async (providerId: string, currentRouteVersion: string, active: boolean) => {
+  const batch = firebase.firestore().batch();
+  //Deactivate others only if activating current
+  if (active) {
+    (
+      await firebase
+        .firestore()
+        .collection(`land-transport-config/${providerId}/routes`)
+        .where('type', '==', ProviderRoutesType.AUTOMATIC)
+        .where('active', '==', true)
+        .get()
+    ).docs.map(r => {
+      return batch.set(r.ref, { active: false });
+    });
+  }
+  //Set current
+  batch.set(
+    firebase
       .firestore()
       .collection(`land-transport-config/${providerId}/routes`)
-      .get()
-  ).docs.forEach(d => {
-    const route = d.data() as AutomaticProviderRoute;
-    if (route.active && route.version !== activeRouteVersion) {
-      d.ref.set({ active: false }, { merge: true });
-    }
-  });
+      .doc(currentRouteVersion),
+    { active },
+  );
+  await batch.commit();
 };
 
 const updateRoute = async (providerId: string, route: AutomaticProviderRoute) => {
@@ -136,8 +152,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await updateRoute(provider.id, { ...route, active: event.target.checked });
-    await deactivateOthers(provider.id, route.version);
+    await activateRoute(provider.id, route.version, event.target.checked);
   };
 
   const handleDeleteVersion = async () => {
