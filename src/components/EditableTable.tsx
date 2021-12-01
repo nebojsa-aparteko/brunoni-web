@@ -280,7 +280,16 @@ const EditableRow: React.FC<EditableRowProps> = ({
                 {...cell.selectProps}
               >
                 {cell.options.map(val => (
-                  <MenuItem value={val.key}>{val.label}</MenuItem>
+                  <MenuItem
+                    key={val.key}
+                    value={val.key}
+                    onClick={event => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }}
+                  >
+                    {val.label}
+                  </MenuItem>
                 ))}
               </Select>
             ) : (

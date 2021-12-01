@@ -4,7 +4,7 @@ import normalizeFirestoreDate from '../utilities/normalizeFirestoreDate';
 import ProviderRouteEntity, { ProviderRoutesType } from '../model/land-transport/providers/ProviderRoutes';
 import { useCallback } from 'react';
 
-const useLandTransportRoutes = (providerId: string, type: ProviderRoutesType) => {
+const useLandTransportRoutes = <T extends ProviderRouteEntity>(providerId: string, type: ProviderRoutesType) => {
   const landTransportRoutesRef = useFirestoreCollection(
     'land-transport-config',
     useCallback(
@@ -25,7 +25,7 @@ const useLandTransportRoutes = (providerId: string, type: ProviderRoutesType) =>
     )({
       ...v.data(),
       id: v.id,
-    } as ProviderRouteEntity),
+    } as T),
   );
 };
 

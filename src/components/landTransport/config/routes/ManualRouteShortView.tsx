@@ -66,6 +66,7 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
         border={1}
         p={2}
         borderRadius={5}
+        borderColor="primary"
         style={{ cursor: 'pointer' }}
         onClick={event => {
           event.preventDefault();

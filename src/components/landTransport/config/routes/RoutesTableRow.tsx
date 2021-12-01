@@ -1,4 +1,7 @@
-import { AutomaticProviderRoute } from '../../../../model/land-transport/providers/ProviderRoutes';
+import {
+  AutomaticProviderRoute,
+  AutomaticProviderRouteEntity,
+} from '../../../../model/land-transport/providers/ProviderRoutes';
 import React, { useState } from 'react';
 import { Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
 import { format } from 'date-fns';
@@ -19,7 +22,7 @@ const useStyles = makeStyles({
 });
 
 interface RoutesTableRowProps {
-  route: AutomaticProviderRoute;
+  route: AutomaticProviderRouteEntity;
   provider: ProviderEntity;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;

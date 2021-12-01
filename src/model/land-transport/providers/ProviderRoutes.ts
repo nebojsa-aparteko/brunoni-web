@@ -2,6 +2,8 @@ import Price from '../../Price';
 import Entity from '../../Entity';
 import { EquipmentControlContainerTypes } from '../../EquipmentControl';
 import { Currency } from '../../Payment';
+import City from '../../City';
+import Destination from '../Destination';
 
 interface ProviderRouteEntity extends Entity {
   id: string;
@@ -40,6 +42,13 @@ export interface ManualProviderRouteEntity extends ProviderRouteEntity {
   active: boolean;
 }
 
+export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
+  type: ProviderRoutesType.SEMI_AUTOMATIC;
+  origin: Destination;
+  transportMode: string;
+  active: boolean;
+}
+
 export type PricePerContainer = {
   [key in keyof typeof EquipmentControlContainerTypes]: Price;
 };
@@ -47,10 +56,12 @@ export type PricePerContainer = {
 export enum ProviderRoutesType {
   AUTOMATIC = 'AUTOMATIC',
   MANUAL = 'MANUAL',
+  SEMI_AUTOMATIC = 'SEMI_AUTOMATIC',
 }
 
 export type ProviderRoute = Omit<ProviderRouteEntity, 'id' | 'createdAt'>;
 export type ManualProviderRoute = Omit<ManualProviderRouteEntity, 'id' | 'createdAt'>;
 export type AutomaticProviderRoute = Omit<AutomaticProviderRouteEntity, 'id'>;
+export type SemiAutomaticProviderRoute = Omit<SemiAutomaticProviderRouteEntity, 'id' | 'createdAt'>;
 
 export default ProviderRouteEntity;

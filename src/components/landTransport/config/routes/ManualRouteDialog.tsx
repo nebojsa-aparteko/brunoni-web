@@ -1,5 +1,16 @@
 import React, { ChangeEvent, useState } from 'react';
-import { AppBar, Box, Button, Dialog, IconButton, Slide, TextField, Toolbar, Typography } from '@material-ui/core';
+import {
+  AppBar,
+  Box,
+  Button,
+  Dialog,
+  IconButton,
+  Slide,
+  TableContainer,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles';
@@ -8,7 +19,6 @@ import {
   getPriceRangeText,
   ManualProviderRouteEntity,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
-import ExtensionTables from '../ExtensionTables';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import EditingInput from '../../../EditingInput';
 import { get, set } from 'lodash/fp';
@@ -20,6 +30,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { TableRowData } from '../../../bookingRequests/BookingRequestSummary';
 import SectionWithTitle from '../../../SectionWithTitle';
 import { ManualRouteTablePricing } from './ManualRouteShortView';
+import ExtensionsContainer from '../extensions/ExtensionsContainer';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -95,59 +106,61 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                 alignItems="flex-start"
                 flex={1}
               >
-                <TableRowData
-                  label={'Origin'}
-                  content={
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        label: 'Origin',
-                        name: 'origin',
-                        onChange: handleInputChange,
-                      }}
-                      typographyProps={{
-                        style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                      }}
-                      value={get('origin')(stateRoute)}
-                    />
-                  }
-                />
+                <TableContainer>
+                  <TableRowData
+                    label={'Origin'}
+                    content={
+                      <EditingInput
+                        editing={isEditing}
+                        inputProps={{
+                          variant: 'outlined',
+                          label: 'Origin',
+                          name: 'origin',
+                          onChange: handleInputChange,
+                        }}
+                        typographyProps={{
+                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+                        }}
+                        value={get('origin')(stateRoute)}
+                      />
+                    }
+                  />
 
-                <TableRowData
-                  label={'Destination'}
-                  content={
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        name: 'destination',
-                        onChange: handleInputChange,
-                      }}
-                      typographyProps={{
-                        style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                      }}
-                      value={get('destination')(stateRoute)}
-                    />
-                  }
-                />
-                <TableRowData
-                  label={'Transport Mode'}
-                  content={
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        name: 'transportMode',
-                        onChange: handleInputChange,
-                      }}
-                      typographyProps={{
-                        style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                      }}
-                      value={get('transportMode')(stateRoute)}
-                    />
-                  }
-                />
+                  <TableRowData
+                    label={'Destination'}
+                    content={
+                      <EditingInput
+                        editing={isEditing}
+                        inputProps={{
+                          variant: 'outlined',
+                          name: 'destination',
+                          onChange: handleInputChange,
+                        }}
+                        typographyProps={{
+                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+                        }}
+                        value={get('destination')(stateRoute)}
+                      />
+                    }
+                  />
+                  <TableRowData
+                    label={'Transport Mode'}
+                    content={
+                      <EditingInput
+                        editing={isEditing}
+                        inputProps={{
+                          variant: 'outlined',
+                          name: 'transportMode',
+                          onChange: handleInputChange,
+                        }}
+                        typographyProps={{
+                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+                        }}
+                        value={get('transportMode')(stateRoute)}
+                      />
+                    }
+                  />
+                </TableContainer>
               </Box>
               <Typography variant="h4">{getPriceRangeText(stateRoute.priceRange)}</Typography>
             </Box>
@@ -162,7 +175,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
             <TextField variant="outlined" placeholder="Write some description here..." multiline rows={6} rowsMax={8} />
           </SectionWithTitle>
           <SectionWithTitle title="Extensions">
-            <ExtensionTables providerId={provider.id} />
+            <ExtensionsContainer provider={provider} routeId={route.id} />
           </SectionWithTitle>
         </Box>
       </Container>
