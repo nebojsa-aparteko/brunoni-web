@@ -1,5 +1,4 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import City from '../../model/City';
 import {
   Box,
   Button,
@@ -30,6 +29,8 @@ import sortBy from 'lodash/sortBy';
 import SingleCountryInput from './SingleCountryInput';
 import Country from '../../model/Country';
 import SimpleSearch from '../SimpleSearch';
+import Destination from '../../model/land-transport/Destination';
+import useModal from '../../hooks/useModal';
 
 const useStyles = makeStyles(() => ({
   closeModal: {
@@ -79,14 +80,14 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
 
   useEffect(() => {
     setPage(0);
-    setFilteredItems(
-      items?.filter(item =>
-        selectedCountry
-          ? item.countryCode === selectedCountry.countryCode &&
-            item.name.toLowerCase().includes(searchStringState.toLowerCase())
-          : item.name.toLowerCase().includes(searchStringState.toLowerCase()),
-      ),
-    );
+    // setFilteredItems(
+    //   items?.filter(item =>
+    //     selectedCountry
+    //       ? item.countryCode === selectedCountry.countryCode &&
+    //         item.name.toLowerCase().includes(searchStringState.toLowerCase())
+    //       : item.name.toLowerCase().includes(searchStringState.toLowerCase()),
+    //   ),
+    // );
   }, [items, selectedCountry, setFilteredItems, searchStringState, setPage]);
 
   useEffect(() => {
@@ -137,10 +138,10 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
             const labelId = `transfer-list-all-item-${value}-label`;
 
             return (
-              <ListItem key={value.id} role="listitem" button onClick={() => onSelect(value)}>
+              <ListItem key={`${new Date()}`} role="listitem" button onClick={() => onSelect(value)}>
                 <ListItemIcon>
                   <Checkbox
-                    checked={selectedItems.some(route => route.id === value.id)}
+                    // checked={selectedItems.some(route => route.id === value.id)}
                     tabIndex={-1}
                     disableRipple
                     inputProps={{
@@ -150,7 +151,7 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
                 </ListItemIcon>
                 <ListItemText
                   id={labelId}
-                  primary={`${value.name}, ${value.countryCode}`}
+                  // primary={`${value.name}, ${value.countryCode}`}
                   secondary={value.distance ? `${value.distance} km` : undefined}
                 />
               </ListItem>
@@ -180,7 +181,8 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
 };
 
 interface Props {
-  startingCity?: City;
+  isEditing: boolean;
+  startingDestination?: Destination;
   selectedRoutes: RouteFromCity[];
   setSelectedRoutes: Dispatch<SetStateAction<RouteFromCity[]>>;
 }
@@ -200,7 +202,7 @@ const handleFetchData = async (countryId?: string, startCityId?: string) => {
       v =>
         ({
           ...v.data(),
-          id: v.id,
+          // id: v.id,
         } as RouteFromCity),
     );
   } catch (error) {
@@ -209,79 +211,87 @@ const handleFetchData = async (countryId?: string, startCityId?: string) => {
   }
 };
 
-const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSelectedRoutes }) => {
+const RoutesMultiInput: React.FC<Props> = ({ startingDestination, selectedRoutes, setSelectedRoutes, isEditing }) => {
   const classes = useStyles();
   const [, dispatch] = useGlobalAppState();
   const [routesState, setRoutesState] = useState<RouteFromCity[] | undefined>(undefined);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const { openModal, closeModal, isOpen } = useModal();
   const [checkedAvailableRoutes, setCheckedAvailableRoutes] = useState<RouteFromCity[]>([]);
   const [checkedSelectedRoutes, setCheckedSelectedRoutes] = useState<RouteFromCity[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
 
-  useEffect(() => {
-    setSelectedCountries(
-      selectedRoutes.map(route => route.countryCode).filter((value, index, self) => self.indexOf(value) === index),
-    );
-  }, [selectedRoutes]);
+  // useEffect(() => {
+  //   setSelectedCountries(
+  //     selectedRoutes
+  //       .map(route => route.country?.countryCode)
+  //       .filter((value, index, self) => self.indexOf(value) === index),
+  //   );
+  // }, [selectedRoutes]);
 
   const handleOpenDialog = async () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
     setRoutesState(
-      (await handleFetchData(startingCity?.countryCode, startingCity?.id))?.filter(
-        route => !selectedRoutes.some((r: RouteFromCity) => r.id === route.id),
+      (await handleFetchData(startingDestination?.country.countryCode, startingDestination?.city?.id))?.filter(
+        route => !selectedRoutes.some((r: RouteFromCity) => r.city.id === route.city.id),
       ) || undefined,
     );
     dispatch({ type: 'STOP_GLOBAL_LOADING' });
-    setIsDialogOpen(true);
+    openModal();
   };
-
-  const closeDialog = () => setIsDialogOpen(false);
 
   const handleAddCheckedToSelected = () => {
     setSelectedRoutes(prevState => sortBy(prevState.concat(checkedAvailableRoutes), ['name']));
-    setRoutesState(prevState =>
-      prevState?.filter(route => !checkedAvailableRoutes.some((r: RouteFromCity) => r.id === route.id)),
-    );
+    // setRoutesState(prevState =>
+    //   prevState?.filter(route => !checkedAvailableRoutes.some((r: RouteFromCity) => r.id === route.id)),
+    // );
     setCheckedAvailableRoutes([]);
   };
 
   const handleRemoveSelected = () => {
     setRoutesState(prevState => sortBy((prevState || []).concat(checkedSelectedRoutes), ['name']));
     setSelectedRoutes(prevState =>
-      prevState?.filter(route => !checkedSelectedRoutes.some((r: RouteFromCity) => r.id === route.id)),
+      prevState?.filter(route => !checkedSelectedRoutes.some((r: RouteFromCity) => r.city.id === route.city.id)),
     );
     setCheckedSelectedRoutes([]);
   };
 
   const handleCheckLeft = (value: RouteFromCity) => {
     setCheckedAvailableRoutes(prevState =>
-      prevState.includes(value) ? prevState.filter(a => a.id !== value.id) : prevState.concat(value),
+      prevState.includes(value) ? prevState.filter(a => a.city.id !== value.city.id) : prevState.concat(value),
     );
   };
 
   const handleSelectRight = (value: RouteFromCity) => {
     setCheckedSelectedRoutes(prevState =>
-      prevState.includes(value) ? prevState.filter(a => a.id !== value.id) : prevState.concat(value),
+      prevState.includes(value) ? prevState.filter(a => a.city.id !== value.city.id) : prevState.concat(value),
     );
   };
 
   return (
     <Box display="flex" flexDirection="row">
-      <Button
-        variant="outlined"
-        onClick={handleOpenDialog}
-        disabled={!startingCity}
-        style={{ height: 38, marginTop: 4 }}
-      >
-        {selectedRoutes?.length > 0
-          ? `${selectedRoutes.length} cities in ${selectedCountries.join(', ')}`
-          : 'Select Routes'}
-      </Button>
-      {isDialogOpen && (
+      {isEditing ? (
+        <Button
+          variant="outlined"
+          onClick={handleOpenDialog}
+          disabled={!startingDestination?.city}
+          style={{ height: 38, marginTop: 4 }}
+        >
+          {selectedRoutes?.length > 0
+            ? `${selectedRoutes.length} cities in ${selectedCountries.join(', ')}`
+            : 'Select Routes'}
+        </Button>
+      ) : (
+        <Typography>
+          {selectedRoutes?.length > 0
+            ? `${selectedRoutes.length} cities in ${selectedCountries.join(', ')}`
+            : '0 routes selected'}
+        </Typography>
+      )}
+      {isOpen && (
         <Dialog
-          open={isDialogOpen}
+          open={isOpen}
           keepMounted
-          onClose={closeDialog}
+          onClose={closeModal}
           maxWidth="lg"
           fullWidth
           aria-labelledby="alert-dialog-slide-title"
@@ -289,7 +299,7 @@ const RoutesMultiInput: React.FC<Props> = ({ startingCity, selectedRoutes, setSe
         >
           <DialogTitle disableTypography>
             <Typography variant="h4">{'Select the desired routes'}</Typography>
-            <IconButton onClick={closeDialog} className={classes.closeModal}>
+            <IconButton onClick={closeModal} className={classes.closeModal}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>

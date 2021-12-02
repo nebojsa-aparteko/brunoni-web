@@ -19,9 +19,6 @@ import { capitalCase } from 'change-case';
 import FirestoreCollectionProvider from '../../../providers/FirestoreCollection';
 import Countries from '../../../contexts/Countries';
 import RouteFromCity from '../../../model/RouteFromCity';
-import firebase from '../../../firebase';
-import flatten from 'lodash/fp/flatten';
-import useGlobalAppState from '../../../hooks/useGlobalAppState';
 import useLandTransportRoutes from '../../../hooks/useLandTransportRoutes';
 import {
   ProviderRoutesType,
@@ -117,23 +114,23 @@ const savePricelistRoutes = async (
     importPricelistEntities: ProviderPricelistEntity[];
   },
 ) => {
-  const pricelistIds = selectedPricelists.exportPricelistEntities
-    .map(p => p.id)
-    .concat(selectedPricelists.importPricelistEntities.map(p => p.id));
-  const promises = flatten(
-    pricelistIds.map(async id => {
-      const ref = firebase
-        .firestore()
-        .collection(`land-transport-config`)
-        .doc(provider.id)
-        .collection('pricelist')
-        .doc(id)
-        .collection('routes');
-
-      return Promise.all(selectedRoutes.map(route => ref.doc(route.id).set(route, { merge: true })));
-    }),
-  );
-  return Promise.all(promises);
+  // const pricelistIds = selectedPricelists.exportPricelistEntities
+  //   .map(p => p.id)
+  //   .concat(selectedPricelists.importPricelistEntities.map(p => p.id));
+  // const promises = flatten(
+  //   pricelistIds.map(async id => {
+  //     const ref = firebase
+  //       .firestore()
+  //       .collection(`land-transport-config`)
+  //       .doc(provider.id)
+  //       .collection('pricelist')
+  //       .doc(id)
+  //       .collection('routes');
+  //
+  //     return Promise.all(selectedRoutes.map(route => ref.doc(route.id).set(route, { merge: true })));
+  //   }),
+  // );
+  // return Promise.all(promises);
 };
 
 interface Props {
@@ -144,7 +141,6 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
     provider.id,
     ProviderRoutesType.SEMI_AUTOMATIC,
   );
-  const [, dispatch] = useGlobalAppState();
   //
   // const handleSavePricelistRoutes = async (selectedRoutes: RouteFromCity[]) => {
   //   return savePricelistRoutes(provider, selectedRoutes, pricelists)
@@ -180,6 +176,7 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
         {newRow && (
           <Box display="flex" flexDirection="row" flex={1} justifyContent="space-between">
             <CityInput
+              isEditing={true}
               onSelect={(value, path) =>
                 setSelectedDestination(prevState =>
                   set(path, value)(prevState && value ? prevState : ({} as Destination)),
@@ -187,21 +184,26 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
               }
               origin={destination}
             />
-            <IconButton
-              onClick={() => {
-                addLandTransportRoute(provider.id, {
-                  type: ProviderRoutesType.SEMI_AUTOMATIC,
-                  active: false,
-                  origin: destination,
-                  transportMode: 'Barge',
-                } as SemiAutomaticProviderRoute).then(() => {
-                  setNewRow(false);
-                  setSelectedDestination(null);
-                });
-              }}
-            >
-              <CheckIcon />
-            </IconButton>
+            <Box>
+              <IconButton
+                onClick={() => {
+                  addLandTransportRoute(provider.id, {
+                    type: ProviderRoutesType.SEMI_AUTOMATIC,
+                    active: false,
+                    origin: destination,
+                    transportMode: 'Barge',
+                  } as SemiAutomaticProviderRoute).then(() => {
+                    setNewRow(false);
+                    setSelectedDestination(null);
+                  });
+                }}
+              >
+                <CheckIcon />
+              </IconButton>
+              <IconButton onClick={() => setNewRow(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
           </Box>
         )}
         {!routes || routes.length < 1 ? (
@@ -243,11 +245,13 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
     >
       <Box display="flex" flexDirection="row" alignItems="center">
         <CityInput
+          isEditing={isEditing}
           onSelect={(value, path) => setSelectedDestination(prevState => set(path, value)(prevState))}
           origin={destination}
         />
         <SeparatorArrow />
         <RoutesMultiInput
+          isEditing={isEditing}
           startingDestination={destination}
           selectedRoutes={selectedRoutes}
           setSelectedRoutes={setSelectedRoutes}

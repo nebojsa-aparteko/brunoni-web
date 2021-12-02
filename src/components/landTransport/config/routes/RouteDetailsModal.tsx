@@ -36,7 +36,6 @@ import { saveRouteFilesToFirestore } from './RoutesFileUploadDialog';
 import useSaveFiles from '../../../../hooks/useSaveFiles';
 import firebase from '../../../../firebase';
 import ConfirmationDialog from '../../../ConfirmationDialog';
-import ExtensionTables from '../ExtensionTables';
 import theme from '../../../../theme';
 import { Transition } from './ManualRouteDialog';
 import Container from '../../../Container';
@@ -246,9 +245,6 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
               )}
             </SectionWithTitle>
             <DocumentsContainer route={route} provider={provider} editing={editing} />
-            <ExtensionTables providerId={provider.id} />
-            <ExtensionTables providerId={provider.id} />
-            <ExtensionTables providerId={provider.id} />
           </Box>
         </DialogContent>
       </Container>
