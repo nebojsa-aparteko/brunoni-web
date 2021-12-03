@@ -2,7 +2,6 @@ import Price from '../../Price';
 import Entity from '../../Entity';
 import { EquipmentControlContainerTypes } from '../../EquipmentControl';
 import { Currency } from '../../Payment';
-import City from '../../City';
 import Destination from '../Destination';
 
 interface ProviderRouteEntity extends Entity {
@@ -19,7 +18,7 @@ export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.AUTOMATIC;
   version: string; //work as id
   updatedAt: Date;
-  validity: RouteValidity;
+  validity: RouteValidity | null;
   description: string;
   active: boolean;
 }

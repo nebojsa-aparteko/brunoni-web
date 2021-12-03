@@ -50,6 +50,7 @@ import { format } from 'date-fns';
 import { useDropzone } from 'react-dropzone';
 import useUser from '../../../../hooks/useUser';
 import { deleteRoutes } from './RoutesTable';
+import { isNil } from 'lodash';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -129,7 +130,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   useEffect(() => {
-    const validityDifference = diff(route.validity, validityState);
+    const validityDifference = route.validity && validityState ? diff(route.validity, validityState) : {};
     const isChanged = keys(validityDifference).length > 0 || route.description !== descriptionState;
     setChanged(isChanged);
   }, [validityState, descriptionState, route.validity, route.description]);
@@ -161,6 +162,8 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
     setOpen(false);
   };
 
+  const hasValidity = !isNil(route.validity) && !isNil(route.validity.startDate) && !isNil(route.validity.endDate);
+
   return (
     <Dialog open={open} fullScreen onClose={handleClose} TransitionComponent={Transition}>
       <AppBar className={classes.appBar}>
@@ -180,7 +183,13 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
       <Container>
         <DialogTitle disableTypography>
           <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-            <Status editing={editing} active={route.active} handleChangeActive={handleChangeActive} />
+            <Status
+              editing={editing}
+              active={route.active}
+              disabled={!hasValidity}
+              disabledMessage={'You must provide validity before activating'}
+              handleChangeActive={handleChangeActive}
+            />
             <ActionButtons
               editing={editing}
               handleEdit={() => setEditing(true)}
@@ -216,14 +225,16 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
               {editing ? (
                 <DateRangeInput
                   onChange={dateRange => setValidityState(dateRange as RouteValidity)}
-                  value={validityState}
+                  value={validityState ? validityState : undefined}
                 />
               ) : (
                 <Typography>
-                  {`${format(route.validity.startDate, 'dd-MM-yyyy')} - ${format(
-                    route.validity.endDate,
-                    'dd-MM-yyyy',
-                  )}`}
+                  {hasValidity
+                    ? `${format(route.validity!.startDate, 'dd-MM-yyyy')} - ${format(
+                        route.validity!.endDate,
+                        'dd-MM-yyyy',
+                      )}`
+                    : 'Not defined'}
                 </Typography>
               )}
             </SectionWithTitle>
@@ -263,10 +274,12 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
 interface StatusProps {
   editing: boolean;
   active: boolean;
+  disabled?: boolean;
+  disabledMessage?: string;
   handleChangeActive: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Status: React.FC<StatusProps> = ({ editing, active, handleChangeActive }) => {
+const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {
   return (
     <Box style={{ gap: '16px' }} display={'flex'} alignItems={'center'}>
       {active ? (
@@ -282,12 +295,16 @@ const Status: React.FC<StatusProps> = ({ editing, active, handleChangeActive }) 
       )}
       {editing ? (
         <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch inputProps={{ 'aria-label': 'controlled' }} checked={active} onChange={handleChangeActive} />
-            }
-            label={''}
-          />
+          <Box display={'flex'} alignItems={'baseline'}>
+            <FormControlLabel
+              control={
+                <Switch inputProps={{ 'aria-label': 'controlled' }} checked={active} onChange={handleChangeActive} />
+              }
+              disabled={disabled}
+              label={''}
+            />
+            {disabled && disabledMessage && <Typography color={'error'}>{disabledMessage}</Typography>}
+          </Box>
         </FormGroup>
       ) : null}
     </Box>

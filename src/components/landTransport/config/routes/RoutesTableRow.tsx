@@ -1,7 +1,4 @@
-import {
-  AutomaticProviderRoute,
-  AutomaticProviderRouteEntity,
-} from '../../../../model/land-transport/providers/ProviderRoutes';
+import { AutomaticProviderRouteEntity } from '../../../../model/land-transport/providers/ProviderRoutes';
 import React, { useState } from 'react';
 import { Checkbox, TableCell, TableRow, Typography } from '@material-ui/core';
 import { format } from 'date-fns';
@@ -11,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import palette from '../../../../theme/palette';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import green from '@material-ui/core/colors/green';
+import { isNil } from 'lodash';
 
 const useStyles = makeStyles({
   tableRow: {
@@ -32,6 +30,8 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
+  const hasValidity = !isNil(route.validity) && !isNil(route.validity.startDate) && !isNil(route.validity.endDate);
+
   return (
     <TableRow className={classes.tableRow} onClick={() => setOpen(true)}>
       <TableCell padding="checkbox">
@@ -45,11 +45,9 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
       <TableCell>{route.version}</TableCell>
       <TableCell>
         <Typography>
-          {`
-                  ${route.validity.startDate ? format(route.validity.startDate, 'dd-MM-yyyy') : 'Not defined'}
-                  -
-                  ${route.validity.endDate ? format(route.validity.endDate, 'dd-MM-yyyy') : 'Not defined'}
-        `}
+          {hasValidity
+            ? `${format(route.validity!.startDate, 'dd-MM-yyyy')} - ${format(route.validity!.endDate, 'dd-MM-yyyy')}`
+            : 'Not defined'}
         </Typography>
       </TableCell>
       <TableCell>{format(route.createdAt, 'dd-MM-yyyy HH:mm')}</TableCell>
