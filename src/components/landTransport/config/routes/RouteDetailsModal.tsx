@@ -46,7 +46,7 @@ import { diff } from 'deep-object-diff';
 import { keys } from 'lodash/fp';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { format } from 'date-fns';
+import { format, isFuture, isPast } from 'date-fns';
 import { useDropzone } from 'react-dropzone';
 import useUser from '../../../../hooks/useUser';
 import { deleteRoutes } from './RoutesTable';
@@ -115,6 +115,25 @@ interface Props {
   open: boolean;
 }
 
+export const getValidityInfo = (validity: RouteValidity | null) => {
+  const hasValidity = !isNil(validity) && !isNil(validity.startDate) && !isNil(validity.endDate);
+  const isValid = hasValidity && isPast(validity!.startDate) && isFuture(validity!.endDate);
+  const validityMessage = !hasValidity
+    ? 'You must provide validity before activating'
+    : !isValid
+    ? isFuture(validity!.startDate)
+      ? `This route is not valid (becomes valid at ${format(validity!.startDate, 'dd-MM-yyyy HH:mm')})`
+      : isPast(validity!.endDate)
+      ? `This route is expired (expired at ${format(validity!.endDate, 'dd-MM-yyyy HH:mm')})`
+      : ''
+    : '';
+  return {
+    hasValidity,
+    isValid,
+    validityMessage,
+  };
+};
+
 const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) => {
   const classes = useStyles();
 
@@ -162,7 +181,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
     setOpen(false);
   };
 
-  const hasValidity = !isNil(route.validity) && !isNil(route.validity.startDate) && !isNil(route.validity.endDate);
+  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
 
   return (
     <Dialog open={open} fullScreen onClose={handleClose} TransitionComponent={Transition}>
@@ -186,8 +205,8 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
             <Status
               editing={editing}
               active={route.active}
-              disabled={!hasValidity}
-              disabledMessage={'You must provide validity before activating'}
+              disabled={!isValid}
+              disabledMessage={validityMessage}
               handleChangeActive={handleChangeActive}
             />
             <ActionButtons
