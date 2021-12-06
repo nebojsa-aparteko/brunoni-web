@@ -5,7 +5,6 @@ import {
   MenuItem,
   Paper,
   Select,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -14,11 +13,11 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
   getPriceRangeText,
   ManualProviderRoute,
   ManualProviderRouteEntity,
+  ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import EditingInput from '../../../EditingInput';
 import { flow, get, set } from 'lodash/fp';
@@ -32,6 +31,7 @@ import useModal from '../../../../hooks/useModal';
 import ManualRouteDialog from './ManualRouteDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import ArrowForward from '@material-ui/icons/ArrowForward';
+import { activateRoute, getValidityInfo, Status } from './RouteDetailsModal';
 
 interface Props {
   route: ManualProviderRouteEntity;
@@ -46,6 +46,9 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
   const [isEditing, setEditing] = useState(!!isAddMode);
   const [stateRoute, setStateRoute] = useState(route);
   const { openModal, closeModal, isOpen } = useModal();
+
+  const { isValid } = getValidityInfo(route.validity);
+
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const key = event.target?.name;
     const value = event.target.value;
@@ -59,6 +62,11 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
       setStateRoute(prevState => set(name, value)(prevState));
     }
   };
+
+  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
+  };
+
   return (
     <>
       <Box
@@ -117,24 +125,12 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
           >
             {getPriceRangeText(route.priceRange)}
           </Typography>
-          {isEditing ? (
-            <Switch
-              name="active"
-              checked={get('active')(stateRoute)}
-              onChange={event => {
-                const name = event.target.name;
-                const checked = event.target.checked;
-                setStateRoute(prevState => set(name, checked)(prevState));
-              }}
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            />
-          ) : (
-            <FiberManualRecordIcon color={stateRoute.active ? 'secondary' : 'error'} />
-          )}
-
+          <Status
+            editing={isEditing}
+            active={route.active}
+            disabled={!isValid}
+            handleChangeActive={handleChangeActive}
+          />
           {isEditing ? (
             <Box display="flex">
               <IconButton

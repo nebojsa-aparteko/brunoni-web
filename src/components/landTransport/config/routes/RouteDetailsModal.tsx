@@ -73,6 +73,7 @@ export const activateRoute = async (
   currentRouteId: string,
   active: boolean,
 ) => {
+  const updatedAt = new Date();
   const batch = firebase.firestore().batch();
   //Deactivate others only if activating current
   if (active) {
@@ -84,7 +85,7 @@ export const activateRoute = async (
         .where('active', '==', true)
         .get()
     ).docs.map(r => {
-      return batch.set(r.ref, { active: false }, { merge: true });
+      return batch.set(r.ref, { active: false, updatedAt }, { merge: true });
     });
   }
   //Set current
@@ -103,7 +104,7 @@ export const updateRoute = async (
   providerId: string,
   route: AutomaticProviderRouteEntity | ManualProviderRouteEntity,
 ) => {
-  const updatedAt = firebase.firestore.Timestamp.fromDate(new Date());
+  const updatedAt = new Date();
   await firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes`)
@@ -182,7 +183,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.version, event.target.checked);
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
   };
 
   const handleDeleteVersion = async () => {
@@ -351,9 +352,9 @@ export const Validity: React.FC<ValidityProps> = ({ validity, validityState, han
 interface StatusProps {
   editing: boolean;
   active: boolean;
+  handleChangeActive: (event: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   disabledMessage?: string;
-  handleChangeActive: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {

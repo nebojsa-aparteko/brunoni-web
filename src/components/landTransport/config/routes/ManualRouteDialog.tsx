@@ -23,7 +23,7 @@ import {
   ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
-import { keys, set } from 'lodash/fp';
+import { keys, omit, set } from 'lodash/fp';
 import { theme } from '../../../../theme';
 import Container from '../../../Container';
 import SectionWithTitle from '../../../SectionWithTitle';
@@ -65,6 +65,8 @@ interface Props {
   provider: ProviderEntity;
 }
 
+const omittedField = ['active'];
+
 const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provider }) => {
   const classes = useStyles();
   const [stateRoute, setStateRoute] = useState(route);
@@ -80,7 +82,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
   const { post } = useAPI();
 
   useEffect(() => {
-    const difference = diff(route, stateRoute);
+    const difference = diff(omit(omittedField)(route), omit(omittedField)(stateRoute));
     const isChanged = keys(difference).length > 0;
     setChanged(isChanged);
   }, [route, stateRoute]);
