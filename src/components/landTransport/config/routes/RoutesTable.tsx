@@ -54,6 +54,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.AUTOMATIC);
 
@@ -75,7 +76,9 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   };
 
   const handleDeleteRoute = async () => {
+    setLoading(true);
     await deleteRoutes(provider, selectedRoutes, deleteFiles);
+    setLoading(false);
     setIsDeleteDialogOpen(false);
     setSelectedRoutes([]);
   };
@@ -147,6 +150,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
         handleConfirm={handleDeleteRoute}
         handleClose={() => setIsDeleteDialogOpen(false)}
         description={`Are you sure you want remove this selected version${selectedRoutes.length > 1 ? 's' : ''}?`}
+        loading={loading}
       />
     </>
   );

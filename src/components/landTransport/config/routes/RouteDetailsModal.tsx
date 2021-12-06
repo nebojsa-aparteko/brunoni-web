@@ -18,6 +18,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import ClearIcon from '@material-ui/icons/Clear';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import {
   AutomaticProviderRoute,
@@ -149,7 +150,7 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   useEffect(() => {
-    const validityDifference = route.validity && validityState ? diff(route.validity, validityState) : {};
+    const validityDifference = route.validity ? diff(route.validity, validityState ? validityState : {}) : {};
     const isChanged = keys(validityDifference).length > 0 || route.description !== descriptionState;
     setChanged(isChanged);
   }, [validityState, descriptionState, route.validity, route.description]);
@@ -176,7 +177,9 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   };
 
   const handleDeleteVersion = async () => {
+    setLoading(true);
     await deleteRoutes(provider, [route.version], deleteFiles);
+    setLoading(false);
     setIsDeleteDialogOpen(false);
     setOpen(false);
   };
@@ -240,23 +243,13 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
                 </Box>
               </Box>
             </SectionWithTitle>
-            <SectionWithTitle title="Validity">
-              {editing ? (
-                <DateRangeInput
-                  onChange={dateRange => setValidityState(dateRange as RouteValidity)}
-                  value={validityState ? validityState : undefined}
-                />
-              ) : (
-                <Typography>
-                  {hasValidity
-                    ? `${format(route.validity!.startDate, 'dd-MM-yyyy')} - ${format(
-                        route.validity!.endDate,
-                        'dd-MM-yyyy',
-                      )}`
-                    : 'Not defined'}
-                </Typography>
-              )}
-            </SectionWithTitle>
+            <Validity
+              validity={route.validity}
+              validityState={validityState}
+              setValidityState={setValidityState}
+              editing={editing}
+              hasValidity={hasValidity}
+            />
             <SectionWithTitle title="Description">
               {editing ? (
                 <TextField
@@ -287,6 +280,50 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
         loading={loading}
       />
     </Dialog>
+  );
+};
+
+interface ValidityProps {
+  validity: RouteValidity | null;
+  validityState: RouteValidity | null;
+  setValidityState: React.Dispatch<React.SetStateAction<RouteValidity | null>>;
+  editing: boolean;
+  hasValidity: boolean;
+}
+
+export const Validity: React.FC<ValidityProps> = ({
+  validity,
+  validityState,
+  setValidityState,
+  editing,
+  hasValidity,
+}) => {
+  return (
+    <SectionWithTitle
+      title="Validity"
+      ActionElement={
+        validityState && editing ? (
+          <Tooltip title={'Clear Validity'} placement={'top'}>
+            <IconButton onClick={() => setValidityState(null)}>
+              <ClearIcon />
+            </IconButton>
+          </Tooltip>
+        ) : null
+      }
+    >
+      {editing ? (
+        <DateRangeInput
+          onChange={dateRange => setValidityState(dateRange as RouteValidity)}
+          value={validityState ? validityState : { startDate: undefined, endDate: undefined }}
+        />
+      ) : (
+        <Typography>
+          {hasValidity
+            ? `${format(validity!.startDate, 'dd-MM-yyyy')} - ${format(validity!.endDate, 'dd-MM-yyyy')}`
+            : 'Not defined'}
+        </Typography>
+      )}
+    </SectionWithTitle>
   );
 };
 
@@ -471,7 +508,7 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
         loading ? (
           <CircularProgress />
         ) : editing ? (
-          <Tooltip title={'Upload Documents'}>
+          <Tooltip title={'Upload Documents'} placement={'top'}>
             <IconButton onClick={open}>
               <AddIcon />
             </IconButton>
