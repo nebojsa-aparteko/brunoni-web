@@ -164,7 +164,8 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
               title={'Save changes'}
             />
           </Box>
-        </DialogTitle>
+
+          </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Button
             variant="outlined"
