@@ -230,7 +230,6 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
   const priceLists = useLandTransportPricelists(provider.id, route.id);
   const [isEditing, setEditing] = useState(false);
   const [destination, setSelectedDestination] = useState<Destination>(route.origin);
-  const [selectedRoutes, setSelectedRoutes] = useState<RouteFromCity[]>([]);
   const handleSavePricelistRoutes = async () => {};
   return (
     <Box
@@ -250,12 +249,7 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
           origin={destination}
         />
         <SeparatorArrow />
-        <RoutesMultiInput
-          isEditing={isEditing}
-          startingDestination={destination}
-          selectedRoutes={selectedRoutes}
-          setSelectedRoutes={setSelectedRoutes}
-        />
+        <RoutesMultiInput isEditing={isEditing} startingDestination={destination} />
       </Box>
       {isEditing ? (
         <Box display="flex">

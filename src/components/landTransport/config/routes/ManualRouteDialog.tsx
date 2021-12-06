@@ -31,6 +31,7 @@ import { TableRowData } from '../../../bookingRequests/BookingRequestSummary';
 import SectionWithTitle from '../../../SectionWithTitle';
 import { ManualRouteTablePricing } from './ManualRouteShortView';
 import ExtensionsContainer from '../extensions/ExtensionsContainer';
+import useAPI from '../../../../hooks/useAPI';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -53,6 +54,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
   const classes = useStyles();
   const [isEditing, setEditing] = useState(false);
   const [stateRoute, setStateRoute] = useState(route);
+  const { post } = useAPI();
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const key = event.target?.name;
     const value = event.target.value;
@@ -94,6 +96,32 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
               </IconButton>
             </Box>
           </Box>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              post(
+                'landTransport/saveRoute',
+                Object.entries(route.pricePerContainer).map(([ctgType, price]) => ({
+                  fromLocationName: route.origin,
+                  toLocationName: route.destination,
+                  curr: route.currency,
+                  rate: price.value,
+                  transportMode: route.transportMode,
+                  routeId: route.id,
+                  active: false,
+                  provider: provider.id,
+                  weightRangeMin: 0,
+                  weightRangeMax: 16.5,
+                  weightRangeUnit: 'T',
+                  equSize: "40'",
+                  equGroup: 'GENERAL PURPOSE',
+                })),
+              );
+            }}
+          >
+            Save into db
+          </Button>
           <Button variant="outlined" color="primary" style={{ alignSelf: 'center' }}>
             Valid from 01.01.2022. - 31.01.2022.
           </Button>

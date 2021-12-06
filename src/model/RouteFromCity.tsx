@@ -1,8 +1,11 @@
-import Port from './Port';
-import Destination from './land-transport/Destination';
+import Entity from './Entity';
+import { Omit } from '@material-ui/core';
 
-export default interface RouteFromCity extends Destination {
+export default interface RouteFromCityEntity extends Entity {
   distance: number;
-  portOfLoading?: Port;
-  transportMode?: string;
+  name: string;
+  countryCode: string;
+  zipCode: string;
 }
+
+export type RouteFromCity = Omit<RouteFromCityEntity, keyof Entity>;
