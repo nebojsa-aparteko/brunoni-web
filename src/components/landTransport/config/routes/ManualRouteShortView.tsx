@@ -31,6 +31,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import useModal from '../../../../hooks/useModal';
 import ManualRouteDialog from './ManualRouteDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
+import ArrowForward from '@material-ui/icons/ArrowForward';
 
 interface Props {
   route: ManualProviderRouteEntity;
@@ -67,8 +68,9 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
         p={2}
         borderRadius={5}
         borderColor="primary"
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: isEditing ? 'default' : 'pointer' }}
         onClick={event => {
+          if (isEditing) return;
           event.preventDefault();
           event.stopPropagation();
           openModal();
@@ -83,9 +85,10 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
               name: 'origin',
               onChange: handleInputChange,
             }}
-            typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            typographyProps={{ variant: 'h4', style: { overflow: 'hidden', textOverflow: 'ellipsis' } }}
             value={get('origin')(stateRoute)}
           />
+          <ArrowForward />
           <EditingInput
             editing={isEditing}
             inputProps={{
@@ -108,7 +111,6 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
             value={get('transportMode')(stateRoute)}
           />
-
           <Typography
             variant="h5"
             style={{ whiteSpace: 'nowrap', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}

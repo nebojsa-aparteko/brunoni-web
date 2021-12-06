@@ -3,6 +3,7 @@ import ManualRouteShortView from './ManualRouteShortView';
 import { Box, Button, Paper } from '@material-ui/core';
 import { Currency } from '../../../../model/Payment';
 import {
+  ManualProviderRoute,
   ManualProviderRouteEntity,
   PricePerContainer,
   ProviderRoutesType,
@@ -15,19 +16,24 @@ import AddIcon from '@material-ui/icons/Add';
 import EmptyStatePanel from '../../../EmptyStatePanel';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 
-//@ts-ignore
-const defaultItem = {
+type InitialManualProviderRoute = Omit<ManualProviderRoute, 'updatedAt' | 'priceRange' | 'pricePerContainer'>;
+
+const defaultItem: InitialManualProviderRoute = {
   type: ProviderRoutesType.MANUAL,
-  price: { currency: Currency.CHF, value: 300 },
+  // price: { currency: Currency.CHF, value: 300 }, todo. Check this is not on Model
   transportMode: '',
+  validity: null,
+  description: '',
   destination: '',
   origin: '',
   currency: Currency.EUR,
   active: false,
-} as ManualProviderRouteEntity;
+};
+
 interface Props {
   provider: ProviderEntity;
 }
+
 const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   const [newRow, setNewRow] = useState(false);
   const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.MANUAL);
@@ -46,12 +52,11 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
           Add route
         </Button>
       )}
-
       <Box display="flex" flexDirection="column" flex={1} style={{ gap: theme.spacing(2) }}>
         {newRow && (
           <ManualRouteShortView
             provider={provider}
-            route={defaultItem}
+            route={defaultItem as ManualProviderRouteEntity}
             isAddMode
             onCancel={() => setNewRow(false)}
             addItem={item =>

@@ -5,8 +5,10 @@ import { Currency } from '../../Payment';
 import Destination from '../Destination';
 
 interface ProviderRouteEntity extends Entity {
-  id: string;
   type: ProviderRoutesType;
+  active: boolean;
+  validity: RouteValidity | null;
+  description: string;
 }
 
 export interface RouteValidity {
@@ -17,10 +19,6 @@ export interface RouteValidity {
 export interface AutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.AUTOMATIC;
   version: string; //work as id
-  updatedAt: Date;
-  validity: RouteValidity | null;
-  description: string;
-  active: boolean;
 }
 
 export type PriceRange = { max: Price; min: Price };
@@ -38,15 +36,15 @@ export interface ManualProviderRouteEntity extends ProviderRouteEntity {
   priceRange: PriceRange;
   pricePerContainer: PricePerContainer;
   currency: Currency;
-  active: boolean;
 }
 
 export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.SEMI_AUTOMATIC;
   origin: Destination;
   transportMode: string;
-  active: boolean;
 }
+
+export type Route = AutomaticProviderRouteEntity & ManualProviderRouteEntity;
 
 export type PricePerContainer = {
   [key in keyof typeof EquipmentControlContainerTypes]: Price;

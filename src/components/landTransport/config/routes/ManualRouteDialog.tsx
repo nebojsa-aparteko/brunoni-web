@@ -1,45 +1,60 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   AppBar,
   Box,
   Button,
   Dialog,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Slide,
-  TableContainer,
   TextField,
   Toolbar,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import ArrowForward from '@material-ui/icons/ArrowForward';
 import { makeStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles';
 import { TransitionProps } from '@material-ui/core/transitions';
 import {
   getPriceRangeText,
   ManualProviderRouteEntity,
+  ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
-import EditingInput from '../../../EditingInput';
-import { get, set } from 'lodash/fp';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import EditIcon from '@material-ui/icons/Edit';
+import { keys, set } from 'lodash/fp';
 import { theme } from '../../../../theme';
 import Container from '../../../Container';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { TableRowData } from '../../../bookingRequests/BookingRequestSummary';
 import SectionWithTitle from '../../../SectionWithTitle';
 import { ManualRouteTablePricing } from './ManualRouteShortView';
 import ExtensionsContainer from '../extensions/ExtensionsContainer';
 import useAPI from '../../../../hooks/useAPI';
+import {
+  ActionButtons,
+  activateRoute,
+  Description,
+  getValidityInfo,
+  Status,
+  updateRoute,
+  Validity,
+} from './RouteDetailsModal';
+import { diff } from 'deep-object-diff';
+import InfoBoxItem from '../../../InfoBoxItem';
+import DateFormattedText from '../../../DateFormattedText';
+import ConfirmationDialog from '../../../ConfirmationDialog';
+import { deleteRoute } from './RoutesTable';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
     position: 'relative',
   },
-  title: {
-    marginLeft: theme.spacing(2),
-    flex: 1,
+  dialogContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: theme.spacing(3),
   },
 }));
 
@@ -52,9 +67,47 @@ interface Props {
 
 const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provider }) => {
   const classes = useStyles();
-  const [isEditing, setEditing] = useState(false);
   const [stateRoute, setStateRoute] = useState(route);
+
+  const [changed, setChanged] = useState(false);
+  const [isEditing, setEditing] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
+
   const { post } = useAPI();
+
+  useEffect(() => {
+    const difference = diff(route, stateRoute);
+    const isChanged = keys(difference).length > 0;
+    setChanged(isChanged);
+  }, [route, stateRoute]);
+
+  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    setEditing(false);
+    await updateRoute(provider.id, {
+      ...route,
+      ...stateRoute,
+      active: false,
+    });
+    setLoading(false);
+  };
+
+  const handleDeleteRoute = async () => {
+    setLoading(true);
+    await deleteManualRoutes(provider, [route.id]);
+    setLoading(false);
+    setIsDeleteDialogOpen(false);
+    closeModal();
+  };
+
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const key = event.target?.name;
     const value = event.target.value;
@@ -68,41 +121,56 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
       setStateRoute(prevState => set(name, value)(prevState));
     }
   };
+
   return (
     <Dialog open={isOpen} fullScreen onClose={closeModal} TransitionComponent={Transition}>
       <AppBar className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h4" className={classes.title}>
-            {provider.name} - Manual route
-          </Typography>
-          <IconButton edge="start" color="inherit" onClick={closeModal} aria-label="close">
-            <CloseIcon />
-          </IconButton>
+          <Box width={'100%'} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center">
+              <Typography variant={'h3'} color={'inherit'}>
+                {`${provider.name} - Manual Route`}
+              </Typography>
+            </Box>
+            <IconButton onClick={closeModal} color="inherit">
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
       <Container>
-        <Box display="flex" flexDirection="column" style={{ gap: theme.spacing(2) }}>
-          <Box display="flex" justifyContent="space-between" my={2}>
-            <Box display="flex" alignItems="center">
-              <FiberManualRecordIcon color={stateRoute.active ? 'secondary' : 'error'} />
-              <Typography> Active route</Typography>
-            </Box>
-            <Box display="flex" alignItems="center">
-              <IconButton>
-                <EditIcon />
-              </IconButton>
-              <IconButton>
-                <DeleteIcon />
-              </IconButton>
-            </Box>
+        <DialogTitle disableTypography>
+          <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+            <Status
+              editing={isEditing}
+              active={route.active}
+              disabled={!isValid}
+              disabledMessage={validityMessage}
+              handleChangeActive={handleChangeActive}
+            />
+            <ActionButtons
+              editing={isEditing}
+              handleEdit={() => setEditing(true)}
+              handleCancel={() => {
+                setStateRoute(route);
+                setEditing(false);
+              }}
+              handleDelete={() => setIsDeleteDialogOpen(true)}
+              showSaveButton={changed}
+              handleSave={handleSave}
+              loading={loading}
+              title={'Save changes'}
+            />
           </Box>
+        </DialogTitle>
+        <DialogContent className={classes.dialogContent}>
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => {
-              post(
+            onClick={async () => {
+              await post(
                 'landTransport/saveRoute',
-                Object.entries(route.pricePerContainer).map(([ctgType, price]) => ({
+                Object.entries(route.pricePerContainer).map(([_, price]) => ({
                   fromLocationName: route.origin,
                   toLocationName: route.destination,
                   curr: route.currency,
@@ -122,93 +190,166 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
           >
             Save into db
           </Button>
-          <Button variant="outlined" color="primary" style={{ alignSelf: 'center' }}>
-            Valid from 01.01.2022. - 31.01.2022.
-          </Button>
-          <SectionWithTitle title="General info">
-            <Box display="flex">
-              <Box
-                display="flex"
-                flexDirection="column"
-                justifyContent="space-between"
-                alignItems="flex-start"
-                flex={1}
-              >
-                <TableContainer>
-                  <TableRowData
-                    label={'Origin'}
-                    content={
-                      <EditingInput
-                        editing={isEditing}
-                        inputProps={{
-                          variant: 'outlined',
-                          label: 'Origin',
-                          name: 'origin',
-                          onChange: handleInputChange,
-                        }}
-                        typographyProps={{
-                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                        }}
-                        value={get('origin')(stateRoute)}
-                      />
-                    }
-                  />
-
-                  <TableRowData
-                    label={'Destination'}
-                    content={
-                      <EditingInput
-                        editing={isEditing}
-                        inputProps={{
-                          variant: 'outlined',
-                          name: 'destination',
-                          onChange: handleInputChange,
-                        }}
-                        typographyProps={{
-                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                        }}
-                        value={get('destination')(stateRoute)}
-                      />
-                    }
-                  />
-                  <TableRowData
-                    label={'Transport Mode'}
-                    content={
-                      <EditingInput
-                        editing={isEditing}
-                        inputProps={{
-                          variant: 'outlined',
-                          name: 'transportMode',
-                          onChange: handleInputChange,
-                        }}
-                        typographyProps={{
-                          style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
-                        }}
-                        value={get('transportMode')(stateRoute)}
-                      />
-                    }
-                  />
-                </TableContainer>
+          <Box display="flex" flexDirection="column" width={'100%'} style={{ gap: '16px' }}>
+            <SectionWithTitle
+              title="General info"
+              ActionElement={<Typography variant="h4">{getPriceRangeText(stateRoute.priceRange)}</Typography>}
+            >
+              <Box display="flex">
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  flex={1}
+                >
+                  <Box display="flex" flexDirection="column" style={{ gap: theme.spacing(5) }}>
+                    <Box display="flex" alignItems="center" style={{ gap: theme.spacing(5) }}>
+                      <Box>
+                        <InfoBoxItem label1={'Created At'} label2={<DateFormattedText date={route.createdAt} />} />
+                      </Box>
+                      <Box>
+                        <InfoBoxItem label1={'Last Updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                      </Box>
+                    </Box>
+                    <Box display="flex" alignItems="center" style={{ gap: theme.spacing(10) }}>
+                      <Box>
+                        <InfoBoxItem
+                          title={'Origin'}
+                          titleVariant={'h5'}
+                          label1={
+                            <EditableTextItem
+                              editing={isEditing}
+                              value={stateRoute.origin}
+                              Element={
+                                <TextField
+                                  variant="outlined"
+                                  margin="dense"
+                                  name={'origin'}
+                                  fullWidth
+                                  value={stateRoute.origin}
+                                  onChange={handleInputChange}
+                                />
+                              }
+                            />
+                          }
+                        />
+                      </Box>
+                      <ArrowForward />
+                      <Box>
+                        <InfoBoxItem
+                          title={'Destination'}
+                          titleVariant={'h5'}
+                          label1={
+                            <EditableTextItem
+                              editing={isEditing}
+                              value={stateRoute.destination}
+                              Element={
+                                <TextField
+                                  variant="outlined"
+                                  margin="dense"
+                                  name={'destination'}
+                                  fullWidth
+                                  value={stateRoute.destination}
+                                  onChange={handleInputChange}
+                                />
+                              }
+                            />
+                          }
+                        />
+                      </Box>
+                      <Box>
+                        <InfoBoxItem
+                          title={'Transport Mode'}
+                          titleVariant={'h5'}
+                          label1={
+                            <EditableTextItem
+                              editing={isEditing}
+                              value={stateRoute.transportMode}
+                              Element={
+                                <TextField
+                                  variant="outlined"
+                                  margin="dense"
+                                  name={'transportMode'}
+                                  fullWidth
+                                  value={stateRoute.transportMode}
+                                  onChange={handleInputChange}
+                                />
+                              }
+                            />
+                          }
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
-              <Typography variant="h4">{getPriceRangeText(stateRoute.priceRange)}</Typography>
-            </Box>
-            <ManualRouteTablePricing
-              route={stateRoute}
-              handleInputChange={handleInputChange}
-              handleSelectChange={handleSelectChange}
-              isEditing={isEditing}
+            </SectionWithTitle>
+            <SectionWithTitle title={'Pricing'}>
+              <ManualRouteTablePricing
+                route={stateRoute}
+                handleInputChange={handleInputChange}
+                handleSelectChange={handleSelectChange}
+                isEditing={isEditing}
+              />
+            </SectionWithTitle>
+            <Validity
+              validity={route.validity}
+              validityState={stateRoute.validity}
+              handleChange={newValidity => setStateRoute(prev => ({ ...prev, validity: newValidity }))}
+              editing={isEditing}
+              hasValidity={hasValidity}
             />
-          </SectionWithTitle>
-          <SectionWithTitle title="Description">
-            <TextField variant="outlined" placeholder="Write some description here..." multiline rows={6} rowsMax={8} />
-          </SectionWithTitle>
-          <SectionWithTitle title="Extensions">
-            <ExtensionsContainer provider={provider} routeId={route.id} />
-          </SectionWithTitle>
-        </Box>
+            <Description
+              description={route.description}
+              descriptionState={stateRoute.description}
+              editing={isEditing}
+              handleChange={newDescription => setStateRoute(prev => ({ ...prev, description: newDescription }))}
+            />
+            <SectionWithTitle title="Extensions">
+              <ExtensionsContainer provider={provider} routeId={route.id} />
+            </SectionWithTitle>
+          </Box>
+        </DialogContent>
       </Container>
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        label={'Please confirm route deletion'}
+        handleConfirm={handleDeleteRoute}
+        handleClose={() => setIsDeleteDialogOpen(false)}
+        description={`Are you sure you want delete this route?`}
+        loading={loading}
+      />
     </Dialog>
   );
+};
+
+const deleteManualRoutes = async (provider: ProviderEntity, routeIds: string[]) => {
+  return Promise.all(
+    routeIds.map(async id => {
+      await deleteRoute(provider.id, id);
+    }),
+  );
+};
+
+interface EditableTextItemProps {
+  value: string;
+  editing: boolean;
+  Element: React.ReactElement | null;
+}
+
+// <TextField
+//   label={label}
+//   variant='outlined'
+//   margin='dense'
+//   name={name}
+//   fullWidth
+//   value={value}
+//   onChange={e => handleChange(e)}
+// />
+
+const EditableTextItem: React.FC<EditableTextItemProps> = ({ value, editing, Element }) => {
+  return editing ? Element : <>{value}</>;
 };
 
 export const Transition = React.forwardRef(function Transition(

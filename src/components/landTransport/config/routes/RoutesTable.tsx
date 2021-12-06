@@ -12,18 +12,18 @@ import { ProviderRoutesType } from '../../../../model/land-transport/providers/P
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import EmptyStatePanel from '../../../EmptyStatePanel';
 
-const deleteRoute = async (providerId: string, routeVersion: string) =>
+export const deleteRoute = async (providerId: string, routeId: string) =>
   await firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes`)
-    .doc(routeVersion)
+    .doc(routeId)
     .delete();
 
-const deleteVersionDocuments = async (providerId: string, routeVersion: string) => {
+const deleteVersionDocuments = async (providerId: string, routeId: string) => {
   return (
     await firebase
       .firestore()
-      .collection(`land-transport-config/${providerId}/routes/${routeVersion}/versionDocuments`)
+      .collection(`land-transport-config/${providerId}/routes/${routeId}/versionDocuments`)
       .get()
   ).docs.map(d => {
     const data = d.data() as ChecklistItemValueDocument;
@@ -32,16 +32,16 @@ const deleteVersionDocuments = async (providerId: string, routeVersion: string) 
   });
 };
 
-export const deleteRoutes = async (
+export const deleteAutomaticRoutes = async (
   provider: ProviderEntity,
-  routeVersions: string[],
+  routeIds: string[],
   deleteFiles: (files: string[]) => Promise<any>,
 ) => {
   return Promise.all(
-    routeVersions.map(async version => {
-      const documents = await deleteVersionDocuments(provider.id, version);
+    routeIds.map(async id => {
+      const documents = await deleteVersionDocuments(provider.id, id);
       await deleteFiles(documents.map(d => d.url));
-      await deleteRoute(provider.id, version);
+      await deleteRoute(provider.id, id);
     }),
   );
 };
@@ -77,7 +77,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
 
   const handleDeleteRoute = async () => {
     setLoading(true);
-    await deleteRoutes(provider, selectedRoutes, deleteFiles);
+    await deleteAutomaticRoutes(provider, selectedRoutes, deleteFiles);
     setLoading(false);
     setIsDeleteDialogOpen(false);
     setSelectedRoutes([]);

@@ -21,7 +21,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import ClearIcon from '@material-ui/icons/Clear';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import {
-  AutomaticProviderRoute,
+  AutomaticProviderRouteEntity,
+  ManualProviderRouteEntity,
   ProviderRoutesType,
   RouteValidity,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
@@ -50,8 +51,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { format, isFuture, isPast } from 'date-fns';
 import { useDropzone } from 'react-dropzone';
 import useUser from '../../../../hooks/useUser';
-import { deleteRoutes } from './RoutesTable';
 import { isNil } from 'lodash';
+import { deleteAutomaticRoutes } from './RoutesTable';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -66,7 +67,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const activateRoute = async (providerId: string, currentRouteVersion: string, active: boolean) => {
+export const activateRoute = async (
+  providerId: string,
+  routeType: ProviderRoutesType,
+  currentRouteId: string,
+  active: boolean,
+) => {
   const batch = firebase.firestore().batch();
   //Deactivate others only if activating current
   if (active) {
@@ -74,7 +80,7 @@ const activateRoute = async (providerId: string, currentRouteVersion: string, ac
       await firebase
         .firestore()
         .collection(`land-transport-config/${providerId}/routes`)
-        .where('type', '==', ProviderRoutesType.AUTOMATIC)
+        .where('type', '==', routeType)
         .where('active', '==', true)
         .get()
     ).docs.map(r => {
@@ -86,19 +92,22 @@ const activateRoute = async (providerId: string, currentRouteVersion: string, ac
     firebase
       .firestore()
       .collection(`land-transport-config/${providerId}/routes`)
-      .doc(currentRouteVersion),
+      .doc(currentRouteId),
     { active },
     { merge: true },
   );
   await batch.commit();
 };
 
-const updateRoute = async (providerId: string, route: AutomaticProviderRoute) => {
+export const updateRoute = async (
+  providerId: string,
+  route: AutomaticProviderRouteEntity | ManualProviderRouteEntity,
+) => {
   const updatedAt = firebase.firestore.Timestamp.fromDate(new Date());
   await firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes`)
-    .doc(route.version)
+    .doc(route.id)
     .set({ ...route, updatedAt }, { merge: true });
 };
 
@@ -110,7 +119,7 @@ const deleteVersionDocument = async (providerId: string, routeVersion: string, d
     .delete();
 
 interface Props {
-  route: AutomaticProviderRoute;
+  route: AutomaticProviderRouteEntity;
   provider: ProviderEntity;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   open: boolean;
@@ -173,12 +182,12 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, route.version, event.target.checked);
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.version, event.target.checked);
   };
 
   const handleDeleteVersion = async () => {
     setLoading(true);
-    await deleteRoutes(provider, [route.version], deleteFiles);
+    await deleteAutomaticRoutes(provider, [route.id], deleteFiles);
     setLoading(false);
     setIsDeleteDialogOpen(false);
     setOpen(false);
@@ -246,27 +255,16 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
             <Validity
               validity={route.validity}
               validityState={validityState}
-              setValidityState={setValidityState}
+              handleChange={setValidityState}
               editing={editing}
               hasValidity={hasValidity}
             />
-            <SectionWithTitle title="Description">
-              {editing ? (
-                <TextField
-                  placeholder="Write some description here..."
-                  variant="outlined"
-                  margin="dense"
-                  name="description"
-                  rows={8}
-                  multiline
-                  fullWidth
-                  value={descriptionState ? descriptionState : ''}
-                  onChange={e => setDescriptionState(e.target.value)}
-                />
-              ) : (
-                <Typography>{route.description !== '' ? route.description : 'No description'}</Typography>
-              )}
-            </SectionWithTitle>
+            <Description
+              description={route.description}
+              descriptionState={descriptionState}
+              editing={editing}
+              handleChange={setDescriptionState}
+            />
             <DocumentsContainer route={route} provider={provider} editing={editing} />
           </Box>
         </DialogContent>
@@ -283,28 +281,51 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   );
 };
 
+interface DescriptionProps {
+  description: string;
+  descriptionState: string;
+  editing: boolean;
+  handleChange: (newDescription: string) => void;
+}
+
+export const Description: React.FC<DescriptionProps> = ({ editing, descriptionState, description, handleChange }) => {
+  return (
+    <SectionWithTitle title="Description">
+      {editing ? (
+        <TextField
+          placeholder="Write some description here..."
+          variant="outlined"
+          margin="dense"
+          name="description"
+          rows={8}
+          multiline
+          fullWidth
+          value={descriptionState}
+          onChange={e => handleChange(e.target.value)}
+        />
+      ) : (
+        <Typography>{description !== '' ? description : 'No description'}</Typography>
+      )}
+    </SectionWithTitle>
+  );
+};
+
 interface ValidityProps {
   validity: RouteValidity | null;
   validityState: RouteValidity | null;
-  setValidityState: React.Dispatch<React.SetStateAction<RouteValidity | null>>;
+  handleChange: (newValidity: RouteValidity | null) => void;
   editing: boolean;
   hasValidity: boolean;
 }
 
-export const Validity: React.FC<ValidityProps> = ({
-  validity,
-  validityState,
-  setValidityState,
-  editing,
-  hasValidity,
-}) => {
+export const Validity: React.FC<ValidityProps> = ({ validity, validityState, handleChange, editing, hasValidity }) => {
   return (
     <SectionWithTitle
       title="Validity"
       ActionElement={
         validityState && editing ? (
           <Tooltip title={'Clear Validity'} placement={'top'}>
-            <IconButton onClick={() => setValidityState(null)}>
+            <IconButton onClick={() => handleChange(null)}>
               <ClearIcon />
             </IconButton>
           </Tooltip>
@@ -313,7 +334,7 @@ export const Validity: React.FC<ValidityProps> = ({
     >
       {editing ? (
         <DateRangeInput
-          onChange={dateRange => setValidityState(dateRange as RouteValidity)}
+          onChange={dateRange => handleChange(dateRange as RouteValidity)}
           value={validityState ? validityState : { startDate: undefined, endDate: undefined }}
         />
       ) : (
@@ -335,7 +356,7 @@ interface StatusProps {
   handleChangeActive: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {
+export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {
   return (
     <Box style={{ gap: '16px' }} display={'flex'} alignItems={'center'}>
       {active ? (
@@ -374,7 +395,7 @@ interface ActionButtonsProps extends SaveButtonProps {
   handleDelete: () => void;
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({
+export const ActionButtons: React.FC<ActionButtonsProps> = ({
   editing,
   showSaveButton,
   loading,
@@ -427,7 +448,7 @@ const useDocumentsContainerStyles = makeStyles(() => ({
 }));
 
 interface DocumentsContainerProps {
-  route: AutomaticProviderRoute;
+  route: AutomaticProviderRouteEntity;
   provider: ProviderEntity;
   editing: boolean;
 }
