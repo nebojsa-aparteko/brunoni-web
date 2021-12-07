@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tooltip, Typography } from '@material-ui/core';
 import formatDate from 'date-fns/format';
-import { formatDistanceToNowConfigured } from '../utilities/formattingHelpers';
+import { formatDateSafe, formatDistanceToNowConfigured } from '../utilities/formattingHelpers';
 
 const DateFormattedText: React.FC<Props> = ({ date }) => {
   const [isFullDateFormat, setIsFullDateFormat] = useState(false);
@@ -13,7 +13,7 @@ const DateFormattedText: React.FC<Props> = ({ date }) => {
         onClick={() => setIsFullDateFormat(prevState => !prevState)}
         style={{ cursor: 'default' }}
       >
-        {isFullDateFormat ? `${formatDate(date, 'dd.MM.yyyy HH:mm:ss')}` : `${formatDistanceToNowConfigured(date)}`}
+        {isFullDateFormat ? `${formatDateSafe(date, 'dd.MM.yyyy HH:mm:ss')}` : `${formatDistanceToNowConfigured(date)}`}
       </Typography>
     </Tooltip>
   );

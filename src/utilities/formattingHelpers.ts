@@ -20,4 +20,4 @@ export const formatDateSafe = (date: Date, dateFormat: DateFormats | string) => 
 };
 
 export const formatDistanceToNowConfigured = (date: Date) =>
-  formatDistanceToNow(date, { includeSeconds: true, addSuffix: true });
+  date ? formatDistanceToNow(date, { includeSeconds: true, addSuffix: true }) : '???';
