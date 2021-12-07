@@ -1,28 +1,99 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { LandTransportFilterContext } from './LandTransportFilterProvider';
 import { R } from '../components/landTransport/LandTransportSearch';
-import useUser from '../hooks/useUser';
+import useLandTransportLocations from '../hooks/useLandTransportLocations';
+import { debounce } from 'lodash/fp';
 
-export const LandTransportContext = createContext<
-  [R[], Dispatch<SetStateAction<R[]>>, string[], boolean, Dispatch<React.SetStateAction<boolean>>]
->([[], () => {}, [], false, () => {}]);
+interface LandTransportContextI {
+  filteredLandTransportRoutes: R[];
+  setLandTransportRoutes: Dispatch<SetStateAction<R[]>>;
+  fromLocationInputState: string;
+  setFromLocationInputState: React.Dispatch<React.SetStateAction<string>>;
+  toLocationInputState: string;
+  setToLocationInputState: React.Dispatch<React.SetStateAction<string>>;
+  fromLocations: string[];
+  toLocations: string[];
+  loadingLocations: boolean;
+  setLoadingLocations: Dispatch<React.SetStateAction<boolean>>;
+  loadingRoutes: boolean;
+  setLoadingRoutes: Dispatch<React.SetStateAction<boolean>>;
+}
+
+const INITIAL_STATE = {
+  filteredLandTransportRoutes: [],
+  setLandTransportRoutes: () => {},
+  fromLocationInputState: '',
+  setFromLocationInputState: () => {},
+  toLocationInputState: '',
+  setToLocationInputState: () => {},
+  fromLocations: [],
+  toLocations: [],
+  loadingLocations: false,
+  setLoadingLocations: () => {},
+  loadingRoutes: false,
+  setLoadingRoutes: () => {},
+};
+
+export const LandTransportContext = createContext<LandTransportContextI>(INITIAL_STATE);
 const LandTransportProvider: React.FC = ({ children }) => {
-  const [loading, setLoading] = useState(false);
-  const [state, setState] = useState<R[]>([]);
-  const [locations, setLocations] = useState<string[]>([]);
-  const [user] = useUser();
-  useEffect(() => {
-    user
-      .getIdToken()
-      .then(token => getAllLocations(token))
-      .then(setLocations)
-      .finally(() => console.log('Got Locations'));
-  }, [user]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+  const [landTransportRoutes, setLandTransportRoutes] = useState<R[]>([]);
+
+  const [fromLocationInputState, setFromLocationInputState] = useState('');
+  const [fromLocations, setFromLocations] = useState<string[]>([]);
+
+  const [toLocationInputState, setToLocationInputState] = useState('');
+  const [toLocations, setToLocations] = useState<string[]>([]);
 
   const [filters] = useContext(LandTransportFilterContext);
+  const { getLocationsByName } = useLandTransportLocations();
 
-  const filteredRoutes = useMemo(() => {
-    let temp = state;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getFromLocations = useCallback(
+    debounce(500)(() => {
+      if (fromLocationInputState.length >= 2) {
+        setLoadingLocations(true);
+        getLocationsByName(fromLocationInputState)
+          .then(setFromLocations)
+          .finally(() => setLoadingLocations(false));
+      }
+    }),
+    [fromLocationInputState],
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getToLocations = useCallback(
+    debounce(500)(() => {
+      if (toLocationInputState.length >= 2) {
+        setLoadingLocations(true);
+        getLocationsByName(toLocationInputState)
+          .then(setToLocations)
+          .finally(() => setLoadingLocations(false));
+      }
+    }),
+    [toLocationInputState],
+  );
+
+  useEffect(() => {
+    getFromLocations();
+  }, [getFromLocations]);
+
+  useEffect(() => {
+    getToLocations();
+  }, [getToLocations]);
+
+  const filteredLandTransportRoutes = useMemo(() => {
+    let temp = landTransportRoutes;
     if (filters.transportModes.some(value => value.checked)) {
       temp = temp.filter(value =>
         value.props.transportMode.some(p =>
@@ -55,39 +126,27 @@ const LandTransportProvider: React.FC = ({ children }) => {
     }
     console.log('Filtering not transportModes');
     return temp;
-  }, [state, filters]);
+  }, [landTransportRoutes, filters]);
   return (
-    <LandTransportContext.Provider value={[filteredRoutes, setState, locations, loading, setLoading]}>
+    <LandTransportContext.Provider
+      value={{
+        filteredLandTransportRoutes,
+        setLandTransportRoutes,
+        fromLocationInputState,
+        setFromLocationInputState,
+        toLocationInputState,
+        setToLocationInputState,
+        fromLocations,
+        toLocations,
+        loadingLocations,
+        setLoadingLocations,
+        loadingRoutes,
+        setLoadingRoutes,
+      }}
+    >
       {children}
     </LandTransportContext.Provider>
   );
 };
 
 export default LandTransportProvider;
-
-const getAllLocations = async (token: string): Promise<string[]> => {
-  try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/landTransport/allLocations`, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      const body = await response.json();
-      console.error(`Failed to request`, response, body);
-      return [];
-    }
-  } catch (e) {
-    console.error('Failed to perform request', e);
-    return [];
-  }
-};

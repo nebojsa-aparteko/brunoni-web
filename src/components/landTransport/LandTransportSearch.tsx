@@ -85,18 +85,18 @@ const LandTransportSearch = () => {
 
   const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
 
-  const [, setLandTransport, , loading, setLoading] = useContext(LandTransportContext);
+  const { setLandTransportRoutes, loadingRoutes, setLoadingRoutes } = useContext(LandTransportContext);
   const [, setFilters] = useContext(LandTransportFilterContext);
   const [user] = useUser();
 
   const handleSearch = async (data: LandTransportRouteSearchParams) => {
-    setLoading(true);
+    setLoadingRoutes(true);
     const token = await user.getIdToken();
     const results = await getLandTransportRecords(token, data.from, data.to);
     const filters = getRespectiveFilters(results);
     setFilters(filters);
-    setLandTransport(results);
-    setLoading(false);
+    setLandTransportRoutes(results);
+    setLoadingRoutes(false);
   };
 
   return (
@@ -107,7 +107,7 @@ const LandTransportSearch = () => {
       </Box>
       <Box className={classes.body}>
         <LandTransportSearchBar />
-        <LoadingButton loading={loading} handleClick={handleSubmit(handleSearch)} />
+        <LoadingButton loading={loadingRoutes} handleClick={handleSubmit(handleSearch)} />
       </Box>
     </Paper>
   );
