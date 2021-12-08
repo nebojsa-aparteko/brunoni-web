@@ -50,6 +50,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  borderCell: {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    paddingLeft: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+  },
   tableRow: {
     '& td, th': {
       whiteSpace: 'nowrap',
@@ -72,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const LandTransportFare: React.FC<DetailsProps> = ({ grouped }) => {
   const classes = useStyles();
-
+  console.log(grouped);
   return (
     <Paper className={classes.paperRoot}>
       <Box className={classes.container}>
@@ -100,6 +105,22 @@ const FareHeader: React.FC = () => {
   );
 };
 
+const Connector = () => {
+  return (
+    <Box
+      display={'flex'}
+      flexDirection={'column'}
+      alignItems={'center'}
+      width={'100%'}
+      alignSelf={'flexStart'}
+      pb={2.5}
+    >
+      <Typography>Operator name</Typography>
+      <StepConnector style={{ width: '100%' }} />
+    </Box>
+  );
+};
+
 const FareBody: React.FC<SegmentsEntity> = ({
   start: {
     properties: { name: startName },
@@ -115,7 +136,7 @@ const FareBody: React.FC<SegmentsEntity> = ({
 
   return (
     <Box flexGrow={1}>
-      <Stepper connector={<StepConnector />}>
+      <Stepper connector={<Connector />}>
         <Step>
           <StepLabel className={classes.firstLabel} icon={<FiberManualRecordIcon />}>
             <Box className={classes.container}>
@@ -209,7 +230,7 @@ const GroupedByType: React.FC<DetailsProps> = ({ grouped }) => {
     <Grid container spacing={2} direction="row">
       {groupedByTypeKeys.map(key => (
         <Grid item key={key} md={6}>
-          <Details grouped={groupedByContainerType[key]} />
+          {groupedByContainerType[key].length > 0 && <Details grouped={groupedByContainerType[key]} />}
         </Grid>
       ))}
     </Grid>
@@ -249,7 +270,7 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
             <TableCell>Weight Range</TableCell>
             <TableCell>Currency</TableCell>
             <TableCell>Cost Value</TableCell>
-            <TableCell>Container type</TableCell>
+            <TableCell className={classes.borderCell}>Cost Unit</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -271,7 +292,7 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
                 <TableCell component="th" scope="row">
                   {properties.rate}
                 </TableCell>
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" className={classes.borderCell}>
                   {`per ${containerType}`}
                 </TableCell>
               </TableRow>
