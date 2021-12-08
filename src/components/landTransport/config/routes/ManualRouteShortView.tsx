@@ -148,7 +148,12 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
                 onClick={event => {
                   event.preventDefault();
                   event.stopPropagation();
-                  isAddMode ? onCancel?.() : setEditing(false);
+                  if (isAddMode) {
+                    onCancel?.();
+                  } else {
+                    setStateRoute(route);
+                    setEditing(false);
+                  }
                 }}
               >
                 <CloseIcon />

@@ -30,6 +30,7 @@ import Destination from '../../model/land-transport/Destination';
 import useModal from '../../hooks/useModal';
 import useDistanceBetweenCities from '../../hooks/useDistanceBetweenCities';
 import { drop, flow, get, has, omit, set, sortBy, take } from 'lodash/fp';
+import { useLandTransportSemiAutomaticContext } from '../../providers/LandTransportSemiAutomaticProvider';
 
 const useStyles = makeStyles(() => ({
   closeModal: {
@@ -182,8 +183,17 @@ interface Props {
 
 const RoutesMultiInput: React.FC<Props> = ({ startingDestination, isEditing }) => {
   const { openModal, closeModal, isOpen } = useModal();
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const selectedRoutes = [];
+  const [selectedRoutes] = useLandTransportSemiAutomaticContext();
+  const selectedCountries = useMemo(
+    () =>
+      selectedRoutes.reduce((previousValue, currentValue) => {
+        if (!previousValue.includes(currentValue.countryCode)) {
+          previousValue.push(currentValue.countryCode);
+        }
+        return previousValue;
+      }, [] as string[]),
+    [selectedRoutes],
+  );
   return (
     <Box display="flex" flexDirection="row">
       {isEditing ? (
@@ -230,13 +240,13 @@ const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, i
   // get routes
   const distances = useDistanceBetweenCities(countryId, startCityId);
 
-  const [selectedDistances, setSelectedDistances] = useState<RouteFromCity[]>([]);
+  const [selectedDistances, setSelectedDistances] = useLandTransportSemiAutomaticContext();
   const [checkedAvailableRoutes, setCheckedAvailableRoutes] = useState<SelectedItems>({});
   const [checkedSelectedRoutes, setCheckedSelectedRoutes] = useState<SelectedItems>({});
-  const filteredDistances = useMemo(() => distances?.filter(val => !selectedDistances.includes(val)), [
-    distances,
-    selectedDistances,
-  ]);
+  const filteredDistances = useMemo(
+    () => distances?.filter(val => selectedDistances.findIndex(value => val.id === value.id) === -1),
+    [distances, selectedDistances],
+  );
   const handleCheck = (value: RouteFromCity, direction: 'left' | 'right') => {
     (direction === 'left' ? setCheckedAvailableRoutes : setCheckedSelectedRoutes)(prevState => {
       if (has(value.id)(prevState)) {

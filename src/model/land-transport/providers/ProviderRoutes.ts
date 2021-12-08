@@ -3,6 +3,7 @@ import Entity from '../../Entity';
 import { EquipmentControlContainerTypes } from '../../EquipmentControl';
 import { Currency } from '../../Payment';
 import Destination from '../Destination';
+import RouteFromCity from '../../RouteFromCity';
 
 interface ProviderRouteEntity extends Entity {
   type: ProviderRoutesType;
@@ -42,6 +43,7 @@ export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.SEMI_AUTOMATIC;
   origin: Destination;
   transportMode: string;
+  selectedRoutes: RouteFromCity[];
 }
 
 export type Route = AutomaticProviderRouteEntity & ManualProviderRouteEntity;

@@ -12,13 +12,11 @@ import {
   deleteLandTransportPricelist,
   editLandTransportPricelist,
 } from '../../../api/landTransportConfig';
-import useLandTransportPricelists from '../../../hooks/useLandTransportPricelists';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import EditableTable, { CellType } from '../../EditableTable';
 import { capitalCase } from 'change-case';
 import FirestoreCollectionProvider from '../../../providers/FirestoreCollection';
 import Countries from '../../../contexts/Countries';
-import RouteFromCity from '../../../model/RouteFromCity';
 import useLandTransportRoutes from '../../../hooks/useLandTransportRoutes';
 import {
   ProviderRoutesType,
@@ -32,9 +30,7 @@ import Destination from '../../../model/land-transport/Destination';
 import AddIcon from '@material-ui/icons/Add';
 import theme from '../../../theme';
 import CloseIcon from '@material-ui/icons/Close';
-import EditIcon from '@material-ui/icons/Edit';
-import { SeparatorArrow } from '../../vesselWithVoyage/VesselVoyageItem';
-import RoutesMultiInput from '../../inputs/RoutesMultiInuput';
+import SemiAutomaticRouteRow from './routes/SemiAutomaticRouteRow';
 
 const defaultExportPricelistItem = {
   pricePerContainer: {},
@@ -106,32 +102,6 @@ const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists
     />
   );
 };
-const savePricelistRoutes = async (
-  provider: ProviderEntity,
-  selectedRoutes: RouteFromCity[],
-  selectedPricelists: {
-    exportPricelistEntities: ProviderPricelistEntity[];
-    importPricelistEntities: ProviderPricelistEntity[];
-  },
-) => {
-  // const pricelistIds = selectedPricelists.exportPricelistEntities
-  //   .map(p => p.id)
-  //   .concat(selectedPricelists.importPricelistEntities.map(p => p.id));
-  // const promises = flatten(
-  //   pricelistIds.map(async id => {
-  //     const ref = firebase
-  //       .firestore()
-  //       .collection(`land-transport-config`)
-  //       .doc(provider.id)
-  //       .collection('pricelist')
-  //       .doc(id)
-  //       .collection('routes');
-  //
-  //     return Promise.all(selectedRoutes.map(route => ref.doc(route.id).set(route, { merge: true })));
-  //   }),
-  // );
-  // return Promise.all(promises);
-};
 
 interface Props {
   provider: ProviderEntity;
@@ -141,20 +111,6 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
     provider.id,
     ProviderRoutesType.SEMI_AUTOMATIC,
   );
-  //
-  // const handleSavePricelistRoutes = async (selectedRoutes: RouteFromCity[]) => {
-  //   return savePricelistRoutes(provider, selectedRoutes, pricelists)
-  //     .then(() => {
-  //       dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Successfully saved pricelists!', duration: 2500 });
-  //     })
-  //     .catch(e => {
-  //       dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: e, duration: 3500 });
-  //     })
-  //     .finally(() => {
-  //       console.log('Saved');
-  //       return;
-  //     });
-  // };
   const [destination, setSelectedDestination] = useState<Destination | null>(null);
   const [newRow, setNewRow] = useState(false);
   return (
@@ -218,89 +174,6 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
         )}
       </Box>
     </FirestoreCollectionProvider>
-  );
-};
-
-interface SemiAutomaticRouteRowProps {
-  provider: ProviderEntity;
-  route: SemiAutomaticProviderRouteEntity;
-}
-
-const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, provider }) => {
-  const priceLists = useLandTransportPricelists(provider.id, route.id);
-  const [isEditing, setEditing] = useState(false);
-  const [destination, setSelectedDestination] = useState<Destination>(route.origin);
-  const handleSavePricelistRoutes = async () => {};
-  return (
-    <Box
-      border={1}
-      p={2}
-      borderRadius={5}
-      borderColor="primary"
-      display="flex"
-      flexDirection="row"
-      alignItems="center"
-      justifyContent="space-between"
-    >
-      <Box display="flex" flexDirection="row" alignItems="center">
-        <CityInput
-          isEditing={isEditing}
-          onSelect={(value, path) => setSelectedDestination(prevState => set(path, value)(prevState))}
-          origin={destination}
-        />
-        <SeparatorArrow />
-        <RoutesMultiInput isEditing={isEditing} startingDestination={destination} />
-      </Box>
-      {isEditing ? (
-        <Box display="flex">
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              setEditing(false);
-            }}
-          >
-            <CheckIcon />
-          </IconButton>
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              setEditing(false);
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      ) : (
-        <Box>
-          <IconButton
-            onClick={event => {
-              event.preventDefault();
-              event.stopPropagation();
-              setEditing(true);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        </Box>
-      )}
-
-      {/*<PricelistTable*/}
-      {/*  route={route}*/}
-      {/*  tableTitle="Export"*/}
-      {/*  provider={provider}*/}
-      {/*  pricelists={priceLists?.exportPricelistEntities}*/}
-      {/*  category={ProviderPricelistCategory.EXPORT}*/}
-      {/*/>*/}
-      {/*<PricelistTable*/}
-      {/*  route={route}*/}
-      {/*  tableTitle="Import"*/}
-      {/*  provider={provider}*/}
-      {/*  pricelists={priceLists?.importPricelistEntities}*/}
-      {/*  category={ProviderPricelistCategory.IMPORT}*/}
-      {/*/>*/}
-    </Box>
   );
 };
 
