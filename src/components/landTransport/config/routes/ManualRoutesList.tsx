@@ -6,6 +6,7 @@ import {
   ManualProviderRoute,
   ManualProviderRouteEntity,
   PricePerContainer,
+  PriceRange,
   ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import theme from '../../../../theme';
@@ -111,8 +112,8 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   );
 };
 
-const getRangePricesByContainer = (priceByContainer: PricePerContainer, currency: Currency) => {
-  if (!priceByContainer) return undefined;
+const getRangePricesByContainer = (priceByContainer: PricePerContainer, currency: Currency): PriceRange | null => {
+  if (!priceByContainer) return null;
   return Object.values(priceByContainer).reduce(
     (previousValue, currentValue, index) => {
       if (index === 0)

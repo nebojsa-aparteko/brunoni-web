@@ -49,13 +49,13 @@ const landTransportRouteDocRef = (providerId: string, routeId: string) =>
     .doc(routeId);
 
 export const addLandTransportRoute = (providerId: string, route: ProviderRoute) =>
-  landTransportRouteRef(providerId).add({ ...route, createdAt: new Date() });
+  landTransportRouteRef(providerId).add({ ...route, createdAt: new Date(), updatedAt: new Date() });
 
 export const editLandTransportRoute = (providerId: string, routeId: string, route: ProviderRoute) =>
-  landTransportRouteDocRef(providerId, routeId).set(route, { merge: true });
+  landTransportRouteDocRef(providerId, routeId).set({ ...route, updatedAt: new Date() }, { merge: true });
 
-export const deleteLandTransportRoute = (providerId: string, routeId: string) =>
-  landTransportRouteDocRef(providerId, routeId).delete();
+export const deleteLandTransportRoute = async (providerId: string, routeId: string) =>
+  await landTransportRouteDocRef(providerId, routeId).delete();
 
 // Pricelist
 const landTransportPriceListRef = (providerId: string, routeId: string) =>

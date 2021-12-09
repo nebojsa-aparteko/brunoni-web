@@ -164,8 +164,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
               title={'Save changes'}
             />
           </Box>
-
-          </DialogTitle>
+        </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <Button
             variant="outlined"
@@ -196,7 +195,11 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
           <Box display="flex" flexDirection="column" width={'100%'} style={{ gap: '16px' }}>
             <SectionWithTitle
               title="General info"
-              ActionElement={<Typography variant="h4">{getPriceRangeText(stateRoute.priceRange)}</Typography>}
+              ActionElement={
+                <Typography variant="h4">
+                  {stateRoute.priceRange ? getPriceRangeText(stateRoute.priceRange) : 'Not defined'}
+                </Typography>
+              }
             >
               <Box display="flex">
                 <Box
@@ -351,7 +354,7 @@ interface EditableTextItemProps {
 //   onChange={e => handleChange(e)}
 // />
 
-const EditableTextItem: React.FC<EditableTextItemProps> = ({ value, editing, Element }) => {
+export const EditableTextItem: React.FC<EditableTextItemProps> = ({ value, editing, Element }) => {
   return editing ? Element : <>{value}</>;
 };
 

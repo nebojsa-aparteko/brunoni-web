@@ -8,7 +8,7 @@ import RoutesTable from './routes/RoutesTable';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router';
 import ManualRoutesList from './routes/ManualRoutesList';
-import PricelistConfig from './PricelistConfig';
+import PriceListConfig from './PricelistConfig';
 import ProfitTables from './ProfitTables';
 import SectionWithTitle from '../../SectionWithTitle';
 
@@ -51,7 +51,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
         </SectionWithTitle>
 
         <SectionWithTitle title="Semi-automatic routes">
-          <PricelistConfig provider={provider} />
+          <PriceListConfig provider={provider} />
         </SectionWithTitle>
 
         <SectionWithTitle title="Manual routes">

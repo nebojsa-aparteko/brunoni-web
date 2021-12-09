@@ -31,6 +31,11 @@ import AddIcon from '@material-ui/icons/Add';
 import theme from '../../../theme';
 import CloseIcon from '@material-ui/icons/Close';
 import SemiAutomaticRouteRow from './routes/SemiAutomaticRouteRow';
+import InfoBoxItem from '../../InfoBoxItem';
+import { EditableTextItem } from './routes/ManualRouteDialog';
+import TransportModeInput from '../../inputs/TransportModeInput';
+import { SeparatorArrow } from '../../vesselWithVoyage/VesselVoyageItem';
+import RoutesMultiInput from '../../inputs/RoutesMultiInuput';
 
 const defaultExportPricelistItem = {
   pricePerContainer: {},
@@ -67,7 +72,7 @@ export const containersCells = Object.keys(EquipmentControlContainerTypes).map(v
   },
 })) as CellType[];
 
-const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category, route }) => {
+const PriceListTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category, route }) => {
   return (
     <EditableTable
       tableTitle={tableTitle}
@@ -106,12 +111,14 @@ const PricelistTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists
 interface Props {
   provider: ProviderEntity;
 }
-const PricelistConfig: React.FC<Props> = ({ provider }) => {
+
+const PriceListConfig: React.FC<Props> = ({ provider }) => {
   const routes = useLandTransportRoutes<SemiAutomaticProviderRouteEntity>(
     provider.id,
     ProviderRoutesType.SEMI_AUTOMATIC,
   );
-  const [destination, setSelectedDestination] = useState<Destination | null>(null);
+  const [originState, setOriginState] = useState<Destination | null>(null);
+  const [transportModeState, setTransportModeState] = useState<string | null>(null);
   const [newRow, setNewRow] = useState(false);
   return (
     <FirestoreCollectionProvider name="countries" context={Countries}>
@@ -131,32 +138,56 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
         </Button>
         {newRow && (
           <Box display="flex" flexDirection="row" flex={1} justifyContent="space-between">
-            <CityInput
-              isEditing={true}
-              onSelect={(value, path) =>
-                setSelectedDestination(prevState =>
-                  set(path, value)(prevState && value ? prevState : ({} as Destination)),
-                )
-              }
-              origin={destination}
-            />
+            <Box display="flex" flexDirection="row" alignItems="center">
+              <CityInput
+                isEditing={true}
+                onSelect={(value, path) =>
+                  setOriginState(prevState => set(path, value)(prevState && value ? prevState : ({} as Destination)))
+                }
+                origin={originState}
+              />
+              <SeparatorArrow />
+              <RoutesMultiInput isEditing={true} startingDestination={originState} />
+            </Box>
+            <Box width={'15%'}>
+              <EditableTextItem
+                editing={true}
+                value={transportModeState || ''}
+                Element={
+                  <TransportModeInput
+                    value={transportModeState}
+                    label={'Transport Mode'}
+                    onChange={transportMode => setTransportModeState(transportMode)}
+                  />
+                }
+              />
+            </Box>
             <Box>
               <IconButton
                 onClick={() => {
                   addLandTransportRoute(provider.id, {
                     type: ProviderRoutesType.SEMI_AUTOMATIC,
                     active: false,
-                    origin: destination,
-                    transportMode: 'Barge',
+                    origin: originState,
+                    transportMode: transportModeState,
+                    selectedRoutes: [],
+                    validity: null,
+                    description: '',
                   } as SemiAutomaticProviderRoute).then(() => {
                     setNewRow(false);
-                    setSelectedDestination(null);
+                    setOriginState(null);
+                    setTransportModeState(null);
                   });
                 }}
               >
                 <CheckIcon />
               </IconButton>
-              <IconButton onClick={() => setNewRow(false)}>
+              <IconButton
+                onClick={() => {
+                  setNewRow(false);
+                  setOriginState(null);
+                }}
+              >
                 <CloseIcon />
               </IconButton>
             </Box>
@@ -177,4 +208,4 @@ const PricelistConfig: React.FC<Props> = ({ provider }) => {
   );
 };
 
-export default PricelistConfig;
+export default PriceListConfig;

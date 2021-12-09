@@ -178,10 +178,10 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
 
 interface Props {
   isEditing: boolean;
-  startingDestination?: Destination;
+  startingDestination: Destination | null;
 }
 
-const RoutesMultiInput: React.FC<Props> = ({ startingDestination, isEditing }) => {
+export const RoutesMultiInput: React.FC<Props> = ({ startingDestination, isEditing }) => {
   const { openModal, closeModal, isOpen } = useModal();
   const [selectedRoutes] = useLandTransportSemiAutomaticContext();
   const selectedCountries = useMemo(

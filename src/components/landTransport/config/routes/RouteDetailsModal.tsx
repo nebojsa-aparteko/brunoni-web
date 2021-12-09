@@ -25,6 +25,7 @@ import {
   ManualProviderRouteEntity,
   ProviderRoutesType,
   RouteValidity,
+  SemiAutomaticProviderRouteEntity,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import useRouteVersionDocs from '../../../../hooks/useRouteVersionDocs';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
@@ -102,7 +103,7 @@ export const activateRoute = async (
 
 export const updateRoute = async (
   providerId: string,
-  route: AutomaticProviderRouteEntity | ManualProviderRouteEntity,
+  route: AutomaticProviderRouteEntity | ManualProviderRouteEntity | SemiAutomaticProviderRouteEntity,
 ) => {
   const updatedAt = new Date();
   await firebase

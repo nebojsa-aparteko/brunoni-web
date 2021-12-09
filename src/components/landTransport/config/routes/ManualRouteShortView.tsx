@@ -123,7 +123,7 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             variant="h5"
             style={{ whiteSpace: 'nowrap', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}
           >
-            {getPriceRangeText(route.priceRange)}
+            {route.priceRange ? getPriceRangeText(route.priceRange) : 'Not defined'}
           </Typography>
           <Status
             editing={isEditing}

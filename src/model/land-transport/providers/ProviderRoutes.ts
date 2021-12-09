@@ -34,15 +34,15 @@ export interface ManualProviderRouteEntity extends ProviderRouteEntity {
   origin: string;
   destination: string;
   transportMode: string;
-  priceRange: PriceRange;
+  priceRange: PriceRange | null;
   pricePerContainer: PricePerContainer;
   currency: Currency;
 }
 
 export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
   type: ProviderRoutesType.SEMI_AUTOMATIC;
-  origin: Destination;
-  transportMode: string;
+  origin: Destination | null;
+  transportMode: string | null;
   selectedRoutes: RouteFromCity[];
 }
 
@@ -58,9 +58,9 @@ export enum ProviderRoutesType {
   SEMI_AUTOMATIC = 'SEMI_AUTOMATIC',
 }
 
-export type ProviderRoute = Omit<ProviderRouteEntity, 'id' | 'createdAt'>;
+export type ProviderRoute = Omit<ProviderRouteEntity, 'id' | 'createdAt' | 'updatedAt'>;
 export type ManualProviderRoute = Omit<ManualProviderRouteEntity, 'id' | 'createdAt'>;
 export type AutomaticProviderRoute = Omit<AutomaticProviderRouteEntity, 'id'>;
-export type SemiAutomaticProviderRoute = Omit<SemiAutomaticProviderRouteEntity, 'id' | 'createdAt'>;
+export type SemiAutomaticProviderRoute = Omit<SemiAutomaticProviderRouteEntity, 'id' | 'createdAt' | 'updatedAt'>;
 
 export default ProviderRouteEntity;

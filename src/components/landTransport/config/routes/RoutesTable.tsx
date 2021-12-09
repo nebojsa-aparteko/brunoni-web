@@ -130,7 +130,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5}>
+                <TableCell colSpan={6}>
                   <EmptyStatePanel />
                 </TableCell>
               </TableRow>
