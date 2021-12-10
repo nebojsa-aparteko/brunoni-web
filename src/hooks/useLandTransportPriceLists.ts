@@ -5,7 +5,7 @@ import ProviderPricelistEntity, {
 } from '../model/land-transport/providers/ProviderPricelists';
 import { useCallback } from 'react';
 
-const useLandTransportPricelists = (providerId: string, routeId: string) => {
+const useLandTransportPriceLists = (providerId: string, routeId: string) => {
   const landTransportProfitsRef = useFirestoreCollection(
     `land-transport-config/${providerId}/routes/${routeId}/price-list`,
     useCallback(collection => collection.orderBy('category', 'asc').orderBy('distance', 'asc'), []),
@@ -34,4 +34,4 @@ const useLandTransportPricelists = (providerId: string, routeId: string) => {
     ) as { exportPricelistEntities: ProviderPricelistEntity[]; importPricelistEntities: ProviderPricelistEntity[] };
 };
 
-export default useLandTransportPricelists;
+export default useLandTransportPriceLists;
