@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Box,
+  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -50,6 +51,7 @@ import CityInput from '../../../inputs/CityInput';
 import City from '../../../../model/City';
 import Country from '../../../../model/Country';
 import { deleteLandTransportRoute } from '../../../../api/landTransportConfig';
+import { useLandTransportSemiAutomaticContext } from '../../../../providers/LandTransportSemiAutomaticProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -77,6 +79,8 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
   const classes = useStyles();
   const [stateRoute, setStateRoute] = useState(route);
 
+  const [selectedRoutes, setSelectedRoutes] = useLandTransportSemiAutomaticContext();
+
   const [changed, setChanged] = useState(false);
   const [isEditing, setEditing] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -86,17 +90,18 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
   const [confirmationType, setConfirmationType] = useState<ConfirmationType | null>(null);
 
   useEffect(() => {
+    const selectedRoutesDiff = diff(route.selectedRoutes, selectedRoutes);
     const difference = diff(omit(omittedField)(route), omit(omittedField)(stateRoute));
-    const isChanged = keys(difference).length > 0;
+    const isChanged = keys(difference).length > 0 || keys(selectedRoutesDiff).length > 0;
     setChanged(isChanged);
-  }, [route, stateRoute]);
+  }, [route, selectedRoutes, stateRoute]);
 
   const handleSave = async () => {
     setLoading(true);
     setEditing(false);
     await updateRoute(provider.id, {
-      ...route,
       ...stateRoute,
+      selectedRoutes,
       active: false,
     });
     const validityDifference = route.validity
@@ -198,6 +203,7 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
               handleEdit={() => setEditing(true)}
               handleCancel={() => {
                 setStateRoute(route);
+                setSelectedRoutes([]);
                 setEditing(false);
               }}
               handleDelete={() => {
@@ -259,7 +265,7 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
                       }
                     />
                   </Box>
-                  <Box width={'15%'}>
+                  <Box width={'20%'}>
                     <InfoBoxItem
                       title={'Transport Mode'}
                       titleVariant={'h5'}
@@ -375,15 +381,14 @@ const SelectedRoutesCollection: React.FC<SelectedRoutesCollectionProps> = ({ sel
   const groupedByCountryCodes = groupBy(selectedRoutes, 'countryCode') as Dictionary<RouteFromCity[]>;
   const groupedByCountryCodesKeys = Object.keys(groupedByCountryCodes);
 
-  console.log({ groupedByCountryCodes, groupedByCountryCodesKeys });
   return (
     <Box display={'flex'} flexDirection={'column'}>
       {groupedByCountryCodesKeys.map(key => (
         <SectionWithTitle key={key} title={getOr(key, key, CountryCodes)}>
           <Grid container spacing={1}>
             {groupedByCountryCodes[key].map(city => (
-              <Grid key={city.id} item xs={2}>
-                <Typography>{city.name}</Typography>
+              <Grid key={city.id} item>
+                <Chip label={city.name} />
               </Grid>
             ))}
           </Grid>

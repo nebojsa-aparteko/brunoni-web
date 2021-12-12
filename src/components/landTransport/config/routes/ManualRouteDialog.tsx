@@ -46,6 +46,7 @@ import InfoBoxItem from '../../../InfoBoxItem';
 import DateFormattedText from '../../../DateFormattedText';
 import ConfirmationDialog from '../../../ConfirmationDialog';
 import { deleteRoute } from './RoutesTable';
+import TransportModeInput from '../../../inputs/TransportModeInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -306,22 +307,21 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                           }
                         />
                       </Box>
-                      <Box>
+                      <Box width={'30%'}>
                         <InfoBoxItem
                           title={'Transport Mode'}
                           titleVariant={'h5'}
                           label1={
                             <EditableTextItem
                               editing={isEditing}
-                              value={stateRoute.transportMode}
+                              value={stateRoute.transportMode || 'Not defined'}
                               Element={
-                                <TextField
-                                  variant="outlined"
-                                  margin="dense"
-                                  name={'transportMode'}
-                                  fullWidth
+                                <TransportModeInput
+                                  label={''}
                                   value={stateRoute.transportMode}
-                                  onChange={handleInputChange}
+                                  onChange={transportMode =>
+                                    setStateRoute(prevState => set('transportMode', transportMode)(prevState))
+                                  }
                                 />
                               }
                             />
