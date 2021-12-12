@@ -46,7 +46,7 @@ export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
   selectedRoutes: RouteFromCity[];
 }
 
-export type Route = AutomaticProviderRouteEntity & ManualProviderRouteEntity;
+export type Route = AutomaticProviderRouteEntity & ManualProviderRouteEntity & SemiAutomaticProviderRouteEntity;
 
 export type PricePerContainer = {
   [key in keyof typeof EquipmentControlContainerTypes]: Price;

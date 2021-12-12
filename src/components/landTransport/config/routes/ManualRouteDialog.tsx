@@ -33,8 +33,10 @@ import useAPI from '../../../../hooks/useAPI';
 import {
   ActionButtons,
   activateRoute,
+  ConfirmationType,
   Description,
   getValidityInfo,
+  handleActivationLogic,
   Status,
   updateRoute,
   Validity,
@@ -75,9 +77,9 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
   const [isEditing, setEditing] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationType, setConfirmationType] = useState<ConfirmationType | null>(null);
 
   const { post } = useAPI();
 
@@ -87,10 +89,6 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
     setChanged(isChanged);
   }, [route, stateRoute]);
 
-  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
-  };
-
   const handleSave = async () => {
     setLoading(true);
     setEditing(false);
@@ -99,15 +97,53 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
       ...stateRoute,
       active: false,
     });
+    const validityDifference = route.validity
+      ? diff(route.validity, stateRoute.validity ? stateRoute.validity : {})
+      : {};
+    if (keys(validityDifference).length === 0) return setLoading(false);
+
+    const { activate, activationMessage } = await handleActivationLogic(
+      provider.id,
+      route.id,
+      ProviderRoutesType.AUTOMATIC,
+      stateRoute.validity,
+    );
+    if (activate) {
+      setConfirmationMessage(activationMessage!);
+      setConfirmationType(ConfirmationType.UPDATE);
+      setIsConfirmationDialogOpen(true);
+    }
     setLoading(false);
+  };
+
+  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
   };
 
   const handleDeleteRoute = async () => {
     setLoading(true);
     await deleteManualRoutes(provider, [route.id]);
     setLoading(false);
-    setIsDeleteDialogOpen(false);
+    setIsConfirmationDialogOpen(false);
     closeModal();
+  };
+
+  const handleCancelConfirmation = async () => {
+    setIsConfirmationDialogOpen(false);
+  };
+
+  const handleConfirmDialog = async () => {
+    setLoading(true);
+    switch (confirmationType) {
+      case ConfirmationType.UPDATE:
+        await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, true);
+        break;
+      case ConfirmationType.DELETE:
+        await handleDeleteRoute();
+        break;
+    }
+    setLoading(false);
+    setIsConfirmationDialogOpen(false);
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -123,6 +159,8 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
       setStateRoute(prevState => set(name, value)(prevState));
     }
   };
+
+  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
 
   return (
     <Dialog open={isOpen} fullScreen onClose={closeModal} TransitionComponent={Transition}>
@@ -157,7 +195,11 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                 setStateRoute(route);
                 setEditing(false);
               }}
-              handleDelete={() => setIsDeleteDialogOpen(true)}
+              handleDelete={() => {
+                setConfirmationMessage('Are you sure you want delete this route?');
+                setConfirmationType(ConfirmationType.DELETE);
+                setIsConfirmationDialogOpen(true);
+              }}
               showSaveButton={changed}
               handleSave={handleSave}
               loading={loading}
@@ -319,11 +361,11 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
         </DialogContent>
       </Container>
       <ConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        label={'Please confirm route deletion'}
-        handleConfirm={handleDeleteRoute}
-        handleClose={() => setIsDeleteDialogOpen(false)}
-        description={`Are you sure you want delete this route?`}
+        isOpen={isConfirmationDialogOpen}
+        label={'Please confirm'}
+        handleConfirm={handleConfirmDialog}
+        handleClose={handleCancelConfirmation}
+        description={confirmationMessage}
         loading={loading}
       />
     </Dialog>

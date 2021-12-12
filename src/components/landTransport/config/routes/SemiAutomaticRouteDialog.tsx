@@ -7,14 +7,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Paper,
   Popover,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Toolbar,
   Typography,
 } from '@material-ui/core';
@@ -31,8 +24,10 @@ import Container from '../../../Container';
 import {
   ActionButtons,
   activateRoute,
+  ConfirmationType,
   Description,
   getValidityInfo,
+  handleActivationLogic,
   Status,
   updateRoute,
   Validity,
@@ -82,24 +77,19 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
   const classes = useStyles();
   const [stateRoute, setStateRoute] = useState(route);
 
-  const [loading, setLoading] = useState<boolean>(false);
-
   const [changed, setChanged] = useState(false);
   const [isEditing, setEditing] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationType, setConfirmationType] = useState<ConfirmationType | null>(null);
 
   useEffect(() => {
     const difference = diff(omit(omittedField)(route), omit(omittedField)(stateRoute));
     const isChanged = keys(difference).length > 0;
     setChanged(isChanged);
   }, [route, stateRoute]);
-
-  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
-  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -109,15 +99,53 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
       ...stateRoute,
       active: false,
     });
+    const validityDifference = route.validity
+      ? diff(route.validity, stateRoute.validity ? stateRoute.validity : {})
+      : {};
+    if (keys(validityDifference).length === 0) return setLoading(false);
+
+    const { activate, activationMessage } = await handleActivationLogic(
+      provider.id,
+      route.id,
+      ProviderRoutesType.AUTOMATIC,
+      stateRoute.validity,
+    );
+    if (activate) {
+      setConfirmationMessage(activationMessage!);
+      setConfirmationType(ConfirmationType.UPDATE);
+      setIsConfirmationDialogOpen(true);
+    }
     setLoading(false);
+  };
+
+  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
   };
 
   const handleDeleteRoute = async () => {
     setLoading(true);
     await deleteLandTransportRoute(provider.id, route.id);
     setLoading(false);
-    setIsDeleteDialogOpen(false);
+    setIsConfirmationDialogOpen(false);
     closeModal();
+  };
+
+  const handleCancelConfirmation = async () => {
+    setIsConfirmationDialogOpen(false);
+  };
+
+  const handleConfirmDialog = async () => {
+    setLoading(true);
+    switch (confirmationType) {
+      case ConfirmationType.UPDATE:
+        await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, true);
+        break;
+      case ConfirmationType.DELETE:
+        await handleDeleteRoute();
+        break;
+    }
+    setLoading(false);
+    setIsConfirmationDialogOpen(false);
   };
 
   const handleCityInput = (value: City | Country | null, path: keyof Destination) => {
@@ -130,6 +158,8 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
       };
     });
   };
+
+  const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
 
   return (
     <Dialog
@@ -170,7 +200,11 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
                 setStateRoute(route);
                 setEditing(false);
               }}
-              handleDelete={() => setIsDeleteDialogOpen(true)}
+              handleDelete={() => {
+                setConfirmationMessage('Are you sure you want delete this route?');
+                setConfirmationType(ConfirmationType.DELETE);
+                setIsConfirmationDialogOpen(true);
+              }}
               showSaveButton={changed}
               handleSave={handleSave}
               loading={loading}
@@ -266,11 +300,11 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
         </DialogContent>
       </Container>
       <ConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        label={'Please confirm route deletion'}
-        handleConfirm={handleDeleteRoute}
-        handleClose={() => setIsDeleteDialogOpen(false)}
-        description={`Are you sure you want delete this route?`}
+        isOpen={isConfirmationDialogOpen}
+        label={'Please confirm'}
+        handleConfirm={handleConfirmDialog}
+        handleClose={handleCancelConfirmation}
+        description={confirmationMessage}
         loading={loading}
       />
     </Dialog>

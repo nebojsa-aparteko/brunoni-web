@@ -2,13 +2,17 @@ import { Provider } from '../model/land-transport/providers/Provider';
 import firebase from '../firebase';
 import { ProviderProfit } from '../model/land-transport/providers/ProviderProfit';
 import { ProviderPricelist } from '../model/land-transport/providers/ProviderPricelists';
-import { ProviderRoute } from '../model/land-transport/providers/ProviderRoutes';
+import ProviderRouteEntity, {
+  ProviderRoute,
+  ProviderRoutesType,
+} from '../model/land-transport/providers/ProviderRoutes';
 import {
   OfferProviderConfig,
   ProviderExtensionEntity,
   ProviderExtensionGroup,
 } from '../model/land-transport/providers/ProviderConfig';
-import { isNil, omitBy } from 'lodash/fp';
+import { flow, isNil, omitBy, update } from 'lodash/fp';
+import normalizeFirestoreDate from '../utilities/normalizeFirestoreDate';
 
 const landTransportRef = firebase.firestore().collection('land-transport-config');
 
@@ -40,6 +44,29 @@ export const deleteLandTransportProfit = (providerId: string, profitId: string) 
   landTransportProfitDocRef(providerId, profitId).delete();
 
 // Routes
+export const hasActiveRoute = async (providerId: string, routeType: ProviderRoutesType) => {
+  const routes = await firebase
+    .firestore()
+    .collection(`/land-transport-config/${providerId}/routes`)
+    .where('type', '==', routeType)
+    .where('active', '==', true)
+    .get();
+  const hasActive = routes.size === 1;
+  return hasActive
+    ? {
+        hasActive: true,
+        activeRoute: flow(
+          update('createdAt', normalizeFirestoreDate),
+          update('updatedAt', normalizeFirestoreDate),
+          update('validity.startDate', normalizeFirestoreDate),
+          update('validity.endDate', normalizeFirestoreDate),
+        )(routes.docs[0].data()) as ProviderRouteEntity,
+      }
+    : {
+        hasActive: false,
+        activeRoute: null,
+      };
+};
 const landTransportRouteRef = (providerId: string) =>
   firebase.firestore().collection(`land-transport-config/${providerId}/routes`);
 const landTransportRouteDocRef = (providerId: string, routeId: string) =>

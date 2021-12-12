@@ -49,11 +49,12 @@ import { diff } from 'deep-object-diff';
 import { keys } from 'lodash/fp';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { format, isFuture, isPast } from 'date-fns';
+import { format, isAfter, isFuture, isPast } from 'date-fns';
 import { useDropzone } from 'react-dropzone';
 import useUser from '../../../../hooks/useUser';
 import { isNil } from 'lodash';
 import { deleteAutomaticRoutes } from './RoutesTable';
+import { hasActiveRoute } from '../../../../api/landTransportConfig';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -120,13 +121,6 @@ const deleteVersionDocument = async (providerId: string, routeVersion: string, d
     .doc(documentId)
     .delete();
 
-interface Props {
-  route: AutomaticProviderRouteEntity;
-  provider: ProviderEntity;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  open: boolean;
-}
-
 export const getValidityInfo = (validity: RouteValidity | null) => {
   const hasValidity = !isNil(validity) && !isNil(validity.startDate) && !isNil(validity.endDate);
   const isValid = hasValidity && isPast(validity!.startDate) && isFuture(validity!.endDate);
@@ -146,6 +140,18 @@ export const getValidityInfo = (validity: RouteValidity | null) => {
   };
 };
 
+export enum ConfirmationType {
+  DELETE = 'DELETE',
+  UPDATE = 'UPDATE',
+}
+
+interface Props {
+  route: AutomaticProviderRouteEntity;
+  provider: ProviderEntity;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  open: boolean;
+}
+
 const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) => {
   const classes = useStyles();
 
@@ -156,7 +162,9 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationType, setConfirmationType] = useState<ConfirmationType | null>(null);
 
   const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
@@ -180,6 +188,20 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
       validity: validityState,
       active: false,
     });
+    const validityDifference = route.validity ? diff(route.validity, validityState ? validityState : {}) : {};
+    if (keys(validityDifference).length === 0) return setLoading(false);
+
+    const { activate, activationMessage } = await handleActivationLogic(
+      provider.id,
+      route.id,
+      ProviderRoutesType.AUTOMATIC,
+      validityState,
+    );
+    if (activate) {
+      setConfirmationMessage(activationMessage!);
+      setConfirmationType(ConfirmationType.UPDATE);
+      setIsConfirmationDialogOpen(true);
+    }
     setLoading(false);
   };
 
@@ -191,8 +213,26 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
     setLoading(true);
     await deleteAutomaticRoutes(provider, [route.id], deleteFiles);
     setLoading(false);
-    setIsDeleteDialogOpen(false);
+    setIsConfirmationDialogOpen(false);
     setOpen(false);
+  };
+
+  const handleCancelConfirmation = async () => {
+    setIsConfirmationDialogOpen(false);
+  };
+
+  const handleConfirmDialog = async () => {
+    setLoading(true);
+    switch (confirmationType) {
+      case ConfirmationType.UPDATE:
+        await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, true);
+        break;
+      case ConfirmationType.DELETE:
+        await handleDeleteVersion();
+        break;
+    }
+    setLoading(false);
+    setIsConfirmationDialogOpen(false);
   };
 
   const { hasValidity, isValid, validityMessage } = getValidityInfo(route.validity);
@@ -231,7 +271,11 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
                 setDescriptionState(route.description);
                 setEditing(false);
               }}
-              handleDelete={() => setIsDeleteDialogOpen(true)}
+              handleDelete={() => {
+                setConfirmationMessage('Are you sure you want delete this version?');
+                setConfirmationType(ConfirmationType.DELETE);
+                setIsConfirmationDialogOpen(true);
+              }}
               showSaveButton={changed}
               handleSave={handleSave}
               loading={loading}
@@ -272,11 +316,11 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
         </DialogContent>
       </Container>
       <ConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        label={'Please confirm version deletion'}
-        handleConfirm={handleDeleteVersion}
-        handleClose={() => setIsDeleteDialogOpen(false)}
-        description={`Are you sure you want delete this version?`}
+        isOpen={isConfirmationDialogOpen}
+        label={'Please confirm'}
+        handleConfirm={handleConfirmDialog}
+        handleClose={handleCancelConfirmation}
+        description={confirmationMessage}
         loading={loading}
       />
     </Dialog>
@@ -310,6 +354,40 @@ export const Description: React.FC<DescriptionProps> = ({ editing, descriptionSt
       )}
     </SectionWithTitle>
   );
+};
+
+export const handleActivationLogic = async (
+  providerId: string,
+  routeId: string,
+  routeType: ProviderRoutesType,
+  validity: RouteValidity | null,
+): Promise<{
+  activate: boolean;
+  activationMessage?: string;
+}> => {
+  if (!validity) return { activate: false };
+
+  const isCurrentlyValid = isPast(validity.startDate) && isFuture(validity.endDate);
+  if (!isCurrentlyValid) return { activate: false };
+
+  const { hasActive, activeRoute } = await hasActiveRoute(providerId, routeType);
+  if (hasActive) {
+    const activeHasLongerPeriod = isAfter(activeRoute!.validity!.endDate, validity.endDate);
+    if (activeHasLongerPeriod) return { activate: false }; //keep same active
+    return {
+      activate: true,
+      activationMessage: `This route has longer end date (ends at: ${format(validity.endDate, 'dd-MM-yyyy')})
+       than currently active route (ends at: ${format(
+         activeRoute!.validity!.endDate,
+         'dd-MM-yyyy',
+       )}). Would you like to activate current route instead?`,
+    };
+  } else {
+    return {
+      activate: true,
+      activationMessage: `There is no active route. Would you like to activate current?`,
+    };
+  }
 };
 
 interface ValidityProps {
