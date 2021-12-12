@@ -73,7 +73,7 @@ interface Props {
   provider: ProviderEntity;
 }
 
-const omittedField = ['active'];
+const omittedField = ['active', 'updatedAt'];
 
 const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provider }) => {
   const classes = useStyles();
