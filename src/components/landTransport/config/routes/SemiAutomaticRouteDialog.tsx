@@ -112,7 +112,7 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
     const { activate, activationMessage } = await handleActivationLogic(
       provider.id,
       route.id,
-      ProviderRoutesType.AUTOMATIC,
+      ProviderRoutesType.SEMI_AUTOMATIC,
       stateRoute.validity,
     );
     if (activate) {
@@ -124,7 +124,7 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
+    await activateRoute(provider.id, ProviderRoutesType.SEMI_AUTOMATIC, route.id, event.target.checked);
   };
 
   const handleDeleteRoute = async () => {
@@ -143,7 +143,7 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
     setLoading(true);
     switch (confirmationType) {
       case ConfirmationType.UPDATE:
-        await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, true);
+        await activateRoute(provider.id, ProviderRoutesType.SEMI_AUTOMATIC, route.id, true);
         break;
       case ConfirmationType.DELETE:
         await handleDeleteRoute();

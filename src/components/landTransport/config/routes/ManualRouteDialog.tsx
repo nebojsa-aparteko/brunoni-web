@@ -36,7 +36,6 @@ import {
   ConfirmationType,
   Description,
   getValidityInfo,
-  handleActivationLogic,
   Status,
   updateRoute,
   Validity,
@@ -47,6 +46,7 @@ import DateFormattedText from '../../../DateFormattedText';
 import ConfirmationDialog from '../../../ConfirmationDialog';
 import { deleteRoute } from './RoutesTable';
 import TransportModeInput from '../../../inputs/TransportModeInput';
+import { TypographyProps } from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -93,32 +93,20 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
   const handleSave = async () => {
     setLoading(true);
     setEditing(false);
+    //Manual route can have multiple active
     await updateRoute(provider.id, {
-      ...route,
       ...stateRoute,
       active: false,
     });
-    const validityDifference = route.validity
-      ? diff(route.validity, stateRoute.validity ? stateRoute.validity : {})
-      : {};
-    if (keys(validityDifference).length === 0) return setLoading(false);
-
-    const { activate, activationMessage } = await handleActivationLogic(
-      provider.id,
-      route.id,
-      ProviderRoutesType.AUTOMATIC,
-      stateRoute.validity,
-    );
-    if (activate) {
-      setConfirmationMessage(activationMessage!);
-      setConfirmationType(ConfirmationType.UPDATE);
-      setIsConfirmationDialogOpen(true);
-    }
     setLoading(false);
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
+    //Manual route can have multiple active
+    await updateRoute(provider.id, {
+      ...stateRoute,
+      active: event.target.checked,
+    });
   };
 
   const handleDeleteRoute = async () => {
@@ -137,7 +125,7 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
     setLoading(true);
     switch (confirmationType) {
       case ConfirmationType.UPDATE:
-        await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, true);
+        await activateRoute(provider.id, ProviderRoutesType.MANUAL, route.id, true);
         break;
       case ConfirmationType.DELETE:
         await handleDeleteRoute();
@@ -384,20 +372,16 @@ interface EditableTextItemProps {
   value: string;
   editing: boolean;
   Element: React.ReactElement | null;
+  typographyProps?: TypographyProps;
 }
 
-// <TextField
-//   label={label}
-//   variant='outlined'
-//   margin='dense'
-//   name={name}
-//   fullWidth
-//   value={value}
-//   onChange={e => handleChange(e)}
-// />
-
-export const EditableTextItem: React.FC<EditableTextItemProps> = ({ value, editing, Element }) => {
-  return editing ? Element : <>{value}</>;
+export const EditableTextItem: React.FC<EditableTextItemProps> = ({
+  value,
+  editing,
+  Element,
+  typographyProps = true,
+}) => {
+  return editing ? Element : <Typography {...typographyProps}>{value}</Typography>;
 };
 
 export const Transition = React.forwardRef(function Transition(

@@ -28,10 +28,11 @@ import { EquipmentControlContainerTypes } from '../../../../model/EquipmentContr
 import { Currency } from '../../../../model/Payment';
 import EditIcon from '@material-ui/icons/Edit';
 import useModal from '../../../../hooks/useModal';
-import ManualRouteDialog from './ManualRouteDialog';
+import ManualRouteDialog, { EditableTextItem } from './ManualRouteDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import { activateRoute, getValidityInfo, Status } from './RouteDetailsModal';
+import TransportModeInput from '../../../inputs/TransportModeInput';
 
 interface Props {
   route: ManualProviderRouteEntity;
@@ -108,16 +109,17 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
             value={get('destination')(stateRoute)}
           />
-          <EditingInput
+          <EditableTextItem
             editing={isEditing}
-            inputProps={{
-              variant: 'outlined',
-              label: 'Transport mode',
-              name: 'transportMode',
-              onChange: handleInputChange,
-            }}
+            value={stateRoute.transportMode || 'Not defined'}
             typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
-            value={get('transportMode')(stateRoute)}
+            Element={
+              <TransportModeInput
+                label={''}
+                value={stateRoute.transportMode}
+                onChange={transportMode => setStateRoute(prevState => set('transportMode', transportMode)(prevState))}
+              />
+            }
           />
           <Typography
             variant="h5"
