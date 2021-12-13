@@ -31,7 +31,6 @@ import AddIcon from '@material-ui/icons/Add';
 import theme from '../../../theme';
 import CloseIcon from '@material-ui/icons/Close';
 import SemiAutomaticRouteRow from './routes/SemiAutomaticRouteRow';
-import InfoBoxItem from '../../InfoBoxItem';
 import { EditableTextItem } from './routes/ManualRouteDialog';
 import TransportModeInput from '../../inputs/TransportModeInput';
 import { SeparatorArrow } from '../../vesselWithVoyage/VesselVoyageItem';
@@ -72,7 +71,7 @@ export const containersCells = Object.keys(EquipmentControlContainerTypes).map(v
   },
 })) as CellType[];
 
-const PriceListTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category, route }) => {
+export const PriceListTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category, route }) => {
   return (
     <EditableTable
       tableTitle={tableTitle}

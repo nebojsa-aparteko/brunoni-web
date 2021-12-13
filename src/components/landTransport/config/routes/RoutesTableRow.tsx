@@ -9,6 +9,7 @@ import palette from '../../../../theme/palette';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import green from '@material-ui/core/colors/green';
 import { isNil } from 'lodash';
+import { formatDateSafe } from '../../../../utilities/formattingHelpers';
 
 const useStyles = makeStyles({
   tableRow: {
@@ -50,8 +51,8 @@ const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, select
             : 'Not defined'}
         </Typography>
       </TableCell>
-      <TableCell>{format(route.createdAt, 'dd-MM-yyyy HH:mm')}</TableCell>
-      <TableCell>{format(route.updatedAt, 'dd-MM-yyyy HH:mm')}</TableCell>
+      <TableCell>{formatDateSafe(route.createdAt, 'dd-MM-yyyy HH:mm')}</TableCell>
+      <TableCell>{formatDateSafe(route.updatedAt, 'dd-MM-yyyy HH:mm')}</TableCell>
       <TableCell>
         {route.active ? (
           <FiberManualRecordIcon style={{ color: green[500], verticalAlign: 'middle' }} />

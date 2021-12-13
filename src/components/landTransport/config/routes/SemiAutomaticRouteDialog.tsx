@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  Divider,
   Grid,
   IconButton,
   Popover,
@@ -51,6 +52,9 @@ import CityInput from '../../../inputs/CityInput';
 import City from '../../../../model/City';
 import Country from '../../../../model/Country';
 import { deleteLandTransportRoute } from '../../../../api/landTransportConfig';
+import { PriceListTable } from '../PricelistConfig';
+import { ProviderPricelistCategory } from '../../../../model/land-transport/providers/ProviderPricelists';
+import useLandTransportPriceLists from '../../../../hooks/useLandTransportPriceLists';
 import { useLandTransportSemiAutomaticContext } from '../../../../providers/LandTransportSemiAutomaticProvider';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -78,6 +82,8 @@ const omittedField = ['active', 'updatedAt'];
 const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provider }) => {
   const classes = useStyles();
   const [stateRoute, setStateRoute] = useState(route);
+
+  const priceList = useLandTransportPriceLists(provider.id, route.id);
 
   const [selectedRoutes, setSelectedRoutes] = useLandTransportSemiAutomaticContext();
 
@@ -296,6 +302,23 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
               editing={isEditing}
               hasValidity={hasValidity}
             />
+            <SectionWithTitle title="Pricing">
+              <PriceListTable
+                route={route}
+                provider={provider}
+                tableTitle="Export Pricing"
+                category={ProviderPricelistCategory.EXPORT}
+                pricelists={priceList?.exportPricelistEntities}
+              />
+              <Divider />
+              <PriceListTable
+                route={route}
+                provider={provider}
+                tableTitle="Import Pricing"
+                category={ProviderPricelistCategory.IMPORT}
+                pricelists={priceList?.importPricelistEntities}
+              />
+            </SectionWithTitle>
             <Description
               description={route.description}
               descriptionState={stateRoute.description}
