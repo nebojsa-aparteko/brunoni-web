@@ -38,8 +38,6 @@ const LandTransportSearchBar: React.FC = () => {
     loadingLocations,
   } = useContext(LandTransportContext);
 
-  console.log({ fromLocations, toLocations });
-
   const getNoOptionsText = (locationInputState: string) => {
     return locationInputState.length < 2 ? 'Please enter at least 2 characters' : 'No location found';
   };

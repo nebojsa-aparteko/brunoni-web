@@ -1,12 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import {
+  AppBar,
   Box,
   Button,
+  Dialog,
+  DialogContent,
   Divider,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
   Grid,
+  IconButton,
   makeStyles,
   Paper,
   Step,
@@ -20,6 +24,7 @@ import {
   TableHead,
   TableRow,
   Theme,
+  Toolbar,
   Tooltip,
   Typography,
 } from '@material-ui/core';
@@ -31,6 +36,15 @@ import { TransportModeLabels, TransportModeType } from '../../model/land-transpo
 import { groupBy } from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import BookNowButton from '../BookNowButton';
+import useAPI from '../../hooks/useAPI';
+import useLandTransportProvider from '../../hooks/useLandTransportProvider';
+import useModal from '../../hooks/useModal';
+import useLandTransportExtensions from '../../hooks/useLandTransportExtensions';
+import CloseIcon from '@material-ui/icons/Close';
+import EditableTable from '../EditableTable';
+import { Currency } from '../../model/Payment';
+import { capitalCase } from 'change-case';
+import theme from '../../theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   paperRoot: {
@@ -73,11 +87,20 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginLeft: theme.spacing(1),
     },
   },
+  appBar: {
+    position: 'relative',
+  },
+  dialogContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    padding: theme.spacing(3),
+  },
 }));
 
 const LandTransportFare: React.FC<DetailsProps> = ({ grouped }) => {
   const classes = useStyles();
-  console.log(grouped);
   return (
     <Paper className={classes.paperRoot}>
       <Box className={classes.container}>
@@ -105,7 +128,8 @@ const FareHeader: React.FC = () => {
   );
 };
 
-const Connector = () => {
+const Connector = ({ provider: providerId }: { provider: string }) => {
+  const provider = useLandTransportProvider(providerId);
   return (
     <Box
       display={'flex'}
@@ -115,7 +139,7 @@ const Connector = () => {
       alignSelf={'flexStart'}
       pb={2.5}
     >
-      <Typography>Operator name</Typography>
+      <Typography> {provider.name || 'Hamburg Süd'}</Typography>
       <StepConnector style={{ width: '100%' }} />
     </Box>
   );
@@ -129,14 +153,14 @@ const FareBody: React.FC<SegmentsEntity> = ({
     properties: { name: endName },
   },
   relationship: {
-    properties: { transportMode },
+    properties: { transportMode, provider },
   },
 }) => {
   const classes = useStyles();
 
   return (
     <Box flexGrow={1}>
-      <Stepper connector={<Connector />}>
+      <Stepper connector={<Connector provider={provider} />}>
         <Step>
           <StepLabel className={classes.firstLabel} icon={<FiberManualRecordIcon />}>
             <Box className={classes.container}>
@@ -300,20 +324,126 @@ const Details: React.FC<DetailsProps> = ({ grouped }) => {
           })}
         </TableBody>
       </Table>
-      <DetailsActionButtons />
+      <DetailsActionButtons grouped={grouped} />
     </Box>
   );
 };
 
-const DetailsActionButtons: React.FC = () => {
+const DetailsActionButtons: React.FC<DetailsProps> = ({ grouped }) => {
   const classes = useStyles();
+  const { post } = useAPI();
+  const { openModal, closeModal, isOpen } = useModal();
   return (
     <Box display="flex" alignItems="center" justifyContent="flex-end" className={classes.buttons}>
-      <Button color="primary" variant="outlined" size="small" onClick={() => console.log('more')}>
+      <Button color="primary" variant="outlined" size="small" onClick={openModal}>
         View more
       </Button>
-      <BookNowButton bookNow={() => console.log('booked')} />
+      <BookNowButton bookNow={() => post('landTransport/bookNow', grouped)} />
+      {isOpen && (
+        <DetailedRoute
+          providerId={grouped?.[0].props.provider?.[0]}
+          routeId={grouped?.[0].props.route?.[0]}
+          isOpen={isOpen}
+          closeModal={closeModal}
+        />
+      )}
     </Box>
+  );
+};
+
+const DetailedRoute = ({
+  providerId,
+  routeId,
+  isOpen,
+  closeModal,
+}: {
+  isOpen: boolean;
+  closeModal: () => void;
+  providerId: string;
+  routeId: string;
+}) => {
+  const classes = useStyles();
+
+  const group = useLandTransportExtensions(providerId, routeId, 'DEFAULT');
+  return (
+    <Dialog open={isOpen} onClose={closeModal} maxWidth="lg" fullWidth>
+      <AppBar className={classes.appBar}>
+        <Toolbar>
+          <Box width={'100%'} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center">
+              <Typography variant={'h3'} color={'inherit'}>
+                {`Included and Add ons table`}
+              </Typography>
+            </Box>
+            <IconButton onClick={closeModal} color="inherit">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <DialogContent>
+        <Box p={2} display="flex" flexDirection="column" style={{ gap: theme.spacing(2) }}>
+          <EditableTable
+            viewOnly
+            tableTitle="Included items"
+            actionLabel="Add included item"
+            data={group?.included}
+            cells={[
+              {
+                label: 'Included',
+                fieldType: 'autocomplete',
+                options: [],
+                fieldName: 'extension',
+                autocompleteProps: {
+                  getOptionLabel: option => option.name,
+                  getOptionSelected: (option, value) => option.id === value.id,
+                  groupBy: option => option.providerName,
+                },
+                renderValue: value => value.name,
+              },
+            ]}
+            //@ts-ignore
+            defaultItem={{ id: '' }}
+            addItem={item => Promise.resolve()}
+            editItem={(id, item) => Promise.resolve()}
+            deleteItem={id => Promise.resolve()}
+          />
+          <Divider />
+          <EditableTable
+            viewOnly
+            tableTitle="Add-on items"
+            actionLabel="Add add-on"
+            data={group?.addOn}
+            cells={[
+              {
+                label: 'Add-on',
+                fieldType: 'autocomplete',
+                options: [],
+                fieldName: 'extension',
+                autocompleteProps: {
+                  getOptionLabel: option => option.name,
+                  getOptionSelected: (option, value) => option.id === value.id,
+                  groupBy: option => option.providerName,
+                },
+                renderValue: value => value.name,
+              },
+              { label: 'Price', fieldType: 'input', fieldName: 'price.value' },
+              {
+                label: 'Currency',
+                fieldType: 'select',
+                fieldName: 'price.currency',
+                options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+              },
+            ]}
+            //@ts-ignore
+            defaultItem={{ id: '' }}
+            addItem={item => Promise.resolve()}
+            editItem={(id, item) => Promise.resolve()}
+            deleteItem={id => Promise.resolve()}
+          />
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 

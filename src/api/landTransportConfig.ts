@@ -10,6 +10,7 @@ import {
   OfferProviderConfig,
   ProviderExtensionEntity,
   ProviderExtensionGroup,
+  ProviderExtensionGroupType,
 } from '../model/land-transport/providers/ProviderConfig';
 import { flow, isNil, omitBy, update } from 'lodash/fp';
 import normalizeFirestoreDate from '../utilities/normalizeFirestoreDate';
@@ -170,6 +171,12 @@ export const addLandTransportExtensionGroup = (
   routeId: string,
   extension: ProviderExtensionGroup,
 ) => landTransportExtensionsGroupRef(providerId, routeId).add({ ...omitBy(isNil)(extension), createdAt: new Date() });
+
+export const addLandTransportExtensionGroupDefault = (providerId: string, routeId: string) =>
+  landTransportExtensionGroupDocRef(providerId, routeId, 'DEFAULT').set({
+    ...omitBy(isNil)({ type: ProviderExtensionGroupType.DEFAULT }),
+    createdAt: new Date(),
+  });
 
 export const editLandTransportExtensionGroup = (
   providerId: string,

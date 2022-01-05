@@ -5,7 +5,6 @@ import useFirestoreDocument from './useFirestoreDocument';
 
 const useLandTransportProvider = (providerId: string) => {
   const landTransportProvidersRef = useFirestoreDocument(`land-transport-config`, providerId);
-  console.log(landTransportProvidersRef?.data());
   return flow(update('createdAt', normalizeFirestoreDate))({
     ...landTransportProvidersRef?.data(),
     id: landTransportProvidersRef?.id,

@@ -10,7 +10,11 @@ import {
   ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import theme from '../../../../theme';
-import { addLandTransportRoute, editLandTransportRoute } from '../../../../api/landTransportConfig';
+import {
+  addLandTransportExtensionGroupDefault,
+  addLandTransportRoute,
+  editLandTransportRoute,
+} from '../../../../api/landTransportConfig';
 import { set } from 'lodash/fp';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import AddIcon from '@material-ui/icons/Add';
@@ -64,7 +68,7 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
               addLandTransportRoute(
                 provider.id,
                 set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-              )
+              ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
             }
             editItem={(id, item) =>
               editLandTransportRoute(
@@ -85,7 +89,7 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
                 addLandTransportRoute(
                   provider.id,
                   set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-                )
+                ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
               }
               editItem={(id, item) =>
                 editLandTransportRoute(

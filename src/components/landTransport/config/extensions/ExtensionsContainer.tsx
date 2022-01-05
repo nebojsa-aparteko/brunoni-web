@@ -109,7 +109,7 @@ const ExtensionsContainer: React.FC<Props> = ({ provider, routeId }) => {
         </Box>
       )}
       {extensionGroup?.map(val => (
-        <ExtensionTables provider={provider} routeId={routeId} group={val} />
+        <ExtensionTables provider={provider} routeId={routeId} group={val} key={val.id} />
       ))}
     </Box>
   );

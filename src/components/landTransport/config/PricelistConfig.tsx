@@ -172,7 +172,7 @@ const PriceListConfig: React.FC<Props> = ({ provider }) => {
                     selectedRoutes: [],
                     validity: null,
                     description: '',
-                  } as SemiAutomaticProviderRoute).then(() => {
+                  } as SemiAutomaticProviderRoute).then(val => {
                     setNewRow(false);
                     setOriginState(null);
                     setTransportModeState(null);

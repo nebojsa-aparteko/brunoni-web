@@ -18,6 +18,7 @@ import SemiAutomaticRouteDialog from './SemiAutomaticRouteDialog';
 import { EditableTextItem } from './ManualRouteDialog';
 import TransportModeInput from '../../../inputs/TransportModeInput';
 import theme from '../../../../theme';
+import { Status } from './RouteDetailsModal';
 
 interface SemiAutomaticRouteRowProps {
   provider: ProviderEntity;
@@ -54,7 +55,7 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
           openModal();
         }}
       >
-        <Box display="flex" flexDirection="row" alignItems="center">
+        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
           <CityInput
             isEditing={isEditing}
             onSelect={(value, path) => setStateRoute(prevState => set(`origin.${path}`, value)(prevState))}
@@ -62,15 +63,17 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
           />
           <SeparatorArrow />
           <RoutesMultiInput isEditing={isEditing} startingDestination={stateRoute.origin} />
+          <Status
+            editing={isEditing}
+            active={stateRoute.active}
+            handleChangeActive={event => {
+              const checked = event.target.checked;
+              setStateRoute(prevState => set('active', checked)(prevState));
+            }}
+          />
         </Box>
-        <Box
-          width={'40%'}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          style={{ gap: theme.spacing(4) }}
-        >
-          <Box width={'50%'}>
+        <Box display="flex" alignItems="center" style={{ gap: theme.spacing(4) }}>
+          <Box>
             <EditableTextItem
               editing={isEditing}
               value={stateRoute.transportMode || ''}

@@ -1,4 +1,11 @@
-import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton } from '@material-ui/core';
+import {
+  Box,
+  Divider,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  IconButton,
+} from '@material-ui/core';
 import EditingInput from '../../EditingInput';
 import EditableTable from '../../EditableTable';
 import { set } from 'lodash/fp';
@@ -24,6 +31,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import theme from '../../../theme';
 
 interface Props {
   provider: ProviderEntity;
@@ -88,7 +96,7 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                 )}
               </Box>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column' }}>
+            <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
               <EditableTable
                 tableTitle="Included items"
                 actionLabel="Add included item"
@@ -112,12 +120,32 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                 editItem={(id, item) => editLandTransportExtension(provider.id, routeId, group.id, id, item)}
                 deleteItem={id => deleteLandTransportExtension(provider.id, routeId, group.id, id)}
               />
+              <Divider />
               <EditableTable
                 tableTitle="Add-on items"
                 actionLabel="Add add-on"
+                data={extensions?.addOn}
                 cells={[
-                  { label: 'Add-on', fieldType: 'input', fieldName: 'extension.name' },
-                  { label: 'Price', fieldType: 'input', fieldName: 'price.value' },
+                  {
+                    label: 'Add-on',
+                    fieldType: 'autocomplete',
+                    options: mixedExtensionConfigs || [],
+                    fieldName: 'extension',
+                    autocompleteProps: {
+                      getOptionLabel: option => option.name,
+                      getOptionSelected: (option, value) => option.id === value.id,
+                      groupBy: option => option.providerName,
+                    },
+                    renderValue: value => value.name,
+                  },
+                  {
+                    label: 'Price',
+                    fieldType: 'input',
+                    fieldName: 'price.value',
+                    inputProps: {
+                      type: 'number',
+                    },
+                  },
                   {
                     label: 'Currency',
                     fieldType: 'select',
@@ -125,7 +153,7 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                     options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
                   },
                 ]}
-                defaultItem={addOn}
+                defaultItem={set('extension', mixedExtensionConfigs?.[0])(addOn)}
                 addItem={item => addLandTransportExtension(provider.id, routeId, group.id, item)}
                 editItem={(id, item) => editLandTransportExtension(provider.id, routeId, group.id, id, item)}
                 deleteItem={id => deleteLandTransportExtension(provider.id, routeId, group.id, id)}
@@ -154,9 +182,8 @@ const included = {
 
 const addOn = {
   id: '',
-  extension: {
-    name: '',
-  },
+  type: ProviderConfigType.OFFER,
+  offerType: OfferProviderConfigType.ADD_ON,
   price: {
     value: 0,
     currency: Currency.EUR,

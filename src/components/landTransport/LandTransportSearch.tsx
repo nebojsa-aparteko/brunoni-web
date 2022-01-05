@@ -156,6 +156,8 @@ export interface R {
     transportMode: TransportModeType[];
     equSize: string[];
     equGroup: string[];
+    provider: string[];
+    route: string[];
   };
 }
 
@@ -213,4 +215,5 @@ export interface HeadsTo {
   remarks: string;
   weightUnit: string;
   status: string;
+  provider: string;
 }

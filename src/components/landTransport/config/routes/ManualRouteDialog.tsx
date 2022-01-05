@@ -47,6 +47,7 @@ import ConfirmationDialog from '../../../ConfirmationDialog';
 import { deleteRoute } from './RoutesTable';
 import TransportModeInput from '../../../inputs/TransportModeInput';
 import { TypographyProps } from '@material-ui/core/Typography';
+import { EquipmentControlContainerTypes } from '../../../../model/EquipmentControl';
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
@@ -69,6 +70,28 @@ interface Props {
 }
 
 const omittedField = ['active', 'updatedAt'];
+const equType = (type: keyof typeof EquipmentControlContainerTypes) => {
+  switch (type) {
+    case '22G1':
+      return { equSize: "20'", equGroup: 'GENERAL PURPOSE' };
+    case '42G1':
+      return { equSize: "40'", equGroup: 'GENERAL PURPOSE' };
+    case '45G1':
+      return { equSize: "40'", equGroup: 'GENERAL PURPOSE' };
+    case '22R1':
+      return { equSize: "20'", equGroup: 'REEFER' };
+    case '45R1':
+      return { equSize: "40'", equGroup: 'REEFER' };
+    case '22U1':
+      return { equSize: "20'", equGroup: 'SPECIAL' };
+    case '42U1':
+      return { equSize: "40'", equGroup: 'SPECIAL' };
+    case '45U1':
+      return { equSize: "40'", equGroup: 'SPECIAL' };
+    default:
+      return undefined;
+  }
+};
 
 const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provider }) => {
   const classes = useStyles();
@@ -201,9 +224,8 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
             variant="outlined"
             color="primary"
             onClick={async () => {
-              await post(
-                'landTransport/saveRoute',
-                Object.entries(route.pricePerContainer).map(([_, price]) => ({
+              await post('landTransport/handleRoute', {
+                body: Object.entries(route.pricePerContainer).map(([ctgType, price]) => ({
                   fromLocationName: route.origin,
                   toLocationName: route.destination,
                   curr: route.currency,
@@ -215,10 +237,10 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                   weightRangeMin: 0,
                   weightRangeMax: 16.5,
                   weightRangeUnit: 'T',
-                  equSize: "40'",
-                  equGroup: 'GENERAL PURPOSE',
+                  ...equType(ctgType as keyof typeof EquipmentControlContainerTypes),
                 })),
-              );
+                type: 'create',
+              });
             }}
           >
             Save into db

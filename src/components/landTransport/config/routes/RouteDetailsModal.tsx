@@ -439,17 +439,6 @@ interface StatusProps {
 export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {
   return (
     <Box style={{ gap: '16px' }} display={'flex'} alignItems={'center'}>
-      {active ? (
-        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
-          <FiberManualRecordIcon style={{ fill: 'lightgreen' }} />
-          <Typography>Active</Typography>
-        </Box>
-      ) : (
-        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
-          <FiberManualRecordIcon color={'error'} />
-          <Typography>Inactive</Typography>
-        </Box>
-      )}
       {editing ? (
         <FormGroup>
           <Box display={'flex'} alignItems={'baseline'}>
@@ -463,7 +452,17 @@ export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disab
             {disabled && disabledMessage && <Typography color={'error'}>{disabledMessage}</Typography>}
           </Box>
         </FormGroup>
-      ) : null}
+      ) : active ? (
+        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
+          <FiberManualRecordIcon style={{ fill: 'lightgreen' }} />
+          <Typography>Active</Typography>
+        </Box>
+      ) : (
+        <Box style={{ gap: '8px' }} display="flex" alignItems="center">
+          <FiberManualRecordIcon color={'error'} />
+          <Typography>Inactive</Typography>
+        </Box>
+      )}
     </Box>
   );
 };
