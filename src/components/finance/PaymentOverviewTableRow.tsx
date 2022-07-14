@@ -1,6 +1,6 @@
 import React from 'react';
 import { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/WeeklyPayment';
-import { Checkbox, Chip, Link, TableCell, TableRow } from '@material-ui/core';
+import { Box, Checkbox, Chip, Link, makeStyles, Popover, TableCell, TableRow, Typography } from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
 import Payment, { DebitCredit } from '../../model/Payment';
@@ -40,6 +40,13 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
           {paymentData.bookingId}
         </Link>
       </TableCell>
+      <TableCell align="center">
+        {paymentData.invoiceReferences ? (
+          <InvoiceReferencesView invoiceReferences={paymentData.invoiceReferences} />
+        ) : (
+          '-'
+        )}
+      </TableCell>
       <TableCell align="center">{paymentData.blNumber}</TableCell>
       <TableCell align="center">{paymentData.vessel || '-'}</TableCell>
       <TableCell align="center">
@@ -72,6 +79,65 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
 };
 
 export default PaymentOverviewTableRow;
+const useStyles = makeStyles(theme => ({
+  popover: {
+    pointerEvents: 'none',
+  },
+  paper: {
+    padding: theme.spacing(1),
+  },
+}));
+const InvoiceReferencesView = ({ invoiceReferences }: { invoiceReferences: string[] }) => {
+  const classes = useStyles();
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
+
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <>
+      <Box
+        display="flex"
+        justifyContent="space-evenly"
+        alignItems="center"
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+      >
+        <Typography>{invoiceReferences[0]}</Typography>
+        {invoiceReferences.length > 1 && <Chip label={`+${invoiceReferences.length - 1}`} />}{' '}
+      </Box>
+      <Popover
+        id="mouse-over-popover"
+        className={classes.popover}
+        classes={{
+          paper: classes.paper,
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        onClose={handlePopoverClose}
+        disableRestoreFocus
+      >
+        {invoiceReferences.map(i => (
+          <Typography style={{ padding: 1 }}>{i}</Typography>
+        ))}
+      </Popover>
+    </>
+  );
+};
 
 interface Props {
   paymentData: Payment;
