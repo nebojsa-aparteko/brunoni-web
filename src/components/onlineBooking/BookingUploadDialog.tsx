@@ -259,13 +259,14 @@ const getClientById = async (id: string): Promise<Client> => {
   return client.data() as Client;
 };
 
-const getUserByEmail = async (email: string): Promise<UserRecord> => {
+const getUserByEmail = async (email: string): Promise<UserRecord | undefined> => {
   const usersRef = await firebase
     .firestore()
     .collection('users')
     .where('emailAddress', '==', email)
     .get();
-  return (usersRef.docs.map(user => user.data())[0] as UserRecord) || undefined;
+  const users = usersRef.docs.map(user => user.data()).filter(u => !u.archived);
+  return users.length > 0 ? (users[0] as UserRecord) : undefined;
 };
 
 interface LatestQuote {
