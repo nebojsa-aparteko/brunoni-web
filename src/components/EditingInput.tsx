@@ -13,7 +13,17 @@ const EditingInput: React.FC<EditingInputProps> = ({
   renderValue = value => value,
 }) =>
   editing && canEdit ? (
-    <TextField margin="dense" variant="outlined" fullWidth value={value} {...inputProps} />
+    <TextField
+      margin="dense"
+      variant="outlined"
+      fullWidth
+      value={value}
+      {...inputProps}
+      onClick={event => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    />
   ) : (
     <Typography {...typographyProps}> {renderValue(value) || (noDefaultLabel ? '' : '[To be assigned]')}</Typography>
   );

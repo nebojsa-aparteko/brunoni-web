@@ -67,6 +67,7 @@ interface EditableTableProps<T> {
   onRowClick?: (item: T) => void;
   editItem: (id: string, item: T) => Promise<any>;
   deleteItem: (id: string) => Promise<any>;
+  viewOnly?: boolean;
   canAddMore?: boolean;
   tableTitle?: string;
   actionLabel?: string;
@@ -120,6 +121,7 @@ const EditableTable = <T extends { id: string }>({
   emptyStateActionLabel,
   emptyStateActionIcon,
   emptyStateAction,
+  viewOnly = false,
   ...props
 }: EditableTableProps<T>) => {
   const classes = useStyles();
@@ -133,7 +135,7 @@ const EditableTable = <T extends { id: string }>({
             {tableTitle || ''}
           </Typography>
 
-          {canAddMore && hasData && (
+          {canAddMore && hasData && !viewOnly && (
             <Button
               variant="contained"
               color="primary"
@@ -156,7 +158,7 @@ const EditableTable = <T extends { id: string }>({
               {cells.map(item => (
                 <TableCell key={`cell-header-${item.label}`}>{item.label}</TableCell>
               ))}
-              <TableCell>Actions</TableCell>
+              {!viewOnly && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -169,6 +171,7 @@ const EditableTable = <T extends { id: string }>({
                   deleteItem={deleteItem}
                   editItem={editItem}
                   cells={cells}
+                  canEdit={!viewOnly}
                   {...props}
                 />
               ))}
@@ -180,12 +183,12 @@ const EditableTable = <T extends { id: string }>({
                     subtitle={emptyStateSubtitle}
                     actionLabel={actionLabel}
                     actionIcon={emptyStateActionIcon}
-                    action={emptyStateAction || (() => setNewRow(true))}
+                    action={!viewOnly && (emptyStateAction || (() => setNewRow(true)))}
                   />
                 </TableCell>
               </TableRow>
             )}
-            {newRow && (
+            {newRow && !viewOnly && (
               <EditableRow
                 item={defaultItem}
                 isAddMode
@@ -213,6 +216,7 @@ interface EditableRowProps {
   isAddMode?: boolean;
   onRowClick?: (item: any) => void;
   onCancel?: () => void;
+  canEdit?: boolean;
 }
 
 const EditableRow: React.FC<EditableRowProps> = ({
@@ -224,8 +228,9 @@ const EditableRow: React.FC<EditableRowProps> = ({
   cells,
   onCancel,
   onRowClick,
+  canEdit = true,
 }) => {
-  const [isEditing, setEditing] = useState(!!isAddMode);
+  const [isEditing, setEditing] = useState(!!isAddMode && canEdit);
   const [stateItem, setStateItem] = useState(item);
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -280,7 +285,16 @@ const EditableRow: React.FC<EditableRowProps> = ({
                 {...cell.selectProps}
               >
                 {cell.options.map(val => (
-                  <MenuItem value={val.key}>{val.label}</MenuItem>
+                  <MenuItem
+                    key={val.key}
+                    value={val.key}
+                    onClick={event => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }}
+                  >
+                    {val.label}
+                  </MenuItem>
                 ))}
               </Select>
             ) : (
@@ -324,57 +338,59 @@ const EditableRow: React.FC<EditableRowProps> = ({
           ) : null}
         </TableCell>
       ))}
-      <TableCell style={{ flex: 1 }}>
-        <Box my={-1.5}>
-          {isEditing ? (
-            <IconButton
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-                isAddMode
-                  ? addItem(removeEntityFields(stateItem))
-                  : editItem(item.id, stateItem).then(() => setEditing(false));
-              }}
-            >
-              <CheckIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-                setEditing(true);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-          {isEditing ? (
-            <IconButton
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-                isAddMode ? onCancel?.() : setEditing(false);
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-                deleteItem(item.id).finally(() => {
-                  console.log('Test');
-                  console.log();
-                });
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          )}
-        </Box>
-      </TableCell>
+      {canEdit && (
+        <TableCell style={{ flex: 1 }}>
+          <Box my={-1.5}>
+            {isEditing ? (
+              <IconButton
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  isAddMode
+                    ? addItem(removeEntityFields(stateItem))
+                    : editItem(item.id, stateItem).then(() => setEditing(false));
+                }}
+              >
+                <CheckIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setEditing(true);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+            {isEditing ? (
+              <IconButton
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  isAddMode ? onCancel?.() : setEditing(false);
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  deleteItem(item.id).finally(() => {
+                    console.log('Test');
+                    console.log();
+                  });
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            )}
+          </Box>
+        </TableCell>
+      )}
     </TableRow>
   );
 };

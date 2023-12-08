@@ -36,23 +36,25 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
           <Paper>
             <List dense>
               {carriers &&
-                carriers.map(carrier => {
-                  const path = `/charges/${carrier.id}`;
-                  const selected = location.pathname.startsWith(path);
-                  return (
-                    <ListItem
-                      key={carrier.id}
-                      button
-                      selected={selected}
-                      onClick={() => (selected ? history.push('/charges') : history.push(path))}
-                    >
-                      <ListItemAvatar className={classes.avatarContainer}>
-                        <FiberManualRecordIcon className={classes.avatar} style={{ color: carrier.color }} />
-                      </ListItemAvatar>
-                      <ListItemText primary={carrier.name.toUpperCase()} />
-                    </ListItem>
-                  );
-                })}
+                carriers
+                  .filter(carrier => !carrier.disabled)
+                  .map(carrier => {
+                    const path = `/charges/${carrier.id}`;
+                    const selected = location.pathname.startsWith(path);
+                    return (
+                      <ListItem
+                        key={carrier.id}
+                        button
+                        selected={selected}
+                        onClick={() => (selected ? history.push('/charges') : history.push(path))}
+                      >
+                        <ListItemAvatar className={classes.avatarContainer}>
+                          <FiberManualRecordIcon className={classes.avatar} style={{ color: carrier.color }} />
+                        </ListItemAvatar>
+                        <ListItemText primary={carrier.name.toUpperCase()} />
+                      </ListItem>
+                    );
+                  })}
             </List>
           </Paper>
         </Grid>

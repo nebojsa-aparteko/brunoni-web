@@ -46,6 +46,10 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       setIsLoading(true);
       let query = collection;
       query = query.where('hold', '==', filters.hold);
+
+      if (actingAs && userRecord?.alphacomClientId) {
+        query = query.where('client.id', '==', userRecord!.alphacomClientId);
+      }
       // for admin: if user filter is in use, show active bookings that are assigned to the filtered user; otherwise only show unassigned requests
       if (filters.assignee?.alphacomId) {
         query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);

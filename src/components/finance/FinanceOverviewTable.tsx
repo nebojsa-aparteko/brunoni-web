@@ -83,6 +83,7 @@ const FinanceOverviewTable: React.FC<Props> = ({
                   </TableCell>
                 )}
                 <TableCell align="left">File No.</TableCell>
+                <TableCell align="left">Invoice numbers</TableCell>
                 <TableCell align="center">B/L No.</TableCell>
                 <TableCell align="center">Vessel</TableCell>
                 <TableCell align="center">Status</TableCell>

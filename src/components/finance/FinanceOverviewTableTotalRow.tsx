@@ -10,6 +10,7 @@ const FinanceOverviewTableTotalRow: React.FC<Props> = ({ total, hasSelection, is
     <TableCell align="center" />
     <TableCell align="center" />
     <TableCell align="center" />
+    <TableCell align="center" />
     <TableCell align="center">{isTotal1 ? `Total 1 ${total.currency}` : `Total 2 ${total.currency}`}</TableCell>
     <TableCell align="right">{currencyFormatter(total.currency)(total.amount)}</TableCell>
   </TableRow>

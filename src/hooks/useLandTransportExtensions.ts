@@ -7,8 +7,10 @@ import {
   OfferProviderConfig,
 } from '../model/land-transport/providers/ProviderConfig';
 
-const useLandTransportExtensions = (providerId: string) => {
-  const landTransportExtensionsRef = useFirestoreCollection(`land-transport-config/${providerId}/extensions`);
+const useLandTransportExtensions = (providerId: string, routeId: string, groupId: string) => {
+  const landTransportExtensionsRef = useFirestoreCollection(
+    `land-transport-config/${providerId}/routes/${routeId}/extensions-group/${groupId}/extensions`,
+  );
   return landTransportExtensionsRef?.docs
     .map(
       v =>

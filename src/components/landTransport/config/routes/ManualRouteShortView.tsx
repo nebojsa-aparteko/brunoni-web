@@ -5,7 +5,6 @@ import {
   MenuItem,
   Paper,
   Select,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -14,11 +13,11 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {
   getPriceRangeText,
   ManualProviderRoute,
   ManualProviderRouteEntity,
+  ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import EditingInput from '../../../EditingInput';
 import { flow, get, set } from 'lodash/fp';
@@ -29,8 +28,11 @@ import { EquipmentControlContainerTypes } from '../../../../model/EquipmentContr
 import { Currency } from '../../../../model/Payment';
 import EditIcon from '@material-ui/icons/Edit';
 import useModal from '../../../../hooks/useModal';
-import ManualRouteDialog from './ManualRouteDialog';
+import ManualRouteDialog, { EditableTextItem } from './ManualRouteDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
+import ArrowForward from '@material-ui/icons/ArrowForward';
+import { activateRoute, getValidityInfo, Status } from './RouteDetailsModal';
+import TransportModeInput from '../../../inputs/TransportModeInput';
 
 interface Props {
   route: ManualProviderRouteEntity;
@@ -45,6 +47,9 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
   const [isEditing, setEditing] = useState(!!isAddMode);
   const [stateRoute, setStateRoute] = useState(route);
   const { openModal, closeModal, isOpen } = useModal();
+
+  const { isValid } = getValidityInfo(route.validity);
+
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const key = event.target?.name;
     const value = event.target.value;
@@ -58,6 +63,11 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
       setStateRoute(prevState => set(name, value)(prevState));
     }
   };
+
+  const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    await activateRoute(provider.id, ProviderRoutesType.AUTOMATIC, route.id, event.target.checked);
+  };
+
   return (
     <>
       <Box
@@ -66,8 +76,10 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
         border={1}
         p={2}
         borderRadius={5}
-        style={{ cursor: 'pointer' }}
+        borderColor="primary"
+        style={{ cursor: isEditing ? 'default' : 'pointer' }}
         onClick={event => {
+          if (isEditing) return;
           event.preventDefault();
           event.stopPropagation();
           openModal();
@@ -82,9 +94,10 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
               name: 'origin',
               onChange: handleInputChange,
             }}
-            typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            typographyProps={{ variant: 'h4', style: { overflow: 'hidden', textOverflow: 'ellipsis' } }}
             value={get('origin')(stateRoute)}
           />
+          <ArrowForward />
           <EditingInput
             editing={isEditing}
             inputProps={{
@@ -96,42 +109,30 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
             value={get('destination')(stateRoute)}
           />
-          <EditingInput
+          <EditableTextItem
             editing={isEditing}
-            inputProps={{
-              variant: 'outlined',
-              label: 'Transport mode',
-              name: 'transportMode',
-              onChange: handleInputChange,
-            }}
+            value={stateRoute.transportMode || 'Not defined'}
             typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
-            value={get('transportMode')(stateRoute)}
+            Element={
+              <TransportModeInput
+                label={''}
+                value={stateRoute.transportMode}
+                onChange={transportMode => setStateRoute(prevState => set('transportMode', transportMode)(prevState))}
+              />
+            }
           />
-
           <Typography
             variant="h5"
             style={{ whiteSpace: 'nowrap', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}
           >
-            {getPriceRangeText(route.priceRange)}
+            {route.priceRange ? getPriceRangeText(route.priceRange) : 'Not defined'}
           </Typography>
-          {isEditing ? (
-            <Switch
-              name="active"
-              checked={get('active')(stateRoute)}
-              onChange={event => {
-                const name = event.target.name;
-                const checked = event.target.checked;
-                setStateRoute(prevState => set(name, checked)(prevState));
-              }}
-              onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            />
-          ) : (
-            <FiberManualRecordIcon color={stateRoute.active ? 'secondary' : 'error'} />
-          )}
-
+          <Status
+            editing={isEditing}
+            active={route.active}
+            disabled={!isValid}
+            handleChangeActive={handleChangeActive}
+          />
           {isEditing ? (
             <Box display="flex">
               <IconButton
@@ -149,7 +150,12 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
                 onClick={event => {
                   event.preventDefault();
                   event.stopPropagation();
-                  isAddMode ? onCancel?.() : setEditing(false);
+                  if (isAddMode) {
+                    onCancel?.();
+                  } else {
+                    setStateRoute(route);
+                    setEditing(false);
+                  }
                 }}
               >
                 <CloseIcon />
@@ -169,59 +175,81 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
             </Box>
           )}
         </Box>
-
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Currency</TableCell>
-                {Object.values(EquipmentControlContainerTypes).map(val => (
-                  <TableCell key={val}>{val}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  {isEditing ? (
-                    <Select
-                      margin="dense"
-                      variant="outlined"
-                      value={get('currency')(stateRoute)}
-                      name="currency"
-                      onChange={handleSelectChange}
-                    >
-                      {Object.keys(Currency).map(val => (
-                        <MenuItem key={val} value={val}>
-                          {val}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <Typography>{get('currency')(stateRoute)}</Typography>
-                  )}
-                </TableCell>
-                {Object.keys(EquipmentControlContainerTypes).map(key => (
-                  <TableCell key={key}>
-                    <EditingInput
-                      editing={isEditing}
-                      inputProps={{
-                        variant: 'outlined',
-                        name: `pricePerContainer.${key}.value`,
-                        onChange: handleInputChange,
-                        type: 'number',
-                      }}
-                      value={flow(get(key), get('value'))(stateRoute.pricePerContainer) || '-'}
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <ManualRouteTablePricing
+          route={stateRoute}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+          isEditing={isEditing}
+        />
       </Box>
       {isOpen && <ManualRouteDialog isOpen={isOpen} closeModal={closeModal} route={route} provider={provider} />}
     </>
+  );
+};
+
+interface ManualRouteTablePricingProps {
+  route: ManualProviderRouteEntity;
+  isEditing: boolean;
+  handleInputChange: (event: any) => void;
+  handleSelectChange: (event: any) => void;
+}
+
+export const ManualRouteTablePricing: React.FC<ManualRouteTablePricingProps> = ({
+  route: stateRoute,
+  isEditing,
+  handleInputChange,
+  handleSelectChange,
+}) => {
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Currency</TableCell>
+            {Object.values(EquipmentControlContainerTypes).map(val => (
+              <TableCell key={val}>{val}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              {isEditing ? (
+                <Select
+                  margin="dense"
+                  variant="outlined"
+                  value={get('currency')(stateRoute)}
+                  name="currency"
+                  onChange={handleSelectChange}
+                >
+                  {Object.keys(Currency).map(val => (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : (
+                <Typography>{get('currency')(stateRoute)}</Typography>
+              )}
+            </TableCell>
+            {Object.keys(EquipmentControlContainerTypes).map(key => (
+              <TableCell key={key}>
+                <EditingInput
+                  editing={isEditing}
+                  inputProps={{
+                    variant: 'outlined',
+                    name: `pricePerContainer.${key}.value`,
+                    onChange: handleInputChange,
+                    type: 'number',
+                  }}
+                  value={flow(get(key), get('value'))(stateRoute.pricePerContainer) || '-'}
+                />
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

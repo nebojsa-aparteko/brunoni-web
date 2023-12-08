@@ -3,9 +3,13 @@ import ProviderPricelistEntity, {
   isExportProviderPricelistEntity,
   isImportProviderPricelistEntity,
 } from '../model/land-transport/providers/ProviderPricelists';
+import { useCallback } from 'react';
 
-const useLandTransportPricelists = (providerId: string) => {
-  const landTransportProfitsRef = useFirestoreCollection(`land-transport-config/${providerId}/pricelist`);
+const useLandTransportPriceLists = (providerId: string, routeId: string) => {
+  const landTransportProfitsRef = useFirestoreCollection(
+    `land-transport-config/${providerId}/routes/${routeId}/price-list`,
+    useCallback(collection => collection.orderBy('category', 'asc').orderBy('distance', 'asc'), []),
+  );
   return landTransportProfitsRef?.docs
     .map(
       v =>
@@ -30,4 +34,4 @@ const useLandTransportPricelists = (providerId: string) => {
     ) as { exportPricelistEntities: ProviderPricelistEntity[]; importPricelistEntities: ProviderPricelistEntity[] };
 };
 
-export default useLandTransportPricelists;
+export default useLandTransportPriceLists;

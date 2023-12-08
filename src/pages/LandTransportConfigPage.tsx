@@ -7,17 +7,24 @@ import {
 } from '../api/landTransportConfig';
 import useLandTransportProviders from '../hooks/useLandTransportProviders';
 import EditableTable from '../components/EditableTable';
-import { Container } from '@material-ui/core';
+import { Container, IconButton } from '@material-ui/core';
 import { format } from 'date-fns';
 import { useHistory } from 'react-router';
+import SettingsIcon from '@material-ui/icons/Settings';
+import useModal from '../hooks/useModal';
+import PredefinedAddOnRatesModal from '../components/landTransport/config/PredefinedAddOnRatesModal';
 
 const LandTransportConfigPage: React.FC = () => {
   const providers = useLandTransportProviders();
   const history = useHistory();
+  const { isOpen, openModal, closeModal } = useModal();
   return (
     <Fragment>
       <Meta title={'Land Transport Config'} />
-      <Container>
+      <Container style={{ display: 'flex', flexDirection: 'column' }}>
+        <IconButton onClick={openModal} style={{ alignSelf: 'flex-end' }}>
+          <SettingsIcon />
+        </IconButton>
         <EditableTable
           cells={[
             { label: 'Name', fieldName: 'name', fieldType: 'input' },
@@ -37,6 +44,7 @@ const LandTransportConfigPage: React.FC = () => {
           onRowClick={item => history.push(`/land-transport-config/${item.id}`)}
         />
       </Container>
+      {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId="Default" />}
     </Fragment>
   );
 };

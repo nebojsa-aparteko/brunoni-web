@@ -26,7 +26,7 @@ import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboar
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link as RouterLink } from 'react-router-dom';
 import parseDate from 'date-fns/parse';
-import { addDays } from 'date-fns';
+import { addDays, isValid } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { RouteInfoBodyHTML, routeInfoBodyPlainText, routeInfoEmailBody } from './RouteBodyTextSharePrep';
@@ -85,7 +85,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const formatDateString = (date: string) => formatDate(new Date(date), DateFormats.LONG);
+export const formatDateString = (date: string) =>
+  isValid(new Date(date)) ? formatDate(new Date(date), DateFormats.LONG) : '-';
 
 const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const classes = useStyles();

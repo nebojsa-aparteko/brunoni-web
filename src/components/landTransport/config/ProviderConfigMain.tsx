@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, IconButton, makeStyles, Paper, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, makeStyles, Typography } from '@material-ui/core';
 import ProviderEntity from '../../../model/land-transport/providers/Provider';
 import SettingsIcon from '@material-ui/icons/Settings';
 import useModal from '../../../hooks/useModal';
@@ -8,31 +8,15 @@ import RoutesTable from './routes/RoutesTable';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useHistory } from 'react-router';
 import ManualRoutesList from './routes/ManualRoutesList';
-import PricelistConfig from './PricelistConfig';
+import PriceListConfig from './PricelistConfig';
 import ProfitTables from './ProfitTables';
+import SectionWithTitle from '../../SectionWithTitle';
 
 const useStyles = makeStyles(() => ({
-  accordionContainer: {
+  container: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  expansionPanel: {
-    marginBottom: 8,
-    width: '1000px',
-  },
-  expansionPanelSummary: {
-    display: 'flex',
-  },
-  expansionPanelTitle: {
-    alignSelf: 'center',
-    marginRight: 16,
-  },
-  icon: {
-    cursor: 'pointer',
-  },
-  formContainer: {
-    display: 'flex',
-    flexDirection: 'row',
+    gap: '16px',
   },
 }));
 
@@ -42,7 +26,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
-      <Box className={classes.accordionContainer}>
+      <Box className={classes.container}>
         <Box display="flex" justifyContent="space-between" alignItems="flex-end" flex={1} my={4}>
           <Box px={2} display="flex" flexDirection="column" alignSelf="flex-start">
             <Box ml={-0.5}>
@@ -58,40 +42,21 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
             </IconButton>
           </Box>
         </Box>
-
-        <Box component={Paper} p={2}>
-          <Typography variant="h2" gutterBottom>
-            Profit
-          </Typography>
+        <SectionWithTitle title="Profit">
           <ProfitTables providerId={provider.id} />
-        </Box>
+        </SectionWithTitle>
 
-        <Box mt={10}>
-          <Box pl={2} mb={4}>
-            <Typography variant="h2" gutterBottom>
-              Automatic Routes
-            </Typography>
-          </Box>
+        <SectionWithTitle title="Automatic routes">
           <RoutesTable provider={provider} />
-        </Box>
+        </SectionWithTitle>
 
-        <Box mt={10}>
-          <Box pl={2}>
-            <Typography variant="h2">Semi-automatic routes</Typography>
-          </Box>
-          <Box display="flex" flexDirection="column" mt={4}>
-            <PricelistConfig provider={provider} />
-          </Box>
-        </Box>
+        <SectionWithTitle title="Semi-automatic routes">
+          <PriceListConfig provider={provider} />
+        </SectionWithTitle>
 
-        <Box my={10}>
-          <Box pl={2}>
-            <Typography variant="h2" gutterBottom>
-              Manual routes
-            </Typography>
-          </Box>
+        <SectionWithTitle title="Manual routes">
           <ManualRoutesList provider={provider} />
-        </Box>
+        </SectionWithTitle>
       </Box>
       {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId={provider.id} />}
     </>

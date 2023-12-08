@@ -10,19 +10,20 @@ import useSaveFiles from '../../../../hooks/useSaveFiles';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
 import { ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
+import EmptyStatePanel from '../../../EmptyStatePanel';
 
-const deleteRoute = async (providerId: string, routeVersion: string) =>
+export const deleteRoute = async (providerId: string, routeId: string) =>
   await firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes`)
-    .doc(routeVersion)
+    .doc(routeId)
     .delete();
 
-const deleteVersionDocuments = async (providerId: string, routeVersion: string) => {
+const deleteVersionDocuments = async (providerId: string, routeId: string) => {
   return (
     await firebase
       .firestore()
-      .collection(`land-transport-config/${providerId}/routes/${routeVersion}/versionDocuments`)
+      .collection(`land-transport-config/${providerId}/routes/${routeId}/versionDocuments`)
       .get()
   ).docs.map(d => {
     const data = d.data() as ChecklistItemValueDocument;
@@ -31,16 +32,16 @@ const deleteVersionDocuments = async (providerId: string, routeVersion: string) 
   });
 };
 
-const deleteRoutes = async (
+export const deleteAutomaticRoutes = async (
   provider: ProviderEntity,
-  routeVersions: string[],
+  routeIds: string[],
   deleteFiles: (files: string[]) => Promise<any>,
 ) => {
   return Promise.all(
-    routeVersions.map(async version => {
-      const documents = await deleteVersionDocuments(provider.id, version);
+    routeIds.map(async id => {
+      const documents = await deleteVersionDocuments(provider.id, id);
       await deleteFiles(documents.map(d => d.url));
-      await deleteRoute(provider.id, version);
+      await deleteRoute(provider.id, id);
     }),
   );
 };
@@ -53,6 +54,7 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.AUTOMATIC);
 
@@ -74,7 +76,9 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
   };
 
   const handleDeleteRoute = async () => {
-    await deleteRoutes(provider, selectedRoutes, deleteFiles);
+    setLoading(true);
+    await deleteAutomaticRoutes(provider, selectedRoutes, deleteFiles);
+    setLoading(false);
     setIsDeleteDialogOpen(false);
     setSelectedRoutes([]);
   };
@@ -88,11 +92,11 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
           handleDelete={() => setIsDeleteDialogOpen(true)}
           labelWhenSelected={
             selectedRoutes.length === 1
-              ? `${selectedRoutes.length} route selected`
-              : `${selectedRoutes.length} routes selected`
+              ? `${selectedRoutes.length} version selected`
+              : `${selectedRoutes.length} versions selected`
           }
-          labelWhenNotSelected={'Automatic Routes'}
-          addButtonLabel={'Add new route'}
+          labelWhenNotSelected={''}
+          addButtonLabel={'Add new version'}
           deleteButtonLabel={selectedRoutes.length === 1 ? `Delete route` : `Delete routes`}
         />
         <Table aria-label="simple table">
@@ -107,20 +111,30 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
                 />
               </TableCell>
               <TableCell>Version</TableCell>
-              <TableCell>Added At</TableCell>
+              <TableCell>Validity</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Last Updated</TableCell>
               <TableCell>Active</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {routes?.map(route => (
-              <RoutesTableRow
-                key={route.version}
-                route={route}
-                provider={provider}
-                selected={selectedRoutes.includes(route.version)}
-                onSelectRow={event => onSelectRow(event, route.version)}
-              />
-            ))}
+            {routes && routes.length > 0 ? (
+              routes.map(route => (
+                <RoutesTableRow
+                  key={route.version}
+                  route={route}
+                  provider={provider}
+                  selected={selectedRoutes.includes(route.version)}
+                  onSelectRow={event => onSelectRow(event, route.version)}
+                />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6}>
+                  <EmptyStatePanel />
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -135,7 +149,8 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
         label={'Please confirm deletion'}
         handleConfirm={handleDeleteRoute}
         handleClose={() => setIsDeleteDialogOpen(false)}
-        description={`Are you sure you want remove this selected route${selectedRoutes.length > 1 ? 's' : ''}?`}
+        description={`Are you sure you want remove this selected version${selectedRoutes.length > 1 ? 's' : ''}?`}
+        loading={loading}
       />
     </>
   );

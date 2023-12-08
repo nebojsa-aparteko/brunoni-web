@@ -31,11 +31,12 @@ const useAPI = () => {
           return await response.json();
         } else {
           console.error(`Failed to request:`, response.status, response.statusText);
-          return undefined;
+          return [];
         }
       } catch (e) {
         setLoading(false);
         console.error('Failed to perform request', e);
+        return [];
       }
     },
     post: async (route: string, obj: Object) => {
@@ -59,10 +60,12 @@ const useAPI = () => {
           return await response.json();
         } else {
           console.error(`Failed to request:`, response.status, response.statusText);
+          return [];
         }
       } catch (e) {
         setLoading(false);
         console.error('Failed to perform request ', e);
+        return [];
       }
     },
   };

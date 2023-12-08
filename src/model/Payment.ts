@@ -13,6 +13,7 @@ export default interface Payment {
   amount: number;
   debitCredit: DebitCredit;
   payDate: Date;
+  invoiceReferences?: string[];
 }
 
 export enum Currency {

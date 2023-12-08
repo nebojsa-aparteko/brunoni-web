@@ -6,17 +6,19 @@ import React, { useState } from 'react';
 import useUser from '../../../../hooks/useUser';
 import {
   Box,
-  Button,
-  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
   makeStyles,
+  Paper,
+  PaperProps,
   Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import DropZoneArea from '../../../dropzone/DropZoneArea';
+import Draggable from 'react-draggable';
+import SaveButton from '../../../SaveButton';
 
 const getRouteVersion = async (providerId: string) => {
   return (
@@ -39,15 +41,16 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   const autoIncrementVersion = await getRouteVersion(provider.id);
   const version = `Version-${autoIncrementVersion}`;
 
-  const addedAt = firebase.firestore.Timestamp.fromDate(new Date());
-
-  let route = {
+  const createdAt = new Date();
+  let route: AutomaticProviderRoute = {
     active: false,
-    addedAt,
-    updatedAt: addedAt,
+    createdAt,
+    updatedAt: createdAt,
+    description: '',
+    validity: null,
     type: ProviderRoutesType.AUTOMATIC,
     version,
-  } as AutomaticProviderRoute;
+  };
 
   await firebase
     .firestore()
@@ -57,7 +60,7 @@ const createAutomaticRouteVersion = async (provider: ProviderEntity) => {
   return version;
 };
 
-const saveRouteFilesToFirestore = async (
+export const saveRouteFilesToFirestore = async (
   provider: ProviderEntity,
   routeVersion: string,
   versionDocument: ChecklistItemValueDocument,
@@ -115,7 +118,6 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
   const handleSave = async () => {
     try {
       setLoading(true);
-      const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       const documents = (await saveFiles(filesState)) as ChecklistItemValueDocument[];
       const values = documents.map(
         item =>
@@ -128,6 +130,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
             isInternal: false,
           } as ChecklistItemValueDocument),
       );
+      const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       values.map(async value => await saveRouteFilesToFirestore(provider, routeVersion, value));
     } catch (e) {
       console.error('Failed to Upload File', e);
@@ -138,9 +141,9 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md">
-      <DialogTitle disableTypography id="dialog-title-check-list">
-        <Typography variant="h4">Upload Files</Typography>
+    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md" PaperComponent={PaperComponent}>
+      <DialogTitle disableTypography id="dialog-automatic-route" style={{ cursor: 'move' }}>
+        <Typography variant="h4">Version creation</Typography>
         <IconButton onClick={handleClose} disabled={loading} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -153,30 +156,24 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
             filesLimit={100}
             dropzoneProps={{ disabled: loading }}
             previewChipProps={{ disabled: loading }}
-            dropzoneText={'Upload Files'}
+            dropzoneText={'Upload version documents'}
           />
-          <Typography variant="caption">Hint: You can drag & drop file over input.</Typography>
+          <Typography variant="caption">Hint: You can drag & drop files over input.</Typography>
           <Box display="flex">
-            <Button
-              onClick={handleSave}
-              variant="contained"
-              color="primary"
-              className={classes.addBtn}
-              disabled={loading}
-            >
-              <CircularProgress
-                size={16}
-                color="inherit"
-                className={classes.progress}
-                style={{ visibility: loading ? 'visible' : 'hidden' }}
-              />
-              <span style={{ visibility: loading ? 'hidden' : 'visible' }}>{`Save Files`}</span>
-            </Button>
+            <SaveButton handleSave={handleSave} loading={loading} title={'Create new version'} />
           </Box>
         </Box>
       </DialogContent>
     </Dialog>
   );
 };
+
+function PaperComponent(props: PaperProps) {
+  return (
+    <Draggable handle="#dialog-automatic-route" cancel={'[class*="MuiDialogContent-root"]'}>
+      <Paper {...props} />
+    </Draggable>
+  );
+}
 
 export default RoutesFileUploadDialog;

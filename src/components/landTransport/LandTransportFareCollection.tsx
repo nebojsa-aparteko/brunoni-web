@@ -17,9 +17,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const LandTransportFareCollection: React.FC = () => {
   const classes = useStyles();
-  const [landTransports] = useContext(LandTransportContext);
+  const { filteredLandTransportRoutes } = useContext(LandTransportContext);
 
-  const grouped = useMemo(() => Object.entries(groupBy(landTransports, 'props.transportMode[0]')), [landTransports]);
+  const grouped = useMemo(() => Object.entries(groupBy(filteredLandTransportRoutes, 'props.transportMode[0]')), [
+    filteredLandTransportRoutes,
+  ]);
   return (
     <Box className={classes.container}>
       {grouped.map(([key, value], i) => {

@@ -27,12 +27,42 @@ const LandTransportSearchBar: React.FC = () => {
   const classes = useStyles();
 
   const [dateOpen, setDateOpen] = useState<boolean>(false);
-  const [, , locations] = useContext(LandTransportContext);
+
+  const {
+    fromLocations,
+    toLocations,
+    fromLocationInputState,
+    setFromLocationInputState,
+    toLocationInputState,
+    setToLocationInputState,
+    loadingLocations,
+  } = useContext(LandTransportContext);
+
+  const getNoOptionsText = (locationInputState: string) => {
+    return locationInputState.length < 2 ? 'Please enter at least 2 characters' : 'No location found';
+  };
+
   return (
     <Box className={classes.root}>
       <Box className={classes.body}>
-        <ControlledLandLocationInput label={'From'} name={'from'} locations={locations} />
-        <ControlledLandLocationInput label={'To'} name={'to'} locations={locations} />
+        <ControlledLandLocationInput
+          label={'From'}
+          name={'from'}
+          noOptionsText={getNoOptionsText(fromLocationInputState)}
+          loading={loadingLocations}
+          locations={fromLocations}
+          inputValue={fromLocationInputState}
+          onInputChange={(_, input) => setFromLocationInputState(input)}
+        />
+        <ControlledLandLocationInput
+          label={'To'}
+          name={'to'}
+          noOptionsText={getNoOptionsText(toLocationInputState)}
+          loading={loadingLocations}
+          locations={toLocations}
+          inputValue={toLocationInputState}
+          onInputChange={(_, input) => setToLocationInputState(input)}
+        />
         <ControlledDateInput
           name={'earliestDate'}
           open={dateOpen}

@@ -3,31 +3,42 @@ import ManualRouteShortView from './ManualRouteShortView';
 import { Box, Button, Paper } from '@material-ui/core';
 import { Currency } from '../../../../model/Payment';
 import {
+  ManualProviderRoute,
   ManualProviderRouteEntity,
   PricePerContainer,
+  PriceRange,
   ProviderRoutesType,
 } from '../../../../model/land-transport/providers/ProviderRoutes';
 import theme from '../../../../theme';
-import { addLandTransportRoute, editLandTransportRoute } from '../../../../api/landTransportConfig';
+import {
+  addLandTransportExtensionGroupDefault,
+  addLandTransportRoute,
+  editLandTransportRoute,
+} from '../../../../api/landTransportConfig';
 import { set } from 'lodash/fp';
 import useLandTransportRoutes from '../../../../hooks/useLandTransportRoutes';
 import AddIcon from '@material-ui/icons/Add';
 import EmptyStatePanel from '../../../EmptyStatePanel';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 
-//@ts-ignore
-const defaultItem = {
+type InitialManualProviderRoute = Omit<ManualProviderRoute, 'updatedAt' | 'priceRange' | 'pricePerContainer'>;
+
+const defaultItem: InitialManualProviderRoute = {
   type: ProviderRoutesType.MANUAL,
-  price: { currency: Currency.CHF, value: 300 },
+  // price: { currency: Currency.CHF, value: 300 }, todo. Check this is not on Model
   transportMode: '',
+  validity: null,
+  description: '',
   destination: '',
   origin: '',
   currency: Currency.EUR,
   active: false,
-} as ManualProviderRouteEntity;
+};
+
 interface Props {
   provider: ProviderEntity;
 }
+
 const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   const [newRow, setNewRow] = useState(false);
   const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.MANUAL);
@@ -46,19 +57,18 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
           Add route
         </Button>
       )}
-
       <Box display="flex" flexDirection="column" flex={1} style={{ gap: theme.spacing(2) }}>
         {newRow && (
           <ManualRouteShortView
             provider={provider}
-            route={defaultItem}
+            route={defaultItem as ManualProviderRouteEntity}
             isAddMode
             onCancel={() => setNewRow(false)}
             addItem={item =>
               addLandTransportRoute(
                 provider.id,
                 set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-              )
+              ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
             }
             editItem={(id, item) =>
               editLandTransportRoute(
@@ -79,7 +89,7 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
                 addLandTransportRoute(
                   provider.id,
                   set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
-                )
+                ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
               }
               editItem={(id, item) =>
                 editLandTransportRoute(
@@ -106,8 +116,8 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   );
 };
 
-const getRangePricesByContainer = (priceByContainer: PricePerContainer, currency: Currency) => {
-  if (!priceByContainer) return undefined;
+const getRangePricesByContainer = (priceByContainer: PricePerContainer, currency: Currency): PriceRange | null => {
+  if (!priceByContainer) return null;
   return Object.values(priceByContainer).reduce(
     (previousValue, currentValue, index) => {
       if (index === 0)

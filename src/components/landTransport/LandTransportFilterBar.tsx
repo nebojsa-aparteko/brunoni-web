@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LandTransportFilterBar = () => {
   const [filters, setFilters] = useContext(LandTransportFilterContext);
 
-  console.log({ filters });
   const classes = useStyles();
   return (
     <Box className={classes.container}>

@@ -4,7 +4,7 @@ import { TextField } from '@material-ui/core';
 import FitContentPopper from '../FitContentPopper';
 import { Controller, useFormContext } from 'react-hook-form';
 
-const defaultTransportModes = ['Barge', 'Truck', 'Barge + Truck', 'Rail + Truck'];
+const defaultTransportModes = ['Barge', 'Truck', 'Rail', 'Barge + Truck', 'Rail + Truck'];
 
 interface Props {
   value?: string | null;
@@ -12,6 +12,7 @@ interface Props {
   onBlur?: () => void;
   transportModes?: string[];
   label?: string;
+  placeholder?: string;
 }
 
 const TransportModeInput: React.FC<Props> = ({
@@ -20,17 +21,19 @@ const TransportModeInput: React.FC<Props> = ({
   onChange,
   onBlur,
   label = 'Transport mode',
+  placeholder = 'Select transport mode',
 }) => {
   return (
     <Autocomplete
       fullWidth
+      placeholder={placeholder}
       id="transport-modes-input"
       options={transportModes}
       value={value || null}
       onChange={(_: ChangeEvent<{}>, mode: string | null) => onChange(mode)}
       onBlur={onBlur}
       getOptionLabel={option => option}
-      renderInput={params => <TextField {...params} label={label} fullWidth variant="outlined" />}
+      renderInput={params => <TextField {...params} margin="dense" label={label} fullWidth variant="outlined" />}
       PopperComponent={FitContentPopper}
     />
   );
