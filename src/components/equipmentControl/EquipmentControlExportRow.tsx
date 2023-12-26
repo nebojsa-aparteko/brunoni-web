@@ -26,13 +26,14 @@ import { getDateRange } from './ExportFlowsTable';
 const getBookingsByEC = async (
   token: string,
   containerType: string,
-  week: string,
+  week: number,
+  year: number,
   locId: string,
   carrierId: string,
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&locId=${locId}&carrierId=${carrierId}`,
+      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&year=${year}&locId=${locId}&carrierId=${carrierId}`,
       {
         method: 'GET',
         mode: 'cors',
@@ -84,6 +85,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const [user] = useUser();
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
   return (
     <Fragment>
       <Tooltip title={location?.name || equipmentControl.id!}>
@@ -97,6 +99,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
       {weeksColumns.map(s => {
         const status = get(equipmentControl, s, {});
         const groupedStatus = groupBy<any>(sa => sa.containerType)(status);
+
         return (
           <Fragment key={`${location?.id}-${s}`}>
             {filters.containerTypes.map((type, index) => {
@@ -119,6 +122,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                           token,
                           type,
                           get(data, 'week', '-1'),
+                          get(data, 'year', '-1'),
                           equipmentControl.id || '-',
                           filters.carrier?.id === 'HSG'
                             ? 'Hamburg Süd'

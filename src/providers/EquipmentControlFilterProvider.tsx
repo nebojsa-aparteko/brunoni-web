@@ -1,7 +1,7 @@
 import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
-import { getISOWeek } from 'date-fns';
+import { getISOWeek, getYear } from 'date-fns';
 import { containerTypesValues } from '../model/EquipmentControl';
 
 export interface EquipmentControlFilterContext {
@@ -9,12 +9,14 @@ export interface EquipmentControlFilterContext {
   country: string[];
   location?: string;
   week: number;
+  year: number;
   containerTypes: string[];
 }
 
 export const TASK_FILTERS_INITIAL_STATE = {
   country: [],
   week: getISOWeek(new Date()),
+  year: getYear(new Date()),
   containerTypes: containerTypesValues,
 } as EquipmentControlFilterContext;
 

@@ -28,7 +28,7 @@ import {
   EquipmentExportSummary,
   EquipmentImportSummary,
 } from '../../model/EquipmentControl';
-import { getYear } from 'date-fns';
+import { addWeeks, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
 import CountryInput from '../inputs/CountryInput';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 import PickupLocations from '../../contexts/PickupLocations';
@@ -73,6 +73,13 @@ const ExportFlowsContainer: React.FC = () => {
     return locations?.filter(l => ids.includes(l.id));
   }, [summary, locations]);
 
+  const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
+  const startWeek = getISOWeek(startWeekDate);
+  const startWeekYear = getYear(startWeekDate);
+  const endWeekDate = addWeeks(startWeekDate, 2);
+  const endWeek = getISOWeek(endWeekDate);
+  const endWeekYear = getYear(endWeekDate);
+
   return (
     <Box>
       <Box p={3}>
@@ -106,18 +113,36 @@ const ExportFlowsContainer: React.FC = () => {
             <IconButton
               color="primary"
               component="span"
-              onClick={() => setFilters(prevState => set('week', prevState.week - 1)(prevState))}
+              onClick={() =>
+                setFilters(prevState => {
+                  const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
+                  const newWeekDate = addWeeks(weekDate, -1);
+                  const newWeek = getISOWeek(newWeekDate);
+                  const newWeekYear = getYear(newWeekDate);
+
+                  return set('year', newWeekYear)(set('week', newWeek)(prevState));
+                })
+              }
             >
               <ChevronLeftIcon />
             </IconButton>
             <Box display="flex" flexDirection="column" alignItems="center">
               <Typography>Change week range</Typography>
-              <Typography>{getMultipleWeekDateRange(filters.week, filters.week + 2, getYear(new Date()))}</Typography>
+              <Typography>{getMultipleWeekDateRange(startWeek, startWeekYear, endWeek, endWeekYear)}</Typography>
             </Box>
             <IconButton
               color="primary"
               component="span"
-              onClick={() => setFilters(prevState => set('week', prevState.week + 1)(prevState))}
+              onClick={() =>
+                setFilters(prevState => {
+                  const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
+                  const newWeekDate = addWeeks(weekDate, 1);
+                  const newWeek = getISOWeek(newWeekDate);
+                  const newWeekYear = getYear(newWeekDate);
+
+                  return set('year', newWeekYear)(set('week', newWeek)(prevState));
+                })
+              }
             >
               <ChevronRightIcon />
             </IconButton>
