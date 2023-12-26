@@ -8,6 +8,7 @@ import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
 import { pick, flow, omitBy, isNil } from 'lodash/fp';
+import { addWeeks, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -15,6 +16,7 @@ export default function useEquipmentSummary<T extends BookingCategory>(
   const [filters] = useEquipmentControlFilterProviderContext();
   const [user] = useUser();
   const [equipmentControl, setEquipmentControl] = useState<any[]>([]);
+
   useEffect(() => {
     const unsubscribe = setInterval(() => {
       user
@@ -29,7 +31,6 @@ export default function useEquipmentSummary<T extends BookingCategory>(
               : filters.carrier?.id!,
             BookingVersion.long,
             category,
-            filters.week,
             filters,
           );
         })
@@ -72,7 +73,6 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             : filters.carrier?.id!,
           BookingVersion.long,
           category,
-          filters.week,
           filters,
         );
       })
@@ -98,16 +98,23 @@ const getEquipmentSummary = async (
   carrierId: string,
   version: BookingVersion,
   category: BookingCategory,
-  week: number,
   filters: EquipmentControlFilterContext,
 ) => {
   try {
+    const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
+    const startWeek = getISOWeek(startWeekDate);
+    const startWeekYear = getYear(startWeekDate);
+    const endWeekDate = addWeeks(startWeekDate, 2);
+    const endWeek = getISOWeek(endWeekDate);
+    const endWeekYear = getYear(endWeekDate);
+
     let url: string;
     if (category === BookingCategory.Export) {
       url = `${
         process.env.REACT_APP_API_URL
-      }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${week}&endWeek=${week +
-        2}&${query(flow(omitBy(isNil), pick(['containerTypes']))(filters))}`;
+      }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${startWeek}&startWeekYear=${startWeekYear}&endWeek=${endWeek}&endWeekYear=${endWeekYear}&${query(
+        flow(omitBy(isNil), pick(['containerTypes']))(filters),
+      )}`;
     } else {
       url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
         flow(omitBy(isNil), pick(['containerTypes']))(filters),

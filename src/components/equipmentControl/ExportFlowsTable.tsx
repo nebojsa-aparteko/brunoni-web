@@ -20,7 +20,7 @@ import truncateString from '../../utilities/truncateString';
 import EquipmentControlExportRow from './EquipmentControlExportRow';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
-import { endOfISOWeek, format, getYear, startOfISOWeek } from 'date-fns';
+import { endOfISOWeek, format, getISOWeek, getYear, setISOWeek, setYear, startOfISOWeek } from 'date-fns';
 
 interface ImportFlowsTableProps {
   summary: [string, EquipmentExportSummary[]][];
@@ -45,17 +45,22 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
               Depot Location
             </TableCell>
             <TableCell rowSpan={2} />
-            {weeksColumns.map((status, index) => (
-              <TableCell
-                key={index}
-                colSpan={filters.containerTypes.length}
-                className={clsx(classes.statusCell, classes.borderRight)}
-              >
-                {status !== 'Export Total'
-                  ? ` ${getDateRange(filters.week + index, getYear(new Date()))} (CW ${filters.week + index})`
-                  : status}
-              </TableCell>
-            ))}
+            {weeksColumns.map((status, index) => {
+              const selectedWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week + index);
+              const selectedWeek = getISOWeek(selectedWeekDate);
+              const selectedYear = getYear(selectedWeekDate);
+              return (
+                <TableCell
+                  key={index}
+                  colSpan={filters.containerTypes.length}
+                  className={clsx(classes.statusCell, classes.borderRight)}
+                >
+                  {status !== 'Export Total'
+                    ? ` ${getDateRange(selectedWeek, selectedYear)} (CW ${selectedWeek})`
+                    : status}
+                </TableCell>
+              );
+            })}
           </TableRow>
           <TableRow>
             {statusLabels.map(() =>
@@ -210,19 +215,18 @@ const importFlowsStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const getDateOfWeek = (w: number, y: number) => {
-  const d = 1 + w * 7;
-
-  return new Date(y, 0, d);
-};
-
 export const getDateRange = (weekNumber: number, year: number) => {
-  const weekDate = getDateOfWeek(weekNumber, year);
+  const weekDate = setISOWeek(setYear(new Date(), year), weekNumber);
   return `${format(startOfISOWeek(weekDate), 'dd.MM')} - ${format(endOfISOWeek(weekDate), 'dd.MM')}`;
 };
 
-export const getMultipleWeekDateRange = (startWeekNumber: number, endWeekNumber: number, year: number) => {
-  const startWeekDate = getDateOfWeek(startWeekNumber, year);
-  const endWeekDate = getDateOfWeek(endWeekNumber, year);
+export const getMultipleWeekDateRange = (
+  startWeekNumber: number,
+  startWeekYear: number,
+  endWeekNumber: number,
+  endWeekYear: number,
+) => {
+  const startWeekDate = setISOWeek(setYear(new Date(), startWeekYear), startWeekNumber);
+  const endWeekDate = setISOWeek(setYear(new Date(), endWeekYear), endWeekNumber);
   return `${format(startOfISOWeek(startWeekDate), 'dd.MM')} - ${format(endOfISOWeek(endWeekDate), 'dd.MM')}`;
 };
