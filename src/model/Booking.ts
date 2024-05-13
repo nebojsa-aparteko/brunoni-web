@@ -302,6 +302,7 @@ export enum CarrierId {
   SLOM = 'SLOM',
   STNN = 'STNN',
   UAL = 'UAL',
+  TARROS = 'TARROS',
   HUGO_STINNES = 'HUGO STINNES',
 }
 
