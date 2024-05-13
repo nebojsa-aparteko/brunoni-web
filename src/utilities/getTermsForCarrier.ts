@@ -14,6 +14,8 @@ export default (carrier: string | undefined) => {
       return 'https://www.stinnes-linien.de/Portals/0/docs/downloads/STINNES_BL_T&C_ed_201802.pdf';
     case CarrierId.UAL:
       return 'https://ualalliance.com/wp-content/uploads/2020/01/UAL-BILL-OF-LADING-CONDITIONS-OF-CARRIAGE.pdf';
+    case CarrierId.TARROS:
+      return 'https://www.tarros.it/wp-content/uploads/2023/10/TA_Bill_of_Lading_TARROS_ott23.pdf';
     default:
       return '#';
   }
