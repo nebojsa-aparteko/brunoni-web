@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -49,6 +49,7 @@ import WeeklyPayment, { WeeklyPaymentStatus } from '../../../model/WeeklyPayment
 import { fileWithExt } from './ChecklistItemRow';
 import CheckAccountingDocumentDialog from '../documentApproval/CheckAccountingDocumentDialog';
 import { isPlatformActivity } from '../../../utilities/activityHelper';
+import { resolveUrl } from '../InternalStorage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -238,11 +239,29 @@ const DocumentListItem = ({
     });
   };
 
+  const [url, setUrl] = useState(item.url);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    resolveUrl(item.url).then(v => {
+      if (cancelled) {
+        return;
+      }
+
+      setUrl(v);
+    });
+
+    return () => {
+      cancelled = true;
+    }
+  }, [item.url]);
+
   return (
     <div {...other}>
       <ListItem>
         <a
-          href={item.url}
+          href={url}
           download={item.name}
           target="_blank"
           rel="noopener noreferrer"
