@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Card,
@@ -125,10 +125,44 @@ const InternalStorage: React.FC<Props> = ({
   const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
   const activityLogContext = useActivityLogState();
 
-  const normalizedFiles =
-    (filesCollection?.docs.map(doc => {
-      return { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
-    }) as ChecklistItemValueDocument[]) || [];
+  const [normalizedFiles, setNormalizedFiles] = useState([] as ChecklistItemValueDocument[]);
+
+  useEffect(() => {
+    const nf = Promise.all(
+      (filesCollection?.docs.map(async doc => {
+        const fileDoc = {...doc.data(), id: doc.id} as ChecklistItemValueDocument;
+
+        const url = new URL(fileDoc.url);
+
+        if (url.origin === 'https://storage.googleapis.com') {
+          const match = url.pathname.match(/^\/download\/storage\/v1\/b\/brunoni\.appspot\.com\/o\/(.*)$/);
+
+          if (match) {
+            const object = decodeURIComponent(match[1]);
+
+            fileDoc.url = await firebase.storage().ref(object).getDownloadURL();
+          }
+        }
+
+        return fileDoc;
+      }) as Promise<ChecklistItemValueDocument>[]) || []
+    );
+
+    let cancelled = false;
+
+    nf.then(v => {
+      if (cancelled) {
+        return;
+      }
+
+      setNormalizedFiles(v);
+    });
+
+    return () => {
+      cancelled = true;
+    }
+  }, [filesCollection]);
+
   const { enqueueSnackbar } = useSnackbar();
   const userRecord = useContext(UserRecordContext);
 
