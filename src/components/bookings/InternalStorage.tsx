@@ -132,17 +132,7 @@ const InternalStorage: React.FC<Props> = ({
       (filesCollection?.docs.map(async doc => {
         const fileDoc = {...doc.data(), id: doc.id} as ChecklistItemValueDocument;
 
-        const url = new URL(fileDoc.url);
-
-        if (url.origin === 'https://storage.googleapis.com') {
-          const match = url.pathname.match(/^\/download\/storage\/v1\/b\/brunoni\.appspot\.com\/o\/(.*)$/);
-
-          if (match) {
-            const object = decodeURIComponent(match[1]);
-
-            fileDoc.url = await firebase.storage().ref(object).getDownloadURL();
-          }
-        }
+        fileDoc.url = await resolveUrl(fileDoc.url);
 
         return fileDoc;
       }) as Promise<ChecklistItemValueDocument>[]) || []
@@ -444,4 +434,31 @@ interface Props {
   dndLabel?: string;
   showHeader?: boolean;
   showComparison?: boolean;
+}
+
+export const resolveUrl = async <T,>(unresolved: T): Promise<string | T> => {
+  if (typeof unresolved !== 'string') {
+    return unresolved;
+  }
+
+  const url = new URL(unresolved);
+
+  if (url.origin !== 'https://storage.googleapis.com') {
+    return unresolved;
+  }
+
+  const match = url.pathname.match(/^\/download\/storage\/v1\/b\/brunoni\.appspot\.com\/o\/(.*)$/);
+
+  if (!match) {
+    return unresolved;
+  }
+
+  const object = decodeURIComponent(match[1]);
+
+  try {
+    return await firebase.storage().ref(object).getDownloadURL();
+  } catch (e) {
+    console.error(e);
+    return unresolved;
+  }
 }
