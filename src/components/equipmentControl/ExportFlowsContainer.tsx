@@ -28,7 +28,7 @@ import {
   EquipmentExportSummary,
   EquipmentImportSummary,
 } from '../../model/EquipmentControl';
-import { addWeeks, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
+import { addWeeks, endOfISOWeek, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
 import CountryInput from '../inputs/CountryInput';
 import sortByObjectKeys from '../../utilities/sortByObjectKeys';
 import PickupLocations from '../../contexts/PickupLocations';
@@ -76,7 +76,7 @@ const ExportFlowsContainer: React.FC = () => {
   const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
   const startWeek = getISOWeek(startWeekDate);
   const startWeekYear = getYear(startWeekDate);
-  const endWeekDate = addWeeks(startWeekDate, 2);
+  const endWeekDate = endOfISOWeek(addWeeks(startWeekDate, 2));
   const endWeek = getISOWeek(endWeekDate);
   const endWeekYear = getYear(endWeekDate);
 
