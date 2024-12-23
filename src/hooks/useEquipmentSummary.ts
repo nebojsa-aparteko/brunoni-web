@@ -8,7 +8,7 @@ import { BookingCategory, BookingVersion } from '../model/Booking';
 import useUser from './useUser';
 import { flatMap } from 'lodash';
 import { pick, flow, omitBy, isNil } from 'lodash/fp';
-import { addWeeks, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
+import { addWeeks, endOfISOWeek, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -104,7 +104,7 @@ const getEquipmentSummary = async (
     const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
     const startWeek = getISOWeek(startWeekDate);
     const startWeekYear = getYear(startWeekDate);
-    const endWeekDate = addWeeks(startWeekDate, 2);
+    const endWeekDate = endOfISOWeek(addWeeks(startWeekDate, 2));
     const endWeek = getISOWeek(endWeekDate);
     const endWeekYear = getYear(endWeekDate);
 
