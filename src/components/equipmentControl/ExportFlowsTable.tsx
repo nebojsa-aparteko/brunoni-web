@@ -217,8 +217,8 @@ const importFlowsStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export const getDateRange = (weekNumber: number, year: number) => {
-  const weekDate = setISOWeek(setYear(new Date(), year), weekNumber);
+export const getDateRange = (week: number, year: number) => {
+  const weekDate = getWeekDate(year, week);
   return `${format(startOfISOWeek(weekDate), 'dd.MM')} - ${format(endOfISOWeek(weekDate), 'dd.MM')}`;
 };
 
@@ -228,7 +228,9 @@ export const getMultipleWeekDateRange = (
   endWeekNumber: number,
   endWeekYear: number,
 ) => {
-  const startWeekDate = setISOWeek(setYear(new Date(), startWeekYear), startWeekNumber);
-  const endWeekDate = setISOWeek(setYear(new Date(), endWeekYear), endWeekNumber);
+  const startWeekDate = startOfISOWeek(getWeekDate(startWeekYear, startWeekNumber));
+  const endWeekDate = endOfISOWeek(getWeekDate(endWeekYear, endWeekNumber));
   return `${format(startOfISOWeek(startWeekDate), 'dd.MM')} - ${format(endOfISOWeek(endWeekDate), 'dd.MM')}`;
 };
+
+export const getWeekDate = (year: number, week: number) => setISOWeek(setYear(new Date(), year), week);
