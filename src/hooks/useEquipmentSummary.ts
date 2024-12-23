@@ -9,6 +9,7 @@ import useUser from './useUser';
 import { flatMap } from 'lodash';
 import { pick, flow, omitBy, isNil } from 'lodash/fp';
 import { addWeeks, endOfISOWeek, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
+import { getMultipleWeekDateRange, getWeekDate } from '../components/equipmentControl/ExportFlowsTable';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -101,9 +102,10 @@ const getEquipmentSummary = async (
   filters: EquipmentControlFilterContext,
 ) => {
   try {
-    const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
+    const startWeekDate = getWeekDate(filters.year, filters.week);
     const startWeek = getISOWeek(startWeekDate);
-    const startWeekYear = getYear(startWeekDate);
+
+    const startWeekYear = getYear(endOfISOWeek(startWeekDate));
     const endWeekDate = endOfISOWeek(addWeeks(startWeekDate, 2));
     const endWeek = getISOWeek(endWeekDate);
     const endWeekYear = getYear(endWeekDate);
