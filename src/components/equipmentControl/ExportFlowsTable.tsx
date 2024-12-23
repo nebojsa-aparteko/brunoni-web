@@ -228,7 +228,7 @@ export const getMultipleWeekDateRange = (
   endWeekNumber: number,
   endWeekYear: number,
 ) => {
-  const startWeekDate = startOfISOWeek(getWeekDate(startWeekYear, startWeekNumber));
+  const startWeekDate = endOfISOWeek(getWeekDate(startWeekYear, startWeekNumber));
   const endWeekDate = endOfISOWeek(getWeekDate(endWeekYear, endWeekNumber));
   return `${format(startOfISOWeek(startWeekDate), 'dd.MM')} - ${format(endOfISOWeek(endWeekDate), 'dd.MM')}`;
 };

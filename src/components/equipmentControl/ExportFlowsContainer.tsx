@@ -115,7 +115,7 @@ const ExportFlowsContainer: React.FC = () => {
               component="span"
               onClick={() =>
                 setFilters(prevState => {
-                  const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
+                  const weekDate = getWeekDate(prevState.year, prevState.week);
                   const newWeekDate = endOfISOWeek(addWeeks(weekDate, -1));
                   const newWeek = getISOWeek(newWeekDate);
                   const newWeekYear = getYear(newWeekDate);
@@ -135,7 +135,7 @@ const ExportFlowsContainer: React.FC = () => {
               component="span"
               onClick={() =>
                 setFilters(prevState => {
-                  const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
+                  const weekDate = getWeekDate(prevState.year, prevState.week);
                   const newWeekDate = endOfISOWeek(addWeeks(weekDate, 1));
                   const newWeek = getISOWeek(newWeekDate);
                   const newWeekYear = getYear(newWeekDate);
