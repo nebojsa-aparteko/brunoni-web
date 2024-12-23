@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core';
 import useEquipmentSummary from '../../hooks/useEquipmentSummary';
 import { BookingCategory } from '../../model/Booking';
-import ExportFlowsTable, { getMultipleWeekDateRange } from './ExportFlowsTable';
+import ExportFlowsTable, { getMultipleWeekDateRange, getWeekDate } from './ExportFlowsTable';
 import CarrierInput from '../inputs/CarrierInput';
 import { groupBy, set, uniq } from 'lodash/fp';
 import { get } from 'lodash';
@@ -73,7 +73,7 @@ const ExportFlowsContainer: React.FC = () => {
     return locations?.filter(l => ids.includes(l.id));
   }, [summary, locations]);
 
-  const startWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week);
+  const startWeekDate = getWeekDate(filters.year, filters.week);
   const startWeek = getISOWeek(startWeekDate);
   const startWeekYear = getYear(startWeekDate);
   const endWeekDate = endOfISOWeek(addWeeks(startWeekDate, 2));
@@ -116,7 +116,7 @@ const ExportFlowsContainer: React.FC = () => {
               onClick={() =>
                 setFilters(prevState => {
                   const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
-                  const newWeekDate = addWeeks(weekDate, -1);
+                  const newWeekDate = endOfISOWeek(addWeeks(weekDate, -1));
                   const newWeek = getISOWeek(newWeekDate);
                   const newWeekYear = getYear(newWeekDate);
 
@@ -136,7 +136,7 @@ const ExportFlowsContainer: React.FC = () => {
               onClick={() =>
                 setFilters(prevState => {
                   const weekDate = setISOWeek(setYear(new Date(), prevState.year), prevState.week);
-                  const newWeekDate = addWeeks(weekDate, 1);
+                  const newWeekDate = endOfISOWeek(addWeeks(weekDate, 1));
                   const newWeek = getISOWeek(newWeekDate);
                   const newWeekYear = getYear(newWeekDate);
 
