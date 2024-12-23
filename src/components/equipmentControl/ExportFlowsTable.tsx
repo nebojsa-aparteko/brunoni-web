@@ -46,7 +46,9 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
             </TableCell>
             <TableCell rowSpan={2} />
             {weeksColumns.map((status, index) => {
-              const selectedWeekDate = setISOWeek(setYear(new Date(), filters.year), filters.week + index);
+              const selectedWeekDate = endOfISOWeek(
+                setISOWeek(setYear(new Date(), filters.year), filters.week + index),
+              );
               const selectedWeek = getISOWeek(selectedWeekDate);
               const selectedYear = getYear(selectedWeekDate);
               return (
