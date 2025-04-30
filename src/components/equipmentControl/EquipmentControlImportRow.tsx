@@ -27,7 +27,7 @@ const getBookingsByEC = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}`,
+      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}&category=Import`,
       {
         method: 'GET',
         mode: 'cors',
@@ -93,6 +93,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                   key={`${type}-${s}`}
                   className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
                   onClick={event => {
+                    if (s === 'TOTAL') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
                     user
@@ -101,7 +102,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                         getBookingsByEC(
                           token,
                           type,
-                          s === 'TOTAL' ? '-' : s,
+                          s,
                           equipmentControl.id || '-',
                           filters.carrier?.id === 'HSG'
                             ? 'Hamburg Süd'
