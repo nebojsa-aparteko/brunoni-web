@@ -1,11 +1,11 @@
 steps:
-  - name: 'node:12-alpine'
+  - name: 'node:22-alpine'
     entrypoint: 'yarn'
     args: ['install']
-  - name: 'node:12-alpine'
+  - name: 'node:22-alpine'
     entrypoint: 'yarn'
     args: ['select:$_BRAND']
-  - name: 'node:12-alpine'
+  - name: 'node:22-alpine'
     entrypoint: 'yarn'
     args: ['build']
     env: ['REACT_APP_API_URL=$_API_URL', 'REACT_APP_ENV=$_REACT_APP_ENV']

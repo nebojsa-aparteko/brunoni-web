@@ -33,7 +33,7 @@ const getBookingsByEC = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&year=${year}&locId=${locId}&carrierId=${carrierId}`,
+      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&year=${year}&locId=${locId}&carrierId=${carrierId}&category=Export`,
       {
         method: 'GET',
         mode: 'cors',
