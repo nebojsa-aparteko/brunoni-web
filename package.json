@@ -59,9 +59,9 @@
     "xlsx": "^0.16.8"
   },
   "scripts": {
-    "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
-    "build": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
-    "build:stage": "REACT_APP_ENV=stage REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
+    "build:stage": "NODE_OPTIONS=--openssl-legacy-provider REACT_APP_ENV=stage REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier:base": "prettier --parser typescript --single-quote",
