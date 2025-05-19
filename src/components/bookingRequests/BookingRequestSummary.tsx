@@ -20,7 +20,7 @@ import {
   BookingRequestItinerary,
   BookingRequestLabels,
 } from '../../model/BookingRequest';
-import { ClientDetails } from '../bookings/BookingSummary';
+import { ClientDetails } from '../bookings/ClientDetails';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
 import {
@@ -32,7 +32,7 @@ import {
   SearchResultsPort,
 } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import { Link } from 'react-router-dom';
+import { Link } from '../Link';
 import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';

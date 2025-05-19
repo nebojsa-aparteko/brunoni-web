@@ -1,14 +1,26 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import mentionsClassNames from './bookings/checklist/mention.module.css';
-import { Mention, MentionItem, MentionsInput } from 'react-mentions';
+import { MentionItem, MentionsInput } from 'react-mentions';
+import { Mention } from './MentionWrapper';
 import ActingAs from '../contexts/ActingAs';
 import { Booking } from '../model/Booking';
 import firebase from '../firebase';
 import UserRecord from '../model/UserRecord';
 import useAdminUsers from '../hooks/useAdminUsers';
 import useTeams from '../hooks/useTeams';
-import { RejectionInput } from './bookings/documentApproval/RejectionModal';
 import { TeamType } from '../model/Teams';
+
+interface RejectionInputType {
+  message: string;
+  messagePlain: string;
+  mentions: MentionItem[];
+}
+
+interface Props {
+  booking: Booking;
+  onInputChange: (input: RejectionInputType) => void;
+  mentionTeamsType?: TeamType;
+}
 
 const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsType }) => {
   const [messageText, setMessageText] = useState('');
@@ -101,9 +113,3 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsTyp
 };
 
 export default CommentInput;
-
-interface Props {
-  booking: Booking;
-  onInputChange: (input: RejectionInput) => void;
-  mentionTeamsType?: TeamType;
-}

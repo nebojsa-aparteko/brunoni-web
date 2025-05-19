@@ -26,7 +26,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import Link from './Link';
+import { Link, ButtonLink, MenuItemLink } from './Link';
 import IdentityWidget from './IdentityWidget';
 import useUser from '../hooks/useUser';
 import Hidden from '@material-ui/core/Hidden';
@@ -37,14 +37,11 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LoginDialog from '../contexts/LoginDialog';
 import ActingAs from '../contexts/ActingAs';
 import Mousetrap from 'mousetrap';
-import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
 import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
-import { Omit } from '@material-ui/types';
 import { camelCase } from 'lodash';
 import GuideButton from './GuideButton';
 import Shepherd from 'shepherd.js';
@@ -159,24 +156,22 @@ export const getLogo = () => {
   return process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
 };
 
-const getPageGuide = () => {
-  switch (window.location.pathname) {
-    case '':
-      return dashboardShepherdTour;
-    case '/schedule' || '/schedule/':
+const getGuide = (path: string): any | undefined => {
+  switch (path) {
+    case '/schedule':
       return scheduleShepherdTour;
-    case '/bookings' || '/bookings/':
+    case '/bookings':
       return bookingsTableShepherdTour;
-    case '/quotes/groups' || '/quotes/groups/':
+    case '/quotes/groups':
       return quotesShepherdTour;
-    case '/quotes/get' || '/quotes/get/':
+    case '/quotes/get':
       return getQuotesShepherdTour;
-    case '/my-day' || '/my-day/':
+    case '/my-day':
       return myDayShepherdTour;
     default: {
-      if (window.location.pathname.startsWith('/bookings/')) return bookingShepherdTour;
-      if (window.location.pathname.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
-      if (window.location.pathname.startsWith('/quotes/')) return quoteShepherdTour;
+      if (path.startsWith('/bookings/')) return bookingShepherdTour;
+      if (path.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
+      if (path.startsWith('/quotes/')) return quoteShepherdTour;
       return undefined;
     }
   }
@@ -195,17 +190,9 @@ interface ListItemLinkProps {
 function ListItemLink(props: ListItemLinkProps) {
   const { icon, primary, to, onClick } = props;
 
-  const renderLink = React.useMemo(
-    () =>
-      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
-        <RouterLink to={to} ref={ref} {...itemProps} />
-      )),
-    [to],
-  );
-
   return (
     <li id={camelCase(primary) + 'Nav'}>
-      <ListItem button component={renderLink} onClick={onClick}>
+      <ListItem button component={Link} to={to} onClick={onClick}>
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
       </ListItem>
@@ -219,30 +206,12 @@ function ButtonMenuItem(props: ListItemLinkProps) {
 
   return (
     <div className={classes.item} id={camelCase(primary) + 'Nav'}>
-      <Button component={RouterLink} variant={variant} color={color} to={to}>
+      <ButtonLink to={to} variant={variant} color={color}>
         <Typography variant="body1" style={typographyStyle}>
           {primary}
         </Typography>
-      </Button>
+      </ButtonLink>
     </div>
-  );
-}
-
-function MenuItemLink(props: ListItemLinkProps) {
-  const { primary, to, onClick } = props;
-
-  const renderLink = React.useMemo(
-    () =>
-      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
-        <RouterLink to={to} ref={ref} {...itemProps} />
-      )),
-    [to],
-  );
-
-  return (
-    <MenuItem id={camelCase(primary) + 'Nav'} onClick={onClick} component={renderLink}>
-      {primary}
-    </MenuItem>
   );
 }
 
@@ -263,8 +232,8 @@ const Navbar: React.FC = () => {
   const zonedTime = useZonedTime();
 
   useEffect(() => {
-    setGuide(getPageGuide());
-  }, [window.location.pathname]);
+    setGuide(getGuide(window.location.pathname));
+  }, []);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 

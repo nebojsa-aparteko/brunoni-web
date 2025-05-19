@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../components/Link';
 import useContainers from '../../../hooks/useContainers';
 import map from 'lodash/fp/map';
 import invoke from 'lodash/fp/invoke';
@@ -256,6 +256,7 @@ const LoadListContainer = () => {
                                             <Link
                                               to={`/bookings/${item.bookingId}`}
                                               target="_blank"
+                                              style={{ textDecoration: 'none' }}
                                             >
                                               {item.bookingId || ''}
                                             </Link>

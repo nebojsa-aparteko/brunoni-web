@@ -14,7 +14,8 @@ import Mousetrap from 'mousetrap';
 import { useActivityLogState } from './ActivityLogContext';
 import ActingAs from '../../../contexts/ActingAs';
 import CloseIcon from '@material-ui/icons/Close';
-import { Mention, MentionItem, MentionsInput } from 'react-mentions';
+import { MentionItem, MentionsInput } from 'react-mentions';
+import { Mention } from '../../MentionWrapper';
 import useAdminUsers from '../../../hooks/useAdminUsers';
 import mentionsClassNames from './mention.module.css';
 import useTeams from '../../../hooks/useTeams';
@@ -139,7 +140,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({
     setIsAdmin(!actingAs);
   }, [actingAs]);
   const [isCustomerMessage, setIsCustomerMessage] = useState(!isAdmin);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const submitButtonRf = useRef<HTMLButtonElement>(null);
   const admins = useAdminUsers();
   const teams = useTeams();
@@ -252,7 +253,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({
             trigger="@"
             data={normalizedAdmins}
             className={mentionsClassNames.mentions__mention}
-            displayTransform={(id, display) => '@' + display}
+            displayTransform={(id: string, display: string) => '@' + display}
           />
         </MentionsInput>
         <IconButton
@@ -318,7 +319,7 @@ const WriteComment: React.FC<WriteCommentProp> = ({
 export default WriteComment;
 
 interface WriteCommentProp {
-  onCommentSave: (messageBody: string, mentions: MentionItem[], internal: boolean) => void;
+  onCommentSave: (comment: string, mentions: MentionItem[], isInternal: boolean) => void;
   booking?: Booking;
   quote?: Quote;
   bookingRequest?: BookingRequest;

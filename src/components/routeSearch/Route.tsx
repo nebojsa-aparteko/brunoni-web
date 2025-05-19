@@ -24,7 +24,7 @@ import CopyToClipboardIcon from '@material-ui/icons/FileCopyOutlined';
 import Carriers from '../../contexts/Carriers';
 import copyToClipboard, { ClipboardFormat } from '../../utilities/copyToClipboard';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link as RouterLink } from 'react-router-dom';
+import { MenuItemLink } from '../Link';
 import parseDate from 'date-fns/parse';
 import { addDays, isValid } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -254,12 +254,12 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
                               <ListItemText primary="Book Now" />
                             </MenuItem>
                           )}
-                          <MenuItem component={RouterLink} to={`/quotes/get`}>
+                          <MenuItemLink to="/quotes/get">
                             <ListItemIcon>
                               <ListAltIcon fontSize="small" />
                             </ListItemIcon>
                             <ListItemText primary="Request Quote" />
-                          </MenuItem>
+                          </MenuItemLink>
                           <MenuItem
                             component={Button}
                             onClick={handleCopyToClipboardClick}

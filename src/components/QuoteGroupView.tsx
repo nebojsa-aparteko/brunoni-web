@@ -33,7 +33,7 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
 import uniqWith from 'lodash/fp/uniqWith';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link } from './Link';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -178,7 +178,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
       <Button
         color="primary"
         variant="outlined"
-        component={RouterLink}
+        component={Link}
         size="small"
         to={`/quotes/${quote.id}`}
       >

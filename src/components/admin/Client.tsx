@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router';
-import { Link as RouterLink } from 'react-router-dom';
 import {
-  Theme,
-  makeStyles,
   Box,
   Card,
   CardHeader,
@@ -15,8 +12,8 @@ import {
   TableBody,
   Table,
   Paper,
-  IconButton,
 } from '@material-ui/core';
+import { IconButtonLink } from '../Link';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import identity from 'lodash/fp/identity';
@@ -30,23 +27,12 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 
 interface Props extends RouteComponentProps<{ id: string }> {}
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    fontWeight: 'bold',
-  },
-}));
-
 const Client: React.FC<Props> = ({ match }) => {
   const history = useHistory();
   const clientId = match.params.id;
 
   const users = useFirestoreCollection(
     'users',
-    useCallback(query => query.where('clientId', '==', clientId), [clientId]),
-  );
-
-  const quotes = useFirestoreCollection(
-    'quotes',
     useCallback(query => query.where('clientId', '==', clientId), [clientId]),
   );
 
@@ -61,14 +47,9 @@ const Client: React.FC<Props> = ({ match }) => {
       <Box my={4}>
         <Box display="flex" mb={2}>
           <Box flexShrink="0" displayPrint="none">
-            <IconButton
-              aria-label="back button"
-              color="primary"
-              component={RouterLink}
-              to="/clients"
-            >
+            <IconButtonLink aria-label="back button" color="primary" to="/clients">
               <ArrowBackIcon />
-            </IconButton>
+            </IconButtonLink>
           </Box>
 
           <Box ml={2} display="flex" flexDirection="column" justifyContent="center">
