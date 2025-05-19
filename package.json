@@ -2,6 +2,9 @@
   "name": "oskar-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.16 <19"
+  },
   "dependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
     "@date-io/date-fns": "^1.3.13",
@@ -55,7 +58,7 @@
     "react-use": "^14.1.0",
     "shepherd.js": "^8.1.0",
     "string-similarity": "^4.0.4",
-    "typescript": "^4.2.4",
+    "typescript": "4.9.5",
     "xlsx": "^0.16.8"
   },
   "scripts": {
@@ -69,7 +72,8 @@
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\"",
     "select:brunoni": "rm -f public && ln -s public.brunoni public",
     "select:allmarine": "rm -f public && ln -s public.allmarine public",
-    "select:brunoni-allmarine": "rm -f public && ln -s public.brunoni public"
+    "select:brunoni-allmarine": "rm -f public && ln -s public.brunoni public",
+    "postinstall": "husky install"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -87,8 +91,6 @@
     ]
   },
   "devDependencies": {
-    "@types/react-linkify": "^1.0.0",
-    "@types/string-similarity": "^4.0.0",
     "@types/autosuggest-highlight": "^3.1.0",
     "@types/classnames": "^2.2.10",
     "@types/fontfaceobserver": "^0.0.6",
@@ -103,27 +105,22 @@
     "@types/react-copy-to-clipboard": "^4.3.0",
     "@types/react-dom": "16.9.8",
     "@types/react-helmet": "^5.0.15",
+    "@types/react-linkify": "^1.0.0",
     "@types/react-mentions": "^3.3.0",
     "@types/react-pdf": "^4.0.6",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-stickynode": "^2.1.0",
-    "husky": "^3.0.9",
-    "lint-staged": "^9.4.2",
-    "prettier": "^1.19.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "@types/string-similarity": "^4.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "13",
+    "prettier": "3"
   },
   "lint-staged": {
-    "*.{js,css,json,md}": [
-      "prettier --write",
-      "git add"
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write"
     ],
-    "*.{ts,tsx}": [
-      "prettier --parser typescript --write",
-      "git add"
+    "*.{json,md,css}": [
+      "prettier --write"
     ]
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
