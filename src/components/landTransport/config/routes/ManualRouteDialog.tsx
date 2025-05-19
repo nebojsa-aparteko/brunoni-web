@@ -162,7 +162,8 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
     const key = event.target?.name;
     const value = event.target.value;
     const type = event.target.type;
-    key && setStateRoute((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
+    key &&
+      setStateRoute((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
   };
   const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target?.name;
@@ -265,10 +266,16 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                   <Box display="flex" flexDirection="column" style={{ gap: theme.spacing(5) }}>
                     <Box display="flex" alignItems="center" style={{ gap: theme.spacing(5) }}>
                       <Box>
-                        <InfoBoxItem label1={'Created At'} label2={<DateFormattedText date={route.createdAt} />} />
+                        <InfoBoxItem
+                          label1={'Created At'}
+                          label2={<DateFormattedText date={route.createdAt} />}
+                        />
                       </Box>
                       <Box>
-                        <InfoBoxItem label1={'Last Updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                        <InfoBoxItem
+                          label1={'Last Updated'}
+                          label2={<DateFormattedText date={route.updatedAt} />}
+                        />
                       </Box>
                     </Box>
                     <Box display="flex" alignItems="center" style={{ gap: theme.spacing(10) }}>
@@ -330,7 +337,9 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
                                   label={''}
                                   value={stateRoute.transportMode}
                                   onChange={transportMode =>
-                                    setStateRoute(prevState => set('transportMode', transportMode)(prevState))
+                                    setStateRoute(prevState =>
+                                      set('transportMode', transportMode)(prevState),
+                                    )
                                   }
                                 />
                               }
@@ -354,7 +363,9 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
             <Validity
               validity={route.validity}
               validityState={stateRoute.validity}
-              handleChange={newValidity => setStateRoute(prev => ({ ...prev, validity: newValidity }))}
+              handleChange={newValidity =>
+                setStateRoute(prev => ({ ...prev, validity: newValidity }))
+              }
               editing={isEditing}
               hasValidity={hasValidity}
             />
@@ -362,7 +373,9 @@ const ManualRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, provide
               description={route.description}
               descriptionState={stateRoute.description}
               editing={isEditing}
-              handleChange={newDescription => setStateRoute(prev => ({ ...prev, description: newDescription }))}
+              handleChange={newDescription =>
+                setStateRoute(prev => ({ ...prev, description: newDescription }))
+              }
             />
             <SectionWithTitle title="Extensions">
               <ExtensionsContainer provider={provider} routeId={route.id} />

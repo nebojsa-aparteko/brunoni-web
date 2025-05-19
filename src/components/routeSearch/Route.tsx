@@ -29,7 +29,11 @@ import parseDate from 'date-fns/parse';
 import { addDays, isValid } from 'date-fns';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { RouteInfoBodyHTML, routeInfoBodyPlainText, routeInfoEmailBody } from './RouteBodyTextSharePrep';
+import {
+  RouteInfoBodyHTML,
+  routeInfoBodyPlainText,
+  routeInfoEmailBody,
+} from './RouteBodyTextSharePrep';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -103,7 +107,9 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const vesselWithVoyage = useMemo(() => {
     const routeItinerary = getItineraryFromSchedule(route);
     return (
-      routeItinerary?.portOfLoading.VoyageInfo.VesselName + ' ' + routeItinerary?.portOfLoading.VoyageInfo.VoyageNr
+      routeItinerary?.portOfLoading.VoyageInfo.VesselName +
+      ' ' +
+      routeItinerary?.portOfLoading.VoyageInfo.VoyageNr
     );
   }, [route]);
   const vesselAllocation = useVesselWithVoyageById(vesselWithVoyage);
@@ -152,7 +158,9 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const buildMailToLink = (route: RouteSearchResult | undefined) => {
     if (route) {
       const mailtoAddress =
-        process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+        process.env.REACT_APP_BRAND === 'brunoni'
+          ? 'mailto:platform@mybrunoni.ch'
+          : 'mailto:platform@myallmarine.ch';
       return (
         mailtoAddress +
         '?'.concat(
@@ -198,7 +206,11 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
           <Grid container spacing={2}>
             <Grid item xs={10}>
               {route && (
-                <RouteSummary route={route} carrier={carrier} isFullyBooked={vesselAllocation?.isFullyBooked} />
+                <RouteSummary
+                  route={route}
+                  carrier={carrier}
+                  isFullyBooked={vesselAllocation?.isFullyBooked}
+                />
               )}
             </Grid>
             <Grid item xs={2} className={classes.actionBarGridItem}>
@@ -211,7 +223,8 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
               >
                 <Box>
                   {route &&
-                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) > addDays(new Date(), 4) &&
+                    parseDate(route.OriginInfo.DepartureDate, 'yyyy-MM-dd', new Date()) >
+                      addDays(new Date(), 4) &&
                     (isPicker && handleBookNow ? (
                       <BookNowButton bookNow={() => handleBookNow(route)} />
                     ) : (
@@ -270,7 +283,9 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
                                 horizontal: 'center',
                               }}
                             >
-                              <Typography className={classes.popover}>Schedule info copied to clipboard.</Typography>
+                              <Typography className={classes.popover}>
+                                Schedule info copied to clipboard.
+                              </Typography>
                             </Popover>
                           </MenuItem>
                         </Menu>
@@ -310,8 +325,8 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
                     <Divider light />
                     <Typography variant="body2">
                       <Box paddingTop={1} component="span">
-                        ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY
-                        BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
+                        ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND
+                        ARE NOT LEGALLY BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
                       </Box>
                     </Typography>
                   </Box>

@@ -100,8 +100,14 @@ export const getItineraryFromSchedule = (schedule?: RouteSearchResult) => {
     // plr - pol - pod - fdp
     const intermediatePorts =
       schedule.IntermediatePortInfos[0].ArrivalDate > schedule.IntermediatePortInfos[1].ArrivalDate
-        ? { portOfLoading: schedule.IntermediatePortInfos[1], portOfDischarge: schedule.IntermediatePortInfos[0] }
-        : { portOfLoading: schedule.IntermediatePortInfos[0], portOfDischarge: schedule.IntermediatePortInfos[1] };
+        ? {
+            portOfLoading: schedule.IntermediatePortInfos[1],
+            portOfDischarge: schedule.IntermediatePortInfos[0],
+          }
+        : {
+            portOfLoading: schedule.IntermediatePortInfos[0],
+            portOfDischarge: schedule.IntermediatePortInfos[1],
+          };
     return {
       placeOfReceipt: schedule.OriginInfo,
       ...intermediatePorts,
@@ -139,7 +145,8 @@ const isRelevantFreight = (
 ) => {
   if (!freightDetail.Unit?.includes("'")) return true;
   return Object.entries(containers).some(
-    ([key, value]) => value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.Unit?.toUpperCase() || ''),
+    ([key, value]) =>
+      value > 0 && [`PRO ${key}`, `PER ${key}`].includes(freightDetail.Unit?.toUpperCase() || ''),
   );
 };
 
@@ -164,16 +171,26 @@ const findIsChargeCodeInternal = (chargeCodes: ChargeCode[], chargeId?: string) 
   return chargeCode && chargeCode.internal1 === 'TRUE' ? true : undefined;
 };
 
-const findChargeIdByDescription = (chargeCodes: ChargeCode[], description: string): string | undefined => {
+const findChargeIdByDescription = (
+  chargeCodes: ChargeCode[],
+  description: string,
+): string | undefined => {
   return chargeCodes.find(code => code.text === description)?.chargeCodeId;
 };
 
-export const findChargeCodeTextInEnglish = (chargeCodes: ChargeCode[], chargeId?: string, description?: string) => {
-  let chargeCodeId = chargeId || (description && findChargeIdByDescription(chargeCodes, description));
+export const findChargeCodeTextInEnglish = (
+  chargeCodes: ChargeCode[],
+  chargeId?: string,
+  description?: string,
+) => {
+  let chargeCodeId =
+    chargeId || (description && findChargeIdByDescription(chargeCodes, description));
   if (!chargeCodeId) {
     return description;
   }
-  const chargeCode = chargeCodes?.find(code => code.chargeCodeId === chargeCodeId && code.language === 'E');
+  const chargeCode = chargeCodes?.find(
+    code => code.chargeCodeId === chargeCodeId && code.language === 'E',
+  );
   return chargeCode && chargeCode.text;
 };
 
@@ -206,7 +223,10 @@ const recalculateQuantity = (
   });
 };
 
-const getQuantity = (containers: { TEU: number; Total: number; [key: string]: number }, costUnit?: string) => {
+const getQuantity = (
+  containers: { TEU: number; Total: number; [key: string]: number },
+  costUnit?: string,
+) => {
   switch (costUnit?.toUpperCase()) {
     case 'PRO TEU':
     case 'PER TEU':
@@ -281,7 +301,11 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
   const handleCreateRequest = () => {
     const voyageInfo = getVoyageInfo(bookingRequest?.schedule);
 
-    const freights = takeQuoteDetails(bookingRequest?.quoteDetails || [], bookingRequest?.containers, chargeCodes);
+    const freights = takeQuoteDetails(
+      bookingRequest?.quoteDetails || [],
+      bookingRequest?.containers,
+      chargeCodes,
+    );
     const commission = generateCommission(
       bookingRequest?.schedule,
       freights,
@@ -301,7 +325,10 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
       vessel: voyageInfo?.VesselName,
       voyage: voyageInfo?.VoyageNr,
       itinerary: getItineraryFromSchedule(bookingRequest?.schedule),
-      freightDetails: compact([...(freights?.filter(value => !isAgencyCommission(value)) || []), commission]),
+      freightDetails: compact([
+        ...(freights?.filter(value => !isAgencyCommission(value)) || []),
+        commission,
+      ]),
     } as BookingRequest;
     omitEmptyDeep(writableRequest);
     // Setting assignedUser: null for filtering purposes
@@ -336,8 +363,12 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
         )
           .then(async docReference => {
             try {
-              const additional = (await saveFiles(files.additional)) as ChecklistItemValueDocument[];
-              const certificate = (await saveFiles(files.certificate)) as ChecklistItemValueDocument[];
+              const additional = (await saveFiles(
+                files.additional,
+              )) as ChecklistItemValueDocument[];
+              const certificate = (await saveFiles(
+                files.certificate,
+              )) as ChecklistItemValueDocument[];
               const imo = (await saveFiles(files.imo)) as ChecklistItemValueDocument[];
 
               const additionalValues = additional.map(
@@ -350,7 +381,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     storedName: item.storedName,
                     isInternal: false,
                     documentType: DocumentType.ADDITIONAL_DOCUMENTS,
-                  } as ChecklistItemValueDocument),
+                  }) as ChecklistItemValueDocument,
               );
               const certificateValues = certificate.map(
                 item =>
@@ -362,7 +393,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     storedName: item.storedName,
                     isInternal: false,
                     documentType: DocumentType.SOC,
-                  } as ChecklistItemValueDocument),
+                  }) as ChecklistItemValueDocument,
               );
               const IMOValues = imo.map(
                 item =>
@@ -374,10 +405,12 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
                     storedName: item.storedName,
                     isInternal: false,
                     documentType: DocumentType.IMO,
-                  } as ChecklistItemValueDocument),
+                  }) as ChecklistItemValueDocument,
               );
               const values = [...additionalValues, ...certificateValues, ...IMOValues];
-              await Promise.all(values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)));
+              await Promise.all(
+                values.map(value => saveFilesToFirestore('bookings-requests', docReference, value)),
+              );
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
@@ -433,13 +466,19 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
           <Grid item xs={12}>
             <Stepper orientation="vertical" className={classes.stepper}>
               {bookingRequest?.schedule!.OriginInfo && (
-                <ItineraryItem noLine={false} itineraryItem={bookingRequest?.schedule!.OriginInfo} />
+                <ItineraryItem
+                  noLine={false}
+                  itineraryItem={bookingRequest?.schedule!.OriginInfo}
+                />
               )}
               {bookingRequest?.schedule!.IntermediatePortInfos.map((intermediatePortInfo, i) => (
                 <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
               ))}
               {bookingRequest?.schedule!.DestinationInfo && (
-                <ItineraryItem noLine={true} itineraryItem={bookingRequest?.schedule!.DestinationInfo} />
+                <ItineraryItem
+                  noLine={true}
+                  itineraryItem={bookingRequest?.schedule!.DestinationInfo}
+                />
               )}
             </Stepper>
           </Grid>

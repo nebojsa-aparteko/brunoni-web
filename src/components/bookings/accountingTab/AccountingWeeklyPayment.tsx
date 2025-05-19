@@ -96,7 +96,13 @@ interface PostponeMenuProps {
 
 const PostponeMenu: React.FC<PostponeMenuProps> = ({ anchorEl, handleClose, changePayment }) => {
   return (
-    <Menu id="accounting-postpone-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+    <Menu
+      id="accounting-postpone-menu"
+      anchorEl={anchorEl}
+      keepMounted
+      open={Boolean(anchorEl)}
+      onClose={handleClose}
+    >
       <MenuItem onClick={() => changePayment(-14)}>2 Weeks Earlier</MenuItem>
       <MenuItem onClick={() => changePayment(-7)}>1 Week Earlier</MenuItem>
       <MenuItem onClick={() => changePayment(7)}>1 Week Later</MenuItem>
@@ -148,13 +154,18 @@ const getPaymentDisplayedStatus = (payment: WeeklyPayment) => {
         ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
         : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
       : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
-      ? payment.status !== WeeklyPaymentStatus.PAID
-        ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
-        : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
-      : WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+        ? payment.status !== WeeklyPaymentStatus.PAID
+          ? WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
+          : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus]
+        : WeeklyPaymentStatusLabel[payment.platformStatus as WeeklyPaymentPlatformStatus]
     : WeeklyPaymentStatusLabel[payment.status as WeeklyPaymentStatus];
 };
-const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: AccountingWeeklyPaymentProps) => {
+const AccountingWeeklyPayment = ({
+  payment,
+  booking,
+  updateComponent,
+  tasks,
+}: AccountingWeeklyPaymentProps) => {
   const userRecord = useContext(UserRecordContext);
   const accountingDocuments = useAccountingDocuments(payment.reference);
   const { enqueueSnackbar } = useSnackbar();
@@ -163,7 +174,9 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
   const [, dispatch] = useContext(GlobalContext);
   const clearInvoiceTask = useMemo(() => {
     return tasks && tasks.length > 0
-      ? tasks.find(task => task.type === TaskType.CLEAR_INVOICE && task.id.includes(payment.reference))
+      ? tasks.find(
+          task => task.type === TaskType.CLEAR_INVOICE && task.id.includes(payment.reference),
+        )
       : undefined;
   }, [payment.reference, tasks]);
   const handleClickMenu = (event: any) => {
@@ -175,9 +188,14 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
   };
 
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, 'accounting-documents'].join(
-      '/',
-    );
+    return [
+      'booking-documents',
+      'clients',
+      booking.ForwAdrId,
+      'bookings',
+      booking.id,
+      'accounting-documents',
+    ].join('/');
   }, [booking]);
 
   const getActivityLogUserData = useCallback(
@@ -188,7 +206,7 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -285,7 +303,14 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
         }),
       );
     },
-    [storeAccountingActivity, enqueueSnackbar, payment.reference, updateComponent, booking, getActivityLogUserData],
+    [
+      storeAccountingActivity,
+      enqueueSnackbar,
+      payment.reference,
+      updateComponent,
+      booking,
+      getActivityLogUserData,
+    ],
   );
 
   const handleChangePayDate = useCallback(
@@ -317,7 +342,15 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
           handleClose();
         });
     },
-    [payment, dispatch, user, storeAccountingActivity, booking, getActivityLogUserData, updateComponent],
+    [
+      payment,
+      dispatch,
+      user,
+      storeAccountingActivity,
+      booking,
+      getActivityLogUserData,
+      updateComponent,
+    ],
   );
 
   const handleChangePaymentPlatformStatus = useCallback(
@@ -382,11 +415,11 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                 payment.status === WeeklyPaymentStatus.PAID
                   ? 'rgba(0,200,81)'
                   : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
-                  ? '#b186df'
-                  : payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD &&
-                    payment.status === WeeklyPaymentStatus.IN_PROGRESS
-                  ? '#df6b00'
-                  : '#000',
+                    ? '#b186df'
+                    : payment.platformStatus === WeeklyPaymentPlatformStatus.ON_HOLD &&
+                        payment.status === WeeklyPaymentStatus.IN_PROGRESS
+                      ? '#df6b00'
+                      : '#000',
             }}
           >
             {getPaymentDisplayedStatus(payment)}
@@ -410,9 +443,11 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
                 item={item}
                 booking={booking}
                 storageBasePath={storageBasePath}
-                changeStatus={(item: DocumentValue, status: DocumentValueStatus, dontCreateActivity?: boolean) =>
-                  handleDocumentStatusChange(item, status, dontCreateActivity)
-                }
+                changeStatus={(
+                  item: DocumentValue,
+                  status: DocumentValueStatus,
+                  dontCreateActivity?: boolean,
+                ) => handleDocumentStatusChange(item, status, dontCreateActivity)}
                 deleteFile={(item: DocumentValue) => handleDeleteFile(item)}
                 internal={true}
                 isAccountingDocument={true}
@@ -442,7 +477,11 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
             {payment.status === WeeklyPaymentStatus.IN_PROGRESS ? (
               payment.platformStatus !== WeeklyPaymentPlatformStatus.ON_HOLD ? (
                 <Tooltip title={'Put this weekly payment on hold'}>
-                  <IconButton onClick={() => handleChangePaymentPlatformStatus(WeeklyPaymentPlatformStatus.ON_HOLD)}>
+                  <IconButton
+                    onClick={() =>
+                      handleChangePaymentPlatformStatus(WeeklyPaymentPlatformStatus.ON_HOLD)
+                    }
+                  >
                     <PanToolIcon />
                   </IconButton>
                 </Tooltip>
@@ -459,13 +498,19 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
             </Button>
           </React.Fragment>
         )}
-        {payment.status === WeeklyPaymentStatus.BLOCKED && clearInvoiceTask && clearInvoiceTask.show && (
-          <Tooltip title={clearInvoiceTask.resolved ? 'Revert clearing of this invoice' : 'Clear this invoice'}>
-            <span>
-              <TaskManualResolveButton task={clearInvoiceTask} />
-            </span>
-          </Tooltip>
-        )}
+        {payment.status === WeeklyPaymentStatus.BLOCKED &&
+          clearInvoiceTask &&
+          clearInvoiceTask.show && (
+            <Tooltip
+              title={
+                clearInvoiceTask.resolved ? 'Revert clearing of this invoice' : 'Clear this invoice'
+              }
+            >
+              <span>
+                <TaskManualResolveButton task={clearInvoiceTask} />
+              </span>
+            </Tooltip>
+          )}
         <PaymentApprovalButton
           payment={payment}
           booking={booking}
@@ -473,7 +518,13 @@ const AccountingWeeklyPayment = ({ payment, booking, updateComponent, tasks }: A
           updateComponent={updateComponent}
         />
       </ExpansionPanelActions>
-      {anchorEl && <PostponeMenu anchorEl={anchorEl} handleClose={handleClose} changePayment={handleChangePayDate} />}
+      {anchorEl && (
+        <PostponeMenu
+          anchorEl={anchorEl}
+          handleClose={handleClose}
+          changePayment={handleChangePayDate}
+        />
+      )}
     </ExpansionPanel>
   );
 };

@@ -1,8 +1,20 @@
 import React, { Fragment, useMemo } from 'react';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
-import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import {
+  Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@material-ui/core';
 import PaymentOverviewTableRow from './PaymentOverviewTableRow';
-import WeeklyPayment, { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus } from '../../model/WeeklyPayment';
+import WeeklyPayment, {
+  WeeklyPaymentPlatformStatus,
+  WeeklyPaymentStatus,
+} from '../../model/WeeklyPayment';
 import { groupBy } from 'lodash/fp';
 import FinanceOverviewTableTotalRow from './FinanceOverviewTableTotalRow';
 import Commission from '../../model/Commission';
@@ -16,10 +28,10 @@ const determinePaymentStatus = (payment: WeeklyPayment) => {
         ? payment.platformStatus
         : payment.status
       : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
-      ? payment.status !== WeeklyPaymentStatus.PAID
-        ? payment.platformStatus
-        : payment.status
-      : payment.platformStatus
+        ? payment.status !== WeeklyPaymentStatus.PAID
+          ? payment.platformStatus
+          : payment.status
+        : payment.platformStatus
     : payment.status;
 };
 
@@ -34,40 +46,44 @@ const FinanceOverviewTable: React.FC<Props> = ({
 }) => {
   const total = useMemo(() => {
     return overviewData
-      ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(([key, value]) => ({
-          currency: key as Currency,
-          amount: value.reduce(
-            (previousValue, currentValue) =>
-              currentValue.debitCredit === DebitCredit.DEBIT
-                ? previousValue + currentValue.amount
-                : previousValue - currentValue.amount,
-            0,
-          ),
-        }))
-      : [];
-  }, [overviewData]);
-
-  const totalWithoutCommissions = useMemo(() => {
-    return commissionsForWeeklyPayments
-      ? Object.entries(groupBy((item: Commission) => item.currency)(commissionsForWeeklyPayments)).map(
+      ? Object.entries(groupBy((item: WeeklyPayment) => item.currency)(overviewData)).map(
           ([key, value]) => ({
             currency: key as Currency,
             amount: value.reduce(
               (previousValue, currentValue) =>
                 currentValue.debitCredit === DebitCredit.DEBIT
-                  ? previousValue - currentValue.amount
-                  : previousValue + currentValue.amount,
-              total.find(total => total.currency === (key as Currency))?.amount || 0,
+                  ? previousValue + currentValue.amount
+                  : previousValue - currentValue.amount,
+              0,
             ),
           }),
         )
+      : [];
+  }, [overviewData]);
+
+  const totalWithoutCommissions = useMemo(() => {
+    return commissionsForWeeklyPayments
+      ? Object.entries(
+          groupBy((item: Commission) => item.currency)(commissionsForWeeklyPayments),
+        ).map(([key, value]) => ({
+          currency: key as Currency,
+          amount: value.reduce(
+            (previousValue, currentValue) =>
+              currentValue.debitCredit === DebitCredit.DEBIT
+                ? previousValue - currentValue.amount
+                : previousValue + currentValue.amount,
+            total.find(total => total.currency === (key as Currency))?.amount || 0,
+          ),
+        }))
       : [];
   }, [commissionsForWeeklyPayments, total]);
 
   return (
     <Fragment>
       {!overviewData || overviewData.length === 0 ? (
-        <BookingsEmptyResults message={'No Payment overview found for your filter criteria. Try changing filters.'} />
+        <BookingsEmptyResults
+          message={'No Payment overview found for your filter criteria. Try changing filters.'}
+        />
       ) : (
         <TableContainer component={Paper}>
           <Table aria-label="simple table">

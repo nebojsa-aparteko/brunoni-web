@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Box, FormControl, InputLabel, makeStyles, MenuItem, Select, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  makeStyles,
+  MenuItem,
+  Select,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import pick from 'lodash/fp/pick';
 import { Currency } from '../../model/Payment';
 import ConfirmationDialog, { ConfirmationDialogProps } from '../ConfirmationDialog';

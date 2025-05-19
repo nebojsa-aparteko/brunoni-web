@@ -22,7 +22,13 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const SimpleExpansionPanel = ({ label, defaultExpanded, children, fullWidth = false, TransitionProps }: Props) => {
+const SimpleExpansionPanel = ({
+  label,
+  defaultExpanded,
+  children,
+  fullWidth = false,
+  TransitionProps,
+}: Props) => {
   const classes = useStyles();
 
   return (
@@ -34,7 +40,9 @@ const SimpleExpansionPanel = ({ label, defaultExpanded, children, fullWidth = fa
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.elevatedComponent}>
         <Typography>{label}</Typography>
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={classes.elevatedComponent}>{children}</ExpansionPanelDetails>
+      <ExpansionPanelDetails className={classes.elevatedComponent}>
+        {children}
+      </ExpansionPanelDetails>
     </ExpansionPanel>
   );
 };

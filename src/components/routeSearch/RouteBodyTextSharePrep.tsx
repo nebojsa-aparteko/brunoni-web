@@ -1,6 +1,9 @@
 import React, { Fragment } from 'react';
 import flatMap from 'lodash/fp/flatMap';
-import { RouteSearchResult, RouteSearchResultDeadline } from '../../model/route-search/RouteSearchResults';
+import {
+  RouteSearchResult,
+  RouteSearchResultDeadline,
+} from '../../model/route-search/RouteSearchResults';
 import formatDate from 'date-fns/format';
 
 const paragraphStyles = {
@@ -65,8 +68,8 @@ export const RouteInfoBodyHTML: React.FC<Props> = ({ route }) => (
       )}
     </p>
     <p style={paragraphStyles}>
-      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING. ALL DATA IS
-      SUBJECT TO ALTERATION WITHOUT NOTICE.
+      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY
+      BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
     </p>
   </Fragment>
 );
@@ -90,7 +93,9 @@ ${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ET
     route.DestinationInfo.ArrivalDate,
   )}
 
-${flatMap((deadline: RouteSearchResultDeadline) => `${deadline.Typ} closing - ${deadline.Time}`)(route.Deadlines)
+${flatMap((deadline: RouteSearchResultDeadline) => `${deadline.Typ} closing - ${deadline.Time}`)(
+  route.Deadlines,
+)
   .toString()
   .split(',')
   .join('\n')}

@@ -11,7 +11,9 @@ interface Props extends InputProps<City> {
 }
 
 const filterOptions = (options: City[], { inputValue }: { inputValue: string }) => {
-  return options.filter(option => option.name.toLowerCase().includes(inputValue.trim().toLowerCase()));
+  return options.filter(option =>
+    option.name.toLowerCase().includes(inputValue.trim().toLowerCase()),
+  );
 };
 
 const CityByCountryInput: React.FC<Props> = ({ value, onChange, country, margin }) => {

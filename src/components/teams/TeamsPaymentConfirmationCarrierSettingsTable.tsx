@@ -42,7 +42,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
     (event: React.MouseEvent<HTMLElement>, id: string) => {
       event.stopPropagation();
       setSelectedPaymentConfirmations(prevState =>
-        selectedPaymentConfirmations.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+        selectedPaymentConfirmations.includes(id)
+          ? [...prevState.filter(t => t !== id)]
+          : [...prevState, id],
       );
     },
     [selectedPaymentConfirmations],
@@ -50,7 +52,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
 
   const handleSelectDeselectAll = () => {
     if (selectedPaymentConfirmations.length !== paymentConfirmations.length) {
-      setSelectedPaymentConfirmations(paymentConfirmations.map(paymentConfirmation => paymentConfirmation.id));
+      setSelectedPaymentConfirmations(
+        paymentConfirmations.map(paymentConfirmation => paymentConfirmation.id),
+      );
     } else {
       setSelectedPaymentConfirmations([]);
     }
@@ -67,7 +71,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
 
     try {
-      selectedPaymentConfirmations.map(paymentConfirmationId => deletePaymentConfirmation(paymentConfirmationId));
+      selectedPaymentConfirmations.map(paymentConfirmationId =>
+        deletePaymentConfirmation(paymentConfirmationId),
+      );
 
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
       setIsConfirmationDialogOpen(false);
@@ -94,7 +100,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
         const dataCopy = exitingPaymentConfirmation.data() as CarrierSettingsRule;
         if (exitingPaymentConfirmation) {
           const ref = collectionRef.doc();
-          const createdAt = firebase.firestore.Timestamp.fromDate(addSeconds(dataCopy.createdAt.toDate(), 2));
+          const createdAt = firebase.firestore.Timestamp.fromDate(
+            addSeconds(dataCopy.createdAt.toDate(), 2),
+          );
           await ref.set({ ...dataCopy, id: ref.id, createdAt });
         }
       } catch (error) {
@@ -125,7 +133,9 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
             }
             labelWhenNotSelected={''}
             addButtonLabel={'Add carrier setting'}
-            deleteButtonLabel={selectedPaymentConfirmations.length === 1 ? `Delete setting` : `Delete settings`}
+            deleteButtonLabel={
+              selectedPaymentConfirmations.length === 1 ? `Delete setting` : `Delete settings`
+            }
           />
           <Table aria-label="a dense table">
             <colgroup>
@@ -161,9 +171,13 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
                   paymentConfirmation={paymentConfirmation}
                   key={`payment-confirmation-${paymentConfirmation.id}-${index}`}
                   selected={
-                    paymentConfirmation.id ? selectedPaymentConfirmations.includes(paymentConfirmation.id) : false
+                    paymentConfirmation.id
+                      ? selectedPaymentConfirmations.includes(paymentConfirmation.id)
+                      : false
                   }
-                  onSelectRow={event => paymentConfirmation.id && onSelectRow(event, paymentConfirmation.id)}
+                  onSelectRow={event =>
+                    paymentConfirmation.id && onSelectRow(event, paymentConfirmation.id)
+                  }
                   onCopy={handleCopy}
                 />
               ))}

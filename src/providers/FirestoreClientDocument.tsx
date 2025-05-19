@@ -8,7 +8,11 @@ interface Props<T> {
   children: React.ReactNode;
 }
 
-export default function firestoreClientDocument<T>({ collection, context: { Provider }, children }: Props<T>) {
+export default function firestoreClientDocument<T>({
+  collection,
+  context: { Provider },
+  children,
+}: Props<T>) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const userRecord = useUser()[1];
   // eslint-disable-next-line react-hooks/rules-of-hooks

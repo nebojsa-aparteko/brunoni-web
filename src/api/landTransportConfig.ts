@@ -23,23 +23,24 @@ export const addLandTransportProvider = (provider: Provider) =>
   landTransportRef.add({ ...provider, createdAt: new Date() });
 export const editLandTransportProvider = (providerId: string, provider: Provider) =>
   landTransportDocRef(providerId).set(provider, { merge: true });
-export const deleteLandTransportProvider = (providerId: string) => landTransportDocRef(providerId).delete();
+export const deleteLandTransportProvider = (providerId: string) =>
+  landTransportDocRef(providerId).delete();
 
 //Profit
 const landTransportProfitRef = (providerId: string) =>
   firebase.firestore().collection(`land-transport-config/${providerId}/profit`);
 
 const landTransportProfitDocRef = (providerId: string, profitId: string) =>
-  firebase
-    .firestore()
-    .collection(`land-transport-config/${providerId}/profit`)
-    .doc(profitId);
+  firebase.firestore().collection(`land-transport-config/${providerId}/profit`).doc(profitId);
 
 export const addLandTransportProfit = (providerId: string, profit: ProviderProfit) =>
   landTransportProfitRef(providerId).add({ ...profit, createdAt: new Date() });
 
-export const editLandTransportProfit = (providerId: string, profitId: string, profit: ProviderProfit) =>
-  landTransportProfitDocRef(providerId, profitId).set(profit, { merge: true });
+export const editLandTransportProfit = (
+  providerId: string,
+  profitId: string,
+  profit: ProviderProfit,
+) => landTransportProfitDocRef(providerId, profitId).set(profit, { merge: true });
 
 export const deleteLandTransportProfit = (providerId: string, profitId: string) =>
   landTransportProfitDocRef(providerId, profitId).delete();
@@ -71,31 +72,36 @@ export const hasActiveRoute = async (providerId: string, routeType: ProviderRout
 const landTransportRouteRef = (providerId: string) =>
   firebase.firestore().collection(`land-transport-config/${providerId}/routes`);
 const landTransportRouteDocRef = (providerId: string, routeId: string) =>
-  firebase
-    .firestore()
-    .collection(`land-transport-config/${providerId}/routes`)
-    .doc(routeId);
+  firebase.firestore().collection(`land-transport-config/${providerId}/routes`).doc(routeId);
 
 export const addLandTransportRoute = (providerId: string, route: ProviderRoute) =>
   landTransportRouteRef(providerId).add({ ...route, createdAt: new Date(), updatedAt: new Date() });
 
 export const editLandTransportRoute = (providerId: string, routeId: string, route: ProviderRoute) =>
-  landTransportRouteDocRef(providerId, routeId).set({ ...route, updatedAt: new Date() }, { merge: true });
+  landTransportRouteDocRef(providerId, routeId).set(
+    { ...route, updatedAt: new Date() },
+    { merge: true },
+  );
 
 export const deleteLandTransportRoute = async (providerId: string, routeId: string) =>
   await landTransportRouteDocRef(providerId, routeId).delete();
 
 // Pricelist
 const landTransportPriceListRef = (providerId: string, routeId: string) =>
-  firebase.firestore().collection(`land-transport-config/${providerId}/routes/${routeId}/price-list`);
+  firebase
+    .firestore()
+    .collection(`land-transport-config/${providerId}/routes/${routeId}/price-list`);
 const landTransportPriceListDocRef = (providerId: string, routeId: string, priceListId: string) =>
   firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes/${routeId}/price-list`)
     .doc(priceListId);
 
-export const addLandTransportPricelist = (providerId: string, routeId: string, pricelist: ProviderPricelist) =>
-  landTransportPriceListRef(providerId, routeId).add({ ...pricelist, createdAt: new Date() });
+export const addLandTransportPricelist = (
+  providerId: string,
+  routeId: string,
+  pricelist: ProviderPricelist,
+) => landTransportPriceListRef(providerId, routeId).add({ ...pricelist, createdAt: new Date() });
 
 export const editLandTransportPricelist = (
   providerId: string,
@@ -104,8 +110,11 @@ export const editLandTransportPricelist = (
   pricelist: ProviderPricelist,
 ) => landTransportPriceListDocRef(providerId, routeId, pricelistId).set(pricelist, { merge: true });
 
-export const deleteLandTransportPricelist = (providerId: string, routeId: string, pricelistId: string) =>
-  landTransportPriceListDocRef(providerId, routeId, pricelistId).delete();
+export const deleteLandTransportPricelist = (
+  providerId: string,
+  routeId: string,
+  pricelistId: string,
+) => landTransportPriceListDocRef(providerId, routeId, pricelistId).delete();
 
 // Extensions config book
 const landTransportExtensionsConfigRef = (providerId: string) =>
@@ -114,8 +123,10 @@ const landTransportExtensionsConfigRef = (providerId: string) =>
 const landTransportExtensionConfigDocRef = (providerId: string, extensionId: string) =>
   landTransportExtensionsConfigRef(providerId).doc(extensionId);
 
-export const addLandTransportExtensionConfig = (providerId: string, extension: ProviderExtensionEntity) =>
-  landTransportExtensionsConfigRef(providerId).add({ ...extension, createdAt: new Date() });
+export const addLandTransportExtensionConfig = (
+  providerId: string,
+  extension: ProviderExtensionEntity,
+) => landTransportExtensionsConfigRef(providerId).add({ ...extension, createdAt: new Date() });
 
 export const editLandTransportExtensionConfig = (
   providerId: string,
@@ -131,17 +142,27 @@ export const deleteLandTransportExtensionConfig = (providerId: string, extension
 const landTransportExtensionsRef = (providerId: string, routeId: string, groupId: string) =>
   firebase
     .firestore()
-    .collection(`land-transport-config/${providerId}/routes/${routeId}/extensions-group/${groupId}/extensions`);
+    .collection(
+      `land-transport-config/${providerId}/routes/${routeId}/extensions-group/${groupId}/extensions`,
+    );
 
-const landTransportExtensionDocRef = (providerId: string, routeId: string, groupId: string, extensionId: string) =>
-  landTransportExtensionsRef(providerId, routeId, groupId).doc(extensionId);
+const landTransportExtensionDocRef = (
+  providerId: string,
+  routeId: string,
+  groupId: string,
+  extensionId: string,
+) => landTransportExtensionsRef(providerId, routeId, groupId).doc(extensionId);
 
 export const addLandTransportExtension = (
   providerId: string,
   routeId: string,
   groupId: string,
   extension: OfferProviderConfig,
-) => landTransportExtensionsRef(providerId, routeId, groupId).add({ ...extension, createdAt: new Date() });
+) =>
+  landTransportExtensionsRef(providerId, routeId, groupId).add({
+    ...extension,
+    createdAt: new Date(),
+  });
 
 export const editLandTransportExtension = (
   providerId: string,
@@ -149,7 +170,10 @@ export const editLandTransportExtension = (
   groupId: string,
   extensionId: string,
   extension: OfferProviderConfig,
-) => landTransportExtensionDocRef(providerId, routeId, groupId, extensionId).set(extension, { merge: true });
+) =>
+  landTransportExtensionDocRef(providerId, routeId, groupId, extensionId).set(extension, {
+    merge: true,
+  });
 
 export const deleteLandTransportExtension = (
   providerId: string,
@@ -161,16 +185,25 @@ export const deleteLandTransportExtension = (
 // Extensions group
 
 const landTransportExtensionsGroupRef = (providerId: string, routeId: string) =>
-  firebase.firestore().collection(`land-transport-config/${providerId}/routes/${routeId}/extensions-group`);
+  firebase
+    .firestore()
+    .collection(`land-transport-config/${providerId}/routes/${routeId}/extensions-group`);
 
-const landTransportExtensionGroupDocRef = (providerId: string, routeId: string, extensionGroupId: string) =>
-  landTransportExtensionsGroupRef(providerId, routeId).doc(extensionGroupId);
+const landTransportExtensionGroupDocRef = (
+  providerId: string,
+  routeId: string,
+  extensionGroupId: string,
+) => landTransportExtensionsGroupRef(providerId, routeId).doc(extensionGroupId);
 
 export const addLandTransportExtensionGroup = (
   providerId: string,
   routeId: string,
   extension: ProviderExtensionGroup,
-) => landTransportExtensionsGroupRef(providerId, routeId).add({ ...omitBy(isNil)(extension), createdAt: new Date() });
+) =>
+  landTransportExtensionsGroupRef(providerId, routeId).add({
+    ...omitBy(isNil)(extension),
+    createdAt: new Date(),
+  });
 
 export const addLandTransportExtensionGroupDefault = (providerId: string, routeId: string) =>
   landTransportExtensionGroupDocRef(providerId, routeId, 'DEFAULT').set({
@@ -183,7 +216,13 @@ export const editLandTransportExtensionGroup = (
   routeId: string,
   extensionId: string,
   extension: ProviderExtensionGroup,
-) => landTransportExtensionGroupDocRef(providerId, routeId, extensionId).set(extension, { merge: true });
+) =>
+  landTransportExtensionGroupDocRef(providerId, routeId, extensionId).set(extension, {
+    merge: true,
+  });
 
-export const deleteLandTransportExtensionGroup = (providerId: string, routeId: string, extensionId: string) =>
-  landTransportExtensionGroupDocRef(providerId, routeId, extensionId).delete();
+export const deleteLandTransportExtensionGroup = (
+  providerId: string,
+  routeId: string,
+  extensionId: string,
+) => landTransportExtensionGroupDocRef(providerId, routeId, extensionId).delete();

@@ -42,7 +42,9 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
         const queryByItemFilter = showMore
           ? query
           : query.where('type', 'in', [ActivityType.COMMENT, ActivityType.ACTIVITY_WITH_COMMENT]);
-        const queryByAdminRole = isAdmin ? query : queryByItemFilter.where('isInternal', '==', isAdmin);
+        const queryByAdminRole = isAdmin
+          ? query
+          : queryByItemFilter.where('isInternal', '==', isAdmin);
         return queryByAdminRole.orderBy('at', 'desc');
       },
       [isAdmin, showMore],
@@ -58,14 +60,18 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
 
   const normalizedActivityLog = useMemo(
     () =>
-      map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
-        activityCollection,
-      ) as ActivityLogItem[],
+      map(
+        flow(
+          update('at', invoke('toDate')),
+          update('paymentActivityData', normalizePaymentActivityData),
+        ),
+      )(activityCollection) as ActivityLogItem[],
     [activityCollection],
   );
-  const pinnedCommentsCount = useMemo(() => normalizedActivityLog?.filter(item => item.isPinned).length, [
-    normalizedActivityLog,
-  ]);
+  const pinnedCommentsCount = useMemo(
+    () => normalizedActivityLog?.filter(item => item.isPinned).length,
+    [normalizedActivityLog],
+  );
   const filteredActivityLog = useMemo(
     () =>
       normalizedActivityLog?.filter((item: ActivityLogItem) =>
@@ -73,12 +79,14 @@ const ActivityLogContainer: React.FC<Props> = ({ booking, isAdmin, isAccounting 
           ? item.isAccountingActivity
             ? showMore
               ? true
-              : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT
+              : item.type === ActivityType.COMMENT ||
+                item.type === ActivityType.ACTIVITY_WITH_COMMENT
             : false
           : showMore
-          ? !item.isAccountingActivity
-          : !item.isAccountingActivity &&
-            (item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT),
+            ? !item.isAccountingActivity
+            : !item.isAccountingActivity &&
+              (item.type === ActivityType.COMMENT ||
+                item.type === ActivityType.ACTIVITY_WITH_COMMENT),
       ),
     [showMore, normalizedActivityLog, isAccounting],
   );

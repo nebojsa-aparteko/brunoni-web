@@ -26,9 +26,14 @@ const BookingContainer: React.FC<Props> = ({ match }) => {
   const history = useHistory();
   const bookingSnapshot = useFirestoreDocument('bookings', bookingId);
 
-  const bookingDoc = bookingSnapshot ? ({ id: bookingSnapshot.id, ...bookingSnapshot.data() } as Booking) : undefined;
+  const bookingDoc = bookingSnapshot
+    ? ({ id: bookingSnapshot.id, ...bookingSnapshot.data() } as Booking)
+    : undefined;
 
-  const booking = useMemo(() => (bookingDoc ? normalizeBooking(bookingDoc) : undefined), [bookingDoc]);
+  const booking = useMemo(
+    () => (bookingDoc ? normalizeBooking(bookingDoc) : undefined),
+    [bookingDoc],
+  );
 
   if (bookingSnapshot === null || (bookingSnapshot && !bookingSnapshot.exists)) {
     history.push('/not-found');

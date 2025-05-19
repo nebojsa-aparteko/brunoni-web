@@ -1,6 +1,14 @@
 import { DefinedRange } from './types';
 
-import { addDays, startOfWeek, endOfWeek, addWeeks, startOfMonth, endOfMonth, addMonths } from 'date-fns';
+import {
+  addDays,
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  startOfMonth,
+  endOfMonth,
+  addMonths,
+} from 'date-fns';
 
 const getDefaultRanges = (date: Date): DefinedRange[] => [
   {

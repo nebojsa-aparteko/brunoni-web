@@ -13,7 +13,9 @@ interface Props {
 
 const WatchersChipMultiInput: React.FC<Props> = ({ options, values, fixedValues, onChange }) => {
   const filteredOptions = useMemo(() => {
-    return options.filter(option => (values ? !values.some(value => option?.alphacomId === value?.alphacomId) : true));
+    return options.filter(option =>
+      values ? !values.some(value => option?.alphacomId === value?.alphacomId) : true,
+    );
   }, [options, values]);
 
   return (
@@ -32,7 +34,9 @@ const WatchersChipMultiInput: React.FC<Props> = ({ options, values, fixedValues,
           />
         ))
       }
-      renderInput={params => <TextField {...params} label="Watchers" placeholder="Type to filter" variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} label="Watchers" placeholder="Type to filter" variant="outlined" />
+      )}
     />
   );
 };

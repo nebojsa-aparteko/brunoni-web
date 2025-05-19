@@ -61,7 +61,12 @@ const Client: React.FC<Props> = ({ match }) => {
       <Box my={4}>
         <Box display="flex" mb={2}>
           <Box flexShrink="0" displayPrint="none">
-            <IconButton aria-label="back button" color="primary" component={RouterLink} to="/clients">
+            <IconButton
+              aria-label="back button"
+              color="primary"
+              component={RouterLink}
+              to="/clients"
+            >
               <ArrowBackIcon />
             </IconButton>
           </Box>

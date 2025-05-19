@@ -13,7 +13,9 @@ import { TeamType } from '../model/Teams';
 const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsType }) => {
   const [messageText, setMessageText] = useState('');
   const actingAs = useContext(ActingAs)[0];
-  const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(undefined);
+  const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(
+    undefined,
+  );
   const [assignedUser, setAssignedUser] = useState<UserRecord | undefined>(undefined);
   const admins = useAdminUsers();
   const teams = useTeams();
@@ -22,11 +24,14 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsTyp
     //this means if user is admin
     if (!actingAs) {
       const tempUsers = admins
-        ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+        ?.map(
+          admin =>
+            ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` }) as MentionItem,
+        )
         .concat(
           teams
             ?.filter(team => (mentionTeamsType ? team.teamType === mentionTeamsType : true))
-            .map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)),
+            .map(team => ({ id: team.id, display: `${team.name}` }) as MentionItem),
         );
       return assignedCustomerUser
         ? tempUsers.concat([
@@ -56,7 +61,8 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsTyp
       .where('emailAddress', '==', booking?.assignedUser?.emailAddress || '')
       .get()
       .then(doc => {
-        if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        if (doc.docs.length > 0)
+          setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
   }, [booking]);
 
@@ -68,7 +74,8 @@ const CommentInput: React.FC<Props> = ({ booking, onInputChange, mentionTeamsTyp
       .where('emailAddress', '==', booking?.assignedCustomerUser?.emailAddress || '')
       .get()
       .then(doc => {
-        if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        if (doc.docs.length > 0)
+          setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
   }, [booking]);
   return (

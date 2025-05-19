@@ -54,7 +54,10 @@ const ExportFlowsContainer: React.FC = () => {
   const availableCarriers = useContext(Carriers);
   const [filters, setFilters] = useEquipmentControlFilterProviderContext();
   const { carrier } = filters;
-  const findLocationById = useCallback((id: string) => locations?.find(loc => loc.id === id), [locations]);
+  const findLocationById = useCallback(
+    (id: string) => locations?.find(loc => loc.id === id),
+    [locations],
+  );
   const groupedSummary = useMemo(
     () =>
       Object.entries(
@@ -67,7 +70,10 @@ const ExportFlowsContainer: React.FC = () => {
       ),
     [summary, locations, filters],
   );
-  const countries = useMemo(() => uniq(groupedSummary.map(([country]) => country.split('~')[0])), [groupedSummary]);
+  const countries = useMemo(
+    () => uniq(groupedSummary.map(([country]) => country.split('~')[0])),
+    [groupedSummary],
+  );
   const selectableLocations = useMemo(() => {
     const ids = summary.map(v => v.id);
     return locations?.filter(l => ids.includes(l.id));
@@ -105,7 +111,9 @@ const ExportFlowsContainer: React.FC = () => {
               selectedLocation={filters.location}
               selectableValues={selectableLocations}
               onChange={location =>
-                setFilters(prevState => set('location', findLocationById(location)?.id || '')(prevState))
+                setFilters(prevState =>
+                  set('location', findLocationById(location)?.id || '')(prevState),
+                )
               }
             />
           </Box>
@@ -128,7 +136,9 @@ const ExportFlowsContainer: React.FC = () => {
             </IconButton>
             <Box display="flex" flexDirection="column" alignItems="center">
               <Typography>Change week range</Typography>
-              <Typography>{getMultipleWeekDateRange(startWeek, startWeekYear, endWeek, endWeekYear)}</Typography>
+              <Typography>
+                {getMultipleWeekDateRange(startWeek, startWeekYear, endWeek, endWeekYear)}
+              </Typography>
             </Box>
             <IconButton
               color="primary"
@@ -159,13 +169,17 @@ const ExportFlowsContainer: React.FC = () => {
                   setFilters(prevState =>
                     set(
                       'containerTypes',
-                      containerTypesValues.filter(type => (event.target.value as string[])?.includes(type)),
+                      containerTypesValues.filter(type =>
+                        (event.target.value as string[])?.includes(type),
+                      ),
                     )(prevState),
                   )
                 }
                 input={<Input />}
                 renderValue={selected =>
-                  (selected as any[]).map(s => get(EquipmentControlContainerTypes, s, '-')).join(', ')
+                  (selected as any[])
+                    .map(s => get(EquipmentControlContainerTypes, s, '-'))
+                    .join(', ')
                 }
                 MenuProps={MenuProps}
               >

@@ -1,5 +1,9 @@
 import React from 'react';
-import { TaskAdditionalInfo, TaskAdditionalInfoType, TaskAdditionalInfoTypeDescription } from '../model/Task';
+import {
+  TaskAdditionalInfo,
+  TaskAdditionalInfoType,
+  TaskAdditionalInfoTypeDescription,
+} from '../model/Task';
 import formatDate from 'date-fns/format';
 import safeInvoke from '../utilities/safeInvoke';
 import { Box, IconButton, Tooltip } from '@material-ui/core';
@@ -9,8 +13,11 @@ import { mdiStar } from '@mdi/js';
 
 const getAdditionalInfoText = (additionalInfo: TaskAdditionalInfo) => {
   if (additionalInfo.type === TaskAdditionalInfoType.AMS_CLOSING)
-    return `${Object.entries(TaskAdditionalInfoTypeDescription).find(t => t[0] === additionalInfo?.type)?.[1] ||
-      '-'} ${formatDate(safeInvoke('toDate')(additionalInfo.amsClosingDate), 'd. MMMM yyyy HH:mm')}`;
+    return `${
+      Object.entries(TaskAdditionalInfoTypeDescription).find(
+        t => t[0] === additionalInfo?.type,
+      )?.[1] || '-'
+    } ${formatDate(safeInvoke('toDate')(additionalInfo.amsClosingDate), 'd. MMMM yyyy HH:mm')}`;
   if (additionalInfo.type === TaskAdditionalInfoType.ON_HOLD)
     return `${Object.entries(TaskAdditionalInfoTypeDescription).find(t => t[0] === additionalInfo?.type)?.[1] || '-'} `;
   if (additionalInfo.type === TaskAdditionalInfoType.BOOKING_HAS_PINNED_COMMENTS)
@@ -39,7 +46,9 @@ const AdditionalInfoBadge: React.FC<BadgeProps> = ({ additionalInfo }) => (
 const TaskAdditionalInfoView: React.FC<Props> = ({ additionalInfo }) => (
   <Box>
     {Array.isArray(additionalInfo) ? (
-      additionalInfo.map((info, i) => <AdditionalInfoBadge key={`${info.type}-${i}`} additionalInfo={info} />)
+      additionalInfo.map((info, i) => (
+        <AdditionalInfoBadge key={`${info.type}-${i}`} additionalInfo={info} />
+      ))
     ) : (
       <AdditionalInfoBadge additionalInfo={additionalInfo} />
     )}

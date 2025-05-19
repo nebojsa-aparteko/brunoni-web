@@ -109,10 +109,10 @@ const checkIfStatusSelected = (
         ? platformStatus && platformStatus.includes(payment.platformStatus)
         : selectedStatuses && selectedStatuses.includes(payment.status)
       : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
-      ? payment.status !== WeeklyPaymentStatus.PAID
-        ? platformStatus && platformStatus.includes(payment.platformStatus)
-        : selectedStatuses && selectedStatuses.includes(payment.status)
-      : platformStatus && platformStatus.includes(payment.platformStatus)
+        ? payment.status !== WeeklyPaymentStatus.PAID
+          ? platformStatus && platformStatus.includes(payment.platformStatus)
+          : selectedStatuses && selectedStatuses.includes(payment.status)
+        : platformStatus && platformStatus.includes(payment.platformStatus)
     : selectedStatuses && selectedStatuses.includes(payment.status);
 };
 
@@ -213,7 +213,9 @@ const PaymentOverviewContainer = () => {
         setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
       }
       if (setCommissionsFilter) {
-        setCommissionsFilter(prevState => set('currency', event.target.value as Currency[])(prevState));
+        setCommissionsFilter(prevState =>
+          set('currency', event.target.value as Currency[])(prevState),
+        );
       }
     },
     [setCommissionsFilter, setFilters],
@@ -238,17 +240,24 @@ const PaymentOverviewContainer = () => {
 
       if (setFilters) {
         const platformStatuses = newSelectedValues.filter(status =>
-          Object.values(WeeklyPaymentPlatformStatus).includes(status as WeeklyPaymentPlatformStatus),
+          Object.values(WeeklyPaymentPlatformStatus).includes(
+            status as WeeklyPaymentPlatformStatus,
+          ),
         );
         const paymentStatuses = newSelectedValues.filter(status =>
           Object.values(WeeklyPaymentStatus).includes(status as WeeklyPaymentStatus),
         );
 
         setFilters(prevState =>
-          set('platformStatus', platformStatuses.length > 0 ? platformStatuses : undefined)(prevState),
+          set(
+            'platformStatus',
+            platformStatuses.length > 0 ? platformStatuses : undefined,
+          )(prevState),
         );
 
-        setFilters(prevState => set('status', paymentStatuses.length > 0 ? paymentStatuses : undefined)(prevState));
+        setFilters(prevState =>
+          set('status', paymentStatuses.length > 0 ? paymentStatuses : undefined)(prevState),
+        );
       }
     },
     [setFilters],
@@ -261,7 +270,9 @@ const PaymentOverviewContainer = () => {
       }
       if (setCommissionsFilter) {
         setCommissionsFilter(prevState =>
-          set('dateRange', { startDate: startOfDay(date), endDate: startOfDay(date) } as DateRange)(prevState),
+          set('dateRange', { startDate: startOfDay(date), endDate: startOfDay(date) } as DateRange)(
+            prevState,
+          ),
         );
       }
       setDateOpen(false);
@@ -304,7 +315,7 @@ const PaymentOverviewContainer = () => {
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -353,7 +364,14 @@ const PaymentOverviewContainer = () => {
         })
         .finally(() => setSelectedPayments([]));
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, user, dispatch],
+    [
+      filteredOverviewData,
+      getActivityLogUserData,
+      enqueueSnackbar,
+      selectedPayments,
+      user,
+      dispatch,
+    ],
   );
 
   const selectDeselectAll = () => {
@@ -407,7 +425,9 @@ const PaymentOverviewContainer = () => {
               onChange={onStatusChange}
               input={<Input />}
               renderValue={selected =>
-                (selected as any[]).map(s => ((s as string) === 'Blocked' ? 'Approved' : (s as string))).join(', ')
+                (selected as any[])
+                  .map(s => ((s as string) === 'Blocked' ? 'Approved' : (s as string)))
+                  .join(', ')
               }
               MenuProps={MenuProps}
             >
@@ -441,7 +461,10 @@ const PaymentOverviewContainer = () => {
             onClick={handleClickMenu}
             color="primary"
             variant="outlined"
-            disabled={!(filteredOverviewData && filteredOverviewData.length > 0) || selectedPayments.length === 0}
+            disabled={
+              !(filteredOverviewData && filteredOverviewData.length > 0) ||
+              selectedPayments.length === 0
+            }
             style={{ marginBottom: theme.spacing(1) }}
           >
             Postpone Selected Payments
@@ -462,7 +485,11 @@ const PaymentOverviewContainer = () => {
           isWeeklyPaymentOverview={true}
         />
         {isDialogOpen && (
-          <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+          <PaymentOverviewDialog
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingId={openBooking}
+          />
         )}
       </CardContent>
     </Card>

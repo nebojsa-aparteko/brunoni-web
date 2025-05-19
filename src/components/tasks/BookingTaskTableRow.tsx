@@ -52,7 +52,9 @@ const BookingTaskTableRow: React.FC<Props> = ({ task, onSelectTask, selected, ta
         </Link>
       </TableCell>
       <TableCell align="center">{task.assignedUser?.emailAddress || '-'}</TableCell>
-      <TableCell align="center">{task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}</TableCell>
+      <TableCell align="center">
+        {task.dueDate ? formatDate(task.dueDate, 'yyyy-MM-dd HH:mm:ss') : '-'}
+      </TableCell>
       <TableCell align="center">
         <TaskStatusChip task={task} />
       </TableCell>

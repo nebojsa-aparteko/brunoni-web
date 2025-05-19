@@ -60,7 +60,13 @@ interface RoutesListProps {
 }
 
 // TODO Make this searchable and selectable list component reusable
-const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, onSelect, onSelectAll }) => {
+const RoutesList: React.FC<RoutesListProps> = ({
+  title,
+  items,
+  selectedItems,
+  onSelect,
+  onSelectAll,
+}) => {
   const classes = useStyles();
   const [searchStringState, setSearchStringState] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -80,7 +86,10 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
   );
   const numberOfResults = useMemo(() => filteredItems.length || 0, [filteredItems]);
 
-  const paginatedItems = useMemo(() => flow(drop(page * 10), take(10))(filteredItems), [filteredItems, page]);
+  const paginatedItems = useMemo(
+    () => flow(drop(page * 10), take(10))(filteredItems),
+    [filteredItems, page],
+  );
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, page: number) => {
     event?.stopPropagation();
@@ -102,9 +111,12 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
         avatar={
           <Checkbox
             onClick={onSelectAll}
-            checked={Boolean(Object.keys(selectedItems).length === items?.length && items?.length !== 0)}
+            checked={Boolean(
+              Object.keys(selectedItems).length === items?.length && items?.length !== 0,
+            )}
             indeterminate={
-              Object.keys(selectedItems).length !== items?.length && Object.keys(selectedItems).length !== 0
+              Object.keys(selectedItems).length !== items?.length &&
+              Object.keys(selectedItems).length !== 0
             }
             disabled={items?.length === 0}
             inputProps={{
@@ -114,7 +126,13 @@ const RoutesList: React.FC<RoutesListProps> = ({ title, items, selectedItems, on
         }
         title={title}
         subheader={`${Object.keys(selectedItems).length} routes selected`}
-        action={<SingleCountryInput margin="dense" value={(selectedCountry || null)!} onChange={setSelectedCountry} />}
+        action={
+          <SingleCountryInput
+            margin="dense"
+            value={(selectedCountry || null)!}
+            onChange={setSelectedCountry}
+          />
+        }
       />
       <Divider />
       <SimpleSearch onSearch={handleSearch} style={{ width: '100%' }} />
@@ -235,7 +253,12 @@ interface RouteSelectingModalProps {
 
 type SelectedItems = { [key: string]: RouteFromCity };
 
-const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, isOpen, countryId, startCityId }) => {
+const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({
+  closeModal,
+  isOpen,
+  countryId,
+  startCityId,
+}) => {
   const classes = useStyles();
   // get routes
   const distances = useDistanceBetweenCities(countryId, startCityId);
@@ -244,7 +267,8 @@ const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, i
   const [checkedAvailableRoutes, setCheckedAvailableRoutes] = useState<SelectedItems>({});
   const [checkedSelectedRoutes, setCheckedSelectedRoutes] = useState<SelectedItems>({});
   const filteredDistances = useMemo(
-    () => distances?.filter(val => selectedDistances.findIndex(value => val.id === value.id) === -1),
+    () =>
+      distances?.filter(val => selectedDistances.findIndex(value => val.id === value.id) === -1),
     [distances, selectedDistances],
   );
   const handleCheck = (value: RouteFromCity, direction: 'left' | 'right') => {
@@ -263,7 +287,9 @@ const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, i
     setCheckedAvailableRoutes({});
   };
   const handleRemoveSelected = () => {
-    setSelectedDistances(prevState => prevState.filter(val => !Object.values(checkedSelectedRoutes).includes(val)));
+    setSelectedDistances(prevState =>
+      prevState.filter(val => !Object.values(checkedSelectedRoutes).includes(val)),
+    );
     setCheckedSelectedRoutes({});
   };
   const selectAll = (direction: 'left' | 'right') => {
@@ -272,8 +298,10 @@ const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, i
       setCheckedAvailableRoutes(
         isAllSelected
           ? {}
-          : distances?.reduce((previousValue, currentValue) => set(currentValue.id, currentValue)(previousValue), {}) ||
+          : distances?.reduce(
+              (previousValue, currentValue) => set(currentValue.id, currentValue)(previousValue),
               {},
+            ) || {},
       );
     } else {
       setCheckedSelectedRoutes(
@@ -314,7 +342,12 @@ const RouteSelectingModal: React.FC<RouteSelectingModalProps> = ({ closeModal, i
           <Grid
             item
             xs={2}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
             <Grid container direction="column" alignItems="center" style={{ maxHeight: '100%' }}>
               <Button

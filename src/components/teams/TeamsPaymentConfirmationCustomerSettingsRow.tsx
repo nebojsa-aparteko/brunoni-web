@@ -1,4 +1,12 @@
-import { Button, Checkbox, IconButton, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
+import {
+  Button,
+  Checkbox,
+  IconButton,
+  TableCell,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import firebase from 'firebase';
 import { isEqual, omit, set } from 'lodash/fp';
@@ -8,7 +16,11 @@ import Carriers from '../../contexts/Carriers';
 import useClients from '../../hooks/useClients';
 import Carrier from '../../model/Carrier';
 import Client from '../../model/Client';
-import { CarrierSettingsRule, CustomerSettingsRule, ImpExp } from '../../model/PaymentConfirmationRule';
+import {
+  CarrierSettingsRule,
+  CustomerSettingsRule,
+  ImpExp,
+} from '../../model/PaymentConfirmationRule';
 import { GlobalContext } from '../../store/GlobalStore';
 import AutomaticEmailSendSwitch from '../AutomaticEmailSendSwitch';
 import CarrierInput from '../inputs/CarrierInput';
@@ -24,7 +36,9 @@ interface Props {
 }
 
 // utility function to remove automaticMessage field from paymentConfirmation Object
-export const omitAutomaticMessage = (paymentConfirmation: CustomerSettingsRule | CarrierSettingsRule) => {
+export const omitAutomaticMessage = (
+  paymentConfirmation: CustomerSettingsRule | CarrierSettingsRule,
+) => {
   return omit(['automaticMessage'])(paymentConfirmation);
 };
 
@@ -38,13 +52,17 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
   const carriers = useContext(Carriers);
   const clients = useClients();
   const [, dispatch] = useContext(GlobalContext);
-  const [paymentConfirmationState, setPaymentConfirmationState] = useState<CustomerSettingsRule>(paymentConfirmation);
+  const [paymentConfirmationState, setPaymentConfirmationState] =
+    useState<CustomerSettingsRule>(paymentConfirmation);
   const { enqueueSnackbar } = useSnackbar();
 
   const { carrier, category, client, contact, statisticClient } = paymentConfirmationState;
 
   const changed = useMemo(
-    () => !isEqual(omitAutomaticMessage(paymentConfirmation))(omitAutomaticMessage(paymentConfirmationState)),
+    () =>
+      !isEqual(omitAutomaticMessage(paymentConfirmation))(
+        omitAutomaticMessage(paymentConfirmationState),
+      ),
     [paymentConfirmation, paymentConfirmationState],
   );
 
@@ -71,11 +89,21 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         autoHideDuration: 3000,
       });
     }
-  }, [carrier, client, dispatch, enqueueSnackbar, paymentConfirmation.id, paymentConfirmationState]);
+  }, [
+    carrier,
+    client,
+    dispatch,
+    enqueueSnackbar,
+    paymentConfirmation.id,
+    paymentConfirmationState,
+  ]);
 
-  const changeData = useCallback((path: string, value?: Carrier | Client | string | string[] | null | ImpExp) => {
-    setPaymentConfirmationState(prevState => set(path, value)(prevState));
-  }, []);
+  const changeData = useCallback(
+    (path: string, value?: Carrier | Client | string | string[] | null | ImpExp) => {
+      setPaymentConfirmationState(prevState => set(path, value)(prevState));
+    },
+    [],
+  );
 
   // const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   let categoryArray: BookingCategory[] = category;
@@ -108,7 +136,11 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
         />
       </TableCell>
       <TableCell align="left">
-        <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
+        <CarrierInput
+          carriers={carriers}
+          onChange={carrier => changeData('carrier', carrier)}
+          value={carrier}
+        />
       </TableCell>
       <TableCell align="left">
         {/*<CategoryMultiSelect value={category} onChange={handleImportOrExportChange} />*/}
@@ -145,12 +177,21 @@ const TeamPaymentConfirmationCustomerSettingsRow: React.FC<Props> = ({
       </TableCell>
       <TableCell align="right">
         {changed ? (
-          <Button onClick={handleEditClientStatistic} size="small" color="primary" variant="contained">
+          <Button
+            onClick={handleEditClientStatistic}
+            size="small"
+            color="primary"
+            variant="contained"
+          >
             Save
           </Button>
         ) : (
           <Tooltip title="Copy">
-            <IconButton onClick={() => onCopy(paymentConfirmation.id)} aria-label="copy" color="primary">
+            <IconButton
+              onClick={() => onCopy(paymentConfirmation.id)}
+              aria-label="copy"
+              color="primary"
+            >
               <FileCopyIcon />
             </IconButton>
           </Tooltip>

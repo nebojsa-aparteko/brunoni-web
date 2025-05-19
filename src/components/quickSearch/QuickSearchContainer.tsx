@@ -47,7 +47,7 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
   useEffect(() => {
     if (inputRef) {
       let moustrapInstance = new Mousetrap(inputRef.current);
-      moustrapInstance.stopCallback = function() {
+      moustrapInstance.stopCallback = function () {
         return false;
       };
       moustrapInstance.bind(['enter', 'enter'], () => handleBookingSearch(fieldPath));
@@ -66,14 +66,12 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
       .get()
       .then(
         result =>
-          new Promise<string>(resolve => resolve((result.docs[0]?.data() as LoadListContainerModel)?.bookingId)),
+          new Promise<string>(resolve =>
+            resolve((result.docs[0]?.data() as LoadListContainerModel)?.bookingId),
+          ),
       )
       .then(bookingId => {
-        return firebase
-          .firestore()
-          .collection('bookings')
-          .doc(bookingId)
-          .get();
+        return firebase.firestore().collection('bookings').doc(bookingId).get();
       })
       .then(booking => {
         setSearchResult(normalizeBooking(booking.data()));
@@ -82,9 +80,12 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
       .catch(error => {
         console.log(error);
         setIsLoading(false);
-        enqueueSnackbar(<Typography color="inherit">{`There is no record with this ${fieldPath}.`}</Typography>, {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          <Typography color="inherit">{`There is no record with this ${fieldPath}.`}</Typography>,
+          {
+            variant: 'error',
+          },
+        );
       });
   };
   return (
@@ -99,7 +100,11 @@ const QuickSearchContainer: React.FC<Props> = ({ label, fieldPath, handleClose }
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
-        <IconButton aria-label="delete" color="primary" onClick={() => handleBookingSearch(fieldPath)}>
+        <IconButton
+          aria-label="delete"
+          color="primary"
+          onClick={() => handleBookingSearch(fieldPath)}
+        >
           <SearchIcon />
         </IconButton>
       </FormControl>

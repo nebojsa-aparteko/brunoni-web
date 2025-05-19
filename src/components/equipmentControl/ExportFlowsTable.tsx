@@ -20,7 +20,15 @@ import truncateString from '../../utilities/truncateString';
 import EquipmentControlExportRow from './EquipmentControlExportRow';
 import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import { useEquipmentControlFilterProviderContext } from '../../providers/EquipmentControlFilterProvider';
-import { endOfISOWeek, format, getISOWeek, getYear, setISOWeek, setYear, startOfISOWeek } from 'date-fns';
+import {
+  endOfISOWeek,
+  format,
+  getISOWeek,
+  getYear,
+  setISOWeek,
+  setYear,
+  startOfISOWeek,
+} from 'date-fns';
 
 interface ImportFlowsTableProps {
   summary: [string, EquipmentExportSummary[]][];
@@ -31,17 +39,29 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const [filters] = useEquipmentControlFilterProviderContext();
 
   return !summary ? (
-    <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+    <Box
+      minHeight="40vh"
+      p={3}
+      width={1}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
       <CircularProgress />
     </Box>
   ) : summary.length === 0 ? (
-    <BookingsEmptyResults message={'No equipment control found for your filter criteria. Try changing filters.'} />
+    <BookingsEmptyResults
+      message={'No equipment control found for your filter criteria. Try changing filters.'}
+    />
   ) : (
     <TableContainer className={classes.container}>
       <Table stickyHeader size="small" aria-label="a dense table" className={classes.root}>
         <TableHead className={classes.table}>
           <TableRow>
-            <TableCell rowSpan={2} className={clsx([classes.stickySide, classes.headerCell, classes.borderRight])}>
+            <TableCell
+              rowSpan={2}
+              className={clsx([classes.stickySide, classes.headerCell, classes.borderRight])}
+            >
               Depot Location
             </TableCell>
             <TableCell rowSpan={2} />
@@ -97,7 +117,11 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                       <TableCell
                         style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
                         colSpan={statusLabels.length * containerTypesLabels.length + 2}
-                        className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
+                        className={clsx([
+                          classes.headerCell,
+                          classes.borderRight,
+                          classes.tightCell,
+                        ])}
                       >
                         {get(CountryCodes, countryCode, '-')}
                       </TableCell>
@@ -115,7 +139,10 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                             </TableCell>
                           </Tooltip>
                         )}
-                        <EquipmentControlExportRow equipmentControl={equipment} key={equipment.id} />
+                        <EquipmentControlExportRow
+                          equipmentControl={equipment}
+                          key={equipment.id}
+                        />
                       </TableRow>
                     ))}
                   </Fragment>
@@ -123,7 +150,14 @@ const ExportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
               })) || (
             <TableRow>
               <TableCell colSpan={10000}>
-                <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+                <Box
+                  minHeight="40vh"
+                  p={3}
+                  width={1}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
                   <CircularProgress />
                 </Box>
               </TableCell>
@@ -233,4 +267,5 @@ export const getMultipleWeekDateRange = (
   return `${format(startOfISOWeek(startWeekDate), 'dd.MM')} - ${format(endOfISOWeek(endWeekDate), 'dd.MM')}`;
 };
 
-export const getWeekDate = (year: number, week: number) => setISOWeek(setYear(new Date(), year), week);
+export const getWeekDate = (year: number, week: number) =>
+  setISOWeek(setYear(new Date(), year), week);

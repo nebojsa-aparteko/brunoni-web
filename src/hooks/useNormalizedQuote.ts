@@ -20,7 +20,13 @@ const useNormalizeQuote = () => {
     const getPort = getEntity(ports, port => port.id);
     const getCarrier = getEntity(carriers, carrier => carrier.name);
 
-    return normalizeQuote(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
+    return normalizeQuote(
+      getContainerType,
+      getCommodityType,
+      getPickupLocation,
+      getPort,
+      getCarrier,
+    );
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 };
 

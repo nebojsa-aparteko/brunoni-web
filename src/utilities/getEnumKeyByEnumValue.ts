@@ -6,6 +6,9 @@ export default function getEnumKeyByEnumValue<T extends { [index: string]: strin
   return keys.length > 0 ? keys[0] : null;
 }
 
-export function getEnumValueByEnumKey<T extends { [index: string]: string }>(myEnum: T, enumKey: string) {
+export function getEnumValueByEnumKey<T extends { [index: string]: string }>(
+  myEnum: T,
+  enumKey: string,
+) {
   return myEnum[enumKey];
 }

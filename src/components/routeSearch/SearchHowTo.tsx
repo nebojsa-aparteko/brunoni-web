@@ -16,8 +16,8 @@ export default () => (
             <Box fontWeight="fontWeightBold">Search Voyages</Box>
           </Typography>
           <Typography variant="subtitle1">
-            To see the voyages that are best for you, please input origin, destination and earliest date of departure
-            and click "Search"
+            To see the voyages that are best for you, please input origin, destination and earliest
+            date of departure and click "Search"
           </Typography>
         </Box>
       </Grid>

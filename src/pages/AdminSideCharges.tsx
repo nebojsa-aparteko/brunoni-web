@@ -1,7 +1,17 @@
 import React, { useContext } from 'react';
 import Carriers from '../contexts/Carriers';
 import Meta from '../components/Meta';
-import { Box, Grid, List, ListItem, ListItemAvatar, ListItemText, Paper, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Grid,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Paper,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import SideCharges from '../components/admin/SideCharges';
@@ -49,7 +59,10 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
                         onClick={() => (selected ? history.push('/charges') : history.push(path))}
                       >
                         <ListItemAvatar className={classes.avatarContainer}>
-                          <FiberManualRecordIcon className={classes.avatar} style={{ color: carrier.color }} />
+                          <FiberManualRecordIcon
+                            className={classes.avatar}
+                            style={{ color: carrier.color }}
+                          />
                         </ListItemAvatar>
                         <ListItemText primary={carrier.name.toUpperCase()} />
                       </ListItem>

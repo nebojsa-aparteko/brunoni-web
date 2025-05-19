@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import firebase from '../firebase';
-import WeeklyPayment, { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus } from '../model/WeeklyPayment';
+import WeeklyPayment, {
+  WeeklyPaymentPlatformStatus,
+  WeeklyPaymentStatus,
+} from '../model/WeeklyPayment';
 import useFirestoreCollection from './useFirestoreCollection';
 import { useWeeklyPaymentFilterProviderContext } from '../providers/WeeklyPaymentFilterProvider';
 import { update } from 'lodash/fp';
@@ -28,7 +31,9 @@ export default (bookingId?: string) => {
             platformStatus.includes(WeeklyPaymentPlatformStatus.ON_HOLD) &&
             !extendedStatusArray.includes(WeeklyPaymentStatus.IN_PROGRESS)
           ) {
-            extendedStatusArray = extendedStatusArray.concat(WeeklyPaymentStatus.IN_PROGRESS as string);
+            extendedStatusArray = extendedStatusArray.concat(
+              WeeklyPaymentStatus.IN_PROGRESS as string,
+            );
           }
           if (
             platformStatus.includes(WeeklyPaymentPlatformStatus.CLEARED) &&
@@ -56,4 +61,5 @@ export default (bookingId?: string) => {
   }) as WeeklyPayment[];
 };
 
-export const normalizePaymentOverview = (item: any) => update('payDate', safeInvoke('toDate'))(item);
+export const normalizePaymentOverview = (item: any) =>
+  update('payDate', safeInvoke('toDate'))(item);

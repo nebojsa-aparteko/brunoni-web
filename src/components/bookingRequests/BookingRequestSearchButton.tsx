@@ -1,4 +1,12 @@
-import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Box,
   Button,
@@ -97,7 +105,7 @@ const SearchBookingRequest: React.FC<SearchBookingRequestProps> = ({
   useEffect(() => {
     if (inputRef && inputRef) {
       let mousetrapInstance = new Mousetrap(inputRef.current);
-      mousetrapInstance.stopCallback = function() {
+      mousetrapInstance.stopCallback = function () {
         return false;
       };
       mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
@@ -143,7 +151,9 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
   const [, setBookingPaginationContextData] = useBookingListPaginationContext();
 
   useEffect(() => {
-    setSelectedClient(searchField === 'client.id' ? clients?.find(client => client.id === searchValue) : undefined);
+    setSelectedClient(
+      searchField === 'client.id' ? clients?.find(client => client.id === searchValue) : undefined,
+    );
   }, [searchField, searchValue, clients]);
 
   const handleBookingSearch = useCallback(() => {
@@ -155,14 +165,21 @@ const SearchClient: React.FC<SearchBookingRequestProps> = ({
     setSearchField(selectedClient ? fieldName : undefined);
     setSearchValue(selectedClient?.id);
     closeModal();
-  }, [setBookingPaginationContextData, setSearchField, selectedClient, fieldName, setSearchValue, closeModal]);
+  }, [
+    setBookingPaginationContextData,
+    setSearchField,
+    selectedClient,
+    fieldName,
+    setSearchValue,
+    closeModal,
+  ]);
 
   const inputRef = useRef();
 
   useEffect(() => {
     if (inputRef) {
       let mousetrapInstance = new Mousetrap(inputRef.current);
-      mousetrapInstance.stopCallback = function() {
+      mousetrapInstance.stopCallback = function () {
         return false;
       };
       mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
@@ -210,8 +227,8 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
       filters.maxStatusCode && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS
         ? [BookingRequestStatusText.REQUESTED, BookingRequestStatusText.IN_PROGRESS]
         : filters.minStatusCode && filters.minStatusCode === BookingRequestStatusCode.CONFIRMED
-        ? [BookingRequestStatusText.CONFIRMED, BookingRequestStatusText.ARCHIVED]
-        : Object.values(BookingRequestStatusText),
+          ? [BookingRequestStatusText.CONFIRMED, BookingRequestStatusText.ARCHIVED]
+          : Object.values(BookingRequestStatusText),
     [filters.minStatusCode, filters.maxStatusCode],
   );
 
@@ -239,7 +256,7 @@ const SearchStatus: React.FC<SearchBookingRequestProps> = ({
   useEffect(() => {
     if (inputRef) {
       let mousetrapInstance = new Mousetrap(inputRef.current);
-      mousetrapInstance.stopCallback = function() {
+      mousetrapInstance.stopCallback = function () {
         return false;
       };
       mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
@@ -305,7 +322,12 @@ const SearchDialog: React.FC<SearchDialogProps> = ({
     closeModal();
   };
   return (
-    <Dialog open={isOpen} onClose={closeModal} aria-labelledby="dialog-title-navBar-quick-search" maxWidth="xl">
+    <Dialog
+      open={isOpen}
+      onClose={closeModal}
+      aria-labelledby="dialog-title-navBar-quick-search"
+      maxWidth="xl"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Search</Typography>
@@ -427,7 +449,9 @@ const BookingRequestSearchButton: React.FC<SearchButtonProps> = ({
       <IconButton
         onClick={openModal}
         onMouseDown={e => e.preventDefault()}
-        style={{ backgroundColor: searchField || searchValue ? 'rgba(255,103,95,0.15)' : undefined }}
+        style={{
+          backgroundColor: searchField || searchValue ? 'rgba(255,103,95,0.15)' : undefined,
+        }}
       >
         <SearchIcon fontSize="large" />
       </IconButton>

@@ -110,7 +110,9 @@ const QuoteGroupsView: React.FC<Props> = ({
               containsString(quoteGroup.destination?.id || '', searchString) ||
               containsString(quoteGroup.destination?.city || '', searchString) ||
               find((container: Container) => {
-                return container.containerType ? containsString(container.containerType.name, searchString) : false;
+                return container.containerType
+                  ? containsString(container.containerType.name, searchString)
+                  : false;
               })(quoteGroup.containers) !== undefined ||
               find((commodityType: CommodityType) => {
                 return containsString(commodityType.name, searchString);
@@ -137,7 +139,9 @@ const QuoteGroupsView: React.FC<Props> = ({
     setQuoteListContextData(set('page', page)(quoteListContextData));
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     setQuoteListContextData(
       flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(quoteListContextData),
     );
@@ -145,7 +149,9 @@ const QuoteGroupsView: React.FC<Props> = ({
 
   const handleSearch = (searchStringNew: string) => {
     if (searchStringNew !== searchString) {
-      setQuoteListContextData(flow(set('searchString', searchStringNew), set('page', 0))(quoteListContextData));
+      setQuoteListContextData(
+        flow(set('searchString', searchStringNew), set('page', 0))(quoteListContextData),
+      );
     }
   };
   //
@@ -159,7 +165,11 @@ const QuoteGroupsView: React.FC<Props> = ({
 
   return (
     <Fragment>
-      <QuotesFiltersBar showClientFilter={showCompanyInfo} showDateRange={showDateFilter} showRefreshButton />
+      <QuotesFiltersBar
+        showClientFilter={showCompanyInfo}
+        showDateRange={showDateFilter}
+        showRefreshButton
+      />
       {quoteGroups ? (
         <Fragment>
           <Card className={className} {...rest}>
@@ -178,7 +188,9 @@ const QuoteGroupsView: React.FC<Props> = ({
                   <div id="searchQuotes">
                     <Search
                       onSearch={handleSearch}
-                      style={{ visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden' }}
+                      style={{
+                        visibility: quoteGroups && quoteGroups.length > 0 ? 'initial' : 'hidden',
+                      }}
                     />
                   </div>
                 </Box>

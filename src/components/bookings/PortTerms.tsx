@@ -1,5 +1,14 @@
 import React, { Fragment } from 'react';
-import { Box, createStyles, makeStyles, Table, TableCell, TableHead, TableRow, Theme } from '@material-ui/core';
+import {
+  Box,
+  createStyles,
+  makeStyles,
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
+  Theme,
+} from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import { PortTerms } from '../../model/Booking';
 
@@ -106,11 +115,15 @@ const PortTermsDetails: React.FC<Props> = ({ portTerms }) => {
                   <TableRow key={`booking-closing-${index}`} className={classes.tableRow}>
                     <TableCell>{item.ClosingType}</TableCell>
                     {item.ClosingTime ? (
-                      <TableCell style={{ minWidth: '13em' }}>{`${item.ClosingDate} - ${item.ClosingTime}h`}</TableCell>
+                      <TableCell
+                        style={{ minWidth: '13em' }}
+                      >{`${item.ClosingDate} - ${item.ClosingTime}h`}</TableCell>
                     ) : (
                       <TableCell>{item.ClosingDate}</TableCell>
                     )}
-                    <TableCell>{item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}</TableCell>
+                    <TableCell>
+                      {item.ClosingType !== 'DELIVERY' ? item.ClosingTxt : null}
+                    </TableCell>
                   </TableRow>
                 );
               })}

@@ -17,7 +17,9 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
           control={
             <Checkbox
               onChange={event => {
-                event.target.checked ? handleChange(stage, event.target.checked) : setActionDialogOpen(true);
+                event.target.checked
+                  ? handleChange(stage, event.target.checked)
+                  : setActionDialogOpen(true);
               }}
               name={stage.label}
               color="primary"
@@ -28,7 +30,8 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
         />
         {stage.checked && stage.by && stage.at && (
           <Typography color="textSecondary" variant="caption">
-            by {capitalCase(stage.by?.firstName)} {formatDistanceToNowConfigured(safeInvoke('toDate')(stage.at))}
+            by {capitalCase(stage.by?.firstName)}{' '}
+            {formatDistanceToNowConfigured(safeInvoke('toDate')(stage.at))}
           </Typography>
         )}{' '}
       </Box>
@@ -39,8 +42,8 @@ const ChecklistStageView = ({ stage, handleChange, disabled }: Props) => {
           onSuccess={() => handleChange(stage, false)}
         >
           <Typography>
-            Are you sure you want to uncheck an item? If you uncheck item, that can generate new notification to the
-            customer?
+            Are you sure you want to uncheck an item? If you uncheck item, that can generate new
+            notification to the customer?
           </Typography>
         </ActionModal>
       )}

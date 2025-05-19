@@ -52,7 +52,10 @@ const NextPreviousVesselTable: React.FC<AllocationProps> = ({ vessel, bookingReq
           ? format(new Date(bookingRequest?.itinerary?.portOfLoading.DepartureDate), 'dd/MM/yyyy')
           : undefined,
       };
-      const response = (await get('vesselAllocationSchedule', params)) as PrevNextVesselResponse | null;
+      const response = (await get(
+        'vesselAllocationSchedule',
+        params,
+      )) as PrevNextVesselResponse | null;
       if (response) {
         setNextPrevVessels(response);
       }

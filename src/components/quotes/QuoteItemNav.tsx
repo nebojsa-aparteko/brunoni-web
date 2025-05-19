@@ -32,7 +32,13 @@ const QuoteNav: React.FC<Props> = ({ backTo, title, subtitle }) => {
         </IconButton>
       </Box>
 
-      <Box ml={2} display="flex" flexDirection="column" justifyContent="center" className={classes.title}>
+      <Box
+        ml={2}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        className={classes.title}
+      >
         <Typography variant="h5">{title}</Typography>
         <Typography variant="subtitle2" gutterBottom>
           {subtitle}

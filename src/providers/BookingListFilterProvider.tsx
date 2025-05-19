@@ -31,7 +31,9 @@ const BookingListFilterProvider = (props: any) => {
   } as BookingContextFilters);
 
   return (
-    <BookingListFilterContext.Provider value={[state, setState]}>{props.children}</BookingListFilterContext.Provider>
+    <BookingListFilterContext.Provider value={[state, setState]}>
+      {props.children}
+    </BookingListFilterContext.Provider>
   );
 };
 

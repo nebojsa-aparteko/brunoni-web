@@ -33,7 +33,9 @@ const TransportModeInput: React.FC<Props> = ({
       onChange={(_: ChangeEvent<{}>, mode: string | null) => onChange(mode)}
       onBlur={onBlur}
       getOptionLabel={option => option}
-      renderInput={params => <TextField {...params} margin="dense" label={label} fullWidth variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} margin="dense" label={label} fullWidth variant="outlined" />
+      )}
       PopperComponent={FitContentPopper}
     />
   );
@@ -43,7 +45,11 @@ interface ControlledProps extends Omit<Props, 'onChange' | 'value' | 'onBlur'> {
   name: string;
 }
 
-export const ControlledTransportModeInput: React.FC<ControlledProps> = ({ label, transportModes, name }) => {
+export const ControlledTransportModeInput: React.FC<ControlledProps> = ({
+  label,
+  transportModes,
+  name,
+}) => {
   const { control } = useFormContext();
 
   return (

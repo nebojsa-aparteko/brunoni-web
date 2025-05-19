@@ -48,7 +48,10 @@ interface Props {
   handleClose: () => void;
 }
 
-const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
+const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({
+  isOpen,
+  handleClose,
+}) => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
@@ -68,10 +71,7 @@ const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isO
 
     dispatch({ type: 'START_GLOBAL_LOADING' });
 
-    const ref = firebase
-      .firestore()
-      .collection('payment-confirmation-config')
-      .doc();
+    const ref = firebase.firestore().collection('payment-confirmation-config').doc();
 
     const data: CarrierSettingsRule = {
       id: ref.id,
@@ -100,10 +100,23 @@ const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isO
         autoHideDuration: 3000,
       });
     }
-  }, [selectedCarrier, selectedPort, dispatch, selectedContactTo, selectedContactCC, handleClose, enqueueSnackbar]);
+  }, [
+    selectedCarrier,
+    selectedPort,
+    dispatch,
+    selectedContactTo,
+    selectedContactCC,
+    handleClose,
+    enqueueSnackbar,
+  ]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="PaymentConfirmationDialogTitle" maxWidth="lg">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="PaymentConfirmationDialogTitle"
+      maxWidth="lg"
+    >
       <DialogTitle disableTypography id="PaymentConfirmationDialogTitle">
         <Typography variant="h4">Add new carrier setting</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
@@ -145,7 +158,12 @@ const TeamsPaymentConfirmationCarrierSettingsAddDialog: React.FC<Props> = ({ isO
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" variant="contained" onClick={handleAddCarrierSetting} style={{ minWidth: 80 }}>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleAddCarrierSetting}
+          style={{ minWidth: 80 }}
+        >
           Add carrier setting
         </Button>
       </DialogActions>

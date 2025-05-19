@@ -13,7 +13,9 @@ const DateFormattedText: React.FC<Props> = ({ date }) => {
         onClick={() => setIsFullDateFormat(prevState => !prevState)}
         style={{ cursor: 'default' }}
       >
-        {isFullDateFormat ? `${formatDateSafe(date, 'dd.MM.yyyy HH:mm:ss')}` : `${formatDistanceToNowConfigured(date)}`}
+        {isFullDateFormat
+          ? `${formatDateSafe(date, 'dd.MM.yyyy HH:mm:ss')}`
+          : `${formatDistanceToNowConfigured(date)}`}
       </Typography>
     </Tooltip>
   );

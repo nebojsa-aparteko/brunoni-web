@@ -30,7 +30,11 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
         <Box display="flex" justifyContent="space-between" alignItems="flex-end" flex={1} my={4}>
           <Box px={2} display="flex" flexDirection="column" alignSelf="flex-start">
             <Box ml={-0.5}>
-              <Button startIcon={<ArrowBackIcon />} color="primary" onClick={() => history.goBack()}>
+              <Button
+                startIcon={<ArrowBackIcon />}
+                color="primary"
+                onClick={() => history.goBack()}
+              >
                 All providers
               </Button>
             </Box>
@@ -58,7 +62,13 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
           <ManualRoutesList provider={provider} />
         </SectionWithTitle>
       </Box>
-      {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId={provider.id} />}
+      {isOpen && (
+        <PredefinedAddOnRatesModal
+          isOpen={isOpen}
+          handleClose={closeModal}
+          providerId={provider.id}
+        />
+      )}
     </>
   );
 };

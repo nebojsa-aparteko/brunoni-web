@@ -62,7 +62,11 @@ export const useVesselAllocationStyles = makeStyles(theme => ({
   },
 }));
 
-const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselVoyage, service, bookingRequest }) => {
+const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({
+  vesselVoyage,
+  service,
+  bookingRequest,
+}) => {
   const { closeModal, openModal, isOpen } = useModal();
   const classes = useVesselAllocationStyles();
 
@@ -73,7 +77,11 @@ const VesselAllocationButton: React.FC<VesselAllocationButtonProps> = ({ vesselV
 
   return (
     <Box className={classes.hidePrint}>
-      <IconButton color="primary" aria-label="check vessel space" onClick={event => handleOpenModal(event)}>
+      <IconButton
+        color="primary"
+        aria-label="check vessel space"
+        onClick={event => handleOpenModal(event)}
+      >
         <DirectionsBoatIcon />
       </IconButton>
       {vesselVoyage && isOpen && (

@@ -41,7 +41,10 @@ const NotificationsButton: React.FC<IconButtonProps> = props => {
         style={{ padding: 8 }}
         {...props}
       >
-        <Badge badgeContent={getNotificationCount(userRecord?.unreadNotifications)} color="secondary">
+        <Badge
+          badgeContent={getNotificationCount(userRecord?.unreadNotifications)}
+          color="secondary"
+        >
           <NotificationsIcon color="primary" fontSize="small" />
         </Badge>
       </IconButton>

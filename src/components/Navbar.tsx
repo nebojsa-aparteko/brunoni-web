@@ -1,4 +1,12 @@
-import React, { Fragment, MouseEventHandler, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as changeCase from 'change-case';
 import {
   AppBar,
@@ -73,17 +81,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: 'auto',
     display: 'flex',
     '& > img':
-      ({
-        brunoni: {
-          position: 'relative',
+      (
+        {
+          brunoni: {
+            position: 'relative',
 
-          height: 45,
-        },
-        allmarine: {
-          maxHeight: 45,
-          width: 'auto',
-        },
-      } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
+            height: 45,
+          },
+          allmarine: {
+            maxHeight: 45,
+            width: 'auto',
+          },
+        } as Record<string, CSSProperties>
+      )[process.env.REACT_APP_BRAND || ''] || {},
     [theme.breakpoints.down('sm')]: {
       '& > img': {
         top: 0,
@@ -259,7 +269,9 @@ const Navbar: React.FC = () => {
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
   useEffect(() => {
-    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], () => setIsSearchDialogOpen(true));
+    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], () =>
+      setIsSearchDialogOpen(true),
+    );
 
     return () => {
       Mousetrap.unbind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q']);
@@ -290,7 +302,8 @@ const Navbar: React.FC = () => {
                   <Grid item key={i}>
                     <Box display="flex" alignItems="center">
                       <Typography variant="body2" color="inherit">
-                        <span>{clock.city}</span> • <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
+                        <span>{clock.city}</span> •{' '}
+                        <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
                       </Typography>
                     </Box>
                   </Grid>
@@ -315,11 +328,17 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
 
                     <ButtonMenuItem primary="My day" to="/my-day" />
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Vessel" to="/vessel" />
+                    )}
                     {/*TODO uncomment this once it's ready*/}
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Land" to="/land-transport" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Land" to="/land-transport" />
+                    )}
 
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Load list" to="/loadList" />
+                    )}
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
@@ -331,8 +350,16 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="EQUIPMENT SITUATION" />
-                        <MenuItemLink onClick={handleMenuClose} to="/charges" primary="SIDE CHARGES" />
+                        <MenuItemLink
+                          onClick={handleMenuClose}
+                          to="/equipment"
+                          primary="EQUIPMENT SITUATION"
+                        />
+                        <MenuItemLink
+                          onClick={handleMenuClose}
+                          to="/charges"
+                          primary="SIDE CHARGES"
+                        />
                       </Fragment>
                     )}
 
@@ -356,10 +383,26 @@ const Navbar: React.FC = () => {
                           className={classes.menu}
                           getContentAnchorEl={null}
                         >
-                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
-                          <MenuItemLink onClick={handleMenuClose} to="/weekly-payment" primary="Weekly Payment" />
-                          <MenuItemLink onClick={handleMenuClose} to="/commissions" primary="Commissions" />
-                          <MenuItemLink primary="Equipment Situation" to="/equipment" onClick={handleMenuClose} />
+                          <MenuItemLink
+                            onClick={handleMenuClose}
+                            to="/charges"
+                            primary="Side Charges"
+                          />
+                          <MenuItemLink
+                            onClick={handleMenuClose}
+                            to="/weekly-payment"
+                            primary="Weekly Payment"
+                          />
+                          <MenuItemLink
+                            onClick={handleMenuClose}
+                            to="/commissions"
+                            primary="Commissions"
+                          />
+                          <MenuItemLink
+                            primary="Equipment Situation"
+                            to="/equipment"
+                            onClick={handleMenuClose}
+                          />
                           {isSuperAdmin(userRecord) && (
                             <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
                           )}
@@ -404,7 +447,10 @@ const Navbar: React.FC = () => {
                         <SearchIcon fontSize="small" />
                       </IconButton>
                       {isSearchDialogOpen && (
-                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                        <NavBarQuickSearchDialog
+                          isOpen={isSearchDialogOpen}
+                          handleClose={handleDialogClose}
+                        />
                       )}
                     </Fragment>
                   ) : (
@@ -418,7 +464,10 @@ const Navbar: React.FC = () => {
                         <SearchIcon fontSize="small" />
                       </IconButton>
                       {isSearchDialogOpen && (
-                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                        <NavBarQuickSearchDialog
+                          isOpen={isSearchDialogOpen}
+                          handleClose={handleDialogClose}
+                        />
                       )}
                     </Fragment>
                   )
@@ -486,7 +535,11 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
                   {isAdmin && (
-                    <ListItemLink primary="Land Transport" to="/land-transport" onClick={handleDrawerToggle} />
+                    <ListItemLink
+                      primary="Land Transport"
+                      to="/land-transport"
+                      onClick={handleDrawerToggle}
+                    />
                   )}
                   {/*<ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />*/}
 
@@ -495,7 +548,11 @@ const Navbar: React.FC = () => {
                   <Fragment>
                     <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
                   </Fragment>
-                  <ListItemLink primary="Equipment Situation" to="/equipment" onClick={handleDrawerToggle} />
+                  <ListItemLink
+                    primary="Equipment Situation"
+                    to="/equipment"
+                    onClick={handleDrawerToggle}
+                  />
                   <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />
                 </Fragment>
               )}
@@ -503,9 +560,17 @@ const Navbar: React.FC = () => {
               {user !== undefined && user !== null ? (
                 <ListItemLink primary="Get Quote" to="/quotes/get" onClick={handleDrawerToggle} />
               ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <ListItemLink primary="Visit brunoni.ch" to="https://brunoni.ch" onClick={handleDrawerToggle} />
+                <ListItemLink
+                  primary="Visit brunoni.ch"
+                  to="https://brunoni.ch"
+                  onClick={handleDrawerToggle}
+                />
               ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <ListItemLink primary="Visit  allmarine.ch" to="https://allmarine.ch" onClick={handleDrawerToggle} />
+                <ListItemLink
+                  primary="Visit  allmarine.ch"
+                  to="https://allmarine.ch"
+                  onClick={handleDrawerToggle}
+                />
               ) : null}
 
               <Divider />

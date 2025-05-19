@@ -54,7 +54,9 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
         position: 'relative',
         display: 'flex',
         backgroundColor: bookingRequest.isUnread ? 'rgba(161,213,255,0.25)' : 'white',
-        border: !bookingRequest.assignedUser ? '2px solid #00b0ff' : `2px solid ${theme.palette.grey[400]}`,
+        border: !bookingRequest.assignedUser
+          ? '2px solid #00b0ff'
+          : `2px solid ${theme.palette.grey[400]}`,
         marginBottom: theme.spacing(1),
       }}
     >
@@ -65,7 +67,9 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
               <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
             </span>
             {bookingRequest && showDeliveryRef(bookingRequest)}
-            {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
+            {bookingRequest.intraRefNumber && (
+              <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />
+            )}
           </Box>
         </Grid>
         <Grid item lg={12} xs={12}>
@@ -82,7 +86,11 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
                   bookingRequest &&
                   bookingRequest.createdBy &&
                   (bookingRequest.createdBy.firstName || bookingRequest.createdBy.lastName)
-                    ? (bookingRequest.createdBy.firstName + ' ' + bookingRequest.createdBy.lastName).toUpperCase()
+                    ? (
+                        bookingRequest.createdBy.firstName +
+                        ' ' +
+                        bookingRequest.createdBy.lastName
+                      ).toUpperCase()
                     : ''
                 }
                 gutterBottom
@@ -98,7 +106,10 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
                     ', ' +
                     getOriginPort(bookingRequest.itinerary)?.Port.Land
                   }
-                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`
+                  }
                   gutterBottom
                 />
               </Grid>
@@ -112,7 +123,8 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
                     getDestinationPort(bookingRequest.itinerary)?.Port.Land
                   }
                   label2={
-                    bookingRequest.itinerary && `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
+                    bookingRequest.itinerary &&
+                    `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
                   }
                   gutterBottom
                 />
@@ -120,7 +132,11 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
             </Grid>
             {bookingRequest.statusText && (
               <Grid item md={2} xs={12}>
-                <InfoBoxItem title="Status" label1={bookingRequest.statusText.toUpperCase()} gutterBottom />
+                <InfoBoxItem
+                  title="Status"
+                  label1={bookingRequest.statusText.toUpperCase()}
+                  gutterBottom
+                />
               </Grid>
             )}
             <Grid item xs={12}>
@@ -132,28 +148,44 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
                   bookingRequest.quoteNumber
                     ? 'Quote Number'
                     : bookingRequest.agreementNo
-                    ? 'Agreement No.'
-                    : 'Quote Number'
+                      ? 'Agreement No.'
+                      : 'Quote Number'
                 }
-                label1={bookingRequest.quoteNumber ? bookingRequest.quoteNumber : bookingRequest.agreementNo || '-'}
+                label1={
+                  bookingRequest.quoteNumber
+                    ? bookingRequest.quoteNumber
+                    : bookingRequest.agreementNo || '-'
+                }
                 gutterBottom
               />
             </Grid>
             <Grid item md={3} xs={12}>
-              <InfoBoxItem title={'Customer reference'} label1={bookingRequest.customerReference || '-'} gutterBottom />
+              <InfoBoxItem
+                title={'Customer reference'}
+                label1={bookingRequest.customerReference || '-'}
+                gutterBottom
+              />
             </Grid>
             <Grid item container md={5} xs={12}>
               <Grid item xs={6}>
                 <InfoBoxItem
                   title="Created On"
-                  label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm') : ''}
+                  label1={
+                    bookingRequest.createdAt
+                      ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm')
+                      : ''
+                  }
                   gutterBottom
                 />
               </Grid>
               <Grid item xs={6}>
                 <InfoBoxItem
                   title="Last updated"
-                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  label1={
+                    bookingRequest.updatedAt
+                      ? formatDistanceToNowConfigured(bookingRequest.updatedAt)
+                      : ''
+                  }
                   gutterBottom
                 />
               </Grid>
@@ -164,9 +196,15 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
                   title="Created By"
                   label1={
                     <Avatar
-                      name={bookingRequest.createdBy?.firstName + ' ' + bookingRequest.createdBy?.lastName}
+                      name={
+                        bookingRequest.createdBy?.firstName +
+                        ' ' +
+                        bookingRequest.createdBy?.lastName
+                      }
                       title={`${bookingRequest.createdBy?.firstName + ' ' + bookingRequest.createdBy?.lastName} <${
-                        bookingRequest.createdBy?.emailAddress ? bookingRequest.createdBy?.emailAddress : null
+                        bookingRequest.createdBy?.emailAddress
+                          ? bookingRequest.createdBy?.emailAddress
+                          : null
                       }>`}
                       size="40"
                       round={true}

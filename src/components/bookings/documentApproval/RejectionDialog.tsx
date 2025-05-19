@@ -43,7 +43,13 @@ const RejectionDialog: React.FC<Props> = ({
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md" fullWidth>
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+      fullWidth
+    >
       <Box>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{`Please enter needed correction on ${checklistItem.label} document`}</Typography>

@@ -16,12 +16,16 @@ interface Props {
   children: React.ReactNode;
 }
 
-const query = (collection: firebase.firestore.CollectionReference) => collection.where('validUntil', '>', new Date());
+const query = (collection: firebase.firestore.CollectionReference) =>
+  collection.where('validUntil', '>', new Date());
 
 const SpecialOffers: React.FC<Props> = ({ children }) => {
   const snapshot = useFirestoreCollection('special-offers', query);
 
-  const offers = useMemo(() => snapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() })), [snapshot]);
+  const offers = useMemo(
+    () => snapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+    [snapshot],
+  );
 
   const containerTypes = useContext(ContainerTypes);
   const ports = useContext(Ports);
@@ -34,9 +38,10 @@ const SpecialOffers: React.FC<Props> = ({ children }) => {
       return;
     }
 
-    const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
-      id: string | null | undefined,
-    ) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
+    const getEntity =
+      <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) =>
+      (id: string | null | undefined) =>
+        id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null;
 
     const getContainerType = getEntity(containerTypes, containerType => containerType.id);
     const getPort = getEntity(ports, port => port.id);
@@ -55,7 +60,9 @@ const SpecialOffers: React.FC<Props> = ({ children }) => {
     );
   }, [offers, containerTypes, ports, carriers]);
 
-  return <SpecialOffersContext.Provider value={specialOffers}>{children}</SpecialOffersContext.Provider>;
+  return (
+    <SpecialOffersContext.Provider value={specialOffers}>{children}</SpecialOffersContext.Provider>
+  );
 };
 
 export default SpecialOffers;

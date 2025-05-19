@@ -85,7 +85,8 @@ const LandTransportSearch = () => {
 
   const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
 
-  const { setLandTransportRoutes, loadingRoutes, setLoadingRoutes } = useContext(LandTransportContext);
+  const { setLandTransportRoutes, loadingRoutes, setLoadingRoutes } =
+    useContext(LandTransportContext);
   const [, setFilters] = useContext(LandTransportFilterContext);
   const [user] = useUser();
 

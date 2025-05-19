@@ -1,4 +1,10 @@
-import React, { forwardRef, ForwardRefRenderFunction, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import SelectInput from './SelectInput';
 import InputProps from '../../model/InputProps';
 

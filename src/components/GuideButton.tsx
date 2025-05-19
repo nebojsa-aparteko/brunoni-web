@@ -18,7 +18,12 @@ const GuideButton: React.FC<Props> = ({ guide }) => {
 
   return (
     <Fragment>
-      <IconButton id="helpButtonNav" aria-label="tour-button-icon" onClick={guide.start} style={{ padding: 8 }}>
+      <IconButton
+        id="helpButtonNav"
+        aria-label="tour-button-icon"
+        onClick={guide.start}
+        style={{ padding: 8 }}
+      >
         <HelpOutlineIcon color="disabled" fontSize="default" />
       </IconButton>
       <GuideDialog isOpen={isDialogOpen} handleClose={handleDialogClose} />

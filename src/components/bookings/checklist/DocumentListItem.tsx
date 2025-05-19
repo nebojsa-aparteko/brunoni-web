@@ -149,7 +149,7 @@ const DocumentListItem = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -217,10 +217,13 @@ const DocumentListItem = ({
         }
       } catch (error) {
         setRemovalInProgress(false);
-        enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 1000,
-        });
+        enqueueSnackbar(
+          <Typography color="inherit">Failed to remove item - {error.message}!</Typography>,
+          {
+            variant: 'error',
+            autoHideDuration: 1000,
+          },
+        );
       }
     },
     [storageBasePath, checklistItem, deleteFile, enqueueSnackbar],
@@ -254,7 +257,7 @@ const DocumentListItem = ({
 
     return () => {
       cancelled = true;
-    }
+    };
   }, [item.url]);
 
   return (
@@ -276,13 +279,17 @@ const DocumentListItem = ({
             id={`filelistitem-${item.storedName}`}
             disableTypography
             primary={
-              <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+              <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>
+                {item.name}
+              </Typography>
             }
             secondary={
               <span>
                 <Typography variant="caption">
                   {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
-                    isAdmin ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}` : ''
+                    isAdmin
+                      ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}`
+                      : ''
                   }`}
                 </Typography>
                 <br />
@@ -305,13 +312,22 @@ const DocumentListItem = ({
             {isAdmin &&
             !internal &&
             checklistItem &&
-            (checklistItem.id === ChecklistNames.B_L || checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
-              <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison(item)}>
-                <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
+            (checklistItem.id === ChecklistNames.B_L ||
+              checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS) ? (
+              <IconButton
+                size="small"
+                aria-label="Add to Comparison"
+                onClick={() => selectForComparison(item)}
+              >
+                <CompareIcon
+                  style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }}
+                />
               </IconButton>
             ) : null}
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              <AddCommentIcon
+                style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }}
+              />
             </IconButton>
             {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED &&
               editRestriction(item.uploadedAt) &&
@@ -329,7 +345,9 @@ const DocumentListItem = ({
                   <DeleteIcon />
                 </IconButton>
               )}
-            {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+            {removalInProgress && (
+              <CircularProgress size={42} className={classes.iconDeleteProgress} />
+            )}
             {checklistItem && checklistItem.id === ChecklistNames.B_L && (
               <IconButton
                 size="small"
@@ -337,7 +355,10 @@ const DocumentListItem = ({
                 onClick={() => markAsFinal(item)}
                 disabled={!isAdmin || checklistCheckedRule()}
               >
-                <FlagIcon className={classes.final} style={{ color: item.final ? '#F7BC06' : 'inherit' }} />
+                <FlagIcon
+                  className={classes.final}
+                  style={{ color: item.final ? '#F7BC06' : 'inherit' }}
+                />
               </IconButton>
             )}
           </div>
@@ -357,24 +378,25 @@ const DocumentListItem = ({
           <Box display="flex" ml={2} flexBasis="fit-content">
             {(payment ? payment.status === WeeklyPaymentStatus.IN_PROGRESS : true) && (
               <React.Fragment>
-                {item.status !== undefined && item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
-                  <Box display="flex" ml={2} mb={2}>
-                    <AccessTimeIcon style={{ color: '#5f91c5' }} />
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => {
-                        changeStatus(item, {
-                          type: ChecklistItemValueDocumentStatusType.DEFAULT,
-                          by: getActivityLogUserData(),
-                        });
-                        activityLogContext.setState(undefined);
-                      }}
-                    >
-                      Undo
-                    </Link>
-                  </Box>
-                )}
+                {item.status !== undefined &&
+                  item.status?.type !== ChecklistItemValueDocumentStatusType.DEFAULT && (
+                    <Box display="flex" ml={2} mb={2}>
+                      <AccessTimeIcon style={{ color: '#5f91c5' }} />
+                      <Link
+                        component="button"
+                        variant="body2"
+                        onClick={() => {
+                          changeStatus(item, {
+                            type: ChecklistItemValueDocumentStatusType.DEFAULT,
+                            by: getActivityLogUserData(),
+                          });
+                          activityLogContext.setState(undefined);
+                        }}
+                      >
+                        Undo
+                      </Link>
+                    </Box>
+                  )}
                 {item.status?.type !== ChecklistItemValueDocumentStatusType.APPROVED && (
                   <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
                     <CheckCircleOutlineOutlinedIcon style={{ color: '#5f91c5' }} />
@@ -394,22 +416,23 @@ const DocumentListItem = ({
                     </Link>
                   </Box>
                 )}
-                {!isAccountingDocument && item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
-                  <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
-                    <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => {
-                        setIsComparisonDialog(false);
-                        setIsAccountingDialog(false);
-                        handleDialogOpen();
-                      }}
-                    >
-                      Request amendment
-                    </Link>
-                  </Box>
-                )}
+                {!isAccountingDocument &&
+                  item.status?.type !== ChecklistItemValueDocumentStatusType.REJECTED && (
+                    <Box display="flex" ml={2} mb={2} alignItems="center" justifyContent="center">
+                      <CancelOutlinedIcon style={{ color: '#5f91c5' }} />
+                      <Link
+                        component="button"
+                        variant="body2"
+                        onClick={() => {
+                          setIsComparisonDialog(false);
+                          setIsAccountingDialog(false);
+                          handleDialogOpen();
+                        }}
+                      >
+                        Request amendment
+                      </Link>
+                    </Box>
+                  )}
                 {!isAdmin &&
                   !isAccountingDocument &&
                   (internal ? true : item.isSelectedForComparison) &&
@@ -482,7 +505,11 @@ export interface DocumentListItemPropsBase {
   checklistItem?: ChecklistItem;
   booking: Booking;
   storageBasePath: string;
-  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) => void;
+  changeStatus: (
+    item: ChecklistItemValueDocument,
+    status: DocumentValueStatus,
+    dontCreateActivity?: boolean,
+  ) => void;
   deleteFile?: (
     item: ChecklistItemValueDocument | DocumentValue,
     documents?: ChecklistItemValueDocument[] | DocumentValue[],
@@ -501,4 +528,5 @@ interface DocumentListItemProps extends DocumentListItemPropsBase {
 }
 
 const dontShowStatusActionForSomeChecklist = ['IMO', 'SOC_CERTIFICATE', 'SHIPPING_INSTRUCTIONS'];
-const checkIfShouldShowStatusAction = (id: string) => !dontShowStatusActionForSomeChecklist.includes(id);
+const checkIfShouldShowStatusAction = (id: string) =>
+  !dontShowStatusActionForSomeChecklist.includes(id);

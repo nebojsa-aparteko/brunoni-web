@@ -21,7 +21,9 @@ const TeamsTeamsChipMultiInput: React.FC<Props> = ({ options, values, onChange }
       renderTags={(value, getTagProps) =>
         value.map((option, index) => <Chip label={`${option.name}`} {...getTagProps({ index })} />)
       }
-      renderInput={params => <TextField {...params} label="Teams" placeholder="Type to filter" variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} label="Teams" placeholder="Type to filter" variant="outlined" />
+      )}
     />
   );
 };

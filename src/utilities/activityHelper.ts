@@ -1,4 +1,7 @@
-import { ActivityChangeType, ActivityLogUserData } from '../components/bookings/checklist/ChecklistItemModel';
+import {
+  ActivityChangeType,
+  ActivityLogUserData,
+} from '../components/bookings/checklist/ChecklistItemModel';
 import isString from './isString';
 import { ActivityLogItem, Platform } from '../components/bookings/checklist/ActivityModel';
 import { capitalCase } from 'change-case';

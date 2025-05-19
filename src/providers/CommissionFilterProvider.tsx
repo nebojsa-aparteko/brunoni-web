@@ -37,7 +37,9 @@ const CommissionFilterProvider = (props: any) => {
 export const useCommissionFilterProviderContext = () => {
   const context = React.useContext(CommissionFilterProviderContext);
   if (context === undefined) {
-    throw new Error('useWeeklyPaymentFilterProviderContext must be used within a WeeklyProviderFilterProvider');
+    throw new Error(
+      'useWeeklyPaymentFilterProviderContext must be used within a WeeklyProviderFilterProvider',
+    );
   }
   return context;
 };

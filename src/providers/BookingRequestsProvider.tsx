@@ -24,7 +24,10 @@ export const normalizeBookingRequest = flow(
 
 export const normalizeBookingRequests = map(normalizeBookingRequest);
 
-const BookingRequestsContext = createContext<[BookingRequest[] | undefined, boolean]>([undefined, true]);
+const BookingRequestsContext = createContext<[BookingRequest[] | undefined, boolean]>([
+  undefined,
+  true,
+]);
 
 export const useBookingRequestsContext = () => {
   const context = React.useContext(BookingRequestsContext);
@@ -53,7 +56,11 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       // for admin: if user filter is in use, show active bookings that are assigned to the filtered user; otherwise only show unassigned requests
       if (filters.assignee?.alphacomId) {
         query = query.where('assignedUser.alphacomId', '==', filters.assignee.alphacomId);
-      } else if (isAdmin && !filters.hold && filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS) {
+      } else if (
+        isAdmin &&
+        !filters.hold &&
+        filters.maxStatusCode === BookingRequestStatusCode.IN_PROGRESS
+      ) {
         query = query.where('assignedUser', '==', null);
       }
       if (filters.minStatusCode) {
@@ -65,7 +72,12 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       if (filters.carrier) {
         query = query.where('carrier.id', '==', filters.carrier.id);
       } else {
-        if (isAdmin && !isSuperAdmin(userRecord) && userRecord.carriers && userRecord.carriers?.length === 1)
+        if (
+          isAdmin &&
+          !isSuperAdmin(userRecord) &&
+          userRecord.carriers &&
+          userRecord.carriers?.length === 1
+        )
           query = query.where('carrier.id', '==', userRecord.carriers[0]);
       }
       if (filters.clientFilter) {
@@ -100,17 +112,29 @@ const BookingRequestsProvider: React.FC<Props> = ({ children }) => {
       return (a: BookingRequest, b: BookingRequest) => {
         if (a.statusCode === b.statusCode) {
           if (!!a.assignedUser === !!b.assignedUser) {
-            if (a.itinerary?.placeOfReceipt?.DepartureDate && b.itinerary?.placeOfReceipt?.DepartureDate)
-              return a.itinerary.placeOfReceipt.DepartureDate < b.itinerary.placeOfReceipt.DepartureDate ? -1 : 1;
-            else if (a.itinerary?.portOfLoading?.DepartureDate && b.itinerary?.portOfLoading?.DepartureDate)
-              return a.itinerary?.portOfLoading?.DepartureDate < b.itinerary?.portOfLoading?.DepartureDate ? -1 : 1;
+            if (
+              a.itinerary?.placeOfReceipt?.DepartureDate &&
+              b.itinerary?.placeOfReceipt?.DepartureDate
+            )
+              return a.itinerary.placeOfReceipt.DepartureDate <
+                b.itinerary.placeOfReceipt.DepartureDate
+                ? -1
+                : 1;
+            else if (
+              a.itinerary?.portOfLoading?.DepartureDate &&
+              b.itinerary?.portOfLoading?.DepartureDate
+            )
+              return a.itinerary?.portOfLoading?.DepartureDate <
+                b.itinerary?.portOfLoading?.DepartureDate
+                ? -1
+                : 1;
             return a.itinerary?.placeOfReceipt
               ? a.itinerary?.placeOfReceipt?.DepartureDate
                 ? -1
                 : 1
               : a.itinerary?.portOfLoading?.DepartureDate
-              ? -1
-              : 1;
+                ? -1
+                : 1;
           } else {
             return a.assignedUser === null ? -1 : 1;
           }

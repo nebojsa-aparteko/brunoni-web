@@ -21,8 +21,7 @@ export let navbarShepherdTour: Shepherd.Tour = new Shepherd.Tour({
 navbarShepherdTour.addSteps([
   {
     title: 'Dashboard',
-    text:
-      'Here you will find statistics that show your performance with us. You can see the numbers from this year and the years before. On company/branch level.',
+    text: 'Here you will find statistics that show your performance with us. You can see the numbers from this year and the years before. On company/branch level.',
     attachTo: { element: '#dashboardNav', on: 'bottom' },
     buttons: [
       {
@@ -44,8 +43,7 @@ navbarShepherdTour.addSteps([
   },
   {
     title: 'Quotes',
-    text:
-      'This is the overview of all quotations that were created via the platform or manually via E-Mail. Here you can also see the quotes from your colleagues in the company.',
+    text: 'This is the overview of all quotations that were created via the platform or manually via E-Mail. Here you can also see the quotes from your colleagues in the company.',
     attachTo: { element: '#quotesNav', on: 'bottom' },
     buttons: [
       {
@@ -56,8 +54,7 @@ navbarShepherdTour.addSteps([
   },
   {
     title: 'My Day',
-    text:
-      'Platform needs action from you! In this section you can check tasks that are assigned to you, and resolve them for example: Arranging VGM submission, Submitting Shipping instructions etc. The most efficient way to plan your day!',
+    text: 'Platform needs action from you! In this section you can check tasks that are assigned to you, and resolve them for example: Arranging VGM submission, Submitting Shipping instructions etc. The most efficient way to plan your day!',
     attachTo: { element: '#myDayNav', on: 'bottom' },
     buttons: [
       {
@@ -68,8 +65,7 @@ navbarShepherdTour.addSteps([
   },
   {
     title: 'Bookings',
-    text:
-      'This is the overview of all bookings that were created via the platform or manually via E-Mail. Here you can also see the bookings from your colleagues in the company.',
+    text: 'This is the overview of all bookings that were created via the platform or manually via E-Mail. Here you can also see the bookings from your colleagues in the company.',
     attachTo: { element: '#bookingsNav', on: 'bottom' },
     buttons: [
       {
@@ -135,8 +131,7 @@ navbarShepherdTour.addSteps([
   },
   {
     title: 'Notifications',
-    text:
-      'Here you get business-relevant information so that your shipment can be processed smoothly. You will also find messages from our customer service here.',
+    text: 'Here you get business-relevant information so that your shipment can be processed smoothly. You will also find messages from our customer service here.',
     attachTo: { element: '#notificationsNav', on: 'bottom' },
     buttons: [
       {

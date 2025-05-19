@@ -23,7 +23,11 @@ const LoadListFilterContext = createContext<
 const LoadListFilterProvider = (props: any) => {
   const [state, setState] = useState<LoadListContextFilters>(LOAD_LIST_FILTERS_INITIAL_STATE);
 
-  return <LoadListFilterContext.Provider value={[state, setState]}>{props.children}</LoadListFilterContext.Provider>;
+  return (
+    <LoadListFilterContext.Provider value={[state, setState]}>
+      {props.children}
+    </LoadListFilterContext.Provider>
+  );
 };
 
 export const useLoadListFilterContext = () => {

@@ -23,7 +23,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, booking }: ActivityWithCommentProp) => {
+const ActivityComment = ({
+  activity,
+  showInput,
+  setShowInput,
+  setNewComment,
+  booking,
+}: ActivityWithCommentProp) => {
   const classes = useStyles();
 
   const handleCancel = () => {
@@ -51,11 +57,23 @@ const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, boo
                   onInputChange={message => setNewComment(message.messagePlain)}
                   // previousMessage={activity.comment}
                 />
-                <Box style={{ display: 'flex', flexDirection: 'row', marginRight: 8, marginLeft: 'auto' }}>
+                <Box
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    marginRight: 8,
+                    marginLeft: 'auto',
+                  }}
+                >
                   <Button size="small" onClick={handleCancel}>
                     Cancel
                   </Button>
-                  <Button size="small" variant="contained" color="primary" onClick={() => setShowInput(false)}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setShowInput(false)}
+                  >
                     Save
                   </Button>
                 </Box>
@@ -72,7 +90,12 @@ const ActivityComment = ({ activity, showInput, setShowInput, setNewComment, boo
               <Box>
                 Doc -{' '}
                 {asArray(activity.documents).map(item => (
-                  <a href={`${item.url}`} key={`doc-${item.url}`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={`${item.url}`}
+                    key={`doc-${item.url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {item.name}
                   </a>
                 ))}

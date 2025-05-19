@@ -1,6 +1,12 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
+import {
+  Box,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import TeamsPaymentConfirmationCarrierSettingsTable from './TeamsPaymentConfirmationCarrierSettingsTable';
 import TeamsPaymentConfirmationCustomerSettingsTable from './TeamsPaymentConfirmationCustomerSettingsTable';
@@ -24,7 +30,10 @@ const TeamsPaymentConfirmationContainer: React.FC = () => {
   return (
     <Box flex={1} display="flex" flexDirection="column" m={1}>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Carrier Settings
           </Typography>
@@ -34,7 +43,10 @@ const TeamsPaymentConfirmationContainer: React.FC = () => {
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Customer Settings
           </Typography>

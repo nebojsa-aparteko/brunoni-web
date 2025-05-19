@@ -66,12 +66,18 @@ const UserApp: React.FC = () => {
       $crisp.push([
         'set',
         'user:company',
-        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
+        [
+          userRecord.company?.name,
+          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
+        ],
       ]);
       $crisp.push([
         'set',
         'user:name',
-        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
+        [
+          userRecord.company?.name,
+          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
+        ],
       ]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
@@ -144,7 +150,11 @@ const CrispChatRouteUpdater = () => {
 
   useEffect(() => {
     try {
-      $crisp.push(['set', 'session:data', [[['last-request-at', new Date().toISOString().slice(0, 10)]]]]);
+      $crisp.push([
+        'set',
+        'session:data',
+        [[['last-request-at', new Date().toISOString().slice(0, 10)]]],
+      ]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
     }
@@ -207,10 +217,19 @@ const render = (user: firebase.User | null) => {
                     <UserRecordProvider>
                       <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                         <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                          <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                          <FirestoreCollectionProvider
+                            name="container-types"
+                            context={ContainerTypesContext}
+                          >
                             <SpecialOffersProvider>
-                              <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                                <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                              <FirestoreCollectionProvider
+                                name="commodity-types"
+                                context={CommodityTypesContext}
+                              >
+                                <FirestoreCollectionProvider
+                                  name="pickup-locations"
+                                  context={PickupLocationsContext}
+                                >
                                   <ActingAsProvider>
                                     <UserApp />
                                   </ActingAsProvider>
@@ -226,7 +245,10 @@ const render = (user: firebase.User | null) => {
                   <UserContext.Provider value={null}>
                     <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                       <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                        <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                        <FirestoreCollectionProvider
+                          name="container-types"
+                          context={ContainerTypesContext}
+                        >
                           <SpecialOffersProvider>
                             <ActingAsProvider anonymous>
                               <App />

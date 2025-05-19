@@ -43,7 +43,14 @@ interface Props {
   onCancel?: () => void;
 }
 
-const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, addItem, editItem, provider }) => {
+const ManualRouteShortView: React.FC<Props> = ({
+  route,
+  isAddMode,
+  onCancel,
+  addItem,
+  editItem,
+  provider,
+}) => {
   const [isEditing, setEditing] = useState(!!isAddMode);
   const [stateRoute, setStateRoute] = useState(route);
   const { openModal, closeModal, isOpen } = useModal();
@@ -54,7 +61,8 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
     const key = event.target?.name;
     const value = event.target.value;
     const type = event.target.type;
-    key && setStateRoute((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
+    key &&
+      setStateRoute((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
   };
   const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target?.name;
@@ -85,7 +93,13 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
           openModal();
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} style={{ gap: theme.spacing(2) }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+          style={{ gap: theme.spacing(2) }}
+        >
           <EditingInput
             editing={isEditing}
             inputProps={{
@@ -94,7 +108,10 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
               name: 'origin',
               onChange: handleInputChange,
             }}
-            typographyProps={{ variant: 'h4', style: { overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            typographyProps={{
+              variant: 'h4',
+              style: { overflow: 'hidden', textOverflow: 'ellipsis' },
+            }}
             value={get('origin')(stateRoute)}
           />
           <ArrowForward />
@@ -106,18 +123,26 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
               name: 'destination',
               onChange: handleInputChange,
             }}
-            typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            typographyProps={{
+              variant: 'h4',
+              style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+            }}
             value={get('destination')(stateRoute)}
           />
           <EditableTextItem
             editing={isEditing}
             value={stateRoute.transportMode || 'Not defined'}
-            typographyProps={{ variant: 'h4', style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' } }}
+            typographyProps={{
+              variant: 'h4',
+              style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' },
+            }}
             Element={
               <TransportModeInput
                 label={''}
                 value={stateRoute.transportMode}
-                onChange={transportMode => setStateRoute(prevState => set('transportMode', transportMode)(prevState))}
+                onChange={transportMode =>
+                  setStateRoute(prevState => set('transportMode', transportMode)(prevState))
+                }
               />
             }
           />
@@ -182,7 +207,14 @@ const ManualRouteShortView: React.FC<Props> = ({ route, isAddMode, onCancel, add
           isEditing={isEditing}
         />
       </Box>
-      {isOpen && <ManualRouteDialog isOpen={isOpen} closeModal={closeModal} route={route} provider={provider} />}
+      {isOpen && (
+        <ManualRouteDialog
+          isOpen={isOpen}
+          closeModal={closeModal}
+          route={route}
+          provider={provider}
+        />
+      )}
     </>
   );
 };

@@ -92,7 +92,11 @@ const EquipmentControlContainer = () => {
 
   return (
     <Paper>
-      <Box className={classes.tabContainer} flexDirection="column" style={{ maxWidth: '100vw', overflowY: 'hidden' }}>
+      <Box
+        className={classes.tabContainer}
+        flexDirection="column"
+        style={{ maxWidth: '100vw', overflowY: 'hidden' }}
+      >
         <Paper square>
           <Tabs
             value={selectedTab}

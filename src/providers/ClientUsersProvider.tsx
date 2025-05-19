@@ -11,9 +11,10 @@ interface Props {
 
 const ClientUsersProvider: React.FC<Props> = ({ children }) => {
   const userRecord = useUser()[1];
-  const query = useCallback(q => (userRecord ? q.where('alphacomClientId', '==', userRecord.alphacomClientId) : q), [
-    userRecord,
-  ]);
+  const query = useCallback(
+    q => (userRecord ? q.where('alphacomClientId', '==', userRecord.alphacomClientId) : q),
+    [userRecord],
+  );
 
   const snapshot = useFirestoreCollection('users', userRecord ? query : null);
 

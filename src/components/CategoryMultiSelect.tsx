@@ -1,5 +1,13 @@
 import React from 'react';
-import { Checkbox, createStyles, FormControl, FormControlLabel, FormGroup, makeStyles, Theme } from '@material-ui/core';
+import {
+  Checkbox,
+  createStyles,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  makeStyles,
+  Theme,
+} from '@material-ui/core';
 import { BookingCategory } from '../model/Booking';
 
 const useStyles = makeStyles((theme: Theme) =>

@@ -4,7 +4,9 @@ import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../../components/dashboard/ChartsCircularProgress';
 import { BookingRequest } from '../../model/BookingRequest';
 import BookingRequestView from './BookingRequestView';
-import BookingRequestProvider, { useBookingRequestContext } from '../../providers/BookingRequestProvider';
+import BookingRequestProvider, {
+  useBookingRequestContext,
+} from '../../providers/BookingRequestProvider';
 import SpecialRemarks from '../../contexts/SpecialRemarks';
 import FirestoreCollectionProvider from '../../providers/FirestoreCollection';
 import ChargeCodes from '../../contexts/ChargeCodes';

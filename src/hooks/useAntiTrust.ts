@@ -29,27 +29,23 @@ const extractIdFromPath = (pathname: string) => {
   }
 };
 
-const fetchQuteByGroupId = async (id: string, normalize: (...args: any[]) => any): Promise<Quote | undefined> => {
+const fetchQuteByGroupId = async (
+  id: string,
+  normalize: (...args: any[]) => any,
+): Promise<Quote | undefined> => {
   return (
-    await firebase
-      .firestore()
-      .collection('quotes')
-      .where('groupId', '==', id)
-      .get()
+    await firebase.firestore().collection('quotes').where('groupId', '==', id).get()
   ).docs.map(doc => normalize(doc.data()) as Quote)[0];
 };
 
 const fetchBookingRequestById = async (id: string) => {
-  return (
-    await firebase
-      .firestore()
-      .collection('bookings-requests')
-      .doc(id)
-      .get()
-  ).data() as BookingRequest | undefined;
+  return (await firebase.firestore().collection('bookings-requests').doc(id).get()).data() as
+    | BookingRequest
+    | undefined;
 };
 
-const isEligible = (userClientId: string, documentClientId: string) => userClientId === documentClientId;
+const isEligible = (userClientId: string, documentClientId: string) =>
+  userClientId === documentClientId;
 
 const useAntiTrust = async () => {
   const history = useHistory();
@@ -85,7 +81,8 @@ const useAntiTrust = async () => {
     case 'bookings-requests':
       const bookingRequest = await fetchBookingRequestById(id);
       if (!bookingRequest || !bookingRequest.client?.id) return;
-      if (!isEligible(userRecord.alphacomClientId, bookingRequest.client?.id)) history.push('/not-found');
+      if (!isEligible(userRecord.alphacomClientId, bookingRequest.client?.id))
+        history.push('/not-found');
       return;
     default:
       return;

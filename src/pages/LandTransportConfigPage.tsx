@@ -44,7 +44,9 @@ const LandTransportConfigPage: React.FC = () => {
           onRowClick={item => history.push(`/land-transport-config/${item.id}`)}
         />
       </Container>
-      {isOpen && <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId="Default" />}
+      {isOpen && (
+        <PredefinedAddOnRatesModal isOpen={isOpen} handleClose={closeModal} providerId="Default" />
+      )}
     </Fragment>
   );
 };

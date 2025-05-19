@@ -87,7 +87,9 @@ const CommissionOverviewContainer = () => {
   );
   const onStatusChange = useCallback(
     (event: ChangeEvent<{ name?: string; value: unknown }>) => {
-      setFilters(prevState => set('commissionStatus', event.target.value as CommissionStatus[])(prevState));
+      setFilters(prevState =>
+        set('commissionStatus', event.target.value as CommissionStatus[])(prevState),
+      );
     },
     [setFilters],
   );
@@ -97,7 +99,9 @@ const CommissionOverviewContainer = () => {
 
   const filteredOverviewData = useMemo(() => {
     return (overviewData || []).filter(
-      data => currency.includes(data.currency) && (data.status ? commissionStatus.includes(data.status) : true),
+      data =>
+        currency.includes(data.currency) &&
+        (data.status ? commissionStatus.includes(data.status) : true),
     );
   }, [overviewData, commissionStatus, currency]);
 
@@ -159,7 +163,8 @@ const CommissionOverviewContainer = () => {
               label={'Carriers'}
               carriers={availableCarriers}
               onChange={carrier => {
-                if (setFilters) setFilters(set('carriers', carrier ? [carrier] : undefined)(filters));
+                if (setFilters)
+                  setFilters(set('carriers', carrier ? [carrier] : undefined)(filters));
               }}
               value={carriers ? carriers[0] : undefined}
             />
@@ -173,7 +178,11 @@ const CommissionOverviewContainer = () => {
           handleOpenPreviewDialog={handleDialogOpen}
           isWeeklyPaymentOverview={false}
         />
-        <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+        <PaymentOverviewDialog
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          bookingId={openBooking}
+        />
       </CardContent>
     </Card>
   );

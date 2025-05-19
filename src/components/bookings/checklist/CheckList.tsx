@@ -86,10 +86,14 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange, tasks }) =>
             )}
           </CardContent>
           {tabValue === 0 && (
-            <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
+            <CardActions>
+              Hint: you can drag files onto the checklist items to attach them
+            </CardActions>
           )}
         </Card>
-        {!actingAs && tabValue === 0 && <InternalStorage id={booking!.id} collection={'bookings'} />}
+        {!actingAs && tabValue === 0 && (
+          <InternalStorage id={booking!.id} collection={'bookings'} />
+        )}
         <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={tabValue === 1} />
       </ActivityLogProvider>
     </Fragment>

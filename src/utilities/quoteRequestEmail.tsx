@@ -27,7 +27,9 @@ export const createEmailBody = (
       container!.containerType?.description +
       ', ' +
       container?.commodityType?.name +
-      (container.pickupLocation ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}` : '') +
+      (container.pickupLocation
+        ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}`
+        : '') +
       (container.imo
         ? container.imo[0]
           ? '\n   This container contains IMO' + container.imo[1].map(renderIMO)
@@ -59,15 +61,26 @@ Cargo Details:
 ${cargoDetailsString}`;
 };
 
-export const buildMailToLink = (searchParams: DetailedRouteSearchParams, userData: UserRecord, client: Client) => {
+export const buildMailToLink = (
+  searchParams: DetailedRouteSearchParams,
+  userData: UserRecord,
+  client: Client,
+) => {
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+    process.env.REACT_APP_BRAND === 'brunoni'
+      ? 'mailto:platform@mybrunoni.ch'
+      : 'mailto:platform@myallmarine.ch';
   return (
     mailtoAddress +
     '?'.concat(
       [
         'subject=' +
-          encodeURI('Request quote - ' + searchParams.originPort!.city + ' → ' + searchParams.destinationPort!.city),
+          encodeURI(
+            'Request quote - ' +
+              searchParams.originPort!.city +
+              ' → ' +
+              searchParams.destinationPort!.city,
+          ),
         'body=' + encodeURI(createEmailBody(searchParams, userData, client)),
       ].join('&'),
     )

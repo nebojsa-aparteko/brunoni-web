@@ -41,7 +41,9 @@ const WeeklyPaymentFilterProvider = (props: any) => {
 export const useWeeklyPaymentFilterProviderContext = () => {
   const context = React.useContext(WeeklyPaymentFilterProviderContext);
   if (context === undefined) {
-    throw new Error('useWeeklyPaymentFilterProviderContext must be used within a WeeklyProviderFilterProvider');
+    throw new Error(
+      'useWeeklyPaymentFilterProviderContext must be used within a WeeklyProviderFilterProvider',
+    );
   }
   return context;
 };

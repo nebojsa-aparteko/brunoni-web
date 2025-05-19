@@ -100,7 +100,10 @@ const EquipmentSituation: React.FC<Props> = () => {
       <Box m={4}>
         {carriers &&
           carriers.filter(get('sideCharges')).map(({ id, name, sideCharges }) => (
-            <ExpansionPanel expanded={expanded === (name || id)} onChange={handleChange(name || id)}>
+            <ExpansionPanel
+              expanded={expanded === (name || id)}
+              onChange={handleChange(name || id)}
+            >
               <ExpansionPanelSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"

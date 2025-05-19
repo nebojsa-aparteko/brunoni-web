@@ -27,11 +27,17 @@ interface RoutesTableRowProps {
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const RoutesTableRow: React.FC<RoutesTableRowProps> = ({ route, provider, selected, onSelectRow }) => {
+const RoutesTableRow: React.FC<RoutesTableRowProps> = ({
+  route,
+  provider,
+  selected,
+  onSelectRow,
+}) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
-  const hasValidity = !isNil(route.validity) && !isNil(route.validity.startDate) && !isNil(route.validity.endDate);
+  const hasValidity =
+    !isNil(route.validity) && !isNil(route.validity.startDate) && !isNil(route.validity.endDate);
 
   return (
     <TableRow className={classes.tableRow} onClick={() => setOpen(true)}>

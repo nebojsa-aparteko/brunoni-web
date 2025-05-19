@@ -1,5 +1,13 @@
 import React, { ChangeEvent, HTMLAttributes, Ref } from 'react';
-import { Theme, makeStyles, TextField, CircularProgress, Popper, Paper, PopperProps } from '@material-ui/core';
+import {
+  Theme,
+  makeStyles,
+  TextField,
+  CircularProgress,
+  Popper,
+  Paper,
+  PopperProps,
+} from '@material-ui/core';
 import InputProps from '../../model/InputProps';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';

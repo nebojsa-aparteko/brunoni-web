@@ -93,7 +93,9 @@ const ActivityLogView: React.FC<Props> = ({
           !quoteActivityLog ? (
             <FormControlLabel
               id="activityToggleActivityLog"
-              control={<Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />}
+              control={
+                <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />
+              }
               label="Show Activity"
               labelPlacement="start"
             />
@@ -107,9 +109,15 @@ const ActivityLogView: React.FC<Props> = ({
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
         ) : booking ? (
-          <WriteComment onCommentSave={onCommentSave} booking={booking} isAccounting={isAccounting} />
+          <WriteComment
+            onCommentSave={onCommentSave}
+            booking={booking}
+            isAccounting={isAccounting}
+          />
         ) : (
-          bookingRequest && <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
+          bookingRequest && (
+            <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
+          )
         )}
         <List>
           {booking

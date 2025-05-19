@@ -219,13 +219,25 @@ export interface ActivityCreationProps {
   paymentConfirmationEmails?: string[];
 }
 
-const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments }: ChecklistItemRowProp) => {
+const ChecklistItemRow = ({
+  booking,
+  checklistItem,
+  isAdmin,
+  comparableDocuments,
+}: ChecklistItemRowProp) => {
   const classes = useStyles();
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const storageBasePath = useMemo((): string => {
-    return ['booking-documents', 'clients', booking.ForwAdrId, 'bookings', booking.id, checklistItem.id].join('/');
+    return [
+      'booking-documents',
+      'clients',
+      booking.ForwAdrId,
+      'bookings',
+      booking.id,
+      checklistItem.id,
+    ].join('/');
   }, [booking, checklistItem]);
 
   const [isActionDialogOpen, setActionDialogOpen] = useState(false);
@@ -242,7 +254,7 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -271,7 +283,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   const saveChecklistChanges = useCallback(
     (
       field: string,
-      value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[] | CustomerAction,
+      value:
+        | ChecklistItemValueDocument[]
+        | undefined
+        | boolean
+        | ConfirmedByCustomer
+        | Stage[]
+        | CustomerAction,
     ) => {
       return firebase
         .firestore()
@@ -306,7 +324,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         addActivityItem(
           booking!.id,
           createActivityObject({
-            changeType: type ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER : ActivityChangeType.DONE_BY_CUSTOMER,
+            changeType: type
+              ? ActivityChangeType.UNDO_COMPLETED_CUSTOMER
+              : ActivityChangeType.DONE_BY_CUSTOMER,
             by: getActivityLogUserData(),
             checklistItem: checklistItem,
           }),
@@ -318,7 +338,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
 
   const checklistItemFileAddedHandler = useCallback(
     (addedFiles: ChecklistItemValueDocument[], internal: boolean) => {
-      const newDocuments = ((internal ? checklistItem.valuesAdmin : checklistItem.values) || []).concat(addedFiles);
+      const newDocuments = (
+        (internal ? checklistItem.valuesAdmin : checklistItem.values) || []
+      ).concat(addedFiles);
       return saveChecklistChanges(internal ? 'valuesAdmin' : 'values', newDocuments)
         .then(_ =>
           addActivityItem(
@@ -390,13 +412,19 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
   };
 
   const handleCompleted = () => {
-    const action = { ...checklistItem!.customerAction, by: getActivityLogUserData(), at: new Date() } as CustomerAction;
+    const action = {
+      ...checklistItem!.customerAction,
+      by: getActivityLogUserData(),
+      at: new Date(),
+    } as CustomerAction;
     storeActivity(() => checklistItemMarkCompletedHandler(action));
   };
 
   const handleUncompleted = () => {
     const action = omit(['by', 'at'])(checklistItem.customerAction) as CustomerAction;
-    storeActivity(() => checklistItemMarkCompletedHandler(action, ActivityChangeType.UNDO_COMPLETED_CUSTOMER));
+    storeActivity(() =>
+      checklistItemMarkCompletedHandler(action, ActivityChangeType.UNDO_COMPLETED_CUSTOMER),
+    );
   };
 
   const handleCheckboxChange = useCallback(
@@ -431,10 +459,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             error => {
               setUploadProgress(0);
               reject(error);
-              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
+              enqueueSnackbar(
+                <Typography color="inherit">Failed to upload file - {error.message}!</Typography>,
+                {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                },
+              );
             },
             () => {
               setUploadProgress(0);
@@ -465,7 +496,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     saveChecklistChanges(
       'values',
       checklistItem.values?.map(value =>
-        value.url === item.url ? { ...value, isSelectedForComparison: !item.isSelectedForComparison } : value,
+        value.url === item.url
+          ? { ...value, isSelectedForComparison: !item.isSelectedForComparison }
+          : value,
       ),
     ).then(() => {
       console.log('done');
@@ -494,7 +527,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       return addActivityItem(
         booking!.id,
         createActivityObject({
-          changeType: !item.final ? ActivityChangeType.MARK_AS_FINAL : ActivityChangeType.UNMARK_AS_FINAL,
+          changeType: !item.final
+            ? ActivityChangeType.MARK_AS_FINAL
+            : ActivityChangeType.UNMARK_AS_FINAL,
           by: getActivityLogUserData(),
           checklistItem: checklistItem,
           documents: [item],
@@ -534,7 +569,10 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
         saveChecklistChanges('values', newValues)
           .then(_ => console.log('Approved file'))
           .catch(err => console.log(err));
-      } else if (isAdmin && newDocument.status?.type === ChecklistItemValueDocumentStatusType.REJECTED) {
+      } else if (
+        isAdmin &&
+        newDocument.status?.type === ChecklistItemValueDocumentStatusType.REJECTED
+      ) {
         const newValues = checklistItem.values?.filter(doc => doc.url !== item.url);
         saveChecklistChanges('values', newValues)
           .then(_ => console.log('Delete rejected file'))
@@ -554,7 +592,12 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
       newItemArray[newItemArray.findIndex(el => el.url === item.url)] = { ...item, status: status };
     }
     storeActivity(() =>
-      checklistItemDocumentStatusChangeHandler(newItemArray, { ...item, status: status }, internal, dontCreateActivity),
+      checklistItemDocumentStatusChangeHandler(
+        newItemArray,
+        { ...item, status: status },
+        internal,
+        dontCreateActivity,
+      ),
     );
   };
 
@@ -578,7 +621,13 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
         });
     },
-    [checklistItem, saveFiles, storeActivity, checklistItemFileAddedHandler, getActivityLogUserData],
+    [
+      checklistItem,
+      saveFiles,
+      storeActivity,
+      checklistItemFileAddedHandler,
+      getActivityLogUserData,
+    ],
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
@@ -591,7 +640,10 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
     getInputProps: getInputPropsDraftNoClick,
     open: openDraftNoClick,
     isDragActive: isDragActiveDraftNoClick,
-  } = useDropzone({ onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true), noClick: true });
+  } = useDropzone({
+    onDrop: (acceptedFiles: File[]) => onDrop(acceptedFiles, true),
+    noClick: true,
+  });
 
   return (
     <Box
@@ -636,7 +688,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
                 checked={checklistItem.checked}
                 disabled={!isAdmin}
                 onChange={event =>
-                  event.target.checked ? handleCheckboxChange(event.target.checked) : setActionDialogOpen(true)
+                  event.target.checked
+                    ? handleCheckboxChange(event.target.checked)
+                    : setActionDialogOpen(true)
                 }
               />
             ) : (
@@ -649,7 +703,10 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               checklistItem.customerAction &&
               checklistItem.customerAction.action === CustomerChecklistActionType.fillForm &&
               (checklistItem.customerAction.stageId
-                ? checkStageDependency(checklistItem.stages, checklistItem.customerAction.stageId || '')
+                ? checkStageDependency(
+                    checklistItem.stages,
+                    checklistItem.customerAction.stageId || '',
+                  )
                 : true) && (
                 <Button
                   variant="outlined"
@@ -663,8 +720,15 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           </Box>
           <Box flex="1" />
           <Box display="flex">
-            <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+            <IconButton
+              id="mentionIconChecklist"
+              size="small"
+              aria-label="Add Comment"
+              onClick={handleMention}
+            >
+              <AddCommentIcon
+                style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }}
+              />
             </IconButton>
             <IconButton size="small" aria-label="Add Files" onClick={open}>
               <AttachFileIcon />
@@ -682,7 +746,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
               </Tooltip>
             )}
             {emailDialogOpen && (
-              <SendEmailDialog booking={booking} setDialogOpen={setEmailDialogOpen} dialogOpen={emailDialogOpen} />
+              <SendEmailDialog
+                booking={booking}
+                setDialogOpen={setEmailDialogOpen}
+                dialogOpen={emailDialogOpen}
+              />
             )}
           </Box>
         </Box>
@@ -703,9 +771,11 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           checklistItemValues={checklistItem.values || []}
           booking={booking}
           checklistItem={checklistItem}
-          changeStatus={(item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) =>
-            handleDocumentStatusChange(item, status, false, dontCreateActivity)
-          }
+          changeStatus={(
+            item: ChecklistItemValueDocument,
+            status: DocumentValueStatus,
+            dontCreateActivity?: boolean,
+          ) => handleDocumentStatusChange(item, status, false, dontCreateActivity)}
           internal={false}
           markAsFinal={item => handleMarkAsFinal(item, false)}
           otherDocuments={comparableDocuments}
@@ -760,7 +830,9 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
             booking={booking}
             checklistItem={checklistItem}
             internal={true}
-            onUpload={(values, internal) => storeActivity(() => checklistItemFileAddedHandler(values, internal))}
+            onUpload={(values, internal) =>
+              storeActivity(() => checklistItemFileAddedHandler(values, internal))
+            }
           />
         </Fragment>
       )}
@@ -771,8 +843,8 @@ const ChecklistItemRow = ({ booking, checklistItem, isAdmin, comparableDocuments
           onSuccess={() => handleCheckboxChange(false)}
         >
           <Typography>
-            Are you sure you want to uncheck an item? If you uncheck item, that can generate new notification to the
-            customer?
+            Are you sure you want to uncheck an item? If you uncheck item, that can generate new
+            notification to the customer?
           </Typography>
         </ActionModal>
       )}

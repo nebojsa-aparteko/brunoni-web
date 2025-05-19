@@ -1,10 +1,15 @@
 import useFirestoreCollection from './useFirestoreCollection';
 import { flow, update } from 'lodash/fp';
 import normalizeFirestoreDate from '../utilities/normalizeFirestoreDate';
-import ProviderRouteEntity, { ProviderRoutesType } from '../model/land-transport/providers/ProviderRoutes';
+import ProviderRouteEntity, {
+  ProviderRoutesType,
+} from '../model/land-transport/providers/ProviderRoutes';
 import { useCallback } from 'react';
 
-const useLandTransportRoutes = <T extends ProviderRouteEntity>(providerId: string, type: ProviderRoutesType) => {
+const useLandTransportRoutes = <T extends ProviderRouteEntity>(
+  providerId: string,
+  type: ProviderRoutesType,
+) => {
   const landTransportRoutesRef = useFirestoreCollection(
     'land-transport-config',
     useCallback(

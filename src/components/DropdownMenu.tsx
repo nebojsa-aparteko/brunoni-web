@@ -29,7 +29,13 @@ export const DropDownMenuWithItems: React.FC<WithItemsProps> = ({
           {dropDownIcon}
         </IconButton>
       </Tooltip>
-      <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
+      <Menu
+        id="actions"
+        anchorEl={moreAnchorEl}
+        keepMounted
+        open={Boolean(moreAnchorEl)}
+        onClose={handleClose}
+      >
         {items.map((item, i) => {
           return (
             <MenuItem onClick={item.onClick} key={i}>

@@ -21,7 +21,13 @@ const showSomethingWrongTask = (booking: Booking, reference: string) => {
     .collection('tasks')
     .doc(`${TaskType.CHECK_FILE}_${reference}`)
     .set(
-      { show: true, resolved: false, createAt: new Date(), dueDate: endOfDay(new Date()), paymentReference: reference },
+      {
+        show: true,
+        resolved: false,
+        createAt: new Date(),
+        dueDate: endOfDay(new Date()),
+        paymentReference: reference,
+      },
       { merge: true },
     );
 };
@@ -40,7 +46,7 @@ const MarkThatSomethingIsWrongButton: React.FC<Props> = ({ payment, booking, upd
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 

@@ -108,7 +108,13 @@ const Filter: React.FC<CompProps> = ({ collection, setCollection, name, label, l
           {collection.slice(0, limited ? limit : collection.length).map((c, i) => (
             <FormControlLabel
               key={`${c}-${i}`}
-              control={<Checkbox checked={c.checked} onChange={(e, v) => handleSelect(i, v)} name="single" />}
+              control={
+                <Checkbox
+                  checked={c.checked}
+                  onChange={(e, v) => handleSelect(i, v)}
+                  name="single"
+                />
+              }
               label={c.name}
             />
           ))}

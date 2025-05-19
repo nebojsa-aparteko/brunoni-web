@@ -11,7 +11,10 @@ interface CheckListContentProps {
   isCommentIconHidden?: boolean;
 }
 
-const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({ bookingRequest, isCommentIconHidden }) => {
+const BookingRequestChecklistContent: React.FC<CheckListContentProps> = ({
+  bookingRequest,
+  isCommentIconHidden,
+}) => {
   const checklistItems = useBookingRequestChecklist(bookingRequest.id || '-');
   const actingAs = useContext(ActingAs)[0];
 

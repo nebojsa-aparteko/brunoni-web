@@ -22,11 +22,13 @@ export interface SpecificProviderProfitEntity extends ProviderProfitEntity {
   category: BookingCategory;
 }
 
-export const isDefaultProviderProfitEntity = (value: ProviderProfitEntity): value is DefaultProviderProfitEntity =>
-  value.type === ProviderProfitType.DEFAULT;
+export const isDefaultProviderProfitEntity = (
+  value: ProviderProfitEntity,
+): value is DefaultProviderProfitEntity => value.type === ProviderProfitType.DEFAULT;
 
-export const isSpecificProviderProfitEntity = (value: ProviderProfitEntity): value is SpecificProviderProfitEntity =>
-  value.type === ProviderProfitType.SPECIFIC;
+export const isSpecificProviderProfitEntity = (
+  value: ProviderProfitEntity,
+): value is SpecificProviderProfitEntity => value.type === ProviderProfitType.SPECIFIC;
 
 export type ProviderProfit = Omit<ProviderProfitEntity, 'id' | 'createdAt'>;
 export type DefaultProviderProfit = Omit<DefaultProviderProfitEntity, 'id' | 'createdAt'>;

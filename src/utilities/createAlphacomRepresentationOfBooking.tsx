@@ -35,37 +35,60 @@ const getTariffs = (container: Container & ContainerDetails) => {
   return tariffs;
 };
 
-const twentyFootContainers = ["20'DC", "20'SO", "20'FR", "20'PF", "20'SR", "20'RF", "20'TK", "20'OT"];
-const fortyFootContainers = ["40'DC", "40'SO", "40'FR", "40'PF", "40'SR", "40'OT", "40'HC", "40'FH", "40'RH", "40'OH"];
+const twentyFootContainers = [
+  "20'DC",
+  "20'SO",
+  "20'FR",
+  "20'PF",
+  "20'SR",
+  "20'RF",
+  "20'TK",
+  "20'OT",
+];
+const fortyFootContainers = [
+  "40'DC",
+  "40'SO",
+  "40'FR",
+  "40'PF",
+  "40'SR",
+  "40'OT",
+  "40'HC",
+  "40'FH",
+  "40'RH",
+  "40'OH",
+];
 
 const getRelevantUnit = (unit: string) => {
   if (unit === 'PRO CONTAINER' || unit === 'PER CONTAINER') return 'CTR';
   if (unit === 'PRO SENDUNG' || unit === 'PER SHIPMENT' || unit === 'PRO SHIPMENT') return 'FEE';
   if (unit === 'PRO SET' || unit === 'PER SET') return 'SET';
   if (unit === 'PRO TEU' || unit === 'PER TEU') return 'TEU';
-  if (twentyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
+  if (
+    twentyFootContainers.some(
+      containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName,
+    )
+  )
     return "20'";
-  if (fortyFootContainers.some(containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName))
+  if (
+    fortyFootContainers.some(
+      containerName => unit === 'PRO ' + containerName || unit === 'PER ' + containerName,
+    )
+  )
     return "40'";
   return unit;
 };
 
 const fetchClientByAlphacomId = async (alphacomId: string) =>
-  await firebase
-    .firestore()
-    .collection('clients')
-    .doc(alphacomId)
-    .get();
+  await firebase.firestore().collection('clients').doc(alphacomId).get();
 
 export default async (
   request: BookingRequest,
   chargeCodes: ChargeCode[] | undefined,
   commodityTypes: CommodityType[] | undefined,
 ) => {
-  const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str => str.trim()) || [
-    undefined,
-    undefined,
-  ];
+  const [erpCarrierId, erpServiceId] = request.schedule?.Service?.split('-')?.map(str =>
+    str.trim(),
+  ) || [undefined, undefined];
   const vgmSubmittedByClient =
     request?.vgmSubmittedBy === VGMSubmittedBy.CLIENT
       ? request.client
@@ -80,7 +103,10 @@ export default async (
     set('INTBL', request.intBlNumber),
     set('BkgAgentContact', request.assignedUser?.alphacomId),
     set('BkgAgentContactEml', request.assignedUser?.emailAddress),
-    set('BkgAgentContactTxt', `${request.assignedUser?.firstName} ${request.assignedUser?.lastName}`),
+    set(
+      'BkgAgentContactTxt',
+      `${request.assignedUser?.firstName} ${request.assignedUser?.lastName}`,
+    ),
     set('BkgCreateTimeStamp', new Date()),
     set('BkgTouchTimeStamp', new Date()),
     set('TimeStamp', new Date()),
@@ -106,7 +132,9 @@ export default async (
         request.freightDetails?.map(detail => ({
           ...detail,
           Unit: detail.Unit ? getRelevantUnit(detail.Unit.trim().toUpperCase()) : undefined,
-          ChgCode: chargeCodes ? chargeCodes?.find(code => code.text === detail.Txt)?.chargeCodeId : undefined,
+          ChgCode: chargeCodes
+            ? chargeCodes?.find(code => code.text === detail.Txt)?.chargeCodeId
+            : undefined,
         })),
       )({}),
     ),
@@ -117,7 +145,9 @@ export default async (
     set('Cust-BkgRef', request.customerReference),
     set(
       'PlaceOfRecieptISO',
-      itinerary?.placeOfReceipt ? itinerary?.placeOfReceipt?.Port.ID : itinerary?.portOfLoading?.Port.ID,
+      itinerary?.placeOfReceipt
+        ? itinerary?.placeOfReceipt?.Port.ID
+        : itinerary?.portOfLoading?.Port.ID,
     ),
     set(
       'PlaceOfRecieptName',
@@ -129,18 +159,27 @@ export default async (
       'PlaceOfReceiptETS',
       itinerary?.placeOfReceipt
         ? itinerary?.placeOfReceipt?.DepartureDate
-          ? formatDateSafe(parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+          ? formatDateSafe(
+              parseDate(itinerary?.placeOfReceipt?.DepartureDate, 'yyyy-MM-dd', new Date()),
+              'dd.MM.yyyy',
+            )
           : null
         : itinerary?.portOfLoading?.DepartureDate
-        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
-        : null,
+          ? formatDateSafe(
+              parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()),
+              'dd.MM.yyyy',
+            )
+          : null,
     ),
     set('POL', itinerary?.portOfLoading?.Port.ID),
     set('POLName', itinerary?.portOfLoading?.Port.HarbourName),
     set(
       'POLETS',
       itinerary?.portOfLoading?.DepartureDate
-        ? formatDateSafe(parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        ? formatDateSafe(
+            parseDate(itinerary?.portOfLoading?.DepartureDate, 'yyyy-MM-dd', new Date()),
+            'dd.MM.yyyy',
+          )
         : null,
     ),
     set('POD', itinerary?.portOfDischarge?.Port.ID),
@@ -148,12 +187,17 @@ export default async (
     set(
       'PODETS',
       itinerary?.portOfDischarge?.DepartureDate
-        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.DepartureDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
+        ? formatDateSafe(
+            parseDate(itinerary?.portOfDischarge?.DepartureDate, 'yyyy-MM-dd', new Date()),
+            'dd.MM.yyyy',
+          )
         : null,
     ), //TODO check if ETA or ETS is needed
     set(
       'FinalDestinationISO',
-      itinerary?.finalDestinationPort ? itinerary?.finalDestinationPort?.Port.ID : itinerary?.portOfDischarge?.Port.ID,
+      itinerary?.finalDestinationPort
+        ? itinerary?.finalDestinationPort?.Port.ID
+        : itinerary?.portOfDischarge?.Port.ID,
     ),
     set(
       'FinalDestinationName',
@@ -171,14 +215,21 @@ export default async (
             )
           : null
         : itinerary?.portOfDischarge?.ArrivalDate
-        ? formatDateSafe(parseDate(itinerary?.portOfDischarge?.ArrivalDate, 'yyyy-MM-dd', new Date()), 'dd.MM.yyyy')
-        : null,
+          ? formatDateSafe(
+              parseDate(itinerary?.portOfDischarge?.ArrivalDate, 'yyyy-MM-dd', new Date()),
+              'dd.MM.yyyy',
+            )
+          : null,
     ),
     set(
       'Remarks',
       flow(set('Remark'))(
         request.specialRemarks?.map((remark, index) =>
-          flow(set('RemarkSeq', `${index}`), renameField('id', 'RemarkType'), renameField('text', 'RemarkTxt'))(remark),
+          flow(
+            set('RemarkSeq', `${index}`),
+            renameField('id', 'RemarkType'),
+            renameField('text', 'RemarkTxt'),
+          )(remark),
         ),
       )({}),
     ),
@@ -190,13 +241,17 @@ export default async (
         set('LinerPortAgentID', portOfLoading?.Port.PortAgentID),
         set('FOBDeliveryBy', portOfLoading?.Port.PortAgent?.split('<br/>')[0]),
         set('VGMSubmByID', vgmSubmittedByClient && vgmSubmittedByClient?.id),
-        set('VGMSubmByTxt', vgmSubmittedByClient && getRepresentationFromClient(vgmSubmittedByClient)),
+        set(
+          'VGMSubmByTxt',
+          vgmSubmittedByClient && getRepresentationFromClient(vgmSubmittedByClient),
+        ),
         set(
           'Closings',
           set(
             'Closing',
             request.schedule?.Deadlines.map(closing => {
-              const [date, time] = (closing.Time && (closing.Time?.endsWith('h') || closing.Time?.endsWith('H'))
+              const [date, time] = (closing.Time &&
+              (closing.Time?.endsWith('h') || closing.Time?.endsWith('H'))
                 ? closing.Time?.slice(0, -1)
                 : closing.Time
               )
@@ -227,7 +282,8 @@ export default async (
               CtrQuantity: value.quantity,
               CtypID: value.containerType?.id,
               CommodityID:
-                commodityTypes && commodityTypes.some(commodity => commodity.id === value.commodityType?.id)
+                commodityTypes &&
+                commodityTypes.some(commodity => commodity.id === value.commodityType?.id)
                   ? value.commodityType?.id
                   : null,
               CommodityTXT:
@@ -236,10 +292,18 @@ export default async (
                   : value.commodityType?.id,
               CtrWeight: `${value.weight?.toFixed(2)} KGS`,
               'VGM-PIN': value.vgmPin,
-              DemDetTariff: value.demDetTariffs && value.demDetTariffs.length > 0 ? value.demDetTariffs[0].id : null,
+              DemDetTariff:
+                value.demDetTariffs && value.demDetTariffs.length > 0
+                  ? value.demDetTariffs[0].id
+                  : null,
               StorageTariff:
-                value.storageTariffs && value.storageTariffs.length > 0 ? value.storageTariffs[0].id : null,
-              PluginTariff: value.pluginTariffs && value.pluginTariffs.length > 0 ? value.pluginTariffs[0].id : null,
+                value.storageTariffs && value.storageTariffs.length > 0
+                  ? value.storageTariffs[0].id
+                  : null,
+              PluginTariff:
+                value.pluginTariffs && value.pluginTariffs.length > 0
+                  ? value.pluginTariffs[0].id
+                  : null,
               Temperature: value.temperature
                 ? `${value.temperature > 0 ? '+' + value.temperature : value.temperature}° Celsius`
                 : null,
@@ -316,15 +380,18 @@ export default async (
   )({});
 };
 
-const renameField = (oldName: string, newName: string, transformationFunction?: any) => (value: any) =>
-  get(oldName)(value)
-    ? flow(renameKey(oldName, newName, transformationFunction), omit([oldName]))(value)
-    : (() => {
-        delete value[oldName];
-        return value;
-      })();
+const renameField =
+  (oldName: string, newName: string, transformationFunction?: any) => (value: any) =>
+    get(oldName)(value)
+      ? flow(renameKey(oldName, newName, transformationFunction), omit([oldName]))(value)
+      : (() => {
+          delete value[oldName];
+          return value;
+        })();
 
-const renameKey = (oldName: string, newName: string, transformationFunction?: any) => (value: { [key: string]: any }) =>
-  transformationFunction
-    ? set(newName, transformationFunction(get(oldName)(value)))(value)
-    : set(newName, get(oldName)(value))(value);
+const renameKey =
+  (oldName: string, newName: string, transformationFunction?: any) =>
+  (value: { [key: string]: any }) =>
+    transformationFunction
+      ? set(newName, transformationFunction(get(oldName)(value)))(value)
+      : set(newName, get(oldName)(value))(value);

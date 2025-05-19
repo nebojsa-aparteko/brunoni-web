@@ -22,7 +22,11 @@ import {
   ShortChecklistItem,
   Stage,
 } from '../../bookings/checklist/ChecklistItemModel';
-import { ActivityLogItem, ActivityType, PaymentActivityData } from '../../bookings/checklist/ActivityModel';
+import {
+  ActivityLogItem,
+  ActivityType,
+  PaymentActivityData,
+} from '../../bookings/checklist/ActivityModel';
 import { MentionItem } from 'react-mentions';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import React, { Fragment, useCallback, useContext, useMemo, useState } from 'react';
@@ -137,11 +141,7 @@ const addActivityItem = (bookingId: string, activityLog: ActivityLogItem) => {
 };
 
 const checklistDocumentsRef = (path: string) =>
-  firebase
-    .firestore()
-    .collection('bookings-requests')
-    .doc(path)
-    .collection('documents');
+  firebase.firestore().collection('bookings-requests').doc(path).collection('documents');
 
 const BookingRequestChecklistRow = ({
   bookingRequest,
@@ -163,7 +163,7 @@ const BookingRequestChecklistRow = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -190,7 +190,13 @@ const BookingRequestChecklistRow = ({
   const saveChecklistChanges = useCallback(
     (
       field: string,
-      value: ChecklistItemValueDocument[] | undefined | boolean | ConfirmedByCustomer | Stage[] | CustomerAction,
+      value:
+        | ChecklistItemValueDocument[]
+        | undefined
+        | boolean
+        | ConfirmedByCustomer
+        | Stage[]
+        | CustomerAction,
     ) => {
       return firebase
         .firestore()
@@ -221,7 +227,10 @@ const BookingRequestChecklistRow = ({
 
   const handleCheckboxChange = useCallback(
     (value: boolean) => {
-      dispatch({ type: SAVED_ACTION_SNACKBAR, storeToFirebase: () => checklistItemCheckedHandler(value) });
+      dispatch({
+        type: SAVED_ACTION_SNACKBAR,
+        storeToFirebase: () => checklistItemCheckedHandler(value),
+      });
     },
     [checklistItemCheckedHandler, dispatch],
   );
@@ -230,7 +239,10 @@ const BookingRequestChecklistRow = ({
     (addedFiles: ChecklistItemValueDocument[]) => {
       const batch = firebase.firestore().batch();
       addedFiles.forEach(doc =>
-        batch.set(checklistDocumentsRef(`/${bookingRequest.id}/checklist/${checklistItem.id}`).doc(), doc),
+        batch.set(
+          checklistDocumentsRef(`/${bookingRequest.id}/checklist/${checklistItem.id}`).doc(),
+          doc,
+        ),
       );
       return batch
         .commit()
@@ -282,10 +294,13 @@ const BookingRequestChecklistRow = ({
             error => {
               setUploadProgress(0);
               reject(error);
-              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
+              enqueueSnackbar(
+                <Typography color="inherit">Failed to upload file - {error.message}!</Typography>,
+                {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                },
+              );
             },
             () => {
               setUploadProgress(0);
@@ -331,7 +346,13 @@ const BookingRequestChecklistRow = ({
           console.error(`Error while storing files ${JSON.stringify(checklistItem, null, 2)}`, err);
         });
     },
-    [checklistItem, saveFiles, storeActivity, checklistItemFileAddedHandler, getActivityLogUserData],
+    [
+      checklistItem,
+      saveFiles,
+      storeActivity,
+      checklistItemFileAddedHandler,
+      getActivityLogUserData,
+    ],
   );
 
   const handleMention = useCallback(() => {
@@ -369,8 +390,15 @@ const BookingRequestChecklistRow = ({
           <ListItemText primary={checklistItem.label} />
           {!isCommentIconHidden && (
             <ListItemSecondaryAction>
-              <IconButton id="mentionIconChecklist" size="small" aria-label="Add Comment" onClick={handleMention}>
-                <AddCommentIcon style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              <IconButton
+                id="mentionIconChecklist"
+                size="small"
+                aria-label="Add Comment"
+                onClick={handleMention}
+              >
+                <AddCommentIcon
+                  style={{ color: (checklistItem.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }}
+                />
               </IconButton>
             </ListItemSecondaryAction>
           )}

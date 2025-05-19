@@ -59,7 +59,11 @@ import ControlPointDuplicateIcon from '@material-ui/icons/ControlPointDuplicate'
 import DoneAllIcon from '@material-ui/icons/DoneAll';
 import ActingAs from '../../contexts/ActingAs';
 import { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
-import { calculateContainers, onContainersChange, takeQuoteDetails } from '../onlineBooking/Summary';
+import {
+  calculateContainers,
+  onContainersChange,
+  takeQuoteDetails,
+} from '../onlineBooking/Summary';
 import EditingInput from '../EditingInput';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import CurrencyInput from '../inputs/CurrencyInput';
@@ -154,11 +158,25 @@ const getUpdatedFreightDetails = (
     if (field === 'Txt' && value === 'Agency Commission') {
       d = flow(set('Group', FreightDetailGroup.INTERNAL1), set('isManual', true))(d);
     }
-    d = set(field, value === '' ? undefined : field === 'Anz' || field === 'UnitValue' ? parseFloat(value) : value)(d);
-    bookingRequest.freightDetails[index] = flow(set(field, get(field)(d)), set('Total', calculateTotal(d)))(d);
+    d = set(
+      field,
+      value === ''
+        ? undefined
+        : field === 'Anz' || field === 'UnitValue'
+          ? parseFloat(value)
+          : value,
+    )(d);
+    bookingRequest.freightDetails[index] = flow(
+      set(field, get(field)(d)),
+      set('Total', calculateTotal(d)),
+    )(d);
     if (isDetailSeafreight(d)) {
       const indexOfCommission = bookingRequest.freightDetails.findIndex(e => isAgencyCommission(e));
-      if (indexOfCommission && indexOfCommission !== -1 && !bookingRequest.freightDetails[indexOfCommission].isManual) {
+      if (
+        indexOfCommission &&
+        indexOfCommission !== -1 &&
+        !bookingRequest.freightDetails[indexOfCommission].isManual
+      ) {
         const newCommission = generateCommission(
           bookingRequest.schedule,
           bookingRequest.freightDetails,
@@ -191,7 +209,8 @@ export const isQuantityAutomatic = (costUnit: string, containerTypeNames: string
       'PER ' + containerName.toUpperCase() === costUnit.toUpperCase(),
   );
 
-export const isAgencyCommission = (freightDetail: FreightDetail) => freightDetail.Txt === 'Agency Commission';
+export const isAgencyCommission = (freightDetail: FreightDetail) =>
+  freightDetail.Txt === 'Agency Commission';
 
 export const calculateTotal = (freightDetail: FreightDetail) =>
   freightDetail.Unit && freightDetail.Unit === '%'
@@ -213,7 +232,8 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const invisible = useMemo(
     () =>
-      selectedTab === 0 && (freightDetail.Group === FreightDetailGroup.INTERNAL2 || isAgencyCommission(freightDetail)),
+      selectedTab === 0 &&
+      (freightDetail.Group === FreightDetailGroup.INTERNAL2 || isAgencyCommission(freightDetail)),
     [freightDetail, selectedTab],
   );
   const [quantity, setQuantity] = useState<number | undefined>(freightDetail.Anz || 0);
@@ -229,7 +249,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
     const newContainerTypeNames = containerTypes?.map(containerType => containerType.name);
     setContainerTypeNames(newContainerTypeNames);
     setIsQAutomatic(
-      (freightDetail.Unit && newContainerTypeNames && isQuantityAutomatic(freightDetail.Unit, newContainerTypeNames)) ||
+      (freightDetail.Unit &&
+        newContainerTypeNames &&
+        isQuantityAutomatic(freightDetail.Unit, newContainerTypeNames)) ||
         false,
     );
   }, [containerTypes, freightDetail.Unit]);
@@ -301,11 +323,15 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
                 inputProps={{
                   name: 'Anz',
                   type: 'number',
-                  onChange: event => setQuantity(event.target.value ? parseFloat(event.target.value) : 0),
-                  onBlur: event => handleChangeFreightDetails(event.target.value, event.target.name),
+                  onChange: event =>
+                    setQuantity(event.target.value ? parseFloat(event.target.value) : 0),
+                  onBlur: event =>
+                    handleChangeFreightDetails(event.target.value, event.target.name),
                 }}
                 value={
-                  costUnit && bookingRequest && bookingRequest.containers && isQAutomatic ? freightDetail.Anz : quantity
+                  costUnit && bookingRequest && bookingRequest.containers && isQAutomatic
+                    ? freightDetail.Anz
+                    : quantity
                 }
                 canEdit={isDashboardUser(userRecord) && !isQAutomatic}
               />
@@ -354,7 +380,9 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
                   value={unitValue || ''}
                   onChange={event =>
                     setUnitValue(
-                      event.target.value && event.target.value !== '' ? parseFloat(event.target.value) : undefined,
+                      event.target.value && event.target.value !== ''
+                        ? parseFloat(event.target.value)
+                        : undefined,
                     )
                   }
                   onBlur={event => handleChangeFreightDetails(event.target.value, 'UnitValue')}
@@ -378,12 +406,19 @@ const BookingRequestFreightDetailsRow: React.FC<RowProps> = ({
                 freightDetail.Unit
               )}
             </TableCell>
-            <TableCell>{freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}</TableCell>
+            <TableCell>
+              {freightDetail.Total ? formatCurrencyAmount(freightDetail.Total) : '0,00'}
+            </TableCell>
             {editing && isAdmin && selectedTab === 0 && (
               <TableCell>
                 <IconButton
                   aria-label="Copy to internal1"
-                  onClick={() => handleChangeFreightDetails(freightDetail.Internal1 ? undefined : true, 'Internal1')}
+                  onClick={() =>
+                    handleChangeFreightDetails(
+                      freightDetail.Internal1 ? undefined : true,
+                      'Internal1',
+                    )
+                  }
                 >
                   {freightDetail.Internal1 ? (
                     <DoneAllIcon style={{ color: '#F7BC06' }} />
@@ -428,22 +463,24 @@ export const generateCommission = (
   carrierId?: string,
   containers?: (Container & ContainerDetails)[],
 ) => {
-  const seaFreightDetails = freightDetails?.filter((detail: FreightDetail) => isDetailSeafreight(detail));
+  const seaFreightDetails = freightDetails?.filter((detail: FreightDetail) =>
+    isDetailSeafreight(detail),
+  );
   const seaFreightTotal = seaFreightDetails?.reduce((a, b) => a + (b?.Total || 0), 0);
   const isHMM = carrierId && carrierId === CarrierId.HMM;
   const isPercent = schedule?.ComPercentE
     ? parseFloat(schedule?.ComPercentE) !== 0
     : schedule?.ComPercentI
-    ? parseFloat(schedule?.ComPercentI) !== 0
-    : false;
+      ? parseFloat(schedule?.ComPercentI) !== 0
+      : false;
   const quantity = isPercent
     ? isHMM
       ? 5
       : schedule?.ComPercentE
-      ? parseFloat(schedule?.ComPercentE)
-      : schedule?.ComPercentI
-      ? parseFloat(schedule?.ComPercentI)
-      : 0
+        ? parseFloat(schedule?.ComPercentE)
+        : schedule?.ComPercentI
+          ? parseFloat(schedule?.ComPercentI)
+          : 0
     : calculateContainers(containers).TEU || 1;
   const value =
     seaFreightDetails && seaFreightDetails.length > 0 && isPercent
@@ -467,7 +504,9 @@ export const generateCommission = (
         Currency: seaFreightDetails[0].Currency,
         UnitValue: -value,
         Unit: isPercent ? '%' : 'per TEU',
-        Total: -(isPercent ? ((quantity || 1) * (value || 0)) / 100 : (quantity || 1) * (value || 0)),
+        Total: -(isPercent
+          ? ((quantity || 1) * (value || 0)) / 100
+          : (quantity || 1) * (value || 0)),
         Group: FreightDetailGroup.INTERNAL1,
       } as FreightDetail)
     : undefined;
@@ -488,10 +527,7 @@ export const getRelatedQuotes = async (bookingRequest: BookingRequest) => {
     query = query.where('destination', '==', bookingRequest.destination?.id);
   }
 
-  const quotesRef = await query
-    .orderBy('dateIssued', 'desc')
-    .limit(10)
-    .get();
+  const quotesRef = await query.orderBy('dateIssued', 'desc').limit(10).get();
 
   return [quotesRef, uniq(bookingRequest.containers?.map(d => d.containerType?.id)) as string[]];
 };
@@ -502,14 +538,19 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   const isAdmin = !actingAs;
   const chargeCodes = useContext(ChargeCodes);
   const { isOpen, closeModal, openModal } = useModal();
-  const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(freightDetails);
+  const [filteredFreightDetails, setFilteredFreightDetails] = useState<FreightDetail[] | undefined>(
+    freightDetails,
+  );
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
 
   const [selectedDetails, setSelectedDetails] = useState<number[]>([]);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   const userRecord = useContext(UserRecordContext);
 
-  const containers = useMemo(() => calculateContainers(bookingRequest?.containers), [bookingRequest?.containers]);
+  const containers = useMemo(
+    () => calculateContainers(bookingRequest?.containers),
+    [bookingRequest?.containers],
+  );
 
   useEffect(() => {
     setBookingRequest(prevState =>
@@ -545,7 +586,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       case 2:
         freightDetails &&
           setFilteredFreightDetails(
-            freightDetails.filter(detail => detail.Group === FreightDetailGroup.INTERNAL2).sort(sortBySeqNr),
+            freightDetails
+              .filter(detail => detail.Group === FreightDetailGroup.INTERNAL2)
+              .sort(sortBySeqNr),
           );
         break;
     }
@@ -575,8 +618,8 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       selectedTab === 0
         ? FreightDetailGroup.EXTERNAL
         : selectedTab === 1
-        ? FreightDetailGroup.INTERNAL1
-        : FreightDetailGroup.INTERNAL2,
+          ? FreightDetailGroup.INTERNAL1
+          : FreightDetailGroup.INTERNAL2,
     [selectedTab],
   );
   const onAdd = useCallback(() => {
@@ -589,7 +632,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
       } as FreightDetail;
       let newDetails = (prevState.freightDetails || []).concat(emptyDetail);
       const indexOfCommission = newDetails.findIndex(e => isAgencyCommission(e));
-      indexOfCommission && indexOfCommission !== -1 && arrayMove(newDetails, indexOfCommission, newDetails.length - 1);
+      indexOfCommission &&
+        indexOfCommission !== -1 &&
+        arrayMove(newDetails, indexOfCommission, newDetails.length - 1);
       return set(
         'freightDetails',
         newDetails.map((detail, index) => ({ ...detail, SeqNr: index + 1 + '' })),
@@ -598,7 +643,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
   }, [setBookingRequest, selectedGroup, chargeCodes]);
 
   const onDelete = useCallback(() => {
-    const filteredFreightDetails = freightDetails?.filter(detail => !selectedDetails.includes(detail.SeqNr));
+    const filteredFreightDetails = freightDetails?.filter(
+      detail => !selectedDetails.includes(detail.SeqNr),
+    );
     // check if we deleted some seafreight details and update the commission
     if (
       selectedDetails.some(detailSeqNr => {
@@ -651,9 +698,12 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
 
     setBookingRequest(prevState => {
       if (!prevState || !prevState.freightDetails) return prevState;
-      const destinationIndex = prevState.freightDetails.findIndex(detail => detail === destinationFD);
+      const destinationIndex = prevState.freightDetails.findIndex(
+        detail => detail === destinationFD,
+      );
       const originIndex = prevState.freightDetails.findIndex(detail => detail === originFD);
-      if (destinationIndex < 0 || originIndex < 0 || destinationIndex === originIndex) return prevState;
+      if (destinationIndex < 0 || originIndex < 0 || destinationIndex === originIndex)
+        return prevState;
       const temp = prevState.freightDetails ? cloneDeep(prevState.freightDetails) : [];
       const [sourceDetail] = temp.splice(result.source.index, 1);
       temp.splice(destinationIndex, 0, sourceDetail);
@@ -691,9 +741,18 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
             {isDashboardUser(userRecord) && (
               <AppBar
                 position="static"
-                style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
               >
-                <Tabs value={selectedTab} onChange={handleTabChange} aria-label="simple tabs example">
+                <Tabs
+                  value={selectedTab}
+                  onChange={handleTabChange}
+                  aria-label="simple tabs example"
+                >
                   <Tab label="External" {...a11yProps(0)} />
                   <Tab label="Internal 1" {...a11yProps(1)} />
                   <Tab label="Internal 2" {...a11yProps(2)} />
@@ -728,7 +787,9 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
                 }
                 labelWhenNotSelected={''}
                 addButtonLabel={'Add new detail'}
-                deleteButtonLabel={selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'}
+                deleteButtonLabel={
+                  selectedDetails.length === 1 ? 'Delete detail' : 'Delete details'
+                }
               />
             )}
             {filteredFreightDetails && filteredFreightDetails.length > 0 ? (
@@ -761,9 +822,15 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
                       </TableCell>
                     )}
                     <TableCell>Description</TableCell>
-                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Quantity</TableCell>
-                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Currency</TableCell>
-                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>Cost Value</TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>
+                      Quantity
+                    </TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>
+                      Currency
+                    </TableCell>
+                    <TableCell align={editing && isDashboardUser(userRecord) ? 'left' : 'right'}>
+                      Cost Value
+                    </TableCell>
                     <TableCell align="left">Cost Unit</TableCell>
                     <TableCell>Total</TableCell>
                     {editing && isAdmin && selectedTab === 0 && <TableCell>Internal</TableCell>}
@@ -772,12 +839,19 @@ const BookingRequestFreightDetails: React.FC<Props> = ({ freightDetails, showWar
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="droppable" direction="vertical">
                     {(droppableProvided: DroppableProvided) => (
-                      <TableBody ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                      <TableBody
+                        ref={droppableProvided.innerRef}
+                        {...droppableProvided.droppableProps}
+                      >
                         {filteredFreightDetails.map((freightDetail, index) => (
                           <BookingRequestFreightDetailsRow
                             key={index}
                             freightDetail={freightDetail}
-                            selected={freightDetail.SeqNr ? selectedDetails.includes(freightDetail.SeqNr) : false}
+                            selected={
+                              freightDetail.SeqNr
+                                ? selectedDetails.includes(freightDetail.SeqNr)
+                                : false
+                            }
                             onSelectRow={event => onSelectRow(event, freightDetail.SeqNr)}
                             selectedTab={selectedTab}
                             index={index}
@@ -851,7 +925,9 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
   const handleSelectQuote = useCallback(
     (searchResult: Quote) => {
       if (isOnlineBookingProcess) {
-        setBookingRequest((prevState: any) => set('containers', searchResult.containers)(prevState as BookingRequest));
+        setBookingRequest((prevState: any) =>
+          set('containers', searchResult.containers)(prevState as BookingRequest),
+        );
         setValue('quoteNumber', searchResult.id);
       } else {
         let freightdetails = takeQuoteDetails(
@@ -869,9 +945,13 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
           ...(freightdetails?.filter(value => value.Txt !== 'Agency Commission') || []),
           commission,
         ]);
-        setBookingRequest((prevState: any) => set('freightDetails', freightdetails)(prevState as BookingRequest));
+        setBookingRequest((prevState: any) =>
+          set('freightDetails', freightdetails)(prevState as BookingRequest),
+        );
       }
-      setBookingRequest((prevState: any) => set('quoteNumber', searchResult.id)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) =>
+        set('quoteNumber', searchResult.id)(prevState as BookingRequest),
+      );
       setBookingRequest((prevState: any) =>
         set('quoteDetails', searchResult.quoteDetails)(prevState as BookingRequest),
       );
@@ -924,7 +1004,9 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
             <Box display="flex" flexDirection="column" py={1}>
               {fetchedResults ? (
                 fetchedResults.length === 0 ? (
-                  <Alert severity="warning">There are no quotes with booking request criteria.</Alert>
+                  <Alert severity="warning">
+                    There are no quotes with booking request criteria.
+                  </Alert>
                 ) : (
                   fetchedResults.map(doc => (
                     <Box onClick={() => handleSelectQuote(doc)} mx={-1} key={doc.id}>
@@ -945,7 +1027,9 @@ export const QuotePickerModal: React.FC<ModalProps> = ({
                     let docs = snapshot.docs.map(d => normalize(d.data()) as Quote);
                     //todo. Check if we should set containers on booking req if containers are defined.
                     if (!isOnlineBookingProcess) {
-                      docs = docs.filter(d => d.containers.some(c => containers.includes(c.containerType?.id || '')));
+                      docs = docs.filter(d =>
+                        d.containers.some(c => containers.includes(c.containerType?.id || '')),
+                      );
                     }
                     setFetchedResults(docs);
                   }}
@@ -968,7 +1052,9 @@ interface ModalProps {
   setBookingRequest:
     | React.Dispatch<React.SetStateAction<BookingRequest>>
     | React.Dispatch<React.SetStateAction<BookingRequest | undefined>>;
-  fetchQuotes: () => Promise<[firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]>;
+  fetchQuotes: () => Promise<
+    [firebase.firestore.QuerySnapshot<firebase.firestore.DocumentData>, string[]]
+  >;
   isOnlineBookingProcess?: boolean;
   carrier?: Carrier;
   bookingRequestState?: BookingRequest;

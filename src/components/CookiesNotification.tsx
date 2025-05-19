@@ -56,7 +56,11 @@ const CookiesNotification: React.FC<Props> = () => {
       <CardContent>
         <Typography variant="body1">
           We use Cookies to ensure that we give you the best experience on our website. Read our{' '}
-          <Link component="a" href="https://www.brunoni.ch/2-uncategorised/116-data-protection" target="_blank">
+          <Link
+            component="a"
+            href="https://www.brunoni.ch/2-uncategorised/116-data-protection"
+            target="_blank"
+          >
             Privacy Policy
           </Link>
           .

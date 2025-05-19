@@ -17,7 +17,7 @@ const useLandTransportExtensions = (providerId: string, routeId: string, groupId
         ({
           ...v.data(),
           id: v.id,
-        } as OfferProviderConfig),
+        }) as OfferProviderConfig,
     )
     .reduce(
       (previousValue, currentValue) => {

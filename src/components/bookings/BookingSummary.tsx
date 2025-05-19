@@ -99,7 +99,9 @@ export const ClientDetails: React.FC<{
       {forwarder ? (
         <span>
           {forwarder?.emailAddress ? (
-            <a href={'mailto:' + forwarderEmail}>{forwarderFullName || forwarderEmail?.toUpperCase()}</a>
+            <a href={'mailto:' + forwarderEmail}>
+              {forwarderFullName || forwarderEmail?.toUpperCase()}
+            </a>
           ) : (
             forwarderFullName || ' '
           )}
@@ -135,7 +137,11 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
     return (
       <Fragment>
         {client.name}, {client.city}
-        <ClientDetails forwarder={forwarder} forwarderText={booking.ForwarderPersTxt} bkgRef={booking['Cust-BkgRef']} />
+        <ClientDetails
+          forwarder={forwarder}
+          forwarderText={booking.ForwarderPersTxt}
+          bkgRef={booking['Cust-BkgRef']}
+        />
       </Fragment>
     );
   }, [client, booking, forwarder]);
@@ -160,7 +166,10 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
           <TableBody>
             <TableRowData label={'Carrier'} content={booking?.CarrierID?.toUpperCase() || ''} />
 
-            <TableRowData label={'Vessel'} content={[booking.Vessel, booking.Voyage].join(' VOY. ')} />
+            <TableRowData
+              label={'Vessel'}
+              content={[booking.Vessel, booking.Voyage].join(' VOY. ')}
+            />
 
             {booking.POLName !== booking.PlaceOfRecieptName ? (
               <TableRowData
@@ -176,11 +185,15 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
 
             <TableRowData
               label={'Port of Loading'}
-              content={[booking.POLName, formatDateSafe(booking.ETS, DateFormats.LONG)].join('<br/>ETS: ')}
+              content={[booking.POLName, formatDateSafe(booking.ETS, DateFormats.LONG)].join(
+                '<br/>ETS: ',
+              )}
             />
             <TableRowData
               label={'Port of Discharge'}
-              content={[booking.PODName, formatDateSafe(booking.ETA, DateFormats.LONG)].join('<br/>ETA: ')}
+              content={[booking.PODName, formatDateSafe(booking.ETA, DateFormats.LONG)].join(
+                '<br/>ETA: ',
+              )}
             />
 
             {booking.PODName !== booking.FinalDestinationName ? (
@@ -247,7 +260,9 @@ const BookingSummary: React.FC<Props> = ({ booking, bookingAgent }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {bookingAgent ? `${bookingAgent.firstName} ${bookingAgent.lastName}` : booking.BkgAgentContactTxt}
+                  {bookingAgent
+                    ? `${bookingAgent.firstName} ${bookingAgent.lastName}`
+                    : booking.BkgAgentContactTxt}
                 </a>
               </TableCell>
             </TableRow>

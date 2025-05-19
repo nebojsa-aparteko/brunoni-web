@@ -79,10 +79,10 @@ const MyDayContainer = () => {
     [filters, setFilters],
   );
 
-  const filteredTeams = useMemo(() => teams?.filter(t => t.teamType === taskCategory.toLowerCase()), [
-    teams,
-    taskCategory,
-  ]);
+  const filteredTeams = useMemo(
+    () => teams?.filter(t => t.teamType === taskCategory.toLowerCase()),
+    [teams, taskCategory],
+  );
 
   useEffect(() => {
     if (assignee && !actingAs)
@@ -99,41 +99,51 @@ const MyDayContainer = () => {
   useEffect(() => {
     if (filteredTeams) {
       filteredTeams
-        ?.reduce(async (previousValue, currentValue) => {
-          dispatch({ type: 'START_GLOBAL_LOADING' });
-          //TODO check what should be queried if currentValue.checklistItems or currentValue.taskTypes is an empty array
-          const tasksPerTeam =
-            (await currentValue.teamType) === TeamType.OPERATIONS
-              ? await getOperationsTeamTasks(currentValue.checklistItems || [''], formatCarrierId(carrier?.id))
-              : await getAccountingTeamTasks(currentValue.taskTypes || [''], formatCarrierId(carrier?.id));
-          const p = await previousValue;
+        ?.reduce(
+          async (previousValue, currentValue) => {
+            dispatch({ type: 'START_GLOBAL_LOADING' });
+            //TODO check what should be queried if currentValue.checklistItems or currentValue.taskTypes is an empty array
+            const tasksPerTeam =
+              (await currentValue.teamType) === TeamType.OPERATIONS
+                ? await getOperationsTeamTasks(
+                    currentValue.checklistItems || [''],
+                    formatCarrierId(carrier?.id),
+                  )
+                : await getAccountingTeamTasks(
+                    currentValue.taskTypes || [''],
+                    formatCarrierId(carrier?.id),
+                  );
+            const p = await previousValue;
 
-          const newTuple = [
-            currentValue.name as string,
-            tasksPerTeam.docs
-              .map(
-                task =>
-                  ({
-                    ...normalizeTaskData(task.data()),
-                    bookingId: task.ref.parent.parent?.id,
-                    id: task.id,
-                    selected: false,
-                  } as Task),
-              )
-              .filter(
-                task =>
-                  currentValue.carriers
-                    ?.map(carrier => getCarrierId(carrier.name) || carrier.name)
-                    .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
-                  currentValue.categories?.findIndex(category => category === task.category) !== -1 &&
-                  (payDate && task.payDate
-                    ? startOfDay(task.payDate).getTime() === startOfDay(payDate).getTime()
-                    : true) &&
-                  (!task.assignedUser || !task.assignedUser.alphacomId),
-              ),
-          ] as [string, Task[]];
-          return [...p, newTuple];
-        }, Promise.resolve([] as [string, Task[]][]))
+            const newTuple = [
+              currentValue.name as string,
+              tasksPerTeam.docs
+                .map(
+                  task =>
+                    ({
+                      ...normalizeTaskData(task.data()),
+                      bookingId: task.ref.parent.parent?.id,
+                      id: task.id,
+                      selected: false,
+                    }) as Task,
+                )
+                .filter(
+                  task =>
+                    currentValue.carriers
+                      ?.map(carrier => getCarrierId(carrier.name) || carrier.name)
+                      .findIndex(carrier => carrier === task.carrierId?.toUpperCase()) !== -1 &&
+                    currentValue.categories?.findIndex(category => category === task.category) !==
+                      -1 &&
+                    (payDate && task.payDate
+                      ? startOfDay(task.payDate).getTime() === startOfDay(payDate).getTime()
+                      : true) &&
+                    (!task.assignedUser || !task.assignedUser.alphacomId),
+                ),
+            ] as [string, Task[]];
+            return [...p, newTuple];
+          },
+          Promise.resolve([] as [string, Task[]][]),
+        )
         .then(n => {
           dispatch({ type: 'STOP_GLOBAL_LOADING' });
           setNormalizedTasks(n || []);
@@ -166,7 +176,10 @@ const MyDayContainer = () => {
       if (setFilters) {
         setSelectedTasks([]);
         setFilters(set('taskCategory', category)(filters));
-        await setLastOpenedChecklistTab(category === TaskCategory.ACCOUNTING ? 'accounting' : 'operations', user.uid);
+        await setLastOpenedChecklistTab(
+          category === TaskCategory.ACCOUNTING ? 'accounting' : 'operations',
+          user.uid,
+        );
       }
     },
     [filters, setFilters, user.uid],
@@ -186,10 +199,10 @@ const MyDayContainer = () => {
   /*
     Overdue / Future, make array of filter functions, and add that function into filter function of an array
    */
-  const filteredTasks = useMemo(() => (taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks), [
-    taskStatus,
-    tasks,
-  ]);
+  const filteredTasks = useMemo(
+    () => (taskStatus ? tasks?.filter(getTaskFilter(taskStatus)) : tasks),
+    [taskStatus, tasks],
+  );
 
   const filteredNormalizedTasks = useMemo(
     () =>
@@ -209,7 +222,8 @@ const MyDayContainer = () => {
       ? normalizedTasks?.reduce((prev, current) => prev + current[1].length, 0)
       : 0;
     if (selectedTasks.length !== filteredTasksLength + normalizedTasksLength) {
-      const filteredTasksSelection = filteredTasks?.map(task => `${task.bookingId}/${task.id}`) || [];
+      const filteredTasksSelection =
+        filteredTasks?.map(task => `${task.bookingId}/${task.id}`) || [];
       const normalizedTasksSelection = normalizedTasks
         ? normalizedTasks.map(normalizedTask =>
             normalizedTask[1].map(task => `${task.bookingId}/${task.id}-${normalizedTask[0]}`),
@@ -250,18 +264,37 @@ const MyDayContainer = () => {
       />
       <CardContent>
         {!actingAs && (
-          <Box display="flex" flexDirection="row" mb={2} justifyContent="flex-start" flexWrap="wrap">
+          <Box
+            display="flex"
+            flexDirection="row"
+            mb={2}
+            justifyContent="flex-start"
+            flexWrap="wrap"
+          >
             <Box display="flex" alignItems="center" mb={2}>
               <Box style={{ minWidth: 'fit-content', alignItems: 'center' }}>
                 <TaskClientFilterSwitch setSelectedTasks={setSelectedTasks} />
               </Box>
             </Box>
             <Box display="flex" alignItems="center" mb={2}>
-              <Box display="flex" style={{ minWidth: theme.spacing(45), alignItems: 'center' }} ml={2}>
-                <Typography variant="h4" display="block" style={{ minWidth: 'fit-content', paddingRight: 4 }}>
+              <Box
+                display="flex"
+                style={{ minWidth: theme.spacing(45), alignItems: 'center' }}
+                ml={2}
+              >
+                <Typography
+                  variant="h4"
+                  display="block"
+                  style={{ minWidth: 'fit-content', paddingRight: 4 }}
+                >
                   Filter by:
                 </Typography>
-                <UserInput label="Assigned user" users={users} onChange={onAssignedFilter} value={assignee} />
+                <UserInput
+                  label="Assigned user"
+                  users={users}
+                  onChange={onAssignedFilter}
+                  value={assignee}
+                />
               </Box>
               <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
                 <TaskStatusInput
@@ -272,7 +305,12 @@ const MyDayContainer = () => {
                 />
               </Box>
               <Box display="flex" style={{ minWidth: theme.spacing(15) }} ml={2}>
-                <CarrierInput label="Carrier" onChange={onCarrierFilter} carriers={availableCarriers} value={carrier} />
+                <CarrierInput
+                  label="Carrier"
+                  onChange={onCarrierFilter}
+                  carriers={availableCarriers}
+                  value={carrier}
+                />
               </Box>
               {taskCategory === TaskCategory.ACCOUNTING ? (
                 <Box display="flex" style={{ minWidth: theme.spacing(15), display: 'flex' }} ml={2}>
@@ -292,7 +330,13 @@ const MyDayContainer = () => {
                         onPayDateChange(null);
                       }}
                       size="small"
-                      style={{ position: 'relative', right: 32, marginRight: -32, height: 32, alignSelf: 'center' }}
+                      style={{
+                        position: 'relative',
+                        right: 32,
+                        marginRight: -32,
+                        height: 32,
+                        alignSelf: 'center',
+                      }}
                     >
                       <ClearIcon />
                     </IconButton>
@@ -313,8 +357,16 @@ const MyDayContainer = () => {
                       }}
                       style={{ flexDirection: 'row' }}
                     >
-                      <FormControlLabel value={TaskCategory.OPERATIONS} control={<Radio />} label="Operations" />
-                      <FormControlLabel value={TaskCategory.ACCOUNTING} control={<Radio />} label="Accounting" />
+                      <FormControlLabel
+                        value={TaskCategory.OPERATIONS}
+                        control={<Radio />}
+                        label="Operations"
+                      />
+                      <FormControlLabel
+                        value={TaskCategory.ACCOUNTING}
+                        control={<Radio />}
+                        label="Accounting"
+                      />
                     </RadioGroup>
                   </Grid>
                 </Grid>
@@ -398,7 +450,9 @@ export const getTeamsPerUser = (assignee: UserRecord) =>
     .get();
 
 const getChecklistItem = (item: ChecklistNames): ChecklistItemType => {
-  const chkitem = checklistItemsWithStages.find(checklistItem => checklistItem.checklistStageId === item);
+  const chkitem = checklistItemsWithStages.find(
+    checklistItem => checklistItem.checklistStageId === item,
+  );
   return chkitem ? chkitem : { checklistId: item };
 };
 
@@ -425,10 +479,10 @@ export const formatCarrierId = (carrierId: string | undefined) => {
     ? carrierId === 'HSG'
       ? 'Hamburg Süd'
       : carrierId === 'SLOM'
-      ? 'SLOMAN NEPTUN'
-      : carrierId === 'STNN'
-      ? 'HUGO STINNES'
-      : carrierId
+        ? 'SLOMAN NEPTUN'
+        : carrierId === 'STNN'
+          ? 'HUGO STINNES'
+          : carrierId
     : undefined;
 };
 

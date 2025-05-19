@@ -73,10 +73,14 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
         history.replace({ ...location, search });
         await firebase.auth().signInWithCustomToken(token);
         setParams(null);
-        enqueueSnackbar(<Typography color="inherit">Sign in successful!</Typography>, { variant: 'success' });
+        enqueueSnackbar(<Typography color="inherit">Sign in successful!</Typography>, {
+          variant: 'success',
+        });
       } catch (e) {
         setParams(null);
-        enqueueSnackbar(<Typography color="inherit">Unable to sign you in.</Typography>, { variant: 'error' });
+        enqueueSnackbar(<Typography color="inherit">Unable to sign you in.</Typography>, {
+          variant: 'error',
+        });
         console.error(e);
       }
     })();
@@ -85,7 +89,13 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
   return (
     <Context.Provider value={{ open: handleOpen }}>
       {children}
-      <Dialog open={Boolean(params)} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="xs" fullWidth>
+      <Dialog
+        open={Boolean(params)}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle id="form-dialog-title">Log in</DialogTitle>
         <DialogContent>
           {params?.message && <Typography variant="subtitle1">{params!.message!}</Typography>}
@@ -94,7 +104,9 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
               <Step>
                 <StepLabel>Enter Email Address</StepLabel>
                 <StepContent>
-                  <Typography className={classes.instructions}>Type in your email address to log in.</Typography>
+                  <Typography className={classes.instructions}>
+                    Type in your email address to log in.
+                  </Typography>
                   <LoginForm next={params?.next} onComplete={handleFormComplete} />
                 </StepContent>
               </Step>

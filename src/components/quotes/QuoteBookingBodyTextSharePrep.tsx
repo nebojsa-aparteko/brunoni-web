@@ -8,7 +8,12 @@ import { portLongFormatLabel, portShortFormatLabel } from '../../utilities/forma
 import { getLocationLabel } from '../inputs/LocationInput';
 import Client from '../../model/Client';
 
-export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: UserRecord, client: Client): string => {
+export const quoteInfoEmailBody = (
+  quote: Quote,
+  firstLine: string,
+  userData: UserRecord,
+  client: Client,
+): string => {
   const cargoDetailsString: string = flatMap(
     (container: Container) =>
       ' - ' +
@@ -16,7 +21,9 @@ export const quoteInfoEmailBody = (quote: Quote, firstLine: string, userData: Us
       container!.containerType?.description +
       ', ' +
       container?.commodityType?.name +
-      (container.pickupLocation ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}` : '') +
+      (container.pickupLocation
+        ? `\n   Depot Location: ${getLocationLabel(container.pickupLocation)}`
+        : '') +
       '\n   WEIGHT:' +
       '\n   PICK UP DATE:\n',
   )(quote.containers).join('\n');
@@ -44,7 +51,9 @@ export const buildMailToLink = (
   [user, userData, client]: [firebase.User, UserRecord, Client],
 ) => {
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+    process.env.REACT_APP_BRAND === 'brunoni'
+      ? 'mailto:platform@mybrunoni.ch'
+      : 'mailto:platform@myallmarine.ch';
   if (quote) {
     return (
       mailtoAddress +
@@ -80,7 +89,9 @@ export const buildSpecialRequestLink = (
 ) => {
   if (process.env.REACT_APP_BRAND === 'brunoni') return '';
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni' ? 'mailto:platform@mybrunoni.ch' : 'mailto:platform@myallmarine.ch';
+    process.env.REACT_APP_BRAND === 'brunoni'
+      ? 'mailto:platform@mybrunoni.ch'
+      : 'mailto:platform@myallmarine.ch';
   if (quote) {
     return (
       mailtoAddress +

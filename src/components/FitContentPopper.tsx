@@ -7,7 +7,7 @@ const popperStyles = () => ({
   },
 });
 
-const FitContentPopper = function(props: any) {
+const FitContentPopper = function (props: any) {
   const classes = popperStyles();
 
   return <Popper {...props} style={classes.popper} placement="bottom-start" />;

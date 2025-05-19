@@ -9,7 +9,13 @@ interface EmptyStatePanelProps {
   action?: any;
 }
 
-const EmptyStatePanel: React.FC<EmptyStatePanelProps> = ({ title, subtitle, actionLabel, actionIcon, action }) => {
+const EmptyStatePanel: React.FC<EmptyStatePanelProps> = ({
+  title,
+  subtitle,
+  actionLabel,
+  actionIcon,
+  action,
+}) => {
   return (
     <Box p={4} textAlign="center">
       <Typography variant="h4" color="textSecondary" gutterBottom>

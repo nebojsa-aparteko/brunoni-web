@@ -38,9 +38,10 @@ const DocumentList: React.FC<Props> = ({
   const userRecord = useContext(UserRecordContext);
   const { enqueueSnackbar } = useSnackbar();
   const [shouldShowPrevious, setShouldShowPrevious] = useState<boolean>(false);
-  const sortedList = useMemo(() => orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[], [
-    checklistItemValues,
-  ]);
+  const sortedList = useMemo(
+    () => orderBy('uploadedAt', 'desc')(checklistItemValues) as ChecklistItemValueDocument[],
+    [checklistItemValues],
+  );
 
   const getActivityLogUserData = useCallback(
     (): ActivityLogUserData =>
@@ -50,7 +51,7 @@ const DocumentList: React.FC<Props> = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -83,10 +84,13 @@ const DocumentList: React.FC<Props> = ({
             })
             .catch(error => {
               console.error('failed to update deleted items', error);
-              enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
+              enqueueSnackbar(
+                <Typography color="inherit">Failed to delete item - {error.message}</Typography>,
+                {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                },
+              );
             })
         : console.log('Error: Checklist item not defined');
     },
@@ -129,7 +133,11 @@ const DocumentList: React.FC<Props> = ({
         </Fragment>
       ) : null}
       {!internal && sortedList.length > 1 && (
-        <Button size="small" color="primary" onClick={() => setShouldShowPrevious(prevState => !prevState)}>
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => setShouldShowPrevious(prevState => !prevState)}
+        >
           {shouldShowPrevious ? 'Show less' : 'Show more'}
         </Button>
       )}

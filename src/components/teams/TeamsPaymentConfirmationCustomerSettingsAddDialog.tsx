@@ -51,7 +51,10 @@ interface Props {
   handleClose: () => void;
 }
 
-const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
+const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({
+  isOpen,
+  handleClose,
+}) => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
   const clients = useClients();
@@ -64,7 +67,9 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   const [selectedCategory, setSelectedCategory] = useState<BookingCategory>(BookingCategory.Import);
   const [selectedClient, setSelectedClient] = useState<Client | undefined | null>(undefined);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
-  const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<Client | undefined | null>(undefined);
+  const [selectedStatisticsClient, setSelectedStatisticsClient] = useState<
+    Client | undefined | null
+  >(undefined);
 
   // const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   let categoryArray: BookingCategory[] = selectedCategory;
@@ -92,10 +97,7 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
 
     dispatch({ type: 'START_GLOBAL_LOADING' });
 
-    const ref = firebase
-      .firestore()
-      .collection('payment-confirmation-config')
-      .doc();
+    const ref = firebase.firestore().collection('payment-confirmation-config').doc();
 
     const data: CustomerSettingsRule = {
       id: ref.id,
@@ -137,7 +139,12 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
   ]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="ReassignmentRulesDialogTitle" maxWidth="xl">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="ReassignmentRulesDialogTitle"
+      maxWidth="xl"
+    >
       <DialogTitle disableTypography id="ReassignmentRulesDialogTitle">
         <Typography variant="h4">Add new customer setting</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
@@ -183,7 +190,12 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({ is
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" variant="contained" onClick={handleAddCustomerSetting} style={{ minWidth: 80 }}>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleAddCustomerSetting}
+          style={{ minWidth: 80 }}
+        >
           Add customer setting
         </Button>
       </DialogActions>

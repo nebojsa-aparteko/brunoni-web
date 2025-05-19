@@ -105,7 +105,13 @@ function ListInput<T>({
         </Paper>
       ))}
       <Box pt={value.length > 0 ? 1 : 0}>
-        <Button buttonRef={addButtonRef} variant="contained" size="small" startIcon={<AddIcon />} onClick={handleAdd}>
+        <Button
+          buttonRef={addButtonRef}
+          variant="contained"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
           {addText ? addText : 'Add'}
         </Button>
       </Box>
@@ -119,7 +125,12 @@ interface ControlledProps<T>
   ItemInput: React.ComponentType<T>;
 }
 
-export const ControlledListInput: React.FC<ControlledProps<any>> = ({ ItemInput, name, addText, ItemInputProps }) => {
+export const ControlledListInput: React.FC<ControlledProps<any>> = ({
+  ItemInput,
+  name,
+  addText,
+  ItemInputProps,
+}) => {
   const classes = useStyles();
 
   const { control } = useFormContext();

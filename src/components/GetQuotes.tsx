@@ -97,7 +97,8 @@ const GetQuotes: React.FC<Props> = () => {
   const setDestinationPort = (port: Port | null) => onChange(set('destinationPort', port)(value));
   const setDate = (date: Date) => onChange(set('date', date)(value));
   const setWeeks = (weeks: number) => onChange(set('weeks', weeks)(value));
-  const setContainers = (containers: ContainerModel[]) => onChange(set('containers', containers)(value));
+  const setContainers = (containers: ContainerModel[]) =>
+    onChange(set('containers', containers)(value));
 
   const closeDialog = () => setDialogOpen(false);
 
@@ -198,7 +199,9 @@ const GetQuotes: React.FC<Props> = () => {
 
         if (response.status === 504) {
           enqueueSnackbar(
-            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            <Typography color="inherit">
+              The API timed out trying to fetch quotes. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -206,7 +209,9 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 500) {
           enqueueSnackbar(
-            <Typography color="inherit">The could not answer your request at the moment. Please try again.</Typography>,
+            <Typography color="inherit">
+              The could not answer your request at the moment. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -224,7 +229,9 @@ const GetQuotes: React.FC<Props> = () => {
           }
         } else {
           enqueueSnackbar(
-            <Typography>Whoops our system is experiencing difficulties at the moment. Please try again.</Typography>,
+            <Typography>
+              Whoops our system is experiencing difficulties at the moment. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -234,7 +241,9 @@ const GetQuotes: React.FC<Props> = () => {
       } catch (error) {
         if (error.name !== 'AbortError') {
           enqueueSnackbar(
-            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            <Typography color="inherit">
+              The API timed out trying to fetch quotes. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -299,7 +308,12 @@ const GetQuotes: React.FC<Props> = () => {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         } else if (!container.pickupLocation) {
-          if (!((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)) {
+          if (
+            !(
+              (container.containerType?.description || '').endsWith('S.O.') ||
+              !showContainerLocations
+            )
+          ) {
             (listInput.current! as { focus: (i: number) => void }).focus(i);
             return;
           }
@@ -414,7 +428,9 @@ const GetQuotes: React.FC<Props> = () => {
                 <Box display="flex" mx={-1}>
                   <Box mx={1}>
                     <Typography>Rotterdam to Santos</Typography>
-                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                    <Typography>
+                      20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container
+                    </Typography>
                   </Box>
                   <Box mx={1}>
                     <Typography>Rotterdam to Santos</Typography>
@@ -427,7 +443,9 @@ const GetQuotes: React.FC<Props> = () => {
                 <Box display="flex" mx={-1}>
                   <Box mx={1}>
                     <Typography>Rotterdam to Shanghai</Typography>
-                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                    <Typography>
+                      20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container
+                    </Typography>
                   </Box>
                   <Box mx={1}>
                     <Typography>Rotterdam to Shanghai</Typography>

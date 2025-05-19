@@ -1,5 +1,12 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { CSSProperties, Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  CSSProperties,
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import BookingsView from '../components/BookingsView';
 import { Badge, Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -86,13 +93,14 @@ const BookingsPageContainer: React.FC = () => {
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
   const setFilters = useBookingRequestsFilterContext()[1];
-  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const [bookingPaginationContextData, setBookingPaginationContextData] =
+    useBookingListPaginationContext();
   const [bookingRequestCountsPerCarrier, setBookingRequestCountsPerCarrier] = useState<number[]>(
     actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
   );
-  const [bookingRequestCountsPerCarrierOnHold, setBookingRequestCountsPerCarrierOnHold] = useState<number[]>(
-    actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
-  );
+  const [bookingRequestCountsPerCarrierOnHold, setBookingRequestCountsPerCarrierOnHold] = useState<
+    number[]
+  >(actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0]);
   const [bookingRequestCount, setBookingRequestCount] = useState(
     bookingRequestCountsPerCarrier?.reduce((a, b) => a + (b || 0), 0),
   );
@@ -162,7 +170,9 @@ const BookingsPageContainer: React.FC = () => {
 
   useEffect(() => {
     setBookingRequestCount(
-      bookingRequestCountsPerCarrier ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0) : 0,
+      bookingRequestCountsPerCarrier
+        ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0)
+        : 0,
     );
   }, [bookingRequestCountsPerCarrier]);
 
@@ -208,7 +218,8 @@ const BookingsPageContainer: React.FC = () => {
   );
 
   useEffect(() => {
-    const newValue = tab && tabToIndex[tab] ? tabToIndex[tab] : bookingPaginationContextData.activeTab;
+    const newValue =
+      tab && tabToIndex[tab] ? tabToIndex[tab] : bookingPaginationContextData.activeTab;
     if (setBookingPaginationContextData) {
       setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
       bookingPaginationContextData.activeTab

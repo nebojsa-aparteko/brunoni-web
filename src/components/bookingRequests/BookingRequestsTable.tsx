@@ -184,7 +184,11 @@ export const BookingRequestProgress: React.FC<ShipmentProgressProps> = ({ bookin
   return (
     <div>
       <div className={classes.progress}>
-        <div className={classes.progressBar} role="progressbar" style={{ width: getProgress()[0] }} />
+        <div
+          className={classes.progressBar}
+          role="progressbar"
+          style={{ width: getProgress()[0] }}
+        />
       </div>
       <Typography variant="subtitle2">{getProgress()[1]}</Typography>
     </div>
@@ -199,7 +203,12 @@ export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+    >
       <span className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{bookingRequest?.carrier?.name.toUpperCase()}</Typography>
@@ -211,7 +220,10 @@ export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
-          <BookingRequestChecklistContent bookingRequest={bookingRequest} isCommentIconHidden={true} />
+          <BookingRequestChecklistContent
+            bookingRequest={bookingRequest}
+            isCommentIconHidden={true}
+          />
         </DialogContent>
       </span>
     </Dialog>
@@ -220,9 +232,9 @@ export const BookingRequestProgressDialog: React.FC<ProgressDialogProps> = ({
 
 export const getOriginPort = (itinerary: BookingRequestItinerary | null | undefined) => {
   return itinerary
-    ? ((itinerary?.placeOfReceipt ? itinerary.placeOfReceipt : itinerary?.portOfLoading && itinerary.portOfLoading) as
-        | ItineraryItem
-        | undefined)
+    ? ((itinerary?.placeOfReceipt
+        ? itinerary.placeOfReceipt
+        : itinerary?.portOfLoading && itinerary.portOfLoading) as ItineraryItem | undefined)
     : undefined;
 };
 
@@ -235,7 +247,8 @@ export const getDestinationPort = (itinerary: BookingRequestItinerary | null | u
 };
 
 export const showDeliveryRef = (bookingRequest: BookingRequest) => {
-  if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference)) return null;
+  if (!bookingRequest.containers || !bookingRequest.containers.some(c => c.deliveryReference))
+    return null;
   return (
     <Box display={'flex'} alignItems={'flex-end'} mr={'auto'} ml={'1.5em'}>
       <Typography style={{ marginRight: '.5em' }} variant={'body2'}>
@@ -243,7 +256,9 @@ export const showDeliveryRef = (bookingRequest: BookingRequest) => {
       </Typography>
       {bookingRequest.containers?.map((c, i) => (
         <Typography key={i} variant={'body2'} style={{ marginRight: '.2em' }}>
-          {i === bookingRequest.containers!.length - 1 ? c.deliveryReference : c.deliveryReference + ' / '}
+          {i === bookingRequest.containers!.length - 1
+            ? c.deliveryReference
+            : c.deliveryReference + ' / '}
         </Typography>
       ))}
     </Box>
@@ -263,9 +278,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   const availableTags = useContext(Tags);
   const [tags, setTags] = useState(
     availableTags &&
-      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      availableTags.filter(
+        tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id),
+      ),
   );
-  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
+  const vesselVoyage = useMemo(
+    () => getVoyageInfoFromBookingRequest(bookingRequest),
+    [bookingRequest],
+  );
 
   const [, userRecord] = useUser();
 
@@ -273,7 +293,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
     () =>
       setTags(
         availableTags &&
-          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+          availableTags.filter(
+            tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id),
+          ),
       ),
     [availableTags, bookingRequest.assignedTags],
   );
@@ -317,7 +339,9 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <Typography variant="h5">Request No. {bookingRequest.id}</Typography>
             </span>
             {bookingRequest && showDeliveryRef(bookingRequest)}
-            {bookingRequest.intraRefNumber && <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />}
+            {bookingRequest.intraRefNumber && (
+              <img src={inttraLogo} alt="inttra logo" className={classes.inttraLogo} />
+            )}
           </Box>
         </Grid>
         <Grid item lg={12} xs={12}>
@@ -345,7 +369,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                   bookingRequest &&
                   bookingRequest.createdBy &&
                   (bookingRequest.createdBy.firstName || bookingRequest.createdBy.lastName)
-                    ? (bookingRequest.createdBy.firstName + ' ' + bookingRequest.createdBy.lastName).toUpperCase()
+                    ? (
+                        bookingRequest.createdBy.firstName +
+                        ' ' +
+                        bookingRequest.createdBy.lastName
+                      ).toUpperCase()
                     : ''
                 }
                 gutterBottom
@@ -375,7 +403,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             )}
             {bookingRequest.statusText && (
               <Grid item md={2} xs={12}>
-                <InfoBoxItem title="Status" label1={bookingRequest.statusText.toUpperCase()} gutterBottom />
+                <InfoBoxItem
+                  title="Status"
+                  label1={bookingRequest.statusText.toUpperCase()}
+                  gutterBottom
+                />
               </Grid>
             )}
             {bookingRequest.createdBy && (
@@ -384,9 +416,15 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                   title="Created By"
                   label1={
                     <Avatar
-                      name={bookingRequest.createdBy?.firstName + ' ' + bookingRequest.createdBy?.lastName}
+                      name={
+                        bookingRequest.createdBy?.firstName +
+                        ' ' +
+                        bookingRequest.createdBy?.lastName
+                      }
                       title={`${bookingRequest.createdBy?.firstName + ' ' + bookingRequest.createdBy?.lastName} <${
-                        bookingRequest.createdBy?.emailAddress ? bookingRequest.createdBy?.emailAddress : null
+                        bookingRequest.createdBy?.emailAddress
+                          ? bookingRequest.createdBy?.emailAddress
+                          : null
                       }>`}
                       size="40"
                       round={true}
@@ -401,7 +439,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <InfoBoxItem
                 title="Progress"
                 label1={
-                  <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
+                  <Box
+                    id="bookingProgressBkgTable"
+                    onClick={onProgressClick}
+                    style={{ width: '64px' }}
+                  >
                     <BookingRequestProgress bookingRequest={bookingRequest} />
                   </Box>
                 }
@@ -417,10 +459,14 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                   bookingRequest.quoteNumber
                     ? 'Quote Number'
                     : bookingRequest.agreementNo
-                    ? 'Agreement No.'
-                    : 'Quote Number'
+                      ? 'Agreement No.'
+                      : 'Quote Number'
                 }
-                label1={bookingRequest.quoteNumber ? bookingRequest.quoteNumber : bookingRequest.agreementNo || '-'}
+                label1={
+                  bookingRequest.quoteNumber
+                    ? bookingRequest.quoteNumber
+                    : bookingRequest.agreementNo || '-'
+                }
                 gutterBottom
               />
             </Grid>
@@ -441,7 +487,10 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                     ', ' +
                     getOriginPort(bookingRequest.itinerary)?.Port?.Land
                   }
-                  label2={bookingRequest.itinerary && `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`}
+                  label2={
+                    bookingRequest.itinerary &&
+                    `ETS: ${getOriginPort(bookingRequest.itinerary)?.DepartureDate}`
+                  }
                   gutterBottom
                 />
               </Grid>
@@ -455,7 +504,8 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
                     getDestinationPort(bookingRequest.itinerary)?.Port.Land
                   }
                   label2={
-                    bookingRequest.itinerary && `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
+                    bookingRequest.itinerary &&
+                    `ETA: ${getDestinationPort(bookingRequest.itinerary)?.ArrivalDate}`
                   }
                   gutterBottom
                 />
@@ -464,7 +514,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
             <Grid item md={2} xs={12}>
               <InfoBoxItem
                 title="Created On"
-                label1={bookingRequest.createdAt ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm') : ''}
+                label1={
+                  bookingRequest.createdAt
+                    ? formatDate(bookingRequest.createdAt, 'dd.MM.yyyy HH:mm')
+                    : ''
+                }
                 gutterBottom
               />
             </Grid>
@@ -472,7 +526,11 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
               <Grid item md={1} xs={12}>
                 <InfoBoxItem
                   title="Last updated"
-                  label1={bookingRequest.updatedAt ? formatDistanceToNowConfigured(bookingRequest.updatedAt) : ''}
+                  label1={
+                    bookingRequest.updatedAt
+                      ? formatDistanceToNowConfigured(bookingRequest.updatedAt)
+                      : ''
+                  }
                   gutterBottom
                 />
               </Grid>
@@ -530,7 +588,9 @@ const BookingRequestsTable: React.FC<BookingRequestsTableProps> = ({
               bookingRequest={bookingRequest}
               selectedRequests={selectedRequests}
               onSelectRequest={onSelectRequest}
-              onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, bookingRequest)}
+              onProgressClick={(event: React.MouseEvent<unknown>) =>
+                handleProgressClick(event, bookingRequest)
+              }
             />
           </Card>
         ))

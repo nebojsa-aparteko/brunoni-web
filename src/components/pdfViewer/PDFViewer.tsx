@@ -41,7 +41,12 @@ const PDFViewer: React.FC<Props> = ({ file }) => {
           <GetAppIcon />
         </Fab>
       </Box>
-      <DocumentView scale={scale} file={file} onDocumentLoadSuccess={onDocumentLoadSuccess} numPages={numPages} />
+      <DocumentView
+        scale={scale}
+        file={file}
+        onDocumentLoadSuccess={onDocumentLoadSuccess}
+        numPages={numPages}
+      />
     </Box>
   );
 };

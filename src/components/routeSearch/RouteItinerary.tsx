@@ -19,7 +19,9 @@ const RouteItinerary: React.FC<Props> = ({ route }) => {
       {route.IntermediatePortInfos.map((intermediatePortInfo, i) => (
         <ItineraryItem key={i} noLine={false} itineraryItem={intermediatePortInfo} />
       ))}
-      {route.DestinationInfo && <ItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />}
+      {route.DestinationInfo && (
+        <ItineraryItem noLine={true} itineraryItem={route.DestinationInfo} />
+      )}
     </Stepper>
   );
 };

@@ -1,4 +1,12 @@
-import { Button, Checkbox, IconButton, TableCell, TableRow, Tooltip, Typography } from '@material-ui/core';
+import {
+  Button,
+  Checkbox,
+  IconButton,
+  TableCell,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
 import firebase from 'firebase';
 import { isEqual, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
@@ -33,13 +41,17 @@ const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
   const carriers = useContext(Carriers);
   const ports = useContext(Ports);
   const [, dispatch] = useContext(GlobalContext);
-  const [paymentConfirmationState, setPaymentConfirmationState] = useState<CarrierSettingsRule>(paymentConfirmation);
+  const [paymentConfirmationState, setPaymentConfirmationState] =
+    useState<CarrierSettingsRule>(paymentConfirmation);
   const { enqueueSnackbar } = useSnackbar();
 
   const { carrier, port, contactCC, contactTo } = paymentConfirmationState;
 
   const changed = useMemo(
-    () => !isEqual(omitAutomaticMessage(paymentConfirmation))(omitAutomaticMessage(paymentConfirmationState)),
+    () =>
+      !isEqual(omitAutomaticMessage(paymentConfirmation))(
+        omitAutomaticMessage(paymentConfirmationState),
+      ),
     [paymentConfirmationState, paymentConfirmation],
   );
 
@@ -83,7 +95,11 @@ const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
         />
       </TableCell>
       <TableCell align="left">
-        <CarrierInput carriers={carriers} onChange={carrier => changeData('carrier', carrier)} value={carrier} />
+        <CarrierInput
+          carriers={carriers}
+          onChange={carrier => changeData('carrier', carrier)}
+          value={carrier}
+        />
       </TableCell>
       <TableCell align="left">
         <MultipleEmailInput
@@ -110,12 +126,21 @@ const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
       </TableCell>
       <TableCell align="right">
         {changed ? (
-          <Button onClick={handleEditPaymentConfirmation} size="small" color="primary" variant="contained">
+          <Button
+            onClick={handleEditPaymentConfirmation}
+            size="small"
+            color="primary"
+            variant="contained"
+          >
             Save
           </Button>
         ) : (
           <Tooltip title="Copy">
-            <IconButton onClick={() => onCopy(paymentConfirmation.id)} aria-label="copy" color="primary">
+            <IconButton
+              onClick={() => onCopy(paymentConfirmation.id)}
+              aria-label="copy"
+              color="primary"
+            >
               <FileCopyIcon />
             </IconButton>
           </Tooltip>

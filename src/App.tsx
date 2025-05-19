@@ -83,7 +83,11 @@ const adminRoutes = (
     <Route exact path="/bookings/:id" component={BookingContainer} />
     <Route exact path="/teams" component={TeamManagementPage} />
     <Route exact path="/land-transport-config" component={LandTransportConfigPage} />
-    <Route exact path="/land-transport-config/:providerId" component={LandTransportConfigProviderPage} />
+    <Route
+      exact
+      path="/land-transport-config/:providerId"
+      component={LandTransportConfigProviderPage}
+    />
     <Route path="/charges" component={AdminSideCharges} />
     <Route exact path="/vessel" component={VesselWithVoyagePage} />
     {/*TODO uncomment this once it's ready*/}
@@ -180,21 +184,25 @@ const App: React.FC = () => {
           .then(() => delete params.checklistTab)
           .then(() => {
             //read that notification
-            notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
-              () => {
-                delete params.readNotification;
-                history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-              },
-            );
+            notificationSeenStatusChange(
+              notificationId,
+              userRecord,
+              NotificationStatusAction.READ_NOTIFICATION,
+            ).then(() => {
+              delete params.readNotification;
+              history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+            });
           });
       } else {
         //read that notification
-        notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
-          () => {
-            delete params.readNotification;
-            history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-          },
-        );
+        notificationSeenStatusChange(
+          notificationId,
+          userRecord,
+          NotificationStatusAction.READ_NOTIFICATION,
+        ).then(() => {
+          delete params.readNotification;
+          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+        });
       }
     }
   }, [history]);
@@ -210,7 +218,13 @@ const App: React.FC = () => {
                   <CircularProgress color="inherit" />
                 </Backdrop>
                 <div className={classes.deviceControl}>
-                  {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+                  {user === undefined ? (
+                    <ChartsCircularProgress />
+                  ) : user === null ? (
+                    anonymousRoutes
+                  ) : (
+                    <UserRoutes />
+                  )}
                 </div>
                 <ScrollToTop className={classes.goTop} />
                 {process.env.REACT_APP_BRAND === 'brunoni' ? (

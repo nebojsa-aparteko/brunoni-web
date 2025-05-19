@@ -13,7 +13,9 @@ const NotFound: React.FC = () => (
           <Typography variant="h5" gutterBottom>
             <Box fontWeight="fontWeightBold">404 Page Not Found</Box>
           </Typography>
-          <Typography variant="subtitle1">Make sure you have the right address or visit home page.</Typography>
+          <Typography variant="subtitle1">
+            Make sure you have the right address or visit home page.
+          </Typography>
           <Box p={2} display="flex" justifyContent="center">
             <Box>
               <Button component={Link} to="/" replace>

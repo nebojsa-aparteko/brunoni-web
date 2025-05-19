@@ -8,7 +8,12 @@ interface Props<T> {
   children: React.ReactNode;
 }
 
-export default function firestoreDocument<T>({ collection, id, context: { Provider }, children }: Props<T>) {
+export default function firestoreDocument<T>({
+  collection,
+  id,
+  context: { Provider },
+  children,
+}: Props<T>) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const snapshot = useFirestoreDocument(collection, id);
 

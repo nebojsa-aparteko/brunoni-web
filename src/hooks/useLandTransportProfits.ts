@@ -7,14 +7,16 @@ import ProviderProfitEntity, {
 } from '../model/land-transport/providers/ProviderProfit';
 
 const useLandTransportProfits = (providerId: string) => {
-  const landTransportProfitsRef = useFirestoreCollection(`land-transport-config/${providerId}/profit`);
+  const landTransportProfitsRef = useFirestoreCollection(
+    `land-transport-config/${providerId}/profit`,
+  );
   return landTransportProfitsRef?.docs
     .map(
       v =>
         ({
           ...v.data(),
           id: v.id,
-        } as ProviderProfitEntity),
+        }) as ProviderProfitEntity,
     )
     .reduce(
       (previousValue, currentValue) => {
@@ -25,8 +27,14 @@ const useLandTransportProfits = (providerId: string) => {
         }
         return previousValue;
       },
-      { defaultProfit: [] as DefaultProviderProfitEntity[], specificProfit: [] as SpecificProviderProfitEntity[] },
-    ) as { defaultProfit: DefaultProviderProfitEntity[]; specificProfit: SpecificProviderProfitEntity[] };
+      {
+        defaultProfit: [] as DefaultProviderProfitEntity[],
+        specificProfit: [] as SpecificProviderProfitEntity[],
+      },
+    ) as {
+    defaultProfit: DefaultProviderProfitEntity[];
+    specificProfit: SpecificProviderProfitEntity[];
+  };
 };
 
 export default useLandTransportProfits;

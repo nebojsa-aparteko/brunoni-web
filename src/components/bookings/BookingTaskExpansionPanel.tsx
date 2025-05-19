@@ -76,13 +76,17 @@ const BookingTaskExpansionPanel: React.FC<Props> = ({ tasks, updateComponent, se
       ),
     [selectedTasks],
   );
-  const filteredTasks = useMemo(() => (showResolved ? tasks : tasks.filter(task => !task.resolved)), [
-    showResolved,
-    tasks,
-  ]);
+  const filteredTasks = useMemo(
+    () => (showResolved ? tasks : tasks.filter(task => !task.resolved)),
+    [showResolved, tasks],
+  );
   return (
     <ExpansionPanel>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
         <Box
           style={{
             display: 'flex',

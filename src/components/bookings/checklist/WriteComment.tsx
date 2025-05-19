@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Checkbox, createStyles, FormControlLabel, IconButton, makeStyles, Theme } from '@material-ui/core';
+import {
+  Box,
+  Checkbox,
+  createStyles,
+  FormControlLabel,
+  IconButton,
+  makeStyles,
+  Theme,
+} from '@material-ui/core';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import SendIcon from '@material-ui/icons/Send';
 import Mousetrap from 'mousetrap';
@@ -40,13 +48,21 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quote, bookingRequest, isAccounting }) => {
+const WriteComment: React.FC<WriteCommentProp> = ({
+  onCommentSave,
+  booking,
+  quote,
+  bookingRequest,
+  isAccounting,
+}) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [messageText, setMessageText] = useState('');
   const [messageTextPlain, setMessageTextPlain] = useState('');
   const [mentions, setMentions] = useState<MentionItem[]>([]);
-  const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(undefined);
+  const [assignedCustomerUser, setAssignedCustomerUser] = useState<UserRecord | undefined>(
+    undefined,
+  );
   const [assignedUser, setAssignedUser] = useState<UserRecord | undefined>(undefined);
   const userRecord = useContext(UserRecordContext);
   useEffect(() => {
@@ -57,7 +73,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
       .where('emailAddress', '==', booking?.assignedCustomerUser?.emailAddress || '')
       .get()
       .then(doc => {
-        if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        if (doc.docs.length > 0)
+          setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
     firebase
       .firestore()
@@ -66,7 +83,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
       .where('emailAddress', '==', booking?.assignedUser?.emailAddress || '')
       .get()
       .then(doc => {
-        if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+        if (doc.docs.length > 0)
+          setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
       });
   }, [booking]);
 
@@ -78,7 +96,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
         .where('alphacomId', '==', quote?.userId || '')
         .get()
         .then(doc => {
-          if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+          if (doc.docs.length > 0)
+            setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
         });
       firebase
         .firestore()
@@ -86,7 +105,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
         .where('alphacomId', '==', quote?.assignedTo?.alphacomId || '')
         .get()
         .then(doc => {
-          if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+          if (doc.docs.length > 0)
+            setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
         });
     }
   }, [quote]);
@@ -99,7 +119,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
         .where('alphacomId', '==', bookingRequest?.createdBy?.alphacomId || '')
         .get()
         .then(doc => {
-          if (doc.docs.length > 0) setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+          if (doc.docs.length > 0)
+            setAssignedCustomerUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
         });
       firebase
         .firestore()
@@ -107,7 +128,8 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
         .where('alphacomId', '==', bookingRequest?.assignedUser?.alphacomId || '')
         .get()
         .then(doc => {
-          if (doc.docs.length > 0) setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
+          if (doc.docs.length > 0)
+            setAssignedUser({ ...doc.docs[0].data(), id: doc.docs[0].id } as UserRecord);
         });
     }
   }, [bookingRequest]);
@@ -127,13 +149,18 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
     if (isAdmin) {
       if (assignedCustomerUser) {
         return admins
-          ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
+          ?.map(
+            admin =>
+              ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` }) as MentionItem,
+          )
           .concat(
             teams
               ?.filter(team =>
-                isAccounting ? team.teamType === TeamType.ACCOUNTING : team.teamType === TeamType.OPERATIONS,
+                isAccounting
+                  ? team.teamType === TeamType.ACCOUNTING
+                  : team.teamType === TeamType.OPERATIONS,
               )
-              .map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)),
+              .map(team => ({ id: team.id, display: `${team.name}` }) as MentionItem),
           )
           .concat([
             {
@@ -144,8 +171,11 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
       }
 
       return admins
-        ?.map(admin => ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` } as MentionItem))
-        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` } as MentionItem)));
+        ?.map(
+          admin =>
+            ({ id: admin.id, display: `${admin.firstName} ${admin.lastName}` }) as MentionItem,
+        )
+        .concat(teams?.map(team => ({ id: team.id, display: `${team.name}` }) as MentionItem));
     } else {
       if (!assignedUser) {
         return [];
@@ -162,10 +192,12 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
   useEffect(() => {
     if (inputRef && inputRef.current && submitButtonRf && submitButtonRf.current) {
       let moustrapInstance = new Mousetrap(inputRef.current);
-      moustrapInstance.stopCallback = function() {
+      moustrapInstance.stopCallback = function () {
         return false;
       };
-      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () => submitButtonRf?.current?.click());
+      moustrapInstance.bind(['ctrl+enter', 'command+enter'], () =>
+        submitButtonRf?.current?.click(),
+      );
       return () => {
         moustrapInstance?.unbind(['ctrl+enter', 'command+enter']);
       };
@@ -205,7 +237,9 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
           classNames={mentionsClassNames}
           className="mentions"
           placeholder={
-            activityLogContext.state?.rejected ? 'Please write reason of revision need' : 'Write a comment...'
+            activityLogContext.state?.rejected
+              ? 'Please write reason of revision need'
+              : 'Write a comment...'
           }
           inputRef={inputRef}
           onChange={(event, newValue, newPlainTextValue, mentions) => {
@@ -221,7 +255,12 @@ const WriteComment: React.FC<WriteCommentProp> = ({ onCommentSave, booking, quot
             displayTransform={(id, display) => '@' + display}
           />
         </MentionsInput>
-        <IconButton color="primary" disabled={messageText.length < 1} onClick={saveMessage} buttonRef={submitButtonRf}>
+        <IconButton
+          color="primary"
+          disabled={messageText.length < 1}
+          onClick={saveMessage}
+          buttonRef={submitButtonRf}
+        >
           <SendIcon />
         </IconButton>
       </Box>

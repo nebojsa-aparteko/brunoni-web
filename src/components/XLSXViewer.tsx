@@ -38,7 +38,12 @@ const XLSXViewer: React.FC<{
 
   return fileData ? (
     <Box style={{ display: 'flex' }}>
-      {sheetHTML && <div dangerouslySetInnerHTML={{ __html: sheetHTML }} style={{ padding: 12, paddingBottom: 60 }} />}
+      {sheetHTML && (
+        <div
+          dangerouslySetInnerHTML={{ __html: sheetHTML }}
+          style={{ padding: 12, paddingBottom: 60 }}
+        />
+      )}
       {fileData && fileData.SheetNames && currentSheet && (
         <Box style={{ position: 'absolute', bottom: 0, width: '100%', backgroundColor: 'white' }}>
           <AppBar position="static" color="default" elevation={0}>
@@ -51,7 +56,9 @@ const XLSXViewer: React.FC<{
               scrollButtons="auto"
             >
               {fileData?.SheetNames.map(sheet =>
-                fileData?.Sheets && fileData.Sheets[sheet] && Object.keys(fileData.Sheets[sheet]).length > 1 ? (
+                fileData?.Sheets &&
+                fileData.Sheets[sheet] &&
+                Object.keys(fileData.Sheets[sheet]).length > 1 ? (
                   <Tab key={sheet} label={sheet} value={sheet} />
                 ) : null,
               )}

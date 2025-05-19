@@ -89,7 +89,11 @@ const QuoteGroupRow: React.FC<RowProps> = ({
     return (
       <TableCell>
         {client.name}
-        <ClientRequestedByLabel userRecord={requestedBy} userId={requestedById} userNameString={clientUserNameString} />
+        <ClientRequestedByLabel
+          userRecord={requestedBy}
+          userId={requestedById}
+          userNameString={clientUserNameString}
+        />
       </TableCell>
     );
   }, [showCompanyInfo, client, requestedBy, requestedById, clientId, clientUserNameString]);
@@ -116,14 +120,18 @@ const QuoteGroupRow: React.FC<RowProps> = ({
           />
         )}
       </TableCell>
-      <TableCell>{uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}</TableCell>
+      <TableCell>
+        {uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}
+      </TableCell>
       <TableCell>
         <Grid container spacing={1}>
           {/*TODO handle the flash of undefined text*/}
           {containers &&
             containers.map((container, index) => (
               <Grid item key={index}>
-                {container && <Chip label={container.containerType?.name || container.containerType?.id} />}
+                {container && (
+                  <Chip label={container.containerType?.name || container.containerType?.id} />
+                )}
               </Grid>
             ))}
         </Grid>
@@ -133,13 +141,17 @@ const QuoteGroupRow: React.FC<RowProps> = ({
           {commodityTypes &&
             commodityTypes.map((commodityType, index) => (
               <Grid item key={index}>
-                <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id || 'N/A'} />
+                <Chip
+                  label={commodityType?.name ? commodityType?.name : commodityType?.id || 'N/A'}
+                />
               </Grid>
             ))}
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
-      <TableCell>{assignedUsers.map(user => `${user?.firstName} ${user?.lastName}`).join(',')}</TableCell>
+      <TableCell>
+        {assignedUsers.map(user => `${user?.firstName} ${user?.lastName}`).join(',')}
+      </TableCell>
     </TableRow>
   );
 };

@@ -73,15 +73,18 @@ const AdminBookingFreight: React.FC<Props> = ({ freightDetails, initiallySelecte
   const handleChange = (event: any, newValue: number) => {
     setValue(newValue);
   };
-  const externalFreight = useMemo(() => getSpecificFreight(freightDetails, FreightDetailGroup.EXTERNAL), [
-    freightDetails,
-  ]);
-  const internal1Freight = useMemo(() => getSpecificFreight(freightDetails, FreightDetailGroup.INTERNAL1), [
-    freightDetails,
-  ]);
-  const internal2Freight = useMemo(() => getSpecificFreight(freightDetails, FreightDetailGroup.INTERNAL2), [
-    freightDetails,
-  ]);
+  const externalFreight = useMemo(
+    () => getSpecificFreight(freightDetails, FreightDetailGroup.EXTERNAL),
+    [freightDetails],
+  );
+  const internal1Freight = useMemo(
+    () => getSpecificFreight(freightDetails, FreightDetailGroup.INTERNAL1),
+    [freightDetails],
+  );
+  const internal2Freight = useMemo(
+    () => getSpecificFreight(freightDetails, FreightDetailGroup.INTERNAL2),
+    [freightDetails],
+  );
   return (
     <Fragment>
       <AppBar position="static">
@@ -156,7 +159,10 @@ const BookingFreightTable: React.FC<Props> = ({ freightDetails }) => {
 const BookingFreight: React.FC<Props> = ({ freightDetails, initiallySelectedTab }) => {
   const [actingAs] = useContext(ActingAs);
   return !actingAs && freightDetails.some(f => f.Group) ? (
-    <AdminBookingFreight freightDetails={freightDetails} initiallySelectedTab={initiallySelectedTab} />
+    <AdminBookingFreight
+      freightDetails={freightDetails}
+      initiallySelectedTab={initiallySelectedTab}
+    />
   ) : (
     <BookingFreightTable
       freightDetails={

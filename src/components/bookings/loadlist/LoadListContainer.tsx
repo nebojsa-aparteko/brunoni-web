@@ -65,7 +65,8 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const safeDateFormat = (date: firebase.firestore.Timestamp) => date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
+const safeDateFormat = (date: firebase.firestore.Timestamp) =>
+  date && formatDate(invoke('toDate')(date), 'dd-MM-yyy');
 
 const normalizeContainerRecord = (item: any) => {
   return {
@@ -92,10 +93,10 @@ const LoadListContainer = () => {
   const ports = useContext(Ports);
   const user = useUser()[1];
 
-  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const availableCarriers = useMemo(
+    () => carriers?.filter(carrier => user.carriers?.includes(carrier.id)),
+    [user.carriers, carriers],
+  );
 
   const handleProgressClick = useCallback(
     async (event: React.MouseEvent<unknown>, bookingId: string) => {
@@ -126,7 +127,8 @@ const LoadListContainer = () => {
       map(normalizeContainerRecord)(containers).reduce((r: any, o: any) => {
         groups
           .reduce(
-            (group: any, key: any, i, { length }) => (group[o[key]] = group[o[key]] || (i + 1 === length ? [] : {})),
+            (group: any, key: any, i, { length }) =>
+              (group[o[key]] = group[o[key]] || (i + 1 === length ? [] : {})),
             r,
           )
           .push(o);
@@ -141,7 +143,10 @@ const LoadListContainer = () => {
         title={
           <Box display="flex" alignItems="center">
             <Typography variant="h3">Load list</Typography>
-            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+            <Box
+              display="flex"
+              style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}
+            >
               <CarrierInput
                 label={'Carriers'}
                 carriers={availableCarriers}
@@ -151,7 +156,10 @@ const LoadListContainer = () => {
                 value={carrier}
               />
             </Box>
-            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+            <Box
+              display="flex"
+              style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}
+            >
               <PortInput
                 label="Origin"
                 ports={ports || []}
@@ -161,7 +169,10 @@ const LoadListContainer = () => {
                 value={origin}
               />
             </Box>
-            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+            <Box
+              display="flex"
+              style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}
+            >
               <DateRangeInput
                 onChange={dateRange => {
                   if (setFilters) setFilters(set('dateRange', dateRange)(filters));
@@ -173,14 +184,23 @@ const LoadListContainer = () => {
           </Box>
         }
         action={
-          <Button onClick={() => setIsDialogOpen(true)} color="primary" variant="contained" startIcon={<AddIcon />}>
+          <Button
+            onClick={() => setIsDialogOpen(true)}
+            color="primary"
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
             Add load list
           </Button>
         }
       />
 
       {isDialogOpen && (
-        <LoadListUploadDialog isOpen={isDialogOpen} handleClose={handleDialogClose} containers={containers!} />
+        <LoadListUploadDialog
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          containers={containers!}
+        />
       )}
       <CardContent>
         {!containers && <ChartsCircularProgress />}
@@ -192,97 +212,109 @@ const LoadListContainer = () => {
                   <CardHeader title={`${date} ${pol}`} />
                   <Card className={classes.card}>
                     <CardContent>
-                      {Object.entries(items).map(([vesselWithVoyage, items]: any, index: number) => (
-                        <Fragment key={`vesselWithVoyageItems-${index}`}>
-                          <div className={classes.vesselWithVoyageTitle}>
-                            <DirectionsBoatIcon />
-                            <Typography style={{ paddingLeft: '1em' }} variant="subtitle1">
-                              {vesselWithVoyage}
-                            </Typography>
-                          </div>
-                          {Object.entries(items).map(([carrierId, items]: any, index: number) => (
-                            <Card key={`${carrierId}${index}`}>
-                              <Fragment key={`carrierIdItems-${index}`}>
-                                <Typography className={classes.carrierTitle} variant="subtitle2">
-                                  {carrierId}
-                                </Typography>
-                                <Table size="small">
-                                  <TableHead>
-                                    <TableRow>
-                                      <TableCell align="right">Container</TableCell>
-                                      <TableCell align="right">Seal No</TableCell>
-                                      <TableCell align="right">Delivery Ref</TableCell>
-                                      <TableCell align="right">Booking #</TableCell>
-                                      <TableCell align="center">Progress</TableCell>
-                                      <TableCell align="right">Status</TableCell>
-                                      <TableCell align="right">Pick up Date</TableCell>
-                                      <TableCell align="right">Gate in Date</TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {items.map((item: LoadListContainerModel) => (
-                                      <TableRow key={item.container}>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.container}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.sealNum || ''}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.deliveryRef || ''}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          <Link to={`/bookings/${item.bookingId}`} target="_blank">
-                                            {item.bookingId || ''}
-                                          </Link>
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.checklistCheckedCount !== undefined &&
-                                            item.checklistItemCount !== undefined &&
-                                            item.checklistCheckedCount >= 0 &&
-                                            item.checklistItemCount > 0 && (
-                                              <Box
-                                                onClick={(event: React.MouseEvent<unknown>) =>
-                                                  handleProgressClick(event, item.bookingId)
-                                                }
-                                                display="flex"
-                                                style={{ cursor: 'pointer', width: 70 }}
-                                              >
-                                                <div className={classes.progress}>
-                                                  <div
-                                                    className={classes.progressBar}
-                                                    role="progressbar"
-                                                    style={{
-                                                      width: `${(item.checklistCheckedCount / item.checklistItemCount) *
-                                                        100}%`,
-                                                    }}
-                                                  />
-                                                </div>
-
-                                                <Typography variant="subtitle2" style={{ marginLeft: 4 }}>
-                                                  {item.checklistCheckedCount}/{item.checklistItemCount}
-                                                </Typography>
-                                              </Box>
-                                            )}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.status || ''}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.pickUp || '-'}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" align="right">
-                                          {item.gateIn || '-'}
-                                        </TableCell>
+                      {Object.entries(items).map(
+                        ([vesselWithVoyage, items]: any, index: number) => (
+                          <Fragment key={`vesselWithVoyageItems-${index}`}>
+                            <div className={classes.vesselWithVoyageTitle}>
+                              <DirectionsBoatIcon />
+                              <Typography style={{ paddingLeft: '1em' }} variant="subtitle1">
+                                {vesselWithVoyage}
+                              </Typography>
+                            </div>
+                            {Object.entries(items).map(([carrierId, items]: any, index: number) => (
+                              <Card key={`${carrierId}${index}`}>
+                                <Fragment key={`carrierIdItems-${index}`}>
+                                  <Typography className={classes.carrierTitle} variant="subtitle2">
+                                    {carrierId}
+                                  </Typography>
+                                  <Table size="small">
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell align="right">Container</TableCell>
+                                        <TableCell align="right">Seal No</TableCell>
+                                        <TableCell align="right">Delivery Ref</TableCell>
+                                        <TableCell align="right">Booking #</TableCell>
+                                        <TableCell align="center">Progress</TableCell>
+                                        <TableCell align="right">Status</TableCell>
+                                        <TableCell align="right">Pick up Date</TableCell>
+                                        <TableCell align="right">Gate in Date</TableCell>
                                       </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </Fragment>
-                            </Card>
-                          ))}
-                        </Fragment>
-                      ))}
+                                    </TableHead>
+                                    <TableBody>
+                                      {items.map((item: LoadListContainerModel) => (
+                                        <TableRow key={item.container}>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.container}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.sealNum || ''}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.deliveryRef || ''}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            <Link
+                                              to={`/bookings/${item.bookingId}`}
+                                              target="_blank"
+                                            >
+                                              {item.bookingId || ''}
+                                            </Link>
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.checklistCheckedCount !== undefined &&
+                                              item.checklistItemCount !== undefined &&
+                                              item.checklistCheckedCount >= 0 &&
+                                              item.checklistItemCount > 0 && (
+                                                <Box
+                                                  onClick={(event: React.MouseEvent<unknown>) =>
+                                                    handleProgressClick(event, item.bookingId)
+                                                  }
+                                                  display="flex"
+                                                  style={{ cursor: 'pointer', width: 70 }}
+                                                >
+                                                  <div className={classes.progress}>
+                                                    <div
+                                                      className={classes.progressBar}
+                                                      role="progressbar"
+                                                      style={{
+                                                        width: `${
+                                                          (item.checklistCheckedCount /
+                                                            item.checklistItemCount) *
+                                                          100
+                                                        }%`,
+                                                      }}
+                                                    />
+                                                  </div>
+
+                                                  <Typography
+                                                    variant="subtitle2"
+                                                    style={{ marginLeft: 4 }}
+                                                  >
+                                                    {item.checklistCheckedCount}/
+                                                    {item.checklistItemCount}
+                                                  </Typography>
+                                                </Box>
+                                              )}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.status || ''}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.pickUp || '-'}
+                                          </TableCell>
+                                          <TableCell component="th" scope="row" align="right">
+                                            {item.gateIn || '-'}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </Fragment>
+                              </Card>
+                            ))}
+                          </Fragment>
+                        ),
+                      )}
                     </CardContent>
                   </Card>
                 </Card>

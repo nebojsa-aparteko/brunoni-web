@@ -36,7 +36,10 @@ export const remark =
   '\n' +
   'BOOKING AND SHIPMENT SUBJECT TO CONDITIONS AS PRINTED ON THE BILL OF LADING. ANY REQUIREMENTS/INSTRUCTIONS WHICH ARE CONTRADICTORY TO THE B/L CLAUSES ARE NOT VALID UNLESS CONFIRMED BY US IN WRITING.';
 
-const BookingRequestViewMainContent: React.FC<Props> = ({ isPrintWithCost, showWarningMessage }) => {
+const BookingRequestViewMainContent: React.FC<Props> = ({
+  isPrintWithCost,
+  showWarningMessage,
+}) => {
   const classes = useStyles();
   const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
@@ -60,7 +63,10 @@ const BookingRequestViewMainContent: React.FC<Props> = ({ isPrintWithCost, showW
           </>
         )}
       </SimpleExpansionPanel>
-      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'} defaultExpanded={true}>
+      <SimpleExpansionPanel
+        label={'Port Terms, Closings And Special Remarks'}
+        defaultExpanded={true}
+      >
         <Box flex={1} display="flex" flexDirection="column">
           <BookingRequestPortTerms />
 

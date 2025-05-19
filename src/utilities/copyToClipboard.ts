@@ -28,7 +28,9 @@ const copyToClipboard = (
     //do failover thingy
     const failoverObject = data.find(element => element.format === failoverFormat);
 
-    result = copy(failoverObject ? failoverObject.body : 'Fail over body was empty', { format: failoverFormat });
+    result = copy(failoverObject ? failoverObject.body : 'Fail over body was empty', {
+      format: failoverFormat,
+    });
   }
 
   return result;

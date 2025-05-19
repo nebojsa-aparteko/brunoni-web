@@ -1,7 +1,23 @@
 import 'isomorphic-fetch';
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref, useContext, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  HTMLAttributes,
+  MutableRefObject,
+  Ref,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
+import {
+  CircularProgress,
+  makeStyles,
+  Paper,
+  Popper,
+  PopperProps,
+  TextField,
+  Theme,
+} from '@material-ui/core';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { FilterOptionsState } from '@material-ui/lab';
@@ -12,7 +28,8 @@ const filter = createFilterOptions<CommodityType>();
 
 const getOptionLabel = (option: CommodityType) =>
   option ? (option.name && option.name !== '' ? option.name : option.id) : '';
-const getOptionSelectItemLabel = (option: CommodityType) => (option.name ? option.name : `Add "${option.id}"`);
+const getOptionSelectItemLabel = (option: CommodityType) =>
+  option.name ? option.name : `Add "${option.id}"`;
 
 interface Props {
   label: string;
@@ -69,7 +86,9 @@ const CommodityTypeInput: React.FC<Props> = ({
   return (
     <Autocomplete
       value={value || null}
-      onChange={(_: ChangeEvent<{}>, commodityType: CommodityType | null) => onChange(commodityType)}
+      onChange={(_: ChangeEvent<{}>, commodityType: CommodityType | null) =>
+        onChange(commodityType)
+      }
       autoHighlight
       open={open}
       onOpen={onOpen}
@@ -115,16 +134,24 @@ const CommodityTypeInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), inputValue);
-        const commodityTypes = parse(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), matches);
+        const matches = match(
+          freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option),
+          inputValue,
+        );
+        const commodityTypes = parse(
+          freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option),
+          matches,
+        );
 
         return (
           <div>
-            {commodityTypes.map((commodityType: { highlight: boolean; text: string }, index: number) => (
-              <span key={index} style={{ fontWeight: commodityType.highlight ? 700 : 400 }}>
-                {commodityType.text}
-              </span>
-            ))}
+            {commodityTypes.map(
+              (commodityType: { highlight: boolean; text: string }, index: number) => (
+                <span key={index} style={{ fontWeight: commodityType.highlight ? 700 : 400 }}>
+                  {commodityType.text}
+                </span>
+              ),
+            )}
           </div>
         );
       }}

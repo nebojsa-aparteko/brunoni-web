@@ -25,7 +25,10 @@ const EditingInput: React.FC<EditingInputProps> = ({
       }}
     />
   ) : (
-    <Typography {...typographyProps}> {renderValue(value) || (noDefaultLabel ? '' : '[To be assigned]')}</Typography>
+    <Typography {...typographyProps}>
+      {' '}
+      {renderValue(value) || (noDefaultLabel ? '' : '[To be assigned]')}
+    </Typography>
   );
 export default EditingInput;
 

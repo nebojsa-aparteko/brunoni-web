@@ -1,5 +1,10 @@
 import React, { createContext, Dispatch, useCallback, useEffect, useReducer } from 'react';
-import { globalActions, GlobalAppState, START_GLOBAL_LOADING, STOP_GLOBAL_LOADING } from './types/globalAppState';
+import {
+  globalActions,
+  GlobalAppState,
+  START_GLOBAL_LOADING,
+  STOP_GLOBAL_LOADING,
+} from './types/globalAppState';
 import globalReducer from './reducers/globalReducer';
 import { useSnackbar } from 'notistack';
 import { Typography } from '@material-ui/core';
@@ -7,7 +12,10 @@ import { Typography } from '@material-ui/core';
 export const defaultState: GlobalAppState = {
   isGlobalLoadingInProgress: false,
 };
-export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActions>]>([defaultState, () => {}]);
+export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActions>]>([
+  defaultState,
+  () => {},
+]);
 
 const GlobalStore: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(globalReducer, defaultState);

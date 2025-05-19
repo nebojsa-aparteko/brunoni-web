@@ -214,7 +214,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -294,7 +294,10 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
   );
 
   const revertApprovalDisabled = useMemo(() => {
-    return (resolved && payment.status === WeeklyPaymentStatus.BLOCKED) || payment.status === WeeklyPaymentStatus.PAID;
+    return (
+      (resolved && payment.status === WeeklyPaymentStatus.BLOCKED) ||
+      payment.status === WeeklyPaymentStatus.PAID
+    );
   }, [payment.status, resolved]);
 
   const paymentApprovalDisabled = useMemo(
@@ -317,7 +320,12 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         paymentApprovalDisabled ? (
           <Tooltip title={'All files must be approved first'} placement="top">
             <span>
-              <Button onClick={handleDialogOpen} color="primary" variant="contained" disabled={true}>
+              <Button
+                onClick={handleDialogOpen}
+                color="primary"
+                variant="contained"
+                disabled={true}
+              >
                 Approve Payment
               </Button>
             </span>
@@ -342,7 +350,8 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           handleConfirm={() => handleChangePaymentStatus(undefined)}
           handleClose={handleDialogClose}
         />
-      ) : (payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
+      ) : (payment.platformStatus &&
+          payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
         payment.status === WeeklyPaymentStatus.BLOCKED ? (
         <RevertApprovalDialog
           isOpen={isDialogOpen}

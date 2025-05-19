@@ -59,7 +59,8 @@ const QuoteGroups: React.FC = () => {
     switch (newValue) {
       case 0:
         history.push('/quotes/groups');
-        setQuoteFilters && setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
+        setQuoteFilters &&
+          setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
         break;
       case 1:
         history.push('/quotes/groups?tab=archived');
@@ -81,7 +82,10 @@ const QuoteGroups: React.FC = () => {
       // we are acting as a customer set a date range:
       setQuoteFilters &&
         setQuoteFilters(
-          flow(set('archived', undefined), set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS))(quoteFilters),
+          flow(
+            set('archived', undefined),
+            set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS),
+          )(quoteFilters),
         );
     }
   }, [actingAs]);

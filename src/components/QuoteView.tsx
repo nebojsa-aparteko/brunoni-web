@@ -35,7 +35,12 @@ import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
-import { Quote, Quote as QuoteModel, QuoteStatus, QuoteStatusText } from '../providers/QuoteGroupsProvider';
+import {
+  Quote,
+  Quote as QuoteModel,
+  QuoteStatus,
+  QuoteStatusText,
+} from '../providers/QuoteGroupsProvider';
 import ActingAs from '../contexts/ActingAs';
 import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
 import UserRecord from '../model/UserRecord';
@@ -141,11 +146,7 @@ const handleSpecialRequest = (quote: QuoteModel) => {
 };
 
 export const addStatus = (status: QuoteStatus | null, quoteId: string) => {
-  return firebase
-    .firestore()
-    .collection('quotes')
-    .doc(quoteId)
-    .update('status', status);
+  return firebase.firestore().collection('quotes').doc(quoteId).update('status', status);
 };
 
 const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
@@ -277,7 +278,9 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   };
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {
-    addStatus(event.target.value as QuoteStatus, quoteId).then(_ => console.log('Successful status change'));
+    addStatus(event.target.value as QuoteStatus, quoteId).then(_ =>
+      console.log('Successful status change'),
+    );
   };
 
   const handleBookNow = (schedule?: RouteSearchResult) => {
@@ -304,7 +307,13 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 </Box>
                 <Divider />
               </Box>
-              <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+              <Box
+                className={classes.actionBar}
+                mb={2}
+                display="flex"
+                alignItems="end"
+                justifyContent="space-between"
+              >
                 <QuoteNav
                   backTo={
                     quote.id && quote?.groupId && quote.groupId !== quote.id
@@ -359,7 +368,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                       <QuoteItemHeader quote={quote} showCompanyInfo={showCompanyInfo} />
                     </Grid>
                     <Grid item md={6} xs={12} className={classes.hidePrint}>
-                      <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                      <QuoteItemContainers
+                        containers={quote.containers}
+                        commodityTypes={quote.commodityTypes}
+                      />
                     </Grid>
 
                     <Grid item xs={12}>
@@ -369,7 +381,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                             <QuoteItemHeader quote={quote} />
                           </Grid>
                           <Grid item xs={6}>
-                            <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                            <QuoteItemContainers
+                              containers={quote.containers}
+                              commodityTypes={quote.commodityTypes}
+                            />
                           </Grid>
                         </Grid>
                       </Box>

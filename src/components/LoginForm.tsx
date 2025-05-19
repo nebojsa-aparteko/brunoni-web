@@ -103,7 +103,8 @@ const LoginForm: React.FC<Props> = ({ next, onComplete }) => {
     // }, 2000);
   };
 
-  const handleEmailAddressChange = (e: ChangeEvent<HTMLInputElement>) => setEmailAddress(e.target.value);
+  const handleEmailAddressChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setEmailAddress(e.target.value);
 
   return (
     <form onSubmit={handleSubmit}>

@@ -62,12 +62,17 @@ const UserWidget: React.FC = () => {
     try {
       await firebase.auth().signOut();
       setAnchorEl(null);
-      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, { variant: 'info' });
+      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, {
+        variant: 'info',
+      });
     } catch (e) {
       console.error('Unable to sign out', e);
-      enqueueSnackbar(<Typography color="inherit">Error occurred while trying to sign you out.</Typography>, {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        <Typography color="inherit">Error occurred while trying to sign you out.</Typography>,
+        {
+          variant: 'error',
+        },
+      );
     }
   }, [setAnchorEl, enqueueSnackbar]);
 
@@ -76,7 +81,9 @@ const UserWidget: React.FC = () => {
       <Chip
         id="userMenuNav"
         avatar={
-          <Avatar className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}>
+          <Avatar
+            className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}
+          >
             {isDashboardUser(userData) ? (
               userData && userData.isRedirectionActive ? (
                 <Forward color="error" />
@@ -113,7 +120,9 @@ const UserWidget: React.FC = () => {
               <MenuItem disabled style={{ opacity: 'initial' }}>
                 <Box>
                   <Typography variant="subtitle1">{client.name.toUpperCase()}</Typography>
-                  {client.city && <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>}
+                  {client.city && (
+                    <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>
+                  )}
                 </Box>
               </MenuItem>
               {isDashboardUser(actingAs) && (

@@ -153,7 +153,11 @@ const hasEquipmentPinNumber = (detail: CargoDetail) => {
       label={'Pin Number'}
       content={detail.Equipment.reduce(
         (previousValue, currentValue) =>
-          previousValue + currentValue.ContainerNumber + ' - ' + (currentValue.PINNr || '') + '<br>',
+          previousValue +
+          currentValue.ContainerNumber +
+          ' - ' +
+          (currentValue.PINNr || '') +
+          '<br>',
         '',
       )}
     />
@@ -250,7 +254,12 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCate
                 equipmentDetail.DropOffDate ||
                 equipmentDetail.GateOutDate ? (
                   <HtmlTooltip
-                    title={<ContainerDates equipment={equipmentDetail} bookingCategory={bookingCategory} />}
+                    title={
+                      <ContainerDates
+                        equipment={equipmentDetail}
+                        bookingCategory={bookingCategory}
+                      />
+                    }
                     placement={'right'}
                   >
                     <span>{equipmentDetail.ContainerNumber}</span>
@@ -267,7 +276,11 @@ export const EquipmentData: React.FC<EquipmentProps> = ({ equipment, bookingCate
   );
 };
 
-export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDetails, ctrTariffs, type }) => {
+export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({
+  tariffDetails,
+  ctrTariffs,
+  type,
+}) => {
   const classes = useStyles();
   const data =
     ctrTariffs && ctrTariffs[0] && tariffDetails && tariffDetails[0]
@@ -275,7 +288,9 @@ export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDeta
           tariff.DaysFree &&
           tariff.Txt &&
           ctrTariffs &&
-          ctrTariffs.some(ctrTariff => ctrTariff.ID === tariff.ID && ctrTariff.Type === tariff.Type) ? (
+          ctrTariffs.some(
+            ctrTariff => ctrTariff.ID === tariff.ID && ctrTariff.Type === tariff.Type,
+          ) ? (
             <Fragment key={`tariffId-${tariff.ID}`}>
               {tariff.DaysFree + ' ' + tariff.Txt}
               <br />
@@ -294,7 +309,11 @@ export const CtrTariffDetailType: React.FC<CtrTariffDetailProps> = ({ tariffDeta
   ) : null;
 };
 
-export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrTariffs, detail }) => {
+export const CtrTariffDetails: React.FC<CtrTariffProps> = ({
+  tariffDetails,
+  ctrTariffs,
+  detail,
+}) => {
   const demDetTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'DEM/DET');
   const storageTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'STORAGE');
   const pluginTariffs = tariffDetails.filter(tariffDetail => tariffDetail.Type === 'PLUGIN');
@@ -304,27 +323,51 @@ export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrT
       {detail.DemDetTariff !== '0' && (
         <Fragment>
           {demDetTariffs && demDetTariffs[0] ? (
-            <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={ctrTariffs} type={'Dem./Det. tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={demDetTariffs}
+              ctrTariffs={ctrTariffs}
+              type={'Dem./Det. tariff'}
+            />
           ) : (
-            <CtrTariffDetailType tariffDetails={demDetTariffs} ctrTariffs={null} type={'Dem./Det. tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={demDetTariffs}
+              ctrTariffs={null}
+              type={'Dem./Det. tariff'}
+            />
           )}
         </Fragment>
       )}
       {detail.StorageTariff !== '0' && (
         <Fragment>
           {storageTariffs && storageTariffs[0] ? (
-            <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={ctrTariffs} type={'Storage tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={storageTariffs}
+              ctrTariffs={ctrTariffs}
+              type={'Storage tariff'}
+            />
           ) : (
-            <CtrTariffDetailType tariffDetails={storageTariffs} ctrTariffs={null} type={'Storage tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={storageTariffs}
+              ctrTariffs={null}
+              type={'Storage tariff'}
+            />
           )}
         </Fragment>
       )}
       {detail.PluginTariff !== '0' && (
         <Fragment>
           {pluginTariffs && pluginTariffs[0] ? (
-            <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={ctrTariffs} type={'Plug-in tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={pluginTariffs}
+              ctrTariffs={ctrTariffs}
+              type={'Plug-in tariff'}
+            />
           ) : (
-            <CtrTariffDetailType tariffDetails={pluginTariffs} ctrTariffs={null} type={'Plug-in tariff'} />
+            <CtrTariffDetailType
+              tariffDetails={pluginTariffs}
+              ctrTariffs={null}
+              type={'Plug-in tariff'}
+            />
           )}
         </Fragment>
       )}
@@ -333,25 +376,35 @@ export const CtrTariffDetails: React.FC<CtrTariffProps> = ({ tariffDetails, ctrT
 };
 
 export const AdditionalCargoData: React.FC<AdditionalCargoProps> = ({ detail }) => {
-  const emptyReturnAddress = (detail.LocRefs && detail.LocRefs[0]
-    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.dropOff && ref.LocID !== '0' ? ref.LocDet : null))
-    : null
+  const emptyReturnAddress = (
+    detail.LocRefs && detail.LocRefs[0]
+      ? detail.LocRefs.map(ref =>
+          ref.LocType === BookingLocType.dropOff && ref.LocID !== '0' ? ref.LocDet : null,
+        )
+      : null
   )?.join('');
-  const destinationTerminal = (detail.LocRefs && detail.LocRefs[0]
-    ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.gateOut ? ref.LocDet : null))
-    : null
+  const destinationTerminal = (
+    detail.LocRefs && detail.LocRefs[0]
+      ? detail.LocRefs.map(ref => (ref.LocType === BookingLocType.gateOut ? ref.LocDet : null))
+      : null
   )?.join('');
 
   return (
     <Fragment>
-      {destinationTerminal ? <TableRowData label={'Destination Terminal'} content={destinationTerminal} /> : null}
+      {destinationTerminal ? (
+        <TableRowData label={'Destination Terminal'} content={destinationTerminal} />
+      ) : null}
 
       {hasEquipmentPinNumber(detail)}
-      {emptyReturnAddress ? <TableRowData label={'Empty Return Address'} content={emptyReturnAddress} /> : null}
+      {emptyReturnAddress ? (
+        <TableRowData label={'Empty Return Address'} content={emptyReturnAddress} />
+      ) : null}
 
       {detail.Stock ? <TableRowData label={'Stock'} content={detail.Stock} /> : null}
 
-      {detail.DropOffRef ? <TableRowData label={'Drop Off Reference'} content={detail.DropOffRef} /> : null}
+      {detail.DropOffRef ? (
+        <TableRowData label={'Drop Off Reference'} content={detail.DropOffRef} />
+      ) : null}
     </Fragment>
   );
 };
@@ -384,8 +437,9 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   <TableCell className={classes.tableCell}>
                     <SvgIcon component={ContainerIconSVG} viewBox="0 0 512 512" />
                   </TableCell>
-                  <TableCell className={classes.tableCell}>{`${detail.CtrQuantity} x ${cont?.description ||
-                    detail.CtypID}`}</TableCell>
+                  <TableCell className={classes.tableCell}>{`${detail.CtrQuantity} x ${
+                    cont?.description || detail.CtypID
+                  }`}</TableCell>
                 </TableRow>
 
                 {detail.CommodityTXT ? (
@@ -414,9 +468,13 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   <TableRowData label={'Dehumidification'} content={detail.Dehumidification} />
                 ) : null}
 
-                {detail.Ventilation ? <TableRowData label={'Ventilation'} content={detail.Ventilation} /> : null}
+                {detail.Ventilation ? (
+                  <TableRowData label={'Ventilation'} content={detail.Ventilation} />
+                ) : null}
 
-                {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? <ImcoContainer IMCOs={detail.IMCOs} /> : null}
+                {detail.IMCO && detail.IMCOs && detail.IMCOs[0] ? (
+                  <ImcoContainer IMCOs={detail.IMCOs} />
+                ) : null}
 
                 {detail.Overdimension && detail.Overdimension === CargoOverdimension.Trigger && (
                   <OverdimensionComponent detail={detail} key={`${index}-Overdimension`} />
@@ -426,7 +484,10 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                   <EquipmentData equipment={detail.Equipment} bookingCategory={category} />
                 ) : null}
 
-                {isLongVersion(version) && tariffDetails && detail.Equipment && detail.Equipment[0] ? (
+                {isLongVersion(version) &&
+                tariffDetails &&
+                detail.Equipment &&
+                detail.Equipment[0] ? (
                   <CtrTariffDetails
                     key={`tariff-${index}`}
                     tariffDetails={tariffDetails}
@@ -469,7 +530,11 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
                     }
                   })}
                   {detail['VGM-PIN'] && (
-                    <TableRowData label={'VGM Pin'} content={detail['VGM-PIN']} key={`booking-vgm-pin-type-${index}`} />
+                    <TableRowData
+                      label={'VGM Pin'}
+                      content={detail['VGM-PIN']}
+                      key={`booking-vgm-pin-type-${index}`}
+                    />
                   )}
                   {detail.CargoDetailRermarks && (
                     <TableRowData label={'Remarks'} content={detail.CargoDetailRermarks} />
@@ -494,7 +559,13 @@ const ContainerItem: React.FC<ContainerItemProps> = ({
   );
 };
 
-const ContainerDetails: React.FC<Props> = ({ cargoDetail, version, category, tariffDetails, remarks }) => {
+const ContainerDetails: React.FC<Props> = ({
+  cargoDetail,
+  version,
+  category,
+  tariffDetails,
+  remarks,
+}) => {
   const containerTypes = useContext(ContainerTypes);
 
   return (

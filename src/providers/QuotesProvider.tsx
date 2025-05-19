@@ -1,4 +1,12 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
 import { ContextFilters } from './filterActions';
@@ -21,7 +29,12 @@ interface QuoteContextFilters extends ContextFilters {
 const defaultFilters = {} as QuoteContextFilters;
 
 export const QuotesContext = createContext<
-  [Quote[] | undefined, boolean, QuoteContextFilters, Dispatch<SetStateAction<QuoteContextFilters>> | undefined]
+  [
+    Quote[] | undefined,
+    boolean,
+    QuoteContextFilters,
+    Dispatch<SetStateAction<QuoteContextFilters>> | undefined,
+  ]
 >([undefined, true, defaultFilters, undefined]);
 
 const QuotesProvider: React.FC<Props> = ({ children }) => {
@@ -36,17 +49,23 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   const [availableCarriers, setAvailableCarriers] = useState(
     isAdmin
       ? carriers && userRecord.carriers
-        ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
+        ? userRecord.carriers?.map(
+            carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name,
+          )
         : []
       : carriers,
   );
 
-  const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(undefined);
+  const [filtersPreviousVal, setFiltersPreviousVal] = useState<QuoteContextFilters | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     setAvailableCarriers(
       carriers && userRecord.carriers
-        ? userRecord.carriers?.map(carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name)
+        ? userRecord.carriers?.map(
+            carrierId => carriers?.find(carrier => carrierId && carrier.id === carrierId)?.name,
+          )
         : [],
     );
   }, [carriers, userRecord]);
@@ -73,7 +92,12 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
       if (actingAs && userRecord?.alphacomClientId) {
         query = collection.where('clientId', '==', userRecord!.alphacomClientId);
       }
-      if (!!availableCarriers && availableCarriers.length > 0 && !isSuperAdmin(userRecord) && isAdmin) {
+      if (
+        !!availableCarriers &&
+        availableCarriers.length > 0 &&
+        !isSuperAdmin(userRecord) &&
+        isAdmin
+      ) {
         query = (query || collection).where('carrier', 'in', availableCarriers);
       }
 
@@ -138,7 +162,9 @@ const QuotesProvider: React.FC<Props> = ({ children }) => {
   }, [quotesSnapshot]);
 
   return (
-    <QuotesContext.Provider value={[quotesResult, isLoading, filters, setFilters]}>{children}</QuotesContext.Provider>
+    <QuotesContext.Provider value={[quotesResult, isLoading, filters, setFilters]}>
+      {children}
+    </QuotesContext.Provider>
   );
 };
 

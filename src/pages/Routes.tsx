@@ -8,7 +8,9 @@ import { Box } from '@material-ui/core';
 
 const Routes: React.FC = () => {
   const history = useHistory();
-  const [isPicker] = useState(QueryString.parse(window.location.search.replace('?', '')).isPicker === 'true');
+  const [isPicker] = useState(
+    QueryString.parse(window.location.search.replace('?', '')).isPicker === 'true',
+  );
 
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('schedule', JSON.stringify(schedule));
@@ -18,7 +20,13 @@ const Routes: React.FC = () => {
   return (
     <Fragment>
       <Meta title="Schedule" />
-      <Box display={'flex'} flexDirection="column" flex={1} mt={isPicker ? 4 : 0} mb={isPicker ? 4 : 0}>
+      <Box
+        display={'flex'}
+        flexDirection="column"
+        flex={1}
+        mt={isPicker ? 4 : 0}
+        mb={isPicker ? 4 : 0}
+      >
         <RouteSearch isPicker={isPicker} handleBookNow={handleBookNow} />
       </Box>
     </Fragment>

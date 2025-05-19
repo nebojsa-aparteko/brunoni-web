@@ -1,4 +1,12 @@
-import React, { ChangeEvent, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Box,
   Button,
@@ -23,7 +31,11 @@ import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Page from '../bookings/Page';
-import { BookingRequest, BookingRequestStatusCode, BookingRequestStatusText } from '../../model/BookingRequest';
+import {
+  BookingRequest,
+  BookingRequestStatusCode,
+  BookingRequestStatusText,
+} from '../../model/BookingRequest';
 import BookingRequestViewMainContent from './BookingRequestViewMainContent';
 import BookingRequestCheckList from './checklist/BookingRequestChecklist';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
@@ -234,35 +246,44 @@ const changeAssignedClient = (id: string, user: UserRecord | null) =>
       { merge: true },
     );
 export const changeBookingRequestUnreadStatus = (id: string, isUnread: boolean) =>
-  firebase
-    .firestore()
-    .collection('bookings-requests')
-    .doc(id)
-    .set(
-      {
-        isUnread: isUnread,
-      },
-      { merge: true },
-    );
-const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRequest, isOpen, handleClose }) => {
+  firebase.firestore().collection('bookings-requests').doc(id).set(
+    {
+      isUnread: isUnread,
+    },
+    { merge: true },
+  );
+const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({
+  bookingRequest,
+  isOpen,
+  handleClose,
+}) => {
   const classes = useStyles();
   const userRecord = useUser()[1];
   const assignableUsers = useAdminUsers(CUSTOMER_FACING_ROLES);
   const assignableCustomers = useClientUsers(bookingRequest.client?.id);
-  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined | null>(bookingRequest.assignedUser);
-  const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(bookingRequest.createdBy);
+  const [selectedAgent, setSelectedAgent] = useState<UserRecordMin | undefined | null>(
+    bookingRequest.assignedUser,
+  );
+  const [selectedClient, setSelectedClient] = useState<UserRecord | undefined>(
+    bookingRequest.createdBy,
+  );
   const [showUnreadContent, setShowUnreadContent] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
 
   const handleChangeClient = async () => {
     try {
-      if (bookingRequest.id && bookingRequest.createdBy?.emailAddress !== selectedClient?.emailAddress) {
+      if (
+        bookingRequest.id &&
+        bookingRequest.createdBy?.emailAddress !== selectedClient?.emailAddress
+      ) {
         await changeAssignedClient(bookingRequest.id, selectedClient || null);
         await addActivityItem(
           'bookings-requests',
           bookingRequest.id,
           createActivityObject({
-            changeType: selectedClient ? ActivityChangeType.ASSIGNED_CLIENT : ActivityChangeType.UNASSIGNED_CLIENT,
+            changeType: selectedClient
+              ? ActivityChangeType.ASSIGNED_CLIENT
+              : ActivityChangeType.UNASSIGNED_CLIENT,
             by: getActivityLogUserData(userRecord),
             addedUsers: selectedClient
               ? [getActivityLogUserData(selectedClient)]
@@ -282,7 +303,8 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
       if (bookingRequest.id) {
         ((!selectedAgent && bookingRequest.assignedUser) ||
           (selectedAgent && !bookingRequest.assignedUser) ||
-          (selectedAgent && bookingRequest.assignedUser?.emailAddress !== selectedAgent.emailAddress)) &&
+          (selectedAgent &&
+            bookingRequest.assignedUser?.emailAddress !== selectedAgent.emailAddress)) &&
           changeAssignedAgent(bookingRequest.id, selectedAgent || null).then(async () => {
             //TODO create activity types for removing the selected agent and client
             bookingRequest.id &&
@@ -290,7 +312,9 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
                 'bookings-requests',
                 bookingRequest.id,
                 createActivityObject({
-                  changeType: selectedAgent ? ActivityChangeType.ASSIGNED_AGENT : ActivityChangeType.UNASSIGNED_AGENT,
+                  changeType: selectedAgent
+                    ? ActivityChangeType.ASSIGNED_AGENT
+                    : ActivityChangeType.UNASSIGNED_AGENT,
                   by: getActivityLogUserData(userRecord),
                   addedUsers: selectedAgent
                     ? [getActivityLogUserData(selectedAgent)]
@@ -316,14 +340,19 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
     } catch (e) {
       console.log(e);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to mark request as unread!' });
+      return dispatch({
+        type: 'SHOW_ERROR_SNACKBAR',
+        message: 'Failed to mark request as unread!',
+      });
     }
   };
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle disableTypography>
-        <Typography variant="h4">{showUnreadContent ? 'Mark booking request as unread' : 'Watchers'}</Typography>
+        <Typography variant="h4">
+          {showUnreadContent ? 'Mark booking request as unread' : 'Watchers'}
+        </Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -366,8 +395,12 @@ const AgentAssignmentDialog: React.FC<AgentAssignmentDialogProps> = ({ bookingRe
               await handleChangeAgent();
               await handleChangeClient();
               dispatch({ type: 'STOP_GLOBAL_LOADING' });
-              !selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread && setShowUnreadContent(true);
-              !(!selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread) && handleClose();
+              !selectedAgent &&
+                bookingRequest.assignedUser &&
+                !bookingRequest.isUnread &&
+                setShowUnreadContent(true);
+              !(!selectedAgent && bookingRequest.assignedUser && !bookingRequest.isUnread) &&
+                handleClose();
             }}
             variant="contained"
             className={classes.saveBtn}
@@ -427,8 +460,14 @@ const checkForUpdatesInArray = async (obj: Container[], bookingRequest: BookingR
   const hasWeight = obj.every(k => !isNil(k.weight));
   await setChecked(bookingRequest.id!, ItemsOptions.WEIGHT_CHECK, hasWeight);
   //Weight Change
-  const hasPickUpAndDeliveryRef = obj.every(k => !isNil(k.pickupReference) && !isNil(k.deliveryReference));
-  await setChecked(bookingRequest.id!, ItemsOptions.PICKUP_AND_DELIVERY_REF, hasPickUpAndDeliveryRef);
+  const hasPickUpAndDeliveryRef = obj.every(
+    k => !isNil(k.pickupReference) && !isNil(k.deliveryReference),
+  );
+  await setChecked(
+    bookingRequest.id!,
+    ItemsOptions.PICKUP_AND_DELIVERY_REF,
+    hasPickUpAndDeliveryRef,
+  );
   // Terminal Change
   const hasTerminal = obj.every(k => !isNil(k.pickupLocation));
   await setChecked(bookingRequest.id!, ItemsOptions.TERMINAL_CHECK, hasTerminal);
@@ -478,7 +517,8 @@ export const handleFieldsEditActivity = async (
     changedFields,
   });
   if (changedKeys.length > 0) {
-    bookingRequest.id && (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
+    bookingRequest.id &&
+      (await addActivityItem('bookings-requests', bookingRequest.id, activityObject));
   }
 };
 
@@ -524,13 +564,7 @@ const onBookingCreate = (bookingRequest: BookingRequest, bookingId: string) =>
     );
 
 export const getBookingData = async (bookingId: string) =>
-  (
-    await firebase
-      .firestore()
-      .collection('bookings')
-      .doc(bookingId)
-      .get()
-  ).data();
+  (await firebase.firestore().collection('bookings').doc(bookingId).get()).data();
 
 const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [user, userRecord, isAdmin] = useUser();
@@ -539,7 +573,8 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const commodityTypes = useContext(CommodityTypes);
   const availableTags = useContext(Tags);
   const { isOpen, openModal, closeModal } = useModal();
-  const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] = useState<boolean>(true);
+  const [isBookNowAutomaticallyDisabled, setIsBookNowAutomaticallyDisabled] =
+    useState<boolean>(true);
   const [isBookNowDisabled, setIsBookNowDisabled] = useState<boolean>(
     bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED ||
       isBookNowAutomaticallyDisabled ||
@@ -563,7 +598,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [tags, setTags] = useState(
     availableTags &&
-      availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+      availableTags.filter(
+        tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id),
+      ),
   );
   const [bookingRequestState, setBookingRequestState, editing] = useBookingRequestContext();
 
@@ -580,12 +617,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
     () =>
       setTags(
         availableTags &&
-          availableTags.filter(tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id)),
+          availableTags.filter(
+            tag => bookingRequest.assignedTags && bookingRequest.assignedTags.includes(tag.id),
+          ),
       ),
     [availableTags, bookingRequest.assignedTags],
   );
 
-  const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequest.id}/activity`, [bookingRequest.id]);
+  const bookingRequestPath = useMemo(
+    () => `/bookings-requests/${bookingRequest.id}/activity`,
+    [bookingRequest.id],
+  );
 
   const activities = useActivities(
     bookingRequestPath,
@@ -615,12 +657,16 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const bookNow = useCallback(async () => {
     // if freight has ocean freight create leading currency
     // if not choose between eur and usd
-    const freight = bookingRequestState?.freightDetails?.filter(f => ['Oceanfreight', 'Seafreight'].includes(f.Txt));
+    const freight = bookingRequestState?.freightDetails?.filter(f =>
+      ['Oceanfreight', 'Seafreight'].includes(f.Txt),
+    );
 
     if (bookingRequestState.leadingCurrency || (freight && freight.length > 0)) {
       const f = freight?.pop();
       if (!bookingRequestState.leadingCurrency && !f?.Currency) return openModal();
-      setBookingRequestState(prevState => prevState && set('leadingCurrency', f?.Currency)(prevState));
+      setBookingRequestState(
+        prevState => prevState && set('leadingCurrency', f?.Currency)(prevState),
+      );
 
       try {
         dispatch({ type: 'START_GLOBAL_LOADING' });
@@ -637,7 +683,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(
-            await createAlphacomRepresentationOfBooking(bookingRequestState!, chargeCodes, commodityTypes),
+            await createAlphacomRepresentationOfBooking(
+              bookingRequestState!,
+              chargeCodes,
+              commodityTypes,
+            ),
           ),
         });
 
@@ -739,7 +789,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   const getCorrectBackRoute = () => {
     if (bookingRequest.statusCode <= BookingRequestStatusCode.IN_PROGRESS && !bookingRequest.hold) {
       return '/bookings?tab=requests';
-    } else if (bookingRequest.statusCode <= BookingRequestStatusCode.IN_PROGRESS && bookingRequest.hold) {
+    } else if (
+      bookingRequest.statusCode <= BookingRequestStatusCode.IN_PROGRESS &&
+      bookingRequest.hold
+    ) {
       return '/bookings?tab=on-hold';
     } else if (bookingRequest.statusCode >= BookingRequestStatusCode.CONFIRMED) {
       return '/bookings?tab=archived-requests';
@@ -749,7 +802,14 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
   };
 
   return (
-    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+    <Grid
+      container
+      direction="row"
+      spacing={2}
+      justify="center"
+      alignItems="flex-start"
+      className={classes.body}
+    >
       <Grid item md={8} xs={12}>
         <Page title={getBookingRequestTitle(bookingRequest)}>
           <MissingFields
@@ -769,7 +829,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
           )}
           {isAdmin &&
             (tags ? (
-              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING_REQUEST} documentId={bookingRequest.id} />
+              <TagsList
+                tags={tags || []}
+                tagCategory={TagCategory.BOOKING_REQUEST}
+                documentId={bookingRequest.id}
+              />
             ) : (
               <Box
                 display="flex"
@@ -783,9 +847,15 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 <CircularProgress size={20} style={{ margin: 'auto' }} />
               </Box>
             ))}
-          {bookingRequest.additionalInfo && <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />}
+          {bookingRequest.additionalInfo && (
+            <AdditionalInfoView additionalInfo={bookingRequest.additionalInfo} />
+          )}
           {isOpenAssignmentModal && (
-            <AgentAssignmentDialog bookingRequest={bookingRequest} isOpen={true} handleClose={closeAssignmentModal} />
+            <AgentAssignmentDialog
+              bookingRequest={bookingRequest}
+              isOpen={true}
+              handleClose={closeAssignmentModal}
+            />
           )}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
@@ -842,7 +912,12 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                 <Box className={classes.actions} displayPrint="none">
                   <EditButton bookingRequest={bookingRequest} />
                   {isAdmin && (
-                    <IconButton size="small" aria-label="Watch" component="span" onClick={openAssignmentModal}>
+                    <IconButton
+                      size="small"
+                      aria-label="Watch"
+                      component="span"
+                      onClick={openAssignmentModal}
+                    >
                       <SupervisedUserCircleIcon />
                     </IconButton>
                   )}
@@ -859,11 +934,17 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                               <ArchiveIcon />
                             ),
                           label:
-                            bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED ? 'Restore' : 'Archive',
+                            bookingRequest.statusCode === BookingRequestStatusCode.ARCHIVED
+                              ? 'Restore'
+                              : 'Archive',
                         },
                         {
                           onClick: () => storeActivity(holdHandler),
-                          icon: bookingRequest.hold ? <SettingsBackupRestoreIcon /> : <PanToolIcon />,
+                          icon: bookingRequest.hold ? (
+                            <SettingsBackupRestoreIcon />
+                          ) : (
+                            <PanToolIcon />
+                          ),
                           label: bookingRequest.hold ? 'Unhold' : 'Hold',
                         },
                         {
@@ -886,7 +967,10 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                           onClick: () => {
                             dispatch({ type: 'START_GLOBAL_LOADING' });
                             bookingRequest.id &&
-                              changeBookingRequestUnreadStatus(bookingRequest.id, !bookingRequest.isUnread)
+                              changeBookingRequestUnreadStatus(
+                                bookingRequest.id,
+                                !bookingRequest.isUnread,
+                              )
                                 .then(() =>
                                   dispatch({
                                     type: 'SHOW_SUCCESS_SNACKBAR',
@@ -907,7 +991,11 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
                                 )
                                 .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
                           },
-                          icon: bookingRequest.isUnread ? <VisibilityIcon /> : <VisibilityOffIcon />,
+                          icon: bookingRequest.isUnread ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          ),
                           label: bookingRequest.isUnread ? 'Mark as read' : 'Mark as unread',
                         },
                       ]}
@@ -934,7 +1022,9 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         <ConfirmLeadingCurrencyDialog
           isOpen={isOpen}
           handleConfirm={currency => {
-            setBookingRequestState(prevState => prevState && set('leadingCurrency', currency)(prevState));
+            setBookingRequestState(
+              prevState => prevState && set('leadingCurrency', currency)(prevState),
+            );
             closeModal();
           }}
           handleClose={closeModal}

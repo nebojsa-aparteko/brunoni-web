@@ -47,7 +47,12 @@ const AutomaticEmailSendSwitch: React.FC<Props> = ({ automaticMessage, paymentCo
 
   return (
     <FormControl>
-      <Switch checked={automaticMessage} onChange={saveChanges} name="automatic message" color="primary" />
+      <Switch
+        checked={automaticMessage}
+        onChange={saveChanges}
+        name="automatic message"
+        color="primary"
+      />
     </FormControl>
   );
 };

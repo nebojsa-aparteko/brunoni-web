@@ -31,8 +31,12 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   const classes = useStyles();
   const [tab, setTab] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [importCharges, setImportCharges] = useState<SideCharge[]>(carrier.sideCharges?.importCharges || []);
-  const [exportCharges, setExportCharges] = useState<SideCharge[]>(carrier.sideCharges?.exportCharges || []);
+  const [importCharges, setImportCharges] = useState<SideCharge[]>(
+    carrier.sideCharges?.importCharges || [],
+  );
+  const [exportCharges, setExportCharges] = useState<SideCharge[]>(
+    carrier.sideCharges?.exportCharges || [],
+  );
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTab(newValue);
@@ -41,30 +45,26 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   const save = async () => {
     setBusy(true);
     try {
-      await firebase
-        .firestore()
-        .collection('carriers')
-        .doc(carrier.id)
-        .update({
-          sideCharges: {
-            importCharges,
-            exportCharges,
-          },
-        });
+      await firebase.firestore().collection('carriers').doc(carrier.id).update({
+        sideCharges: {
+          importCharges,
+          exportCharges,
+        },
+      });
     } finally {
       setBusy(false);
     }
   };
 
-  const importChargesModified = useMemo(() => !isEqual(carrier.sideCharges?.importCharges || [], importCharges), [
-    carrier.sideCharges,
-    importCharges,
-  ]);
+  const importChargesModified = useMemo(
+    () => !isEqual(carrier.sideCharges?.importCharges || [], importCharges),
+    [carrier.sideCharges, importCharges],
+  );
 
-  const exportChargesModified = useMemo(() => !isEqual(carrier.sideCharges?.exportCharges || [], exportCharges), [
-    carrier.sideCharges,
-    exportCharges,
-  ]);
+  const exportChargesModified = useMemo(
+    () => !isEqual(carrier.sideCharges?.exportCharges || [], exportCharges),
+    [carrier.sideCharges, exportCharges],
+  );
 
   const hasChanges = importChargesModified || exportChargesModified;
 
@@ -117,13 +117,14 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   );
 };
 
-const WaitFor = (Component: React.FC<{ carrier: Carrier }>) => (props: RouteComponentProps<{ id: string }>) => {
-  const carrierId = props.match.params.id;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const carriers = useContext(Carriers);
-  const carrier = carriers?.find(carrier => carrier.id === carrierId);
+const WaitFor =
+  (Component: React.FC<{ carrier: Carrier }>) => (props: RouteComponentProps<{ id: string }>) => {
+    const carrierId = props.match.params.id;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const carriers = useContext(Carriers);
+    const carrier = carriers?.find(carrier => carrier.id === carrierId);
 
-  return carrier ? <Component key={carrierId} carrier={carrier} /> : <ChartsCircularProgress />;
-};
+    return carrier ? <Component key={carrierId} carrier={carrier} /> : <ChartsCircularProgress />;
+  };
 
 export default WaitFor(SideCharges);
