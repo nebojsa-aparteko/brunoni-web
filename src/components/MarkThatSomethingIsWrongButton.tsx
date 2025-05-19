@@ -12,6 +12,7 @@ import ActingAs from '../contexts/ActingAs';
 import WeeklyPayment from '../model/WeeklyPayment';
 import UserRecordContext from '../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 const showSomethingWrongTask = (booking: Booking, reference: string) => {
   return firebase
@@ -62,7 +63,7 @@ const MarkThatSomethingIsWrongButton: React.FC<Props> = ({ payment, booking, upd
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

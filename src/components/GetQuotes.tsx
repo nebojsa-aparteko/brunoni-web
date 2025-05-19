@@ -239,7 +239,7 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('Unexpected error response', response.status, response.statusText);
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
+        if (error instanceof Error && error.name !== 'AbortError') {
           enqueueSnackbar(
             <Typography color="inherit">
               The API timed out trying to fetch quotes. Please try again.

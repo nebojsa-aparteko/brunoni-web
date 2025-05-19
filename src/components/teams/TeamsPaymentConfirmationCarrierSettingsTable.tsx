@@ -18,6 +18,7 @@ import { useSnackbar } from 'notistack';
 import TeamsPaymentConfirmationCarrierSettingsAddDialog from './TeamsPaymentConfirmationCarrierSettingsAddDialog';
 import { CarrierSettingsRule, PaymentConfirmationType } from '../../model/PaymentConfirmationRule';
 import { addSeconds } from 'date-fns';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -85,7 +86,7 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+      enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });
@@ -107,7 +108,7 @@ const TeamsPaymentConfirmationCarrierSettingsTable: React.FC = () => {
         }
       } catch (error) {
         console.error(error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

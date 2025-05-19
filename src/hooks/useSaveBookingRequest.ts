@@ -11,6 +11,7 @@ import { useBookingRequestContext } from '../providers/BookingRequestProvider';
 import useUser from './useUser';
 import useActivityLogUserData from './useActivityLogUserData';
 import Mousetrap from 'mousetrap';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 const useSaveBookingRequest = (
   bookingRequest: BookingRequest,
@@ -35,7 +36,7 @@ const useSaveBookingRequest = (
         })
         .catch(error => {
           console.error('error saving booking request', error);
-          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
+          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: tryGetErrorMessage(error) });
         })
         .finally(async () => {
           setEditing(false);
@@ -48,7 +49,7 @@ const useSaveBookingRequest = (
             );
           } catch (error) {
             console.error('error creating activity', error);
-            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
+            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: tryGetErrorMessage(error) });
           } finally {
             dispatch({ type: 'STOP_GLOBAL_LOADING' });
           }

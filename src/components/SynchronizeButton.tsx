@@ -65,7 +65,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
           });
         }
       } catch (e) {
-        if (e.name !== 'AbortError') {
+        if (e instanceof Error && e.name !== 'AbortError') {
           dispatch({
             type: SHOW_ERROR_SNACKBAR,
             message: 'Failed to refresh the contents. Please try again later',

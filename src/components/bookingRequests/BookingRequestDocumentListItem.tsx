@@ -49,6 +49,7 @@ import theme from '../../theme/index';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import useUser from '../../hooks/useUser';
 import { DescriptionOutlined } from '@material-ui/icons';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -181,7 +182,7 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
             });
           })
           .catch(error => {
-            console.error('Failed to remove item - {error.message}', error);
+            console.error(`Failed to remove item - ${tryGetErrorMessage(error)}`, error);
           })
           .finally(() => {
             // remove item from the list in any case since if it is an error with the storage means file is already out
@@ -191,7 +192,7 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
         setRemovalInProgress(false);
         dispatch({
           type: 'SHOW_ERROR_SNACKBAR',
-          message: `Failed to remove item - ${error.message}!`,
+          message: `Failed to remove item - ${tryGetErrorMessage(error)}!`,
         });
       }
     },

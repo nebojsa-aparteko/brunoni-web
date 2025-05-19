@@ -46,6 +46,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import { useActivityLogState } from '../../bookings/checklist/ActivityLogContext';
 import Alert from '@material-ui/lab/Alert';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -178,7 +179,7 @@ const BookingRequestChecklistRow = ({
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

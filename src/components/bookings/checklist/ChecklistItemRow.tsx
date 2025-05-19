@@ -48,6 +48,7 @@ import DropZone, { makeContentDispositionFileName } from '../../DropZone';
 import { MentionItem } from 'react-mentions';
 import SendEmailDialog from './SendEmailDialog';
 import Task from '../../../model/Task';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const mediaPrint = '@media print';
 const useStyles = makeStyles((theme: Theme) =>
@@ -271,7 +272,7 @@ const ChecklistItemRow = ({
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

@@ -1,5 +1,6 @@
 import { DependencyList, useEffect, useMemo, useState } from 'react';
 import isArray from 'lodash/fp/isArray';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 export type Callback = (err?: Error, response?: Response, body?: any) => void;
 
@@ -84,16 +85,17 @@ export default function useRequest<T>(
           }
         }
       } catch (e) {
-        if (e.name !== 'AbortError' || timedOut) {
-          setError(e);
+        const error = e instanceof Error ? e : new Error(tryGetErrorMessage(e));
+
+        if (error.name !== 'AbortError' || timedOut) {
+          setError(error);
         }
 
         if (action.callback) {
-          action!.callback(e);
+          action!.callback(error);
         }
       } finally {
         setBusy(false);
-
         setAction(undefined);
       }
     })();

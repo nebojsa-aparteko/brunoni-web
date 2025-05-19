@@ -8,7 +8,7 @@ const EditingInput: React.FC<EditingInputProps> = ({
   inputProps,
   value,
   canEdit = true,
-  typographyProps = true,
+  typographyProps = {},
   noDefaultLabel = false,
   renderValue = value => value,
 }) =>

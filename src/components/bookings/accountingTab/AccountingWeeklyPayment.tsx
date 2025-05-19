@@ -49,6 +49,7 @@ import PaymentApprovalButton from './PaymentApprovalButton';
 import TaskManualResolveButton from '../../TaskManualResolveButton';
 import Task, { TaskType } from '../../../model/Task';
 import MarkThatSomethingIsWrongButton from '../../MarkThatSomethingIsWrongButton';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const addAccountingDocument = (file: DocumentValue, paymentReference: string) => {
   return firebase
@@ -262,7 +263,7 @@ const AccountingWeeklyPayment = ({
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

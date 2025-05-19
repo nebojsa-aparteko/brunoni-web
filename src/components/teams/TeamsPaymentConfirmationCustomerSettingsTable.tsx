@@ -18,6 +18,7 @@ import { CustomerSettingsRule, PaymentConfirmationType } from '../../model/Payme
 import TeamsPaymentConfirmationCustomerSettingsAddDialog from './TeamsPaymentConfirmationCustomerSettingsAddDialog';
 import TeamPaymentConfirmationCustomerSettingsRow from './TeamsPaymentConfirmationCustomerSettingsRow';
 import { addSeconds } from 'date-fns';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -84,7 +85,7 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+      enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });
@@ -106,7 +107,7 @@ const TeamsPaymentConfirmationCustomerSettingsTable: React.FC = () => {
         }
       } catch (error) {
         console.error(error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

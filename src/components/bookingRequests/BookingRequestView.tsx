@@ -83,6 +83,7 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import CommodityTypes from '../../contexts/CommodityTypes';
 import Tags from '../../contexts/Tags';
 import Container from '../../model/Container';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   body: {
@@ -648,7 +649,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
         })
         .catch(error => {
           console.error('error storing activity', error);
-          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message });
+          dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: tryGetErrorMessage(error) });
         });
     },
     [dispatch],

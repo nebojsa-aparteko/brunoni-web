@@ -19,6 +19,7 @@ import { useSnackbar } from 'notistack';
 import pick from 'lodash/fp/pick';
 import { TaskDescription, TaskType } from '../../model/Task';
 import CarriersMultiInput from '../inputs/CarriersMultiInput';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -115,7 +116,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
       })
       .catch(error => {
         console.trace(error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

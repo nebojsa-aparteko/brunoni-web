@@ -8,6 +8,7 @@ import {
 import globalReducer from './reducers/globalReducer';
 import { useSnackbar } from 'notistack';
 import { Typography } from '@material-ui/core';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 export const defaultState: GlobalAppState = {
   isGlobalLoadingInProgress: false,
@@ -44,7 +45,7 @@ const GlobalStore: React.FC = ({ children }) => {
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

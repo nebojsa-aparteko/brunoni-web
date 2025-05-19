@@ -42,6 +42,7 @@ import { useSnackbar } from 'notistack';
 import useUser from '../../../hooks/useUser';
 import firebase from '../../../firebase';
 import Task, { TaskType } from '../../../model/Task';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -240,7 +241,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

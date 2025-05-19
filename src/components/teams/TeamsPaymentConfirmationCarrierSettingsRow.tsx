@@ -23,6 +23,7 @@ import MultipleEmailInput from '../inputs/MultipleEmailInput';
 import PortInput from '../inputs/PortInput';
 import { omitAutomaticMessage } from './TeamsPaymentConfirmationCustomerSettingsRow';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 interface Props {
   paymentConfirmation: CarrierSettingsRule;
@@ -73,7 +74,7 @@ const TeamPaymentConfirmationCarrierSettingsRow: React.FC<Props> = ({
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+      enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });

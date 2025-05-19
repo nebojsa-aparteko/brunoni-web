@@ -32,6 +32,7 @@ import { showCrispChat } from '../../index';
 import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
 import { BookingRequest } from '../../model/BookingRequest';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(() => ({
   rootEmpty: {
@@ -287,7 +288,7 @@ const InternalStorage: React.FC<Props> = ({
             console.debug('File deleted from storage ', item);
           })
           .catch(error => {
-            console.error('Failed to remove item - {error.message}', error);
+            console.error(`Failed to remove item - ${tryGetErrorMessage(error)}`, error);
           })
           .finally(() => {
             // remove item from the list in any case since if it is an error with the storage means file is alrady out
@@ -303,7 +304,9 @@ const InternalStorage: React.FC<Props> = ({
               .catch(error => {
                 console.error('failed to update deleted items', error);
                 enqueueSnackbar(
-                  <Typography color="inherit">Failed to delete item - {error.message}</Typography>,
+                  <Typography color="inherit">
+                    Failed to delete item - {tryGetErrorMessage(error)}
+                  </Typography>,
                   {
                     variant: 'error',
                     autoHideDuration: 1000,
@@ -314,7 +317,9 @@ const InternalStorage: React.FC<Props> = ({
       } catch (error) {
         setRemovalInProgress(false);
         enqueueSnackbar(
-          <Typography color="inherit">Failed to remove item - {error.message}!</Typography>,
+          <Typography color="inherit">
+            Failed to remove item - {tryGetErrorMessage(error)}!
+          </Typography>,
           {
             variant: 'error',
             autoHideDuration: 1000,

@@ -414,7 +414,7 @@ export const EditableTextItem: React.FC<EditableTextItemProps> = ({
   value,
   editing,
   Element,
-  typographyProps = true,
+  typographyProps = {},
 }) => {
   return editing ? Element : <Typography {...typographyProps}>{value}</Typography>;
 };

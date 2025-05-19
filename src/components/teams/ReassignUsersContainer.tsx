@@ -35,6 +35,7 @@ import ReassignUserRow from './ReassignUsersRow';
 import CarrierInput from '../inputs/CarrierInput';
 import Carrier from '../../model/Carrier';
 import Carriers from '../../contexts/Carriers';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -220,7 +221,7 @@ const ReassignUsersContainer: React.FC = () => {
       })
       .catch(error => {
         console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

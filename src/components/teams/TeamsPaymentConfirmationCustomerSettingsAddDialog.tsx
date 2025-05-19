@@ -25,6 +25,7 @@ import { useSnackbar } from 'notistack';
 // import CategoryMultiSelect from '../CategoryMultiSelect';
 import { BookingCategory } from '../../model/Booking';
 import CategoryFilter from '../CategoryFilter';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -122,7 +123,7 @@ const TeamsPaymentConfirmationCustomerSettingsAddDialog: React.FC<Props> = ({
     } catch (error) {
       console.error(error);
       dispatch({ type: 'STOP_GLOBAL_LOADING' });
-      enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+      enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });

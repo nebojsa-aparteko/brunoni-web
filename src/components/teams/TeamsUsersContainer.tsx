@@ -33,6 +33,7 @@ import ConfirmationDialog from '../ConfirmationDialog';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -201,7 +202,7 @@ const TeamsUsersContainer: React.FC = () => {
       })
       .catch(error => {
         console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

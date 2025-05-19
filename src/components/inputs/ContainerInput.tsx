@@ -693,11 +693,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = (
           defaultItemValue={[defaultIMOItem]}
           value={
             container.imo && container.imo.length > 0 && typeof container.imo[0] !== 'boolean'
-              ? container.imo
-                ? container.imo.length > 0
-                  ? [true, container.imo as unknown as IMO[]]
-                  : [false]
-                : [false]
+              ? [true, container.imo as unknown as IMO[]]
               : container.imo || [false]
           }
           onChange={handleIMOChange}
@@ -709,11 +705,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = (
             defaultItemValue={[defaultOOGItem]}
             value={
               container.oog && container.oog.length > 0 && typeof container.oog[0] !== 'boolean'
-                ? container.oog
-                  ? container.oog.length > 0
-                    ? [true, container.oog as unknown as OOG[]]
-                    : [false]
-                  : [false]
+                ? [true, container.oog as unknown as OOG[]]
                 : container.oog || [false]
             }
             onChange={handleOOGChange}

@@ -48,6 +48,7 @@ import Commission from '../../model/Commission';
 import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
 import { DateRange } from '../daterangepicker/types';
 import Carrier from '../../model/Carrier';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -357,7 +358,7 @@ const PaymentOverviewContainer = () => {
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

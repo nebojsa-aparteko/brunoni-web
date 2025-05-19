@@ -33,6 +33,7 @@ import { GlobalContext } from '../../store/GlobalStore';
 import UserRecord from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
 import { FirebaseActionType } from '../../model/FirebaseAction';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -241,7 +242,9 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({
       .catch(error => {
         console.error('failed to update deleted items', error);
         enqueueSnackbar(
-          <Typography color="inherit">Failed to delete notification - {error.message}</Typography>,
+          <Typography color="inherit">
+            Failed to delete notification - {tryGetErrorMessage(error)}
+          </Typography>,
           {
             variant: 'error',
             autoHideDuration: 1000,
@@ -263,7 +266,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({
         console.error('Failed to update notification status', error);
         enqueueSnackbar(
           <Typography color="inherit">
-            Failed to update notification status - {error.message}
+            Failed to update notification status - {tryGetErrorMessage(error)}
           </Typography>,
           {
             variant: 'error',

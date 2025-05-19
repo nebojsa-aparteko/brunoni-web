@@ -24,6 +24,7 @@ import {
 import { useSnackbar } from 'notistack';
 import UserRecordContext from '../contexts/UserRecordContext';
 import CloseIcon from '@material-ui/icons/Close';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 interface DropZoneProps {
   label?: string;
@@ -249,7 +250,9 @@ const DropZone: React.FC<DropZoneProps> = ({
               setUploadProgress(0);
               reject(error);
               enqueueSnackbar(
-                <Typography color="inherit">Failed to upload file - {error.message}!</Typography>,
+                <Typography color="inherit">
+                  Failed to upload file - {tryGetErrorMessage(error)}!
+                </Typography>,
                 {
                   variant: 'error',
                   autoHideDuration: 1000,

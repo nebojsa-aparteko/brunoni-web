@@ -68,6 +68,7 @@ import {
 } from '../bookingRequests/BookingRequestFreightDetails';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -526,7 +527,7 @@ export const readAndParseFile = (
     } catch (error) {
       setLoading(false);
       console.error(error);
-      dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message, duration: 4000 });
+      dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: tryGetErrorMessage(error), duration: 4000 });
     }
   };
 };

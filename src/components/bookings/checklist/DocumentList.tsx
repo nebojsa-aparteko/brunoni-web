@@ -13,6 +13,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import UserRecordContext from '../../../contexts/UserRecordContext';
 import { useSnackbar } from 'notistack';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,7 +86,9 @@ const DocumentList: React.FC<Props> = ({
             .catch(error => {
               console.error('failed to update deleted items', error);
               enqueueSnackbar(
-                <Typography color="inherit">Failed to delete item - {error.message}</Typography>,
+                <Typography color="inherit">
+                  Failed to delete item - {tryGetErrorMessage(error)}
+                </Typography>,
                 {
                   variant: 'error',
                   autoHideDuration: 1000,
