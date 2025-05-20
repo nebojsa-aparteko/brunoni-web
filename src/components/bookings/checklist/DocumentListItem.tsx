@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const { NODE_ENV } = process.env;
+const { MODE } = import.meta.env;
 
 const findClassName = (item: DocumentValueStatus | undefined, classes: any) => {
   if (!item) {
@@ -370,7 +370,7 @@ const DocumentListItem = ({
       {(isAdmin ? true : !item.final) &&
         ((internal && isAdmin) || (!internal && !isAdmin)) &&
         (((item.status?.at ? editRestriction(item.status.at) : true) &&
-          (!internal && !isAdmin && NODE_ENV === 'production'
+          (!internal && !isAdmin && MODE === 'production'
             ? userRecord?.emailAddress !==
               (isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.emailAddress)
             : true) &&

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import queryString from 'querystring';
+import queryString from 'query-string';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import {

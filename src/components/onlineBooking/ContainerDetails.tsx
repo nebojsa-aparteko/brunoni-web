@@ -12,9 +12,9 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
-import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
-import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
+import ContainerIconSVG from '../../assets/container.svg?react';
+import PackageIconSVG from '../../assets/package.svg?react';
+import WeightIconSVG from '../../assets/weight.svg?react';
 import theme from '../../theme';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import { BookingRequest } from '../../model/BookingRequest';

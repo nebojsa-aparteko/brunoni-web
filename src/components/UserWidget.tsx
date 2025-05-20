@@ -128,7 +128,7 @@ const UserWidget: React.FC = () => {
               {isDashboardUser(actingAs) && (
                 <MenuItem onClick={handleSwitch}>
                   Switch to{' '}
-                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(import.meta.env.VITE_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </MenuItem>
@@ -140,7 +140,7 @@ const UserWidget: React.FC = () => {
             <MenuItem disabled style={{ opacity: 'initial' }}>
               <Box>
                 <Typography variant="subtitle1">
-                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(import.meta.env.VITE_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </Typography>

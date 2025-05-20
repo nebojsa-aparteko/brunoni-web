@@ -41,7 +41,7 @@ import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
 import { compact, flow, isNil, omitBy, update } from 'lodash/fp';
 import { useHistory } from 'react-router';
-import querySting from 'querystring';
+import querySting from 'query-string';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
 import RouteSearchResults, { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
@@ -203,7 +203,7 @@ const fetchSchedule = async (
     ...queryObject,
     date,
   });
-  const url = `${process.env.REACT_APP_API_URL}/routes?${query}`;
+  const url = `${import.meta.env.VITE_REACT_APP_API_URL}/routes?${query}`;
   const res = await fetch(url);
   return (await res.json()) as RouteSearchResults;
 };

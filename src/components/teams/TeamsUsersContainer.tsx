@@ -65,7 +65,7 @@ interface AddAdminsDialogProps {
 const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
   const clientUsers = useClientUsers(
-    process.env.REACT_APP_BRAND === 'brunoni' ? '001772' : '005905',
+    import.meta.env.VITE_BRAND === 'brunoni' ? '001772' : '005905',
   );
   const nonAdminUsers = clientUsers?.filter(user => !user.isAdmin && !user.role) || [];
   const [selectedUser, setSelectedUser] = useState<UserRecordMin | undefined>(undefined);

@@ -68,7 +68,7 @@ const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => 
   try {
     const token = await user.getIdToken();
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/weeklyPayment`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',

@@ -9,7 +9,7 @@ import OverviewsContainer from './OverviewsContainer';
 import BookingsVsStockContainer from './BookingsVsStockContainer';
 import EquipmentBookingDetailsContainer from './EquipmentBookingDetailsContainer';
 import { useHistory } from 'react-router';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -55,7 +55,7 @@ const EquipmentControlContainer = () => {
   const classes = useStyles();
 
   const history = useHistory();
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = {

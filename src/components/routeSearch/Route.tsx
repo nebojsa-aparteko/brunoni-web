@@ -158,7 +158,7 @@ const Route: React.FC<Props> = ({ route, isPicker, handleBookNow }) => {
   const buildMailToLink = (route: RouteSearchResult | undefined) => {
     if (route) {
       const mailtoAddress =
-        process.env.REACT_APP_BRAND === 'brunoni'
+        import.meta.env.VITE_BRAND === 'brunoni'
           ? 'mailto:platform@mybrunoni.ch'
           : 'mailto:platform@myallmarine.ch';
       return (

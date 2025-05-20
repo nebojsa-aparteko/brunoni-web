@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) => ({
             width: 'auto',
           },
         } as Record<string, CSSProperties>
-      )[process.env.REACT_APP_BRAND || ''] || {},
+      )[import.meta.env.VITE_BRAND || ''] || {},
     [theme.breakpoints.down('sm')]: {
       '& > img': {
         top: 0,
@@ -153,7 +153,7 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
 }));
 
 export const getLogo = () => {
-  return process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
+  return import.meta.env.VITE_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
 };
 
 const getGuide = (path: string): any | undefined => {
@@ -285,7 +285,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={getLogo()}
-                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>
@@ -440,13 +440,13 @@ const Navbar: React.FC = () => {
                       )}
                     </Fragment>
                   )
-                ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
+                ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">
                       <Typography variant="body1">Visit brunoni.ch</Typography>
                     </Button>
                   </div>
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://allmarine.ch">
                       <Typography variant="body1">Visit allmarine.ch</Typography>
@@ -473,7 +473,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={getLogo()}
-                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>
@@ -528,13 +528,13 @@ const Navbar: React.FC = () => {
 
               {user !== undefined && user !== null ? (
                 <ListItemLink primary="Get Quote" to="/quotes/get" onClick={handleDrawerToggle} />
-              ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
+              ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
                 <ListItemLink
                   primary="Visit brunoni.ch"
                   to="https://brunoni.ch"
                   onClick={handleDrawerToggle}
                 />
-              ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+              ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                 <ListItemLink
                   primary="Visit  allmarine.ch"
                   to="https://allmarine.ch"

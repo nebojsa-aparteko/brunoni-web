@@ -121,7 +121,7 @@ const postponePayments = async (offset: number, user: any, weeklyPayment: Weekly
   try {
     const token = await user.getIdToken();
     console.log('Postponing');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/weeklyPayment`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',

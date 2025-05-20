@@ -172,7 +172,7 @@ const GetQuotes: React.FC<Props> = () => {
           console.warn('Failed to push crisp command.');
         }
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/quotes/create`, {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',
@@ -418,7 +418,7 @@ const GetQuotes: React.FC<Props> = () => {
             </Grid>
           </Box>
         </Paper>
-        {process.env.NODE_ENV !== 'production' && (
+        {import.meta.env.MODE !== 'production' && (
           <Box mt={4}>
             <Typography variant="subtitle2">This is visible in development only.</Typography>
             <Typography variant="h5">For testing purposes please use following options:</Typography>

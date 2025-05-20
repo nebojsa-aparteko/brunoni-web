@@ -166,7 +166,7 @@ navbarShepherdTour.addSteps([
     title: 'Log Out',
     text:
       'No need to log out. Just close the window and stay logged in. If needed, just open ' +
-      (process.env.REACT_APP_BRAND === 'brunoni' ? 'MyBrunoni.ch' : 'MyAllmarine.ch') +
+      (import.meta.env.VITE_BRAND === 'brunoni' ? 'MyBrunoni.ch' : 'MyAllmarine.ch') +
       " and you are online. You don't have to log in every time. Awesome isn't it?",
     attachTo: { element: '#logOutNav', on: 'right' },
     buttons: [

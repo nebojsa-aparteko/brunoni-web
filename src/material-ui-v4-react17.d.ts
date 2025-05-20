@@ -16,6 +16,13 @@ declare module '@material-ui/core' {
     defaultComponent: D;
   }
 
+  interface SvgIcon<P = {}, D extends ElementType = 'svg'> {
+    props: P & {
+      component?: D;
+    };
+    defaultComponent: D;
+  }
+
   interface IconButtonTypeMap<P = {}, D extends ElementType = 'button'> {
     props: P & {
       component?: D;

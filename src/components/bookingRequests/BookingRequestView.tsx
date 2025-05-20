@@ -672,7 +672,7 @@ const BookingRequestView: React.FC<Props> = ({ bookingRequest }) => {
       try {
         dispatch({ type: 'START_GLOBAL_LOADING' });
         const token = await user.getIdToken();
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/bookingRequest`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/bookingRequest`, {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',

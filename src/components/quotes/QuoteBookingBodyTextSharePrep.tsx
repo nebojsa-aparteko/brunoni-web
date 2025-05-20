@@ -51,7 +51,7 @@ export const buildMailToLink = (
   [user, userData, client]: [firebase.User, UserRecord, Client],
 ) => {
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni'
+    import.meta.env.VITE_BRAND === 'brunoni'
       ? 'mailto:platform@mybrunoni.ch'
       : 'mailto:platform@myallmarine.ch';
   if (quote) {
@@ -87,9 +87,9 @@ export const buildSpecialRequestLink = (
   quote: Quote | undefined,
   [user, userData, client]: [firebase.User, UserRecord, Client],
 ) => {
-  if (process.env.REACT_APP_BRAND === 'brunoni') return '';
+  if (import.meta.env.VITE_BRAND === 'brunoni') return '';
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni'
+    import.meta.env.VITE_BRAND === 'brunoni'
       ? 'mailto:platform@mybrunoni.ch'
       : 'mailto:platform@myallmarine.ch';
   if (quote) {

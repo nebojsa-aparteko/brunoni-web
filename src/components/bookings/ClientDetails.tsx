@@ -1,9 +1,12 @@
 import React from 'react';
-import type { ClientDetails as ClientDetailsType } from './BookingSummary.types';
+import UserRecord from '../../model/UserRecord';
 
-interface Props extends ClientDetailsType {}
+export interface ClientDetails {
+  forwarder?: UserRecord;
+  bkgRef?: string;
+}
 
-export const ClientDetails: React.FC<Props> = ({ forwarder }) => {
+export const ClientDetails: React.FC<ClientDetails> = ({ forwarder }) => {
   if (!forwarder) {
     return null;
   }

@@ -13,7 +13,7 @@ import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 import QuoteGroupsProvider from '../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -45,7 +45,7 @@ const QuoteGroups: React.FC = () => {
   const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
 
   const history = useHistory();
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = {

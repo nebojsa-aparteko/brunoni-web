@@ -203,14 +203,14 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     id: doc.id,
     ...doc.data(),
   }));
-  const normalizedPinnedActivities = useMemo(
+  const normalizedPinnedActivities: ActivityLogItem[] = useMemo(
     () =>
       map(
         flow(
           update('at', invoke('toDate')),
           update('paymentActivityData', normalizePaymentActivityData),
         ),
-      )(pinnedActivities) as ActivityLogItem[],
+      )(pinnedActivities) as [],
     [pinnedActivities],
   );
 
@@ -394,7 +394,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
                 <img
-                  src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
+                  src={import.meta.env.VITE_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
                   alt=""
                   className={classes.logo}
                 />

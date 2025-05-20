@@ -155,25 +155,28 @@ const SendEmailContent = ({
     console.log('Sending payment confirmation mail...');
     try {
       dispatch({ type: 'START_GLOBAL_LOADING' });
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/paymentConfirmation`,
+        {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bcc: selectedContactBCC,
+            cc: selectedContactCC || [],
+            contactTo: selectedContactTo || [],
+            portId: carrierSetting.port?.id,
+            freeText: additionalInfo,
+            bookingId: bookingId,
+          }),
         },
-        body: JSON.stringify({
-          bcc: selectedContactBCC,
-          cc: selectedContactCC || [],
-          contactTo: selectedContactTo || [],
-          portId: carrierSetting.port?.id,
-          freeText: additionalInfo,
-          bookingId: bookingId,
-        }),
-      });
+      );
       if (response.ok) {
         const resp = await response.json();
         dispatch({ type: 'STOP_GLOBAL_LOADING' });

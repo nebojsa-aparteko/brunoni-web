@@ -118,12 +118,12 @@ const getEquipmentSummary = async (
     let url: string;
     if (category === BookingCategory.Export) {
       url = `${
-        process.env.REACT_APP_API_URL
+        import.meta.env.VITE_REACT_APP_API_URL
       }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${startWeek}&startWeekYear=${startWeekYear}&endWeek=${endWeek}&endWeekYear=${endWeekYear}&${query(
         flow(omitBy(isNil), pick(['containerTypes']))(filters),
       )}`;
     } else {
-      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
+      url = `${import.meta.env.VITE_REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
         flow(omitBy(isNil), pick(['containerTypes']))(filters),
       )}`;
     }

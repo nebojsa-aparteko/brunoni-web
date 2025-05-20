@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useEffect } from 'react';
-import { Route, Switch } from 'react-router';
+import { Route, Switch, useHistory } from 'react-router';
 import { Backdrop, CircularProgress, makeStyles, Theme } from '@material-ui/core';
+import queryString from 'query-string';
 
 import Routes from './pages/Routes';
 import Dashboard from './pages/Dashboard';
@@ -34,8 +35,6 @@ import BookingListFilterProvider from './providers/BookingListFilterProvider';
 import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
 import MyDayPage from './pages/MyDayPage';
-import * as QueryString from 'querystring';
-import { useHistory } from 'react-router-dom';
 import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 import CommissionsPage from './pages/CommissionsPage';
@@ -174,7 +173,7 @@ const App: React.FC = () => {
 
   // If we come from email notification, we want to read that notification and delete it from url
   useEffect(() => {
-    const params = QueryString.parse(window.location.search.replace('?', ''));
+    const params = queryString.parse(window.location.search);
 
     if (params.readNotification && userRecord) {
       const notificationId = params.readNotification as string;
@@ -190,7 +189,7 @@ const App: React.FC = () => {
               NotificationStatusAction.READ_NOTIFICATION,
             ).then(() => {
               delete params.readNotification;
-              history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+              history.replace(`${window.location.pathname}?${queryString.stringify(params)}`);
             });
           });
       } else {
@@ -201,7 +200,7 @@ const App: React.FC = () => {
           NotificationStatusAction.READ_NOTIFICATION,
         ).then(() => {
           delete params.readNotification;
-          history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+          history.replace(`${window.location.pathname}?${queryString.stringify(params)}`);
         });
       }
     }
@@ -227,9 +226,9 @@ const App: React.FC = () => {
                   )}
                 </div>
                 <ScrollToTop className={classes.goTop} />
-                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                {import.meta.env.VITE_BRAND === 'brunoni' ? (
                   <BrunoniFooter />
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                   <AllmarineFooter />
                 ) : null}
               </BookingRequestsFilterProvider>

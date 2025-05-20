@@ -3,8 +3,8 @@ import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import IMO from '../../model/IMO';
 import OOG from '../../model/OOG';
 import React from 'react';
-import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
-import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
+import ContainerIconSVG from '../../assets/container.svg?react';
+import PackageIconSVG from '../../assets/package.svg?react';
 import DepotLocationIcon from '@material-ui/icons/LocalShipping';
 import Typography from '@material-ui/core/Typography';
 

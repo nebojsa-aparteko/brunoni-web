@@ -203,7 +203,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           [
             'quote-last-viewed-link',
             String(
-              process.env.REACT_APP_BRAND === 'brunoni'
+              import.meta.env.VITE_BRAND === 'brunoni'
                 ? `https://mybrunoni.ch/quotes/${quote.id}`
                 : `https://myallmarine.ch/quotes/${quote.id}`,
             ),
@@ -226,7 +226,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
             {
               quoteId: String(quote.id),
               quoteLink: String(
-                process.env.REACT_APP_BRAND === 'brunoni'
+                import.meta.env.VITE_BRAND === 'brunoni'
                   ? `https://mybrunoni.ch/quotes/${quote.id}`
                   : `https://myallmarine.ch/quotes/${quote.id}`,
               ),
@@ -301,7 +301,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 <Box mb={2}>
                   <img
                     src={getLogo()}
-                    alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                    alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                     className={classes.logo}
                   />
                 </Box>
@@ -405,21 +405,21 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                     <Typography variant="body1">
                       <br />
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>Your Brunoni-Team</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>Your Allmarine-Team</span>
                       ) : null}
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>Tel. 044 455 58 58</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>Tel. 044 533 38 48</span>
                       ) : null}
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>info@brunoni.ch</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>info@allmarine.ch</span>
                       ) : null}
                     </Typography>

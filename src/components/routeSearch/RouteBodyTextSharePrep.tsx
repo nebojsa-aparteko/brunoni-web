@@ -61,7 +61,7 @@ export const RouteInfoBodyHTML: React.FC<Props> = ({ route }) => (
     </p>
     <p style={paragraphStyles}>
       Source:{' '}
-      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+      {import.meta.env.VITE_BRAND === 'brunoni' ? (
         <a href="https://mybrunoni.ch">mybrunoni.ch</a>
       ) : (
         <a href="https://myallmarine.ch">myallmarine.ch</a>
@@ -106,7 +106,7 @@ ${route.OriginInfo.Port.PortName.split('<br/> ').join('\n')}
 Destination Address:
 ${route.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}
 
-Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
+Source: ${import.meta.env.VITE_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
 
 ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.`;
 };

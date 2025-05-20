@@ -3,13 +3,13 @@ import RouteSearch from '../components/RouteSearch';
 import Meta from '../components/Meta';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import { useHistory } from 'react-router';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 import { Box } from '@material-ui/core';
 
 const Routes: React.FC = () => {
   const history = useHistory();
   const [isPicker] = useState(
-    QueryString.parse(window.location.search.replace('?', '')).isPicker === 'true',
+    queryString.parse(window.location.search.replace('?', '')).isPicker === 'true',
   );
 
   const handleBookNow = (schedule?: RouteSearchResult) => {

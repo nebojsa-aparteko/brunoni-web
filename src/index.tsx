@@ -32,9 +32,8 @@ import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+// Environment variables are handled by Vite automatically
+// https://vitejs.dev/guide/env-and-mode.html
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -49,7 +48,7 @@ const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
 
-export const showCrispChat = (show: Boolean) => {
+export const showCrispChat = (show: boolean) => {
   try {
     $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
   } catch (e) {

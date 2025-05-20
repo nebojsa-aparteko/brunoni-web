@@ -17,7 +17,7 @@ import { ActivityLogProvider } from './ActivityLogContext';
 import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
 import { useHistory } from 'react-router-dom';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 import { BookingRequest } from '../../../model/BookingRequest';
 import List from '@material-ui/core/List';
 
@@ -60,7 +60,7 @@ const ActivityLogView: React.FC<Props> = ({
 
   useLayoutEffect(() => {
     setTimeout(() => {
-      const params = QueryString.parse(window.location.search.replace('?', ''));
+      const params = queryString.parse(window.location.search.replace('?', ''));
       if (params.focusComment) {
         const activityId = params.focusComment as string;
         //read that notification
@@ -81,7 +81,7 @@ const ActivityLogView: React.FC<Props> = ({
           },
         );
         delete params.focusComment;
-        history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+        history.replace(`${window.location.pathname}?${queryString.stringify(params)}`);
       }
     }, 1000);
   }, [history]);

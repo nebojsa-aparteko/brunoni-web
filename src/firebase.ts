@@ -42,13 +42,13 @@ const productionConfig = {
 };
 
 const firebaseConfig =
-  process.env.REACT_APP_ENV === 'stage'
+  import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging'
     ? developmentConfig // TODO this means that stage.brunoni.ch will use brunoni-allmarine DB. Good for now, revisit later :)
-    : process.env.NODE_ENV === 'production'
-      ? productionConfig[process.env.REACT_APP_BRAND as 'brunoni' | 'allmarine']
-      : process.env.REACT_APP_API_URL === 'https://stage-dot-brunoni.appspot.com'
+    : import.meta.env.MODE === 'production'
+      ? productionConfig[import.meta.env.VITE_BRAND as 'brunoni' | 'allmarine']
+      : import.meta.env.VITE_REACT_APP_API_URL === 'https://stage-dot-brunoni.appspot.com'
         ? productionConfig.brunoni
-        : process.env.REACT_APP_API_URL === 'https://stage-dot-allmarine.appspot.com'
+        : import.meta.env.VITE_REACT_APP_API_URL === 'https://stage-dot-allmarine.appspot.com'
           ? productionConfig.allmarine
           : developmentConfig;
 

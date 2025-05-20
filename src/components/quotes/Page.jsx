@@ -4,13 +4,13 @@ import { useLocation } from 'react-router';
 import PropTypes from 'prop-types';
 import Meta from '../Meta';
 
-const { NODE_ENV, REACT_APP_GA_MEASUREMENT_ID: GA_MEASUREMENT_ID } = process.env;
+const { MODE, REACT_APP_GA_MEASUREMENT_ID: GA_MEASUREMENT_ID } = import.meta.env;
 
 function Page({ title, children, ...rest }) {
   const location = useLocation();
 
   useEffect(() => {
-    if (NODE_ENV !== 'production') {
+    if (MODE !== 'production') {
       return;
     }
 

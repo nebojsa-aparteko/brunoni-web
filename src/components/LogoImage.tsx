@@ -5,7 +5,7 @@ import React, { ImgHTMLAttributes } from 'react';
 const LogoImage: React.FC<ImgHTMLAttributes<any>> = ({ ...props }) => {
   return (
     <img
-      src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
+      src={import.meta.env.VITE_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
       alt=""
       {...props}
     />

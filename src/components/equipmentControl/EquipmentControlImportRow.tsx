@@ -31,7 +31,7 @@ const getBookingsByEC = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}&category=Import`,
+      `${import.meta.env.VITE_REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}&category=Import`,
       {
         method: 'GET',
         mode: 'cors',

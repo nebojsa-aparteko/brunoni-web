@@ -31,7 +31,7 @@ import {
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { R, SegmentsEntity } from './LandTransportSearch';
-import { ReactComponent as EcologyIconSVG } from '../../assets/ecology.svg';
+import EcologyIconSVG from '../../assets/ecology.svg?react';
 import { TransportModeLabels, TransportModeType } from '../../model/land-transport/TransportMode';
 import { groupBy } from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';

@@ -29,7 +29,7 @@ import FirestoreCollectionProvider from '../providers/FirestoreCollection';
 import Tags from '../contexts/Tags';
 import { TagCategory } from '../model/Tag';
 import { BookingRequestStatusCode } from '../model/BookingRequest';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 import { useHistory } from 'react-router';
 import useUser from '../hooks/useUser';
 
@@ -113,7 +113,7 @@ const BookingsPageContainer: React.FC = () => {
 
   const history = useHistory();
 
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = !actingAs

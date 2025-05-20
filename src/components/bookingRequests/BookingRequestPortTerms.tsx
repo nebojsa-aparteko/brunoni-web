@@ -53,7 +53,7 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
   };
 
   const handleAdminLabel = () => {
-    switch (process.env.REACT_APP_BRAND) {
+    switch (import.meta.env.VITE_BRAND) {
       case 'brunoni':
         return 'Brunoni';
       case 'allmarine':

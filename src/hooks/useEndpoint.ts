@@ -28,7 +28,7 @@ export default function useEndpoint<B, T>(
       try {
         const token = await user.getIdToken();
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}${uri}`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${uri}`, {
           method: 'GET',
           mode: 'cors',
           cache: 'no-cache',

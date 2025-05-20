@@ -67,7 +67,7 @@ export const buildMailToLink = (
   client: Client,
 ) => {
   const mailtoAddress =
-    process.env.REACT_APP_BRAND === 'brunoni'
+    import.meta.env.VITE_BRAND === 'brunoni'
       ? 'mailto:platform@mybrunoni.ch'
       : 'mailto:platform@myallmarine.ch';
   return (

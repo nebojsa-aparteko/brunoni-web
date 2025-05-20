@@ -10,7 +10,7 @@ const styles = (theme: Theme) =>
     container: {
       height: 0,
       padding: `${200 / 14}%`,
-      background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
+      background: `url(../assets/hero.${import.meta.env.VITE_BRAND}.jpg)})`,
       backgroundSize: 'cover',
     },
   });

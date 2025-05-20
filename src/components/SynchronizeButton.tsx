@@ -41,7 +41,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
         const token = await user.getIdToken();
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/synchronization/${collection}/${alphacomClientId}`,
+          `${import.meta.env.VITE_REACT_APP_API_URL}/synchronization/${collection}/${alphacomClientId}`,
           {
             method: 'POST',
             mode: 'cors',

@@ -116,7 +116,7 @@ const postponePayment = async (offset: number, user: any, weeklyPayment: WeeklyP
   try {
     const token = await user.getIdToken();
     console.log('Postponing');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/weeklyPayment`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -277,7 +277,7 @@ const AccountingWeeklyPayment = ({
       if (item.status && !editRestriction(item.status!.at as Date)) {
         return enqueueSnackbar(
           <Typography color="inherit">
-            {`Failed to edit item - You cant change status after ${process.env.EDIT_RESTRICTION_TIME} from last change!`}
+            {`Failed to edit item - You cant change status after ${import.meta.env.VITE_EDIT_RESTRICTION_TIME} from last change!`}
           </Typography>,
           {
             variant: 'error',

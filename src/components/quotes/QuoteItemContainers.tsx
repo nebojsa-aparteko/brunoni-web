@@ -20,8 +20,8 @@ import Container from '../../model/Container';
 import CommodityType from '../../model/CommodityType';
 import { getLocationLabel } from '../inputs/LocationInput';
 import DepotLocationIcon from '@material-ui/icons/LocalShipping';
-import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
-import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
+import ContainerIconSVG from '../../assets/container.svg?react';
+import PackageIconSVG from '../../assets/package.svg?react';
 
 interface Props {
   containers: Container[];

@@ -20,7 +20,8 @@ interface CheckListProps {
 }
 
 export const editRestriction = (date: Date) =>
-  differenceInMilliseconds(new Date(), date) <= Number(process.env.EDIT_RESTRICTION_TIME) || 600000;
+  differenceInMilliseconds(new Date(), date) <=
+    Number(import.meta.env.VITE_EDIT_RESTRICTION_TIME) || 600000;
 
 function a11yProps(index: any) {
   return {

@@ -11,7 +11,7 @@ import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
 import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
 import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
 import { useHistory } from 'react-router';
-import QueryString from 'querystring';
+import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {
@@ -35,7 +35,7 @@ function a11yProps(index: any) {
 const TeamManagementPage: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = {

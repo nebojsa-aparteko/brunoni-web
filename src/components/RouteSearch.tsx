@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
-import querySting from 'querystring';
+import querySting from 'query-string';
 import formatDate from 'date-fns/format';
 import isObject from 'lodash/fp/isObject';
 import update from 'lodash/fp/update';
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '> .sticky-outer-wrapper > .sticky-inner-wrapper': {
       display: 'flex',
     },
-    background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
+    background: `url(../assets/hero.${import.meta.env.VITE_BRAND}.jpg})`,
     paddingTop: theme.spacing(10),
     paddingBottom: theme.spacing(10),
     backgroundSize: 'cover',
@@ -120,7 +120,7 @@ const RouteSearch: React.FC<Props> = ({
       carrier: carrierFilter,
     });
 
-    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
+    return `${import.meta.env.VITE_REACT_APP_API_URL}/routes?${search}`;
   }, [params]);
 
   const [user, userData] = useUser();
