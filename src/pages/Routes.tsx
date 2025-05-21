@@ -2,19 +2,19 @@ import React, { Fragment, useState } from 'react';
 import RouteSearch from '../components/RouteSearch';
 import Meta from '../components/Meta';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { Box } from '@material-ui/core';
 
 const Routes: React.FC = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [isPicker] = useState(
     queryString.parse(window.location.search.replace('?', '')).isPicker === 'true',
   );
 
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('schedule', JSON.stringify(schedule));
-    history.push('/online-booking');
+    navigate('/online-booking');
   };
 
   return (

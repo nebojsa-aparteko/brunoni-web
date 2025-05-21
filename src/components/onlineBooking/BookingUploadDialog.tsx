@@ -40,7 +40,7 @@ import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
 import { compact, flow, isNil, omitBy, update } from 'lodash/fp';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import querySting from 'query-string';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
@@ -538,7 +538,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [, userRecord] = useUser();
   const ports = useContext(Ports);
@@ -608,7 +608,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               dispatch({ type: 'STOP_GLOBAL_LOADING' });
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
-              history.push(`/booking-requests/${docReference}`);
+              navigate(`/booking-requests/${docReference}`);
             }
           })
           .catch(error => {

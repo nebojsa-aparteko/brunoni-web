@@ -20,7 +20,7 @@ import firebase from '../firebase';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import LoginDialogContext from '../contexts/LoginDialog';
 import UserContext from '../contexts/UserContext';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { DateFormats } from '../utilities/formattingHelpers';
 
 interface Props {
@@ -88,7 +88,7 @@ const SpecialOffer: React.FC<Props> = ({
   validUntil,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const user = useContext(UserContext);
   const loginDialog = useContext(LoginDialogContext);
   const setParams = useContext(RouteSearchContext)[1];
@@ -110,7 +110,7 @@ const SpecialOffer: React.FC<Props> = ({
     });
 
     if (user) {
-      history.push('/quotes/get');
+      navigate('/quotes/get');
     } else {
       loginDialog.open({
         message: 'Log in first to claim special offer.',

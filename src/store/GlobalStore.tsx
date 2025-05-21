@@ -1,4 +1,5 @@
-import React, { createContext, Dispatch, useCallback, useEffect, useReducer } from 'react';
+import React from 'react';
+import { ReactNode, createContext, Dispatch, useEffect, useReducer } from 'react';
 import {
   globalActions,
   GlobalAppState,
@@ -18,7 +19,11 @@ export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActio
   () => {},
 ]);
 
-const GlobalStore: React.FC = ({ children }) => {
+interface GlobalStoreProps {
+  children: ReactNode;
+}
+
+const GlobalStore = ({ children }: GlobalStoreProps) => {
   const [state, dispatch] = useReducer(globalReducer, defaultState);
   const { snackbarMessage, promiseActivity } = state;
   const { enqueueSnackbar } = useSnackbar();

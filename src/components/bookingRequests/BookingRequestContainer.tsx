@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../../components/dashboard/ChartsCircularProgress';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -73,15 +73,16 @@ const BookingRequestContainerContent: React.FC<ContentProps> = ({ bookingRequest
   );
 };
 
-interface Props extends RouteComponentProps<{ id: string }> {}
+const BookingRequestContainer: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const bookingRequest = useBookingRequest(id || '');
 
-const BookingRequestContainer: React.FC<Props> = ({ match }) => {
-  const history = useHistory();
-  const bookingRequest = useBookingRequest(match.params.id);
-
-  if (!bookingRequest.exists) {
-    history.push('/not-found');
-  }
+  useEffect(() => {
+    if (!bookingRequest.exists) {
+      navigate('/not-found', { replace: true });
+    }
+  }, [bookingRequest.exists, navigate]);
 
   return (
     <BookingRequestProvider>

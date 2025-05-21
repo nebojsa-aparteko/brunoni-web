@@ -66,7 +66,7 @@ import ContainerTypes from '../contexts/ContainerTypes';
 import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import BookNowButton from './BookNowButton';
@@ -140,7 +140,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [user, userData] = useUser();
   const client = userData?.company!;
@@ -164,7 +164,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('quote', JSON.stringify(quote));
     localStorage.setItem('schedule', JSON.stringify(schedule));
-    history.push('/online-booking');
+    navigate('/online-booking');
   };
 
   return (
@@ -226,7 +226,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const [, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
@@ -371,7 +371,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   }
 
   if (!isLoading && !quoteGroup) {
-    history.push('/not-found');
+    navigate('/not-found');
   }
 
   return !quotesByCarrier ? (

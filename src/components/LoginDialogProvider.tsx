@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
@@ -38,7 +38,7 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const queryParams = location.search ? queryString.parse(location.search.slice(1)) : {};
   const token = queryParams.logIn as string;
 
@@ -70,7 +70,7 @@ const LoginDialogProvider: React.FC<Props> = ({ children }) => {
     (async () => {
       try {
         const search = queryString.stringify(omit(queryParams, 'logIn'));
-        history.replace({ ...location, search });
+        navigate({ pathname: location.pathname, search }, { replace: true });
         await firebase.auth().signInWithCustomToken(token);
         setParams(null);
         enqueueSnackbar(<Typography color="inherit">Sign in successful!</Typography>, {

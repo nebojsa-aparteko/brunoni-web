@@ -26,7 +26,7 @@ import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { BookingRequest, BookingRequestItinerary } from '../../model/BookingRequest';
 import Avatar from 'react-avatar';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@material-ui/icons/Close';
 import BookingRequestChecklistContent from './checklist/BookingRequestChecklistContent';
 import { ActivityLogProvider } from '../bookings/checklist/ActivityLogContext';
@@ -274,7 +274,7 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   onProgressClick,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const availableTags = useContext(Tags);
   const [tags, setTags] = useState(
     availableTags &&
@@ -303,10 +303,10 @@ export const BookingRequestRow: React.FC<BookingRequestRowProps> = ({
   const handleRowClick = useCallback(
     (id: string) => {
       if (!preventDefaultClick) {
-        history.push(`/booking-requests/${id}`);
+        navigate(`/booking-requests/${id}`);
       }
     },
-    [history, preventDefaultClick],
+    [navigate, preventDefaultClick],
   );
 
   return (

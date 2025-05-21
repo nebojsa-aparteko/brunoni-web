@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import useUser from '../../hooks/useUser';
 import {
   getDestinationPort,
@@ -31,7 +31,7 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
   preventDefaultClick,
 }) => {
   const classes = useVesselAllocationStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [, userRecord] = useUser();
 
@@ -43,7 +43,7 @@ export const BookingRequestSimplifiedRow: React.FC<BookingRequestRowProps> = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [history, preventDefaultClick],
+    [navigate, preventDefaultClick],
   );
 
   return (

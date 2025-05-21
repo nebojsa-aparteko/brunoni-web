@@ -55,7 +55,7 @@ import { GlobalContext } from '../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { getLogo } from './Navbar';
 import PromoBox from './PromoBox';
 
@@ -155,7 +155,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const [user, userData] = useUser();
   const clients = useClients();
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -286,7 +286,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('quote', JSON.stringify(quote));
     localStorage.setItem('schedule', JSON.stringify(schedule));
-    history.push('/online-booking');
+    navigate('/online-booking');
   };
 
   return (

@@ -12,7 +12,7 @@ import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { isDashboardUser } from '../model/UserRecord';
 
 const useStyles = makeStyles(() => ({
@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
 
 const UserWidget: React.FC = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
   const [user, userData] = useUser();
@@ -55,8 +55,8 @@ const UserWidget: React.FC = () => {
     } else {
       setActingAs(user.uid);
     }
-    history.push('/');
-  }, [setAnchorEl, setActingAs, user, history, actingAs]);
+    navigate('/');
+  }, [setAnchorEl, setActingAs, user, navigate, actingAs]);
 
   const handleLogOut = useCallback(async () => {
     try {

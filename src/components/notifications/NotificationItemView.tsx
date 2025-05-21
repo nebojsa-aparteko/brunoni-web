@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import Notification, { NotificationType } from '../../model/Notification';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Activity from '../bookings/checklist/Activity';
 import Alert from './Alert';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
@@ -141,7 +141,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({
   ...other
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const userRecord = useUser()[1];
   const [actingAs] = useContext(ActingAs);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -185,14 +185,14 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({
         handleShowDrawer();
         if (notification.type === NotificationType.COMMENT) {
           notification.referenceObject &&
-            history.push(
+            navigate(
               `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
                 notification.referenceID
               }?focusComment=${notification.activity?.id}`,
             );
         } else {
           notification.referenceObject &&
-            history.push(
+            navigate(
               `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
                 notification.referenceID
               }`,
@@ -222,7 +222,7 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({
       .then(() => {
         handleShowDrawer();
         notification.referenceObject &&
-          history.push(
+          navigate(
             `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
               notification.referenceID
             }?focusComment=${notification.activity?.id}`,

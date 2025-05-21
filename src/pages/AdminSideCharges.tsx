@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import { Route, RouteComponentProps, Switch } from 'react-router';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import SideCharges from '../components/admin/SideCharges';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
@@ -34,9 +34,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, match }) => {
+const AdminSideCharges: React.FC = () => {
   const classes = useStyles();
   const carriers = useContext(Carriers);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <Box m={4}>
@@ -56,7 +58,7 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
                         key={carrier.id}
                         button
                         selected={selected}
-                        onClick={() => (selected ? history.push('/charges') : history.push(path))}
+                        onClick={() => navigate(selected ? '/charges' : path)}
                       >
                         <ListItemAvatar className={classes.avatarContainer}>
                           <FiberManualRecordIcon
@@ -73,10 +75,10 @@ const AdminSideCharges: React.FC<RouteComponentProps> = ({ history, location, ma
         </Grid>
         <Grid item xs={9}>
           <Paper>
-            <Switch>
-              <Route path={`${match.path}/:id`} component={SideCharges} />
-              <Route component={GetStarted} />
-            </Switch>
+            <Routes>
+              <Route path=":id" element={<SideCharges />} />
+              <Route path="/" element={<GetStarted />} />
+            </Routes>
           </Paper>
         </Grid>
       </Grid>

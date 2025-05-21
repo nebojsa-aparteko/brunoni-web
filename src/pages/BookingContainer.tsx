@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 import BookingView from '../components/bookings/BookingView';
 import { normalizeBooking } from '../providers/BookingsProvider';
 import useFirestoreDocument from '../hooks/useFirestoreDocument';
 import { Booking } from '../model/Booking';
 import { Container, makeStyles, Paper, Theme } from '@material-ui/core';
 import ChartsCircularProgress from '../components/dashboard/ChartsCircularProgress';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Tags from '../contexts/Tags';
 import { TagCategory } from '../model/Tag';
 import FirestoreCollectionProvider from '../providers/FirestoreCollection';
@@ -17,13 +17,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Props extends RouteComponentProps<{ id: string }> {}
-
-const BookingContainer: React.FC<Props> = ({ match }) => {
+const BookingContainer: React.FC = () => {
   const classes = useStyles();
-  const bookingId = match.params.id;
-
-  const history = useHistory();
+  const { id: bookingId } = useParams();
+  const navigate = useNavigate();
   const bookingSnapshot = useFirestoreDocument('bookings', bookingId);
 
   const bookingDoc = bookingSnapshot
@@ -36,7 +33,7 @@ const BookingContainer: React.FC<Props> = ({ match }) => {
   );
 
   if (bookingSnapshot === null || (bookingSnapshot && !bookingSnapshot.exists)) {
-    history.push('/not-found');
+    navigate('/not-found');
   }
 
   return !booking ? (

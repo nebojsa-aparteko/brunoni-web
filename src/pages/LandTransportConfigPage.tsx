@@ -9,14 +9,14 @@ import useLandTransportProviders from '../hooks/useLandTransportProviders';
 import EditableTable from '../components/EditableTable';
 import { Container, IconButton } from '@material-ui/core';
 import { format } from 'date-fns';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import SettingsIcon from '@material-ui/icons/Settings';
 import useModal from '../hooks/useModal';
 import PredefinedAddOnRatesModal from '../components/landTransport/config/PredefinedAddOnRatesModal';
 
 const LandTransportConfigPage: React.FC = () => {
   const providers = useLandTransportProviders();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <Fragment>
@@ -41,7 +41,7 @@ const LandTransportConfigPage: React.FC = () => {
           addItem={item => addLandTransportProvider(item)}
           editItem={(id, item) => editLandTransportProvider(id, item)}
           deleteItem={id => deleteLandTransportProvider(id)}
-          onRowClick={item => history.push(`/land-transport-config/${item.id}`)}
+          onRowClick={item => navigate(`/land-transport-config/${item.id}`)}
         />
       </Container>
       {isOpen && (

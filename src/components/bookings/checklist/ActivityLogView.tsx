@@ -16,7 +16,7 @@ import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
 import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { BookingRequest } from '../../../model/BookingRequest';
 import List from '@material-ui/core/List';
@@ -56,7 +56,7 @@ const ActivityLogView: React.FC<Props> = ({
   pinnedCommentsCount,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     setTimeout(() => {
@@ -81,10 +81,10 @@ const ActivityLogView: React.FC<Props> = ({
           },
         );
         delete params.focusComment;
-        history.replace(`${window.location.pathname}?${queryString.stringify(params)}`);
+        navigate(`${window.location.pathname}?${queryString.stringify(params)}`, { replace: true });
       }
     }, 1000);
-  }, [history]);
+  }, [navigate]);
 
   return (
     <Card id="activityLog" className={classes.spacing} style={{ overflow: 'unset' }}>

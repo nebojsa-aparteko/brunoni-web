@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
@@ -68,7 +68,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   assignedUsers,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const requestedById = quotes[0].userId;
   const requestedBy = useUserByAlphacomId(requestedById);
@@ -100,9 +100,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({
 
   const handleRowClick = useCallback(
     (event: React.MouseEvent<unknown>) => {
-      console.log(history.location);
-
-      history.push(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
+      navigate(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
     },
     [history, quotes, id],
   );

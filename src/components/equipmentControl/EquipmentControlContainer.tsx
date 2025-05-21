@@ -8,7 +8,7 @@ import ExportFlowsContainer from './ExportFlowsContainer';
 import OverviewsContainer from './OverviewsContainer';
 import BookingsVsStockContainer from './BookingsVsStockContainer';
 import EquipmentBookingDetailsContainer from './EquipmentBookingDetailsContainer';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -54,7 +54,7 @@ function a11yProps(index: any) {
 const EquipmentControlContainer = () => {
   const classes = useStyles();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
@@ -71,19 +71,19 @@ const EquipmentControlContainer = () => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
-        history.push('/equipment-control');
+        navigate('/equipment-control');
         break;
       case 1:
-        history.push('/equipment-control?tab=export-flows');
+        navigate('/equipment-control?tab=export-flows');
         break;
       case 2:
-        history.push('/equipment-control?tab=overviews');
+        navigate('/equipment-control?tab=overviews');
         break;
       case 3:
-        history.push('/equipment-control?tab=bookings-vs-stock');
+        navigate('/equipment-control?tab=bookings-vs-stock');
         break;
       case 4:
-        history.push('/equipment-control?tab=booking-details');
+        navigate('/equipment-control?tab=booking-details');
         break;
       default:
         break;

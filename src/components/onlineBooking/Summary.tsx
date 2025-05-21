@@ -15,7 +15,7 @@ import ItineraryItem from '../ItineraryItem';
 import RouteDeadlines from '../routeSearch/RouteDeaadlines';
 import RouteSummary from '../routeSearch/RouteSummary';
 import ContainersList from './ContainersList';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase';
 import { format } from 'date-fns';
 import useSaveFiles from '../../hooks/useSaveFiles';
@@ -286,7 +286,7 @@ export const takeQuoteDetails = (
 
 const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRequest, files }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [, userRecord] = useUser();
   const [, dispatch] = useGlobalAppState();
   const chargeCodes = useContext(ChargeCodes);
@@ -414,7 +414,7 @@ const Summary: React.FC<Props> = ({ handlePrevious, bookingRequest, setBookingRe
             } catch (e) {
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
-              history.push(`/booking-requests/${docReference}`);
+              navigate(`/booking-requests/${docReference}`);
             }
           })
           .catch(error => {

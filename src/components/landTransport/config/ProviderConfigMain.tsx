@@ -6,7 +6,7 @@ import useModal from '../../../hooks/useModal';
 import PredefinedAddOnRatesModal from './PredefinedAddOnRatesModal';
 import RoutesTable from './routes/RoutesTable';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import ManualRoutesList from './routes/ManualRoutesList';
 import PriceListConfig from './PricelistConfig';
 import ProfitTables from './ProfitTables';
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { isOpen, openModal, closeModal } = useModal();
   return (
     <>
@@ -30,11 +30,7 @@ const ProviderConfigMain: React.FC<{ provider: ProviderEntity }> = ({ provider }
         <Box display="flex" justifyContent="space-between" alignItems="flex-end" flex={1} my={4}>
           <Box px={2} display="flex" flexDirection="column" alignSelf="flex-start">
             <Box ml={-0.5}>
-              <Button
-                startIcon={<ArrowBackIcon />}
-                color="primary"
-                onClick={() => history.goBack()}
-              >
+              <Button startIcon={<ArrowBackIcon />} color="primary" onClick={() => navigate(-1)}>
                 All providers
               </Button>
             </Box>

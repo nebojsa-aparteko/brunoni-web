@@ -12,7 +12,7 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 import QuoteGroupsProvider from '../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -44,7 +44,7 @@ const QuoteGroups: React.FC = () => {
 
   const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
@@ -58,12 +58,12 @@ const QuoteGroups: React.FC = () => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
-        history.push('/quotes/groups');
+        navigate('/quotes/groups');
         setQuoteFilters &&
           setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
         break;
       case 1:
-        history.push('/quotes/groups?tab=archived');
+        navigate('/quotes/groups?tab=archived');
         setQuoteFilters &&
           setQuoteFilters(
             flow(

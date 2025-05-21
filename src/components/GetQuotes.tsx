@@ -29,7 +29,7 @@ import Container from './Container';
 import ContainerType from '../model/Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
@@ -71,7 +71,7 @@ const checkIfPortsInEurope = (originPort: Port | undefined, destinationPort: Por
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const [user, userData] = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -222,7 +222,7 @@ const GetQuotes: React.FC<Props> = () => {
           const groupId = get('groupId')(json);
 
           if (groupId) {
-            history.push(`/quotes/groups/${groupId}`);
+            navigate(`/quotes/groups/${groupId}`);
             setQuoteListContextData(set('page', 0)(quoteListContextData));
           } else {
             setDialogOpen(true);

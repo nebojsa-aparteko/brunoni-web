@@ -1,6 +1,6 @@
 import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -215,7 +215,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({
 }) => {
   const classes = useStyles();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const availableTags = useContext(Tags);
   const [tags, setTags] = useState(
     availableTags &&
@@ -225,10 +225,10 @@ export const BookingRow: React.FC<BookingRowProps> = ({
   const handleRowClick = useCallback(
     (id: string) => {
       if (!preventDefaultClick) {
-        history.push(`/bookings/${id}`);
+        navigate(`/bookings/${id}`);
       }
     },
-    [history, preventDefaultClick],
+    [navigate, preventDefaultClick],
   );
 
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
@@ -418,11 +418,11 @@ export const BookingRow: React.FC<BookingRowProps> = ({
                         <Fragment>
                           {booking.PlaceOfRecieptName}
                           <br />
-                          <Typography variant={'body2'}>
+                          <Typography variant="body2" component="div">
                             ETS.{' '}
                             {booking.PlaceOfReceiptETS
-                              ? formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG)
-                              : formatDateSafe(booking.ETS, DateFormats.LONG)}
+                              ? String(formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG))
+                              : String(formatDateSafe(booking.ETS, DateFormats.LONG))}
                           </Typography>
                         </Fragment>
                       }
@@ -437,13 +437,15 @@ export const BookingRow: React.FC<BookingRowProps> = ({
                         <Fragment>
                           {booking.FinalDestinationName}
                           <br />
-                          <Typography variant={'body2'}>
+                          <Typography variant="body2" component="div">
                             ETA.
-                            {formatDateSafe(
-                              booking.FinalDestinationETA
-                                ? booking.FinalDestinationETA
-                                : booking.ETA,
-                              DateFormats.LONG,
+                            {String(
+                              formatDateSafe(
+                                booking.FinalDestinationETA
+                                  ? booking.FinalDestinationETA
+                                  : booking.ETA,
+                                DateFormats.LONG,
+                              ),
                             )}
                           </Typography>
                         </Fragment>

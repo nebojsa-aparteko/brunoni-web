@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, useHistory, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useNavigate, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
@@ -31,6 +31,7 @@ import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
+import { createRoot } from 'react-dom/client';
 
 // Environment variables are handled by Vite automatically
 // https://vitejs.dev/guide/env-and-mode.html
@@ -145,7 +146,8 @@ const UserApp: React.FC = () => {
 };
 
 const CrispChatRouteUpdater = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     try {
@@ -157,7 +159,7 @@ const CrispChatRouteUpdater = () => {
     } catch (e) {
       console.warn('Failed to push crisp command.');
     }
-  }, [history.location.pathname]);
+  }, [location.pathname]);
 
   return null;
 };
@@ -266,7 +268,8 @@ const render = (user: firebase.User | null) => {
     </Router>
   );
 
-  ReactDOM.render(app, document.getElementById('root'));
+  createRoot(document.getElementById('root')!).render(app);
+  //   ReactDOM.render(app, document.getElementById('root'));
 };
 
 firebase.auth().onAuthStateChanged(async user => {
