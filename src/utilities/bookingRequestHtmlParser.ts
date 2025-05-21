@@ -1,7 +1,8 @@
-import cheerio from 'cheerio';
+import { load, CheerioAPI, AnyNode, Cheerio, Element } from 'cheerio';
 import { isEqual, omit } from 'lodash/fp';
 import { getEnumValueByEnumKey } from './getEnumKeyByEnumValue';
 import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
+import type { Element as DomHandlerElement } from 'domhandler';
 
 enum Types {
   //CANCELED = 'Cancelled',
@@ -154,7 +155,7 @@ interface DataNormalTable {
   [key: string]: string[][];
 }
 
-const parseOddTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
+const parseOddTable = ($: CheerioAPI, table: Cheerio<AnyNode>) => {
   let DATA: DataOddTable = {};
 
   table.find('td').each((index, td) => {
@@ -173,21 +174,23 @@ const parseOddTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
       // Iterate over <strong> siblings
       siblings.each((index, sibling) => {
         //Siblings are either <span> OR <br>.
-        const tagName = sibling.tagName;
+        const tagName = (sibling as Element).name;
         // Ignore <br>
         if (tagName === 'br') return;
         else {
           // Iterate over <span class='data_nopad'> children
-          $(sibling.childNodes).each((index, child) => {
-            // child is either <br> OR #text.
-            const tagName = child.tagName;
-            // Ignore <br>
-            if (tagName === 'br') return;
-            else {
-              const text = $(child).text().replace(/\s+/g, ' ').trim();
-              if (text) dataArray.push(text);
-            }
-          });
+          $(sibling)
+            .contents()
+            .each((index, child) => {
+              // child is either <br> OR #text.
+              const elem = child as Element;
+              // Ignore <br>
+              if (elem.type === 'tag' && elem.name === 'br') return;
+              else {
+                const text = $(child).text().replace(/\s+/g, ' ').trim();
+                if (text) dataArray.push(text);
+              }
+            });
         }
       });
       if (DATA[titleData]) {
@@ -305,7 +308,7 @@ const extractDataOddTable = (object: DataOddTable) => {
   };
 };
 
-const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
+const parseNormalTable = ($: CheerioAPI, table: Cheerio<AnyNode>) => {
   let DATA: DataNormalTable = {};
   // find table rows
   const tableRows = table.find('tr');
@@ -333,29 +336,31 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
         .children()
         .each((index, child) => {
           // child is either <br>, <strong> (inside title) OR <span> (data).
+          const elem = child as DomHandlerElement;
           // Ignore <br>
-          const tagName = child.tagName;
-          if (tagName === 'br') return;
+          if (elem.name === 'br') return;
           //insideTitle
-          if (tagName === 'strong') {
+          if (elem.name === 'strong') {
             insideTitle = $(child).text().replace(/\s+/g, ' ').trim();
             // ignore '--------------------'
             if (insideTitle?.includes('-----')) return;
             dataArray.push(insideTitle);
           }
           // data
-          if (tagName === 'span') {
+          if (elem.name === 'span') {
             // Iterate over <span class='data_nopad'> children
-            $(child.childNodes).each((index, child) => {
-              // child is either <br> OR #text.
-              const tagName = child.tagName;
-              // Ignore <br>
-              if (tagName === 'br') return;
-              else {
-                const text = $(child).text().replace(/\s+/g, ' ').trim();
-                if (text) dataArray.push(text);
-              }
-            });
+            $(child)
+              .contents()
+              .each((index, innerChild) => {
+                // child is either <br> OR #text.
+                const innerElem = innerChild as DomHandlerElement;
+                // Ignore <br>
+                if (innerElem.type === 'tag' && innerElem.name === 'br') return;
+                else {
+                  const text = $(innerChild).text().replace(/\s+/g, ' ').trim();
+                  if (text) dataArray.push(text);
+                }
+              });
           }
           if (DATA[title]) {
             DATA[title] = [...DATA[title], dataArray];
@@ -600,7 +605,7 @@ const extractDataNormalTable = (object: DataNormalTable) => {
   };
 };
 
-const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number => {
+const findOddTableIndex = ($: CheerioAPI, dataTables: Cheerio<AnyNode>): number => {
   let oddDataTableIndex = 0;
   let currTableIndex = 0;
   const nDataTables = dataTables.length;
@@ -620,7 +625,7 @@ const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number
 };
 
 export const Parse = (html: string): HtmlBookingRequest | undefined => {
-  const $ = cheerio.load(html);
+  const $ = load(html);
 
   const bookingType = $('span[class=h]').text();
 

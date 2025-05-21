@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import { AppBar, Box, Tab, Tabs } from '@material-ui/core';
 
 const XLSXViewer: React.FC<{
