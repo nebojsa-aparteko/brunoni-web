@@ -7,7 +7,7 @@ import {
   Tooltip,
   Typography,
 } from '@material-ui/core';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import { isEqual, set } from 'lodash/fp';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useContext, useMemo, useState } from 'react';

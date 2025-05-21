@@ -23,7 +23,7 @@ import BookingRequestsProvider from '../providers/BookingRequestsProvider';
 import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import InputIcon from '@material-ui/icons/Input';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import { useBookingRequestsFilterContext } from '../providers/BookingRequestsFilterProvider';
 import FirestoreCollectionProvider from '../providers/FirestoreCollection';
 import Tags from '../contexts/Tags';

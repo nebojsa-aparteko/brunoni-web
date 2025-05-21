@@ -16,7 +16,7 @@ import RouteDeadlines from '../routeSearch/RouteDeaadlines';
 import RouteSummary from '../routeSearch/RouteSummary';
 import ContainersList from './ContainersList';
 import { useNavigate } from 'react-router-dom';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import { format } from 'date-fns';
 import useSaveFiles from '../../hooks/useSaveFiles';
 import { saveFilesToFirestore } from '../bookings/InternalStorage';

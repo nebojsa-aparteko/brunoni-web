@@ -1,4 +1,4 @@
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import {
   AutomaticProviderRoute,

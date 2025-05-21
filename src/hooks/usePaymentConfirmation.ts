@@ -5,7 +5,7 @@ import {
 } from '../model/PaymentConfirmationRule';
 import useFirestoreCollection from './useFirestoreCollection';
 import { useMemo } from 'react';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 
 const usePaymentConfirmation = <T extends PaymentConfirmationType>(
   type: T,
