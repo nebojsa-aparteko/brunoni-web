@@ -319,16 +319,12 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <MenuItemLink
-                          onClick={handleMenuClose}
-                          to="/equipment"
-                          primary="EQUIPMENT SITUATION"
-                        />
-                        <MenuItemLink
-                          onClick={handleMenuClose}
-                          to="/charges"
-                          primary="SIDE CHARGES"
-                        />
+                        <MenuItemLink onClick={handleMenuClose} to="/equipment">
+                          EQUIPMENT SITUATION
+                        </MenuItemLink>
+                        <MenuItemLink onClick={handleMenuClose} to="/charges">
+                          SIDE CHARGES
+                        </MenuItemLink>
                       </Fragment>
                     )}
 
@@ -352,34 +348,26 @@ const Navbar: React.FC = () => {
                           className={classes.menu}
                           getContentAnchorEl={null}
                         >
-                          <MenuItemLink
-                            onClick={handleMenuClose}
-                            to="/charges"
-                            primary="Side Charges"
-                          />
-                          <MenuItemLink
-                            onClick={handleMenuClose}
-                            to="/weekly-payment"
-                            primary="Weekly Payment"
-                          />
-                          <MenuItemLink
-                            onClick={handleMenuClose}
-                            to="/commissions"
-                            primary="Commissions"
-                          />
-                          <MenuItemLink
-                            primary="Equipment Situation"
-                            to="/equipment"
-                            onClick={handleMenuClose}
-                          />
+                          <MenuItemLink onClick={handleMenuClose} to="/charges">
+                            Side Charges
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/weekly-payment">
+                            Weekly Payment
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/commissions">
+                            Commissions
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/equipment">
+                            Equipment Situation
+                          </MenuItemLink>
                           {isSuperAdmin(userRecord) && (
-                            <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
+                            <MenuItemLink onClick={handleMenuClose} to="/teams">
+                              Teams
+                            </MenuItemLink>
                           )}
-                          <MenuItemLink
-                            onClick={handleMenuClose}
-                            primary="Land Transport Config"
-                            to="/land-transport-config"
-                          />
+                          <MenuItemLink onClick={handleMenuClose} to="/land-transport-config">
+                            Land Transport Config
+                          </MenuItemLink>
                         </Menu>
                         {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
                         {/*{isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}*/}
