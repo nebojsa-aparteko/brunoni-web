@@ -56,7 +56,14 @@ const MyProfileContainer = () => {
   }, [userData]);
 
   return (
-    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+    <Grid
+      container
+      direction="row"
+      spacing={2}
+      justify="center"
+      alignItems="flex-start"
+      className={classes.body}
+    >
       <Grid item xs={12} md={11}>
         <Card className={classes.root}>
           <CardHeader
@@ -68,7 +75,12 @@ const MyProfileContainer = () => {
                 {userData &&
                   userData.redirectedAdmin &&
                   (userData.redirectedAdmin.firstName || userData.redirectedAdmin.lastName) && (
-                    <Box display="flex" flexWrap="nowrap" alignItems="center" justifyContent="center">
+                    <Box
+                      display="flex"
+                      flexWrap="nowrap"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
                       <Typography>Notification redirection</Typography>
                       <UserNotificationRedirectionSwitch userUid={user.uid} user={userData} />
                     </Box>
@@ -84,7 +96,10 @@ const MyProfileContainer = () => {
                 <List className={classes.list}>
                   {(userData.firstName || userData.lastName) && (
                     <ListItem>
-                      <ListItemText primary="Name:" secondary={userData.firstName + ' ' + userData.lastName} />
+                      <ListItemText
+                        primary="Name:"
+                        secondary={userData.firstName + ' ' + userData.lastName}
+                      />
                     </ListItem>
                   )}
                   {userData.emailAddress && (
@@ -104,7 +119,10 @@ const MyProfileContainer = () => {
                   )}
                   {userTeams && userTeams.length > 0 && (
                     <ListItem>
-                      <ListItemText primary="Teams:" secondary={userTeams?.map(team => team.name).join(', ')} />
+                      <ListItemText
+                        primary="Teams:"
+                        secondary={userTeams?.map(team => team.name).join(', ')}
+                      />
                     </ListItem>
                   )}
                   {userData.redirectedAdmin &&
@@ -114,7 +132,10 @@ const MyProfileContainer = () => {
                           primary="Administrator to whom notifications are redirected: "
                           secondary={
                             <Box>
-                              {userData.redirectedAdmin?.firstName + ' ' + userData.redirectedAdmin?.lastName + ' ('}
+                              {userData.redirectedAdmin?.firstName +
+                                ' ' +
+                                userData.redirectedAdmin?.lastName +
+                                ' ('}
                               <a
                                 href={`mailto:${userData.redirectedAdmin?.emailAddress}`}
                                 target="_blank"

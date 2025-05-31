@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import {
+  Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@material-ui/core';
 import { EnhancedTableToolbar } from '../../../EnhancedTableToolbar';
 import ConfirmationDialog from '../../../ConfirmationDialog';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
@@ -58,7 +67,9 @@ const RoutesTable: React.FC<RoutesTableProps> = ({ provider }) => {
 
   const routes = useLandTransportRoutes(provider.id, ProviderRoutesType.AUTOMATIC);
 
-  const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
+  const { saveFiles, deleteFiles } = useSaveFiles(
+    `land-transport-config/routes/versions/${provider.id}`,
+  );
 
   const handleSelectDeselectAll = () => {
     if (selectedRoutes.length !== routes?.length) {

@@ -48,6 +48,7 @@ import Commission from '../../model/Commission';
 import { useCommissionFilterProviderContext } from '../../providers/CommissionFilterProvider';
 import { DateRange } from '../daterangepicker/types';
 import Carrier from '../../model/Carrier';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -109,10 +110,10 @@ const checkIfStatusSelected = (
         ? platformStatus && platformStatus.includes(payment.platformStatus)
         : selectedStatuses && selectedStatuses.includes(payment.status)
       : payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED
-      ? payment.status !== WeeklyPaymentStatus.PAID
-        ? platformStatus && platformStatus.includes(payment.platformStatus)
-        : selectedStatuses && selectedStatuses.includes(payment.status)
-      : platformStatus && platformStatus.includes(payment.platformStatus)
+        ? payment.status !== WeeklyPaymentStatus.PAID
+          ? platformStatus && platformStatus.includes(payment.platformStatus)
+          : selectedStatuses && selectedStatuses.includes(payment.status)
+        : platformStatus && platformStatus.includes(payment.platformStatus)
     : selectedStatuses && selectedStatuses.includes(payment.status);
 };
 
@@ -120,7 +121,7 @@ const postponePayments = async (offset: number, user: any, weeklyPayment: Weekly
   try {
     const token = await user.getIdToken();
     console.log('Postponing');
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/weeklyPayment`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -213,7 +214,9 @@ const PaymentOverviewContainer = () => {
         setFilters(prevState => set('currency', event.target.value as Currency[])(prevState));
       }
       if (setCommissionsFilter) {
-        setCommissionsFilter(prevState => set('currency', event.target.value as Currency[])(prevState));
+        setCommissionsFilter(prevState =>
+          set('currency', event.target.value as Currency[])(prevState),
+        );
       }
     },
     [setCommissionsFilter, setFilters],
@@ -238,17 +241,24 @@ const PaymentOverviewContainer = () => {
 
       if (setFilters) {
         const platformStatuses = newSelectedValues.filter(status =>
-          Object.values(WeeklyPaymentPlatformStatus).includes(status as WeeklyPaymentPlatformStatus),
+          Object.values(WeeklyPaymentPlatformStatus).includes(
+            status as WeeklyPaymentPlatformStatus,
+          ),
         );
         const paymentStatuses = newSelectedValues.filter(status =>
           Object.values(WeeklyPaymentStatus).includes(status as WeeklyPaymentStatus),
         );
 
         setFilters(prevState =>
-          set('platformStatus', platformStatuses.length > 0 ? platformStatuses : undefined)(prevState),
+          set(
+            'platformStatus',
+            platformStatuses.length > 0 ? platformStatuses : undefined,
+          )(prevState),
         );
 
-        setFilters(prevState => set('status', paymentStatuses.length > 0 ? paymentStatuses : undefined)(prevState));
+        setFilters(prevState =>
+          set('status', paymentStatuses.length > 0 ? paymentStatuses : undefined)(prevState),
+        );
       }
     },
     [setFilters],
@@ -261,7 +271,9 @@ const PaymentOverviewContainer = () => {
       }
       if (setCommissionsFilter) {
         setCommissionsFilter(prevState =>
-          set('dateRange', { startDate: startOfDay(date), endDate: startOfDay(date) } as DateRange)(prevState),
+          set('dateRange', { startDate: startOfDay(date), endDate: startOfDay(date) } as DateRange)(
+            prevState,
+          ),
         );
       }
       setDateOpen(false);
@@ -304,7 +316,7 @@ const PaymentOverviewContainer = () => {
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -346,14 +358,21 @@ const PaymentOverviewContainer = () => {
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });
         })
         .finally(() => setSelectedPayments([]));
     },
-    [filteredOverviewData, getActivityLogUserData, enqueueSnackbar, selectedPayments, user, dispatch],
+    [
+      filteredOverviewData,
+      getActivityLogUserData,
+      enqueueSnackbar,
+      selectedPayments,
+      user,
+      dispatch,
+    ],
   );
 
   const selectDeselectAll = () => {
@@ -407,7 +426,9 @@ const PaymentOverviewContainer = () => {
               onChange={onStatusChange}
               input={<Input />}
               renderValue={selected =>
-                (selected as any[]).map(s => ((s as string) === 'Blocked' ? 'Approved' : (s as string))).join(', ')
+                (selected as any[])
+                  .map(s => ((s as string) === 'Blocked' ? 'Approved' : (s as string)))
+                  .join(', ')
               }
               MenuProps={MenuProps}
             >
@@ -441,7 +462,10 @@ const PaymentOverviewContainer = () => {
             onClick={handleClickMenu}
             color="primary"
             variant="outlined"
-            disabled={!(filteredOverviewData && filteredOverviewData.length > 0) || selectedPayments.length === 0}
+            disabled={
+              !(filteredOverviewData && filteredOverviewData.length > 0) ||
+              selectedPayments.length === 0
+            }
             style={{ marginBottom: theme.spacing(1) }}
           >
             Postpone Selected Payments
@@ -462,7 +486,11 @@ const PaymentOverviewContainer = () => {
           isWeeklyPaymentOverview={true}
         />
         {isDialogOpen && (
-          <PaymentOverviewDialog isOpen={isDialogOpen} handleClose={handleDialogClose} bookingId={openBooking} />
+          <PaymentOverviewDialog
+            isOpen={isDialogOpen}
+            handleClose={handleDialogClose}
+            bookingId={openBooking}
+          />
         )}
       </CardContent>
     </Card>

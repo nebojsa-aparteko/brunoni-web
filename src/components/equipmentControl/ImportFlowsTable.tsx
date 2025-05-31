@@ -109,18 +109,30 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
   const [filters] = useEquipmentControlFilterProviderContext();
 
   return !summary ? (
-    <Box minHeight="40vh" p={3} width={1} display="flex" alignItems="center" justifyContent="center">
+    <Box
+      minHeight="40vh"
+      p={3}
+      width={1}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
       <CircularProgress />
     </Box>
   ) : summary.length === 0 ? (
-    <BookingsEmptyResults message={'No equipment control found for your filter criteria. Try changing filters.'} />
+    <BookingsEmptyResults
+      message={'No equipment control found for your filter criteria. Try changing filters.'}
+    />
   ) : (
     <TableContainer className={classes.container}>
       <Table stickyHeader size="small" aria-label="a dense table" className={classes.root}>
         <TableHead className={classes.table}>
           <TableRow>
             <TableCell rowSpan={2} />
-            <TableCell rowSpan={2} className={clsx([classes.stickySide, classes.headerCell, classes.borderRight])}>
+            <TableCell
+              rowSpan={2}
+              className={clsx([classes.stickySide, classes.headerCell, classes.borderRight])}
+            >
               Depot Location
             </TableCell>
             {statusLabels.map((status, index) => (
@@ -166,7 +178,11 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                       <TableCell
                         style={{ paddingTop: 2, paddingBottom: 2, fontWeight: 'bold' }}
                         colSpan={statusLabels.length * filters.containerTypes.length + 2}
-                        className={clsx([classes.headerCell, classes.borderRight, classes.tightCell])}
+                        className={clsx([
+                          classes.headerCell,
+                          classes.borderRight,
+                          classes.tightCell,
+                        ])}
                       >
                         {get(CountryCodes, countryCode, '-')}
                       </TableCell>
@@ -184,7 +200,10 @@ const ImportFlowsTable: React.FC<ImportFlowsTableProps> = ({ summary }) => {
                             </TableCell>
                           </Tooltip>
                         )}
-                        <EquipmentControlImportRow equipmentControl={equipment} key={equipment.id} />
+                        <EquipmentControlImportRow
+                          equipmentControl={equipment}
+                          key={equipment.id}
+                        />
                       </TableRow>
                     ))}
                   </Fragment>

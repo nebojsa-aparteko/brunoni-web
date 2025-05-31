@@ -18,7 +18,9 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
   const filteredChargeCodes = useMemo(
     () =>
       group && group === FreightDetailGroup.INTERNAL1
-        ? chargeCodes?.filter(code => code.internal1 === 'TRUE' && code.language === 'E').concat(commissionChargeCode)
+        ? chargeCodes
+            ?.filter(code => code.internal1 === 'TRUE' && code.language === 'E')
+            .concat(commissionChargeCode)
         : chargeCodes?.filter(code => code.language === 'E'),
     [chargeCodes, group],
   );
@@ -29,7 +31,9 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
 
   useEffect(() => {
     setChargeCode(
-      chargeCodes ? chargeCodes.concat(commissionChargeCode).find(code => code.text === chargeCodeText) : undefined,
+      chargeCodes
+        ? chargeCodes.concat(commissionChargeCode).find(code => code.text === chargeCodeText)
+        : undefined,
     );
   }, [chargeCodeText, chargeCodes]);
 
@@ -52,7 +56,13 @@ const ChargeCodeInput: React.FC<Props> = ({ chargeCodeText, handleChange, group,
       onChange={handleSetSelectedValue}
       value={chargeCode}
       renderInput={params => (
-        <TextField {...params} margin={margin} fullWidth placeholder="Type to filter" variant="outlined" />
+        <TextField
+          {...params}
+          margin={margin}
+          fullWidth
+          placeholder="Type to filter"
+          variant="outlined"
+        />
       )}
     />
   );

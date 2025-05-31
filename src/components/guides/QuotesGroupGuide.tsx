@@ -16,8 +16,7 @@ export let quotesGroupShepherdTour: Shepherd.Tour = new Shepherd.Tour({
 quotesGroupShepherdTour.addSteps([
   {
     title: 'Quote Options',
-    text:
-      'Here you can see which carriers we can offer your requested route. Disclaimer: Please note that the maintenance of the data is carried out independently by different people.',
+    text: 'Here you can see which carriers we can offer your requested route. Disclaimer: Please note that the maintenance of the data is carried out independently by different people.',
     attachTo: { element: '#optionsQuoteGroup', on: 'bottom' },
     buttons: [
       {

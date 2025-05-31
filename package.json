@@ -2,6 +2,12 @@
   "name": "oskar-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.16"
+  },
+  "resolutions": {
+    "minimist": "1.2.8"
+  },
   "dependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
     "@date-io/date-fns": "^1.3.13",
@@ -12,33 +18,33 @@
     "@material-ui/styles": "^4.9.14",
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
-    "@react-pdf/renderer": "1.6.11",
+    "@react-pdf/renderer": "^4.3.0",
     "autosuggest-highlight": "^3.1.1",
     "change-case": "^4.1.1",
-    "chart.js": "^2.9.3",
-    "cheerio": "^1.0.0-rc.6",
+    "chart.js": "4",
+    "cheerio": "1.0.0-rc.12",
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.3.1",
-    "date-fns": "^2.13.0",
-    "date-fns-tz": "^1.1.6",
+    "date-fns": "2.30.0",
+    "date-fns-tz": "1.3.8",
     "deep-object-diff": "^1.1.0",
     "docx-preview": "^0.1.4",
-    "dotenv": "^8.2.0",
-    "firebase": "^8.3.0",
+    "dotenv": "^16.5.0",
+    "firebase": "9",
     "fontfaceobserver": "^2.1.0",
-    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-fetch": "^3.0.0",
     "js-cookie": "^2.2.1",
     "material-ui-dropzone": "^3.5.0",
     "material-ui-image": "^3.3.2",
     "mousetrap": "^1.6.5",
-    "notistack": "^0.9.9",
+    "notistack": "^3.0.0",
     "papaparse": "^5.2.0",
-    "query-string": "^6.13.1",
-    "react": "^16.13.1",
+    "query-string": "^9.1.2",
+    "react": "^18",
     "react-avatar": "^3.9.3",
     "react-beautiful-dnd": "^13.1.0",
-    "react-chartjs-2": "^2.9.0",
-    "react-dom": "^16.13.1",
+    "react-chartjs-2": "5",
+    "react-dom": "^18",
     "react-draggable": "^4.4.4",
     "react-dropzone": "^10.2.2",
     "react-helmet": "^6.0.0",
@@ -46,30 +52,32 @@
     "react-id-generator": "^3.0.0",
     "react-linkify": "^1.0.0-alpha",
     "react-mentions": "^3.3.1",
-    "react-pdf": "^5.0.0",
+    "react-pdf": "9.2.1",
     "react-perfect-scrollbar": "^1.5.8",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.3",
+    "react-router-dom": "^6",
     "react-shepherd": "^3.3.0",
     "react-stickynode": "^2.1.1",
     "react-use": "^14.1.0",
     "shepherd.js": "^8.1.0",
     "string-similarity": "^4.0.4",
-    "typescript": "^4.2.4",
-    "xlsx": "^0.16.8"
+    "typescript": "^4.9.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "scripts": {
-    "start": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts start",
-    "build": "REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
-    "build:stage": "REACT_APP_ENV=stage REACT_APP_BRAND=$(readlink public | tail -c +8) react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite --mode development",
+    "start:stage": "vite --mode staging",
+    "start:prod": "vite --mode production",
+    "build": "vite build --mode development",
+    "build:stage": "vite build --mode staging",
+    "build:prod": "vite build --mode production",
+    "preview": "vite preview --port 3000",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "npm run prettier:base -- --list-different \"src/**/*.{ts,tsx}\"",
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\"",
     "select:brunoni": "rm -f public && ln -s public.brunoni public",
     "select:allmarine": "rm -f public && ln -s public.allmarine public",
-    "select:brunoni-allmarine": "rm -f public && ln -s public.brunoni public"
+    "select:brunoni-allmarine": "rm -f public && ln -s public.brunoni public",
+    "postinstall": "husky install"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -87,43 +95,49 @@
     ]
   },
   "devDependencies": {
-    "@types/react-linkify": "^1.0.0",
-    "@types/string-similarity": "^4.0.0",
+    "@svgr/rollup": "^8.1.0",
     "@types/autosuggest-highlight": "^3.1.0",
     "@types/classnames": "^2.2.10",
     "@types/fontfaceobserver": "^0.0.6",
-    "@types/jest": "25.2.1",
+    "@types/jest": "^25.2.1",
     "@types/js-cookie": "^2.2.5",
     "@types/lodash": "^4.14.151",
     "@types/mousetrap": "^1.6.3",
     "@types/node": "^15.0.2",
     "@types/papaparse": "^5.0.3",
-    "@types/react": "16.9.35",
+    "@types/react": "^18",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-copy-to-clipboard": "^4.3.0",
-    "@types/react-dom": "16.9.8",
+    "@types/react-dom": "^18",
     "@types/react-helmet": "^5.0.15",
-    "@types/react-mentions": "^3.3.0",
-    "@types/react-pdf": "^4.0.6",
-    "@types/react-router-dom": "^5.1.5",
+    "@types/react-linkify": "^1.0.0",
+    "@types/react-mentions": "^4.4.1",
+    "@types/react-router-dom": "^5.3.3",
     "@types/react-stickynode": "^2.1.0",
-    "husky": "^3.0.9",
-    "lint-staged": "^9.4.2",
-    "prettier": "^1.19.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "@types/string-similarity": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^8.0.0",
+    "lint-staged": "13",
+    "prettier": "^3",
+    "vite": "^5",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "lint-staged": {
-    "*.{js,css,json,md}": [
-      "prettier --write",
-      "git add"
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write"
     ],
-    "*.{ts,tsx}": [
-      "prettier --parser typescript --write",
-      "git add"
+    "*.{json,md,css}": [
+      "prettier --write"
     ]
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

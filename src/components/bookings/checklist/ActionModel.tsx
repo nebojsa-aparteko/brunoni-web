@@ -25,7 +25,13 @@ const ActionModal: React.FC<Props> = ({ isOpen, handleClose, onSuccess, children
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md" fullWidth>
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+      fullWidth
+    >
       <Box>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <IconButton onClick={handleClose} className={classes.closeModal}>

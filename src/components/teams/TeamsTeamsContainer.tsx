@@ -1,6 +1,12 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core';
+import {
+  Box,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import OperationsTeamsTable from './OperationsTeamsTable';
 import AccountingTeamsTable from './AccountingTeamsTable';
@@ -21,11 +27,7 @@ const useStyles = makeStyles({
 });
 
 export const deleteTeam = (teamId: string) =>
-  firebase
-    .firestore()
-    .collection('teams')
-    .doc(teamId)
-    .delete();
+  firebase.firestore().collection('teams').doc(teamId).delete();
 
 export const deleteTeams = async (teamIds: string[]): Promise<any> => {
   const requests = teamIds.map((teamId: string) => {
@@ -52,7 +54,10 @@ const TeamsTeamsContainer: React.FC = () => {
   return (
     <Box flex={1} display="flex" flexDirection="column" m={1}>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Accounting teams
           </Typography>
@@ -62,7 +67,10 @@ const TeamsTeamsContainer: React.FC = () => {
         </ExpansionPanelDetails>
       </ExpansionPanel>
       <ExpansionPanel className={classes.expansionPanel} TransitionProps={{ mountOnEnter: true }}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} className={classes.expansionPanelSummary}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.expansionPanelSummary}
+        >
           <Typography variant="h5" className={classes.expansionPanelTitle}>
             Operations teams
           </Typography>

@@ -65,7 +65,11 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          {isString(description) ? <Typography className={classes.content}>{description}</Typography> : description}
+          {isString(description) ? (
+            <Typography className={classes.content}>{description}</Typography>
+          ) : (
+            description
+          )}
         </DialogContent>
         <Divider />
 

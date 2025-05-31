@@ -71,7 +71,11 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails, hideRemarks }) =
             </TableHead>
             <TableBody>
               {quoteDetails.map((quoteDetail, index) => (
-                <TableRow key={quoteDetail.Pos} selected={(index + 1) % 2 === 0} className={classes.tableRow}>
+                <TableRow
+                  key={quoteDetail.Pos}
+                  selected={(index + 1) % 2 === 0}
+                  className={classes.tableRow}
+                >
                   <TableCell component="th" scope="row">
                     {quoteDetail.Description}
                   </TableCell>
@@ -81,7 +85,11 @@ const QuoteItemQuoteDetails: React.FC<Props> = ({ quoteDetails, hideRemarks }) =
                   {!hideRemarks && (
                     <TableCell>
                       <Linkify
-                        componentDecorator={(decoratedHref: string, decoratedText: string, key: number) => (
+                        componentDecorator={(
+                          decoratedHref: string,
+                          decoratedText: string,
+                          key: number,
+                        ) => (
                           <Link key={key} href={decoratedHref}>
                             {decoratedText}
                           </Link>

@@ -4,7 +4,10 @@ import { Box, Grid, makeStyles, Theme } from '@material-ui/core';
 import DirectionsBoatIcon from '@material-ui/icons/DirectionsBoat';
 import DirectionsPortIcon from '@material-ui/icons/PinDrop';
 import FlagIcon from '@material-ui/icons/Flag';
-import { ItineraryItem as ItineraryItemModel, SearchResultsPort } from '../model/route-search/RouteSearchResults';
+import {
+  ItineraryItem as ItineraryItemModel,
+  SearchResultsPort,
+} from '../model/route-search/RouteSearchResults';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
@@ -55,8 +58,8 @@ const ItineraryItem: React.FC<Props> = ({ itineraryItem, noLine, ...rest }) => {
           {isIntermediary(itineraryItem)
             ? `${formatDateString(itineraryItem.ArrivalDate!)} - ${formatDateString(itineraryItem.DepartureDate!)}`
             : itineraryItem.DepartureDate
-            ? formatDateString(itineraryItem.DepartureDate!)
-            : formatDateString(itineraryItem.ArrivalDate!)}
+              ? formatDateString(itineraryItem.DepartureDate!)
+              : formatDateString(itineraryItem.ArrivalDate!)}
           <div>
             {itineraryItem.Port.HarbourName}, {itineraryItem.Port.Land}
           </div>

@@ -53,7 +53,12 @@ interface SingleInputProps {
   margin?: any;
 }
 
-const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margin, handleChange }) => {
+const TariffInput: React.FC<SingleInputProps> = ({
+  tariff,
+  availableCodes,
+  margin,
+  handleChange,
+}) => {
   const classes = useStyles();
   const [selectedValue, setSelectedValue] = React.useState<string>(
     tariff?.id || (availableCodes && availableCodes.length > 0 ? availableCodes[0].id || '' : ''),
@@ -61,7 +66,9 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
   const [tariffDays, setTariffDays] = useState<number>(tariff?.days ? parseInt(tariff?.days) : 14);
 
   useEffect(() => {
-    setSelectedValue(tariff?.id || (availableCodes && availableCodes.length > 0 ? availableCodes[0].id || '' : ''));
+    setSelectedValue(
+      tariff?.id || (availableCodes && availableCodes.length > 0 ? availableCodes[0].id || '' : ''),
+    );
     setTariffDays(tariff?.days ? parseInt(tariff?.days) : 14);
   }, [tariff]);
 
@@ -98,7 +105,11 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
           value={tariffDays ? (tariffDays === -1 ? '' : tariffDays) : ''}
           onChange={event => handleOnDaysChange(event.target.value)}
           onBlur={event =>
-            handleSetSelectedTariffValue({ id: selectedValue, days: event.target.value, text: tariff?.text } as Tariff)
+            handleSetSelectedTariffValue({
+              id: selectedValue,
+              days: event.target.value,
+              text: tariff?.text,
+            } as Tariff)
           }
         />
       </Grid>
@@ -114,7 +125,9 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
           {availableCodes?.map(tariff => {
             return (
               <MenuItem key={tariff.id} value={tariff.id} className={classes.menuItem}>
-                <Typography className={classes.menuItemPrimaryText}>{tariff.description}</Typography>
+                <Typography className={classes.menuItemPrimaryText}>
+                  {tariff.description}
+                </Typography>
                 <Typography
                   className={classes.menuItemSecondaryText}
                   variant="body2"
@@ -133,7 +146,12 @@ const TariffInput: React.FC<SingleInputProps> = ({ tariff, availableCodes, margi
 };
 
 const getTariffFromBrunoniCode = (code: BrunoniCodes) => {
-  return omitBy(isNil)({ id: code.id, days: code.days, text: code.text, description: code.description }) as Tariff;
+  return omitBy(isNil)({
+    id: code.id,
+    days: code.days,
+    text: code.text,
+    description: code.description,
+  }) as Tariff;
 };
 const TariffsInput: React.FC<Props> = ({ tariffs, availableTariffs, margin, handleChange }) => {
   const classes = useStyles();

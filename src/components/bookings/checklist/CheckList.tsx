@@ -20,7 +20,8 @@ interface CheckListProps {
 }
 
 export const editRestriction = (date: Date) =>
-  differenceInMilliseconds(new Date(), date) <= Number(process.env.EDIT_RESTRICTION_TIME) || 600000;
+  differenceInMilliseconds(new Date(), date) <=
+    Number(import.meta.env.VITE_EDIT_RESTRICTION_TIME) || 600000;
 
 function a11yProps(index: any) {
   return {
@@ -86,10 +87,14 @@ const CheckList: React.FC<CheckListProps> = ({ booking, onTabChange, tasks }) =>
             )}
           </CardContent>
           {tabValue === 0 && (
-            <CardActions>Hint: you can drag files onto the checklist items to attach them</CardActions>
+            <CardActions>
+              Hint: you can drag files onto the checklist items to attach them
+            </CardActions>
           )}
         </Card>
-        {!actingAs && tabValue === 0 && <InternalStorage id={booking!.id} collection={'bookings'} />}
+        {!actingAs && tabValue === 0 && (
+          <InternalStorage id={booking!.id} collection={'bookings'} />
+        )}
         <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={tabValue === 1} />
       </ActivityLogProvider>
     </Fragment>

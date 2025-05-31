@@ -1,4 +1,11 @@
-import React, { forwardRef, ForwardRefRenderFunction, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useContext,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import InputProps from '../../model/InputProps';
 import CommodityTypes from '../../contexts/CommodityTypes';
 import CommodityType from '../../model/CommodityType';
@@ -13,13 +20,15 @@ interface Props extends InputProps<CommodityType> {
   margin: string;
 }
 
-const filterFlow = (parts: string[], options: CommodityType[], findIntersection: boolean = false) => {
+const filterFlow = (
+  parts: string[],
+  options: CommodityType[],
+  findIntersection: boolean = false,
+) => {
   const filteredItems = map((part: string) =>
     filter(
       (option: CommodityType) =>
-        getCommodityTypeLabel(option)
-          .toLowerCase()
-          .indexOf(part.toLowerCase()) > -1,
+        getCommodityTypeLabel(option).toLowerCase().indexOf(part.toLowerCase()) > -1,
     )(options),
   )(parts);
 
@@ -33,14 +42,18 @@ const filterOptions = (options: CommodityType[], { inputValue }: { inputValue: s
   return filterFlow(searchWords, options, searchWords.length > 1);
 };
 
-const getCommodityTypeLabel = (commodityType: CommodityType | undefined) => (commodityType ? commodityType.name : '');
+const getCommodityTypeLabel = (commodityType: CommodityType | undefined) =>
+  commodityType ? commodityType.name : '';
 
 const focusAndSelect = (input: HTMLInputElement) => {
   input.focus();
   input.setSelectionRange(0, input.value.length);
 };
 
-const PredefinedCommodityTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
+const PredefinedCommodityTypeInput: ForwardRefRenderFunction<any, Props> = (
+  { value, onChange, margin },
+  ref,
+) => {
   const input = useRef();
   const commodityTypes = useContext(CommodityTypes);
   const [open, setOpen] = useState(false);

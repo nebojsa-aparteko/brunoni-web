@@ -31,7 +31,9 @@ const ExistingTagsMultiInput: React.FC<Props> = ({ options, defaultValues, onCha
       onChange={handleChange}
       renderTags={value => value.map(option => <TagItem key={option.id} tag={option} />)}
       renderOption={option => <TagItem key={option.id} tag={option} />}
-      renderInput={params => <TextField {...params} label="Tags" placeholder="Type to filter" variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} label="Tags" placeholder="Type to filter" variant="outlined" />
+      )}
     />
   );
 };

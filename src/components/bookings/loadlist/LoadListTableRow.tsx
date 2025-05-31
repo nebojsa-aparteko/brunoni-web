@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableCell, TableRow } from '@material-ui/core';
 import LoadListContainerModel from '../../../model/LoadListContainerModel';
-import { Link } from 'react-router-dom';
+import { Link } from '../../../components/Link';
 
 const LoadListTableRow = ({ item }: Props) => (
   <TableRow key={'A'}>

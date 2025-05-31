@@ -12,8 +12,8 @@ import { INITIAL_DATERANGE_FILTER, LAST_3_MONTHS } from '../providers/filterActi
 import flow from 'lodash/fp/flow';
 import set from 'lodash/fp/set';
 import QuoteGroupsProvider from '../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router';
-import QueryString from 'querystring';
+import { useNavigate } from 'react-router-dom';
+import queryString from 'query-string';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -44,8 +44,8 @@ const QuoteGroups: React.FC = () => {
 
   const [, , quoteFilters, setQuoteFilters] = useQuotesContext();
 
-  const history = useHistory();
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const navigate = useNavigate();
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = {
@@ -58,11 +58,12 @@ const QuoteGroups: React.FC = () => {
     setSelectedTab(newValue);
     switch (newValue) {
       case 0:
-        history.push('/quotes/groups');
-        setQuoteFilters && setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
+        navigate('/quotes/groups');
+        setQuoteFilters &&
+          setQuoteFilters(flow(set('archived', false), set('dateRange', undefined))(quoteFilters));
         break;
       case 1:
-        history.push('/quotes/groups?tab=archived');
+        navigate('/quotes/groups?tab=archived');
         setQuoteFilters &&
           setQuoteFilters(
             flow(
@@ -81,7 +82,10 @@ const QuoteGroups: React.FC = () => {
       // we are acting as a customer set a date range:
       setQuoteFilters &&
         setQuoteFilters(
-          flow(set('archived', undefined), set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS))(quoteFilters),
+          flow(
+            set('archived', undefined),
+            set('dateRange', quoteFilters.dateRange || LAST_3_MONTHS),
+          )(quoteFilters),
         );
     }
   }, [actingAs]);

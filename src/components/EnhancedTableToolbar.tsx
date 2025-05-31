@@ -58,7 +58,12 @@ export const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
       })}
     >
       {numSelected > 0 ? (
-        <Typography className={classes.toolbarTitle} color="error" variant="subtitle1" component="div">
+        <Typography
+          className={classes.toolbarTitle}
+          color="error"
+          variant="subtitle1"
+          component="div"
+        >
           {labelWhenSelected}
         </Typography>
       ) : (

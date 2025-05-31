@@ -13,9 +13,14 @@ import { SHOW_ERROR_SNACKBAR, SHOW_SUCCESS_SNACKBAR } from '../../store/types/gl
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 
 const PinnedActivities: React.FC<Props> = ({ pinnedActivities, booking, collection, docId }) => {
-  const [showUnpinButtonForActivity, setShowUnpinButtonForActivity] = useState<string | undefined>();
+  const [showUnpinButtonForActivity, setShowUnpinButtonForActivity] = useState<
+    string | undefined
+  >();
   const [, dispatch] = useGlobalAppState();
-  const handleUnpin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, activity: ActivityLogItem) => {
+  const handleUnpin = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    activity: ActivityLogItem,
+  ) => {
     event.stopPropagation();
     if (booking?.id && activity.id) {
       setIsPinned(activity.id, 'bookings', booking?.id, false, pinnedActivities.length)
@@ -25,7 +30,9 @@ const PinnedActivities: React.FC<Props> = ({ pinnedActivities, booking, collecti
             message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
         )
-        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+        .catch(error =>
+          dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }),
+        );
     } else if (collection && docId && activity.id) {
       setIsPinned(activity.id, collection, docId, false, pinnedActivities.length)
         .then(() =>
@@ -34,7 +41,9 @@ const PinnedActivities: React.FC<Props> = ({ pinnedActivities, booking, collecti
             message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
         )
-        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+        .catch(error =>
+          dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }),
+        );
     } else if (activity.path) {
       firebase
         .firestore()
@@ -46,12 +55,21 @@ const PinnedActivities: React.FC<Props> = ({ pinnedActivities, booking, collecti
             message: `The activity has been ${activity.isPinned ? 'unpinned' : 'pinned'}.`,
           }),
         )
-        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+        .catch(error =>
+          dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }),
+        );
     }
   };
 
   return (
-    <Paper style={{ display: 'flex', flexDirection: 'row', backgroundColor: 'rgba(198, 238, 241, 0.24)', padding: 16 }}>
+    <Paper
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        backgroundColor: 'rgba(198, 238, 241, 0.24)',
+        padding: 16,
+      }}
+    >
       <Box display="flex" p={2}>
         <Icon
           path={mdiStarCircleOutline}

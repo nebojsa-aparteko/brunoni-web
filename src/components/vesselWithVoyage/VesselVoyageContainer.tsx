@@ -28,10 +28,10 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   const carriers = useContext(Carriers);
   const user = useUser()[1];
 
-  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const availableCarriers = useMemo(
+    () => carriers?.filter(carrier => user.carriers?.includes(carrier.id)),
+    [user.carriers, carriers],
+  );
 
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
@@ -42,7 +42,8 @@ const VesselVoyageContainer: React.FC<Props> = () => {
       vessel?.reduce((r: any, o: any) => {
         groups
           .reduce(
-            (group: any, key: any, i, { length }) => (group[o[key]] = group[o[key]] || (i + 1 === length ? [] : {})),
+            (group: any, key: any, i, { length }) =>
+              (group[o[key]] = group[o[key]] || (i + 1 === length ? [] : {})),
             r,
           )
           .push(o);
@@ -52,7 +53,10 @@ const VesselVoyageContainer: React.FC<Props> = () => {
   );
 
   const handleImportOrExportChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (setFilters) setFilters(set('category', (event.target as HTMLInputElement).value as BookingCategory)(filters));
+    if (setFilters)
+      setFilters(
+        set('category', (event.target as HTMLInputElement).value as BookingCategory)(filters),
+      );
   };
 
   const handleDialogOpen = (item: VesselWithVoyage[], vessel: string) => {
@@ -81,7 +85,10 @@ const VesselVoyageContainer: React.FC<Props> = () => {
                 value={carrier}
               />
             </Box>
-            <Box display="flex" style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}>
+            <Box
+              display="flex"
+              style={{ maxWidth: theme.spacing(35), marginLeft: theme.spacing(3) }}
+            >
               <DateRangeInput
                 onChange={dateRange => {
                   if (setFilters) setFilters(set('dateRange', dateRange)(filters));
@@ -97,7 +104,12 @@ const VesselVoyageContainer: React.FC<Props> = () => {
 
         {normalizedVessel && Object.entries(normalizedVessel).length > 0 ? (
           Object.entries(normalizedVessel).map(([vessel, items]: any) => (
-            <VesselVoyageItem vessel={vessel} items={items} key={vessel} handleDialogOpen={handleDialogOpen} />
+            <VesselVoyageItem
+              vessel={vessel}
+              items={items}
+              key={vessel}
+              handleDialogOpen={handleDialogOpen}
+            />
           ))
         ) : (
           <BookingsEmptyResults title="" message="No vessel with voyage item with this criteria." />

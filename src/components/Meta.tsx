@@ -7,7 +7,7 @@ interface Props {
   title: string;
 }
 
-const brandName = changeCase.capitalCase(process.env.REACT_APP_BRAND || '').trim();
+const brandName = changeCase.capitalCase(import.meta.env.VITE_BRAND || '').trim();
 
 const platformName = brandName ? `My${brandName}` : '';
 

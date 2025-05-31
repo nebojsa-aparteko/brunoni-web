@@ -81,9 +81,9 @@ const useStyles = makeStyles(theme => ({
 export const getContainersString = (booking: Booking) => {
   return booking.CargoDetails.map(cargoDetail =>
     cargoDetail.Equipment && cargoDetail.Equipment[0]
-      ? cargoDetail.Equipment.map(equipment => (equipment.ContainerNumber ? '/' + equipment.ContainerNumber : '')).join(
-          '',
-        )
+      ? cargoDetail.Equipment.map(equipment =>
+          equipment.ContainerNumber ? '/' + equipment.ContainerNumber : '',
+        ).join('')
       : '',
   )
     .join('')
@@ -96,7 +96,8 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
   const [bookings, isLoading] = useBookingsContext();
   const [filters, setFilters] = useBookingListFilterContext();
 
-  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const [bookingPaginationContextData, setBookingPaginationContextData] =
+    useBookingListPaginationContext();
 
   const { assignee } = filters;
   const { searchString, page, rowsPerPage } = bookingPaginationContextData;
@@ -121,16 +122,22 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
         // vessel
         (booking.Vessel ? containsString(booking.Vessel, searchString) : false) ||
         // destionation (place of delivery)
-        (booking.FinalDestinationName ? containsString(booking.FinalDestinationName, searchString) : false) ||
+        (booking.FinalDestinationName
+          ? containsString(booking.FinalDestinationName, searchString)
+          : false) ||
         // destionation (port of discharge)
         (booking.PODName ? containsString(booking.PODName, searchString) : false) ||
         // origin (place of receipt)
-        (booking.PlaceOfRecieptName ? containsString(booking.PlaceOfRecieptName, searchString) : false) ||
+        (booking.PlaceOfRecieptName
+          ? containsString(booking.PlaceOfRecieptName, searchString)
+          : false) ||
         // origin (port of loading)
         (booking.POLName ? containsString(booking.POLName, searchString) : false) ||
         // container number
         (booking.CargoDetails && booking.CargoDetails[0]
-          ? getContainersString(booking).some(containerString => containsString(containerString, searchString))
+          ? getContainersString(booking).some(containerString =>
+              containsString(containerString, searchString),
+            )
           : false) ||
         // customer reference
         ('Cust-BkgRef' in booking ? containsString(booking['Cust-BkgRef'], searchString) : false) ||
@@ -159,7 +166,10 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (setBookingPaginationContextData)
         setBookingPaginationContextData(
-          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
+          flow(
+            set('rowsPerPage', parseInt(event.target.value)),
+            set('page', 0),
+          )(bookingPaginationContextData),
         );
     },
     [bookingPaginationContextData, setBookingPaginationContextData],
@@ -213,7 +223,10 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
                     </Typography>
                     <Divider orientation="vertical" style={{ height: '100%' }} />
                     <div id="exportImportBkgView">
-                      <CategoryFilter value={filters.category} onChange={handleImportOrExportChange} />
+                      <CategoryFilter
+                        value={filters.category}
+                        onChange={handleImportOrExportChange}
+                      />
                     </div>
 
                     <Box flex={1} />
@@ -241,7 +254,10 @@ const BookingsView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter 
             {bookings.length > 0 && (
               <Fragment>
                 <CardContent className={classes.content}>
-                  <BookingsTable bookings={resultChunks && (get(page)(resultChunks) || [])} isAdmin={isAdmin} />
+                  <BookingsTable
+                    bookings={resultChunks && (get(page)(resultChunks) || [])}
+                    isAdmin={isAdmin}
+                  />
                 </CardContent>
 
                 <CardActions className={classes.actions}>

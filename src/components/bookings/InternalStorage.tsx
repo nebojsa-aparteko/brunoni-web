@@ -32,6 +32,7 @@ import { showCrispChat } from '../../index';
 import BookingRequestComparisonDialog from '../bookingRequests/checklist/BookingRequestComparisonDialog';
 import { BookingRequest } from '../../model/BookingRequest';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(() => ({
   rootEmpty: {
@@ -68,7 +69,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const saveFilesToFirestore = (collection: string, id: string, files: ChecklistItemValueDocument) =>
+export const saveFilesToFirestore = (
+  collection: string,
+  id: string,
+  files: ChecklistItemValueDocument,
+) =>
   firebase
     .firestore()
     .collection(collection)
@@ -77,7 +82,11 @@ export const saveFilesToFirestore = (collection: string, id: string, files: Chec
     .doc()
     .set(files);
 
-const deleteFileFromFirebase = (collection: string, deletedFile: ChecklistItemValueDocument, id: string) =>
+const deleteFileFromFirebase = (
+  collection: string,
+  deletedFile: ChecklistItemValueDocument,
+  id: string,
+) =>
   firebase
     .firestore()
     .collection(collection)
@@ -87,13 +96,7 @@ const deleteFileFromFirebase = (collection: string, deletedFile: ChecklistItemVa
     .delete();
 
 const addActivity = (activity: ActivityLogItem, collection: string, id: string) =>
-  firebase
-    .firestore()
-    .collection(collection)
-    .doc(id)
-    .collection('activity')
-    .doc()
-    .set(activity);
+  firebase.firestore().collection(collection).doc(id).collection('activity').doc().set(activity);
 const InternalStorage: React.FC<Props> = ({
   id,
   collection,
@@ -118,8 +121,12 @@ const InternalStorage: React.FC<Props> = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTask, setUploadTask] = useState<firebase.storage.UploadTask>(); // add some control to uploads so that users can cancel
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<ChecklistItemValueDocument | undefined>(undefined);
-  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(undefined);
+  const [selectedDocument, setSelectedDocument] = useState<ChecklistItemValueDocument | undefined>(
+    undefined,
+  );
+  const [initialBookingRequest, setInitialBookingRequest] = useState<BookingRequest | undefined>(
+    undefined,
+  );
   const [, dispatch] = useGlobalAppState();
 
   const filesCollection = useFirestoreCollection(collection, query, id, 'internal-documents');
@@ -130,12 +137,12 @@ const InternalStorage: React.FC<Props> = ({
   useEffect(() => {
     const nf = Promise.all(
       (filesCollection?.docs.map(async doc => {
-        const fileDoc = {...doc.data(), id: doc.id} as ChecklistItemValueDocument;
+        const fileDoc = { ...doc.data(), id: doc.id } as ChecklistItemValueDocument;
 
         fileDoc.url = await resolveUrl(fileDoc.url);
 
         return fileDoc;
-      }) as Promise<ChecklistItemValueDocument>[]) || []
+      }) as Promise<ChecklistItemValueDocument>[]) || [],
     );
 
     let cancelled = false;
@@ -150,7 +157,7 @@ const InternalStorage: React.FC<Props> = ({
 
     return () => {
       cancelled = true;
-    }
+    };
   }, [filesCollection]);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -170,7 +177,9 @@ const InternalStorage: React.FC<Props> = ({
           res.json().then(res => JSON.stringify(res)),
         );
         setInitialBookingRequest(
-          initialBookingRequestJson ? (JSON.parse(initialBookingRequestJson) as BookingRequest) : undefined,
+          initialBookingRequestJson
+            ? (JSON.parse(initialBookingRequestJson) as BookingRequest)
+            : undefined,
         );
         setSelectedDocument(undefined);
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
@@ -207,10 +216,13 @@ const InternalStorage: React.FC<Props> = ({
             error => {
               setUploadProgress(0);
               reject(error);
-              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
+              enqueueSnackbar(
+                <Typography color="inherit">Failed to upload file - {error.message}!</Typography>,
+                {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                },
+              );
             },
             () => {
               setUploadProgress(0);
@@ -245,7 +257,7 @@ const InternalStorage: React.FC<Props> = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -258,7 +270,7 @@ const InternalStorage: React.FC<Props> = ({
         isInternal: true,
         documents: documents,
         changeType: activityType,
-      } as ActivityLogItem),
+      }) as ActivityLogItem,
     [getActivityLogUserData],
   );
 
@@ -276,7 +288,7 @@ const InternalStorage: React.FC<Props> = ({
             console.debug('File deleted from storage ', item);
           })
           .catch(error => {
-            console.error('Failed to remove item - {error.message}', error);
+            console.error(`Failed to remove item - ${tryGetErrorMessage(error)}`, error);
           })
           .finally(() => {
             // remove item from the list in any case since if it is an error with the storage means file is alrady out
@@ -286,21 +298,33 @@ const InternalStorage: React.FC<Props> = ({
                 console.log('File deleted', collection, item, id);
                 return new Promise<ChecklistItemValueDocument>(resolve => resolve(item));
               })
-              .then(item => addActivity(createActivity([item], ActivityChangeType.DELETE_FILE), collection, id))
+              .then(item =>
+                addActivity(createActivity([item], ActivityChangeType.DELETE_FILE), collection, id),
+              )
               .catch(error => {
                 console.error('failed to update deleted items', error);
-                enqueueSnackbar(<Typography color="inherit">Failed to delete item - {error.message}</Typography>, {
-                  variant: 'error',
-                  autoHideDuration: 1000,
-                });
+                enqueueSnackbar(
+                  <Typography color="inherit">
+                    Failed to delete item - {tryGetErrorMessage(error)}
+                  </Typography>,
+                  {
+                    variant: 'error',
+                    autoHideDuration: 1000,
+                  },
+                );
               });
           });
       } catch (error) {
         setRemovalInProgress(false);
-        enqueueSnackbar(<Typography color="inherit">Failed to remove item - {error.message}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 1000,
-        });
+        enqueueSnackbar(
+          <Typography color="inherit">
+            Failed to remove item - {tryGetErrorMessage(error)}!
+          </Typography>,
+          {
+            variant: 'error',
+            autoHideDuration: 1000,
+          },
+        );
       }
     },
     [storageBasePath, collection, id, createActivity, enqueueSnackbar],
@@ -319,12 +343,14 @@ const InternalStorage: React.FC<Props> = ({
                 url: item.url,
                 storedName: item.storedName,
                 isInternal,
-              } as ChecklistItemValueDocument),
+              }) as ChecklistItemValueDocument,
           );
           values.map(value => saveFilesToFirestore(collection, id, value));
           return new Promise<ChecklistItemValueDocument[]>(resolve => resolve(documents));
         })
-        .then(documents => addActivity(createActivity(documents, ActivityChangeType.ADD_FILE), collection, id))
+        .then(documents =>
+          addActivity(createActivity(documents, ActivityChangeType.ADD_FILE), collection, id),
+        )
         .catch(err => {
           console.error(`Error while storing files ${JSON.stringify(id, null, 2)}`, err);
         });
@@ -351,7 +377,11 @@ const InternalStorage: React.FC<Props> = ({
         <Box
           {...getRootProps()}
           className={
-            isDragActive ? classes.dropZone : normalizedFiles && normalizedFiles[0] ? classes.root : classes.rootEmpty
+            isDragActive
+              ? classes.dropZone
+              : normalizedFiles && normalizedFiles[0]
+                ? classes.root
+                : classes.rootEmpty
           }
           my={cardMargin}
           py={normalizedFiles && normalizedFiles[0] ? 0 : 1}
@@ -391,7 +421,9 @@ const InternalStorage: React.FC<Props> = ({
               />
               <CardContent>
                 <List className={classes.documentList}>
-                  {(orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]).map(item => (
+                  {(
+                    orderBy('uploadedAt', 'desc')(normalizedFiles) as ChecklistItemValueDocument[]
+                  ).map(item => (
                     <InternalStorageItem
                       key={`chklistitem-${item.storedName}`}
                       item={item}
@@ -461,4 +493,4 @@ export const resolveUrl = async <T,>(unresolved: T): Promise<string | T> => {
     console.error(e);
     return unresolved;
   }
-}
+};

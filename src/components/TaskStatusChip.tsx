@@ -10,24 +10,24 @@ const TaskStatusChip = ({ task }: { task: Task }) => {
         task.dueDate && task.dueDate < new Date() && !task.resolved
           ? 'Overdue'
           : task.resolved
-          ? 'Resolved'
-          : task.show
-          ? 'Pending'
-          : !task.show && task.dueDate
-          ? 'Future'
-          : 'Not Created yet'
+            ? 'Resolved'
+            : task.show
+              ? 'Pending'
+              : !task.show && task.dueDate
+                ? 'Future'
+                : 'Not Created yet'
       }`}
       style={{
         backgroundColor:
           task.dueDate && task.dueDate < new Date() && !task.resolved
             ? '#f4364c'
             : task.resolved
-            ? '#999999'
-            : task.show
-            ? '#00a2f2'
-            : !task.show && task.dueDate
-            ? '#3cb371'
-            : '#999999',
+              ? '#999999'
+              : task.show
+                ? '#00a2f2'
+                : !task.show && task.dueDate
+                  ? '#3cb371'
+                  : '#999999',
         color: 'white',
       }}
     />
@@ -40,7 +40,8 @@ export type TaskStatus = 'Overdue' | 'Resolved' | 'Future' | 'Not Created yet' |
 
 const taskFilters = {
   Overdue: (task: Task) => task.dueDate && task.dueDate < new Date() && !task.resolved,
-  Pending: (task: Task) => !task.resolved && task.show && (!task.dueDate || !(task.dueDate < new Date())),
+  Pending: (task: Task) =>
+    !task.resolved && task.show && (!task.dueDate || !(task.dueDate < new Date())),
   Resolved: () => false,
   'Not Created yet': () => false,
   Future: () => false,

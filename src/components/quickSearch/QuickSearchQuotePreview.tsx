@@ -59,7 +59,10 @@ const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
         />
       </Grid>
       <Grid item md={3} xs={12}>
-        <InfoBoxItem title="Commodities" label1={quote.commodityTypes?.map(commodity => commodity.name).join(', ')} />
+        <InfoBoxItem
+          title="Commodities"
+          label1={quote.commodityTypes?.map(commodity => commodity.name).join(', ')}
+        />
       </Grid>
       <Grid item md={3} xs={12}>
         <InfoBoxItem
@@ -69,8 +72,9 @@ const QuickSearchQuotePreview: React.FC<Props> = ({ quote }) => {
               {quote.containers
                 ?.map(
                   container =>
-                    `${container.quantity && container.quantity > 0 ? container.quantity + ' x ' : ''}${container
-                      .containerType?.description || ''}`,
+                    `${container.quantity && container.quantity > 0 ? container.quantity + ' x ' : ''}${
+                      container.containerType?.description || ''
+                    }`,
                 )
                 .join(',\n')}
             </Typography>

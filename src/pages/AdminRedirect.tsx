@@ -1,4 +1,4 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-export default () => <Redirect to="/my-day" />;
+export default () => <Navigate to="/my-day" replace />;

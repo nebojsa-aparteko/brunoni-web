@@ -115,7 +115,7 @@ const QuickSearchBooking: React.FC<Props> = ({ label, getBookingChunks }) => {
   useEffect(() => {
     if (inputRef) {
       let mousetrapInstance = new Mousetrap(inputRef.current);
-      mousetrapInstance.stopCallback = function() {
+      mousetrapInstance.stopCallback = function () {
         return false;
       };
       mousetrapInstance.bind(['enter', 'enter'], () => handleBookingSearch());
@@ -137,7 +137,12 @@ const QuickSearchBooking: React.FC<Props> = ({ label, getBookingChunks }) => {
           className={classes.searchInput}
           onChange={event => setInputValue(event.target.value)}
         />
-        <IconButton aria-label="delete" color="primary" tabIndex={-1} onClick={() => handleBookingSearch()}>
+        <IconButton
+          aria-label="delete"
+          color="primary"
+          tabIndex={-1}
+          onClick={() => handleBookingSearch()}
+        >
           <SearchIcon />
         </IconButton>
       </FormControl>

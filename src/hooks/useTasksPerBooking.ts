@@ -27,9 +27,15 @@ export default function useTasksPerBooking(bookingId: string) {
 
   return tasksCollection
     ? (tasksCollection?.docs.map(
-        doc => ({ ...normalizeTaskData(doc.data()), bookingId: doc.ref.parent.parent?.id, id: doc.id } as Task),
+        doc =>
+          ({
+            ...normalizeTaskData(doc.data()),
+            bookingId: doc.ref.parent.parent?.id,
+            id: doc.id,
+          }) as Task,
       ) as Task[])
     : undefined;
 }
 
-export const normalizeTaskData = (item: any) => flow(update('dueDate', safeInvoke('toDate')))(item) as Task;
+export const normalizeTaskData = (item: any) =>
+  flow(update('dueDate', safeInvoke('toDate')))(item) as Task;

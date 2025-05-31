@@ -3,6 +3,7 @@ import firebase from '../firebase';
 import { Switch, Typography } from '@material-ui/core';
 import useVesselWithVoyageById from '../hooks/useVesselWithVoyageById';
 import { useSnackbar } from 'notistack';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 const setFullyBookedStatus = (docId: string, newValue: boolean) => {
   return firebase
@@ -26,8 +27,9 @@ const VesselFullyBookedSwitch: React.FC<Props> = ({ vessel }) => {
     try {
       await setFullyBookedStatus(vessel, !vesselWithVoyage?.isFullyBooked);
     } catch (e) {
-      console.error('Failed to switch', e.message);
-      enqueueSnackbar(<Typography color="inherit"> {e.message}</Typography>, {
+      const errorMessage = tryGetErrorMessage(e);
+      console.error('Failed to switch', errorMessage);
+      enqueueSnackbar(<Typography color="inherit"> {errorMessage}</Typography>, {
         variant: 'error',
         autoHideDuration: 3000,
       });

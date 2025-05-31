@@ -24,6 +24,7 @@ import {
 import { useSnackbar } from 'notistack';
 import UserRecordContext from '../contexts/UserRecordContext';
 import CloseIcon from '@material-ui/icons/Close';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 interface DropZoneProps {
   label?: string;
@@ -95,7 +96,9 @@ export const makeContentDispositionFilePrefix = (
   booking: Booking | undefined,
 ) => {
   if (checklistItem && booking && ['IMO', 'OOG'].includes(checklistItem.id)) {
-    const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(f => f.LocType === BookingLocType.delivery);
+    const deliveryRef = booking.CargoDetails?.[0]?.LocRefs.find(
+      f => f.LocType === BookingLocType.delivery,
+    );
     if (deliveryRef) {
       return `attachment; filename=${checklistItem.id}_${deliveryRef.LocRef}_`;
     }
@@ -217,7 +220,7 @@ const DropZone: React.FC<DropZoneProps> = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -246,10 +249,15 @@ const DropZone: React.FC<DropZoneProps> = ({
             error => {
               setUploadProgress(0);
               reject(error);
-              enqueueSnackbar(<Typography color="inherit">Failed to upload file - {error.message}!</Typography>, {
-                variant: 'error',
-                autoHideDuration: 1000,
-              });
+              enqueueSnackbar(
+                <Typography color="inherit">
+                  Failed to upload file - {tryGetErrorMessage(error)}!
+                </Typography>,
+                {
+                  variant: 'error',
+                  autoHideDuration: 1000,
+                },
+              );
             },
             () => {
               setUploadProgress(0);

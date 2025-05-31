@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import identity from 'lodash/fp/identity';
 import firebase from '../firebase';
 
-export type QueryFunction = (collection: firebase.firestore.CollectionReference) => firebase.firestore.Query;
+export type QueryFunction = (
+  collection: firebase.firestore.CollectionReference,
+) => firebase.firestore.Query;
 
 /**
  *
@@ -29,11 +31,7 @@ export default function useFirestoreCollection(
       try {
         const collectionReference =
           documentPath && subCollection
-            ? firebase
-                .firestore()
-                .collection(name)
-                .doc(documentPath)
-                .collection(subCollection)
+            ? firebase.firestore().collection(name).doc(documentPath).collection(subCollection)
             : firebase.firestore().collection(name);
 
         const collection = await ((query || identity)(collectionReference) as any).get();

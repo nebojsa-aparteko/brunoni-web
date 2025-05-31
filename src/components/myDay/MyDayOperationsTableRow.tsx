@@ -1,5 +1,14 @@
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { Box, Checkbox, CircularProgress, Collapse, IconButton, Link, TableCell, TableRow } from '@material-ui/core';
+import {
+  Box,
+  Checkbox,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  Link,
+  TableCell,
+  TableRow,
+} from '@material-ui/core';
 import Task, { ManualResolveType, TaskDescription, UserRole } from '../../model/Task';
 import formatDate from 'date-fns/format';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -14,13 +23,14 @@ import { Booking } from '../../model/Booking';
 import firebase from '../../firebase';
 
 const getBooking = (bookingId: string) =>
-  firebase
-    .firestore()
-    .collection('bookings')
-    .doc(bookingId)
-    .get();
+  firebase.firestore().collection('bookings').doc(bookingId).get();
 
-const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow, updateComponent }) => {
+const MyDayOperationsTableRow: React.FC<Props> = ({
+  task,
+  selected,
+  onSelectRow,
+  updateComponent,
+}) => {
   const [open, setOpen] = React.useState(false);
   const actingAs = useContext(ActingAs)[0];
   const [booking, setBooking] = useState<Booking | undefined>(undefined);
@@ -72,7 +82,10 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
         key={task.id}
         hover
         onClick={handleRowClick}
-        style={{ cursor: 'pointer', backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff' }}
+        style={{
+          cursor: 'pointer',
+          backgroundColor: task.userRole === UserRole.ADMIN ? '#eee' : '#fff',
+        }}
       >
         <TableCell padding="checkbox">
           {!actingAs && (
@@ -119,13 +132,21 @@ const MyDayOperationsTableRow: React.FC<Props> = ({ task, selected, onSelectRow,
                 <CircularProgress style={{ padding: 8, margin: 'auto' }} />
               </Box>
             ) : (
-              <BookingRow booking={booking} isAdmin={!actingAs} onProgressClick={handleProgressClick} />
+              <BookingRow
+                booking={booking}
+                isAdmin={!actingAs}
+                onProgressClick={handleProgressClick}
+              />
             )}
           </Collapse>
         </TableCell>
       </TableRow>
       {isDialogOpen && booking && (
-        <BookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={booking} />
+        <BookingProgressDialog
+          isOpen={isDialogOpen}
+          handleClose={handleDialogClose}
+          booking={booking}
+        />
       )}
     </Fragment>
   );

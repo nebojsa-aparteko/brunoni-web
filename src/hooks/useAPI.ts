@@ -14,7 +14,7 @@ const useAPI = () => {
       try {
         setLoading(true);
         const token = await user.getIdToken();
-        const url = `${process.env.REACT_APP_API_URL}/${route}?${new URLSearchParams(params)}`;
+        const url = `${import.meta.env.VITE_REACT_APP_API_URL}/${route}?${new URLSearchParams(params)}`;
         const response = await fetch(url, {
           method: 'GET',
           mode: 'cors',
@@ -43,7 +43,7 @@ const useAPI = () => {
       try {
         setLoading(true);
         const token = await user.getIdToken();
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/${route}`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/${route}`, {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',

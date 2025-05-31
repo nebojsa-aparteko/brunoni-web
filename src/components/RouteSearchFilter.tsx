@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Theme, makeStyles, ListItemIcon, CircularProgress, ListItemText, ListItem, Radio } from '@material-ui/core';
+import {
+  Theme,
+  makeStyles,
+  ListItemIcon,
+  CircularProgress,
+  ListItemText,
+  ListItem,
+  Radio,
+} from '@material-ui/core';
 import { useId } from 'react-id-generator';
 
 interface Props {
@@ -33,7 +41,12 @@ const RouteSearchFilter: React.FC<Props> = ({ label, selected, onSelect }) => {
         {busy ? (
           <CircularProgress size={42} className={classes.spinner} />
         ) : (
-          <Radio checked={selected} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': id }} />
+          <Radio
+            checked={selected}
+            tabIndex={-1}
+            disableRipple
+            inputProps={{ 'aria-labelledby': id }}
+          />
         )}
       </ListItemIcon>
       <ListItemText id={id} primary={label} />

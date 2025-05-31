@@ -56,7 +56,13 @@ const SchedulePicker: React.FC<Props> = ({
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="lg" classes={{ paper: classes.dialogPaper }}>
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="lg"
+      classes={{ paper: classes.dialogPaper }}
+    >
       <DialogTitle disableTypography id="schedulePickerDialogTitle">
         <Typography variant="h4">Choose the schedule that best suits your needs</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>

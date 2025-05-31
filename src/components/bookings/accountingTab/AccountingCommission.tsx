@@ -17,7 +17,9 @@ const AccountingCommission = ({ commission }: AccountingCommissionProps) => {
       }}
     >
       <Box flex={1} display="flex" flexDirection="row" justifyContent="space-between">
-        <Typography variant={'h5'}>{formatDateSafe(commission.dueDate, 'd. MMMM yyyy.')}</Typography>
+        <Typography variant={'h5'}>
+          {formatDateSafe(commission.dueDate, 'd. MMMM yyyy.')}
+        </Typography>
         <Typography variant={'h5'}>
           {'Amount: '.concat(currencyFormatter(commission.currency)(commission.amount))}
         </Typography>
@@ -29,8 +31,8 @@ const AccountingCommission = ({ commission }: AccountingCommissionProps) => {
               commission.status === CommissionStatus.PAID
                 ? 'rgba(0,200,81)'
                 : commission.status === CommissionStatus.INVOICED
-                ? '#0070df'
-                : '#000',
+                  ? '#0070df'
+                  : '#000',
           }}
         >
           {commission.status}

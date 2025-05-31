@@ -237,7 +237,8 @@ const EditableRow: React.FC<EditableRowProps> = ({
     const key = event.target?.name;
     const value = event.target.value;
     const type = event.target.type;
-    key && setStateItem((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
+    key &&
+      setStateItem((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
   };
   const handleSelectChange = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target?.name;
@@ -308,7 +309,9 @@ const EditableRow: React.FC<EditableRowProps> = ({
                 name="active"
                 checked={get('active')(stateItem)}
                 onChange={event => {
-                  setStateItem((prevState: any) => set(event.target.name, event.target.checked)(prevState));
+                  setStateItem((prevState: any) =>
+                    set(event.target.name, event.target.checked)(prevState),
+                  );
                 }}
                 onClick={event => {
                   event.stopPropagation();
@@ -326,7 +329,9 @@ const EditableRow: React.FC<EditableRowProps> = ({
                 value={get(cell.fieldName)(stateItem)}
                 style={{ flex: 1 }}
                 //@ts-ignore
-                onChange={(event, value) => setStateItem((prevState: any) => set(cell.fieldName, value)(prevState))}
+                onChange={(event, value) =>
+                  setStateItem((prevState: any) => set(cell.fieldName, value)(prevState))
+                }
                 renderInput={params => (
                   <TextField {...params} name={cell.fieldName} variant="outlined" margin="dense" />
                 )}

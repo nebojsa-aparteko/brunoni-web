@@ -3,6 +3,7 @@ import { FormControl, Switch, Typography } from '@material-ui/core';
 import firebase from '../firebase';
 import { GlobalContext } from '../store/GlobalStore';
 import { useSnackbar } from 'notistack';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 interface Props {
   paymentConfirmationId: string;
@@ -36,7 +37,7 @@ const AutomaticEmailSendSwitch: React.FC<Props> = ({ automaticMessage, paymentCo
       } catch (error) {
         console.error(error);
         dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -47,7 +48,12 @@ const AutomaticEmailSendSwitch: React.FC<Props> = ({ automaticMessage, paymentCo
 
   return (
     <FormControl>
-      <Switch checked={automaticMessage} onChange={saveChanges} name="automatic message" color="primary" />
+      <Switch
+        checked={automaticMessage}
+        onChange={saveChanges}
+        name="automatic message"
+        color="primary"
+      />
     </FormControl>
   );
 };

@@ -33,6 +33,7 @@ import ConfirmationDialog from '../ConfirmationDialog';
 import { GlobalContext } from '../../store/GlobalStore';
 import { useSnackbar } from 'notistack';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -63,7 +64,9 @@ interface AddAdminsDialogProps {
 
 const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose }) => {
   const classes = useStyles();
-  const clientUsers = useClientUsers(process.env.REACT_APP_BRAND === 'brunoni' ? '001772' : '005905');
+  const clientUsers = useClientUsers(
+    import.meta.env.VITE_BRAND === 'brunoni' ? '001772' : '005905',
+  );
   const nonAdminUsers = clientUsers?.filter(user => !user.isAdmin && !user.role) || [];
   const [selectedUser, setSelectedUser] = useState<UserRecordMin | undefined>(undefined);
   const [selectedRole, setSelectedRole] = useState(ADMIN_ROLES[0]);
@@ -87,7 +90,12 @@ const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose })
   }, [selectedUser, selectedRole, handleClose, dispatch]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="addAdminsDialogTitle" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="addAdminsDialogTitle"
+      maxWidth="md"
+    >
       <DialogTitle disableTypography id="addAdminsDialogTitle">
         <Typography variant="h4">Assign admin role</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
@@ -103,13 +111,18 @@ const AddAdminDialog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose })
             value={selectedUser}
           />
         </Box>
-        <FormControl variant="outlined" style={{ minWidth: 250, maxWidth: 400, margin: 8, paddingRight: 8 }}>
+        <FormControl
+          variant="outlined"
+          style={{ minWidth: 250, maxWidth: 400, margin: 8, paddingRight: 8 }}
+        >
           <InputLabel id="roleInputLabel">Role</InputLabel>
           <Select
             labelId="roleInputLabel"
             label="Role"
             value={selectedRole}
-            onChange={event => setSelectedRole(event.target.value ? (event.target.value as string) : ADMIN_ROLES[0])}
+            onChange={event =>
+              setSelectedRole(event.target.value ? (event.target.value as string) : ADMIN_ROLES[0])
+            }
           >
             {ADMIN_ROLES.map(role => (
               <MenuItem key={role} value={role}>
@@ -189,7 +202,7 @@ const TeamsUsersContainer: React.FC = () => {
       })
       .catch(error => {
         console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

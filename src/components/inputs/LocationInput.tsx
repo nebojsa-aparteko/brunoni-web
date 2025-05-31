@@ -26,13 +26,15 @@ interface Props extends InputProps<PickupLocation> {
   shouldShowAllDepots?: boolean;
 }
 
-const filterFlow = (parts: string[], options: PickupLocation[], findIntersection: boolean = false) => {
+const filterFlow = (
+  parts: string[],
+  options: PickupLocation[],
+  findIntersection: boolean = false,
+) => {
   const filteredItems = map((part: string) =>
     filter(
       (option: PickupLocation) =>
-        getLocationLabel(option)
-          .toLowerCase()
-          .indexOf(part.toLowerCase()) > -1,
+        getLocationLabel(option).toLowerCase().indexOf(part.toLowerCase()) > -1,
     )(options),
   )(parts);
 
@@ -54,7 +56,10 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin, shouldShowAllDepots }, ref) => {
+const LocationInput: ForwardRefRenderFunction<any, Props> = (
+  { value, onChange, margin, shouldShowAllDepots },
+  ref,
+) => {
   const input = useRef();
   const locations = useContext(Locations);
   const [open, setOpen] = useState(false);
@@ -67,7 +72,9 @@ const LocationInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, 
       )(
         filter((location: PickupLocation) => {
           const adrNameFiltered = includes(location.name.toLowerCase())(adrNameToFilterOut);
-          const shouldNotBeShown = shouldShowAllDepots ? false : includes(location.city.toLowerCase())(doNotShowCities);
+          const shouldNotBeShown = shouldShowAllDepots
+            ? false
+            : includes(location.city.toLowerCase())(doNotShowCities);
           return !(adrNameFiltered || shouldNotBeShown); // || !portOnlyLocation;
         })(locations),
       ),

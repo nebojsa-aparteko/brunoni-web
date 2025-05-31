@@ -50,10 +50,12 @@ export enum OfferProviderConfigType {
 export type ProviderExtension = Omit<ProviderExtensionEntity, 'id' | 'createdAt'>;
 export type ProviderExtensionGroup = Omit<ProviderExtensionGroupEntity, 'id' | 'createdAt'>;
 
-export const isIncludedProviderProfitEntity = (value: OfferProviderConfig): value is IncludedOfferProviderConfig =>
-  value.offerType === OfferProviderConfigType.INCLUDED;
+export const isIncludedProviderProfitEntity = (
+  value: OfferProviderConfig,
+): value is IncludedOfferProviderConfig => value.offerType === OfferProviderConfigType.INCLUDED;
 
-export const isAddOnProviderProfitEntity = (value: OfferProviderConfig): value is AddOnOfferProviderConfig =>
-  value.offerType === OfferProviderConfigType.ADD_ON;
+export const isAddOnProviderProfitEntity = (
+  value: OfferProviderConfig,
+): value is AddOnOfferProviderConfig => value.offerType === OfferProviderConfigType.ADD_ON;
 
 export default ProviderConfig;

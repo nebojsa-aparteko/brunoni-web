@@ -17,8 +17,12 @@ interface Props {
 const CityInput: React.FC<Props> = ({ onSelect, origin, isEditing }) => (
   <Box display="flex" flexDirection="row" style={{ gap: theme.spacing(1) }} alignItems="center">
     {isEditing ? (
-      //@ts-ignore
-      <SingleCountryInput margin="dense" value={origin?.country} onChange={value => onSelect(value, 'country')} />
+      <SingleCountryInput
+        margin="dense"
+        // @ts-ignore
+        value={origin?.country}
+        onChange={value => onSelect(value, 'country')}
+      />
     ) : (
       <Typography>{get('name')(origin?.country)},</Typography>
     )}
@@ -26,7 +30,7 @@ const CityInput: React.FC<Props> = ({ onSelect, origin, isEditing }) => (
       <CityByCountryInput
         margin="dense"
         country={origin?.country}
-        //@ts-ignore
+        // @ts-ignore
         value={origin?.city}
         onChange={value => onSelect(value, 'city')}
       />

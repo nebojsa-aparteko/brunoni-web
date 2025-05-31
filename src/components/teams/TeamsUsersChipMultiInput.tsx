@@ -26,7 +26,9 @@ const TeamsUsersChipMultiInput: React.FC<Props> = ({ options, values, onChange }
           <Chip label={`${option.firstName} ${option.lastName}`} {...getTagProps({ index })} />
         ))
       }
-      renderInput={params => <TextField {...params} label="Users" placeholder="Type to filter" variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} label="Users" placeholder="Type to filter" variant="outlined" />
+      )}
     />
   );
 };

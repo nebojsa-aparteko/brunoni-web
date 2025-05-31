@@ -52,8 +52,8 @@ const CommissionOverviewTableRow: React.FC<Props> = ({
                 status === CommissionStatus.INVOICED
                   ? theme.palette.primary.main
                   : status === CommissionStatus.PAID
-                  ? '#10881a'
-                  : '#999',
+                    ? '#10881a'
+                    : '#999',
               color: 'white',
             }}
           />

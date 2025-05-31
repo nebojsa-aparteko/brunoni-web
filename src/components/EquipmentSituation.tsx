@@ -70,7 +70,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const updateEquipmentSituationBody = (carriers?: Carrier[] | null, containerTypes?: ContainerType[] | null) =>
+const updateEquipmentSituationBody = (
+  carriers?: Carrier[] | null,
+  containerTypes?: ContainerType[] | null,
+) =>
   flow(
     get('idStat_012.Statistics.Carrier'),
     asArray,
@@ -90,7 +93,10 @@ const updateEquipmentSituationBody = (carriers?: Carrier[] | null, containerType
                   AdrID: 'name',
                   Detail: 'containers',
                 }),
-                update('containers', flow(asArray, groupBy('CtypID'), mapValues(flow(head, get('Status'))))),
+                update(
+                  'containers',
+                  flow(asArray, groupBy('CtypID'), mapValues(flow(head, get('Status')))),
+                ),
               ),
             ),
           ),
@@ -130,10 +136,10 @@ const EquipmentSituation: React.FC = () => {
   const carriers = useContext(Carriers);
   const containerTypes = useContext(ContainerTypes);
 
-  const bodyTransform = useMemo(() => updateEquipmentSituationBody(carriers, containerTypes), [
-    carriers,
-    containerTypes,
-  ]);
+  const bodyTransform = useMemo(
+    () => updateEquipmentSituationBody(carriers, containerTypes),
+    [carriers, containerTypes],
+  );
 
   const { result } = useEndpoint(
     '/equipmentSituation',
@@ -206,7 +212,9 @@ const EquipmentSituation: React.FC = () => {
                           {location.name}
                         </TableCell>
                         {containerTypes.map(containerType => {
-                          const status = (location.containers[containerType.id] || '').toLowerCase();
+                          const status = (
+                            location.containers[containerType.id] || ''
+                          ).toLowerCase();
 
                           const className = classNames({
                             [classes.avatar]: true,

@@ -1,5 +1,9 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
-import { containerTypesLabels, EquipmentExportSummary, weeksColumns } from '../../model/EquipmentControl';
+import {
+  containerTypesLabels,
+  EquipmentExportSummary,
+  weeksColumns,
+} from '../../model/EquipmentControl';
 import {
   Box,
   CircularProgress,
@@ -33,7 +37,7 @@ const getBookingsByEC = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&year=${year}&locId=${locId}&carrierId=${carrierId}`,
+      `${import.meta.env.VITE_REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&week=${week}&year=${year}&locId=${locId}&carrierId=${carrierId}&category=Export`,
       {
         method: 'GET',
         mode: 'cors',
@@ -63,13 +67,16 @@ const getBookingsByEC = async (
 };
 const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipmentControl }) => {
   const locations = useContext(PickupLocations);
-  const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [
-    locations,
-    equipmentControl,
-  ]);
+  const location = useMemo(
+    () => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')),
+    [locations, equipmentControl],
+  );
   const classes = importFlowsStyles();
-  const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
-  const [bookings, setBookings] = useState<{ bookingId: string; count: number; bookingStatus: string }[]>();
+  const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(
+    null,
+  );
+  const [bookings, setBookings] =
+    useState<{ bookingId: string; count: number; bookingStatus: string }[]>();
   const [weekAndYear, setWeekAndYear] = useState<[number, number]>();
   const handleClose = () => {
     setAnchorEl(null);
@@ -77,7 +84,9 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const groupedBookingsByStatus = useMemo(
     () =>
       Object.entries(
-        groupBy<{ bookingId: string; count: number; bookingStatus: string }>(doc => doc.bookingStatus)(bookings),
+        groupBy<{ bookingId: string; count: number; bookingStatus: string }>(
+          doc => doc.bookingStatus,
+        )(bookings),
       ),
     [bookings],
   );
@@ -91,7 +100,12 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
       <Tooltip title={location?.name || equipmentControl.id!}>
         <TableCell
           style={{ whiteSpace: 'nowrap' }}
-          className={clsx(classes.stickySide, classes.hoverColorControl, classes.borderRight, classes.cityCell)}
+          className={clsx(
+            classes.stickySide,
+            classes.hoverColorControl,
+            classes.borderRight,
+            classes.cityCell,
+          )}
         >
           {truncateString(location?.name || equipmentControl.id!, 13)}
         </TableCell>
@@ -109,7 +123,9 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                 <TableCell
                   aria-describedby={id}
                   key={`${type}-${s}`}
-                  className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
+                  className={clsx({
+                    [classes.borderRight]: containerTypesLabels.length === index + 1,
+                  })}
                   onClick={event => {
                     if (s === 'Export Total') return;
                     setAnchorEl(event.currentTarget);
@@ -127,8 +143,8 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                           filters.carrier?.id === 'HSG'
                             ? 'Hamburg Süd'
                             : filters.carrier?.id === 'STNN'
-                            ? 'HUGO STINNES'
-                            : filters.carrier?.id!,
+                              ? 'HUGO STINNES'
+                              : filters.carrier?.id!,
                         ),
                       )
                       .then(response => {

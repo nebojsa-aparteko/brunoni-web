@@ -1,15 +1,23 @@
 import React, { Fragment } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams, useNavigate } from 'react-router-dom';
 import QuoteGroupView from '../components/QuoteGroupView';
 import Meta from '../components/Meta';
 
-interface Props extends RouteComponentProps<{ id: string }> {}
+const QuoteGroupPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
-const QuoteGroupPage: React.FC<Props> = ({ match }) => (
-  <Fragment>
-    <Meta title="Quotes" />
-    <QuoteGroupView id={match.params.id} />
-  </Fragment>
-);
+  if (!id) {
+    navigate('/not-found');
+    return null;
+  }
+
+  return (
+    <Fragment>
+      <Meta title="Quotes" />
+      <QuoteGroupView id={id} />
+    </Fragment>
+  );
+};
 
 export default QuoteGroupPage;

@@ -28,7 +28,9 @@ const QuoteFilterListProvider = (props: any) => {
     setState(state);
   };
   return (
-    <QuoteListFilterContext.Provider value={[state, setStateFn]}>{props.children}</QuoteListFilterContext.Provider>
+    <QuoteListFilterContext.Provider value={[state, setStateFn]}>
+      {props.children}
+    </QuoteListFilterContext.Provider>
   );
 };
 

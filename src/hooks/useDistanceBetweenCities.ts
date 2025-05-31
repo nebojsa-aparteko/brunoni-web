@@ -13,7 +13,9 @@ const useDistanceBetweenCities = (countryId: string, startCityId: string) => {
 
     getDistancesByCountryAndCityId(countryId, startCityId).then(d => {
       setDistances(
-        d.docs.map(value => ({ ...value.data(), id: value.id } as RouteFromCityEntity)) as RouteFromCityEntity[],
+        d.docs.map(
+          value => ({ ...value.data(), id: value.id }) as RouteFromCityEntity,
+        ) as RouteFromCityEntity[],
       );
     });
   }, [countryId, startCityId]);

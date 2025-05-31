@@ -70,7 +70,14 @@ const DocumentLayout: React.FC<{ name: string; children: ReactChild }> = ({ name
       <Paper style={{ padding: 8, maxWidth: '48vw' }}>
         <Typography style={{ fontWeight: 'bolder' }}>{name}</Typography>
       </Paper>
-      <Box style={{ flexFlow: 'column scroll', height: '100%', backgroundColor: 'grey', overflow: 'auto' }}>
+      <Box
+        style={{
+          flexFlow: 'column scroll',
+          height: '100%',
+          backgroundColor: 'grey',
+          overflow: 'auto',
+        }}
+      >
         {children}
       </Box>
     </Box>
@@ -97,8 +104,8 @@ export const renderDocument = (
       </div>
     ) : (
       <Typography style={{ flex: 1, margin: 'auto' }}>
-        The comparing option is currently only available for PDF, HTML, CSV, XLS, XLSX and DOCX files. The same
-        functionality for other document types will be available soon.
+        The comparing option is currently only available for PDF, HTML, CSV, XLS, XLSX and DOCX
+        files. The same functionality for other document types will be available soon.
       </Typography>
     )}
   </DocumentLayout>
@@ -136,7 +143,9 @@ const ComparisonDialogContent = ({
     ...doc.data(),
   })) as ActivityLogItem[];
 
-  const filteredActivities = activityCollection?.filter(activity => activity.documents && activity.documents);
+  const filteredActivities = activityCollection?.filter(
+    activity => activity.documents && activity.documents,
+  );
 
   return (
     <Grid
@@ -158,10 +167,7 @@ const ComparisonDialogContent = ({
               <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
                 {renderDocument(
                   leftDocument,
-                  leftDocument?.name
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase(),
+                  leftDocument?.name.split('.').pop()?.toLowerCase(),
                   'leftDocumentContainer',
                 )}
               </Grid>
@@ -176,10 +182,7 @@ const ComparisonDialogContent = ({
               <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
                 {renderDocument(
                   rightDocument,
-                  rightDocument?.name
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase(),
+                  rightDocument?.name.split('.').pop()?.toLowerCase(),
                   'rightDocumentContainer',
                 )}
               </Grid>
@@ -188,10 +191,7 @@ const ComparisonDialogContent = ({
             <Grid item xs={12} md={6} style={{ display: 'flex', minHeight: 0, height: '100%' }}>
               {renderDocument(
                 document,
-                document?.name
-                  .split('.')
-                  .pop()
-                  ?.toLowerCase(),
+                document?.name.split('.').pop()?.toLowerCase(),
                 'documentContainer',
               )}
             </Grid>
@@ -201,7 +201,9 @@ const ComparisonDialogContent = ({
       <Grid item md style={{ flexGrow: 0 }}>
         {amendmentRequested ? (
           <React.Fragment>
-            <Typography style={{ marginTop: 8 }}>Please enter the description of what needs to be changed:</Typography>
+            <Typography style={{ marginTop: 8 }}>
+              Please enter the description of what needs to be changed:
+            </Typography>
             <CommentInput
               booking={booking}
               onInputChange={onRejectionInputChange}

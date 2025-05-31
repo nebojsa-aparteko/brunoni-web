@@ -42,6 +42,7 @@ import { useSnackbar } from 'notistack';
 import useUser from '../../../hooks/useUser';
 import firebase from '../../../firebase';
 import Task, { TaskType } from '../../../model/Task';
+import { tryGetErrorMessage } from '../../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,7 +68,7 @@ const approveWeeklyPayment = async (user: any, weeklyPayment: WeeklyPayment) => 
   try {
     const token = await user.getIdToken();
 
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/weeklyPayment`, {
+    const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/weeklyPayment`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -214,7 +215,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -240,7 +241,7 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });
@@ -294,7 +295,10 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
   );
 
   const revertApprovalDisabled = useMemo(() => {
-    return (resolved && payment.status === WeeklyPaymentStatus.BLOCKED) || payment.status === WeeklyPaymentStatus.PAID;
+    return (
+      (resolved && payment.status === WeeklyPaymentStatus.BLOCKED) ||
+      payment.status === WeeklyPaymentStatus.PAID
+    );
   }, [payment.status, resolved]);
 
   const paymentApprovalDisabled = useMemo(
@@ -317,7 +321,12 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
         paymentApprovalDisabled ? (
           <Tooltip title={'All files must be approved first'} placement="top">
             <span>
-              <Button onClick={handleDialogOpen} color="primary" variant="contained" disabled={true}>
+              <Button
+                onClick={handleDialogOpen}
+                color="primary"
+                variant="contained"
+                disabled={true}
+              >
                 Approve Payment
               </Button>
             </span>
@@ -342,7 +351,8 @@ const PaymentApprovalButton: React.FC<PaymentApprovalProps> = ({
           handleConfirm={() => handleChangePaymentStatus(undefined)}
           handleClose={handleDialogClose}
         />
-      ) : (payment.platformStatus && payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
+      ) : (payment.platformStatus &&
+          payment.platformStatus === WeeklyPaymentPlatformStatus.CLEARED) ||
         payment.status === WeeklyPaymentStatus.BLOCKED ? (
         <RevertApprovalDialog
           isOpen={isDialogOpen}

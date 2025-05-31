@@ -82,20 +82,28 @@ const ComparisonDialog: React.FC<Props> = ({
   const [amendmentRequested, setAmendmentRequested] = useState<boolean>(false);
 
   const [leftDocument, setLeftDocument] = useState<ChecklistItemValueDocument | undefined>();
-  const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>(document);
+  const [rightDocument, setRightDocument] = useState<ChecklistItemValueDocument | undefined>(
+    document,
+  );
 
   useEffect(() => {
-    setLeftDocument(sortedDocuments?.filter(doc => doc.checklistId === ChecklistNames.SHIPPING_INSTRUCTIONS)?.[0]);
+    setLeftDocument(
+      sortedDocuments?.filter(doc => doc.checklistId === ChecklistNames.SHIPPING_INSTRUCTIONS)?.[0],
+    );
   }, [sortedDocuments]);
 
   const handleChangeLeftDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
     event.stopPropagation();
-    setLeftDocument(sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument);
+    setLeftDocument(
+      sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || leftDocument,
+    );
   };
 
   const handleChangeRightDocument = (event: React.ChangeEvent<{ value: unknown }>) => {
     event.stopPropagation();
-    setRightDocument(sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument);
+    setRightDocument(
+      sortedDocuments?.find(doc => doc.url === (event.target.value as string)) || rightDocument,
+    );
   };
 
   const handleApproveDocument = () => {
@@ -117,7 +125,10 @@ const ComparisonDialog: React.FC<Props> = ({
         className={classes.dialogTitleBar}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}
       >
-        <Typography variant="h4" className={classes.fileNumber}>{`File No: ${booking.id}`}</Typography>
+        <Typography
+          variant="h4"
+          className={classes.fileNumber}
+        >{`File No: ${booking.id}`}</Typography>
         <Box style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           {!isAccountingDialog && leftDocument && sortedDocuments ? (
             <FormControl className={classes.formControl}>
@@ -205,7 +216,12 @@ const ComparisonDialog: React.FC<Props> = ({
       <DialogActions className={classes.dialogActions}>
         {amendmentRequested ? (
           <React.Fragment>
-            <Button onClick={() => setAmendmentRequested(false)} color="primary" variant="outlined" autoFocus>
+            <Button
+              onClick={() => setAmendmentRequested(false)}
+              color="primary"
+              variant="outlined"
+              autoFocus
+            >
               Cancel amendment
             </Button>
             <Button
@@ -247,7 +263,10 @@ interface Props {
   isOpen: boolean;
   handleClose: () => void;
   booking: Booking;
-  updateDocumentStatus: (newStatus: ChecklistItemValueDocumentStatusType, dontCreateActivity?: boolean) => void;
+  updateDocumentStatus: (
+    newStatus: ChecklistItemValueDocumentStatusType,
+    dontCreateActivity?: boolean,
+  ) => void;
   sortedDocuments: ChecklistItemValueDocument[];
   onReject: () => void;
   rejectionInput: RejectionInput | undefined;

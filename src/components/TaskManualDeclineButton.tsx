@@ -7,12 +7,7 @@ import HighlightOffOutlinedIcon from '@material-ui/icons/HighlightOffOutlined';
 import { endOfDay } from 'date-fns/fp';
 
 const taskRef = (bookingId: string, taskId: string | TaskType) =>
-  firebase
-    .firestore()
-    .collection('bookings')
-    .doc(bookingId)
-    .collection('tasks')
-    .doc(taskId);
+  firebase.firestore().collection('bookings').doc(bookingId).collection('tasks').doc(taskId);
 
 const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
   task.resolved ? (
@@ -47,7 +42,12 @@ const TaskManualDeclineButton: React.FC<Props> = ({ task, updateComponent }) =>
           .then(() =>
             task.declineManualResolveAction
               ? taskRef(task.bookingId, task.declineManualResolveAction).set(
-                  { resolved: false, createAt: new Date(), show: true, dueDate: endOfDay(new Date()) },
+                  {
+                    resolved: false,
+                    createAt: new Date(),
+                    show: true,
+                    dueDate: endOfDay(new Date()),
+                  },
                   { merge: true },
                 )
               : new Promise<void>(resolve => resolve()),

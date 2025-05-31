@@ -44,8 +44,12 @@ const DropZoneArea: React.FC<Props> = ({
     (acceptedFiles: File[]) => {
       const hasUnacceptedExtensions =
         acceptedExtensions &&
-        !acceptedFiles.every(file => acceptedExtensions.includes(`.${file.name.split('.').pop()}` || ''));
-      const hasDuplicates = currentFiles?.map(f => f.name)?.some(f => acceptedFiles.map(f => f.name).includes(f));
+        !acceptedFiles.every(file =>
+          acceptedExtensions.includes(`.${file.name.split('.').pop()}` || ''),
+        );
+      const hasDuplicates = currentFiles
+        ?.map(f => f.name)
+        ?.some(f => acceptedFiles.map(f => f.name).includes(f));
 
       if (hasUnacceptedExtensions) {
         return dispatch({

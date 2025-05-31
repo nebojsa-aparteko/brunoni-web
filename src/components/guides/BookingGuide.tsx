@@ -38,8 +38,7 @@ bookingShepherdTour.addSteps([
   },
   {
     title: 'Other Booking Information',
-    text:
-      'This is where you can see the rest of the booking information such as freight details and if available, port terms.',
+    text: 'This is where you can see the rest of the booking information such as freight details and if available, port terms.',
     attachTo: { element: '#otherBookingInfoBkg', on: 'right' },
     buttons: [
       {
@@ -61,8 +60,7 @@ bookingShepherdTour.addSteps([
   },
   {
     title: 'Attach files',
-    text:
-      'You can upload documents by dragging them onto the desired item or by clicking on the paperclip icon. As soon as this has been done, it triggers a task for us, which is immediately processed by our team.',
+    text: 'You can upload documents by dragging them onto the desired item or by clicking on the paperclip icon. As soon as this has been done, it triggers a task for us, which is immediately processed by our team.',
     attachTo: { element: '#checklistItemRow_SHIPPING_INSTRUCTIONS', on: 'left' },
     buttons: [
       {

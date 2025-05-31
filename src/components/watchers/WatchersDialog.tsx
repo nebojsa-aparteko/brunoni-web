@@ -1,9 +1,21 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import UserInput from '../inputs/UserInput';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import UserRecord, { CUSTOMER_FACING_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, {
+  CUSTOMER_FACING_ROLES,
+  UserRecordMin,
+  UserRecordMinProperties,
+} from '../../model/UserRecord';
 import WatchersChipMultiInput from './WatchersChipMultiInput';
 import firebase from '../../firebase';
 import { Booking } from '../../model/Booking';
@@ -51,7 +63,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const handleChangeAgent = (id: string, user: UserRecordMin | null, watchers: UserRecordMin[] | null) =>
+const handleChangeAgent = (
+  id: string,
+  user: UserRecordMin | null,
+  watchers: UserRecordMin[] | null,
+) =>
   firebase
     .firestore()
     .collection('bookings')
@@ -63,7 +79,9 @@ const handleChangeAgent = (id: string, user: UserRecordMin | null, watchers: Use
         BkgAgentContact: user?.alphacomId || '',
         assignedUser: user ? pick(UserRecordMinProperties)(user) : null,
         watchers: uniqBy((item: UserRecordMin) => item.alphacomId)(
-          (watchers || []).concat(user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : []),
+          (watchers || []).concat(
+            user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : [],
+          ),
         ),
       },
       { merge: true },
@@ -80,7 +98,9 @@ const handleChangeCustomer = (id: string, user: UserRecordMin | null, watchers: 
         ForwarderPersTxt: `${user?.firstName || ''} ${user?.lastName || ''}`,
         assignedCustomerUser: user ? pick(UserRecordMinProperties)(user) : null,
         watchers: uniqBy((item: UserRecordMin) => item.alphacomId)(
-          (watchers || []).concat(user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : []),
+          (watchers || []).concat(
+            user ? (pick(UserRecordMinProperties)(user) as UserRecordMin) : [],
+          ),
         ),
       },
       { merge: true },
@@ -131,7 +151,7 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
         alphacomClientId: user?.alphacomClientId,
         alphacomId: user?.alphacomId,
         emailAddress: user?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [],
   );
 
@@ -139,7 +159,10 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
     (fn: Promise<any>, users: ActivityLogUserData[] | null, changeType: WatchersChangeType) => {
       fn.then(_ => {
         const usersToAdd = users
-          ? users.filter(user => currentWatchers.findIndex(watcher => watcher.alphacomId === user.alphacomId) === -1)
+          ? users.filter(
+              user =>
+                currentWatchers.findIndex(watcher => watcher.alphacomId === user.alphacomId) === -1,
+            )
           : [];
         const usersToRemove =
           changeType === WatchersChangeType.SET_WATCHERS && currentWatchers && users
@@ -174,8 +197,8 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
                   ? usersToAdd
                   : undefined
                 : users
-                ? users
-                : undefined,
+                  ? users
+                  : undefined,
             removedUsers: usersToRemove.length > 0 ? usersToRemove : undefined,
           }),
         );
@@ -183,7 +206,9 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
         .then(() => {
           console.log('New watchers have been set');
         })
-        .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }));
+        .catch(error =>
+          dispatch({ type: SHOW_ERROR_SNACKBAR, message: `There was an error ${error}` }),
+        );
     },
     [currentWatchers, dispatch, booking, getActivityLogUserData, userRecord],
   );
@@ -243,7 +268,12 @@ const WatchersDialog: React.FC<Props> = ({ booking, isOpen, handleClose }) => {
               options={assignableUsers || []}
               onChange={(event, value) => {
                 handleResponse(
-                  handleChangeWatchers(booking.id, value, booking.assignedUser, booking.assignedCustomerUser),
+                  handleChangeWatchers(
+                    booking.id,
+                    value,
+                    booking.assignedUser,
+                    booking.assignedCustomerUser,
+                  ),
                   value
                     ? Array.isArray(value)
                       ? value.map(user => getActivityLogUserData(user))

@@ -6,8 +6,10 @@ import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import UserRecord, { UserRecordMin } from '../../model/UserRecord';
 
-const getOptionSelected = (option: UserRecord, value: UserRecord) => option?.alphacomId === value?.alphacomId;
-const getOptionLabel = (option: UserRecord) => (option ? `${option.firstName || ''} ${option.lastName || ''}` : '');
+const getOptionSelected = (option: UserRecord, value: UserRecord) =>
+  option?.alphacomId === value?.alphacomId;
+const getOptionLabel = (option: UserRecord) =>
+  option ? `${option.firstName || ''} ${option.lastName || ''}` : '';
 
 interface Props {
   label: string;
@@ -29,7 +31,17 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const UserInput: React.FC<Props> = ({ label, users, inputRef, value, onChange, open, onOpen, onClose, ...rest }) => {
+const UserInput: React.FC<Props> = ({
+  label,
+  users,
+  inputRef,
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  ...rest
+}) => {
   const classes = useStyles();
   const loading = open && !users;
 

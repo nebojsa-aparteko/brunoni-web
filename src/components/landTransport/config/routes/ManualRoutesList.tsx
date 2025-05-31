@@ -21,7 +21,10 @@ import AddIcon from '@material-ui/icons/Add';
 import EmptyStatePanel from '../../../EmptyStatePanel';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 
-type InitialManualProviderRoute = Omit<ManualProviderRoute, 'updatedAt' | 'priceRange' | 'pricePerContainer'>;
+type InitialManualProviderRoute = Omit<
+  ManualProviderRoute,
+  'updatedAt' | 'priceRange' | 'pricePerContainer'
+>;
 
 const defaultItem: InitialManualProviderRoute = {
   type: ProviderRoutesType.MANUAL,
@@ -67,14 +70,20 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
             addItem={item =>
               addLandTransportRoute(
                 provider.id,
-                set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                set(
+                  'priceRange',
+                  getRangePricesByContainer(item.pricePerContainer, item.currency),
+                )(item),
               ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
             }
             editItem={(id, item) =>
               editLandTransportRoute(
                 provider.id,
                 id,
-                set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                set(
+                  'priceRange',
+                  getRangePricesByContainer(item.pricePerContainer, item.currency),
+                )(item),
               )
             }
           />
@@ -88,14 +97,20 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
               addItem={item =>
                 addLandTransportRoute(
                   provider.id,
-                  set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                  set(
+                    'priceRange',
+                    getRangePricesByContainer(item.pricePerContainer, item.currency),
+                  )(item),
                 ).then(val => addLandTransportExtensionGroupDefault(provider.id, val.id))
               }
               editItem={(id, item) =>
                 editLandTransportRoute(
                   provider.id,
                   id,
-                  set('priceRange', getRangePricesByContainer(item.pricePerContainer, item.currency))(item),
+                  set(
+                    'priceRange',
+                    getRangePricesByContainer(item.pricePerContainer, item.currency),
+                  )(item),
                 )
               }
             />
@@ -116,12 +131,18 @@ const ManualRoutesList: React.FC<Props> = ({ provider }) => {
   );
 };
 
-const getRangePricesByContainer = (priceByContainer: PricePerContainer, currency: Currency): PriceRange | null => {
+const getRangePricesByContainer = (
+  priceByContainer: PricePerContainer,
+  currency: Currency,
+): PriceRange | null => {
   if (!priceByContainer) return null;
   return Object.values(priceByContainer).reduce(
     (previousValue, currentValue, index) => {
       if (index === 0)
-        return { min: { value: currentValue.value, currency }, max: { value: currentValue.value, currency } };
+        return {
+          min: { value: currentValue.value, currency },
+          max: { value: currentValue.value, currency },
+        };
       if (previousValue.max.value < currentValue.value) {
         return set('max.value', currentValue.value)(previousValue);
       } else if (previousValue.min.value > currentValue.value) {

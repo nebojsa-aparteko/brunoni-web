@@ -11,7 +11,10 @@ import {
 } from '../types/globalAppState';
 import { defaultState } from '../GlobalStore';
 
-const globalReducer: Reducer<GlobalAppState, globalActions> = (prevState = defaultState, action) => {
+const globalReducer: Reducer<GlobalAppState, globalActions> = (
+  prevState = defaultState,
+  action,
+) => {
   switch (action.type) {
     case START_GLOBAL_LOADING:
       return { ...prevState, isGlobalLoadingInProgress: true };

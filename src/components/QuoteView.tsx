@@ -35,7 +35,12 @@ import { portLongFormatLabel } from '../utilities/formattedPortDisplay';
 import * as changeCase from 'change-case';
 import useClients from '../hooks/useClients';
 import ContainerType from '../model/Container';
-import { Quote, Quote as QuoteModel, QuoteStatus, QuoteStatusText } from '../providers/QuoteGroupsProvider';
+import {
+  Quote,
+  Quote as QuoteModel,
+  QuoteStatus,
+  QuoteStatusText,
+} from '../providers/QuoteGroupsProvider';
 import ActingAs from '../contexts/ActingAs';
 import QuoteActivityLogContainer from './activities/QuoteActivityLogContainer';
 import UserRecord from '../model/UserRecord';
@@ -50,7 +55,7 @@ import { GlobalContext } from '../store/GlobalStore';
 import { SHOW_ERROR_SNACKBAR } from '../store/types/globalAppState';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { getLogo } from './Navbar';
 import PromoBox from './PromoBox';
 
@@ -141,11 +146,7 @@ const handleSpecialRequest = (quote: QuoteModel) => {
 };
 
 export const addStatus = (status: QuoteStatus | null, quoteId: string) => {
-  return firebase
-    .firestore()
-    .collection('quotes')
-    .doc(quoteId)
-    .update('status', status);
+  return firebase.firestore().collection('quotes').doc(quoteId).update('status', status);
 };
 
 const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
@@ -154,7 +155,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   const [user, userData] = useUser();
   const clients = useClients();
   const { enqueueSnackbar } = useSnackbar();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isSmAndDown = useMediaQuery(theme.breakpoints.down('xs'));
@@ -202,7 +203,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
           [
             'quote-last-viewed-link',
             String(
-              process.env.REACT_APP_BRAND === 'brunoni'
+              import.meta.env.VITE_BRAND === 'brunoni'
                 ? `https://mybrunoni.ch/quotes/${quote.id}`
                 : `https://myallmarine.ch/quotes/${quote.id}`,
             ),
@@ -225,7 +226,7 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
             {
               quoteId: String(quote.id),
               quoteLink: String(
-                process.env.REACT_APP_BRAND === 'brunoni'
+                import.meta.env.VITE_BRAND === 'brunoni'
                   ? `https://mybrunoni.ch/quotes/${quote.id}`
                   : `https://myallmarine.ch/quotes/${quote.id}`,
               ),
@@ -277,13 +278,15 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
   };
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>, quoteId: string) => {
-    addStatus(event.target.value as QuoteStatus, quoteId).then(_ => console.log('Successful status change'));
+    addStatus(event.target.value as QuoteStatus, quoteId).then(_ =>
+      console.log('Successful status change'),
+    );
   };
 
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('quote', JSON.stringify(quote));
     localStorage.setItem('schedule', JSON.stringify(schedule));
-    history.push('/online-booking');
+    navigate('/online-booking');
   };
 
   return (
@@ -298,13 +301,19 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                 <Box mb={2}>
                   <img
                     src={getLogo()}
-                    alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                    alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                     className={classes.logo}
                   />
                 </Box>
                 <Divider />
               </Box>
-              <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+              <Box
+                className={classes.actionBar}
+                mb={2}
+                display="flex"
+                alignItems="end"
+                justifyContent="space-between"
+              >
                 <QuoteNav
                   backTo={
                     quote.id && quote?.groupId && quote.groupId !== quote.id
@@ -359,7 +368,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                       <QuoteItemHeader quote={quote} showCompanyInfo={showCompanyInfo} />
                     </Grid>
                     <Grid item md={6} xs={12} className={classes.hidePrint}>
-                      <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                      <QuoteItemContainers
+                        containers={quote.containers}
+                        commodityTypes={quote.commodityTypes}
+                      />
                     </Grid>
 
                     <Grid item xs={12}>
@@ -369,7 +381,10 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                             <QuoteItemHeader quote={quote} />
                           </Grid>
                           <Grid item xs={6}>
-                            <QuoteItemContainers containers={quote.containers} commodityTypes={quote.commodityTypes} />
+                            <QuoteItemContainers
+                              containers={quote.containers}
+                              commodityTypes={quote.commodityTypes}
+                            />
                           </Grid>
                         </Grid>
                       </Box>
@@ -390,21 +405,21 @@ const QuoteView: React.FC<Props> = ({ quote, loading, showCompanyInfo }) => {
                     <Typography variant="body1">
                       <br />
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>Your Brunoni-Team</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>Your Allmarine-Team</span>
                       ) : null}
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>Tel. 044 455 58 58</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>Tel. 044 533 38 48</span>
                       ) : null}
                       <br />
-                      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                      {import.meta.env.VITE_BRAND === 'brunoni' ? (
                         <span>info@brunoni.ch</span>
-                      ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                      ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                         <span>info@allmarine.ch</span>
                       ) : null}
                     </Typography>

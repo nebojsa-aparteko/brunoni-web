@@ -77,7 +77,11 @@ const BookingViewMainContent = ({ booking, isPrintWithCost }: Props) => {
         ) : null}
 
         {booking.FreightDetails && (
-          <Box marginTop="0em" marginBottom="0em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
+          <Box
+            marginTop="0em"
+            marginBottom="0em"
+            className={isPrintWithCost ? classes.showPrint : classes.hidePrint}
+          >
             <BookingFreight freightDetails={booking.FreightDetails} />
           </Box>
         )}

@@ -77,23 +77,21 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
           const batch = firebase.firestore().batch();
 
           results.data.map(async (c: LoadListContainerModel) => {
-            batch.set(
-              firebase
-                .firestore()
-                .collection('containers')
-                .doc(c.container),
-              c,
-              { merge: true },
-            );
+            batch.set(firebase.firestore().collection('containers').doc(c.container), c, {
+              merge: true,
+            });
             console.log(c);
           });
 
           batch
             .commit()
             .then(_ =>
-              enqueueSnackbar(<Typography color="inherit">Saved load list successfully!</Typography>, {
-                variant: 'success',
-              }),
+              enqueueSnackbar(
+                <Typography color="inherit">Saved load list successfully!</Typography>,
+                {
+                  variant: 'success',
+                },
+              ),
             )
             .catch(err => console.trace(err));
         },
@@ -117,7 +115,9 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   useEffect(() => {
     if (!isHeaderValid) {
       enqueueSnackbar(
-        <Typography color="inherit">Headers of CSV are not properly spelled. Please check sample data.</Typography>,
+        <Typography color="inherit">
+          Headers of CSV are not properly spelled. Please check sample data.
+        </Typography>,
         {
           variant: 'error',
         },
@@ -137,7 +137,12 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
     parseCSV(loadListInput);
   }, [loadListInput, parseCSV]);
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Update Load List</Typography>
@@ -163,7 +168,12 @@ const LoadListUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
             />
             <Typography variant="caption">Hint: You can drag CSV files over input.</Typography>
             <Box display="flex">
-              <Button onClick={handleLoadListSave} variant="contained" color="primary" className={classes.addBtn}>
+              <Button
+                onClick={handleLoadListSave}
+                variant="contained"
+                color="primary"
+                className={classes.addBtn}
+              >
                 Save load list
               </Button>
               <Button onClick={open} variant="contained" color="default" className={classes.addBtn}>

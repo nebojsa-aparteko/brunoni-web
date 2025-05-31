@@ -9,7 +9,10 @@ import useUser from './useUser';
 import { flatMap } from 'lodash';
 import { pick, flow, omitBy, isNil } from 'lodash/fp';
 import { addWeeks, endOfISOWeek, getISOWeek, getYear, setISOWeek, setYear } from 'date-fns';
-import { getMultipleWeekDateRange, getWeekDate } from '../components/equipmentControl/ExportFlowsTable';
+import {
+  getMultipleWeekDateRange,
+  getWeekDate,
+} from '../components/equipmentControl/ExportFlowsTable';
 
 export default function useEquipmentSummary<T extends BookingCategory>(
   category: T,
@@ -28,8 +31,8 @@ export default function useEquipmentSummary<T extends BookingCategory>(
             filters.carrier?.id === 'HSG'
               ? 'Hamburg Süd'
               : filters.carrier?.id === 'STNN'
-              ? 'HUGO STINNES'
-              : filters.carrier?.id!,
+                ? 'HUGO STINNES'
+                : filters.carrier?.id!,
             BookingVersion.long,
             category,
             filters,
@@ -70,8 +73,8 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           filters.carrier?.id === 'HSG'
             ? 'Hamburg Süd'
             : filters.carrier?.id === 'STNN'
-            ? 'HUGO STINNES'
-            : filters.carrier?.id!,
+              ? 'HUGO STINNES'
+              : filters.carrier?.id!,
           BookingVersion.long,
           category,
           filters,
@@ -86,7 +89,9 @@ export default function useEquipmentSummary<T extends BookingCategory>(
           }[],
         ) => {
           if (value && Array.isArray(value))
-            setEquipmentControl(flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))));
+            setEquipmentControl(
+              flatMap(value?.map(e => Object.entries(e)?.map(([k, v]) => ({ id: k, ...v })))),
+            );
         },
       );
   }, [category, filters, user]);
@@ -113,12 +118,12 @@ const getEquipmentSummary = async (
     let url: string;
     if (category === BookingCategory.Export) {
       url = `${
-        process.env.REACT_APP_API_URL
+        import.meta.env.VITE_REACT_APP_API_URL
       }/equipmentControl/getExport?carrierId=${carrierId}&version=${version}&startWeek=${startWeek}&startWeekYear=${startWeekYear}&endWeek=${endWeek}&endWeekYear=${endWeekYear}&${query(
         flow(omitBy(isNil), pick(['containerTypes']))(filters),
       )}`;
     } else {
-      url = `${process.env.REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
+      url = `${import.meta.env.VITE_REACT_APP_API_URL}/equipmentControl?carrierId=${carrierId}&version=${version}&${query(
         flow(omitBy(isNil), pick(['containerTypes']))(filters),
       )}`;
     }

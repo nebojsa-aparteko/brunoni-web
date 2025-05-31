@@ -43,21 +43,22 @@ export const setIsPinned = (
     .collection('activity')
     .doc(activityItemId)
     .set({ isPinned: isPinned }, { merge: true })
-    .then(() => updateTasksWithPinnedCommentsFlag(documentId, numberOfPinnedComments + (isPinned ? 1 : -1)))
+    .then(() =>
+      updateTasksWithPinnedCommentsFlag(documentId, numberOfPinnedComments + (isPinned ? 1 : -1)),
+    )
     .catch(err => console.error(err));
 
-const updateTasksWithPinnedCommentsFlag = async (bookingId: string, numberOfPinnedComments: number) =>
-  firebase
-    .firestore()
-    .collection('functions-action')
-    .doc()
-    .set({
-      date: new Date(),
-      type: FirebaseActionType.UPDATE_TASKS_WHEN_COMMENT_IS_PINNED,
-      done: false,
-      bookingId,
-      numberOfPinnedComments,
-    });
+const updateTasksWithPinnedCommentsFlag = async (
+  bookingId: string,
+  numberOfPinnedComments: number,
+) =>
+  firebase.firestore().collection('functions-action').doc().set({
+    date: new Date(),
+    type: FirebaseActionType.UPDATE_TASKS_WHEN_COMMENT_IS_PINNED,
+    done: false,
+    bookingId,
+    numberOfPinnedComments,
+  });
 
 const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
   activityItem,
@@ -74,14 +75,22 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
       event.stopPropagation();
 
       if (booking?.id && activityItem.id) {
-        setIsPinned(activityItem.id, 'bookings', booking?.id, !activityItem.isPinned, pinnedCommentsCount!)
+        setIsPinned(
+          activityItem.id,
+          'bookings',
+          booking?.id,
+          !activityItem.isPinned,
+          pinnedCommentsCount!,
+        )
           .then(() =>
             dispatch({
               type: SHOW_SUCCESS_SNACKBAR,
               message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
             }),
           )
-          .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+          .catch(error =>
+            dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }),
+          );
       } else if (activityItem.path) {
         firebase
           .firestore()
@@ -93,7 +102,9 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
               message: `The activity has been ${activityItem.isPinned ? 'unpinned' : 'pinned'}.`,
             }),
           )
-          .catch(error => dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }));
+          .catch(error =>
+            dispatch({ type: SHOW_ERROR_SNACKBAR, message: `An error has occurred - ${error}` }),
+          );
       }
     },
     [activityItem, booking],
@@ -101,7 +112,11 @@ const ActivityLogItemView: React.FC<ActivityLogItemViewProps> = ({
 
   return (
     <Fragment {...other}>
-      <div {...other} onMouseEnter={() => setShowPinButton(true)} onMouseLeave={() => setShowPinButton(false)}>
+      <div
+        {...other}
+        onMouseEnter={() => setShowPinButton(true)}
+        onMouseLeave={() => setShowPinButton(false)}
+      >
         {activityItem.type === ActivityType.COMMENT ? (
           <Comment activity={activityItem} booking={booking} />
         ) : activityItem.type === ActivityType.ACTIVITY_WITH_COMMENT ? (

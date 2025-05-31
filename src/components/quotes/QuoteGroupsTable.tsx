@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { QuoteGroup } from '../../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { quoteRouteLabelDisplay } from '../../utilities/formattedPortDisplay';
 import identity from 'lodash/fp/identity';
 import invoke from 'lodash/fp/invoke';
@@ -68,7 +68,7 @@ const QuoteGroupRow: React.FC<RowProps> = ({
   assignedUsers,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const requestedById = quotes[0].userId;
   const requestedBy = useUserByAlphacomId(requestedById);
@@ -89,16 +89,18 @@ const QuoteGroupRow: React.FC<RowProps> = ({
     return (
       <TableCell>
         {client.name}
-        <ClientRequestedByLabel userRecord={requestedBy} userId={requestedById} userNameString={clientUserNameString} />
+        <ClientRequestedByLabel
+          userRecord={requestedBy}
+          userId={requestedById}
+          userNameString={clientUserNameString}
+        />
       </TableCell>
     );
   }, [showCompanyInfo, client, requestedBy, requestedById, clientId, clientUserNameString]);
 
   const handleRowClick = useCallback(
     (event: React.MouseEvent<unknown>) => {
-      console.log(history.location);
-
-      history.push(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
+      navigate(quotes?.length > 1 ? `/quotes/groups/${id}` : `/quotes/${quotes[0].id}`);
     },
     [history, quotes, id],
   );
@@ -116,14 +118,18 @@ const QuoteGroupRow: React.FC<RowProps> = ({
           />
         )}
       </TableCell>
-      <TableCell>{uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}</TableCell>
+      <TableCell>
+        {uniq(quotes.map(quote => quote.carrier?.name || quote.carrier?.id)).join(', ')}
+      </TableCell>
       <TableCell>
         <Grid container spacing={1}>
           {/*TODO handle the flash of undefined text*/}
           {containers &&
             containers.map((container, index) => (
               <Grid item key={index}>
-                {container && <Chip label={container.containerType?.name || container.containerType?.id} />}
+                {container && (
+                  <Chip label={container.containerType?.name || container.containerType?.id} />
+                )}
               </Grid>
             ))}
         </Grid>
@@ -133,13 +139,17 @@ const QuoteGroupRow: React.FC<RowProps> = ({
           {commodityTypes &&
             commodityTypes.map((commodityType, index) => (
               <Grid item key={index}>
-                <Chip label={commodityType?.name ? commodityType?.name : commodityType?.id || 'N/A'} />
+                <Chip
+                  label={commodityType?.name ? commodityType?.name : commodityType?.id || 'N/A'}
+                />
               </Grid>
             ))}
         </Grid>
       </TableCell>
       <TableCell>{formatDate(dateIssued, 'd. MMMM')}</TableCell>
-      <TableCell>{assignedUsers.map(user => `${user?.firstName} ${user?.lastName}`).join(',')}</TableCell>
+      <TableCell>
+        {assignedUsers.map(user => `${user?.firstName} ${user?.lastName}`).join(',')}
+      </TableCell>
     </TableRow>
   );
 };

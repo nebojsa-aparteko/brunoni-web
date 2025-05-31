@@ -19,5 +19,7 @@ export default (carrierId: string, type: PaymentConfirmationType) => {
     ),
   );
 
-  return carrierSettingsRef?.docs.map(carrierSetting => carrierSetting.data()) as CarrierSettingsRule[];
+  return carrierSettingsRef?.docs.map(carrierSetting =>
+    carrierSetting.data(),
+  ) as CarrierSettingsRule[];
 };

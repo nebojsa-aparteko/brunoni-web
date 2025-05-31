@@ -46,7 +46,9 @@ export interface SemiAutomaticProviderRouteEntity extends ProviderRouteEntity {
   selectedRoutes: RouteFromCity[];
 }
 
-export type Route = AutomaticProviderRouteEntity & ManualProviderRouteEntity & SemiAutomaticProviderRouteEntity;
+export type Route = AutomaticProviderRouteEntity &
+  ManualProviderRouteEntity &
+  SemiAutomaticProviderRouteEntity;
 
 export type PricePerContainer = {
   [key in keyof typeof EquipmentControlContainerTypes]: Price;
@@ -61,6 +63,9 @@ export enum ProviderRoutesType {
 export type ProviderRoute = Omit<ProviderRouteEntity, 'id' | 'createdAt' | 'updatedAt'>;
 export type ManualProviderRoute = Omit<ManualProviderRouteEntity, 'id' | 'createdAt'>;
 export type AutomaticProviderRoute = Omit<AutomaticProviderRouteEntity, 'id'>;
-export type SemiAutomaticProviderRoute = Omit<SemiAutomaticProviderRouteEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type SemiAutomaticProviderRoute = Omit<
+  SemiAutomaticProviderRouteEntity,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 export default ProviderRouteEntity;

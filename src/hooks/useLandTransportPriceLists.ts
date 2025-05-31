@@ -16,7 +16,7 @@ const useLandTransportPriceLists = (providerId: string, routeId: string) => {
         ({
           ...v.data(),
           id: v.id,
-        } as ProviderPricelistEntity),
+        }) as ProviderPricelistEntity,
     )
     .reduce(
       (previousValue, currentValue) => {
@@ -31,7 +31,10 @@ const useLandTransportPriceLists = (providerId: string, routeId: string) => {
         exportPricelistEntities: [] as ProviderPricelistEntity[],
         importPricelistEntities: [] as ProviderPricelistEntity[],
       },
-    ) as { exportPricelistEntities: ProviderPricelistEntity[]; importPricelistEntities: ProviderPricelistEntity[] };
+    ) as {
+    exportPricelistEntities: ProviderPricelistEntity[];
+    importPricelistEntities: ProviderPricelistEntity[];
+  };
 };
 
 export default useLandTransportPriceLists;

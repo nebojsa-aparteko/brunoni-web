@@ -34,14 +34,8 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
     () =>
       vesselItems && vesselItems.length > 0
         ? ({
-            VesselName: vesselItems[0].vesselWithVoyage
-              ?.split(' ')
-              .slice(0, -2)
-              .join(' '),
-            VoyageNr: vesselItems[0].vesselWithVoyage
-              ?.split(' ')
-              .slice(-2)
-              .join(' '),
+            VesselName: vesselItems[0].vesselWithVoyage?.split(' ').slice(0, -2).join(' '),
+            VoyageNr: vesselItems[0].vesselWithVoyage?.split(' ').slice(-2).join(' '),
             Carrier: vesselItems[0].carrier,
           } as RouteSearchResultVoyageInfo)
         : undefined,
@@ -49,7 +43,9 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
   );
   const service = useMemo(
     () =>
-      vesselItems && vesselItems.length > 0 ? vesselItems.find(item => item.erpServiceId)?.erpServiceId : undefined,
+      vesselItems && vesselItems.length > 0
+        ? vesselItems.find(item => item.erpServiceId)?.erpServiceId
+        : undefined,
     [vesselItems],
   );
 
@@ -64,7 +60,9 @@ const VesselVoyageItem: React.FC<Props> = ({ vessel, items, handleDialogOpen }) 
           <Box display="flex" flexDirection="column">
             <Typography style={{ width: theme.spacing(30) }}>{vessel}</Typography>
             {findCarrierId(entries[0][1]) && (
-              <Typography style={{ width: theme.spacing(30) }}>{findCarrierId(entries[0][1])}</Typography>
+              <Typography style={{ width: theme.spacing(30) }}>
+                {findCarrierId(entries[0][1])}
+              </Typography>
             )}
           </Box>
         </Box>

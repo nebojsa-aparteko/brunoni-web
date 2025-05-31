@@ -104,7 +104,10 @@ export const activateRoute = async (
 
 export const updateRoute = async (
   providerId: string,
-  route: AutomaticProviderRouteEntity | ManualProviderRouteEntity | SemiAutomaticProviderRouteEntity,
+  route:
+    | AutomaticProviderRouteEntity
+    | ManualProviderRouteEntity
+    | SemiAutomaticProviderRouteEntity,
 ) => {
   const updatedAt = new Date();
   await firebase
@@ -114,7 +117,11 @@ export const updateRoute = async (
     .set({ ...route, updatedAt }, { merge: true });
 };
 
-const deleteVersionDocument = async (providerId: string, routeVersion: string, documentId: string) =>
+const deleteVersionDocument = async (
+  providerId: string,
+  routeVersion: string,
+  documentId: string,
+) =>
   await firebase
     .firestore()
     .collection(`land-transport-config/${providerId}/routes/${routeVersion}/versionDocuments`)
@@ -127,12 +134,12 @@ export const getValidityInfo = (validity: RouteValidity | null) => {
   const validityMessage = !hasValidity
     ? 'You must provide validity before activating'
     : !isValid
-    ? isFuture(validity!.startDate)
-      ? `This route is not valid (becomes valid at ${format(validity!.startDate, 'dd-MM-yyyy HH:mm')})`
-      : isPast(validity!.endDate)
-      ? `This route is expired (expired at ${format(validity!.endDate, 'dd-MM-yyyy HH:mm')})`
-      : ''
-    : '';
+      ? isFuture(validity!.startDate)
+        ? `This route is not valid (becomes valid at ${format(validity!.startDate, 'dd-MM-yyyy HH:mm')})`
+        : isPast(validity!.endDate)
+          ? `This route is expired (expired at ${format(validity!.endDate, 'dd-MM-yyyy HH:mm')})`
+          : ''
+      : '';
   return {
     hasValidity,
     isValid,
@@ -169,7 +176,9 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
   const { deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
 
   useEffect(() => {
-    const validityDifference = route.validity ? diff(route.validity, validityState ? validityState : {}) : {};
+    const validityDifference = route.validity
+      ? diff(route.validity, validityState ? validityState : {})
+      : {};
     const isChanged = keys(validityDifference).length > 0 || route.description !== descriptionState;
     setChanged(isChanged);
   }, [validityState, descriptionState, route.validity, route.description]);
@@ -188,7 +197,9 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
       validity: validityState,
       active: false,
     });
-    const validityDifference = route.validity ? diff(route.validity, validityState ? validityState : {}) : {};
+    const validityDifference = route.validity
+      ? diff(route.validity, validityState ? validityState : {})
+      : {};
     if (keys(validityDifference).length === 0) return setLoading(false);
 
     const { activate, activationMessage } = await handleActivationLogic(
@@ -290,10 +301,16 @@ const RouteDetailsModal: React.FC<Props> = ({ route, provider, open, setOpen }) 
                 <InfoBoxItem title={route.version} titleVariant={'h2'} />
                 <Box display="flex" alignItems="center">
                   <Box pl={0} p={2}>
-                    <InfoBoxItem label1={'Created At'} label2={<DateFormattedText date={route.createdAt} />} />
+                    <InfoBoxItem
+                      label1={'Created At'}
+                      label2={<DateFormattedText date={route.createdAt} />}
+                    />
                   </Box>
                   <Box p={2}>
-                    <InfoBoxItem label1={'Last Updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                    <InfoBoxItem
+                      label1={'Last Updated'}
+                      label2={<DateFormattedText date={route.updatedAt} />}
+                    />
                   </Box>
                 </Box>
               </Box>
@@ -334,7 +351,12 @@ interface DescriptionProps {
   handleChange: (newDescription: string) => void;
 }
 
-export const Description: React.FC<DescriptionProps> = ({ editing, descriptionState, description, handleChange }) => {
+export const Description: React.FC<DescriptionProps> = ({
+  editing,
+  descriptionState,
+  description,
+  handleChange,
+}) => {
   return (
     <SectionWithTitle title="Description">
       {editing ? (
@@ -398,7 +420,13 @@ interface ValidityProps {
   hasValidity: boolean;
 }
 
-export const Validity: React.FC<ValidityProps> = ({ validity, validityState, handleChange, editing, hasValidity }) => {
+export const Validity: React.FC<ValidityProps> = ({
+  validity,
+  validityState,
+  handleChange,
+  editing,
+  hasValidity,
+}) => {
   return (
     <SectionWithTitle
       title="Validity"
@@ -436,7 +464,13 @@ interface StatusProps {
   disabledMessage?: string;
 }
 
-export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disabledMessage, handleChangeActive }) => {
+export const Status: React.FC<StatusProps> = ({
+  editing,
+  active,
+  disabled,
+  disabledMessage,
+  handleChangeActive,
+}) => {
   return (
     <Box style={{ gap: '16px' }} display={'flex'} alignItems={'center'}>
       {editing ? (
@@ -444,12 +478,18 @@ export const Status: React.FC<StatusProps> = ({ editing, active, disabled, disab
           <Box display={'flex'} alignItems={'baseline'}>
             <FormControlLabel
               control={
-                <Switch inputProps={{ 'aria-label': 'controlled' }} checked={active} onChange={handleChangeActive} />
+                <Switch
+                  inputProps={{ 'aria-label': 'controlled' }}
+                  checked={active}
+                  onChange={handleChangeActive}
+                />
               }
               disabled={disabled}
               label={''}
             />
-            {disabled && disabledMessage && <Typography color={'error'}>{disabledMessage}</Typography>}
+            {disabled && disabledMessage && (
+              <Typography color={'error'}>{disabledMessage}</Typography>
+            )}
           </Box>
         </FormGroup>
       ) : active ? (
@@ -540,7 +580,9 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const versionDocs = useRouteVersionDocs(provider.id, route.version);
-  const { saveFiles, deleteFiles } = useSaveFiles(`land-transport-config/routes/versions/${provider.id}`);
+  const { saveFiles, deleteFiles } = useSaveFiles(
+    `land-transport-config/routes/versions/${provider.id}`,
+  );
 
   const [, userRecord] = useUser();
 
@@ -557,7 +599,7 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
             url: item.url,
             storedName: item.storedName,
             isInternal: false,
-          } as ChecklistItemValueDocument),
+          }) as ChecklistItemValueDocument,
       );
       values.map(async value => await saveRouteFilesToFirestore(provider, route.version, value));
       await updateRoute(provider.id, {
@@ -626,8 +668,16 @@ const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ route, provider
         {versionDocs.length > 0 ? (
           <List style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
             {versionDocs.map((item: ChecklistItemValueDocument) => (
-              <Box key={`${item.storedName}`} component={Paper} m={theme.spacing(0.1)} width={'33%'}>
-                <InternalStorageItem item={item} handleDelete={editing ? handleDeleteDocument : undefined} />
+              <Box
+                key={`${item.storedName}`}
+                component={Paper}
+                m={theme.spacing(0.1)}
+                width={'33%'}
+              >
+                <InternalStorageItem
+                  item={item}
+                  handleDelete={editing ? handleDeleteDocument : undefined}
+                />
               </Box>
             ))}
           </List>

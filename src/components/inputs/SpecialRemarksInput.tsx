@@ -56,11 +56,19 @@ interface SingleInputProps {
   margin?: any;
 }
 
-const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, margin, handleChange }) => {
+const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({
+  specialRemark,
+  margin,
+  handleChange,
+}) => {
   const classes = useStyles();
   const specialRemarks = useContext(SpecialRemarks);
-  const [selectedValue, setSelectedValue] = React.useState<string>(specialRemark?.id || emptyValue.id);
-  const [specialRemarkValue, setSpecialRemarkValue] = useState<string>(specialRemark?.text || emptyValue.text || '');
+  const [selectedValue, setSelectedValue] = React.useState<string>(
+    specialRemark?.id || emptyValue.id,
+  );
+  const [specialRemarkValue, setSpecialRemarkValue] = useState<string>(
+    specialRemark?.text || emptyValue.text || '',
+  );
 
   useEffect(() => {
     setSelectedValue(specialRemark?.id || emptyValue.id);
@@ -103,7 +111,11 @@ const SingleSpecialRemarkInput: React.FC<SingleInputProps> = ({ specialRemark, m
             const specialRemarkNoHTML = specialRemark.text?.replace(/(<([^>]+)>)/gi, '');
 
             return (
-              <MenuItem key={specialRemark.id} value={specialRemark.id} className={classes.menuItem}>
+              <MenuItem
+                key={specialRemark.id}
+                value={specialRemark.id}
+                className={classes.menuItem}
+              >
                 <Typography className={classes.menuItemPrimaryText}>{specialRemark.id}</Typography>
                 <Typography
                   className={classes.menuItemSecondaryText}

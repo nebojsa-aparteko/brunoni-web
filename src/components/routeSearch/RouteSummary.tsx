@@ -45,7 +45,10 @@ const RouteSummary: React.FC<Props> = ({ route, carrier, isFullyBooked }) => {
               {route ? (
                 <Fragment>
                   {carrier ? (
-                    <FiberManualRecordIcon className={classes.carrierAvatar} style={{ color: carrier!.color }} />
+                    <FiberManualRecordIcon
+                      className={classes.carrierAvatar}
+                      style={{ color: carrier!.color }}
+                    />
                   ) : (
                     <Skeleton variant="circle" className={classes.carrierAvatar} />
                   )}
@@ -71,7 +74,10 @@ const RouteSummary: React.FC<Props> = ({ route, carrier, isFullyBooked }) => {
           </Grid>
           {isDashboardUser(userRecord) && (
             <Grid item md={3} style={{ display: 'flex', alignItems: 'center' }}>
-              <VesselAllocationButton vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo} service={route.Service} />
+              <VesselAllocationButton
+                vesselVoyage={routeItinerary?.portOfLoading.VoyageInfo}
+                service={route.Service}
+              />
             </Grid>
           )}
         </Grid>

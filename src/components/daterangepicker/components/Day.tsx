@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { IconButton, Typography, createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
+import {
+  IconButton,
+  Typography,
+  createStyles,
+  Theme,
+  WithStyles,
+  withStyles,
+} from '@material-ui/core';
 import { combine } from '../utils';
 
 interface DayProps extends WithStyles<typeof styles> {
@@ -73,7 +80,10 @@ const Day: React.FunctionComponent<DayProps> = props => {
       >
         <Typography
           color={!props.disabled ? 'primary' : 'textSecondary'}
-          className={combine(classes.buttonText, !props.disabled && props.filled && classes.contrast)}
+          className={combine(
+            classes.buttonText,
+            !props.disabled && props.filled && classes.contrast,
+          )}
           variant="body2"
         >
           {props.value}

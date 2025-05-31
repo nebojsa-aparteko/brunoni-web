@@ -32,11 +32,16 @@ const OOGInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
     },
   }));
 
-  const handleWidthChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('width', e.target.value)(value));
-  const handleHeightChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('height', e.target.value)(value));
-  const handleLengthChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('length', e.target.value)(value));
-  const handleWeightChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('weight', e.target.value)(value));
-  const handleOverwidthChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('diffWidth', e.target.value)(value));
+  const handleWidthChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('width', e.target.value)(value));
+  const handleHeightChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('height', e.target.value)(value));
+  const handleLengthChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('length', e.target.value)(value));
+  const handleWeightChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('weight', e.target.value)(value));
+  const handleOverwidthChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('diffWidth', e.target.value)(value));
   const handleOverheightChange = (e: ChangeEvent<HTMLInputElement>) =>
     onChange(set('diffHeight', e.target.value)(value));
   const handleOverlengthChange = (e: ChangeEvent<HTMLInputElement>) =>

@@ -2,7 +2,16 @@ import React, { useContext, useEffect, useState, Fragment } from 'react';
 import formatDate from 'date-fns/format';
 import addDays from 'date-fns/addDays';
 import subDays from 'date-fns/subDays';
-import { makeStyles, Box, Typography, Theme, Button, Card, CardMedia, CardContent } from '@material-ui/core';
+import {
+  makeStyles,
+  Box,
+  Typography,
+  Theme,
+  Button,
+  Card,
+  CardMedia,
+  CardContent,
+} from '@material-ui/core';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Carrier from '../model/Carrier';
 import ContainerType from '../model/ContainerType';
@@ -11,7 +20,7 @@ import firebase from '../firebase';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import LoginDialogContext from '../contexts/LoginDialog';
 import UserContext from '../contexts/UserContext';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { DateFormats } from '../utilities/formattingHelpers';
 
 interface Props {
@@ -69,9 +78,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, image, origin, price, validUntil }) => {
+const SpecialOffer: React.FC<Props> = ({
+  carrier,
+  containerType,
+  destination,
+  image,
+  origin,
+  price,
+  validUntil,
+}) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const user = useContext(UserContext);
   const loginDialog = useContext(LoginDialogContext);
   const setParams = useContext(RouteSearchContext)[1];
@@ -79,13 +96,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
   const [imageURL, setImageURL] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    (async () =>
-      setImageURL(
-        await firebase
-          .storage()
-          .ref(image)
-          .getDownloadURL(),
-      ))();
+    (async () => setImageURL(await firebase.storage().ref(image).getDownloadURL()))();
   }, [image]);
 
   const handleClick = () => {
@@ -99,7 +110,7 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
     });
 
     if (user) {
-      history.push('/quotes/get');
+      navigate('/quotes/get');
     } else {
       loginDialog.open({
         message: 'Log in first to claim special offer.',
@@ -111,14 +122,24 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
   return (
     <Card className={classes.card}>
       <div onClick={handleClick} style={{ cursor: 'pointer' }}>
-        <CardMedia className={classes.media} image={imageURL} title={`${origin.city} to ${destination.city}`} />
+        <CardMedia
+          className={classes.media}
+          image={imageURL}
+          title={`${origin.city} to ${destination.city}`}
+        />
         <CardContent className={classes.content}>
           <Box display="flex" alignContent="center" className={classes.subtitle}>
             <Typography>{origin.city}</Typography>
             <ArrowForwardIcon fontSize="small" className={classes.routeIcon} />
             <Typography>{destination.city}</Typography>
           </Box>
-          <Typography gutterBottom variant="body1" color="textSecondary" component="p" className={classes.body}>
+          <Typography
+            gutterBottom
+            variant="body1"
+            color="textSecondary"
+            component="p"
+            className={classes.body}
+          >
             {containerType.description ? (
               <Fragment>
                 {containerType.description} <br />
@@ -126,16 +147,28 @@ const SpecialOffer: React.FC<Props> = ({ carrier, containerType, destination, im
             ) : null}
             {`Valid until ${formatDate(subDays(validUntil, 1), DateFormats.LONG)}`}
           </Typography>
-          <Button variant="outlined" color="primary" size="large" fullWidth className={classes.button}>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            fullWidth
+            className={classes.button}
+          >
             {user ? (
               <Fragment>
-                Book now for&nbsp;<strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
+                Book now for&nbsp;
+                <strong>{price ? `${price.currency} ${price.amount}` : 'SECRET PRICE'}**</strong>
               </Fragment>
             ) : (
               'Book now'
             )}
           </Button>
-          <Typography variant="body2" color="textSecondary" component="p" className={classes.finePrint}>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            component="p"
+            className={classes.finePrint}
+          >
             **subject to other charges
           </Typography>
         </CardContent>

@@ -90,13 +90,7 @@ const updateTag = async (tag: Tag, tagText: string, tagColor: string) => {
 };
 
 const deleteTag = async (tag: Tag) => {
-  tag &&
-    tag.id &&
-    firebase
-      .firestore()
-      .collection('tags')
-      .doc(tag.id)
-      .delete();
+  tag && tag.id && firebase.firestore().collection('tags').doc(tag.id).delete();
 };
 
 const TagManagementContent: React.FC<TagManagementProps> = ({ tag, tagCategory, stopEditing }) => {
@@ -255,7 +249,10 @@ const addSelectedTag = (tagCategory: TagCategory, tag: Tag, documentId: string) 
 
     return transaction.set(
       documentReference,
-      { assignedTags: updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null },
+      {
+        assignedTags:
+          updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null,
+      },
       { merge: true },
     );
   });
@@ -275,7 +272,10 @@ const removeSelectedTag = (tagCategory: TagCategory, tagId: string, documentId: 
 
     return transaction.set(
       documentReference,
-      { assignedTags: updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null },
+      {
+        assignedTags:
+          updatedAssignedTags && updatedAssignedTags.length > 0 ? updatedAssignedTags : null,
+      },
       { merge: true },
     );
   });
@@ -289,10 +289,10 @@ const TagRepresentation: React.FC<TagRepresentationProps> = ({
   documentId,
 }) => {
   const classes = useStyles();
-  const isSelected = useMemo(() => selectedTags?.some(selectedTag => selectedTag.id === tag.id), [
-    selectedTags,
-    tag.id,
-  ]);
+  const isSelected = useMemo(
+    () => selectedTags?.some(selectedTag => selectedTag.id === tag.id),
+    [selectedTags, tag.id],
+  );
   const [, dispatch] = useContext(GlobalContext);
 
   const handleChangeSelected = () => {
@@ -398,7 +398,11 @@ const TagManagementDialog: React.FC<TagManagementDialogProps> = ({
         </DialogTitle>
         <DialogContent className={classes.dialogContent}>
           {isEditingOrCreating ? (
-            <TagManagementContent tag={editingTag} tagCategory={tagCategory} stopEditing={handleFinishEditing} />
+            <TagManagementContent
+              tag={editingTag}
+              tagCategory={tagCategory}
+              stopEditing={handleFinishEditing}
+            />
           ) : (
             <React.Fragment>
               <TagRepresentationList

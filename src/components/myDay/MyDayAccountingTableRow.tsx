@@ -15,7 +15,10 @@ const MyDayAccountingTableRow: React.FC<Props> = ({
   handleOpenPreviewDialog,
 }) => {
   const actingAs = useContext(ActingAs)[0];
-  const label = useMemo(() => Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1], [task.type]);
+  const label = useMemo(
+    () => Object.entries(TaskDescription).find(t => t[0] === task.type)?.[1],
+    [task.type],
+  );
   const handleRowClick = () => {
     handleOpenPreviewDialog(task.bookingId);
   };

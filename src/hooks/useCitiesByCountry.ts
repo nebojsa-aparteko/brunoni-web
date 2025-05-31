@@ -12,5 +12,5 @@ export default (id?: string) => {
 
   if (!citiesCollection) return undefined;
 
-  return citiesCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() } as City)) as City[];
+  return citiesCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() }) as City) as City[];
 };

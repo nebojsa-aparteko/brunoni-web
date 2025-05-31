@@ -11,7 +11,14 @@ interface Props {
   gutterBottom?: boolean;
 }
 
-const InfoBoxItemHorizontal: React.FC<Props> = ({ IconComponent, title, label1, label1HTML, label2, gutterBottom }) => {
+const InfoBoxItemHorizontal: React.FC<Props> = ({
+  IconComponent,
+  title,
+  label1,
+  label1HTML,
+  label2,
+  gutterBottom,
+}) => {
   const hasLabel1 = label1 || label1HTML;
   return (
     <Fragment>

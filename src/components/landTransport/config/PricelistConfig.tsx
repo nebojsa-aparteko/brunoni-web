@@ -71,7 +71,13 @@ export const containersCells = Object.keys(EquipmentControlContainerTypes).map(v
   },
 })) as CellType[];
 
-export const PriceListTable: React.FC<TableProps> = ({ tableTitle, provider, pricelists, category, route }) => {
+export const PriceListTable: React.FC<TableProps> = ({
+  tableTitle,
+  provider,
+  pricelists,
+  category,
+  route,
+}) => {
   return (
     <EditableTable
       tableTitle={tableTitle}
@@ -89,13 +95,18 @@ export const PriceListTable: React.FC<TableProps> = ({ tableTitle, provider, pri
           label: 'Currency',
           fieldType: 'select',
           fieldName: 'currency',
-          options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+          options: Object.values(Currency).map(value => ({
+            key: value,
+            label: capitalCase(value),
+          })),
         },
 
         ...containersCells,
       ]}
       defaultItem={
-        category === ProviderPricelistCategory.EXPORT ? defaultExportPricelistItem : defaultImportPricelistItem
+        category === ProviderPricelistCategory.EXPORT
+          ? defaultExportPricelistItem
+          : defaultImportPricelistItem
       }
       addItem={item => addLandTransportPricelist(provider.id, route.id, item)}
       editItem={(id, item) => editLandTransportPricelist(provider.id, route.id, id, item)}
@@ -141,7 +152,9 @@ const PriceListConfig: React.FC<Props> = ({ provider }) => {
               <CityInput
                 isEditing={true}
                 onSelect={(value, path) =>
-                  setOriginState(prevState => set(path, value)(prevState && value ? prevState : ({} as Destination)))
+                  setOriginState(prevState =>
+                    set(path, value)(prevState && value ? prevState : ({} as Destination)),
+                  )
                 }
                 origin={originState}
               />
@@ -200,7 +213,9 @@ const PriceListConfig: React.FC<Props> = ({ provider }) => {
             action={() => setNewRow(true)}
           />
         ) : (
-          routes.map(route => <SemiAutomaticRouteRow key={route.id} route={route} provider={provider} />)
+          routes.map(route => (
+            <SemiAutomaticRouteRow key={route.id} route={route} provider={provider} />
+          ))
         )}
       </Box>
     </FirestoreCollectionProvider>

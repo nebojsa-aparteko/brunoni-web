@@ -1,4 +1,11 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import Carrier from '../model/Carrier';
 import Carriers from '../contexts/Carriers';
 import { getISOWeek, getYear } from 'date-fns';
@@ -45,7 +52,9 @@ const EquipmentControlFilterProvider = (props: any) => {
 export const useEquipmentControlFilterProviderContext = () => {
   const context = React.useContext(EquipmentControlFilterProviderContext);
   if (context === undefined) {
-    throw new Error('EquipmentControlFilterProviderContext must be used within a EquipmentControlFilter');
+    throw new Error(
+      'EquipmentControlFilterProviderContext must be used within a EquipmentControlFilter',
+    );
   }
   return context;
 };

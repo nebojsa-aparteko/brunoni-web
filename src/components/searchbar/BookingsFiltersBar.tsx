@@ -62,7 +62,8 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
   const { clientFilter, originPort, destinationPort, assignee, dateRange, carrier } = filters;
 
-  const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
+  const setOriginPort = (port: Port | null) =>
+    setFilters && setFilters(set('originPort', port || undefined)(filters));
 
   const setDestinationPort = (port: Port | null) =>
     setFilters && setFilters(set('destinationPort', port || undefined)(filters));
@@ -82,7 +83,12 @@ const BookingsFiltersBar: React.FC<Props> = ({
   const setTags = (assignedTags: Tag[] | Tag | null) => {
     // @ts-ignore
     setFilters &&
-      setFilters(set('assignedTags', assignedTags ? asArray(assignedTags).map(tag => tag.id) : undefined)(filters));
+      setFilters(
+        set(
+          'assignedTags',
+          assignedTags ? asArray(assignedTags).map(tag => tag.id) : undefined,
+        )(filters),
+      );
   };
 
   return (
@@ -111,10 +117,20 @@ const BookingsFiltersBar: React.FC<Props> = ({
           </Grid>
         )}
         <Grid item sm={3} xs={12}>
-          <PortInput label="Origin" ports={ports || []} value={originPort} onChange={setOriginPort} />
+          <PortInput
+            label="Origin"
+            ports={ports || []}
+            value={originPort}
+            onChange={setOriginPort}
+          />
         </Grid>
         <Grid item sm={3} xs={12}>
-          <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
+          <PortInput
+            label="Destination"
+            ports={ports || []}
+            value={destinationPort}
+            onChange={setDestinationPort}
+          />
         </Grid>
         {tags && (
           <Grid item sm={3} xs={12}>
@@ -124,7 +140,13 @@ const BookingsFiltersBar: React.FC<Props> = ({
 
         {showDateRange && (
           <Grid item sm={3} xs={12}>
-            <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
+            <Box
+              display="flex"
+              alignItems="flex-end"
+              alignContent="flex-end"
+              flexDirection="column"
+              m="6px auto"
+            >
               <DateRangeInput onChange={setDateRange} value={dateRange} maxDate={new Date()} />
             </Box>
           </Grid>
@@ -140,7 +162,12 @@ const BookingsFiltersBar: React.FC<Props> = ({
           </Grid>
         )}
         <Grid item sm={3} xs={12}>
-          <CarrierInput label={'Choose Carrier'} carriers={availableCarriers} onChange={setCarrier} value={carrier} />
+          <CarrierInput
+            label={'Choose Carrier'}
+            carriers={availableCarriers}
+            onChange={setCarrier}
+            value={carrier}
+          />
         </Grid>
       </Grid>
       {showAssigneeFilter && showDateRange && users && (

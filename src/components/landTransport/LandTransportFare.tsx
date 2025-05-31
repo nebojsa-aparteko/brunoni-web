@@ -31,7 +31,7 @@ import {
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import { R, SegmentsEntity } from './LandTransportSearch';
-import { ReactComponent as EcologyIconSVG } from '../../assets/ecology.svg';
+import EcologyIconSVG from '../../assets/ecology.svg?react';
 import { TransportModeLabels, TransportModeType } from '../../model/land-transport/TransportMode';
 import { groupBy } from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -229,7 +229,10 @@ const FareFooter: React.FC<DetailsProps> = ({ grouped }) => {
 };
 
 const GroupedBySize: React.FC<DetailsProps> = ({ grouped }) => {
-  const groupedByContainerSize = useMemo(() => Object.entries(groupBy(grouped, 'props.equSize[0]')), [grouped]);
+  const groupedByContainerSize = useMemo(
+    () => Object.entries(groupBy(grouped, 'props.equSize[0]')),
+    [grouped],
+  );
   return (
     <>
       {groupedByContainerSize.map(([key, groupedFare]) => (
@@ -254,7 +257,9 @@ const GroupedByType: React.FC<DetailsProps> = ({ grouped }) => {
     <Grid container spacing={2} direction="row">
       {groupedByTypeKeys.map(key => (
         <Grid item key={key} md={6}>
-          {groupedByContainerType[key].length > 0 && <Details grouped={groupedByContainerType[key]} />}
+          {groupedByContainerType[key].length > 0 && (
+            <Details grouped={groupedByContainerType[key]} />
+          )}
         </Grid>
       ))}
     </Grid>
@@ -432,7 +437,10 @@ const DetailedRoute = ({
                 label: 'Currency',
                 fieldType: 'select',
                 fieldName: 'price.currency',
-                options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+                options: Object.values(Currency).map(value => ({
+                  key: value,
+                  label: capitalCase(value),
+                })),
               },
             ]}
             //@ts-ignore

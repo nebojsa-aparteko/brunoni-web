@@ -1,11 +1,17 @@
-import { CarrierSettingsRule, CustomerSettingsRule, PaymentConfirmationType } from '../model/PaymentConfirmationRule';
+import {
+  CarrierSettingsRule,
+  CustomerSettingsRule,
+  PaymentConfirmationType,
+} from '../model/PaymentConfirmationRule';
 import useFirestoreCollection from './useFirestoreCollection';
 import { useMemo } from 'react';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 
 const usePaymentConfirmation = <T extends PaymentConfirmationType>(
   type: T,
-): T extends PaymentConfirmationType.CARRIER_SETTINGS ? CarrierSettingsRule[] : CustomerSettingsRule[] => {
+): T extends PaymentConfirmationType.CARRIER_SETTINGS
+  ? CarrierSettingsRule[]
+  : CustomerSettingsRule[] => {
   const query = useMemo(
     () => (collection: firebase.firestore.Query) => {
       let query = collection.where('type', '==', type);

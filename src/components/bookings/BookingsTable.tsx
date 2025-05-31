@@ -1,6 +1,6 @@
 import Avatar from 'react-avatar';
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -28,7 +28,11 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import { withStyles } from '@material-ui/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { isImport } from './BookingView';
-import { DateFormats, formatDateSafe, formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
+import {
+  DateFormats,
+  formatDateSafe,
+  formatDistanceToNowConfigured,
+} from '../../utilities/formattingHelpers';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import { useClientById } from '../../hooks/useClient';
 import WarningIcon from '@material-ui/icons/Warning';
@@ -147,18 +151,29 @@ export const ShipmentProgress: React.FC<ShipmentProgressProps> = ({ booking }) =
   );
 };
 
-export const BookingProgressDialog: React.FC<ProgressDialogProps> = ({ isOpen, handleClose, booking }) => {
+export const BookingProgressDialog: React.FC<ProgressDialogProps> = ({
+  isOpen,
+  handleClose,
+  booking,
+}) => {
   const classes = useStyles();
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+    >
       <span className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{booking?.CarrierID.toUpperCase()}</Typography>
           {booking && booking['ERP-BkgRef'] ? (
             <Typography variant="h6">File Number: {booking['ERP-BkgRef']}</Typography>
           ) : null}
-          {booking && booking['BL-No'] ? <Typography variant="h6">BL Number: {booking['BL-No']}</Typography> : null}
+          {booking && booking['BL-No'] ? (
+            <Typography variant="h6">BL Number: {booking['BL-No']}</Typography>
+          ) : null}
           <IconButton onClick={handleClose} className={classes.closeModal}>
             <CloseIcon />
           </IconButton>
@@ -179,7 +194,9 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
           cargoDetail
             ? cargoDetail.LocRefs && cargoDetail.LocRefs[0]
               ? cargoDetail.LocRefs.map(locRef =>
-                  locRef && locRef.LocType === 'DELIVERY' && locRef.LocRef ? ' / ' + locRef.LocRef : '',
+                  locRef && locRef.LocType === 'DELIVERY' && locRef.LocRef
+                    ? ' / ' + locRef.LocRef
+                    : '',
                 ).join('')
               : ''
             : '',
@@ -190,22 +207,28 @@ const LocRefs: React.FC<LocRefProps> = ({ cargoDetails }) => {
   ) : null;
 };
 
-export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProgressClick, preventDefaultClick }) => {
+export const BookingRow: React.FC<BookingRowProps> = ({
+  isAdmin,
+  booking,
+  onProgressClick,
+  preventDefaultClick,
+}) => {
   const classes = useStyles();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const availableTags = useContext(Tags);
   const [tags, setTags] = useState(
-    availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+    availableTags &&
+      availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
   );
 
   const handleRowClick = useCallback(
     (id: string) => {
       if (!preventDefaultClick) {
-        history.push(`/bookings/${id}`);
+        navigate(`/bookings/${id}`);
       }
     },
-    [history, preventDefaultClick],
+    [navigate, preventDefaultClick],
   );
 
   const checkedBkgAgentContactID = booking?.BkgAgentContact ? booking.BkgAgentContact : undefined;
@@ -238,7 +261,10 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
   useEffect(
     () =>
       setTags(
-        availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+        availableTags &&
+          availableTags.filter(
+            tag => booking.assignedTags && booking.assignedTags.includes(tag.id),
+          ),
       ),
     [availableTags, booking.assignedTags],
   );
@@ -283,7 +309,8 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                 label1={booking && booking.CarrierID ? booking.CarrierID.toUpperCase() : ''}
                 label2={
                   isAdmin && (booking['ERP-CarrierID'] || booking['ERP-ServiceID'])
-                    ? booking['ERP-CarrierID'] + (booking['ERP-ServiceID'] && ` - ${booking['ERP-ServiceID']}`)
+                    ? booking['ERP-CarrierID'] +
+                      (booking['ERP-ServiceID'] && ` - ${booking['ERP-ServiceID']}`)
                     : ''
                 }
                 gutterBottom
@@ -294,15 +321,31 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                 <InfoBoxItem
                   title="Client"
                   label1={client ? client.name : booking.ForwAdrName || ''}
-                  label2={booking && booking.ForwarderPersTxt ? booking.ForwarderPersTxt : booking.ForwAdrCity || ''}
+                  label2={
+                    booking && booking.ForwarderPersTxt
+                      ? booking.ForwarderPersTxt
+                      : booking.ForwAdrCity || ''
+                  }
                   gutterBottom
                 />
               )}
             </Grid>
             <Grid item md={3} xs={12}>
-              <InfoBoxItem title="Vessel" label1={booking.Vessel} label2={booking.Voyage} gutterBottom />
+              <InfoBoxItem
+                title="Vessel"
+                label1={booking.Vessel}
+                label2={booking.Voyage}
+                gutterBottom
+              />
             </Grid>
-            <Grid item container spacing={2} md={4} xs={12} style={{ display: 'flex', flexDirection: 'row' }}>
+            <Grid
+              item
+              container
+              spacing={2}
+              md={4}
+              xs={12}
+              style={{ display: 'flex', flexDirection: 'row' }}
+            >
               <Grid item style={{ width: '45%' }}>
                 <InfoBoxItem title="Status" label1={booking.BkgStatusText} gutterBottom />
               </Grid>
@@ -338,7 +381,11 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                   <InfoBoxItem
                     title="Progress"
                     label1={
-                      <Box id="bookingProgressBkgTable" onClick={onProgressClick} style={{ width: '64px' }}>
+                      <Box
+                        id="bookingProgressBkgTable"
+                        onClick={onProgressClick}
+                        style={{ width: '64px' }}
+                      >
                         <ShipmentProgress booking={booking!} />
                       </Box>
                     }
@@ -371,11 +418,11 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                         <Fragment>
                           {booking.PlaceOfRecieptName}
                           <br />
-                          <Typography variant={'body2'}>
+                          <Typography variant="body2" component="div">
                             ETS.{' '}
                             {booking.PlaceOfReceiptETS
-                              ? formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG)
-                              : formatDateSafe(booking.ETS, DateFormats.LONG)}
+                              ? String(formatDateSafe(booking.PlaceOfReceiptETS, DateFormats.LONG))
+                              : String(formatDateSafe(booking.ETS, DateFormats.LONG))}
                           </Typography>
                         </Fragment>
                       }
@@ -390,11 +437,15 @@ export const BookingRow: React.FC<BookingRowProps> = ({ isAdmin, booking, onProg
                         <Fragment>
                           {booking.FinalDestinationName}
                           <br />
-                          <Typography variant={'body2'}>
+                          <Typography variant="body2" component="div">
                             ETA.
-                            {formatDateSafe(
-                              booking.FinalDestinationETA ? booking.FinalDestinationETA : booking.ETA,
-                              DateFormats.LONG,
+                            {String(
+                              formatDateSafe(
+                                booking.FinalDestinationETA
+                                  ? booking.FinalDestinationETA
+                                  : booking.ETA,
+                                DateFormats.LONG,
+                              ),
                             )}
                           </Typography>
                         </Fragment>
@@ -463,12 +514,18 @@ const BookingsTable: React.FC<BookingsTableProps> = ({ bookings, isAdmin }) => {
             <BookingRow
               isAdmin={isAdmin}
               booking={booking}
-              onProgressClick={(event: React.MouseEvent<unknown>) => handleProgressClick(event, booking)}
+              onProgressClick={(event: React.MouseEvent<unknown>) =>
+                handleProgressClick(event, booking)
+              }
             />
           </Card>
         ))
       )}
-      <BookingProgressDialog isOpen={isDialogOpen} handleClose={handleDialogClose} booking={dialogData!} />
+      <BookingProgressDialog
+        isOpen={isDialogOpen}
+        handleClose={handleDialogClose}
+        booking={dialogData!}
+      />
     </Fragment>
   );
 };

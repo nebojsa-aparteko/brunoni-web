@@ -1,4 +1,12 @@
-import { WithStyles, Grid, createStyles, withStyles, IconButton, Select, MenuItem } from '@material-ui/core';
+import {
+  WithStyles,
+  Grid,
+  createStyles,
+  withStyles,
+  IconButton,
+  Select,
+  MenuItem,
+} from '@material-ui/core';
 import React from 'react';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
@@ -25,7 +33,20 @@ const styles = createStyles({
   },
 });
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'June',
+  'July',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 const generateYears = (relativeTo: Date, count: number) => {
   const half = Math.floor(count / 2);
@@ -59,7 +80,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
         </IconButton>
       </Grid>
       <Grid item>
-        <Select value={getMonth(date)} onChange={handleMonthChange} MenuProps={{ disablePortal: true }}>
+        <Select
+          value={getMonth(date)}
+          onChange={handleMonthChange}
+          MenuProps={{ disablePortal: true }}
+        >
           {MONTHS.map((month, idx) => (
             <MenuItem key={month} value={idx}>
               {month}
@@ -69,7 +94,11 @@ const Header: React.FunctionComponent<HeaderProps> = ({
       </Grid>
 
       <Grid item>
-        <Select value={getYear(date)} onChange={handleYearChange} MenuProps={{ disablePortal: true }}>
+        <Select
+          value={getYear(date)}
+          onChange={handleYearChange}
+          MenuProps={{ disablePortal: true }}
+        >
           {generateYears(date, 30).map(year => (
             <MenuItem key={year} value={year}>
               {year}

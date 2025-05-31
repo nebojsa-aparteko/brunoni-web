@@ -33,7 +33,7 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
 import uniqWith from 'lodash/fp/uniqWith';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link } from './Link';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import quoteDetailFilterList from '../utilities/quoteDetailFilterList';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -45,7 +45,13 @@ import useUser from '../hooks/useUser';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import FlareIcon from '@material-ui/icons/Flare';
 import Meta from './Meta';
-import { getEntity, normalizeQuoteGroups, Quote, QuoteDetail, QuoteGroup } from '../providers/QuoteGroupsProvider';
+import {
+  getEntity,
+  normalizeQuoteGroups,
+  Quote,
+  QuoteDetail,
+  QuoteGroup,
+} from '../providers/QuoteGroupsProvider';
 import QuoteNav from './quotes/QuoteItemNav';
 import { quoteRouteLabelDisplay } from '../utilities/formattedPortDisplay';
 import useUserByAlphacomId from '../hooks/useUserByAlphacomId';
@@ -60,7 +66,7 @@ import ContainerTypes from '../contexts/ContainerTypes';
 import CommodityTypes from '../contexts/CommodityTypes';
 import PickupLocations from '../contexts/PickupLocations';
 import Ports from '../contexts/Ports';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import SchedulePicker from './bookingRequests/SchedulePicker';
 import { RouteSearchResult } from '../model/route-search/RouteSearchResults';
 import BookNowButton from './BookNowButton';
@@ -134,7 +140,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const classes = useStyles();
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [user, userData] = useUser();
   const client = userData?.company!;
@@ -158,7 +164,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
   const handleBookNow = (schedule?: RouteSearchResult) => {
     localStorage.setItem('quote', JSON.stringify(quote));
     localStorage.setItem('schedule', JSON.stringify(schedule));
-    history.push('/online-booking');
+    navigate('/online-booking');
   };
 
   return (
@@ -169,15 +175,31 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
         quote={quote}
         handleBookNow={handleBookNow}
       />
-      <Button color="primary" variant="outlined" component={RouterLink} size="small" to={`/quotes/${quote.id}`}>
+      <Button
+        color="primary"
+        variant="outlined"
+        component={Link}
+        size="small"
+        to={`/quotes/${quote.id}`}
+      >
         View more
       </Button>
       <BookNowButton bookNow={handleDialogOpen} />
       <IconButton aria-label="actions" onClick={onMoreButtonClick}>
         <MoreVertIcon />
       </IconButton>
-      <Menu id="actions" anchorEl={moreAnchorEl} keepMounted open={Boolean(moreAnchorEl)} onClose={handleClose}>
-        <MenuItem component="a" href={buildSpecialRequestLink(quote, [user, userData, client])} target="_blank">
+      <Menu
+        id="actions"
+        anchorEl={moreAnchorEl}
+        keepMounted
+        open={Boolean(moreAnchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem
+          component="a"
+          href={buildSpecialRequestLink(quote, [user, userData, client])}
+          target="_blank"
+        >
           <ListItemIcon>
             <FlareIcon fontSize="small" />
           </ListItemIcon>
@@ -189,11 +211,7 @@ const QuoteItemActionButtons: React.FC<ActionButtonsProps> = ({ quote }) => {
 };
 
 export const addAssignee = (user: UserRecord | null, quoteId: string) => {
-  return firebase
-    .firestore()
-    .collection('quotes')
-    .doc(quoteId)
-    .update('assignedTo', user);
+  return firebase.firestore().collection('quotes').doc(quoteId).update('assignedTo', user);
 };
 
 const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
@@ -202,11 +220,13 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [quoteGroup, setQouteGroup] = useState<QuoteGroup | undefined>(undefined);
 
-  const [quotesByCarrier, setQuotesByCarrier] = useState<[string, Quote[]][] | undefined>(undefined);
+  const [quotesByCarrier, setQuotesByCarrier] = useState<[string, Quote[]][] | undefined>(
+    undefined,
+  );
 
   const [selectedPanel, setSelectedPanel] = useState('');
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const [, userRecord] = useUser();
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
@@ -243,7 +263,9 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   );
 
   useEffect(() => {
-    if (!(quotesSnapshot && containerTypes && commodityTypes && pickupLocations && ports && carriers)) {
+    if (
+      !(quotesSnapshot && containerTypes && commodityTypes && pickupLocations && ports && carriers)
+    ) {
       return;
     }
 
@@ -262,13 +284,21 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
         const getPort = getEntity(ports, port => port.id);
         const getCarrier = getEntity(carriers, carrier => carrier.name);
 
-        return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier)(quotes);
+        return normalizeQuoteGroups(
+          getContainerType,
+          getCommodityType,
+          getPickupLocation,
+          getPort,
+          getCarrier,
+        )(quotes);
       };
 
       const normalizedQuoteGroup = quotes === undefined ? undefined : normalize(quotes).pop();
 
       const quotesByCarrierNormalized = normalizedQuoteGroup
-        ? (flow(get('quotes'), groupBy('carrier.id'), toPairs)(normalizedQuoteGroup) as Array<[string, Quote[]]>)
+        ? (flow(get('quotes'), groupBy('carrier.id'), toPairs)(normalizedQuoteGroup) as Array<
+            [string, Quote[]]
+          >)
         : undefined;
 
       setQouteGroup(normalizedQuoteGroup);
@@ -289,13 +319,9 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
     const updateBatch = firebase.firestore().batch();
 
     quotes.map((quote: Quote) =>
-      updateBatch.update(
-        firebase
-          .firestore()
-          .collection('quotes')
-          .doc(quote.id),
-        { assignedTo: user },
-      ),
+      updateBatch.update(firebase.firestore().collection('quotes').doc(quote.id), {
+        assignedTo: user,
+      }),
     );
 
     updateBatch
@@ -345,7 +371,7 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
   }
 
   if (!isLoading && !quoteGroup) {
-    history.push('/not-found');
+    navigate('/not-found');
   }
 
   return !quotesByCarrier ? (
@@ -406,7 +432,10 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
 
             return (
               <Box id={carrierId} mb={1} key={index}>
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }} expanded={selectedPanel === carrierId}>
+                <ExpansionPanel
+                  TransitionProps={{ unmountOnExit: true }}
+                  expanded={selectedPanel === carrierId}
+                >
                   <ExpansionPanelSummary
                     aria-controls="panel1c-content"
                     expandIcon={<ExpandMoreIcon />}
@@ -446,10 +475,16 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
                             <TableBody>
                               {quoteDetailItemsMerged
                                 .filter(quoteDetail =>
-                                  quoteDetailFilterList.includes((quoteDetail.Description || '').toLowerCase()),
+                                  quoteDetailFilterList.includes(
+                                    (quoteDetail.Description || '').toLowerCase(),
+                                  ),
                                 )
                                 .map((quoteDetail, i) => (
-                                  <TableRow key={i} className={classes.tableRow} selected={(i + 1) % 2 === 0}>
+                                  <TableRow
+                                    key={i}
+                                    className={classes.tableRow}
+                                    selected={(i + 1) % 2 === 0}
+                                  >
                                     <TableCell component="th" scope="row">
                                       {quoteDetail.Description}
                                     </TableCell>
@@ -462,7 +497,9 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
                                       );
                                       return matchingQuoteDetail ? (
                                         <Fragment key={index}>
-                                          <TableCell className={`${classes.currencyCell} ${classes.borderCell}`}>
+                                          <TableCell
+                                            className={`${classes.currencyCell} ${classes.borderCell}`}
+                                          >
                                             {matchingQuoteDetail.Currency !== 'incl.'
                                               ? matchingQuoteDetail.Currency
                                               : ''}
@@ -497,7 +534,8 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
                                       align="center"
                                       className={classes.borderCell}
                                     >
-                                      {quote.serviceDetails[0]?.Frequency} {quote.serviceDetails[0]?.Routing}{' '}
+                                      {quote.serviceDetails[0]?.Frequency}{' '}
+                                      {quote.serviceDetails[0]?.Routing}{' '}
                                       {quote.serviceDetails[0]?.TransitTime} days
                                     </TableCell>
                                   </Fragment>
@@ -510,7 +548,11 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
                                 </TableCell>
                                 {quotes.map((quote, index) => (
                                   <Fragment key={index}>
-                                    <TableCell colSpan={3} align="center" className={classes.borderCell}>
+                                    <TableCell
+                                      colSpan={3}
+                                      align="center"
+                                      className={classes.borderCell}
+                                    >
                                       {formatDate(quote.validityPeriod.from, 'd. MMMM')} –{' '}
                                       {formatDate(quote.validityPeriod.to, 'd. MMMM')}
                                     </TableCell>
@@ -547,7 +589,12 @@ const QuoteGroupView: React.FC<Props> = ({ id, showCompanyInfo }) => {
         <ActivityLogProvider>
           {/*<InternalStorage id={quoteGroup?.id} collection={}/>*/}
           {/*TODO This should be visible only for admins*/}
-          {quoteGroup && <QuoteGroupActivityLogContainer groupId={quoteGroup.id} quote={quoteGroup?.quotes?.[0]} />}
+          {quoteGroup && (
+            <QuoteGroupActivityLogContainer
+              groupId={quoteGroup.id}
+              quote={quoteGroup?.quotes?.[0]}
+            />
+          )}
         </ActivityLogProvider>
       </Container>
     </Fragment>

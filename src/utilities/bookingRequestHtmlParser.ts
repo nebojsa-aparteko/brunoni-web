@@ -1,7 +1,8 @@
-import cheerio from 'cheerio';
+import { load, CheerioAPI, AnyNode, Cheerio, Element } from 'cheerio';
 import { isEqual, omit } from 'lodash/fp';
 import { getEnumValueByEnumKey } from './getEnumKeyByEnumValue';
 import { ISOCodesEdiAlphacom } from '../model/BookingRequest';
+import type { Element as DomHandlerElement } from 'domhandler';
 
 enum Types {
   //CANCELED = 'Cancelled',
@@ -154,7 +155,7 @@ interface DataNormalTable {
   [key: string]: string[][];
 }
 
-const parseOddTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
+const parseOddTable = ($: CheerioAPI, table: Cheerio<AnyNode>) => {
   let DATA: DataOddTable = {};
 
   table.find('td').each((index, td) => {
@@ -166,34 +167,30 @@ const parseOddTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
         .text()
         .replace(/\s+/g, ' ')
         .trim();
-      titleData = $(title)
-        .text()
-        .replace(/\s+/g, ' ')
-        .trim();
+      titleData = $(title).text().replace(/\s+/g, ' ').trim();
       // Get all siblings until next <strong> tag
       let siblings = $(title).nextUntil('strong');
       const dataArray: string[] = [];
       // Iterate over <strong> siblings
       siblings.each((index, sibling) => {
         //Siblings are either <span> OR <br>.
-        const tagName = sibling.tagName;
+        const tagName = (sibling as Element).name;
         // Ignore <br>
         if (tagName === 'br') return;
         else {
           // Iterate over <span class='data_nopad'> children
-          $(sibling.childNodes).each((index, child) => {
-            // child is either <br> OR #text.
-            const tagName = child.tagName;
-            // Ignore <br>
-            if (tagName === 'br') return;
-            else {
-              const text = $(child)
-                .text()
-                .replace(/\s+/g, ' ')
-                .trim();
-              if (text) dataArray.push(text);
-            }
-          });
+          $(sibling)
+            .contents()
+            .each((index, child) => {
+              // child is either <br> OR #text.
+              const elem = child as Element;
+              // Ignore <br>
+              if (elem.type === 'tag' && elem.name === 'br') return;
+              else {
+                const text = $(child).text().replace(/\s+/g, ' ').trim();
+                if (text) dataArray.push(text);
+              }
+            });
         }
       });
       if (DATA[titleData]) {
@@ -259,14 +256,18 @@ const extractDataOddTable = (object: DataOddTable) => {
     true,
   );
   const CUSTOMER_PREFERENCES = findDataOddTable(object, Titles.CUSTOMER_PREFERENCES);
-  const CUSTOMER_TRANSACTION_ASSEMBLED_DATE = findDataOddTable(object, Titles.CUSTOMER_TRANSACTION_ASSEMBLED_DATE);
+  const CUSTOMER_TRANSACTION_ASSEMBLED_DATE = findDataOddTable(
+    object,
+    Titles.CUSTOMER_TRANSACTION_ASSEMBLED_DATE,
+  );
   const MOVE_TYPE = findDataOddTable(object, Titles.MOVE_TYPE);
   const PLACE_OF_CARRIER_RECEIPT = findDataOddTable(object, Titles.PLACE_OF_CARRIER_RECEIPT);
   const PLACE_OF_CARRIER_DELIVERY = findDataOddTable(object, Titles.PLACE_OF_CARRIER_DELIVERY);
 
-  const CARRIER_VESSEL_LLOYD_CODE_VOYAGE = findDataOddTable(object, Titles.CARRIER_VESSEL_LLOYD_CODE_VOYAGE) as
-    | string
-    | undefined;
+  const CARRIER_VESSEL_LLOYD_CODE_VOYAGE = findDataOddTable(
+    object,
+    Titles.CARRIER_VESSEL_LLOYD_CODE_VOYAGE,
+  ) as string | undefined;
   const VESSEL = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[1];
   const VOYAGE = CARRIER_VESSEL_LLOYD_CODE_VOYAGE?.split(', ')[3].replace(/ /g, '');
 
@@ -307,7 +308,7 @@ const extractDataOddTable = (object: DataOddTable) => {
   };
 };
 
-const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
+const parseNormalTable = ($: CheerioAPI, table: Cheerio<AnyNode>) => {
   let DATA: DataNormalTable = {};
   // find table rows
   const tableRows = table.find('tr');
@@ -326,10 +327,7 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
     // get the table data columns
     dataTableRow.children().each((index, column) => {
       // index is mapping 1 to 1 title to data
-      title = $(titlesTableRow.children().get(index))
-        .text()
-        .replace(/\s+/g, ' ')
-        .trim();
+      title = $(titlesTableRow.children().get(index)).text().replace(/\s+/g, ' ').trim();
       // ignore 'NET WEIGHT' & 'NET VOLUME' because it's already under CONTAINER info
       if (title?.includes(Titles.NET_WEIGHT)) return;
       if (title?.includes(Titles.NET_VOLUME)) return;
@@ -338,35 +336,31 @@ const parseNormalTable = ($: cheerio.Root, table: cheerio.Cheerio) => {
         .children()
         .each((index, child) => {
           // child is either <br>, <strong> (inside title) OR <span> (data).
+          const elem = child as DomHandlerElement;
           // Ignore <br>
-          const tagName = child.tagName;
-          if (tagName === 'br') return;
+          if (elem.name === 'br') return;
           //insideTitle
-          if (tagName === 'strong') {
-            insideTitle = $(child)
-              .text()
-              .replace(/\s+/g, ' ')
-              .trim();
+          if (elem.name === 'strong') {
+            insideTitle = $(child).text().replace(/\s+/g, ' ').trim();
             // ignore '--------------------'
             if (insideTitle?.includes('-----')) return;
             dataArray.push(insideTitle);
           }
           // data
-          if (tagName === 'span') {
+          if (elem.name === 'span') {
             // Iterate over <span class='data_nopad'> children
-            $(child.childNodes).each((index, child) => {
-              // child is either <br> OR #text.
-              const tagName = child.tagName;
-              // Ignore <br>
-              if (tagName === 'br') return;
-              else {
-                const text = $(child)
-                  .text()
-                  .replace(/\s+/g, ' ')
-                  .trim();
-                if (text) dataArray.push(text);
-              }
-            });
+            $(child)
+              .contents()
+              .each((index, innerChild) => {
+                // child is either <br> OR #text.
+                const innerElem = innerChild as DomHandlerElement;
+                // Ignore <br>
+                if (innerElem.type === 'tag' && innerElem.name === 'br') return;
+                else {
+                  const text = $(innerChild).text().replace(/\s+/g, ' ').trim();
+                  if (text) dataArray.push(text);
+                }
+              });
           }
           if (DATA[title]) {
             DATA[title] = [...DATA[title], dataArray];
@@ -395,12 +389,11 @@ const getContainerData = (array: string[]) => {
   const TYPE = SIZE_TYPE_CODE?.match(/[0-9]{2}[A-Za-z][0-9][A-Za-z]?/g)?.[0] || undefined;
   const ISO_TYPE = (TYPE && getEnumValueByEnumKey(ISOCodesEdiAlphacom, TYPE)) || undefined;
   const SIZE = TYPE
-    ? SIZE_TYPE_CODE?.replace(TYPE, '')
-        .replace(/[()]/g, '')
-        .trim() || undefined
+    ? SIZE_TYPE_CODE?.replace(TYPE, '').replace(/[()]/g, '').trim() || undefined
     : undefined;
 
-  const NET_WEIGHT = getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0] || undefined;
+  const NET_WEIGHT =
+    getNeededData(array, NeededData.NET_WEIGHT)?.match(/[+-]?\d+(\.\d+)?/g)?.[0] || undefined;
   const NET_VOLUME = getNeededData(array, NeededData.NET_VOLUME);
   const EQUIPMENT_SUPPLIER = getNeededData(array, NeededData.EQUIPMENT_SUPPLIER);
   const EMPTY_FULL = getNeededData(array, NeededData.EMPTY_FULL);
@@ -444,7 +437,8 @@ const getContainerLocation = (array: string[]) => {
 
 const getContainerMainData = (container: string[][]) => {
   const data = container.find(
-    data => data[0]?.includes(NeededData.QUANTITY) || data[0]?.includes(NeededData.CONTAINER_NUMBER),
+    data =>
+      data[0]?.includes(NeededData.QUANTITY) || data[0]?.includes(NeededData.CONTAINER_NUMBER),
   );
   if (data) return getContainerData(data);
 };
@@ -463,7 +457,10 @@ const getContainerTitleData = (container: string[][], title: Titles) => {
   }
 };
 
-const getDuplicateIndex = (containers: HtmlBookingContainer[], container: HtmlBookingContainer): number => {
+const getDuplicateIndex = (
+  containers: HtmlBookingContainer[],
+  container: HtmlBookingContainer,
+): number => {
   return containers.findIndex(c => {
     const curr = omit(['QUANTITY'])(c);
     const watched = omit(['QUANTITY'])(container);
@@ -471,7 +468,12 @@ const getDuplicateIndex = (containers: HtmlBookingContainer[], container: HtmlBo
   });
 };
 
-const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: NeededData, container?: boolean) => {
+const findDataNormalTable = (
+  object: DataNormalTable,
+  key: Titles,
+  neededData?: NeededData,
+  container?: boolean,
+) => {
   if (!object[key]) return undefined;
 
   if (container) {
@@ -503,9 +505,12 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
         Titles.EMPTY_CONTAINER_REQUESTED_PICK_UP_DATE,
       );
 
-      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS) as string[] | undefined;
+      const REEFER_SETTINGS = getContainerTitleData(container, Titles.REEFER_SETTINGS) as
+        | string[]
+        | undefined;
       const TEMPERATURE =
-        REEFER_SETTINGS && getNeededData(REEFER_SETTINGS, NeededData.TEMPERATURE)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
+        REEFER_SETTINGS &&
+        getNeededData(REEFER_SETTINGS, NeededData.TEMPERATURE)?.match(/[+-]?\d+(\.\d+)?/g)?.[0];
       const VENTILATION = REEFER_SETTINGS && getNeededData(REEFER_SETTINGS, NeededData.VENTILATION);
 
       const containerObject = {
@@ -522,7 +527,9 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
       if (duplicateIdx !== -1) {
         containers[duplicateIdx] = {
           ...containers[duplicateIdx],
-          QUANTITY: String(Number(containers[duplicateIdx].QUANTITY) + Number(containerObject.QUANTITY)),
+          QUANTITY: String(
+            Number(containers[duplicateIdx].QUANTITY) + Number(containerObject.QUANTITY),
+          ),
         };
       } else {
         containers.push(containerObject);
@@ -547,17 +554,30 @@ const findDataNormalTable = (object: DataNormalTable, key: Titles, neededData?: 
 const extractDataNormalTable = (object: DataNormalTable) => {
   const CUSTOMER_COMMENTS = findDataNormalTable(object, Titles.CUSTOMER_COMMENTS);
   // TRANSPORT PLAN DETAILS
-  const TRANSPORT_MODE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.TRANSPORT_MODE);
-  const CONVEYANCE_TYPE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.CONVEYANCE_TYPE);
+  const TRANSPORT_MODE = findDataNormalTable(
+    object,
+    Titles.TRANSPORT_PLAN_DETAILS,
+    NeededData.TRANSPORT_MODE,
+  );
+  const CONVEYANCE_TYPE = findDataNormalTable(
+    object,
+    Titles.TRANSPORT_PLAN_DETAILS,
+    NeededData.CONVEYANCE_TYPE,
+  );
   const CARRIER = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.CARRIER);
   const VESSEL = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VESSEL);
-  let VOYAGE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VOYAGE) as string | undefined;
+  let VOYAGE = findDataNormalTable(object, Titles.TRANSPORT_PLAN_DETAILS, NeededData.VOYAGE) as
+    | string
+    | undefined;
   VOYAGE = VOYAGE?.replace(/ /g, '');
   // CARGO
   const CARGO_PACKING = findDataNormalTable(object, Titles.CARGO_PACKING);
   const PACKAGES = findDataNormalTable(object, Titles.PACKAGES);
   const CARGO_DESCRIPTION = findDataNormalTable(object, Titles.CARGO_DESCRIPTION);
-  const CARGO_WEIGHT_EXCLUDING_TARE = findDataNormalTable(object, Titles.CARGO_WEIGHT_EXCLUDING_TARE);
+  const CARGO_WEIGHT_EXCLUDING_TARE = findDataNormalTable(
+    object,
+    Titles.CARGO_WEIGHT_EXCLUDING_TARE,
+  );
   const GROSS_VOLUME = findDataNormalTable(object, Titles.GROSS_VOLUME);
   // CONTAINERS
   const CONTAINERS = findDataNormalTable(object, Titles.CONTAINER, undefined, true);
@@ -585,7 +605,7 @@ const extractDataNormalTable = (object: DataNormalTable) => {
   };
 };
 
-const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number => {
+const findOddTableIndex = ($: CheerioAPI, dataTables: Cheerio<AnyNode>): number => {
   let oddDataTableIndex = 0;
   let currTableIndex = 0;
   const nDataTables = dataTables.length;
@@ -593,9 +613,7 @@ const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number
   while (currTableIndex < nDataTables) {
     const tableElement = dataTables.get(currTableIndex);
     const table = $(tableElement);
-    const title = $(table)
-      .find('strong')
-      .text();
+    const title = $(table).find('strong').text();
 
     if (title.includes(Titles.BOOKER)) {
       oddDataTableIndex = currTableIndex;
@@ -607,7 +625,7 @@ const findOddTableIndex = ($: cheerio.Root, dataTables: cheerio.Cheerio): number
 };
 
 export const Parse = (html: string): HtmlBookingRequest | undefined => {
-  const $ = cheerio.load(html);
+  const $ = load(html);
 
   const bookingType = $('span[class=h]').text();
 

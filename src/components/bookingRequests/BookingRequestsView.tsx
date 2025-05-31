@@ -22,7 +22,12 @@ import BookingRequestsTable from './BookingRequestsTable';
 import UserInput from '../inputs/UserInput';
 import ActingAs from '../../contexts/ActingAs';
 import useAdminUsers from '../../hooks/useAdminUsers';
-import { CUSTOMER_FACING_ROLES, isSuperAdmin, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import {
+  CUSTOMER_FACING_ROLES,
+  isSuperAdmin,
+  UserRecordMin,
+  UserRecordMinProperties,
+} from '../../model/UserRecord';
 import theme from '../../theme';
 import firebase from '../../firebase';
 import pick from 'lodash/fp/pick';
@@ -125,9 +130,13 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
     // there are more than one carrier assigned to an admin;
     // if it's not already filtered on the backend (because of limitation) than filter it here
     const filteredByCarrier =
-      (isAdmin && userCarriers && userCarriers?.length === 1) || isSuperAdmin(userRecord) || !isAdmin
+      (isAdmin && userCarriers && userCarriers?.length === 1) ||
+      isSuperAdmin(userRecord) ||
+      !isAdmin
         ? bookingRequests
-        : bookingRequests?.filter(request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id));
+        : bookingRequests?.filter(
+            request => request?.carrier?.id && userCarriers?.includes(request?.carrier?.id),
+          );
 
     setFilteredBookingRequests(
       !fieldName || !value
@@ -145,10 +154,13 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
           }),
     );
   }, [bookingRequests, fieldName, value, userCarriers]);
-  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const [bookingPaginationContextData, setBookingPaginationContextData] =
+    useBookingListPaginationContext();
   const { page, rowsPerPage } = bookingPaginationContextData;
 
-  const [chinkifiedResults, setChunkifiedResults] = useState<BookingRequest[] | undefined | null>([]);
+  const [chinkifiedResults, setChunkifiedResults] = useState<BookingRequest[] | undefined | null>(
+    [],
+  );
 
   const resultChunks = useMemo(() => {
     setChunkifiedResults(filteredBookingRequests);
@@ -168,7 +180,10 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       if (setBookingPaginationContextData)
         setBookingPaginationContextData(
-          flow(set('rowsPerPage', parseInt(event.target.value)), set('page', 0))(bookingPaginationContextData),
+          flow(
+            set('rowsPerPage', parseInt(event.target.value)),
+            set('page', 0),
+          )(bookingPaginationContextData),
         );
     },
     [bookingPaginationContextData, setBookingPaginationContextData],
@@ -187,7 +202,10 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
             setSelectedRequests([]);
           })
           .catch(e => {
-            dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Error assigning task. Please try again.' });
+            dispatch({
+              type: 'SHOW_ERROR_SNACKBAR',
+              message: 'Error assigning task. Please try again.',
+            });
             console.error(e);
           })
           .finally(async () => {
@@ -233,7 +251,10 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
                     {!actingAs && (
                       <Box ml={2}>
                         <Tooltip title="Add from a html file">
-                          <IconButton onClick={openModal} style={{ display: 'flex', flexDirection: 'column' }}>
+                          <IconButton
+                            onClick={openModal}
+                            style={{ display: 'flex', flexDirection: 'column' }}
+                          >
                             <AddIcon fontSize="large" />
                           </IconButton>
                         </Tooltip>
@@ -277,7 +298,9 @@ const BookingRequestsView: React.FC<Props> = ({ isAdmin }) => {
             </Card>
 
             {filteredBookingRequests && filteredBookingRequests.length === 0 && (
-              <BookingsEmptyResults message={'There are no bookings that might need your attention at the moment. '} />
+              <BookingsEmptyResults
+                message={'There are no bookings that might need your attention at the moment. '}
+              />
             )}
 
             {filteredBookingRequests && filteredBookingRequests.length > 0 && (

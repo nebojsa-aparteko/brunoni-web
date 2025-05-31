@@ -1,4 +1,12 @@
-import React, { Fragment, MouseEventHandler, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as changeCase from 'change-case';
 import {
   AppBar,
@@ -18,7 +26,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import Link from './Link';
+import { Link, ButtonLink, MenuItemLink } from './Link';
 import IdentityWidget from './IdentityWidget';
 import useUser from '../hooks/useUser';
 import Hidden from '@material-ui/core/Hidden';
@@ -29,14 +37,11 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LoginDialog from '../contexts/LoginDialog';
 import ActingAs from '../contexts/ActingAs';
 import Mousetrap from 'mousetrap';
-import MenuItem from '@material-ui/core/MenuItem';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import NavBarQuickSearchDialog from './quickSearch/NavBarQuickSearchDialog';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsButton from './notifications/NotificationsButton';
 import { isDashboardUser, isSuperAdmin } from '../model/UserRecord';
-import { Link as RouterLink, LinkProps as RouterLinkProps } from 'react-router-dom';
-import { Omit } from '@material-ui/types';
 import { camelCase } from 'lodash';
 import GuideButton from './GuideButton';
 import Shepherd from 'shepherd.js';
@@ -73,17 +78,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: 'auto',
     display: 'flex',
     '& > img':
-      ({
-        brunoni: {
-          position: 'relative',
+      (
+        {
+          brunoni: {
+            position: 'relative',
 
-          height: 45,
-        },
-        allmarine: {
-          maxHeight: 45,
-          width: 'auto',
-        },
-      } as Record<string, CSSProperties>)[process.env.REACT_APP_BRAND || ''] || {},
+            height: 45,
+          },
+          allmarine: {
+            maxHeight: 45,
+            width: 'auto',
+          },
+        } as Record<string, CSSProperties>
+      )[import.meta.env.VITE_BRAND || ''] || {},
     [theme.breakpoints.down('sm')]: {
       '& > img': {
         top: 0,
@@ -146,27 +153,25 @@ const useStylesButtonMenuItem = makeStyles((theme: Theme) => ({
 }));
 
 export const getLogo = () => {
-  return process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
+  return import.meta.env.VITE_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo;
 };
 
-const getPageGuide = () => {
-  switch (window.location.pathname) {
-    case '':
-      return dashboardShepherdTour;
-    case '/schedule' || '/schedule/':
+const getGuide = (path: string): any | undefined => {
+  switch (path) {
+    case '/schedule':
       return scheduleShepherdTour;
-    case '/bookings' || '/bookings/':
+    case '/bookings':
       return bookingsTableShepherdTour;
-    case '/quotes/groups' || '/quotes/groups/':
+    case '/quotes/groups':
       return quotesShepherdTour;
-    case '/quotes/get' || '/quotes/get/':
+    case '/quotes/get':
       return getQuotesShepherdTour;
-    case '/my-day' || '/my-day/':
+    case '/my-day':
       return myDayShepherdTour;
     default: {
-      if (window.location.pathname.startsWith('/bookings/')) return bookingShepherdTour;
-      if (window.location.pathname.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
-      if (window.location.pathname.startsWith('/quotes/')) return quoteShepherdTour;
+      if (path.startsWith('/bookings/')) return bookingShepherdTour;
+      if (path.startsWith('/quotes/groups/')) return quotesGroupShepherdTour;
+      if (path.startsWith('/quotes/')) return quoteShepherdTour;
       return undefined;
     }
   }
@@ -185,17 +190,9 @@ interface ListItemLinkProps {
 function ListItemLink(props: ListItemLinkProps) {
   const { icon, primary, to, onClick } = props;
 
-  const renderLink = React.useMemo(
-    () =>
-      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
-        <RouterLink to={to} ref={ref} {...itemProps} />
-      )),
-    [to],
-  );
-
   return (
     <li id={camelCase(primary) + 'Nav'}>
-      <ListItem button component={renderLink} onClick={onClick}>
+      <ListItem button component={Link} to={to} onClick={onClick}>
         {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
       </ListItem>
@@ -209,30 +206,12 @@ function ButtonMenuItem(props: ListItemLinkProps) {
 
   return (
     <div className={classes.item} id={camelCase(primary) + 'Nav'}>
-      <Button component={RouterLink} variant={variant} color={color} to={to}>
+      <ButtonLink to={to} variant={variant} color={color}>
         <Typography variant="body1" style={typographyStyle}>
           {primary}
         </Typography>
-      </Button>
+      </ButtonLink>
     </div>
-  );
-}
-
-function MenuItemLink(props: ListItemLinkProps) {
-  const { primary, to, onClick } = props;
-
-  const renderLink = React.useMemo(
-    () =>
-      React.forwardRef<any, Omit<RouterLinkProps, 'to'>>((itemProps, ref) => (
-        <RouterLink to={to} ref={ref} {...itemProps} />
-      )),
-    [to],
-  );
-
-  return (
-    <MenuItem id={camelCase(primary) + 'Nav'} onClick={onClick} component={renderLink}>
-      {primary}
-    </MenuItem>
   );
 }
 
@@ -253,13 +232,15 @@ const Navbar: React.FC = () => {
   const zonedTime = useZonedTime();
 
   useEffect(() => {
-    setGuide(getPageGuide());
-  }, [window.location.pathname]);
+    setGuide(getGuide(window.location.pathname));
+  }, []);
 
   const quickSearchButtonRef = useRef<HTMLButtonElement>();
 
   useEffect(() => {
-    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], () => setIsSearchDialogOpen(true));
+    Mousetrap.bind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q'], () =>
+      setIsSearchDialogOpen(true),
+    );
 
     return () => {
       Mousetrap.unbind(['ctrl+g', 'command+k', 'ctrl+shift+g', 'j q']);
@@ -290,7 +271,8 @@ const Navbar: React.FC = () => {
                   <Grid item key={i}>
                     <Box display="flex" alignItems="center">
                       <Typography variant="body2" color="inherit">
-                        <span>{clock.city}</span> • <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
+                        <span>{clock.city}</span> •{' '}
+                        <span style={{ whiteSpace: 'nowrap' }}>{formattedDate}</span>
                       </Typography>
                     </Box>
                   </Grid>
@@ -303,7 +285,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={getLogo()}
-                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>
@@ -315,11 +297,17 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="Quotes" to="/quotes/groups" />
 
                     <ButtonMenuItem primary="My day" to="/my-day" />
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Vessel" to="/vessel" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Vessel" to="/vessel" />
+                    )}
                     {/*TODO uncomment this once it's ready*/}
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Land" to="/land-transport" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Land" to="/land-transport" />
+                    )}
 
-                    {isDashboardUser(userRecord) && !actingAs && <ButtonMenuItem primary="Load list" to="/loadList" />}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem primary="Load list" to="/loadList" />
+                    )}
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem primary="Equipment control" to="/equipment-control" />
                     )}
@@ -331,8 +319,12 @@ const Navbar: React.FC = () => {
 
                     {actingAs !== null && (
                       <Fragment>
-                        <MenuItemLink onClick={handleMenuClose} to="/equipment" primary="EQUIPMENT SITUATION" />
-                        <MenuItemLink onClick={handleMenuClose} to="/charges" primary="SIDE CHARGES" />
+                        <MenuItemLink onClick={handleMenuClose} to="/equipment">
+                          EQUIPMENT SITUATION
+                        </MenuItemLink>
+                        <MenuItemLink onClick={handleMenuClose} to="/charges">
+                          SIDE CHARGES
+                        </MenuItemLink>
                       </Fragment>
                     )}
 
@@ -356,18 +348,26 @@ const Navbar: React.FC = () => {
                           className={classes.menu}
                           getContentAnchorEl={null}
                         >
-                          <MenuItemLink onClick={handleMenuClose} to="/charges" primary="Side Charges" />
-                          <MenuItemLink onClick={handleMenuClose} to="/weekly-payment" primary="Weekly Payment" />
-                          <MenuItemLink onClick={handleMenuClose} to="/commissions" primary="Commissions" />
-                          <MenuItemLink primary="Equipment Situation" to="/equipment" onClick={handleMenuClose} />
+                          <MenuItemLink onClick={handleMenuClose} to="/charges">
+                            Side Charges
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/weekly-payment">
+                            Weekly Payment
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/commissions">
+                            Commissions
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/equipment">
+                            Equipment Situation
+                          </MenuItemLink>
                           {isSuperAdmin(userRecord) && (
-                            <MenuItemLink onClick={handleMenuClose} to="/teams" primary="Teams" />
+                            <MenuItemLink onClick={handleMenuClose} to="/teams">
+                              Teams
+                            </MenuItemLink>
                           )}
-                          <MenuItemLink
-                            onClick={handleMenuClose}
-                            primary="Land Transport Config"
-                            to="/land-transport-config"
-                          />
+                          <MenuItemLink onClick={handleMenuClose} to="/land-transport-config">
+                            Land Transport Config
+                          </MenuItemLink>
                         </Menu>
                         {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
                         {/*{isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}*/}
@@ -404,7 +404,10 @@ const Navbar: React.FC = () => {
                         <SearchIcon fontSize="small" />
                       </IconButton>
                       {isSearchDialogOpen && (
-                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                        <NavBarQuickSearchDialog
+                          isOpen={isSearchDialogOpen}
+                          handleClose={handleDialogClose}
+                        />
                       )}
                     </Fragment>
                   ) : (
@@ -418,17 +421,20 @@ const Navbar: React.FC = () => {
                         <SearchIcon fontSize="small" />
                       </IconButton>
                       {isSearchDialogOpen && (
-                        <NavBarQuickSearchDialog isOpen={isSearchDialogOpen} handleClose={handleDialogClose} />
+                        <NavBarQuickSearchDialog
+                          isOpen={isSearchDialogOpen}
+                          handleClose={handleDialogClose}
+                        />
                       )}
                     </Fragment>
                   )
-                ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
+                ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://brunoni.ch">
                       <Typography variant="body1">Visit brunoni.ch</Typography>
                     </Button>
                   </div>
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                   <div className={classes.item}>
                     <Button component="a" href="https://allmarine.ch">
                       <Typography variant="body1">Visit allmarine.ch</Typography>
@@ -455,7 +461,7 @@ const Navbar: React.FC = () => {
               <Link className={classes.logo} to="/">
                 <img
                   src={getLogo()}
-                  alt={changeCase.capitalCase(process.env.REACT_APP_BRAND || '')}
+                  alt={changeCase.capitalCase(import.meta.env.VITE_BRAND || '')}
                   className={classes.logo}
                 />
               </Link>
@@ -486,7 +492,11 @@ const Navbar: React.FC = () => {
                   <ListItemLink primary="Schedule" to="/schedule" onClick={handleDrawerToggle} />
                   <ListItemLink primary="Quotes" to="/quotes/groups" onClick={handleDrawerToggle} />
                   {isAdmin && (
-                    <ListItemLink primary="Land Transport" to="/land-transport" onClick={handleDrawerToggle} />
+                    <ListItemLink
+                      primary="Land Transport"
+                      to="/land-transport"
+                      onClick={handleDrawerToggle}
+                    />
                   )}
                   {/*<ListItemLink primary="Online Booking" to="/online-booking" onClick={handleDrawerToggle} />*/}
 
@@ -495,17 +505,29 @@ const Navbar: React.FC = () => {
                   <Fragment>
                     <ListItemLink primary="Bookings" to="/bookings" onClick={handleDrawerToggle} />
                   </Fragment>
-                  <ListItemLink primary="Equipment Situation" to="/equipment" onClick={handleDrawerToggle} />
+                  <ListItemLink
+                    primary="Equipment Situation"
+                    to="/equipment"
+                    onClick={handleDrawerToggle}
+                  />
                   <ListItemLink primary="Side Charges" to="/charges" onClick={handleDrawerToggle} />
                 </Fragment>
               )}
 
               {user !== undefined && user !== null ? (
                 <ListItemLink primary="Get Quote" to="/quotes/get" onClick={handleDrawerToggle} />
-              ) : process.env.REACT_APP_BRAND === 'brunoni' ? (
-                <ListItemLink primary="Visit brunoni.ch" to="https://brunoni.ch" onClick={handleDrawerToggle} />
-              ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
-                <ListItemLink primary="Visit  allmarine.ch" to="https://allmarine.ch" onClick={handleDrawerToggle} />
+              ) : import.meta.env.VITE_BRAND === 'brunoni' ? (
+                <ListItemLink
+                  primary="Visit brunoni.ch"
+                  to="https://brunoni.ch"
+                  onClick={handleDrawerToggle}
+                />
+              ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
+                <ListItemLink
+                  primary="Visit  allmarine.ch"
+                  to="https://allmarine.ch"
+                  onClick={handleDrawerToggle}
+                />
               ) : null}
 
               <Divider />

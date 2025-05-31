@@ -12,9 +12,9 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
-import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
-import { ReactComponent as WeightIconSVG } from '../../assets/weight.svg';
+import ContainerIconSVG from '../../assets/container.svg?react';
+import PackageIconSVG from '../../assets/package.svg?react';
+import WeightIconSVG from '../../assets/weight.svg?react';
 import theme from '../../theme';
 import { DateFormats, formatDateSafe } from '../../utilities/formattingHelpers';
 import { BookingRequest } from '../../model/BookingRequest';
@@ -81,7 +81,9 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
   return (
     <React.Fragment>
       {(container.oog?.[1] as OOG[]).map((oogItem: OOG, index) => (
-        <TableRow key={`${index}:${oogItem.length}-${oogItem.width}-${oogItem.height}-${oogItem.weight}`}>
+        <TableRow
+          key={`${index}:${oogItem.length}-${oogItem.width}-${oogItem.height}-${oogItem.weight}`}
+        >
           <TableCell className={classes.tableCellLabel}>Overdimension</TableCell>
           <TableCell className={classes.tableCell}>
             <Box display="flex" flexDirection="column">
@@ -103,10 +105,11 @@ const OverdimensionDetails: React.FC<OverdimensionDetailsProps> = ({ container }
                     ? `Max: ${oogItem.length}${oogItem.length && oogItem.width ? 'x' : ''}${oogItem.width}${
                         (oogItem.length || oogItem.width) && oogItem.height ? 'x' : ''
                       }${oogItem.height} cm${oogItem.weight && ' - ' + oogItem.weight + ' Kgs'}`
-                    : `${oogItem.width && 'Max Width: ' + oogItem.width + 'cm\n'}${oogItem.height &&
-                        'Max Height: ' + oogItem.height + 'cm\n'}${oogItem.length &&
-                        'Max Length: ' + oogItem.length + 'cm\n'}${oogItem.weight &&
-                        'Max Weight: ' + oogItem.weight + 'Kgs\n'}`}
+                    : `${oogItem.width && 'Max Width: ' + oogItem.width + 'cm\n'}${
+                        oogItem.height && 'Max Height: ' + oogItem.height + 'cm\n'
+                      }${oogItem.length && 'Max Length: ' + oogItem.length + 'cm\n'}${
+                        oogItem.weight && 'Max Weight: ' + oogItem.weight + 'Kgs\n'
+                      }`}
                 </Typography>
               )}
             </Box>
@@ -138,9 +141,15 @@ const IMCODetails: React.FC<IMCODetailsProps> = ({ container }) => {
                     key={`${index}:${imoItem.IMOClass}-${imoItem.PGNumber}-${imoItem.UNNumber}`}
                     mb={2}
                   >
-                    {imoItem.IMOClass && <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>}
-                    {imoItem.UNNumber && <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>}
-                    {imoItem.PGNumber && <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>}
+                    {imoItem.IMOClass && (
+                      <Typography>{`IMO Class: ${imoItem.IMOClass}`}</Typography>
+                    )}
+                    {imoItem.UNNumber && (
+                      <Typography>{`UN Number: ${imoItem.UNNumber}`}</Typography>
+                    )}
+                    {imoItem.PGNumber && (
+                      <Typography>{`PG Number: ${imoItem.PGNumber}`}</Typography>
+                    )}
                   </Box>
                 ),
             )}
@@ -196,25 +205,28 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               </TableCell>
             </TableRow>
 
-            {container.commodityType && (container.commodityType?.name || container.commodityType?.id) && (
-              <TableRow>
-                <TableCell className={classes.tableCell}>
-                  <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
-                </TableCell>
-                <TableCell className={classes.tableCell}>
-                  {container.commodityType?.name && container.commodityType?.name !== ''
-                    ? container.commodityType?.name
-                    : container.commodityType?.id}
-                </TableCell>
-              </TableRow>
-            )}
+            {container.commodityType &&
+              (container.commodityType?.name || container.commodityType?.id) && (
+                <TableRow>
+                  <TableCell className={classes.tableCell}>
+                    <SvgIcon component={PackageIconSVG} viewBox="0 0 512 512" />
+                  </TableCell>
+                  <TableCell className={classes.tableCell}>
+                    {container.commodityType?.name && container.commodityType?.name !== ''
+                      ? container.commodityType?.name
+                      : container.commodityType?.id}
+                  </TableCell>
+                </TableRow>
+              )}
 
             {container.weight && (
               <TableRow>
                 <TableCell className={classes.tableCell}>
                   <SvgIcon component={WeightIconSVG} viewBox="0 0 512 512" />
                 </TableCell>
-                <TableCell className={classes.tableCell}>{container.weight.toFixed(2) + ' KGS'}</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {container.weight.toFixed(2) + ' KGS'}
+                </TableCell>
               </TableRow>
             )}
 
@@ -240,16 +252,23 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               />
             )}
 
-            {container.humidity && <TableRowData label={'Humidity'} content={container.humidity + ' %'} />}
+            {container.humidity && (
+              <TableRowData label={'Humidity'} content={container.humidity + ' %'} />
+            )}
 
-            {container.ventilation && <TableRowData label={'Ventilation'} content={container.ventilation} />}
+            {container.ventilation && (
+              <TableRowData label={'Ventilation'} content={container.ventilation} />
+            )}
 
             {container.imo && container.imo?.[0] && <IMCODetails container={container} />}
 
             {container.oog && container.oog?.[0] && <OverdimensionDetails container={container} />}
 
             {container.containerNumbers && container.containerNumbers.length > 0 && (
-              <TableRowData label={'Container numbers'} content={container.containerNumbers.join('<br/>')} />
+              <TableRowData
+                label={'Container numbers'}
+                content={container.containerNumbers.join('<br/>')}
+              />
             )}
 
             {container.demDetTariffs && (
@@ -287,7 +306,10 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
           </colgroup>
           <TableBody>
             {!isContainerSO(container) && (
-              <TableRowData label={'Pick Up Reference'} content={container.pickupReference || '[To be advised]'} />
+              <TableRowData
+                label={'Pick Up Reference'}
+                content={container.pickupReference || '[To be advised]'}
+              />
             )}
             {container.pickupDate && (
               <TableRowData
@@ -296,16 +318,28 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
               />
             )}
             {pickupLocation && pickupLocation.name && (
-              <TableRowData label={'Pick Up Location'} content={createAddressString(pickupLocation)} />
+              <TableRowData
+                label={'Pick Up Location'}
+                content={createAddressString(pickupLocation)}
+              />
             )}
-            <TableRowData label={'Delivery Reference'} content={container.deliveryReference || '[To be advised]'} />
+            <TableRowData
+              label={'Delivery Reference'}
+              content={container.deliveryReference || '[To be advised]'}
+            />
             {bookingRequest?.schedule && bookingRequest.schedule.OriginInfo.Port.PortName && (
-              <TableRowData label={'Delivery Address'} content={bookingRequest.schedule.OriginInfo.Port.PortName} />
+              <TableRowData
+                label={'Delivery Address'}
+                content={bookingRequest.schedule.OriginInfo.Port.PortName}
+              />
             )}
 
             <TableRowData label={'VGM Reference'} content={container.vgmPin || '[To be advised]'} />
             {container.oog?.[0] && (
-              <TableRowData label={'Remarks'} content={container.oog?.[0] ? 'OUT-OF-GAUGE' : 'IN-GAUGE'} />
+              <TableRowData
+                label={'Remarks'}
+                content={container.oog?.[0] ? 'OUT-OF-GAUGE' : 'IN-GAUGE'}
+              />
             )}
           </TableBody>
         </Table>
@@ -315,7 +349,12 @@ const ContainerDetail: React.FC<ContainerDetailProps> = ({ container, index, boo
 };
 
 //TODO Refactor containers so we handle multiple models for IMCO and OOG
-const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBookingRequest, editing }) => {
+const ContainerDetails: React.FC<Props> = ({
+  containers,
+  bookingRequest,
+  setBookingRequest,
+  editing,
+}) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
   const terms = useContext(PortTerms);
@@ -324,7 +363,9 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   );
 
   useEffect(() => {
-    setFilteredTerms(terms ? terms.filter(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : []);
+    setFilteredTerms(
+      terms ? terms.filter(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID) : [],
+    );
   }, [bookingRequest?.schedule?.OriginInfo.Port.ID, terms]);
 
   const [selectedPortTerm, setSelectedPortTerm] = useState(
@@ -343,7 +384,11 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
           : terms.find(term => term.port === bookingRequest?.schedule?.OriginInfo.Port.ID)
         : undefined,
     );
-  }, [bookingRequest?.schedule?.OriginInfo.Port.ID, bookingRequest?.schedule?.OriginInfo.Port.TerminalID, terms]);
+  }, [
+    bookingRequest?.schedule?.OriginInfo.Port.ID,
+    bookingRequest?.schedule?.OriginInfo.Port.TerminalID,
+    terms,
+  ]);
 
   const [deliveryAddress, setDeliveryAddress] = useState<string>(
     bookingRequest?.schedule?.OriginInfo.Port.PortName?.replaceAll('<br/>', '\n') || '',
@@ -352,25 +397,34 @@ const ContainerDetails: React.FC<Props> = ({ containers, bookingRequest, setBook
   const userRecord = useContext(UserRecordContext);
 
   useEffect(() => {
-    setDeliveryAddress(bookingRequest?.schedule?.OriginInfo.Port.PortName?.replaceAll('<br/>', '\n') || '');
+    setDeliveryAddress(
+      bookingRequest?.schedule?.OriginInfo.Port.PortName?.replaceAll('<br/>', '\n') || '',
+    );
   }, [bookingRequest?.schedule?.OriginInfo.Port.PortName]);
 
   const handleChange = (value: any[] | undefined) => {
     const writableContainers = value?.map(container => {
       const containerNumbers =
-        container.containerNumbers && container.containerNumbers.slice(undefined, container.quantity);
+        container.containerNumbers &&
+        container.containerNumbers.slice(undefined, container.quantity);
       return {
         ...container,
-        containerNumbers: containerNumbers && (containerNumbers.length === 0 ? undefined : containerNumbers),
+        containerNumbers:
+          containerNumbers && (containerNumbers.length === 0 ? undefined : containerNumbers),
         ventilation: isReefer(container.containerType)
           ? container.ventilation || Ventilation.CLOSED
           : container.ventilation,
         // imo: container.imo,
         // oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
-        pickupDate: isContainerSO(container) ? undefined : container.pickupDate ? container.pickupDate : new Date(),
+        pickupDate: isContainerSO(container)
+          ? undefined
+          : container.pickupDate
+            ? container.pickupDate
+            : new Date(),
       };
     });
-    setBookingRequest && setBookingRequest({ ...bookingRequest, containers: writableContainers } as BookingRequest);
+    setBookingRequest &&
+      setBookingRequest({ ...bookingRequest, containers: writableContainers } as BookingRequest);
   };
 
   const handleAddressTextChange = (v: string | undefined) => {

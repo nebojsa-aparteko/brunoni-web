@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, IconButton, makeStyles, Typography } from '@material-ui/core';
-import { Link as RouterLink } from 'react-router-dom';
+import { Box, makeStyles, Typography } from '@material-ui/core';
+import { IconButtonLink } from '../Link';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 interface Props {
@@ -27,12 +27,18 @@ const QuoteNav: React.FC<Props> = ({ backTo, title, subtitle }) => {
   return (
     <Box display="flex">
       <Box flexShrink="0" displayPrint="none">
-        <IconButton aria-label="back button" color="primary" component={RouterLink} to={backTo}>
+        <IconButtonLink aria-label="back button" color="primary" to={backTo}>
           <ArrowBackIcon />
-        </IconButton>
+        </IconButtonLink>
       </Box>
 
-      <Box ml={2} display="flex" flexDirection="column" justifyContent="center" className={classes.title}>
+      <Box
+        ml={2}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        className={classes.title}
+      >
         <Typography variant="h5">{title}</Typography>
         <Typography variant="subtitle2" gutterBottom>
           {subtitle}

@@ -1,6 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 import useModal from '../../hooks/useModal';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import { mdiStarCircleOutline } from '@mdi/js';
 import CloseIcon from '@material-ui/icons/Close';
 import useActivities from '../../hooks/useActivities';
@@ -35,9 +43,16 @@ interface PinnedCommentsModalProps {
   bookingRequestId: string;
 }
 
-const PinnedCommentsModal: React.FC<PinnedCommentsModalProps> = ({ isOpen, closeModal, bookingRequestId }) => {
+const PinnedCommentsModal: React.FC<PinnedCommentsModalProps> = ({
+  isOpen,
+  closeModal,
+  bookingRequestId,
+}) => {
   const classes = useStyles();
-  const bookingRequestPath = useMemo(() => `/bookings-requests/${bookingRequestId}/activity`, [bookingRequestId]);
+  const bookingRequestPath = useMemo(
+    () => `/bookings-requests/${bookingRequestId}/activity`,
+    [bookingRequestId],
+  );
   const activities = useActivities(
     bookingRequestPath,
     useCallback(query => {
@@ -51,7 +66,12 @@ const PinnedCommentsModal: React.FC<PinnedCommentsModalProps> = ({ isOpen, close
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleCloseModal} aria-labelledby="dialog-pinned-comments" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleCloseModal}
+      aria-labelledby="dialog-pinned-comments"
+      maxWidth="md"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Pinned Comments ({bookingRequestId})</Typography>
@@ -87,7 +107,11 @@ const PinnedCommentsButton: React.FC<PinnedCommentsButtonProps> = ({ bookingRequ
 
   return (
     <>
-      <IconButton color="primary" aria-label="check vessel space" onClick={event => handleOpenModal(event)}>
+      <IconButton
+        color="primary"
+        aria-label="check vessel space"
+        onClick={event => handleOpenModal(event)}
+      >
         <Icon
           path={mdiStarCircleOutline}
           title="Pinned Activities"
@@ -97,7 +121,11 @@ const PinnedCommentsButton: React.FC<PinnedCommentsButtonProps> = ({ bookingRequ
         />
       </IconButton>
       {bookingRequestId && isOpen && (
-        <PinnedCommentsModal isOpen={isOpen} closeModal={closeModal} bookingRequestId={bookingRequestId} />
+        <PinnedCommentsModal
+          isOpen={isOpen}
+          closeModal={closeModal}
+          bookingRequestId={bookingRequestId}
+        />
       )}
     </>
   );

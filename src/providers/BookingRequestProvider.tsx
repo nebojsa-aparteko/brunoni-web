@@ -2,7 +2,12 @@ import React, { createContext, Dispatch, SetStateAction, useState } from 'react'
 import { BookingRequest } from '../model/BookingRequest';
 const defaultBookingRequest = {} as BookingRequest;
 const BookingRequestContext = createContext<
-  [BookingRequest, Dispatch<SetStateAction<BookingRequest>>, boolean, Dispatch<SetStateAction<boolean>>]
+  [
+    BookingRequest,
+    Dispatch<SetStateAction<BookingRequest>>,
+    boolean,
+    Dispatch<SetStateAction<boolean>>,
+  ]
 >([defaultBookingRequest, () => {}, false, () => {}]);
 
 const BookingRequestProvider = (props: any) => {

@@ -41,17 +41,21 @@ interface Props {
 const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
   const providersExtensionConfigs = useLandTransportExtensionConfig(provider.id, provider.name);
   const defaultExtensionConfigs = useLandTransportExtensionConfig('Default', 'Default');
-  const mixedExtensionConfigs = useMemo(() => (providersExtensionConfigs || []).concat(defaultExtensionConfigs || []), [
-    defaultExtensionConfigs,
-    providersExtensionConfigs,
-  ]);
+  const mixedExtensionConfigs = useMemo(
+    () => (providersExtensionConfigs || []).concat(defaultExtensionConfigs || []),
+    [defaultExtensionConfigs, providersExtensionConfigs],
+  );
   const extensions = useLandTransportExtensions(provider.id, routeId, group.id);
   const isDefault = group.type === ProviderExtensionGroupType.DEFAULT;
   return (
     <>
       <Box display="flex" flexDirection="column">
         <Box display="flex" flex={1} justifyContent="space-between">
-          <ExpansionPanel defaultExpanded={isDefault} style={{ flex: 1 }} TransitionProps={{ unmountOnExit: true }}>
+          <ExpansionPanel
+            defaultExpanded={isDefault}
+            style={{ flex: 1 }}
+            TransitionProps={{ unmountOnExit: true }}
+          >
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
               <Box display="flex" flex={1}>
                 {group.transportMode && (
@@ -96,7 +100,9 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                 )}
               </Box>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
+            <ExpansionPanelDetails
+              style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}
+            >
               <EditableTable
                 tableTitle="Included items"
                 actionLabel="Add included item"
@@ -117,7 +123,9 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                 ]}
                 defaultItem={set('extension', mixedExtensionConfigs?.[0])(included)}
                 addItem={item => addLandTransportExtension(provider.id, routeId, group.id, item)}
-                editItem={(id, item) => editLandTransportExtension(provider.id, routeId, group.id, id, item)}
+                editItem={(id, item) =>
+                  editLandTransportExtension(provider.id, routeId, group.id, id, item)
+                }
                 deleteItem={id => deleteLandTransportExtension(provider.id, routeId, group.id, id)}
               />
               <Divider />
@@ -150,12 +158,17 @@ const ExtensionTables: React.FC<Props> = ({ provider, routeId, group }) => {
                     label: 'Currency',
                     fieldType: 'select',
                     fieldName: 'price.currency',
-                    options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+                    options: Object.values(Currency).map(value => ({
+                      key: value,
+                      label: capitalCase(value),
+                    })),
                   },
                 ]}
                 defaultItem={set('extension', mixedExtensionConfigs?.[0])(addOn)}
                 addItem={item => addLandTransportExtension(provider.id, routeId, group.id, item)}
-                editItem={(id, item) => editLandTransportExtension(provider.id, routeId, group.id, id, item)}
+                editItem={(id, item) =>
+                  editLandTransportExtension(provider.id, routeId, group.id, id, item)
+                }
                 deleteItem={id => deleteLandTransportExtension(provider.id, routeId, group.id, id)}
               />
             </ExpansionPanelDetails>

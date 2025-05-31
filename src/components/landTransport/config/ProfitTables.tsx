@@ -52,7 +52,10 @@ const ProfitTables: React.FC<Props> = ({ providerId }) => {
             label: 'Currency',
             fieldType: 'select',
             fieldName: 'currency',
-            options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+            options: Object.values(Currency).map(value => ({
+              key: value,
+              label: capitalCase(value),
+            })),
           },
           ...containersCells,
         ]}
@@ -73,7 +76,10 @@ const ProfitTables: React.FC<Props> = ({ providerId }) => {
             label: 'Currency',
             fieldType: 'select',
             fieldName: 'currency',
-            options: Object.values(Currency).map(value => ({ key: value, label: capitalCase(value) })),
+            options: Object.values(Currency).map(value => ({
+              key: value,
+              label: capitalCase(value),
+            })),
           },
           ...containersCells,
         ]}

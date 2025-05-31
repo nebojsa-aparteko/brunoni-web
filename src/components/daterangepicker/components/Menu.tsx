@@ -1,5 +1,14 @@
 import React from 'react';
-import { Paper, Grid, Typography, Divider, createStyles, WithStyles, Theme, withStyles } from '@material-ui/core';
+import {
+  Paper,
+  Grid,
+  Typography,
+  Divider,
+  createStyles,
+  WithStyles,
+  Theme,
+  withStyles,
+} from '@material-ui/core';
 import { format, differenceInCalendarMonths } from 'date-fns';
 import ArrowRightAlt from '@material-ui/icons/ArrowRightAlt';
 import Month from './Month';
@@ -74,7 +83,9 @@ const Menu: React.FunctionComponent<MenuProps> = props => {
               <ArrowRightAlt color="action" />
             </Grid>
             <Grid item className={classes.headerItem}>
-              <Typography variant="subtitle1">{endDate ? format(endDate, 'MMM dd, yyyy') : 'End Date'}</Typography>
+              <Typography variant="subtitle1">
+                {endDate ? format(endDate, 'MMM dd, yyyy') : 'End Date'}
+              </Typography>
             </Grid>
           </Grid>
           <Divider />

@@ -47,11 +47,13 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBookingRequest(prevState => set('vgmSubmittedBy', event.target.value)(prevState as BookingRequest));
+    setBookingRequest(prevState =>
+      set('vgmSubmittedBy', event.target.value)(prevState as BookingRequest),
+    );
   };
 
   const handleAdminLabel = () => {
-    switch (process.env.REACT_APP_BRAND) {
+    switch (import.meta.env.VITE_BRAND) {
       case 'brunoni':
         return 'Brunoni';
       case 'allmarine':
@@ -67,7 +69,10 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
         {/*TODO change port to be taken from portOfLoading instead of OriginInfo*/}
         {bookingRequest?.schedule?.OriginInfo.Port.PortAgent && (
           <React.Fragment>
-            <TableRowData label={'Liner Port Agent'} content={bookingRequest?.schedule?.OriginInfo.Port.PortAgent} />
+            <TableRowData
+              label={'Liner Port Agent'}
+              content={bookingRequest?.schedule?.OriginInfo.Port.PortAgent}
+            />
             <TableRowData
               label={'FOB Delivery By'}
               content={bookingRequest?.schedule?.OriginInfo.Port.PortAgent.split('<br/>')[0]}
@@ -84,7 +89,11 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
                 onChange={handleChange}
                 style={{ display: 'flex', flexDirection: 'row' }}
               >
-                <FormControlLabel value={VGMSubmittedBy.CLIENT} control={<Radio />} label="Client" />
+                <FormControlLabel
+                  value={VGMSubmittedBy.CLIENT}
+                  control={<Radio />}
+                  label="Client"
+                />
                 <Box display={'flex'} alignItems={'center'}>
                   <FormControlLabel
                     value={VGMSubmittedBy.ADMIN}
@@ -93,11 +102,14 @@ const BookingRequestPortTerms: React.FC<Props> = () => {
                     label={handleAdminLabel()}
                   />
                   {!bookingRequest?.assignedUser ? (
-                    <Typography color={'error'}>Please assign Watcher (Assigned agent) first</Typography>
+                    <Typography color={'error'}>
+                      Please assign Watcher (Assigned agent) first
+                    </Typography>
                   ) : null}
                 </Box>
               </RadioGroup>
-            ) : bookingRequest?.vgmSubmittedBy === VGMSubmittedBy.CLIENT && bookingRequest.client ? (
+            ) : bookingRequest?.vgmSubmittedBy === VGMSubmittedBy.CLIENT &&
+              bookingRequest.client ? (
               <ClientRepresentation client={bookingRequest.client} />
             ) : bookingRequest?.vgmSubmittedBy === VGMSubmittedBy.ADMIN &&
               bookingRequest.assignedUser?.alphacomClientId ? (

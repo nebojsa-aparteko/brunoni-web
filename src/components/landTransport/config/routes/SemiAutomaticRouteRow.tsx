@@ -58,7 +58,9 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
           <CityInput
             isEditing={isEditing}
-            onSelect={(value, path) => setStateRoute(prevState => set(`origin.${path}`, value)(prevState))}
+            onSelect={(value, path) =>
+              setStateRoute(prevState => set(`origin.${path}`, value)(prevState))
+            }
             origin={stateRoute.origin}
           />
           <SeparatorArrow />
@@ -147,7 +149,14 @@ const SemiAutomaticRouteRow: React.FC<SemiAutomaticRouteRowProps> = ({ route, pr
         {/*  category={ProviderPricelistCategory.IMPORT}*/}
         {/*/>*/}
       </Box>
-      {isOpen && <SemiAutomaticRouteDialog isOpen={isOpen} closeModal={closeModal} route={route} provider={provider} />}
+      {isOpen && (
+        <SemiAutomaticRouteDialog
+          isOpen={isOpen}
+          closeModal={closeModal}
+          route={route}
+          provider={provider}
+        />
+      )}
     </>
   );
 };

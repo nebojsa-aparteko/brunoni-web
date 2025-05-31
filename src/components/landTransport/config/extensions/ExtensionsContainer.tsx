@@ -26,7 +26,8 @@ const ExtensionsContainer: React.FC<Props> = ({ provider, routeId }) => {
     const key = event.target?.name;
     const value = event.target.value;
     const type = event.target.type;
-    key && setStateGroup((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
+    key &&
+      setStateGroup((prevState: any) => set(key, type === 'number' ? +value : value)(prevState));
   };
   return (
     <Box display="flex" flexDirection="column" style={{ gap: theme.spacing(2) }}>
@@ -97,7 +98,9 @@ const ExtensionsContainer: React.FC<Props> = ({ provider, routeId }) => {
           <Box display="flex">
             <IconButton
               onClick={() =>
-                addLandTransportExtensionGroup(provider.id, routeId, stateGroup).then(() => setNewRow(false))
+                addLandTransportExtensionGroup(provider.id, routeId, stateGroup).then(() =>
+                  setNewRow(false),
+                )
               }
             >
               <CheckIcon />

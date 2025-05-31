@@ -1,6 +1,10 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { containerTypesLabels, EquipmentImportSummary, statusLabels } from '../../model/EquipmentControl';
+import {
+  containerTypesLabels,
+  EquipmentImportSummary,
+  statusLabels,
+} from '../../model/EquipmentControl';
 import {
   Box,
   CircularProgress,
@@ -27,7 +31,7 @@ const getBookingsByEC = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}`,
+      `${import.meta.env.VITE_REACT_APP_API_URL}/equipmentControl/getBookingsByEC?containerType=${containerType}&equipmentStatus=${equipmentStatus}&locId=${locId}&carrierId=${carrierId}&category=Import`,
       {
         method: 'GET',
         mode: 'cors',
@@ -59,12 +63,14 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
   const classes = importFlowsStyles();
   const [user] = useUser();
   const locations = useContext(PickupLocations);
-  const location = useMemo(() => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')), [
-    locations,
-    equipmentControl,
-  ]);
+  const location = useMemo(
+    () => locations?.find(loc => loc.id === get(equipmentControl, 'id', '-')),
+    [locations, equipmentControl],
+  );
   const [filters] = useEquipmentControlFilterProviderContext();
-  const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<(EventTarget & HTMLTableHeaderCellElement) | null>(
+    null,
+  );
   const [bookings, setBookings] = useState<{ bookingId: string; count: number }[]>();
   const handleClose = () => {
     setAnchorEl(null);
@@ -91,8 +97,11 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                 <TableCell
                   aria-describedby={id}
                   key={`${type}-${s}`}
-                  className={clsx({ [classes.borderRight]: containerTypesLabels.length === index + 1 })}
+                  className={clsx({
+                    [classes.borderRight]: containerTypesLabels.length === index + 1,
+                  })}
                   onClick={event => {
+                    if (s === 'TOTAL') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
                     user
@@ -101,13 +110,13 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                         getBookingsByEC(
                           token,
                           type,
-                          s === 'TOTAL' ? '-' : s,
+                          s,
                           equipmentControl.id || '-',
                           filters.carrier?.id === 'HSG'
                             ? 'Hamburg Süd'
                             : filters.carrier?.id === 'STNN'
-                            ? 'HUGO STINNES'
-                            : filters.carrier?.id!,
+                              ? 'HUGO STINNES'
+                              : filters.carrier?.id!,
                         ),
                       )
                       .then(response => {

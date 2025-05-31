@@ -9,7 +9,11 @@ import parseISO from 'date-fns/parseISO';
 
 const stringifyReplacer = (key: string, value: any) => {
   if (key === 'date' || key === 'startDate' || key === 'endDate') {
-    const dateToParse = value ? (typeof value === 'string' ? parseISO(value) : value) : addDays(new Date(), 2);
+    const dateToParse = value
+      ? typeof value === 'string'
+        ? parseISO(value)
+        : value
+      : addDays(new Date(), 2);
     return formatDate(dateToParse, 'yyyy-MM-dd HH:mm:ss');
   } else {
     return value;
@@ -26,10 +30,19 @@ const clearLocalStorageAfter = (lastSavedKey: string, minutes: number) => {
 };
 
 const fixUpDateValue = (value: string, startOfDay: boolean = false) => {
-  return value.length === 10 ? (startOfDay ? value.concat(' 00:00:00') : value.concat(' 23:59:59')) : value;
+  return value.length === 10
+    ? startOfDay
+      ? value.concat(' 00:00:00')
+      : value.concat(' 23:59:59')
+    : value;
 };
 
-const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, timeoutMinutes: number = 5) => {
+const useLocalStorage = (
+  key: any,
+  initialValue: any,
+  useRawValues: boolean,
+  timeoutMinutes: number = 5,
+) => {
   const [value, setValue] = useState(() => {
     try {
       clearLocalStorageAfter(key + '_saved', timeoutMinutes);
@@ -47,7 +60,11 @@ const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, tim
           : JSON.parse(localStorageValue || 'null', (key, value) => {
               if (key === 'date' || key === 'startDate' || key === 'endDate') {
                 return value
-                  ? parseDate(fixUpDateValue(value, key !== 'endDate'), 'yyyy-MM-dd HH:mm:ss', addDays(new Date(), 2))
+                  ? parseDate(
+                      fixUpDateValue(value, key !== 'endDate'),
+                      'yyyy-MM-dd HH:mm:ss',
+                      addDays(new Date(), 2),
+                    )
                   : value;
               } else {
                 return value;
@@ -61,7 +78,9 @@ const useLocalStorage = (key: any, initialValue: any, useRawValues: boolean, tim
 
   useEffect(() => {
     try {
-      const serializedState = useRawValues ? String(value) : JSON.stringify(value, stringifyReplacer);
+      const serializedState = useRawValues
+        ? String(value)
+        : JSON.stringify(value, stringifyReplacer);
       clearLocalStorageAfter(key + '_saved', timeoutMinutes);
       localStorage.setItem(key, serializedState);
       localStorage.setItem(key + '_saved', new Date().getTime().toString());

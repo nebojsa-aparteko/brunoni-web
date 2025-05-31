@@ -1,4 +1,12 @@
-import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Box,
   Button,
@@ -162,7 +170,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   const [isPrintWithCost, setPrintWithCost] = useState(false);
   const [isOpenWatcherDialog, setIsOpenWatcherDialog] = useState(false);
   const [tags, setTags] = useState(
-    availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+    availableTags &&
+      availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
   );
   const [selectedTab, setSelectedTab] = useState(userRecord.lastOpenedChecklistTab || 'operations');
 
@@ -171,7 +180,10 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   useEffect(
     () =>
       setTags(
-        availableTags && availableTags.filter(tag => booking.assignedTags && booking.assignedTags.includes(tag.id)),
+        availableTags &&
+          availableTags.filter(
+            tag => booking.assignedTags && booking.assignedTags.includes(tag.id),
+          ),
       ),
     [availableTags, booking.assignedTags],
   );
@@ -191,11 +203,14 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     id: doc.id,
     ...doc.data(),
   }));
-  const normalizedPinnedActivities = useMemo(
+  const normalizedPinnedActivities: ActivityLogItem[] = useMemo(
     () =>
-      map(flow(update('at', invoke('toDate')), update('paymentActivityData', normalizePaymentActivityData)))(
-        pinnedActivities,
-      ) as ActivityLogItem[],
+      map(
+        flow(
+          update('at', invoke('toDate')),
+          update('paymentActivityData', normalizePaymentActivityData),
+        ),
+      )(pinnedActivities) as [],
     [pinnedActivities],
   );
 
@@ -203,7 +218,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
   const filteredTasks = useMemo(() => {
     return tasks?.filter(task =>
-      task.taskCategory ? task.taskCategory === selectedTab.toUpperCase() : selectedTab === 'operations',
+      task.taskCategory
+        ? task.taskCategory === selectedTab.toUpperCase()
+        : selectedTab === 'operations',
     );
   }, [selectedTab, tasks]);
 
@@ -215,7 +232,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
@@ -229,11 +246,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
     // if the booking was in dispute and action is to archive it
     // this is expected to be very rare so leave it as a separate call
     if (booking.inDispute && !booking.archived) {
-      await firebase
-        .firestore()
-        .collection('bookings')
-        .doc(booking?.id)
-        .update('inDispute', false);
+      await firebase.firestore().collection('bookings').doc(booking?.id).update('inDispute', false);
     }
   }, [booking]);
 
@@ -256,18 +269,24 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         .then(_ => {
           dispatch({
             type: SHOW_SUCCESS_SNACKBAR,
-            message: isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
+            message: isWatching
+              ? 'Successfully removed from watchers!'
+              : 'Successfully added to watchers!',
           });
           return addActivityItem(
             booking!.id,
             createActivityObject({
-              changeType: isWatching ? ActivityChangeType.UNSET_WATCHING : ActivityChangeType.SET_WATCHING,
+              changeType: isWatching
+                ? ActivityChangeType.UNSET_WATCHING
+                : ActivityChangeType.SET_WATCHING,
               by: getActivityLogUserData(),
             }),
           );
         })
         .then(() => {
-          console.log(isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!');
+          console.log(
+            isWatching ? 'Successfully removed from watchers!' : 'Successfully added to watchers!',
+          );
         })
         .catch(err => console.log(err));
     },
@@ -292,11 +311,20 @@ const BookingView: React.FC<Props> = ({ booking }) => {
   };
 
   return (
-    <Grid container direction="row" spacing={2} justify="center" alignItems="flex-start" className={classes.body}>
+    <Grid
+      container
+      direction="row"
+      spacing={2}
+      justify="center"
+      alignItems="flex-start"
+      className={classes.body}
+    >
       {normalizedPinnedActivities === undefined && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
-            <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Paper
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
               <CircularProgress style={{ margin: 'auto' }} />
             </Paper>
           </Box>
@@ -312,7 +340,9 @@ const BookingView: React.FC<Props> = ({ booking }) => {
       {tasks === undefined && (
         <Grid item xs={12} md={11}>
           <Box displayPrint="none" display="flex" justifyContent="center" height={78}>
-            <Paper style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Paper
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
               <CircularProgress style={{ margin: 'auto' }} />
             </Paper>
           </Box>
@@ -329,7 +359,11 @@ const BookingView: React.FC<Props> = ({ booking }) => {
         <Grid item xs={12}>
           {isAdmin &&
             (tags ? (
-              <TagsList tags={tags || []} tagCategory={TagCategory.BOOKING} documentId={booking.id} />
+              <TagsList
+                tags={tags || []}
+                tagCategory={TagCategory.BOOKING}
+                documentId={booking.id}
+              />
             ) : (
               <Box
                 display="flex"
@@ -347,7 +381,12 @@ const BookingView: React.FC<Props> = ({ booking }) => {
 
         <Page title={getBookingTitle(booking)}>
           {isOpenWatcherDialog ? (
-            <WatchersDialog booking={booking} isOpen={true} handleClose={handleCloseWatcherDialog} id={booking.id} />
+            <WatchersDialog
+              booking={booking}
+              isOpen={true}
+              handleClose={handleCloseWatcherDialog}
+              id={booking.id}
+            />
           ) : null}
           <ScrollToTopOnMount />
           <Paper className={classes.root}>
@@ -355,7 +394,7 @@ const BookingView: React.FC<Props> = ({ booking }) => {
             <Box display="none" displayPrint="block" mb={2}>
               <Box mb={2}>
                 <img
-                  src={process.env.REACT_APP_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
+                  src={import.meta.env.VITE_BRAND === 'brunoni' ? brunoniLogo : allmarineLogo}
                   alt=""
                   className={classes.logo}
                 />
@@ -363,7 +402,13 @@ const BookingView: React.FC<Props> = ({ booking }) => {
               <Divider />
             </Box>
 
-            <Box className={classes.actionBar} mb={2} display="flex" alignItems="end" justifyContent="space-between">
+            <Box
+              className={classes.actionBar}
+              mb={2}
+              display="flex"
+              alignItems="end"
+              justifyContent="space-between"
+            >
               <Box
                 className={classes.actionBar}
                 mb={2}
@@ -381,8 +426,8 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                   {booking?.Agreement
                     ? 'Agreement No. ' + booking?.Agreement
                     : booking?.StatClientRef
-                    ? 'Agreement No. ' + booking.StatClientRef
-                    : null}
+                      ? 'Agreement No. ' + booking.StatClientRef
+                      : null}
                 </Typography>
               </Box>
               <Box flex="1" />
@@ -414,13 +459,18 @@ const BookingView: React.FC<Props> = ({ booking }) => {
                 )}
 
                 {actingAs === null &&
-                (isDashboardUser(userRecord) || booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
+                (isDashboardUser(userRecord) ||
+                  booking.assignedUser.alphacomId === userRecord.alphacomId) ? (
                   <IconButton size="small" onClick={() => setIsOpenWatcherDialog(true)}>
                     <SupervisedUserCircleIcon />
                   </IconButton>
                 ) : (
                   <WatcherIconButton
-                    isWatching={booking.watchers?.findIndex(val => val.alphacomId === userRecord.alphacomId) !== -1}
+                    isWatching={
+                      booking.watchers?.findIndex(
+                        val => val.alphacomId === userRecord.alphacomId,
+                      ) !== -1
+                    }
                     handleWatch={onWatch}
                   />
                 )}

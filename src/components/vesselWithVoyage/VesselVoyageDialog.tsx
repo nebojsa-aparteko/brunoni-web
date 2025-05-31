@@ -1,5 +1,14 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Paper, Typography } from '@material-ui/core';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  makeStyles,
+  Paper,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import VesselWithVoyage from '../../model/VesselWithVoyage';
 import { chunk } from 'lodash/fp';
@@ -29,17 +38,16 @@ const useStyles = makeStyles(theme => ({
 const CHUNK_SIZE = 10;
 
 const getBookings = (bookings: string[]) => {
-  return firebase
-    .firestore()
-    .collection('bookings')
-    .where('ERP-BkgRef', 'in', bookings)
-    .get();
+  return firebase.firestore().collection('bookings').where('ERP-BkgRef', 'in', bookings).get();
 };
 
 const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems, vessel }) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
-  const bookingsIds = useMemo(() => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)), [vesselItems]);
+  const bookingsIds = useMemo(
+    () => chunk(CHUNK_SIZE)(vesselItems?.map(v => v.bookingId)),
+    [vesselItems],
+  );
   const [bookings, setBookings] = useState<Booking[] | undefined>(undefined);
   useEffect(() => {
     let didCancel = false;
@@ -47,7 +55,10 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
       if (!didCancel && bookingsIds && isOpen) {
         let bkgs: any[] = [];
         for (const id of bookingsIds) {
-          bkgs = [...bkgs, ...(await getBookings(id)).docs.map(bkg => normalizeBooking(bkg.data()))];
+          bkgs = [
+            ...bkgs,
+            ...(await getBookings(id)).docs.map(bkg => normalizeBooking(bkg.data())),
+          ];
         }
 
         setBookings(bkgs);
@@ -63,7 +74,12 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
     window.open(`/bookings/${bookingId}`, '_blank');
   };
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="xl">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="xl"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">{vessel}</Typography>
@@ -82,7 +98,12 @@ const VesselVoyageDialog: React.FC<Props> = ({ isOpen, handleClose, vesselItems,
                     component={Paper}
                     key={`${booking['ERP-BkgRef']}-${index}`}
                   >
-                    <BookingRow booking={booking} preventDefaultClick isAdmin={!actingAs} onProgressClick={() => {}} />
+                    <BookingRow
+                      booking={booking}
+                      preventDefaultClick
+                      isAdmin={!actingAs}
+                      onProgressClick={() => {}}
+                    />
                   </Box>
                 ))}
               </Box>

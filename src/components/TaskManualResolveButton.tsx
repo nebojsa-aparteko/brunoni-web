@@ -5,7 +5,10 @@ import firebase from '../firebase';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { ActivityChangeType, ActivityLogUserData } from './bookings/checklist/ChecklistItemModel';
-import WeeklyPayment, { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus } from '../model/WeeklyPayment';
+import WeeklyPayment, {
+  WeeklyPaymentPlatformStatus,
+  WeeklyPaymentStatus,
+} from '../model/WeeklyPayment';
 import { normalizePaymentOverview } from '../hooks/usePaymentOverview';
 import { addActivityItem } from './bookings/checklist/ActivityLogContainer';
 import { createActivityObject } from './bookings/checklist/ChecklistItemRow';
@@ -13,13 +16,7 @@ import UserRecordContext from '../contexts/UserRecordContext';
 
 const getWeeklyPayment = async (paymentId: string | undefined) => {
   return normalizePaymentOverview(
-    (
-      await firebase
-        .firestore()
-        .collection('weeklyPayment')
-        .doc(paymentId)
-        .get()
-    ).data(),
+    (await firebase.firestore().collection('weeklyPayment').doc(paymentId).get()).data(),
   ) as WeeklyPayment;
 };
 
@@ -34,7 +31,7 @@ const TaskManualResolveButton: React.FC<Props> = ({ task, updateComponent }) => 
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 

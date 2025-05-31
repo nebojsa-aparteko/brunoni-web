@@ -14,7 +14,12 @@ export interface SaveButtonProps {
   showSaveButton?: boolean;
 }
 
-const SaveButton: React.FC<SaveButtonProps> = ({ handleSave, loading, showSaveButton = true, title = `Save` }) => {
+const SaveButton: React.FC<SaveButtonProps> = ({
+  handleSave,
+  loading,
+  showSaveButton = true,
+  title = `Save`,
+}) => {
   const classes = useStyles();
 
   return showSaveButton ? (
