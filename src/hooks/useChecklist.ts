@@ -27,7 +27,7 @@ export default function useChecklist(bookingId: string) {
 
   return checklistCollection
     ? (normalizedChecklistItems(
-        checklistCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChecklistItem)),
+        checklistCollection?.docs.map(doc => ({ id: doc.id, ...doc.data() }) as ChecklistItem),
       ) as ChecklistItem[])
     : undefined;
 }

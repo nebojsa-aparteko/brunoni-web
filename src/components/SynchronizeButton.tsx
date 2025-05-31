@@ -41,7 +41,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
         const token = await user.getIdToken();
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/synchronization/${collection}/${alphacomClientId}`,
+          `${import.meta.env.VITE_REACT_APP_API_URL}/synchronization/${collection}/${alphacomClientId}`,
           {
             method: 'POST',
             mode: 'cors',
@@ -65,7 +65,7 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
           });
         }
       } catch (e) {
-        if (e.name !== 'AbortError') {
+        if (e instanceof Error && e.name !== 'AbortError') {
           dispatch({
             type: SHOW_ERROR_SNACKBAR,
             message: 'Failed to refresh the contents. Please try again later',
@@ -85,7 +85,11 @@ const SynchronizeButton: React.FC<Props> = ({ collection, alphacomClientId }) =>
   return (
     <Tooltip title="Refresh" enterDelay={500} leaveDelay={200}>
       <IconButton onClick={() => setBusy(true)} className={classes.button}>
-        <CircularProgress size={15} className={classes.progress} style={{ visibility: busy ? 'visible' : 'hidden' }} />
+        <CircularProgress
+          size={15}
+          className={classes.progress}
+          style={{ visibility: busy ? 'visible' : 'hidden' }}
+        />
         <RefreshIcon style={{ visibility: busy ? 'hidden' : 'visible' }} />
       </IconButton>
     </Tooltip>

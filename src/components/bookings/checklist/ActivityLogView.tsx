@@ -16,8 +16,8 @@ import ActivityLogItemView from './ActivityLogItemView';
 import { ActivityLogProvider } from './ActivityLogContext';
 import { Booking } from '../../../model/Booking';
 import { Quote } from '../../../providers/QuoteGroupsProvider';
-import { useHistory } from 'react-router-dom';
-import QueryString from 'querystring';
+import { useNavigate } from 'react-router-dom';
+import queryString from 'query-string';
 import { BookingRequest } from '../../../model/BookingRequest';
 import List from '@material-ui/core/List';
 
@@ -56,11 +56,11 @@ const ActivityLogView: React.FC<Props> = ({
   pinnedCommentsCount,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     setTimeout(() => {
-      const params = QueryString.parse(window.location.search.replace('?', ''));
+      const params = queryString.parse(window.location.search.replace('?', ''));
       if (params.focusComment) {
         const activityId = params.focusComment as string;
         //read that notification
@@ -81,10 +81,10 @@ const ActivityLogView: React.FC<Props> = ({
           },
         );
         delete params.focusComment;
-        history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
+        navigate(`${window.location.pathname}?${queryString.stringify(params)}`, { replace: true });
       }
     }, 1000);
-  }, [history]);
+  }, [navigate]);
 
   return (
     <Card id="activityLog" className={classes.spacing} style={{ overflow: 'unset' }}>
@@ -93,7 +93,9 @@ const ActivityLogView: React.FC<Props> = ({
           !quoteActivityLog ? (
             <FormControlLabel
               id="activityToggleActivityLog"
-              control={<Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />}
+              control={
+                <Switch checked={showMore} onChange={onChange} name="showMore" color="primary" />
+              }
               label="Show Activity"
               labelPlacement="start"
             />
@@ -107,9 +109,15 @@ const ActivityLogView: React.FC<Props> = ({
             <WriteComment onCommentSave={onCommentSave} quote={quote} />
           </ActivityLogProvider>
         ) : booking ? (
-          <WriteComment onCommentSave={onCommentSave} booking={booking} isAccounting={isAccounting} />
+          <WriteComment
+            onCommentSave={onCommentSave}
+            booking={booking}
+            isAccounting={isAccounting}
+          />
         ) : (
-          bookingRequest && <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
+          bookingRequest && (
+            <WriteComment onCommentSave={onCommentSave} bookingRequest={bookingRequest} />
+          )
         )}
         <List>
           {booking

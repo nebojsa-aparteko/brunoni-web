@@ -110,7 +110,8 @@ export interface Codebook {
   plugin: BrunoniCodes[];
 }
 
-export const isReefer = (containerType: ContainerType) => containerType?.id === '45R1' || containerType?.id === '22R1';
+export const isReefer = (containerType: ContainerType) =>
+  containerType?.id === '45R1' || containerType?.id === '22R1';
 
 export const isContainerSO = (container: Container & ContainerDetails) =>
   container.containerType &&
@@ -123,14 +124,22 @@ interface ContainerNumberInputProp {
   handleChange: (newContainerNumbers: string[] | undefined) => void;
 }
 
-const ContainerNumberInput: React.FC<ContainerNumberInputProp> = ({ container, index, handleChange }) => {
+const ContainerNumberInput: React.FC<ContainerNumberInputProp> = ({
+  container,
+  index,
+  handleChange,
+}) => {
   const [containerNumber, setContainerNumber] = useState<string | undefined>(
-    container.containerNumbers && container.containerNumbers[index] && container.containerNumbers[index],
+    container.containerNumbers &&
+      container.containerNumbers[index] &&
+      container.containerNumbers[index],
   );
 
   useEffect(() => {
     setContainerNumber(
-      container.containerNumbers && container.containerNumbers[index] && container.containerNumbers[index],
+      container.containerNumbers &&
+        container.containerNumbers[index] &&
+        container.containerNumbers[index],
     );
   }, [container.containerNumbers]);
 
@@ -140,7 +149,9 @@ const ContainerNumberInput: React.FC<ContainerNumberInputProp> = ({ container, i
       while (container.quantity > tempContainerNumbers.length) tempContainerNumbers.push('');
     }
 
-    const newContainerNumbers = tempContainerNumbers?.map((number, i) => (i === index ? value || '' : number));
+    const newContainerNumbers = tempContainerNumbers?.map((number, i) =>
+      i === index ? value || '' : number,
+    );
     handleChange(newContainerNumbers.slice(0, container.quantity));
   };
 
@@ -167,7 +178,12 @@ const getContainerNumberInputs = (
   if (container.quantity && container.quantity > 0) {
     for (let i = 0; i < container.quantity; i++) {
       containerNumberInputs.push(
-        <ContainerNumberInput key={'container' + i} container={container} index={i} handleChange={handleChange} />,
+        <ContainerNumberInput
+          key={'container' + i}
+          container={container}
+          index={i}
+          handleChange={handleChange}
+        />,
       );
     }
   }
@@ -182,7 +198,10 @@ const getArrayOfCorrectLength = (containerNumbers: string[] | undefined, quantit
   return newContainerNumbers.slice(undefined, quantity);
 };
 
-const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, removeAllKindType, ...rest }, ref) => {
+const ContainerInput: ForwardRefRenderFunction<any, Props> = (
+  { value, onChange, removeAllKindType, ...rest },
+  ref,
+) => {
   const classes = useStyles();
   const containerTypeInput = useRef();
   const commodityTypeInput = useRef();
@@ -193,7 +212,9 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   const [linkedReferences, setLinkedReferences] = useState<boolean>(true);
   const [container, setContainer] = useState<Container & ContainerDetails>(value);
   const [temperatureFocused, setTemperatureFocused] = useState<boolean>(false);
-  const [temperature, setTemperature] = useState<string | undefined>(container.temperature?.toString());
+  const [temperature, setTemperature] = useState<string | undefined>(
+    container.temperature?.toString(),
+  );
   const [bookingRequest] = useBookingRequestContext();
 
   const tariffs = useCodebook({
@@ -214,7 +235,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
 
   useEffect(() => {
     if (isContainerSO(container)) {
-      const newContainerNumbers = getArrayOfCorrectLength(container.containerNumbers, container.quantity);
+      const newContainerNumbers = getArrayOfCorrectLength(
+        container.containerNumbers,
+        container.quantity,
+      );
       setContainer(prevState => ({
         ...prevState,
         containerNumbers: container.quantity === 0 ? undefined : newContainerNumbers,
@@ -315,59 +339,86 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handlePickupReferenceTextChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
-      : { ...container, pickupReference: isContainerSO(container) ? undefined : v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, pickupReference: isContainerSO(container) ? undefined : v }
+    ) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handlePickupReferenceChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? {
-          ...container,
-          pickupReference: isContainerSO(container) ? undefined : v,
-          deliveryReference: v,
-          vgmPin: v,
-        }
-      : { ...container, pickupReference: isContainerSO(container) ? undefined : v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, pickupReference: isContainerSO(container) ? undefined : v }
+    ) as Container & ContainerDetails;
     onChange(newValue);
   };
 
   const handleDeliveryReferenceTextChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
-      : { ...container, deliveryReference: v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, deliveryReference: v }
+    ) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handleDeliveryReferenceChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? {
-          ...container,
-          pickupReference: isContainerSO(container) ? undefined : v,
-          deliveryReference: v,
-          vgmPin: v,
-        }
-      : { ...container, deliveryReference: v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, deliveryReference: v }
+    ) as Container & ContainerDetails;
     onChange(newValue);
   };
 
   const handleVGMPinTextChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? { ...container, pickupReference: isContainerSO(container) ? undefined : v, deliveryReference: v, vgmPin: v }
-      : { ...container, vgmPin: v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, vgmPin: v }
+    ) as Container & ContainerDetails;
     setContainer(newValue);
   };
 
   const handleVGMPinChange = (v: string | null) => {
-    const newValue = (linkedReferences
-      ? {
-          ...container,
-          pickupReference: isContainerSO(container) ? undefined : v,
-          deliveryReference: v,
-          vgmPin: v,
-        }
-      : { ...container, vgmPin: v }) as Container & ContainerDetails;
+    const newValue = (
+      linkedReferences
+        ? {
+            ...container,
+            pickupReference: isContainerSO(container) ? undefined : v,
+            deliveryReference: v,
+            vgmPin: v,
+          }
+        : { ...container, vgmPin: v }
+    ) as Container & ContainerDetails;
     onChange(newValue);
   };
 
@@ -384,7 +435,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
   };
 
   const handleChangeContainerNumbers = (newContainerNumbers: string[] | undefined) => {
-    onChange({ ...container, containerNumbers: newContainerNumbers?.filter(value => value.trim() !== '') });
+    onChange({
+      ...container,
+      containerNumbers: newContainerNumbers?.filter(value => value.trim() !== ''),
+    });
   };
 
   return (
@@ -421,7 +475,11 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           </Grid>
         )}
         <Grid item md={2} xs={12}>
-          <QuantityInput value={container.quantity} margin="dense" onChange={handleQuantityChange} />
+          <QuantityInput
+            value={container.quantity}
+            margin="dense"
+            onChange={handleQuantityChange}
+          />
         </Grid>
         {get('isDetailedInput')(rest) && (
           <>
@@ -448,9 +506,15 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 fullWidth
                 value={container.weight || ''}
                 onChange={event =>
-                  handleWeightTextChange(event.target.value === '' ? null : parseInt(event.target.value))
+                  handleWeightTextChange(
+                    event.target.value === '' ? null : parseInt(event.target.value),
+                  )
                 }
-                onBlur={event => handleWeightChange(event.target.value === '' ? null : parseInt(event.target.value))}
+                onBlur={event =>
+                  handleWeightChange(
+                    event.target.value === '' ? null : parseInt(event.target.value),
+                  )
+                }
               />
             </Grid>
             {container.containerType && isReefer(container.containerType) && (
@@ -466,7 +530,9 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                     onChange={event => setTemperature(event.target.value.replace(/[^0-9.\-]$/, ''))}
                     onFocus={() => setTemperatureFocused(true)}
                     onBlur={event => {
-                      handleTemperatureChange(event.target.value === '-' ? null : parseInt(event.target.value));
+                      handleTemperatureChange(
+                        event.target.value === '-' ? null : parseInt(event.target.value),
+                      );
                       setTemperatureFocused(false);
                     }}
                     helperText={
@@ -501,7 +567,10 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                   />
                 </Grid>
                 <Grid item md={2} xs={12}>
-                  <VentilationInput value={container.ventilation} onChange={handleVentilationChange} />
+                  <VentilationInput
+                    value={container.ventilation}
+                    onChange={handleVentilationChange}
+                  />
                 </Grid>
               </React.Fragment>
             )}
@@ -516,10 +585,14 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                       fullWidth
                       value={container.pickupReference || ''}
                       onChange={event =>
-                        handlePickupReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                        handlePickupReferenceTextChange(
+                          event.target.value === '' ? null : event.target.value,
+                        )
                       }
                       onBlur={event =>
-                        handlePickupReferenceChange(event.target.value === '' ? null : event.target.value)
+                        handlePickupReferenceChange(
+                          event.target.value === '' ? null : event.target.value,
+                        )
                       }
                     />
                   </Grid>
@@ -527,16 +600,22 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                 {isAdmin && (
                   <Grid item md={3} xs={12}>
                     <TextField
-                      label={linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'}
+                      label={
+                        linkedReferences ? 'Delivery Reference (Linked)' : 'Delivery Reference'
+                      }
                       margin="dense"
                       variant="outlined"
                       fullWidth
                       value={container.deliveryReference || ''}
                       onChange={event =>
-                        handleDeliveryReferenceTextChange(event.target.value === '' ? null : event.target.value)
+                        handleDeliveryReferenceTextChange(
+                          event.target.value === '' ? null : event.target.value,
+                        )
                       }
                       onBlur={event =>
-                        handleDeliveryReferenceChange(event.target.value === '' ? null : event.target.value)
+                        handleDeliveryReferenceChange(
+                          event.target.value === '' ? null : event.target.value,
+                        )
                       }
                     />
                   </Grid>
@@ -549,10 +628,19 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
                       variant="outlined"
                       fullWidth
                       value={container.vgmPin || ''}
-                      onChange={event => handleVGMPinTextChange(event.target.value === '' ? null : event.target.value)}
-                      onBlur={event => handleVGMPinChange(event.target.value === '' ? null : event.target.value)}
+                      onChange={event =>
+                        handleVGMPinTextChange(
+                          event.target.value === '' ? null : event.target.value,
+                        )
+                      }
+                      onBlur={event =>
+                        handleVGMPinChange(event.target.value === '' ? null : event.target.value)
+                      }
                     />
-                    <IconButton onClick={() => setLinkedReferences(prevState => !prevState)} size="small">
+                    <IconButton
+                      onClick={() => setLinkedReferences(prevState => !prevState)}
+                      size="small"
+                    >
                       {linkedReferences ? <LinkOffIcon /> : <LinkIcon />}
                     </IconButton>
                   </Grid>
@@ -605,11 +693,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
           defaultItemValue={[defaultIMOItem]}
           value={
             container.imo && container.imo.length > 0 && typeof container.imo[0] !== 'boolean'
-              ? container.imo
-                ? container.imo.length > 0
-                  ? [true, (container.imo as unknown) as IMO[]]
-                  : [false]
-                : [false]
+              ? [true, container.imo as unknown as IMO[]]
               : container.imo || [false]
           }
           onChange={handleIMOChange}
@@ -621,11 +705,7 @@ const ContainerInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange,
             defaultItemValue={[defaultOOGItem]}
             value={
               container.oog && container.oog.length > 0 && typeof container.oog[0] !== 'boolean'
-                ? container.oog
-                  ? container.oog.length > 0
-                    ? [true, (container.oog as unknown) as OOG[]]
-                    : [false]
-                  : [false]
+                ? [true, container.oog as unknown as OOG[]]
                 : container.oog || [false]
             }
             onChange={handleOOGChange}

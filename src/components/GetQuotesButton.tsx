@@ -1,14 +1,14 @@
-import { Box, Button } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { ButtonLink } from './Link';
 
 interface Props {}
 
 const GetQuotesButton: React.FC<Props> = () => (
   <Box display="flex" flexDirection="row-reverse" pt={0} pb={0}>
-    <Button component={RouterLink} to="/quotes/get" color="primary" variant="contained">
+    <ButtonLink to="/quotes/get" color="primary" variant="contained">
       Get Quote
-    </Button>
+    </ButtonLink>
   </Box>
 );
 

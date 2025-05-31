@@ -5,7 +5,11 @@ import invoke from 'lodash/fp/invoke';
 import { flow, isNil, omitBy } from 'lodash/fp';
 import { MentionItem } from 'react-mentions';
 import ActivityLogView from '../bookings/checklist/ActivityLogView';
-import { ActivityType, QuoteActivityModel, QuoteGroupActivityModel } from '../bookings/checklist/ActivityModel';
+import {
+  ActivityType,
+  QuoteActivityModel,
+  QuoteGroupActivityModel,
+} from '../bookings/checklist/ActivityModel';
 import UserRecordContext from '../../contexts/UserRecordContext';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import { ActivityLogUserData } from '../bookings/checklist/ChecklistItemModel';
@@ -39,9 +43,10 @@ const QuoteGroupActivityLogContainer: React.FC<Props> = ({ groupId, quote }) => 
     ...doc.data(),
   })) as QuoteActivityModel[];
 
-  const normalizedActivityLog = useMemo(() => map(update('at', invoke('toDate')))(quoteActivityCollection), [
-    quoteActivityCollection,
-  ]);
+  const normalizedActivityLog = useMemo(
+    () => map(update('at', invoke('toDate')))(quoteActivityCollection),
+    [quoteActivityCollection],
+  );
 
   const userRecord = useContext(UserRecordContext);
 

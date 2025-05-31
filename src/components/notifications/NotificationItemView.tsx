@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 import Comment from '../bookings/checklist/Comment';
 import Notification, { NotificationType } from '../../model/Notification';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Activity from '../bookings/checklist/Activity';
 import Alert from './Alert';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
@@ -33,6 +33,7 @@ import { GlobalContext } from '../../store/GlobalStore';
 import UserRecord from '../../model/UserRecord';
 import useUser from '../../hooks/useUser';
 import { FirebaseActionType } from '../../model/FirebaseAction';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -59,26 +60,26 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
           notification.type === NotificationType.COMMENT
             ? 'Comment'
             : notification.type === NotificationType.ACTIVITY ||
-              notification.type === NotificationType.ACTIVITY_WITH_COMMENT
-            ? 'Activity'
-            : notification.type === NotificationType.ALERT
-            ? 'Alert'
-            : notification.type === NotificationType.TASK
-            ? 'Task'
-            : 'Info'
+                notification.type === NotificationType.ACTIVITY_WITH_COMMENT
+              ? 'Activity'
+              : notification.type === NotificationType.ALERT
+                ? 'Alert'
+                : notification.type === NotificationType.TASK
+                  ? 'Task'
+                  : 'Info'
         }`}
         style={{
           backgroundColor:
             notification.type === NotificationType.COMMENT
               ? '#3cb371'
               : notification.type === NotificationType.ACTIVITY ||
-                notification.type === NotificationType.ACTIVITY_WITH_COMMENT
-              ? '#00a2f2'
-              : notification.type === NotificationType.ALERT
-              ? '#f4364c'
-              : notification.type === NotificationType.TASK
-              ? '#2bbbad'
-              : '#9b59b6',
+                  notification.type === NotificationType.ACTIVITY_WITH_COMMENT
+                ? '#00a2f2'
+                : notification.type === NotificationType.ALERT
+                  ? '#f4364c'
+                  : notification.type === NotificationType.TASK
+                    ? '#2bbbad'
+                    : '#9b59b6',
           color: 'white',
         }}
       />
@@ -87,14 +88,16 @@ const NotificationTitle: React.FC<NotificationTitleProps> = ({ notification, han
           {notification.type === NotificationType.COMMENT
             ? 'Comment left at '
             : notification.type === NotificationType.ACTIVITY ||
-              notification.type === NotificationType.ACTIVITY_WITH_COMMENT
-            ? 'Activity at '
-            : notification.type === NotificationType.ALERT
-            ? 'Alert at '
-            : notification.type === NotificationType.TASK
-            ? 'New Task at '
-            : 'New Info about '}
-          {notification.referenceObject ? `${getReferenceLabel(notification.referenceObject)}` : null}
+                notification.type === NotificationType.ACTIVITY_WITH_COMMENT
+              ? 'Activity at '
+              : notification.type === NotificationType.ALERT
+                ? 'Alert at '
+                : notification.type === NotificationType.TASK
+                  ? 'New Task at '
+                  : 'New Info about '}
+          {notification.referenceObject
+            ? `${getReferenceLabel(notification.referenceObject)}`
+            : null}
         </Typography>
 
         <Button className={classes.titleAnchor} onClick={handleClick} color="primary">
@@ -115,7 +118,9 @@ export const notificationSeenStatusChange = async (
   user: UserRecord,
   action?: NotificationStatusAction,
 ) => {
-  const changeNotificationSeenStatus = firebase.functions().httpsCallable('changeNotificationSeenStatus');
+  const changeNotificationSeenStatus = firebase
+    .functions()
+    .httpsCallable('changeNotificationSeenStatus');
   if (!notificationId) return;
   return await changeNotificationSeenStatus({
     action: action,
@@ -127,16 +132,16 @@ export const notificationSeenStatusChange = async (
 
 const deleteNotification = async (notificationId: string | undefined) => {
   if (notificationId)
-    return firebase
-      .firestore()
-      .collection('notifications')
-      .doc(notificationId)
-      .delete();
+    return firebase.firestore().collection('notifications').doc(notificationId).delete();
 };
 
-const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, handleShowDrawer, ...other }) => {
+const NotificationItemView: React.FC<NotificationItemProps> = ({
+  notification,
+  handleShowDrawer,
+  ...other
+}) => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const userRecord = useUser()[1];
   const [actingAs] = useContext(ActingAs);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -171,19 +176,23 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   }, [dispatch, notification.readId, userRecord, handleClose]);
   const handleClick = useCallback(() => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification.id, userRecord, NotificationStatusAction.READ_NOTIFICATION)
+    notificationSeenStatusChange(
+      notification.id,
+      userRecord,
+      NotificationStatusAction.READ_NOTIFICATION,
+    )
       .then(() => {
         handleShowDrawer();
         if (notification.type === NotificationType.COMMENT) {
           notification.referenceObject &&
-            history.push(
+            navigate(
               `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
                 notification.referenceID
               }?focusComment=${notification.activity?.id}`,
             );
         } else {
           notification.referenceObject &&
-            history.push(
+            navigate(
               `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
                 notification.referenceID
               }`,
@@ -205,11 +214,15 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
 
   const handleCommentClick = () => {
     dispatch({ type: 'START_GLOBAL_LOADING' });
-    notificationSeenStatusChange(notification.id, userRecord, NotificationStatusAction.READ_NOTIFICATION)
+    notificationSeenStatusChange(
+      notification.id,
+      userRecord,
+      NotificationStatusAction.READ_NOTIFICATION,
+    )
       .then(() => {
         handleShowDrawer();
         notification.referenceObject &&
-          history.push(
+          navigate(
             `/${notification.referenceObject === 'quoteGroup' ? 'quotes/groups' : notification.referenceObject}/${
               notification.referenceID
             }?focusComment=${notification.activity?.id}`,
@@ -228,10 +241,15 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
       })
       .catch(error => {
         console.error('failed to update deleted items', error);
-        enqueueSnackbar(<Typography color="inherit">Failed to delete notification - {error.message}</Typography>, {
-          variant: 'error',
-          autoHideDuration: 1000,
-        });
+        enqueueSnackbar(
+          <Typography color="inherit">
+            Failed to delete notification - {tryGetErrorMessage(error)}
+          </Typography>,
+          {
+            variant: 'error',
+            autoHideDuration: 1000,
+          },
+        );
       });
   };
   const handleSeenStatusChange = async (notification: Notification) => {
@@ -239,13 +257,17 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
     notificationSeenStatusChange(
       notification.id,
       userRecord,
-      notification.seen ? NotificationStatusAction.UNREAD_NOTIFICATION : NotificationStatusAction.READ_NOTIFICATION,
+      notification.seen
+        ? NotificationStatusAction.UNREAD_NOTIFICATION
+        : NotificationStatusAction.READ_NOTIFICATION,
     )
       .then(() => console.log('Changed notification status'))
       .catch(error => {
         console.error('Failed to update notification status', error);
         enqueueSnackbar(
-          <Typography color="inherit">Failed to update notification status - {error.message}</Typography>,
+          <Typography color="inherit">
+            Failed to update notification status - {tryGetErrorMessage(error)}
+          </Typography>,
           {
             variant: 'error',
             autoHideDuration: 1000,
@@ -256,7 +278,11 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
   };
 
   return (
-    <Card className={classes.root} {...other} style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}>
+    <Card
+      className={classes.root}
+      {...other}
+      style={{ backgroundColor: notification.seen ? 'initial' : '#eee' }}
+    >
       <CardHeader
         title={<NotificationTitle notification={notification} handleClick={handleClick} />}
         subheader={<DateFormattedText date={notification.at} />}
@@ -275,8 +301,16 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
               </IconButton>
             )}
             {!actingAs && (
-              <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-                {notification.readId ? <MenuItem onClick={onReadForAll}>Read for all</MenuItem> : null}
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                {notification.readId ? (
+                  <MenuItem onClick={onReadForAll}>Read for all</MenuItem>
+                ) : null}
                 <MenuItem onClick={handleDeleteNotification} style={{ color: '#ff0000' }}>
                   Delete
                 </MenuItem>
@@ -299,17 +333,27 @@ const NotificationItemView: React.FC<NotificationItemProps> = ({ notification, h
           <TaskNotification task={notification.createdTaskType} />
         ) : notification.type === NotificationType.INFO && notification.infoType ? (
           <InfoNotification infoType={notification.infoType} />
-        ) : notification.type === NotificationType.ACTIVITY_WITH_COMMENT && notification.activity ? (
-          <ActivityWithComment activity={notification.activity} handleCommentClick={handleCommentClick} />
+        ) : notification.type === NotificationType.ACTIVITY_WITH_COMMENT &&
+          notification.activity ? (
+          <ActivityWithComment
+            activity={notification.activity}
+            handleCommentClick={handleCommentClick}
+          />
         ) : null}
       </CardContent>
       <CardActions>
-        <Button size="small" style={{ marginLeft: 'auto' }} variant="contained" color="primary" onClick={handleClick}>
+        <Button
+          size="small"
+          style={{ marginLeft: 'auto' }}
+          variant="contained"
+          color="primary"
+          onClick={handleClick}
+        >
           {notification.referenceObject === 'quoteGroup'
             ? 'View Quote Group'
             : notification.referenceObject === 'bookings'
-            ? 'View Booking'
-            : 'View Quote'}
+              ? 'View Booking'
+              : 'View Quote'}
         </Button>
       </CardActions>
     </Card>

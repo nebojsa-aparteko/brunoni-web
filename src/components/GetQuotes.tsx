@@ -29,7 +29,7 @@ import Container from './Container';
 import ContainerType from '../model/Container';
 import Ports from '../contexts/Ports';
 import useUser from '../hooks/useUser';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { RouteSearchContext } from '../contexts/RouteSearchContext';
 import { useSnackbar } from 'notistack';
 import { buildMailToLink } from '../utilities/quoteRequestEmail';
@@ -71,7 +71,7 @@ const checkIfPortsInEurope = (originPort: Port | undefined, destinationPort: Por
 const GetQuotes: React.FC<Props> = () => {
   const classes = useStyles();
   const [user, userData] = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -97,7 +97,8 @@ const GetQuotes: React.FC<Props> = () => {
   const setDestinationPort = (port: Port | null) => onChange(set('destinationPort', port)(value));
   const setDate = (date: Date) => onChange(set('date', date)(value));
   const setWeeks = (weeks: number) => onChange(set('weeks', weeks)(value));
-  const setContainers = (containers: ContainerModel[]) => onChange(set('containers', containers)(value));
+  const setContainers = (containers: ContainerModel[]) =>
+    onChange(set('containers', containers)(value));
 
   const closeDialog = () => setDialogOpen(false);
 
@@ -171,7 +172,7 @@ const GetQuotes: React.FC<Props> = () => {
           console.warn('Failed to push crisp command.');
         }
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/create`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/quotes/create`, {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',
@@ -198,7 +199,9 @@ const GetQuotes: React.FC<Props> = () => {
 
         if (response.status === 504) {
           enqueueSnackbar(
-            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            <Typography color="inherit">
+              The API timed out trying to fetch quotes. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -206,7 +209,9 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('API error', response.status, response.statusText);
         } else if (response.status === 500) {
           enqueueSnackbar(
-            <Typography color="inherit">The could not answer your request at the moment. Please try again.</Typography>,
+            <Typography color="inherit">
+              The could not answer your request at the moment. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -217,14 +222,16 @@ const GetQuotes: React.FC<Props> = () => {
           const groupId = get('groupId')(json);
 
           if (groupId) {
-            history.push(`/quotes/groups/${groupId}`);
+            navigate(`/quotes/groups/${groupId}`);
             setQuoteListContextData(set('page', 0)(quoteListContextData));
           } else {
             setDialogOpen(true);
           }
         } else {
           enqueueSnackbar(
-            <Typography>Whoops our system is experiencing difficulties at the moment. Please try again.</Typography>,
+            <Typography>
+              Whoops our system is experiencing difficulties at the moment. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -232,9 +239,11 @@ const GetQuotes: React.FC<Props> = () => {
           console.error('Unexpected error response', response.status, response.statusText);
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
+        if (error instanceof Error && error.name !== 'AbortError') {
           enqueueSnackbar(
-            <Typography color="inherit">The API timed out trying to fetch quotes. Please try again.</Typography>,
+            <Typography color="inherit">
+              The API timed out trying to fetch quotes. Please try again.
+            </Typography>,
             {
               variant: 'error',
             },
@@ -299,7 +308,12 @@ const GetQuotes: React.FC<Props> = () => {
           (listInput.current! as { focus: (i: number) => void }).focus(i);
           return;
         } else if (!container.pickupLocation) {
-          if (!((container.containerType?.description || '').endsWith('S.O.') || !showContainerLocations)) {
+          if (
+            !(
+              (container.containerType?.description || '').endsWith('S.O.') ||
+              !showContainerLocations
+            )
+          ) {
             (listInput.current! as { focus: (i: number) => void }).focus(i);
             return;
           }
@@ -404,7 +418,7 @@ const GetQuotes: React.FC<Props> = () => {
             </Grid>
           </Box>
         </Paper>
-        {process.env.NODE_ENV !== 'production' && (
+        {import.meta.env.MODE !== 'production' && (
           <Box mt={4}>
             <Typography variant="subtitle2">This is visible in development only.</Typography>
             <Typography variant="h5">For testing purposes please use following options:</Typography>
@@ -414,7 +428,9 @@ const GetQuotes: React.FC<Props> = () => {
                 <Box display="flex" mx={-1}>
                   <Box mx={1}>
                     <Typography>Rotterdam to Santos</Typography>
-                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                    <Typography>
+                      20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container
+                    </Typography>
                   </Box>
                   <Box mx={1}>
                     <Typography>Rotterdam to Santos</Typography>
@@ -427,7 +443,9 @@ const GetQuotes: React.FC<Props> = () => {
                 <Box display="flex" mx={-1}>
                   <Box mx={1}>
                     <Typography>Rotterdam to Shanghai</Typography>
-                    <Typography>20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container</Typography>
+                    <Typography>
+                      20‘Boxcontainer & 40‘Boxcontainer & 40‘High Cube Container
+                    </Typography>
                   </Box>
                   <Box mx={1}>
                     <Typography>Rotterdam to Shanghai</Typography>

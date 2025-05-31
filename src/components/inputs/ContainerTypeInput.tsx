@@ -1,4 +1,11 @@
-import React, { forwardRef, ForwardRefRenderFunction, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useContext,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import InputProps from '../../model/InputProps';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ContainerType from '../../model/ContainerType';
@@ -21,13 +28,15 @@ const focusAndSelect = (input: HTMLInputElement) => {
   input.setSelectionRange(0, input.value.length);
 };
 
-const filterFlow = (parts: string[], options: ContainerType[], findIntersection: boolean = false) => {
+const filterFlow = (
+  parts: string[],
+  options: ContainerType[],
+  findIntersection: boolean = false,
+) => {
   const filteredItems = map((part: string) =>
     filter(
       (option: ContainerType) =>
-        getContainerTypeLabel(option)
-          .toLowerCase()
-          .indexOf(part.toLowerCase()) > -1,
+        getContainerTypeLabel(option).toLowerCase().indexOf(part.toLowerCase()) > -1,
     )(options),
   )(parts);
 
@@ -41,7 +50,10 @@ const filterOptions = (options: ContainerType[], { inputValue }: { inputValue: s
   return filterFlow(searchWords, options, searchWords.length > 1);
 };
 
-const ContainerTypeInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange, margin }, ref) => {
+const ContainerTypeInput: ForwardRefRenderFunction<any, Props> = (
+  { value, onChange, margin },
+  ref,
+) => {
   const input = useRef();
   const containerTypes = useContext(ContainerTypes);
   const [open, setOpen] = useState(false);

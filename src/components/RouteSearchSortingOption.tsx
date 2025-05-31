@@ -29,7 +29,12 @@ const RouteSearchSortingOption: React.FC<Props> = ({ value, selected, onSelect }
   return (
     <Grid item sm={Math.floor(12 / sortingOptions.length) as any} className={classes.item}>
       <Button className={classes.button} onClick={onSelect}>
-        <Radio checked={selected} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': id }} />
+        <Radio
+          checked={selected}
+          tabIndex={-1}
+          disableRipple
+          inputProps={{ 'aria-labelledby': id }}
+        />
         <Typography id={id} variant="body2" className={classes.label}>
           {value.name}
         </Typography>

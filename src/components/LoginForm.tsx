@@ -38,7 +38,7 @@ const LoginForm: React.FC<Props> = ({ next, onComplete }) => {
 
     (async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/session/request`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}/session/request`, {
           method: 'POST',
           mode: 'cors',
           cache: 'no-cache',
@@ -103,7 +103,8 @@ const LoginForm: React.FC<Props> = ({ next, onComplete }) => {
     // }, 2000);
   };
 
-  const handleEmailAddressChange = (e: ChangeEvent<HTMLInputElement>) => setEmailAddress(e.target.value);
+  const handleEmailAddressChange = (e: ChangeEvent<HTMLInputElement>) =>
+    setEmailAddress(e.target.value);
 
   return (
     <form onSubmit={handleSubmit}>

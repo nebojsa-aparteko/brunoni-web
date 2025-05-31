@@ -10,13 +10,20 @@ interface Props<T> {
   subCollection?: string;
 }
 
-function firestoreCollection<T>({ name, query, documentPath, subCollection, context, children }: Props<T>) {
+function firestoreCollection<T>({
+  name,
+  query,
+  documentPath,
+  subCollection,
+  context,
+  children,
+}: Props<T>) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const snapshot = useFirestoreCollection(name, query, documentPath, subCollection);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const value = useMemo(() => {
-    return snapshot?.docs.map(doc => ({ ...doc.data(), id: doc.id } as any)) as T[] | undefined;
+    return snapshot?.docs.map(doc => ({ ...doc.data(), id: doc.id }) as any) as T[] | undefined;
   }, [snapshot]);
 
   const { Provider } = context;

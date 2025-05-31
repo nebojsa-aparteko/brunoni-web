@@ -17,6 +17,7 @@ import ConfirmationDialog from '../ConfirmationDialog';
 import { deleteTeams } from './TeamsTeamsContainer';
 import useTeams from '../../hooks/useTeams';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -71,7 +72,7 @@ const OperationsTeamsTable = ({ onAdd }: Props) => {
       })
       .catch(error => {
         console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

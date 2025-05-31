@@ -98,13 +98,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 const getBooking = (bookingId: string) =>
-  firebase
-    .firestore()
-    .collection('bookings')
-    .doc(bookingId)
-    .get();
+  firebase.firestore().collection('bookings').doc(bookingId).get();
 
-const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId, updateComponent }) => {
+const PaymentOverviewDialog: React.FC<Props> = ({
+  isOpen,
+  handleClose,
+  bookingId,
+  updateComponent,
+}) => {
   const classes = useStyles();
   const actingAs = useContext(ActingAs)[0];
   const [booking, setBooking] = useState<Booking | undefined>();
@@ -120,7 +121,10 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
   }, [bookingId]);
 
   const filteredTasks = useMemo(
-    () => tasks?.filter(task => (task.taskCategory ? task.taskCategory === TaskCategory.ACCOUNTING : false)),
+    () =>
+      tasks?.filter(task =>
+        task.taskCategory ? task.taskCategory === TaskCategory.ACCOUNTING : false,
+      ),
     [tasks],
   );
 
@@ -133,7 +137,11 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
       fullWidth
       classes={{ paper: classes.dialogPaper }}
     >
-      <DialogTitle disableTypography id="dialog-title-check-list" className={classes.dialogTitleBar}>
+      <DialogTitle
+        disableTypography
+        id="dialog-title-check-list"
+        className={classes.dialogTitleBar}
+      >
         <Typography variant="h4">{`File No: ${bookingId}`}</Typography>
         {booking && (
           <Link href={`/bookings/${bookingId}`} target="_blank" className={classes.bookingLink}>
@@ -163,17 +171,25 @@ const PaymentOverviewDialog: React.FC<Props> = ({ isOpen, handleClose, bookingId
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.bookingViewContainer}>
                   <Paper className={classes.accountingTabContainer}>
-                    <AccountingTabContent booking={booking} updateComponent={updateComponent} tasks={tasks} />
+                    <AccountingTabContent
+                      booking={booking}
+                      updateComponent={updateComponent}
+                      tasks={tasks}
+                    />
                   </Paper>
                   <Box className={classes.activityLogContainer}>
-                    <ActivityLogContainer booking={booking} isAdmin={!actingAs} isAccounting={true} />
+                    <ActivityLogContainer
+                      booking={booking}
+                      isAdmin={!actingAs}
+                      isAccounting={true}
+                    />
                   </Box>
                 </Grid>
               </Grid>
             ) : (
               <Typography variant={'h5'} className={classes.noBookingText}>
-                It appears that the booking you selected doesn't exist, please contact an administrator for further
-                instructions.
+                It appears that the booking you selected doesn't exist, please contact an
+                administrator for further instructions.
               </Typography>
             )}
           </ActivityLogProvider>

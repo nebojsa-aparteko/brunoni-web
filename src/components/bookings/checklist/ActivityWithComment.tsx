@@ -31,7 +31,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ActivityWithComment = ({ activity, handleCommentClick, ...other }: ActivityWithCommentProp) => {
+const ActivityWithComment = ({
+  activity,
+  handleCommentClick,
+  ...other
+}: ActivityWithCommentProp) => {
   const classes = useStyles();
   // const htmlComment = useMemo(() => comment?.comment?.replaceAll('\n', '<br/>'), [comment.comment]);
   return (
@@ -47,7 +51,9 @@ const ActivityWithComment = ({ activity, handleCommentClick, ...other }: Activit
           <Box display="flex" flexDirection="column" ml={1}>
             {makeActivityRepresentation(activity)}
           </Box>
-          {activity.comment && activity.comment.trim() !== '' ? <ActivityComment activity={activity} /> : null}
+          {activity.comment && activity.comment.trim() !== '' ? (
+            <ActivityComment activity={activity} />
+          ) : null}
         </Box>
       </Box>
     </Box>

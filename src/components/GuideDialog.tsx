@@ -82,7 +82,8 @@ const GuideDialog: React.FC<ConfirmationDialogProps> = ({ isOpen, handleClose })
         {localStorage.getItem('finishedNavbarGuide') !== 'true' ? (
           <DialogContent>
             <Typography variant="body1">
-              The guide can help you familiarize yourself with the site if you haven't used it before.
+              The guide can help you familiarize yourself with the site if you haven't used it
+              before.
             </Typography>
           </DialogContent>
         ) : null}

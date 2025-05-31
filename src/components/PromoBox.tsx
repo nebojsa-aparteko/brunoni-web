@@ -36,7 +36,9 @@ export default () => {
   });
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const anchor = ((event.target as HTMLDivElement).ownerDocument || document).querySelector('#back-to-top-anchor');
+    const anchor = ((event.target as HTMLDivElement).ownerDocument || document).querySelector(
+      '#back-to-top-anchor',
+    );
 
     if (anchor) {
       anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -74,10 +76,14 @@ export default () => {
                 <Typography variant="h4" gutterBottom>
                   Need Land Transport?
                 </Typography>
-                <Typography>We got you covered. Choose a service from our partner at affordable rates.</Typography>
+                <Typography>
+                  We got you covered. Choose a service from our partner at affordable rates.
+                </Typography>
               </Fragment>
             ) : (
-              <Alert severity="info">Thank you for showing interest! We are working on enabling this feature.</Alert>
+              <Alert severity="info">
+                Thank you for showing interest! We are working on enabling this feature.
+              </Alert>
             )}
           </CardContent>
           <CardActions>

@@ -1,5 +1,12 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
-import React, { CSSProperties, Fragment, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  CSSProperties,
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import BookingsView from '../components/BookingsView';
 import { Badge, Box, makeStyles, Tab, Tabs, Theme } from '@material-ui/core';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
@@ -16,14 +23,14 @@ import BookingRequestsProvider from '../providers/BookingRequestsProvider';
 import BookingRequestsView from '../components/bookingRequests/BookingRequestsView';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import InputIcon from '@material-ui/icons/Input';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import { useBookingRequestsFilterContext } from '../providers/BookingRequestsFilterProvider';
 import FirestoreCollectionProvider from '../providers/FirestoreCollection';
 import Tags from '../contexts/Tags';
 import { TagCategory } from '../model/Tag';
 import { BookingRequestStatusCode } from '../model/BookingRequest';
-import QueryString from 'querystring';
-import { useHistory } from 'react-router';
+import queryString from 'query-string';
+import { useNavigate } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -86,13 +93,14 @@ const BookingsPageContainer: React.FC = () => {
 
   const [bookingsContextData, setBookingsContextData] = useBookingListFilterContext();
   const setFilters = useBookingRequestsFilterContext()[1];
-  const [bookingPaginationContextData, setBookingPaginationContextData] = useBookingListPaginationContext();
+  const [bookingPaginationContextData, setBookingPaginationContextData] =
+    useBookingListPaginationContext();
   const [bookingRequestCountsPerCarrier, setBookingRequestCountsPerCarrier] = useState<number[]>(
     actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
   );
-  const [bookingRequestCountsPerCarrierOnHold, setBookingRequestCountsPerCarrierOnHold] = useState<number[]>(
-    actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0],
-  );
+  const [bookingRequestCountsPerCarrierOnHold, setBookingRequestCountsPerCarrierOnHold] = useState<
+    number[]
+  >(actingAs ? [0] : userRecord.carriers?.map(() => 0) || [0]);
   const [bookingRequestCount, setBookingRequestCount] = useState(
     bookingRequestCountsPerCarrier?.reduce((a, b) => a + (b || 0), 0),
   );
@@ -103,9 +111,9 @@ const BookingsPageContainer: React.FC = () => {
 
   const selectedTab = bookingPaginationContextData.activeTab;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  const params = QueryString.parse(window.location.search.replace('?', ''));
+  const params = queryString.parse(window.location.search.replace('?', ''));
   const tab = params.tab as string | undefined;
 
   const tabToIndex: any = !actingAs
@@ -162,7 +170,9 @@ const BookingsPageContainer: React.FC = () => {
 
   useEffect(() => {
     setBookingRequestCount(
-      bookingRequestCountsPerCarrier ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0) : 0,
+      bookingRequestCountsPerCarrier
+        ? Array.from(bookingRequestCountsPerCarrier).reduce((a, b) => a + (b || 0), 0)
+        : 0,
     );
   }, [bookingRequestCountsPerCarrier]);
 
@@ -208,12 +218,13 @@ const BookingsPageContainer: React.FC = () => {
   );
 
   useEffect(() => {
-    const newValue = tab && tabToIndex[tab] ? tabToIndex[tab] : bookingPaginationContextData.activeTab;
+    const newValue =
+      tab && tabToIndex[tab] ? tabToIndex[tab] : bookingPaginationContextData.activeTab;
     if (setBookingPaginationContextData) {
       setBookingPaginationContextData(set('activeTab', newValue)(bookingPaginationContextData));
       bookingPaginationContextData.activeTab
-        ? history.push(`/bookings?tab=${indexToTab[bookingPaginationContextData.activeTab]}`)
-        : history.push(`/bookings`);
+        ? navigate(`/bookings?tab=${indexToTab[bookingPaginationContextData.activeTab]}`)
+        : navigate(`/bookings`);
     }
   }, []);
 
@@ -222,28 +233,28 @@ const BookingsPageContainer: React.FC = () => {
       const bookingsContextDataNew = () => {
         switch (newValue) {
           case 0:
-            history.push('/bookings');
+            navigate('/bookings');
             return flow(
               set('archived', false),
               set('pendingPayment', false),
               set('dateRange', undefined),
             )(bookingsContextData);
           case 1:
-            history.push('/bookings?tab=pending-payment');
+            navigate('/bookings?tab=pending-payment');
             return flow(
               set('archived', false),
               set('pendingPayment', true),
               set('dateRange', undefined),
             )(bookingsContextData);
           case 2:
-            history.push('/bookings?tab=archived');
+            navigate('/bookings?tab=archived');
             return flow(
               set('archived', true),
               set('pendingPayment', undefined),
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
           case 3:
-            history.push('/bookings?tab=requests');
+            navigate('/bookings?tab=requests');
             setFilters &&
               setFilters(prevState =>
                 flow(
@@ -254,7 +265,7 @@ const BookingsPageContainer: React.FC = () => {
               );
             return bookingsContextData;
           case 4:
-            history.push('/bookings?tab=on-hold');
+            navigate('/bookings?tab=on-hold');
             setFilters &&
               setFilters(prevState =>
                 flow(
@@ -265,7 +276,7 @@ const BookingsPageContainer: React.FC = () => {
               );
             return bookingsContextData;
           case 5:
-            history.push('/bookings?tab=archived-requests');
+            navigate('/bookings?tab=archived-requests');
             setFilters &&
               setFilters(prevState =>
                 flow(
@@ -291,21 +302,21 @@ const BookingsPageContainer: React.FC = () => {
       const bookingsContextDataNew = () => {
         switch (newValue) {
           case 0:
-            history.push('/bookings');
+            navigate('/bookings');
             return flow(
               set('archived', false),
               set('pendingPayment', undefined),
               set('dateRange', undefined),
             )(bookingsContextData);
           case 1:
-            history.push('/bookings?tab=history');
+            navigate('/bookings?tab=history');
             return flow(
               set('archived', true),
               set('pendingPayment', undefined),
               set('dateRange', bookingsContextData.dateRange || INITIAL_DATERANGE_FILTER),
             )(bookingsContextData);
           case 2:
-            history.push('/bookings?tab=requests');
+            navigate('/bookings?tab=requests');
             setFilters &&
               setFilters(prevState =>
                 flow(
@@ -317,7 +328,7 @@ const BookingsPageContainer: React.FC = () => {
               );
             return bookingsContextData;
           case 3:
-            history.push('/bookings?tab=archived-requests');
+            navigate('/bookings?tab=archived-requests');
             setFilters &&
               setFilters(prevState =>
                 flow(

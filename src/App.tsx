@@ -1,8 +1,9 @@
 import React, { Fragment, useContext, useEffect } from 'react';
-import { Route, Switch } from 'react-router';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { Backdrop, CircularProgress, makeStyles, Theme } from '@material-ui/core';
+import queryString from 'query-string';
 
-import Routes from './pages/Routes';
+import RoutesPage from './pages/Routes';
 import Dashboard from './pages/Dashboard';
 import EquipmentSituation from './pages/EquipmentSituation';
 import QuotePageContainer from './pages/QuotePageContainer';
@@ -34,8 +35,6 @@ import BookingListFilterProvider from './providers/BookingListFilterProvider';
 import { QuoteFilterListProvider } from './providers/QuoteListFilterContext';
 import BookingListPaginationProvider from './providers/BookingListPaginationProvider';
 import MyDayPage from './pages/MyDayPage';
-import * as QueryString from 'querystring';
-import { useHistory } from 'react-router-dom';
 import MyProfilePage from './pages/MyProfilePage';
 import WeeklyPaymentPage from './pages/WeeklyPaymentPage';
 import CommissionsPage from './pages/CommissionsPage';
@@ -56,69 +55,71 @@ import LandTransportConfigPage from './pages/LandTransportConfigPage';
 import LandTransportConfigProviderPage from './pages/LandTransportConfigProviderPage';
 
 const anonymousRoutes = (
-  <Switch>
-    <Route exact path="/" component={Routes} />
-    <Route exact path="/schedule" component={Unauthorized} />
-    <Route exact path="/quotes/groups" component={Unauthorized} />
-    <Route exact path="/quotes/groups/:id" component={Unauthorized} />
-    <Route exact path="/quotes/get" component={Unauthorized} />
-    <Route exact path="/quotes/:id" component={Unauthorized} />
-    <Route exact path="/equipment" component={Unauthorized} />
-    <Route path="/charges" component={Unauthorized} />
-    <Route component={NotFound} />
-  </Switch>
+  <Routes>
+    <Route path="/" element={<RoutesPage />} />
+    <Route path="/schedule" element={<Unauthorized />} />
+    <Route path="/quotes/groups" element={<Unauthorized />} />
+    <Route path="/quotes/groups/:id" element={<Unauthorized />} />
+    <Route path="/quotes/get" element={<Unauthorized />} />
+    <Route path="/quotes/:id" element={<Unauthorized />} />
+    <Route path="/equipment" element={<Unauthorized />} />
+    <Route path="/charges/*" element={<Unauthorized />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
 );
 
 const adminRoutes = (
-  <Switch>
-    <Route exact path="/" component={AdminRedirect} />
-    <Route exact path="/client-statistics" component={AdminDashboard} />
-    <Route exact path="/schedule" component={Routes} />
-    <Route exact path="/quotes/groups" component={QuoteGroups} />
-    <Route exact path="/quotes/groups/:id" component={AdminQuoteGroup} />
-    <Route exact path="/quotes/:id" component={QuotePageContainer} />
-    <Route exact path="/online-booking" component={OnlineBookingPage} />
-    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
-    <Route exact path="/bookings" component={BookingsPageContainer} />
-    <Route exact path="/bookings/:id" component={BookingContainer} />
-    <Route exact path="/teams" component={TeamManagementPage} />
-    <Route exact path="/land-transport-config" component={LandTransportConfigPage} />
-    <Route exact path="/land-transport-config/:providerId" component={LandTransportConfigProviderPage} />
-    <Route path="/charges" component={AdminSideCharges} />
-    <Route exact path="/vessel" component={VesselWithVoyagePage} />
-    {/*TODO uncomment this once it's ready*/}
-    <Route exact path="/land-transport" component={LandTransportPage} />
-    <Route exact path="/loadList" component={LoadListPage} />
-    <Route exact path="/equipment-control" component={EquipmentControlPage} />
-    <Route exact path="/my-day" component={MyDayPage} />
-    <Route exact path="/my-profile" component={MyProfilePage} />
-    <Route exact path="/equipment" component={EquipmentSituation} />
-    <Route exact path="/weekly-payment" component={WeeklyPaymentPage} />
-    <Route exact path="/commissions" component={CommissionsPage} />
-    <Route path="/not-found" component={NotFound} />
-    <Route component={NotFound} />
-  </Switch>
+  <Routes>
+    <Route path="/" element={<AdminRedirect />} />
+    <Route path="/client-statistics" element={<AdminDashboard />} />
+    <Route path="/schedule" element={<RoutesPage />} />
+    <Route path="/quotes/groups" element={<QuoteGroups />} />
+    <Route path="/quotes/groups/:id" element={<AdminQuoteGroup />} />
+    <Route path="/quotes/:id" element={<QuotePageContainer />} />
+    <Route path="/online-booking" element={<OnlineBookingPage />} />
+    <Route path="/booking-requests/:id" element={<BookingRequestContainer />} />
+    <Route path="/bookings" element={<BookingsPageContainer />} />
+    <Route path="/bookings/:id" element={<BookingContainer />} />
+    <Route path="/teams" element={<TeamManagementPage />} />
+    <Route path="/land-transport-config" element={<LandTransportConfigPage />} />
+    <Route
+      path="/land-transport-config/:providerId"
+      element={<LandTransportConfigProviderPage />}
+    />
+    <Route path="/charges/*" element={<AdminSideCharges />} />
+    <Route path="/vessel" element={<VesselWithVoyagePage />} />
+    <Route path="/land-transport" element={<LandTransportPage />} />
+    <Route path="/loadList" element={<LoadListPage />} />
+    <Route path="/equipment-control" element={<EquipmentControlPage />} />
+    <Route path="/my-day" element={<MyDayPage />} />
+    <Route path="/my-profile" element={<MyProfilePage />} />
+    <Route path="/equipment" element={<EquipmentSituation />} />
+    <Route path="/weekly-payment" element={<WeeklyPaymentPage />} />
+    <Route path="/commissions" element={<CommissionsPage />} />
+    <Route path="/not-found" element={<NotFound />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
 );
 
 const userRoutes = (
-  <Switch>
-    <Route exact path="/" component={Dashboard} />
-    <Route exact path="/schedule" component={Routes} />
-    <Route exact path="/quotes/groups" component={QuoteGroups} />
-    <Route exact path="/quotes/groups/:id" component={QuoteGroup} />
-    <Route exact path="/quotes/get" component={GetQuotes} />
-    <Route exact path="/quotes/:id" component={QuotePageContainer} />
-    <Route exact path="/online-booking" component={OnlineBookingPage} />
-    <Route exact path="/booking-requests/:id" component={BookingRequestContainer} />
-    <Route exact path="/bookings" component={BookingsPageContainer} />
-    <Route exact path="/bookings/:id" component={BookingContainer} />
-    <Route exact path="/equipment" component={EquipmentSituation} />
-    <Route exact path="/my-day" component={MyDayPage} />
-    <Route exact path="/my-profile" component={MyProfilePage} />
-    <Route path="/charges" component={SideCharges} />
-    <Route path="/not-found" component={NotFound} />
-    <Route component={NotFound} />
-  </Switch>
+  <Routes>
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/schedule" element={<RoutesPage />} />
+    <Route path="/quotes/groups" element={<QuoteGroups />} />
+    <Route path="/quotes/groups/:id" element={<QuoteGroup />} />
+    <Route path="/quotes/get" element={<GetQuotes />} />
+    <Route path="/quotes/:id" element={<QuotePageContainer />} />
+    <Route path="/online-booking" element={<OnlineBookingPage />} />
+    <Route path="/booking-requests/:id" element={<BookingRequestContainer />} />
+    <Route path="/bookings" element={<BookingsPageContainer />} />
+    <Route path="/bookings/:id" element={<BookingContainer />} />
+    <Route path="/equipment" element={<EquipmentSituation />} />
+    <Route path="/my-day" element={<MyDayPage />} />
+    <Route path="/my-profile" element={<MyProfilePage />} />
+    <Route path="/charges/*" element={<SideCharges />} />
+    <Route path="/not-found" element={<NotFound />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
 );
 
 const UserRoutes: React.FC = () => {
@@ -164,13 +165,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 const App: React.FC = () => {
   const classes = useStyles();
   const [user, userRecord] = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [state] = useContext(GlobalContext);
   const { isGlobalLoadingInProgress } = state;
 
   // If we come from email notification, we want to read that notification and delete it from url
   useEffect(() => {
-    const params = QueryString.parse(window.location.search.replace('?', ''));
+    const params = queryString.parse(window.location.search);
 
     if (params.readNotification && userRecord) {
       const notificationId = params.readNotification as string;
@@ -180,24 +182,29 @@ const App: React.FC = () => {
           .then(() => delete params.checklistTab)
           .then(() => {
             //read that notification
-            notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
-              () => {
-                delete params.readNotification;
-                history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-              },
-            );
+            notificationSeenStatusChange(
+              notificationId,
+              userRecord,
+              NotificationStatusAction.READ_NOTIFICATION,
+            ).then(() => {
+              delete params.readNotification;
+              navigate(`${location.pathname}?${queryString.stringify(params)}`);
+            });
           });
       } else {
         //read that notification
-        notificationSeenStatusChange(notificationId, userRecord, NotificationStatusAction.READ_NOTIFICATION).then(
-          () => {
-            delete params.readNotification;
-            history.replace(`${window.location.pathname}?${QueryString.stringify(params)}`);
-          },
-        );
+        notificationSeenStatusChange(
+          notificationId,
+          userRecord,
+          NotificationStatusAction.READ_NOTIFICATION,
+        ).then(() => {
+          delete params.readNotification;
+          navigate(`${location.pathname}?${queryString.stringify(params)}`);
+        });
       }
     }
-  }, [history]);
+  }, [location]);
+
   return (
     <Fragment>
       <QuoteFilterListProvider>
@@ -210,12 +217,18 @@ const App: React.FC = () => {
                   <CircularProgress color="inherit" />
                 </Backdrop>
                 <div className={classes.deviceControl}>
-                  {user === undefined ? <ChartsCircularProgress /> : user === null ? anonymousRoutes : <UserRoutes />}
+                  {user === undefined ? (
+                    <ChartsCircularProgress />
+                  ) : user === null ? (
+                    anonymousRoutes
+                  ) : (
+                    <UserRoutes />
+                  )}
                 </div>
                 <ScrollToTop className={classes.goTop} />
-                {process.env.REACT_APP_BRAND === 'brunoni' ? (
+                {import.meta.env.VITE_BRAND === 'brunoni' ? (
                   <BrunoniFooter />
-                ) : process.env.REACT_APP_BRAND === 'allmarine' ? (
+                ) : import.meta.env.VITE_BRAND === 'allmarine' ? (
                   <AllmarineFooter />
                 ) : null}
               </BookingRequestsFilterProvider>

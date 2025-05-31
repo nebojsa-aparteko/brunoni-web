@@ -1,5 +1,13 @@
 import React, { useContext } from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import QuickSearchBooking from './QuickSearchBooking';
 import QuickSearchQuote from './QuickSearchQuote';
@@ -47,13 +55,11 @@ const getBookingIds = async (
   isAdmin: boolean,
   clientId?: string,
 ) => {
-  if (isAdmin && !clientId) return new Promise<string[]>((resolve, reject) => reject('No booking found'));
+  if (isAdmin && !clientId)
+    return new Promise<string[]>((resolve, reject) => reject('No booking found'));
   const searchRef = isAdmin
     ? firebase.firestore().collection(collection)
-    : firebase
-        .firestore()
-        .collection(collection)
-        .where('clientId', '==', clientId);
+    : firebase.firestore().collection(collection).where('clientId', '==', clientId);
   return searchRef
     .where(fieldPath, opStr, inputValue)
     .get()
@@ -71,7 +77,12 @@ const NavBarQuickSearchDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const userRecord = useContext(UserRecordContext);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-navBar-quick-search" maxWidth="xl">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-navBar-quick-search"
+      maxWidth="xl"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Quick Search</Typography>

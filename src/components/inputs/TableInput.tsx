@@ -73,10 +73,19 @@ const TableInput: React.FC<Props> = ({ value, onChange }) => {
   const handleRemoveRow = (i: number) => () => onChange(update('rows', removeAt(i))(value));
 
   const handleRemoveColumn = (j: number) => () =>
-    onChange(flow(update('columns', removeAt(j)), update('rows', map(update('values', removeAt(j)))))(value));
+    onChange(
+      flow(
+        update('columns', removeAt(j)),
+        update('rows', map(update('values', removeAt(j)))),
+      )(value),
+    );
 
   const handleAddRow = () =>
-    onChange(update('rows', rows => rows.concat([{ values: [...Array(value.columns.length)].map(_ => '') }]))(value));
+    onChange(
+      update('rows', rows =>
+        rows.concat([{ values: [...Array(value.columns.length)].map(_ => '') }]),
+      )(value),
+    );
 
   const handleUpdateColumn = (j: number) => (e: ChangeEvent<HTMLInputElement>) =>
     onChange(set(['columns', j], e.target.value)(value));
@@ -98,7 +107,11 @@ const TableInput: React.FC<Props> = ({ value, onChange }) => {
                   onChange={handleUpdateColumn(j)}
                 />
                 <Tooltip title="Remove column">
-                  <IconButton aria-label="Remove column" onClick={handleRemoveColumn(j)} className={classes.button}>
+                  <IconButton
+                    aria-label="Remove column"
+                    onClick={handleRemoveColumn(j)}
+                    className={classes.button}
+                  >
                     <RemoveCircleOutlineIcon />
                   </IconButton>
                 </Tooltip>
@@ -107,7 +120,11 @@ const TableInput: React.FC<Props> = ({ value, onChange }) => {
           ))}
           <TableCell className={classNames(classes.tableCell, classes.lastTableCell)}>
             <Tooltip title="Add column">
-              <IconButton aria-label="Add column" onClick={handleAddColumn} className={classes.button}>
+              <IconButton
+                aria-label="Add column"
+                onClick={handleAddColumn}
+                className={classes.button}
+              >
                 <ArrowForwardIcon />
               </IconButton>
             </Tooltip>
@@ -129,7 +146,11 @@ const TableInput: React.FC<Props> = ({ value, onChange }) => {
             ))}
             <TableCell className={classNames(classes.tableCell, classes.lastTableCell)}>
               <Tooltip title="Remove row">
-                <IconButton aria-label="Remove row" onClick={handleRemoveRow(i)} className={classes.button}>
+                <IconButton
+                  aria-label="Remove row"
+                  onClick={handleRemoveRow(i)}
+                  className={classes.button}
+                >
                   <RemoveCircleOutlineIcon />
                 </IconButton>
               </Tooltip>

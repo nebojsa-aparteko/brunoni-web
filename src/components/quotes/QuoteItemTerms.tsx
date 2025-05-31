@@ -25,7 +25,12 @@ const QuoteItemTerms: React.FC<Props> = ({ terms }) => {
             <Typography variant="body2" key={index}>
               {term.TermValue} - {term.TermDetail}
               <br />
-              <Link href={term.TermURL || ''} className={classes.link} target="_blank" rel="noreferrer">
+              <Link
+                href={term.TermURL || ''}
+                className={classes.link}
+                target="_blank"
+                rel="noreferrer"
+              >
                 {term.TermURL}
               </Link>
             </Typography>

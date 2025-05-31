@@ -59,8 +59,7 @@ getQuotesShepherdTour.addSteps([
   },
   {
     title: 'Add Cargo',
-    text:
-      'Use this option to choose Equipment type, Commodity and Quantity. If more than one equipment type is involved, use it several times so that the details can be captured in one quote.',
+    text: 'Use this option to choose Equipment type, Commodity and Quantity. If more than one equipment type is involved, use it several times so that the details can be captured in one quote.',
     attachTo: { element: '#addCargoGetQuote', on: 'bottom' },
     buttons: [
       {

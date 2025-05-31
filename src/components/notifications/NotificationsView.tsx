@@ -1,5 +1,13 @@
 import React, { Fragment, useCallback, useContext } from 'react';
-import { Box, Button, createStyles, IconButton, ListItem, makeStyles, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  createStyles,
+  IconButton,
+  ListItem,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import NotificationItemView from './NotificationItemView';
 import Notification from '../../model/Notification';
 import CloseIcon from '@material-ui/icons/Close';
@@ -25,17 +33,13 @@ const useStyles = makeStyles(theme =>
 );
 
 const readAllNotifications = async (userEmail: string, userAlphacomId: string) =>
-  firebase
-    .firestore()
-    .collection('functions-action')
-    .doc()
-    .set({
-      date: new Date(),
-      type: FirebaseActionType.MARK_ALL_NOTIFICATIONS_AS_READ,
-      done: false,
-      userEmail,
-      userAlphacomId,
-    });
+  firebase.firestore().collection('functions-action').doc().set({
+    date: new Date(),
+    type: FirebaseActionType.MARK_ALL_NOTIFICATIONS_AS_READ,
+    done: false,
+    userEmail,
+    userAlphacomId,
+  });
 
 const NotificationsView: React.FC<Props> = ({
   notifications,
@@ -56,7 +60,10 @@ const NotificationsView: React.FC<Props> = ({
         dispatch({ type: 'SHOW_SUCCESS_SNACKBAR', message: 'Success.' });
       })
       .catch(error =>
-        dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: `Error marking all notifications as read - ${error}` }),
+        dispatch({
+          type: 'SHOW_ERROR_SNACKBAR',
+          message: `Error marking all notifications as read - ${error}`,
+        }),
       )
       .finally(() => dispatch({ type: 'STOP_GLOBAL_LOADING' }));
   }, [dispatch, userRecord, handleShow]);
@@ -82,7 +89,9 @@ const NotificationsView: React.FC<Props> = ({
         {notifications && notifications.length === 0 && filterByUnread ? (
           <Box flex={1} display="flex">
             <Box display="flex" flexDirection="column" margin="auto" padding={2}>
-              <Typography style={{ padding: 2 }}>You don't have any unread notifications.</Typography>
+              <Typography style={{ padding: 2 }}>
+                You don't have any unread notifications.
+              </Typography>
               <Button variant="contained" onClick={onFilterByUnread} style={{ margin: 'auto' }}>
                 View all
               </Button>

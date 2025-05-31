@@ -1,6 +1,9 @@
 import React, { Fragment } from 'react';
 import flatMap from 'lodash/fp/flatMap';
-import { RouteSearchResult, RouteSearchResultDeadline } from '../../model/route-search/RouteSearchResults';
+import {
+  RouteSearchResult,
+  RouteSearchResultDeadline,
+} from '../../model/route-search/RouteSearchResults';
 import formatDate from 'date-fns/format';
 
 const paragraphStyles = {
@@ -58,15 +61,15 @@ export const RouteInfoBodyHTML: React.FC<Props> = ({ route }) => (
     </p>
     <p style={paragraphStyles}>
       Source:{' '}
-      {process.env.REACT_APP_BRAND === 'brunoni' ? (
+      {import.meta.env.VITE_BRAND === 'brunoni' ? (
         <a href="https://mybrunoni.ch">mybrunoni.ch</a>
       ) : (
         <a href="https://myallmarine.ch">myallmarine.ch</a>
       )}
     </p>
     <p style={paragraphStyles}>
-      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING. ALL DATA IS
-      SUBJECT TO ALTERATION WITHOUT NOTICE.
+      ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY
+      BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.
     </p>
   </Fragment>
 );
@@ -90,7 +93,9 @@ ${route.DestinationInfo.Port.HarbourName}, ${route.DestinationInfo.Port.Land} ET
     route.DestinationInfo.ArrivalDate,
   )}
 
-${flatMap((deadline: RouteSearchResultDeadline) => `${deadline.Typ} closing - ${deadline.Time}`)(route.Deadlines)
+${flatMap((deadline: RouteSearchResultDeadline) => `${deadline.Typ} closing - ${deadline.Time}`)(
+  route.Deadlines,
+)
   .toString()
   .split(',')
   .join('\n')}
@@ -101,7 +106,7 @@ ${route.OriginInfo.Port.PortName.split('<br/> ').join('\n')}
 Destination Address:
 ${route.DestinationInfo.Port.PortName.split('<br/> ').join('\n')}
 
-Source: ${process.env.REACT_APP_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
+Source: ${import.meta.env.VITE_BRAND === 'brunoni' ? 'https://mybrunoni.ch' : 'https://myallmarine.ch'}
 
 ALL ETS/ETA DATES, PORTS AND ROTATIONS ARE GIVEN FOR INFORMATION ONLY AND ARE NOT LEGALLY BINDING. ALL DATA IS SUBJECT TO ALTERATION WITHOUT NOTICE.`;
 };

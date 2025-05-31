@@ -23,7 +23,9 @@ const CarriersMultiInput: React.FC<Props> = ({ options, defaultValues, onChange 
       renderTags={(value, getTagProps) =>
         value.map((option, index) => <Chip label={`${option.name}`} {...getTagProps({ index })} />)
       }
-      renderInput={params => <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />}
+      renderInput={params => (
+        <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />
+      )}
     />
   );
 };

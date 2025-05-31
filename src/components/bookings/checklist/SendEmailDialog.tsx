@@ -15,7 +15,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MultipleEmailInput from '../../inputs/MultipleEmailInput';
 import PortInput from '../../inputs/PortInput';
 import EmailIcon from '@material-ui/icons/Email';
-import { CarrierSettingsRule, PaymentConfirmationType } from '../../../model/PaymentConfirmationRule';
+import {
+  CarrierSettingsRule,
+  PaymentConfirmationType,
+} from '../../../model/PaymentConfirmationRule';
 import { Booking } from '../../../model/Booking';
 import useCarrierSettings from '../../../hooks/useCarrierSettings';
 import useUser from '../../../hooks/useUser';
@@ -24,7 +27,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import { ActivityChangeType, ActivityLogUserData, ChecklistNames } from './ChecklistItemModel';
 import { ActivityType } from './ActivityModel';
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,13 +51,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }) => {
   const classes = useStyles();
-  const carrierSettings = useCarrierSettings(booking.CarrierID.toUpperCase(), PaymentConfirmationType.CARRIER_SETTINGS);
+  const carrierSettings = useCarrierSettings(
+    booking.CarrierID.toUpperCase(),
+    PaymentConfirmationType.CARRIER_SETTINGS,
+  );
   const ports = useMemo(() => carrierSettings?.map(s => s.port), [carrierSettings]);
 
   const [selectedCarrierSettings, setSelectedCarrierSettings] = useState<CarrierSettingsRule>();
 
   return (
-    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} aria-labelledby="send-email-dialog" maxWidth="lg">
+    <Dialog
+      open={dialogOpen}
+      onClose={() => setDialogOpen(false)}
+      aria-labelledby="send-email-dialog"
+      maxWidth="lg"
+    >
       <DialogTitle disableTypography id="send-email-dialog" className={classes.dialogTitle}>
         <Typography variant="h4">Send semi automatic email</Typography>
         <IconButton onClick={() => setDialogOpen(false)}>
@@ -66,7 +77,9 @@ const SendEmailDialog: React.FC<Props> = ({ booking, setDialogOpen, dialogOpen }
           <PortInput
             label="Destination port agent"
             ports={ports || []}
-            onChange={port => setSelectedCarrierSettings(carrierSettings?.find(c => c.port.id === port?.id))}
+            onChange={port =>
+              setSelectedCarrierSettings(carrierSettings?.find(c => c.port.id === port?.id))
+            }
             value={selectedCarrierSettings?.port}
           />
         </Box>
@@ -127,36 +140,43 @@ const SendEmailContent = ({
         alphacomClientId: userRecord?.alphacomClientId,
         alphacomId: userRecord?.alphacomId,
         emailAddress: userRecord?.emailAddress,
-      } as ActivityLogUserData),
+      }) as ActivityLogUserData,
     [userRecord],
   );
 
   const handleAdditionalInfoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAdditionalInfo(event.target.value);
   };
-  const handleSendEmail = async (token: string, addActivity: (emails: string[]) => Promise<any>, bookingId: string) => {
+  const handleSendEmail = async (
+    token: string,
+    addActivity: (emails: string[]) => Promise<any>,
+    bookingId: string,
+  ) => {
     console.log('Sending payment confirmation mail...');
     try {
       dispatch({ type: 'START_GLOBAL_LOADING' });
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/paymentConfirmation`, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${import.meta.env.VITE_REACT_APP_API_URL}/paymentConfirmation`,
+        {
+          method: 'POST',
+          mode: 'cors',
+          cache: 'no-cache',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bcc: selectedContactBCC,
+            cc: selectedContactCC || [],
+            contactTo: selectedContactTo || [],
+            portId: carrierSetting.port?.id,
+            freeText: additionalInfo,
+            bookingId: bookingId,
+          }),
         },
-        body: JSON.stringify({
-          bcc: selectedContactBCC,
-          cc: selectedContactCC || [],
-          contactTo: selectedContactTo || [],
-          portId: carrierSetting.port?.id,
-          freeText: additionalInfo,
-          bookingId: bookingId,
-        }),
-      });
+      );
       if (response.ok) {
         const resp = await response.json();
         dispatch({ type: 'STOP_GLOBAL_LOADING' });

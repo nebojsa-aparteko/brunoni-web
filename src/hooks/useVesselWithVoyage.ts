@@ -14,7 +14,9 @@ export default function useVesselWithVoyage() {
     () => (collection: firebase.firestore.Query) => {
       // setIsLoading(true);
 
-      let query = collection.where('ets', '>=', dateRange.startDate).where('ets', '<=', dateRange.endDate);
+      let query = collection
+        .where('ets', '>=', dateRange.startDate)
+        .where('ets', '<=', dateRange.endDate);
 
       if (category) {
         query = query.where('category', '==', category);
@@ -37,7 +39,8 @@ export default function useVesselWithVoyage() {
         const collection = await ((query || identity)(collectionReference) as any);
         return collection.onSnapshot({
           complete: () => console.log('Collection group for Voyage and Vessel completed'),
-          error: (error: any) => console.error('Collection group for Voyage and Vessel threw an error', error),
+          error: (error: any) =>
+            console.error('Collection group for Voyage and Vessel threw an error', error),
           next: (snapshot: any) => {
             console.debug('Collection group for Voyage and Vessel', 'updated with', snapshot);
             setSnapshot(
@@ -69,4 +72,7 @@ export default function useVesselWithVoyage() {
 }
 
 export const normalizeVesselData = (item: any) =>
-  flow(update('ets', safeInvoke('toDate')), update('eta', safeInvoke('toDate')))(item) as VesselWithVoyage;
+  flow(
+    update('ets', safeInvoke('toDate')),
+    update('eta', safeInvoke('toDate')),
+  )(item) as VesselWithVoyage;

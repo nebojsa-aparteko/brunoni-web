@@ -130,7 +130,12 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
   };
 
   const handleChangeActive = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    await activateRoute(provider.id, ProviderRoutesType.SEMI_AUTOMATIC, route.id, event.target.checked);
+    await activateRoute(
+      provider.id,
+      ProviderRoutesType.SEMI_AUTOMATIC,
+      route.id,
+      event.target.checked,
+    );
   };
 
   const handleDeleteRoute = async () => {
@@ -230,10 +235,16 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
               <Box display="flex" flexDirection="column" style={{ gap: theme.spacing(5) }}>
                 <Box display="flex" alignItems="center" style={{ gap: theme.spacing(5) }}>
                   <Box>
-                    <InfoBoxItem label1={'Created At'} label2={<DateFormattedText date={route.createdAt} />} />
+                    <InfoBoxItem
+                      label1={'Created At'}
+                      label2={<DateFormattedText date={route.createdAt} />}
+                    />
                   </Box>
                   <Box>
-                    <InfoBoxItem label1={'Last Updated'} label2={<DateFormattedText date={route.updatedAt} />} />
+                    <InfoBoxItem
+                      label1={'Last Updated'}
+                      label2={<DateFormattedText date={route.updatedAt} />}
+                    />
                   </Box>
                 </Box>
                 <Box display="flex" alignItems="center" style={{ gap: theme.spacing(10) }}>
@@ -250,7 +261,11 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
                               : 'Not defined'
                           }
                           Element={
-                            <CityInput isEditing={isEditing} onSelect={handleCityInput} origin={stateRoute.origin} />
+                            <CityInput
+                              isEditing={isEditing}
+                              onSelect={handleCityInput}
+                              origin={stateRoute.origin}
+                            />
                           }
                         />
                       }
@@ -266,7 +281,10 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
                           show={!isEditing && route.selectedRoutes.length > 0}
                           selectedRoutes={route.selectedRoutes}
                         >
-                          <RoutesMultiInput isEditing={isEditing} startingDestination={stateRoute.origin} />
+                          <RoutesMultiInput
+                            isEditing={isEditing}
+                            startingDestination={stateRoute.origin}
+                          />
                         </WithSelectedRoutesPopover>
                       }
                     />
@@ -284,7 +302,9 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
                               label={''}
                               value={stateRoute.transportMode}
                               onChange={transportMode =>
-                                setStateRoute(prevState => set('transportMode', transportMode)(prevState))
+                                setStateRoute(prevState =>
+                                  set('transportMode', transportMode)(prevState),
+                                )
                               }
                             />
                           }
@@ -298,7 +318,9 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
             <Validity
               validity={route.validity}
               validityState={stateRoute.validity}
-              handleChange={newValidity => setStateRoute(prev => ({ ...prev, validity: newValidity }))}
+              handleChange={newValidity =>
+                setStateRoute(prev => ({ ...prev, validity: newValidity }))
+              }
               editing={isEditing}
               hasValidity={hasValidity}
             />
@@ -323,7 +345,9 @@ const SemiAutomaticRouteDialog: React.FC<Props> = ({ closeModal, isOpen, route, 
               description={route.description}
               descriptionState={stateRoute.description}
               editing={isEditing}
-              handleChange={newDescription => setStateRoute(prev => ({ ...prev, description: newDescription }))}
+              handleChange={newDescription =>
+                setStateRoute(prev => ({ ...prev, description: newDescription }))
+              }
             />
           </Box>
         </DialogContent>
@@ -401,7 +425,9 @@ interface SelectedRoutesCollectionProps {
 }
 
 const SelectedRoutesCollection: React.FC<SelectedRoutesCollectionProps> = ({ selectedRoutes }) => {
-  const groupedByCountryCodes = groupBy(selectedRoutes, 'countryCode') as Dictionary<RouteFromCity[]>;
+  const groupedByCountryCodes = groupBy(selectedRoutes, 'countryCode') as Dictionary<
+    RouteFromCity[]
+  >;
   const groupedByCountryCodesKeys = Object.keys(groupedByCountryCodes);
 
   return (

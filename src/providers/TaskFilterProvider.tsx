@@ -19,7 +19,10 @@ export const TASK_FILTERS_INITIAL_STATE = {
 } as TaskFilterProviderContextFilters;
 
 const TaskFilterProviderContext = createContext<
-  [TaskFilterProviderContextFilters, Dispatch<SetStateAction<TaskFilterProviderContextFilters>> | undefined]
+  [
+    TaskFilterProviderContextFilters,
+    Dispatch<SetStateAction<TaskFilterProviderContextFilters>> | undefined,
+  ]
 >([TASK_FILTERS_INITIAL_STATE, undefined]);
 
 const TaskFilterProvider = (props: any) => {
@@ -29,13 +32,17 @@ const TaskFilterProvider = (props: any) => {
     ...TASK_FILTERS_INITIAL_STATE,
     assignee: userRecord,
     taskCategory:
-      userRecord && userRecord.lastOpenedChecklistTab && userRecord.lastOpenedChecklistTab === 'accounting'
+      userRecord &&
+      userRecord.lastOpenedChecklistTab &&
+      userRecord.lastOpenedChecklistTab === 'accounting'
         ? TaskCategory.ACCOUNTING
         : TaskCategory.OPERATIONS,
   });
 
   return (
-    <TaskFilterProviderContext.Provider value={[state, setState]}>{props.children}</TaskFilterProviderContext.Provider>
+    <TaskFilterProviderContext.Provider value={[state, setState]}>
+      {props.children}
+    </TaskFilterProviderContext.Provider>
   );
 };
 

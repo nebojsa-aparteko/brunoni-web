@@ -14,7 +14,12 @@ interface Props {
 const ActingAsUser: React.FC<Props> = ({ children }) => {
   const userRecord = useContext(UserRecordContext);
 
-  const [actingAsId, setActingAsId] = useLocalStorage('actingAs', null, false, Number.MAX_SAFE_INTEGER);
+  const [actingAsId, setActingAsId] = useLocalStorage(
+    'actingAs',
+    null,
+    false,
+    Number.MAX_SAFE_INTEGER,
+  );
 
   const [actingAs, setActingAs] = useState<UserRecord | null | undefined>(undefined);
 
@@ -38,7 +43,7 @@ const ActingAsUser: React.FC<Props> = ({ children }) => {
         .doc(actingAsId)
         .onSnapshot({
           next: (snapshot: firebase.firestore.DocumentSnapshot) => {
-            setActingAs(({ ...snapshot.data(), id: snapshot.id } as unknown) as UserRecord);
+            setActingAs({ ...snapshot.data(), id: snapshot.id } as unknown as UserRecord);
           },
           error: (error: Error) => {
             console.error('fetching user record', actingAsId, 'threw an error', error);

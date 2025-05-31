@@ -31,18 +31,25 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
         const queryByItemFilter = showMore
           ? query
           : query.where('type', 'in', [ActivityType.COMMENT, ActivityType.ACTIVITY_WITH_COMMENT]);
-        const queryByAdminRole = isAdmin ? query : queryByItemFilter.where('isInternal', '==', isAdmin);
+        const queryByAdminRole = isAdmin
+          ? query
+          : queryByItemFilter.where('isInternal', '==', isAdmin);
         return queryByAdminRole.orderBy('at', 'desc');
       },
       [isAdmin, showMore],
     ),
   );
 
-  const pinnedCommentsCount = useMemo(() => activities?.filter(item => item.isPinned).length, [activities]);
+  const pinnedCommentsCount = useMemo(
+    () => activities?.filter(item => item.isPinned).length,
+    [activities],
+  );
   const filteredActivityLog = useMemo(
     () =>
       activities?.filter((item: ActivityLogItem) =>
-        showMore ? true : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT,
+        showMore
+          ? true
+          : item.type === ActivityType.COMMENT || item.type === ActivityType.ACTIVITY_WITH_COMMENT,
       ),
     [showMore, activities],
   );
@@ -73,7 +80,9 @@ const ActivityLogContainer: React.FC<Props> = ({ bookingRequest, isAdmin }) => {
             mentions: mentions,
             checklistItem: shortenedChecklist(activityLogContext.state?.checklistReference),
             documents: activityLogContext.state?.documentReference && [
-              pick(['id', 'name', 'url', 'isInternal'])(activityLogContext.state?.documentReference),
+              pick(['id', 'name', 'url', 'isInternal'])(
+                activityLogContext.state?.documentReference,
+              ),
             ],
           } as ActivityLogItem),
         )

@@ -1,6 +1,9 @@
-import firebase from 'firebase';
+import firebase from 'firebase/compat/app';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
-import { AutomaticProviderRoute, ProviderRoutesType } from '../../../../model/land-transport/providers/ProviderRoutes';
+import {
+  AutomaticProviderRoute,
+  ProviderRoutesType,
+} from '../../../../model/land-transport/providers/ProviderRoutes';
 import { ChecklistItemValueDocument } from '../../../bookings/checklist/ChecklistItemModel';
 import React, { useState } from 'react';
 import useUser from '../../../../hooks/useUser';
@@ -22,10 +25,7 @@ import SaveButton from '../../../SaveButton';
 
 const getRouteVersion = async (providerId: string) => {
   return (
-    await firebase
-      .database()
-      .ref(`/land-transport-versions/${providerId}/version`)
-      .get()
+    await firebase.database().ref(`/land-transport-versions/${providerId}/version`).get()
   ).val() as number;
 };
 
@@ -128,7 +128,7 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
             url: item.url,
             storedName: item.storedName,
             isInternal: false,
-          } as ChecklistItemValueDocument),
+          }) as ChecklistItemValueDocument,
       );
       const routeVersion = route ? route.version : await createAutomaticRouteVersion(provider);
       values.map(async value => await saveRouteFilesToFirestore(provider, routeVersion, value));
@@ -141,7 +141,13 @@ const RoutesFileUploadDialog: React.FC<RouteFileUploadDialogProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="md" PaperComponent={PaperComponent}>
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="md"
+      PaperComponent={PaperComponent}
+    >
       <DialogTitle disableTypography id="dialog-automatic-route" style={{ cursor: 'move' }}>
         <Typography variant="h4">Version creation</Typography>
         <IconButton onClick={handleClose} disabled={loading} className={classes.closeModal}>

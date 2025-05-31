@@ -120,7 +120,9 @@ const BrunoniFooter: React.FC<Props> = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="https://www.brunoni.ch/newsletter-abo/user/modify">Newsletter ABO</Link>
+                    <Link href="https://www.brunoni.ch/newsletter-abo/user/modify">
+                      Newsletter ABO
+                    </Link>
                   </li>
                 </ul>
               </Box>
@@ -134,9 +136,12 @@ const BrunoniFooter: React.FC<Props> = () => {
               </Box>
               <Box mb={4}>
                 <Typography variant="body1" color="inherit">
-                  Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his own company, to
-                  represent foreign shipping lines in Switzerland.{' '}
-                  <Link href="https://www.brunoni.ch/index.php/company/history" className={classes.link}>
+                  Shortly after the Second World War, in the year 1946. Oskar Brunoni founded his
+                  own company, to represent foreign shipping lines in Switzerland.{' '}
+                  <Link
+                    href="https://www.brunoni.ch/index.php/company/history"
+                    className={classes.link}
+                  >
                     Read more…
                   </Link>
                 </Typography>

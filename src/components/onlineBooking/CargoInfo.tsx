@@ -23,7 +23,13 @@ const checkRequestForSOC = (containers: (Container & ContainerDetails)[] | undef
       container.containerType?.description.includes('S.O.'),
   );
 
-const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, bookingRequest, setBookingRequest }) => {
+const CargoInfo: React.FC<Props> = ({
+  quote,
+  handlePrevious,
+  handleNext,
+  bookingRequest,
+  setBookingRequest,
+}) => {
   const addButton = useRef<HTMLButtonElement>();
   const listInput = useRef<unknown>();
   const userRecord = useContext(UserRecordContext);
@@ -34,18 +40,18 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
     bookingRequest && bookingRequest.containers
       ? bookingRequest.containers
       : quote && quote.containers
-      ? quote.containers.map(container => {
-          return {
-            ...container,
-            imo: [false],
-            oog: [false],
-            ventilation:
-              container.containerType && isReefer(container.containerType)
-                ? container.ventilation || Ventilation.CLOSED
-                : container.ventilation,
-          };
-        })
-      : [],
+        ? quote.containers.map(container => {
+            return {
+              ...container,
+              imo: [false],
+              oog: [false],
+              ventilation:
+                container.containerType && isReefer(container.containerType)
+                  ? container.ventilation || Ventilation.CLOSED
+                  : container.ventilation,
+            };
+          })
+        : [],
   );
 
   const isNextButtonDisabled = useMemo<boolean>(
@@ -70,7 +76,11 @@ const CargoInfo: React.FC<Props> = ({ quote, handlePrevious, handleNext, booking
         ...container,
         // imo: container.imo && container.imo.length > 1 ? container.imo[1] : null,
         // oog: container.oog && container.oog.length > 1 ? container.oog[1] : null,
-        pickupDate: isContainerSO(container) ? null : container.pickupDate ? container.pickupDate : new Date(),
+        pickupDate: isContainerSO(container)
+          ? null
+          : container.pickupDate
+            ? container.pickupDate
+            : new Date(),
       };
     });
 

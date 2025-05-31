@@ -13,7 +13,9 @@ import { DateRange } from './types';
 export const identity = <T>(x: T) => x;
 
 export const chunks = <T>(array: ReadonlyArray<T>, size: number): T[][] => {
-  return Array.from({ length: Math.ceil(array.length / size) }, (v, i) => array.slice(i * size, i * size + size));
+  return Array.from({ length: Math.ceil(array.length / size) }, (v, i) =>
+    array.slice(i * size, i * size + size),
+  );
 };
 
 export const combine = (...args: any[]): string => args.filter(identity).join(' ');
@@ -33,7 +35,8 @@ export const getDaysInMonth = (date: Date) => {
 export const isStartOfRange = ({ startDate }: DateRange, day: Date) =>
   (startDate && isSameDay(day, startDate)) as boolean;
 
-export const isEndOfRange = ({ endDate }: DateRange, day: Date) => (endDate && isSameDay(day, endDate)) as boolean;
+export const isEndOfRange = ({ endDate }: DateRange, day: Date) =>
+  (endDate && isSameDay(day, endDate)) as boolean;
 
 export const inDateRange = ({ startDate, endDate }: DateRange, day: Date) =>
   (startDate &&

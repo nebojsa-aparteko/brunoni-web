@@ -1,4 +1,10 @@
-import React, { ChangeEvent, forwardRef, ForwardRefRenderFunction, useImperativeHandle, useRef } from 'react';
+import React, {
+  ChangeEvent,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import set from 'lodash/fp/set';
 import InputProps from '../../model/InputProps';
 import IMO from '../../model/IMO';
@@ -39,9 +45,12 @@ const IMOInput: ForwardRefRenderFunction<any, Props> = ({ value, onChange }, ref
     },
   }));
 
-  const handleIMOClassChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('IMOClass', e.target.value)(value));
-  const handleUNNumberChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('UNNumber', e.target.value)(value));
-  const handlePGNumberChange = (e: ChangeEvent<HTMLInputElement>) => onChange(set('PGNumber', e.target.value)(value));
+  const handleIMOClassChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('IMOClass', e.target.value)(value));
+  const handleUNNumberChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('UNNumber', e.target.value)(value));
+  const handlePGNumberChange = (e: ChangeEvent<HTMLInputElement>) =>
+    onChange(set('PGNumber', e.target.value)(value));
 
   return (
     <Box display="flex" className={classes.formControl}>

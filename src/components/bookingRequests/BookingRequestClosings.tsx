@@ -44,13 +44,14 @@ const BookingRequestClosings: React.FC<Props> = ({}) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
   const userRecord = useUser()[1];
+  const setBookingRequestExists = setBookingRequest !== undefined;
   const handleChangeClosing = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, index: number) => {
       const newDeadlines = bookingRequest?.schedule?.Deadlines.map((deadline, deadlineIndex) =>
         index === deadlineIndex ? { ...deadline, Time: event.target.value } : deadline,
       );
       bookingRequest &&
-        setBookingRequest &&
+        setBookingRequestExists &&
         setBookingRequest({
           ...bookingRequest,
           schedule: {
@@ -59,10 +60,10 @@ const BookingRequestClosings: React.FC<Props> = ({}) => {
           } as RouteSearchResult,
         });
     },
-    [bookingRequest],
+    [bookingRequest, setBookingRequestExists, setBookingRequest],
   );
 
-  return bookingRequest && bookingRequest.schedule?.Deadlines && setBookingRequest ? (
+  return bookingRequest && bookingRequest.schedule?.Deadlines && setBookingRequestExists ? (
     <Box className={classes.tableWrapper} marginTop="1em" marginBottom="1em">
       <Table className={classes.table} size="small">
         <TableHead className={classes.tableHead}>

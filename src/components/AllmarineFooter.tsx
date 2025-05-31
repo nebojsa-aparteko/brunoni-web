@@ -120,8 +120,8 @@ const BrunoniFooter: React.FC<Props> = () => {
               </Box>
               <Box mb={4}>
                 <Typography variant="body1" color="inherit">
-                  Allmarine AG was founded in 2017 and is a privately owned company, which acts as an independent
-                  shipping agency in Switzerland.{' '}
+                  Allmarine AG was founded in 2017 and is a privately owned company, which acts as
+                  an independent shipping agency in Switzerland.{' '}
                   <Link href="https://allmarine.ch/company" className={classes.link}>
                     Read more…
                   </Link>

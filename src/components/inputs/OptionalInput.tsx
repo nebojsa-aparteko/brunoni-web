@@ -17,13 +17,20 @@ interface Props<T> {
   onChange: (value: [false] | [true, T]) => void;
 }
 
-function OptionalInput<T>({ label, itemRef, ItemInput, defaultItemValue, value, onChange }: Props<T>) {
+function OptionalInput<T>({
+  label,
+  itemRef,
+  ItemInput,
+  defaultItemValue,
+  value,
+  onChange,
+}: Props<T>) {
   const ref = useRef();
 
   useImperativeHandle(itemRef, () => ({
     focus: () => {
       if (ref.current) {
-        const r = ((ref.current || {}) as unknown) as { focus?: () => void };
+        const r = (ref.current || {}) as unknown as { focus?: () => void };
 
         if (r.focus) {
           r.focus();
@@ -40,7 +47,10 @@ function OptionalInput<T>({ label, itemRef, ItemInput, defaultItemValue, value, 
 
   return (
     <Box>
-      <FormControlLabel control={<Checkbox checked={value && value[0]} onChange={handleChange} />} label={label} />
+      <FormControlLabel
+        control={<Checkbox checked={value && value[0]} onChange={handleChange} />}
+        label={label}
+      />
       {value[0] && (
         <Box>
           <ItemInput ref={ref} value={value[1]} onChange={handleItemChange} />

@@ -2,7 +2,11 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import React, { useCallback, useContext, useMemo } from 'react';
 import invoke from 'lodash/fp/invoke';
-import UserRecord, { ADMIN_ROLES, UserRecordMin, UserRecordMinProperties } from '../../model/UserRecord';
+import UserRecord, {
+  ADMIN_ROLES,
+  UserRecordMin,
+  UserRecordMinProperties,
+} from '../../model/UserRecord';
 import { formatDistanceToNowConfigured } from '../../utilities/formattingHelpers';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import UserInput from '../inputs/UserInput';
@@ -18,10 +22,10 @@ import asArray from '../../utilities/asArray';
 const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other }) => {
   const assignableUsers = useAdminUsers(ADMIN_ROLES);
   const carriers = useContext(Carriers);
-  const selectedCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const selectedCarriers = useMemo(
+    () => carriers?.filter(carrier => user.carriers?.includes(carrier.id)),
+    [user.carriers, carriers],
+  );
 
   const assignableUsersWithoutCurrent = useMemo(
     () => assignableUsers.filter(assignableUser => assignableUser.alphacomId !== user.alphacomId),
@@ -37,13 +41,19 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
         .firestore()
         .collection('users')
         .doc(user.id)
-        .set({ redirectedAdmin: selectedUser ? pick(UserRecordMinProperties)(selectedUser) : null }, { merge: true })
+        .set(
+          { redirectedAdmin: selectedUser ? pick(UserRecordMinProperties)(selectedUser) : null },
+          { merge: true },
+        )
         .then(_ => console.log('Saved'));
     },
     [user],
   );
 
-  const handleChangeCarriers = (event: React.ChangeEvent<{}>, value: Carrier | Carrier[] | null) => {
+  const handleChangeCarriers = (
+    event: React.ChangeEvent<{}>,
+    value: Carrier | Carrier[] | null,
+  ) => {
     const carrierIds = asArray(value).map(carrier => carrier.id);
     firebase
       .firestore()
@@ -69,7 +79,11 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
       <TableCell align="right">{user.emailAddress}</TableCell>
       <TableCell align="right">{user.role}</TableCell>
       <TableCell align="right">
-        <CarriersMultiInput options={carriers || []} defaultValues={selectedCarriers} onChange={handleChangeCarriers} />
+        <CarriersMultiInput
+          options={carriers || []}
+          defaultValues={selectedCarriers}
+          onChange={handleChangeCarriers}
+        />
         {/*<CarrierInput*/}
         {/*  label={'Select Carrier'}*/}
         {/*  carriers={carriers || []}*/}
@@ -78,7 +92,9 @@ const TeamUserRow: React.FC<Props> = ({ user, selected, onSelectRow, ...other })
         {/*/>*/}
       </TableCell>
       <TableCell align="right">
-        {user.lastSession ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession)) : 'never'}
+        {user.lastSession
+          ? formatDistanceToNowConfigured(invoke('toDate')(user.lastSession))
+          : 'never'}
       </TableCell>
       <TableCell align="right">
         <UserNotificationRedirectionSwitch userUid={user.id || ''} user={user} />

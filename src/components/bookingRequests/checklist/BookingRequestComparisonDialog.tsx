@@ -17,7 +17,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import BookingRequestViewMainContent, { remark } from '../BookingRequestViewMainContent';
 import { renderDocument } from '../../bookings/documentApproval/ComparisonDialogContent';
 import { BookingRequest } from '../../../model/BookingRequest';
-import BookingRequestProvider, { useBookingRequestContext } from '../../../providers/BookingRequestProvider';
+import BookingRequestProvider, {
+  useBookingRequestContext,
+} from '../../../providers/BookingRequestProvider';
 import Page from '../../bookings/Page';
 import { getBookingRequestTitle } from '../BookingRequestView';
 import SimpleExpansionPanel from '../../SimpleExpansionPanel';
@@ -105,7 +107,10 @@ const BookingRequestRepresentation: React.FC<BookingRequestRepresentationProps> 
           </>
         )}
       </SimpleExpansionPanel>
-      <SimpleExpansionPanel label={'Port Terms, Closings And Special Remarks'} defaultExpanded={true}>
+      <SimpleExpansionPanel
+        label={'Port Terms, Closings And Special Remarks'}
+        defaultExpanded={true}
+      >
         <Box flex={1} display="flex" flexDirection="column">
           <BookingRequestPortTerms />
 
@@ -175,10 +180,7 @@ const ComparisonDialogContent = ({ document, secondBookingRequest }: ContentProp
                 </Typography>
                 {renderDocument(
                   document,
-                  document?.name
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase(),
+                  document?.name.split('.').pop()?.toLowerCase(),
                   'rightDocumentContainer',
                 )}
               </Box>
@@ -191,7 +193,10 @@ const ComparisonDialogContent = ({ document, secondBookingRequest }: ContentProp
                   <Typography variant={'h3'} style={{ margin: '.5em' }}>
                     Initial Booking Request
                   </Typography>
-                  <BookingRequestRepresentation bookingRequest={secondBookingRequest} isPrintWithCost={false} />
+                  <BookingRequestRepresentation
+                    bookingRequest={secondBookingRequest}
+                    isPrintWithCost={false}
+                  />
                 </Box>
               </BookingRequestProvider>
             </Grid>
@@ -231,7 +236,10 @@ const BookingRequestComparisonDialog: React.FC<Props> = ({
       >
         <Box display={'flex'} alignItems={'flex-end'}>
           <Box display={'flex'} alignItems={'center'}>
-            <Typography variant="h4" className={classes.fileNumber}>{`File No: ${bookingRequestId}`}</Typography>
+            <Typography
+              variant="h4"
+              className={classes.fileNumber}
+            >{`File No: ${bookingRequestId}`}</Typography>
             {editing && isDashboardUser(userRecord) ? (
               <TextField
                 defaultValue={''}

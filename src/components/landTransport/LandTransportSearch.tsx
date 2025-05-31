@@ -85,7 +85,8 @@ const LandTransportSearch = () => {
 
   const { handleSubmit } = useFormContext<LandTransportRouteSearchParams>();
 
-  const { setLandTransportRoutes, loadingRoutes, setLoadingRoutes } = useContext(LandTransportContext);
+  const { setLandTransportRoutes, loadingRoutes, setLoadingRoutes } =
+    useContext(LandTransportContext);
   const [, setFilters] = useContext(LandTransportFilterContext);
   const [user] = useUser();
 
@@ -122,7 +123,7 @@ const getLandTransportRecords = async (
 ): Promise<R[]> => {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/landTransport?toLocationName=${toLocationName}&fromLocationName=${fromLocationName}`,
+      `${import.meta.env.VITE_REACT_APP_API_URL}/landTransport?toLocationName=${toLocationName}&fromLocationName=${fromLocationName}`,
       {
         method: 'GET',
         mode: 'cors',

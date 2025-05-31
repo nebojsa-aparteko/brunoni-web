@@ -27,13 +27,22 @@ import { OnlineBookingInputs } from './OnlineBookingContainer';
 import { getQuoteDocRef } from './MissingFields';
 import useModal from '../../hooks/useModal';
 import ImportContactsIcon from '@material-ui/icons/ImportContacts';
-import { getRelatedQuotes, QuotePickerModal } from '../bookingRequests/BookingRequestFreightDetails';
+import {
+  getRelatedQuotes,
+  QuotePickerModal,
+} from '../bookingRequests/BookingRequestFreightDetails';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
 import useUser from '../../hooks/useUser';
 import { useIsEligibleForQuote } from '../../hooks/useIsEligibleForQuote';
 import Carrier from '../../model/Carrier';
 
-const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingRequest, setBookingRequest }) => {
+const ShippingInfo: React.FC<Props> = ({
+  quote,
+  schedule,
+  handleNext,
+  bookingRequest,
+  setBookingRequest,
+}) => {
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const carrierName = schedule?.OriginInfo.VoyageInfo.Carrier.toLowerCase();
@@ -57,8 +66,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
       schedule && ports
         ? ports?.find(port => port.id === schedule.OriginInfo.Port.ID)
         : quote
-        ? quote.origin
-        : undefined,
+          ? quote.origin
+          : undefined,
     [ports, quote, schedule],
   );
   const destinationPort = useMemo(
@@ -66,8 +75,8 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
       schedule && ports
         ? ports?.find(port => port.id === schedule.DestinationInfo.Port.ID)
         : quote
-        ? quote.destination
-        : undefined,
+          ? quote.destination
+          : undefined,
     [ports, quote, schedule],
   );
 
@@ -108,15 +117,21 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
   };
 
   const shouldGetQuote = (data: OnlineBookingInputs): boolean =>
-    !!data.quoteNumber && data.quoteNumber !== '' && data.quoteNumber !== bookingRequest?.quoteNumber?.toString();
+    !!data.quoteNumber &&
+    data.quoteNumber !== '' &&
+    data.quoteNumber !== bookingRequest?.quoteNumber?.toString();
 
   const getQuote = async (data: OnlineBookingInputs): Promise<boolean> => {
     const quoteRef = await getQuoteDocRef(data.quoteNumber);
     const quote = quoteRef ? (quoteRef.data() as Quote) : undefined;
     if (quote && isEligibleForQuote(quote, scheduleCarrier)) {
       const normalizedQuote = normalize(quote) as Quote;
-      setBookingRequest((prevState: any) => set('containers', normalizedQuote.containers)(prevState as BookingRequest));
-      setBookingRequest((prevState: any) => set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest));
+      setBookingRequest((prevState: any) =>
+        set('containers', normalizedQuote.containers)(prevState as BookingRequest),
+      );
+      setBookingRequest((prevState: any) =>
+        set('quoteNumber', normalizedQuote.id)(prevState as BookingRequest),
+      );
       setBookingRequest((prevState: any) =>
         set('quoteDetails', normalizedQuote.quoteDetails)(prevState as BookingRequest),
       );
@@ -257,19 +272,30 @@ const ShippingInfo: React.FC<Props> = ({ quote, schedule, handleNext, bookingReq
                 name="acceptedTerms"
                 defaultValue={false}
                 render={({ field: { onChange, value } }) => (
-                  <Checkbox color="primary" onChange={e => onChange(e.target.checked)} checked={value} />
+                  <Checkbox
+                    color="primary"
+                    onChange={e => onChange(e.target.checked)}
+                    checked={value}
+                  />
                 )}
               />
             }
             label={
-              <Box display={'flex'} flexDirection={'row'} alignItems={'center'} style={{ cursor: 'default' }}>
+              <Box
+                display={'flex'}
+                flexDirection={'row'}
+                alignItems={'center'}
+                style={{ cursor: 'default' }}
+              >
                 <Typography>
                   I accept the{' '}
                   <Button target="_blank" href={getTermsForCarrier(carrier?.id)} color={'primary'}>
                     Terms and Conditions
                   </Button>
                 </Typography>
-                {errors.acceptedTerms && <Typography color={'error'}>{defaultValidationRules.required}</Typography>}
+                {errors.acceptedTerms && (
+                  <Typography color={'error'}>{defaultValidationRules.required}</Typography>
+                )}
               </Box>
             }
           />

@@ -64,17 +64,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export const getQuoteDocRef = async (quoteId: string) =>
-  await firebase
-    .firestore()
-    .collection('quotes')
-    .doc(quoteId)
-    .get();
+  await firebase.firestore().collection('quotes').doc(quoteId).get();
 
 const validQuote = async (bookingRequest: BookingRequest) => {
-  const quote = bookingRequest.quoteNumber && (await getQuoteDocRef(`${bookingRequest.quoteNumber}`)).data();
+  const quote =
+    bookingRequest.quoteNumber && (await getQuoteDocRef(`${bookingRequest.quoteNumber}`)).data();
   const quoteNormalized = normalizeQuote(quote) as Quote;
 
-  const quoteValidityDate = quoteNormalized?.validityPeriod.to ? quoteNormalized?.validityPeriod.to : undefined;
+  const quoteValidityDate = quoteNormalized?.validityPeriod.to
+    ? quoteNormalized?.validityPeriod.to
+    : undefined;
 
   const scheduleDepartureDate = bookingRequest.schedule?.OriginInfo.DepartureDate
     ? new Date(bookingRequest.schedule?.OriginInfo.DepartureDate)
@@ -104,7 +103,8 @@ const MissingFields: React.FC<Props> = ({
 
   const [nonMatchingFields, setNonMatchingFields] = useState<string[]>();
   const [containersNonMatchingFields, setContainersNonMatchingFields] = useState<string[][]>();
-  const [freightDetailsNonMatchingFields, setFreightDetailsNonMatchingFields] = useState<string[][]>();
+  const [freightDetailsNonMatchingFields, setFreightDetailsNonMatchingFields] =
+    useState<string[][]>();
   const [validQuoteState, setValidQuoteState] = useState(true);
 
   const findNonMatchingFields = useCallback((): string[] => {
@@ -133,7 +133,9 @@ const MissingFields: React.FC<Props> = ({
     const freightDetailsNonMatchingFields: string[][] = [];
     bookingRequest.freightDetails?.forEach(freightDetail => {
       const freightDetailNonMatchingFields = freightDetailWatchedFields.filter(field => {
-        return field === 'Currency' ? !isAllowedCurrency(freightDetail.Currency) : !hasIn(field)(freightDetail);
+        return field === 'Currency'
+          ? !isAllowedCurrency(freightDetail.Currency)
+          : !hasIn(field)(freightDetail);
       });
       // freightDetailNonMatchingFields && freightDetailNonMatchingFields?.length > 0 &&
       freightDetailsNonMatchingFields.push(freightDetailNonMatchingFields);
@@ -151,7 +153,10 @@ const MissingFields: React.FC<Props> = ({
 
   useEffect(() => {
     if (setIsBookNowButtonDisabled) {
-      if (freightDetailsNonMatchingFields && freightDetailsNonMatchingFields?.some(fields => fields?.length > 0)) {
+      if (
+        freightDetailsNonMatchingFields &&
+        freightDetailsNonMatchingFields?.some(fields => fields?.length > 0)
+      ) {
         setIsBookNowButtonDisabled(true);
       } else {
         setIsBookNowButtonDisabled(false);
@@ -181,7 +186,9 @@ const MissingFields: React.FC<Props> = ({
       <Box border={1} borderColor={'error.main'}>
         <ExpansionPanel defaultExpanded={true}>
           <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">{isDashboardUser(userRecord) ? 'Warning message' : ''}</Typography>
+            <Typography variant="h5">
+              {isDashboardUser(userRecord) ? 'Warning message' : ''}
+            </Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Box display={'flex'} flexDirection={'column'}>
@@ -190,7 +197,10 @@ const MissingFields: React.FC<Props> = ({
                   {`You are booking on a vessel with an expired quotation date`}
                 </Typography>
               )}
-              <Typography variant="h4" style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}>
+              <Typography
+                variant="h4"
+                style={{ whiteSpace: 'pre-line', paddingBottom: theme.spacing(1) }}
+              >
                 {isDashboardUser(userRecord)
                   ? hasMissingFields() && 'These fields were not found on booking:'
                   : 'Thanks for using our online services.\n' +

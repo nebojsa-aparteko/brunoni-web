@@ -35,7 +35,7 @@ const quoteDetailFilterList: string[] = [
   'ship security charge',
 ];
 
-if (process.env.REACT_APP_BRAND === 'allmarine') {
+if (import.meta.env.VITE_BRAND === 'allmarine') {
   quoteDetailFilterList.unshift('gfs', 'green fuel surcharge');
 }
 

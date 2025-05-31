@@ -35,6 +35,7 @@ import ReassignUserRow from './ReassignUsersRow';
 import CarrierInput from '../inputs/CarrierInput';
 import Carrier from '../../model/Carrier';
 import Carriers from '../../contexts/Carriers';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,7 +106,12 @@ const AddRuleDialog: React.FC<AddRuleDialogProps> = ({ isOpen, handleClose, admi
   }, [selectedUser, selectedCarrier, reassignToUser, handleClose, dispatch]);
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="ReassignmentRulesDialogTitle" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="ReassignmentRulesDialogTitle"
+      maxWidth="md"
+    >
       <DialogTitle disableTypography id="ReassignmentRulesDialogTitle">
         <Typography variant="h4">Add new reassignment rule</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
@@ -137,7 +143,9 @@ const AddRuleDialog: React.FC<AddRuleDialogProps> = ({ isOpen, handleClose, admi
           <UserInput
             label="Reassign to:"
             users={
-              (selectedUser ? adminUsers.filter(user => user.alphacomId !== selectedUser.alphacomId) : adminUsers) || []
+              (selectedUser
+                ? adminUsers.filter(user => user.alphacomId !== selectedUser.alphacomId)
+                : adminUsers) || []
             }
             onChange={(_, user) => setReassignToUser(user || undefined)}
             value={reassignToUser}
@@ -145,7 +153,12 @@ const AddRuleDialog: React.FC<AddRuleDialogProps> = ({ isOpen, handleClose, admi
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" variant="contained" onClick={handleAddReassignmentRule} style={{ minWidth: 80 }}>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleAddReassignmentRule}
+          style={{ minWidth: 80 }}
+        >
           Add rule
         </Button>
       </DialogActions>
@@ -155,11 +168,7 @@ const AddRuleDialog: React.FC<AddRuleDialogProps> = ({ isOpen, handleClose, admi
 
 const removeReassignmentRules = async (ruleIds: string[]): Promise<any> => {
   const removeReassignmentRule = async (ruleId: string): Promise<any> => {
-    return firebase
-      .firestore()
-      .collection('reassignment-rules')
-      .doc(ruleId)
-      .delete();
+    return firebase.firestore().collection('reassignment-rules').doc(ruleId).delete();
   };
 
   const requests = ruleIds.map((ruleId: string) => {
@@ -212,7 +221,7 @@ const ReassignUsersContainer: React.FC = () => {
       })
       .catch(error => {
         console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });

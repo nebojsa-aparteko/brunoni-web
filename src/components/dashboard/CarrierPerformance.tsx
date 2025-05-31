@@ -9,7 +9,15 @@ import upperCase from 'lodash/fp/upperCase';
 import defaultTo from 'lodash/fp/defaultTo';
 import flatten from 'lodash/fp/flatten';
 import toPairs from 'lodash/fp/toPairs';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors, useMediaQuery } from '@material-ui/core';
+import {
+  Card,
+  CardHeader,
+  Divider,
+  CardContent,
+  useTheme,
+  colors,
+  useMediaQuery,
+} from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Doughnut } from 'react-chartjs-2';
 import Carriers from '../../contexts/Carriers';
@@ -24,7 +32,9 @@ interface Props {
 const performanceByCarrierByYear = (year: number) =>
   flow(
     get(['TEU']),
-    mapValues(flow(get(String(year)), map(flow(flatten, map(flow(get('Amount'), Number)), sum)), sum)),
+    mapValues(
+      flow(get(String(year)), map(flow(flatten, map(flow(get('Amount'), Number)), sum)), sum),
+    ),
   );
 
 const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
@@ -41,7 +51,9 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         update(
           0,
           carrierId =>
-            carriers?.find(carrier => carrier.id === carrierId || carrier.name === carrierId) || { name: carrierId },
+            carriers?.find(carrier => carrier.id === carrierId || carrier.name === carrierId) || {
+              name: carrierId,
+            },
         ),
       ),
       filter(get(1)),
@@ -95,7 +107,9 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           const value = data['datasets'][0]['data'][tooltipItem['index']];
 
           return `${label}: ${value} (${
-            value / data.total < 0.005 ? (value / data.total).toFixed(3) : Math.round((value / data.total) * 100)
+            value / data.total < 0.005
+              ? (value / data.total).toFixed(3)
+              : Math.round((value / data.total) * 100)
           }%)`;
         },
       },

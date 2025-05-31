@@ -9,7 +9,11 @@ import {
 } from './ChecklistItemModel';
 import DateFormattedText from '../../DateFormattedText';
 import { formatDateSafe } from '../../../utilities/formattingHelpers';
-import { activityHasLink, getFullName, isPlatformActivity } from '../../../utilities/activityHelper';
+import {
+  activityHasLink,
+  getFullName,
+  isPlatformActivity,
+} from '../../../utilities/activityHelper';
 import { BookingRequestLabels } from '../../../model/BookingRequest';
 import isString from '../../../utilities/isString';
 import { isNil } from 'lodash/fp';
@@ -57,11 +61,12 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
       case ActivityChangeType.STAGE_CHECKED:
         return activity.stage!.checked ? ActivityText.CHECKED : ActivityText.UNCHECKED;
       case ActivityChangeType.DOCUMENT_STATUS_CHANGED:
-        return activity.documents?.[0]?.status?.type === ChecklistItemValueDocumentStatusType.DEFAULT
+        return activity.documents?.[0]?.status?.type ===
+          ChecklistItemValueDocumentStatusType.DEFAULT
           ? ActivityText.DEFAULTED_FILE
           : activity.documents?.[0]?.status?.type === ChecklistItemValueDocumentStatusType.APPROVED
-          ? ActivityText.APPROVED_FILE
-          : ActivityText.REJECTED_FILE;
+            ? ActivityText.APPROVED_FILE
+            : ActivityText.REJECTED_FILE;
       case ActivityChangeType.DONE_BY_CUSTOMER:
         return ActivityText.DONE_BY_CUSTOMER;
       case ActivityChangeType.UNDO_COMPLETED_CUSTOMER:
@@ -150,7 +155,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
           : null}
         {activity.task && activity.addedUsers && (
           <>
-            <Typography component="span">{createUsersRepresentation(activity.addedUsers)}</Typography>
+            <Typography component="span">
+              {createUsersRepresentation(activity.addedUsers)}
+            </Typography>
             <Typography component="span">{' on the task '}</Typography>
             <Typography component="span" color="primary">
               {TaskDescription[activity.task.type] || '[no description]'}
@@ -231,7 +238,10 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
 
             {activity.checklistItem ? (
               <Fragment>
-                <Link href={`#${activity.checklistItem.id}`}>{` ${activity.checklistItem.label}`}</Link> item
+                <Link
+                  href={`#${activity.checklistItem.id}`}
+                >{` ${activity.checklistItem.label}`}</Link>{' '}
+                item
               </Fragment>
             ) : !activity.isAccountingActivity ? (
               activity.isInternal ? (
@@ -250,7 +260,9 @@ export const makeActivityRepresentation = (activity: ActivityLogItem) => {
               <Box display={'flex'} key={index}>
                 <Typography color={'primary'}>{BookingRequestLabels[field.fieldName]}</Typography>
                 <Typography style={{ paddingLeft: '.5em' }}>
-                  {isString(field.oldVal) && isString(field.newVal) ? `(${field.oldVal} -> ${field.newVal})` : ''}
+                  {isString(field.oldVal) && isString(field.newVal)
+                    ? `(${field.oldVal} -> ${field.newVal})`
+                    : ''}
                   {isNil(field.oldVal) && isString(field.newVal) ? `( -> ${field.newVal})` : ''}
                   {isString(field.oldVal) && isNil(field.newVal) ? `(${field.oldVal} -> )` : ''}
                 </Typography>

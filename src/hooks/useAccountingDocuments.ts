@@ -16,6 +16,9 @@ export default function useAccountingDocuments(paymentReference: string) {
   );
 
   return accountingDocumentsCollection?.docs.map(doc => {
-    return update('uploadedAt', safeInvoke('toDate'))({ id: doc.id, ...doc.data() } as DocumentValue);
+    return update(
+      'uploadedAt',
+      safeInvoke('toDate'),
+    )({ id: doc.id, ...doc.data() } as DocumentValue);
   }) as DocumentValue[];
 }

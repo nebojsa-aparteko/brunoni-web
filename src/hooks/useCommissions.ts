@@ -30,7 +30,9 @@ export default (bookingId?: string) => {
         );
       }
       if (dateRange) {
-        query = filters.dateRange ? query.orderBy('dueDate', 'asc') : query.orderBy('payDate', 'asc');
+        query = filters.dateRange
+          ? query.orderBy('dueDate', 'asc')
+          : query.orderBy('payDate', 'asc');
       }
       return query;
     },

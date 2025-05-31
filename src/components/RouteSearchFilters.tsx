@@ -38,7 +38,11 @@ const RouteSearchFilters: React.FC<Props> = ({ only, value, onChange }) => {
         Carrier
       </Typography>
       <List dense className={classes.root}>
-        <RouteSearchFilter label="ANY" selected={value === undefined} onSelect={callback => onChange(undefined)} />
+        <RouteSearchFilter
+          label="ANY"
+          selected={value === undefined}
+          onSelect={callback => onChange(undefined)}
+        />
         {filtered.map(carrier => (
           <RouteSearchFilter
             key={carrier.id}

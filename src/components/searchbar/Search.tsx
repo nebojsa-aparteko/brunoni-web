@@ -45,7 +45,12 @@ interface Props {
   localStorageKey?: string;
 }
 
-const Search: React.FC<Props> = ({ onSearch, localStorageKey = 'quoteSearchQuery', className, style }) => {
+const Search: React.FC<Props> = ({
+  onSearch,
+  localStorageKey = 'quoteSearchQuery',
+  className,
+  style,
+}) => {
   const classes = useStyles();
   const input = useRef<HTMLInputElement>();
   const [searchString, setSearchString] = useLocalStorage(localStorageKey, '', false, 15);

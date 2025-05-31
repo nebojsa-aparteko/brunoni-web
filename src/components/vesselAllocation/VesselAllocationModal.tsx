@@ -50,10 +50,10 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
 }) => {
   const classes = useVesselAllocationStyles();
 
-  const vesselVoyageString = useMemo(() => `${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`, [
-    vesselVoyage?.VesselName,
-    vesselVoyage?.VoyageNr,
-  ]);
+  const vesselVoyageString = useMemo(
+    () => `${vesselVoyage?.VesselName} ${vesselVoyage?.VoyageNr}`,
+    [vesselVoyage?.VesselName, vesselVoyage?.VoyageNr],
+  );
   const vesselAllocation = useVesselWithVoyageById(vesselVoyageString);
 
   const handleCloseModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -103,7 +103,9 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
                 {vesselAllocation ? (
                   <VesselAllocationTable vessel={vesselAllocation} vesselVoyage={vesselVoyage} />
                 ) : (
-                  <SearchEmptyResults message={`Vessel & Voyage ${vesselVoyageString} was not found`} />
+                  <SearchEmptyResults
+                    message={`Vessel & Voyage ${vesselVoyageString} was not found`}
+                  />
                 )}
               </ExpansionPanelDetails>
             </ExpansionPanel>
@@ -112,11 +114,18 @@ const VesselAllocationModal: React.FC<VesselAllocationModalProps> = ({
               <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h5">Previous & Next Vessel</Typography>
               </ExpansionPanelSummary>
-              <ExpansionPanelDetails style={{ display: 'flex', justifyContent: 'center', padding: 0 }}>
+              <ExpansionPanelDetails
+                style={{ display: 'flex', justifyContent: 'center', padding: 0 }}
+              >
                 {vesselAllocation ? (
-                  <NextPreviousVesselTable vessel={vesselAllocation} bookingRequest={bookingRequest} />
+                  <NextPreviousVesselTable
+                    vessel={vesselAllocation}
+                    bookingRequest={bookingRequest}
+                  />
                 ) : (
-                  <SearchEmptyResults message={`Vessel & Voyage ${vesselVoyageString} was not found`} />
+                  <SearchEmptyResults
+                    message={`Vessel & Voyage ${vesselVoyageString} was not found`}
+                  />
                 )}
               </ExpansionPanelDetails>
             </ExpansionPanel>

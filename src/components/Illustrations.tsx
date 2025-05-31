@@ -96,7 +96,10 @@ export const Error: React.FC = () => (
           className="cls-3"
           points="105.53 73.42 105.5 73.01 123.49 71.49 122.53 59.77 122.94 59.73 123.94 71.86 105.53 73.42"
         />
-        <polygon className="cls-3" points="72.79 87.76 72.5 87.46 85.4 74.51 85.69 74.8 72.79 87.76" />
+        <polygon
+          className="cls-3"
+          points="72.79 87.76 72.5 87.46 85.4 74.51 85.69 74.8 72.79 87.76"
+        />
         <rect
           className="cls-3"
           x="92.57"
@@ -165,40 +168,112 @@ export const Error: React.FC = () => (
           transform="translate(-11.78 39) rotate(-18.43)"
         />
         <g className="cls-7">
-          <polygon className="cls-8" points="0 100.3 144.54 101.52 144.54 103.23 0 103.23 0 100.3" />
-          <polygon className="cls-8" points="0 100.25 144.54 101.48 144.54 101.52 0 100.3 0 100.25" />
-          <polygon className="cls-9" points="0 100.21 144.54 101.43 144.54 101.48 0 100.25 0 100.21" />
-          <polygon className="cls-10" points="0 100.16 144.54 101.39 144.54 101.43 0 100.21 0 100.16" />
-          <polygon className="cls-11" points="0 100.12 144.54 101.34 144.54 101.39 0 100.16 0 100.12" />
-          <polygon className="cls-12" points="0 100.08 144.54 101.3 144.54 101.34 0 100.12 0 100.08" />
-          <polygon className="cls-13" points="0 100.03 144.54 101.26 144.54 101.3 0 100.08 0 100.03" />
-          <polygon className="cls-14" points="0 99.99 144.54 101.21 144.54 101.26 0 100.03 0 99.99" />
-          <polygon className="cls-15" points="0 99.94 144.54 101.17 144.54 101.21 0 99.99 0 99.94" />
+          <polygon
+            className="cls-8"
+            points="0 100.3 144.54 101.52 144.54 103.23 0 103.23 0 100.3"
+          />
+          <polygon
+            className="cls-8"
+            points="0 100.25 144.54 101.48 144.54 101.52 0 100.3 0 100.25"
+          />
+          <polygon
+            className="cls-9"
+            points="0 100.21 144.54 101.43 144.54 101.48 0 100.25 0 100.21"
+          />
+          <polygon
+            className="cls-10"
+            points="0 100.16 144.54 101.39 144.54 101.43 0 100.21 0 100.16"
+          />
+          <polygon
+            className="cls-11"
+            points="0 100.12 144.54 101.34 144.54 101.39 0 100.16 0 100.12"
+          />
+          <polygon
+            className="cls-12"
+            points="0 100.08 144.54 101.3 144.54 101.34 0 100.12 0 100.08"
+          />
+          <polygon
+            className="cls-13"
+            points="0 100.03 144.54 101.26 144.54 101.3 0 100.08 0 100.03"
+          />
+          <polygon
+            className="cls-14"
+            points="0 99.99 144.54 101.21 144.54 101.26 0 100.03 0 99.99"
+          />
+          <polygon
+            className="cls-15"
+            points="0 99.94 144.54 101.17 144.54 101.21 0 99.99 0 99.94"
+          />
           <polygon className="cls-16" points="0 99.9 144.54 101.13 144.54 101.17 0 99.94 0 99.9" />
           <polygon className="cls-17" points="0 99.86 144.54 101.08 144.54 101.13 0 99.9 0 99.86" />
-          <polygon className="cls-18" points="0 99.81 144.54 101.04 144.54 101.08 0 99.86 0 99.81" />
-          <polygon className="cls-19" points="0 99.77 144.54 100.99 144.54 101.04 0 99.81 0 99.77" />
-          <polygon className="cls-20" points="0 99.72 144.54 100.95 144.54 100.99 0 99.77 0 99.72" />
+          <polygon
+            className="cls-18"
+            points="0 99.81 144.54 101.04 144.54 101.08 0 99.86 0 99.81"
+          />
+          <polygon
+            className="cls-19"
+            points="0 99.77 144.54 100.99 144.54 101.04 0 99.81 0 99.77"
+          />
+          <polygon
+            className="cls-20"
+            points="0 99.72 144.54 100.95 144.54 100.99 0 99.77 0 99.72"
+          />
           <polygon className="cls-21" points="0 99.68 144.54 100.9 144.54 100.95 0 99.72 0 99.68" />
           <polygon className="cls-22" points="0 99.64 144.54 100.86 144.54 100.9 0 99.68 0 99.64" />
-          <polygon className="cls-23" points="0 99.59 144.54 100.82 144.54 100.86 0 99.64 0 99.59" />
-          <polygon className="cls-24" points="0 99.55 144.54 100.77 144.54 100.82 0 99.59 0 99.55" />
+          <polygon
+            className="cls-23"
+            points="0 99.59 144.54 100.82 144.54 100.86 0 99.64 0 99.59"
+          />
+          <polygon
+            className="cls-24"
+            points="0 99.55 144.54 100.77 144.54 100.82 0 99.59 0 99.55"
+          />
           <polygon className="cls-25" points="0 99.5 144.54 100.73 144.54 100.77 0 99.55 0 99.5" />
           <polygon className="cls-26" points="0 99.46 144.54 100.68 144.54 100.73 0 99.5 0 99.46" />
-          <polygon className="cls-27" points="0 99.41 144.54 100.64 144.54 100.68 0 99.46 0 99.41" />
+          <polygon
+            className="cls-27"
+            points="0 99.41 144.54 100.64 144.54 100.68 0 99.46 0 99.41"
+          />
           <polygon className="cls-28" points="0 99.37 144.54 100.6 144.54 100.64 0 99.41 0 99.37" />
           <polygon className="cls-29" points="0 99.33 144.54 100.55 144.54 100.6 0 99.37 0 99.33" />
-          <polygon className="cls-30" points="0 99.28 144.54 100.51 144.54 100.55 0 99.33 0 99.28" />
-          <polygon className="cls-31" points="0 99.24 144.54 100.46 144.54 100.51 0 99.28 0 99.24" />
-          <polygon className="cls-32" points="0 99.19 144.54 100.42 144.54 100.46 0 99.24 0 99.19" />
-          <polygon className="cls-33" points="0 99.15 144.54 100.38 144.54 100.42 0 99.19 0 99.15" />
-          <polygon className="cls-34" points="0 99.11 144.54 100.33 144.54 100.38 0 99.15 0 99.11" />
-          <polygon className="cls-35" points="0 99.06 144.54 100.29 144.54 100.33 0 99.11 0 99.06" />
-          <polygon className="cls-36" points="0 99.02 144.54 100.24 144.54 100.29 0 99.06 0 99.02" />
+          <polygon
+            className="cls-30"
+            points="0 99.28 144.54 100.51 144.54 100.55 0 99.33 0 99.28"
+          />
+          <polygon
+            className="cls-31"
+            points="0 99.24 144.54 100.46 144.54 100.51 0 99.28 0 99.24"
+          />
+          <polygon
+            className="cls-32"
+            points="0 99.19 144.54 100.42 144.54 100.46 0 99.24 0 99.19"
+          />
+          <polygon
+            className="cls-33"
+            points="0 99.15 144.54 100.38 144.54 100.42 0 99.19 0 99.15"
+          />
+          <polygon
+            className="cls-34"
+            points="0 99.11 144.54 100.33 144.54 100.38 0 99.15 0 99.11"
+          />
+          <polygon
+            className="cls-35"
+            points="0 99.06 144.54 100.29 144.54 100.33 0 99.11 0 99.06"
+          />
+          <polygon
+            className="cls-36"
+            points="0 99.02 144.54 100.24 144.54 100.29 0 99.06 0 99.02"
+          />
           <polygon className="cls-37" points="0 98.97 144.54 100.2 144.54 100.24 0 99.02 0 98.97" />
           <polygon className="cls-38" points="0 98.93 144.54 100.16 144.54 100.2 0 98.97 0 98.93" />
-          <polygon className="cls-39" points="0 98.89 144.54 100.11 144.54 100.16 0 98.93 0 98.89" />
-          <polygon className="cls-40" points="0 98.84 144.54 100.07 144.54 100.11 0 98.89 0 98.84" />
+          <polygon
+            className="cls-39"
+            points="0 98.89 144.54 100.11 144.54 100.16 0 98.93 0 98.89"
+          />
+          <polygon
+            className="cls-40"
+            points="0 98.84 144.54 100.07 144.54 100.11 0 98.89 0 98.84"
+          />
           <polygon className="cls-41" points="0 98.8 144.54 100.02 144.54 100.07 0 98.84 0 98.8" />
           <polygon className="cls-42" points="0 98.75 144.54 99.98 144.54 100.02 0 98.8 0 98.75" />
           <polygon className="cls-43" points="0 98.71 144.54 99.94 144.54 99.98 0 98.75 0 98.71" />
@@ -327,18 +402,54 @@ export const Error: React.FC = () => (
           <polygon className="cls-166" points="0 93.29 144.54 94.51 144.54 94.56 0 93.33 0 93.29" />
           <polygon className="cls-167" points="0 93.24 144.54 94.47 144.54 94.51 0 93.29 0 93.24" />
           <polygon className="cls-168" points="0 93.2 144.54 94.42 144.54 94.47 0 93.24 0 93.2" />
-          <polygon className="cls-169" points="4.5 93.19 144.54 94.38 144.54 94.42 0 93.2 0 93.19 4.5 93.19" />
-          <polygon className="cls-170" points="9.7 93.19 144.54 94.34 144.54 94.38 4.5 93.19 9.7 93.19" />
-          <polygon className="cls-171" points="14.9 93.19 144.54 94.29 144.54 94.34 9.7 93.19 14.9 93.19" />
-          <polygon className="cls-172" points="20.09 93.19 144.54 94.25 144.54 94.29 14.9 93.19 20.09 93.19" />
-          <polygon className="cls-173" points="25.29 93.19 144.54 94.2 144.54 94.25 20.09 93.19 25.29 93.19" />
-          <polygon className="cls-174" points="30.49 93.19 144.54 94.16 144.54 94.2 25.29 93.19 30.49 93.19" />
-          <polygon className="cls-175" points="35.69 93.19 144.54 94.12 144.54 94.16 30.49 93.19 35.69 93.19" />
-          <polygon className="cls-176" points="40.88 93.19 144.54 94.07 144.54 94.12 35.69 93.19 40.88 93.19" />
-          <polygon className="cls-177" points="46.08 93.19 144.54 94.03 144.54 94.07 40.88 93.19 46.08 93.19" />
-          <polygon className="cls-178" points="51.28 93.19 144.54 93.98 144.54 94.03 46.08 93.19 51.28 93.19" />
-          <polygon className="cls-179" points="56.48 93.19 144.54 93.94 144.54 93.98 51.28 93.19 56.48 93.19" />
-          <polygon className="cls-179" points="144.54 93.94 56.48 93.19 144.54 93.19 144.54 93.94" />
+          <polygon
+            className="cls-169"
+            points="4.5 93.19 144.54 94.38 144.54 94.42 0 93.2 0 93.19 4.5 93.19"
+          />
+          <polygon
+            className="cls-170"
+            points="9.7 93.19 144.54 94.34 144.54 94.38 4.5 93.19 9.7 93.19"
+          />
+          <polygon
+            className="cls-171"
+            points="14.9 93.19 144.54 94.29 144.54 94.34 9.7 93.19 14.9 93.19"
+          />
+          <polygon
+            className="cls-172"
+            points="20.09 93.19 144.54 94.25 144.54 94.29 14.9 93.19 20.09 93.19"
+          />
+          <polygon
+            className="cls-173"
+            points="25.29 93.19 144.54 94.2 144.54 94.25 20.09 93.19 25.29 93.19"
+          />
+          <polygon
+            className="cls-174"
+            points="30.49 93.19 144.54 94.16 144.54 94.2 25.29 93.19 30.49 93.19"
+          />
+          <polygon
+            className="cls-175"
+            points="35.69 93.19 144.54 94.12 144.54 94.16 30.49 93.19 35.69 93.19"
+          />
+          <polygon
+            className="cls-176"
+            points="40.88 93.19 144.54 94.07 144.54 94.12 35.69 93.19 40.88 93.19"
+          />
+          <polygon
+            className="cls-177"
+            points="46.08 93.19 144.54 94.03 144.54 94.07 40.88 93.19 46.08 93.19"
+          />
+          <polygon
+            className="cls-178"
+            points="51.28 93.19 144.54 93.98 144.54 94.03 46.08 93.19 51.28 93.19"
+          />
+          <polygon
+            className="cls-179"
+            points="56.48 93.19 144.54 93.94 144.54 93.98 51.28 93.19 56.48 93.19"
+          />
+          <polygon
+            className="cls-179"
+            points="144.54 93.94 56.48 93.19 144.54 93.19 144.54 93.94"
+          />
         </g>
       </g>
     </g>

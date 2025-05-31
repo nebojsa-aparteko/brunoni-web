@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useEffect, useMemo, useState } from 'react';
 import Sticky from 'react-stickynode';
-import querySting from 'querystring';
+import querySting from 'query-string';
 import formatDate from 'date-fns/format';
 import isObject from 'lodash/fp/isObject';
 import update from 'lodash/fp/update';
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     '> .sticky-outer-wrapper > .sticky-inner-wrapper': {
       display: 'flex',
     },
-    background: `url(${require(`../assets/hero.${process.env.REACT_APP_BRAND}.jpg`)})`,
+    background: `url(../assets/hero.${import.meta.env.VITE_BRAND}.jpg})`,
     paddingTop: theme.spacing(10),
     paddingBottom: theme.spacing(10),
     backgroundSize: 'cover',
@@ -95,7 +95,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBookNow, carrier }) => {
+const RouteSearch: React.FC<Props> = ({
+  isPicker,
+  origin,
+  destination,
+  handleBookNow,
+  carrier,
+}) => {
   const classes = useStyles();
 
   const [params, setParams] = useContext(RouteSearchContext);
@@ -114,7 +120,7 @@ const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBoo
       carrier: carrierFilter,
     });
 
-    return `${process.env.REACT_APP_API_URL}/routes?${search}`;
+    return `${import.meta.env.VITE_REACT_APP_API_URL}/routes?${search}`;
   }, [params]);
 
   const [user, userData] = useUser();
@@ -189,7 +195,8 @@ const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBoo
     carrierId
       ? routes &&
         routes.filter(
-          (route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier.toLowerCase() === carrierId.toLowerCase(),
+          (route: RouteSearchResult) =>
+            route.OriginInfo.VoyageInfo.Carrier.toLowerCase() === carrierId.toLowerCase(),
         )
       : routes;
 
@@ -201,7 +208,9 @@ const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBoo
 
   const carriers = useMemo(() => {
     return uniq(
-      (result as any)?.Routes.map((route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier),
+      (result as any)?.Routes.map(
+        (route: RouteSearchResult) => route.OriginInfo.VoyageInfo.Carrier,
+      ),
     ) as string[];
   }, [result]);
 
@@ -242,7 +251,11 @@ const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBoo
               {!carrier && (
                 <Grid item md={3} xs={12}>
                   <Paper className={classes.sidebar}>
-                    <RouteSearchFilters only={carriers} value={carrierFilter} onChange={setCarrierFilter} />
+                    <RouteSearchFilters
+                      only={carriers}
+                      value={carrierFilter}
+                      onChange={setCarrierFilter}
+                    />
                   </Paper>
                 </Grid>
               )}
@@ -257,7 +270,12 @@ const RouteSearch: React.FC<Props> = ({ isPicker, origin, destination, handleBoo
                   <Grid item xs={12}>
                     {results ? (
                       results.Routes.map((route, i) => (
-                        <Route key={i} route={route} isPicker={isPicker} handleBookNow={handleBookNow} />
+                        <Route
+                          key={i}
+                          route={route}
+                          isPicker={isPicker}
+                          handleBookNow={handleBookNow}
+                        />
                       ))
                     ) : (
                       <Route />

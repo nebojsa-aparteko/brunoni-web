@@ -19,7 +19,12 @@ const UserNotificationRedirectionSwitch = ({ userUid, user }: Props) => {
 
   return (
     <FormControl>
-      <Switch checked={user.isRedirectionActive} onChange={saveUserChanges} name="checkedB" color="primary" />
+      <Switch
+        checked={user.isRedirectionActive}
+        onChange={saveUserChanges}
+        name="checkedB"
+        color="primary"
+      />
     </FormControl>
   );
 };

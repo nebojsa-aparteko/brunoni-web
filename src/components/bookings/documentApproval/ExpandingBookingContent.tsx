@@ -71,8 +71,15 @@ const ExpandingBookingContent = ({ booking, isPrintWithCost, initialFreightTab }
         </SimpleExpansionPanel>
       ) : null}
       {booking.FreightDetails && (
-        <Box marginTop="1em" marginBottom="1em" className={isPrintWithCost ? classes.showPrint : classes.hidePrint}>
-          <BookingFreight freightDetails={booking.FreightDetails} initiallySelectedTab={initialFreightTab} />
+        <Box
+          marginTop="1em"
+          marginBottom="1em"
+          className={isPrintWithCost ? classes.showPrint : classes.hidePrint}
+        >
+          <BookingFreight
+            freightDetails={booking.FreightDetails}
+            initiallySelectedTab={initialFreightTab}
+          />
         </Box>
       )}
       <BookingRemarks booking={booking} />

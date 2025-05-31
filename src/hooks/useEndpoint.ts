@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import useUser from './useUser';
 
-export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) => T, initialResults: T) {
+export default function useEndpoint<B, T>(
+  uri: string,
+  bodyTransform: (body: B) => T,
+  initialResults: T,
+) {
   const [user] = useUser();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -24,7 +28,7 @@ export default function useEndpoint<B, T>(uri: string, bodyTransform: (body: B) 
       try {
         const token = await user.getIdToken();
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}${uri}`, {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_API_URL}${uri}`, {
           method: 'GET',
           mode: 'cors',
           cache: 'no-cache',

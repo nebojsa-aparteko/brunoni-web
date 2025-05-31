@@ -18,10 +18,10 @@ export function useClientById(id?: string) {
 
 export function useClientByIdFromCache(clientId?: string) {
   const clients = useClients();
-  const client = useMemo(() => (clientId ? clients?.find(client => client.id === clientId) : undefined), [
-    clients,
-    clientId,
-  ]);
+  const client = useMemo(
+    () => (clientId ? clients?.find(client => client.id === clientId) : undefined),
+    [clients, clientId],
+  );
 
   return client;
 }

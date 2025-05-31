@@ -22,22 +22,27 @@ interface Props {
   showDateRange?: boolean;
 }
 
-const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, showRefreshButton }) => {
+const QuotesFiltersBar: React.FC<Props> = ({
+  showClientFilter,
+  showDateRange,
+  showRefreshButton,
+}) => {
   const clients = useClients();
   const ports = useContext(Ports);
   const carriers = useContext(Carriers);
   const user = useUser()[1];
 
-  const availableCarriers = useMemo(() => carriers?.filter(carrier => user.carriers?.includes(carrier.id)), [
-    user.carriers,
-    carriers,
-  ]);
+  const availableCarriers = useMemo(
+    () => carriers?.filter(carrier => user.carriers?.includes(carrier.id)),
+    [user.carriers, carriers],
+  );
 
   const [, , filters, setFilters] = useQuotesContext();
 
   const { clientFilter, originPort, destinationPort, dateRange, carrier } = filters;
 
-  const setOriginPort = (port: Port | null) => setFilters && setFilters(set('originPort', port || undefined)(filters));
+  const setOriginPort = (port: Port | null) =>
+    setFilters && setFilters(set('originPort', port || undefined)(filters));
 
   const setDestinationPort = (port: Port | null) =>
     setFilters && setFilters(set('destinationPort', port || undefined)(filters));
@@ -77,10 +82,20 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
           </Grid>
         )}
         <Grid id="originQuotes" item sm={3} xs={12}>
-          <PortInput label="Origin" ports={ports || []} value={originPort} onChange={setOriginPort} />
+          <PortInput
+            label="Origin"
+            ports={ports || []}
+            value={originPort}
+            onChange={setOriginPort}
+          />
         </Grid>
         <Grid id="destinationQuotes" item sm={3} xs={12}>
-          <PortInput label="Destination" ports={ports || []} value={destinationPort} onChange={setDestinationPort} />
+          <PortInput
+            label="Destination"
+            ports={ports || []}
+            value={destinationPort}
+            onChange={setDestinationPort}
+          />
         </Grid>
         <Grid id="carrierQuotes" item sm={3} xs={12}>
           <CarrierInput
@@ -94,7 +109,13 @@ const QuotesFiltersBar: React.FC<Props> = ({ showClientFilter, showDateRange, sh
         {!showClientFilter && <Grid item sm={3} xs={12} />}
         {showDateRange && (
           <Grid item sm={3} xs={12}>
-            <Box display="flex" alignItems="flex-end" alignContent="flex-end" flexDirection="column" m="6px auto">
+            <Box
+              display="flex"
+              alignItems="flex-end"
+              alignContent="flex-end"
+              flexDirection="column"
+              m="6px auto"
+            >
               <DateRangeInput onChange={setDateRange} value={dateRange} maxDate={new Date()} />
             </Box>
           </Grid>

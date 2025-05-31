@@ -20,7 +20,11 @@ import {
 } from '../../model/BookingRequest';
 import UserRecord from '../../model/UserRecord';
 
-import { HtmlBookingContainer, HtmlBookingRequest, Parse } from '../../utilities/bookingRequestHtmlParser';
+import {
+  HtmlBookingContainer,
+  HtmlBookingRequest,
+  Parse,
+} from '../../utilities/bookingRequestHtmlParser';
 import useUser from '../../hooks/useUser';
 import Ports from '../../contexts/Ports';
 import Carriers from '../../contexts/Carriers';
@@ -36,8 +40,8 @@ import PickupLocations from '../../contexts/PickupLocations';
 import PickupLocation from '../../model/PickupLocation';
 import string_similarity from 'string-similarity';
 import { compact, flow, isNil, omitBy, update } from 'lodash/fp';
-import { useHistory } from 'react-router';
-import querySting from 'querystring';
+import { useNavigate } from 'react-router-dom';
+import querySting from 'query-string';
 import formatDate from 'date-fns/format';
 import RouteSearchParams from '../../model/route-search/RouteSearchParams';
 import RouteSearchResults, { RouteSearchResult } from '../../model/route-search/RouteSearchResults';
@@ -58,9 +62,13 @@ import useSaveFiles from '../../hooks/useSaveFiles';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import safeInvoke from '../../utilities/safeInvoke';
 import ContainerDetails from '../../model/ContainerDetails';
-import { generateCommission, isAgencyCommission } from '../bookingRequests/BookingRequestFreightDetails';
+import {
+  generateCommission,
+  isAgencyCommission,
+} from '../bookingRequests/BookingRequestFreightDetails';
 import { getVoyageInfo } from '../bookingRequests/BookingRequestView';
 import useNormalizeQuote from '../../hooks/useNormalizedQuote';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -107,21 +115,35 @@ const matchLocation = (
 
   const htmlAddress = container.EMPTY_CONTAINER_PICK_UP_LOCATION?.ADDRESS.join(' ').toLowerCase();
 
-  const match = string_similarity.findBestMatch(htmlAddress as string, concatenatedAddresses as string[]);
+  const match = string_similarity.findBestMatch(
+    htmlAddress as string,
+    concatenatedAddresses as string[],
+  );
 
   return locations?.[match.bestMatchIndex];
 };
 // todo better ?
-const matchContainerType = (containerTypes: ContainerType[] | undefined, container: HtmlBookingContainer) => {
+const matchContainerType = (
+  containerTypes: ContainerType[] | undefined,
+  container: HtmlBookingContainer,
+) => {
   return containerTypes?.find(
-    containerType => container.TYPE?.includes(containerType.id) || container.SIZE?.includes(containerType.description),
+    containerType =>
+      container.TYPE?.includes(containerType.id) ||
+      container.SIZE?.includes(containerType.description),
   );
 };
 // todo better ?
-const matchCommodityType = (commodityTypes: CommodityType[] | undefined, object: HtmlBookingRequest) => {
+const matchCommodityType = (
+  commodityTypes: CommodityType[] | undefined,
+  object: HtmlBookingRequest,
+) => {
   if (!object.CARGO_DESCRIPTION) return;
   const commodityTypeNames = commodityTypes?.map(type => type.name);
-  const match = string_similarity.findBestMatch(object.CARGO_DESCRIPTION, commodityTypeNames as string[]);
+  const match = string_similarity.findBestMatch(
+    object.CARGO_DESCRIPTION,
+    commodityTypeNames as string[],
+  );
 
   return match.bestMatch.rating > 0.5 ? commodityTypes?.[match.bestMatchIndex] : undefined;
 };
@@ -147,7 +169,8 @@ const getContainers = (
     // Reefer settings
     const temperature = container.TEMPERATURE && Number(container.TEMPERATURE);
     const ventilation =
-      container.VENTILATION && getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
+      container.VENTILATION &&
+      getEnumKeyByEnumValue(Ventilation, container.VENTILATION.toUpperCase());
 
     return omitBy(isNil)({
       commodityType,
@@ -166,7 +189,10 @@ const validScheduleSearch = (search: RouteSearchParams) => {
   return search.carrier && search.originPort && search.destinationPort && search.date;
 };
 
-const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: string): Promise<RouteSearchResults> => {
+const fetchSchedule = async (
+  scheduleSearchParams: RouteSearchParams,
+  date?: string,
+): Promise<RouteSearchResults> => {
   const queryObject = {
     origin: scheduleSearchParams?.originPort?.id,
     destination: scheduleSearchParams?.destinationPort?.id,
@@ -177,7 +203,7 @@ const fetchSchedule = async (scheduleSearchParams: RouteSearchParams, date?: str
     ...queryObject,
     date,
   });
-  const url = `${process.env.REACT_APP_API_URL}/routes?${query}`;
+  const url = `${import.meta.env.VITE_REACT_APP_API_URL}/routes?${query}`;
   const res = await fetch(url);
   return (await res.json()) as RouteSearchResults;
 };
@@ -217,7 +243,9 @@ const matchAndFetchSchedule = async (
   }
   //if no match try again 3 days before departure date
   if (schedules.length === 0) {
-    date = scheduleSearchParams?.date && formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
+    date =
+      scheduleSearchParams?.date &&
+      formatDate(subDays(scheduleSearchParams?.date, 3), 'yyyy-MM-dd');
     data = await fetchSchedule(scheduleSearchParams, date);
     schedules = data.Routes;
 
@@ -251,11 +279,7 @@ const matchAndFetchSchedule = async (
 };
 
 const getClientById = async (id: string): Promise<Client> => {
-  const client = await firebase
-    .firestore()
-    .collection('clients')
-    .doc(id)
-    .get();
+  const client = await firebase.firestore().collection('clients').doc(id).get();
   return client.data() as Client;
 };
 
@@ -274,7 +298,9 @@ interface LatestQuote {
   showWarningMessage: boolean;
 }
 
-export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Promise<LatestQuote> => {
+export const getLatestQuote = async (
+  quoteSearchParams: QuoteSearchParams,
+): Promise<LatestQuote> => {
   if (quoteSearchParams.agreementNo) {
     try {
       const quoteByAgreement = await firebase
@@ -314,7 +340,9 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
       quotes = clientFilteredQuotes.length === 0 ? quotes : clientFilteredQuotes;
       if (quoteSearchParams.containers?.[0].containerType) {
         const containerFilteredQuotes = quotes.filter(q =>
-          q.containers.some(c => c.containerType === quoteSearchParams.containers![0].containerType?.id),
+          q.containers.some(
+            c => c.containerType === quoteSearchParams.containers![0].containerType?.id,
+          ),
         );
         // Apply container filter if size > 0, otherwise no
         quotes = containerFilteredQuotes.length === 0 ? quotes : containerFilteredQuotes;
@@ -328,7 +356,10 @@ export const getLatestQuote = async (quoteSearchParams: QuoteSearchParams): Prom
 };
 
 export const normalizeQuote = (data: any) => {
-  return flow(update('dateIssued', safeInvoke('toDate')), update('validityPeriod', normalizeDateRange))(data);
+  return flow(
+    update('dateIssued', safeInvoke('toDate')),
+    update('validityPeriod', normalizeDateRange),
+  )(data);
 };
 
 interface QuoteSearchParams extends Omit<RouteSearchParams, 'date' | 'weeks'> {
@@ -348,12 +379,16 @@ const mapIntoBookingRequestModel = async (
   chargeCodes: ChargeCode[] | undefined,
   normalize: (...args: any[]) => any,
 ): Promise<BookingRequest> => {
-  let createdBy = object.BOOKER_CONTACT_EMAIL ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase()) : user;
+  let createdBy = object.BOOKER_CONTACT_EMAIL
+    ? await getUserByEmail(object.BOOKER_CONTACT_EMAIL.toLowerCase())
+    : user;
 
   if (!createdBy) createdBy = user;
 
   const vgmSubmittedBy = VGMSubmittedBy.CLIENT;
-  const client = createdBy?.alphacomClientId ? await getClientById(createdBy.alphacomClientId) : undefined;
+  const client = createdBy?.alphacomClientId
+    ? await getClientById(createdBy.alphacomClientId)
+    : undefined;
 
   const agreementNo = object.CONTRACT_NUMBER;
   const customerReference = object.FREIGHT_FORWARDERS_REFERENCE_NUMBERS
@@ -362,7 +397,10 @@ const mapIntoBookingRequestModel = async (
 
   const carrier = object.CARRIER_ID
     ? carriers?.find(carrier => {
-        const match = string_similarity.compareTwoStrings(object.CARRIER_ID as string, carrier.name);
+        const match = string_similarity.compareTwoStrings(
+          object.CARRIER_ID as string,
+          carrier.name,
+        );
         return match > 0.7;
       })
     : undefined;
@@ -397,7 +435,8 @@ const mapIntoBookingRequestModel = async (
 
   const normalizedQuote = quote && (normalize(quote) as Quote);
 
-  const freightDetails = normalizedQuote && takeQuoteDetails(normalizedQuote?.quoteDetails, containers, chargeCodes);
+  const freightDetails =
+    normalizedQuote && takeQuoteDetails(normalizedQuote?.quoteDetails, containers, chargeCodes);
 
   const voyageInfo = getVoyageInfo(schedule);
 
@@ -415,7 +454,10 @@ const mapIntoBookingRequestModel = async (
     createdBy,
     customerReference,
     destination,
-    freightDetails: compact([...(freightDetails?.filter(value => !isAgencyCommission(value)) || []), commission]),
+    freightDetails: compact([
+      ...(freightDetails?.filter(value => !isAgencyCommission(value)) || []),
+      commission,
+    ]),
     hold: false,
     intraRefNumber,
     origin,
@@ -485,7 +527,7 @@ export const readAndParseFile = (
     } catch (error) {
       setLoading(false);
       console.error(error);
-      dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: error.message, duration: 4000 });
+      dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: tryGetErrorMessage(error), duration: 4000 });
     }
   };
 };
@@ -496,7 +538,7 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [, dispatch] = useGlobalAppState();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [, userRecord] = useUser();
   const ports = useContext(Ports);
@@ -559,14 +601,14 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
                     url: item.url,
                     storedName: item.storedName,
                     isInternal: false,
-                  } as ChecklistItemValueDocument),
+                  }) as ChecklistItemValueDocument,
               );
               values.map(value => saveFilesToFirestore('bookings-requests', docReference, value));
             } catch (e) {
               dispatch({ type: 'STOP_GLOBAL_LOADING' });
               return dispatch({ type: 'SHOW_ERROR_SNACKBAR', message: 'Failed to upload file!' });
             } finally {
-              history.push(`/booking-requests/${docReference}`);
+              navigate(`/booking-requests/${docReference}`);
             }
           })
           .catch(error => {
@@ -584,7 +626,12 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} aria-labelledby="dialog-title-check-list" maxWidth="md">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="dialog-title-check-list"
+      maxWidth="md"
+    >
       <Box className={classes.dialogBody}>
         <DialogTitle disableTypography id="dialog-title-check-list">
           <Typography variant="h4">Upload Booking</Typography>
@@ -604,7 +651,9 @@ const BookingUploadDialog: React.FC<Props> = ({ isOpen, handleClose }) => {
               previewChipProps={{ disabled: !bookingRequest || loading }}
               dropzoneText={'Upload HTML Document'}
             />
-            <Typography variant="caption">Hint: You can drag & drop HTML booking file over input.</Typography>
+            <Typography variant="caption">
+              Hint: You can drag & drop HTML booking file over input.
+            </Typography>
             <Box display="flex">
               <Button
                 onClick={handleBookingSave}

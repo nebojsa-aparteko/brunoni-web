@@ -1,5 +1,14 @@
 import React, { Fragment } from 'react';
-import { Grid, Typography, ListItem, Box, makeStyles, ListItemIcon, ListItemText, SvgIcon } from '@material-ui/core';
+import {
+  Grid,
+  Typography,
+  ListItem,
+  Box,
+  makeStyles,
+  ListItemIcon,
+  ListItemText,
+  SvgIcon,
+} from '@material-ui/core';
 import List from '@material-ui/core/List';
 // import flow from 'lodash/fp/flow';
 // import filter from 'lodash/fp/filter';
@@ -11,8 +20,8 @@ import Container from '../../model/Container';
 import CommodityType from '../../model/CommodityType';
 import { getLocationLabel } from '../inputs/LocationInput';
 import DepotLocationIcon from '@material-ui/icons/LocalShipping';
-import { ReactComponent as ContainerIconSVG } from '../../assets/container.svg';
-import { ReactComponent as PackageIconSVG } from '../../assets/package.svg';
+import ContainerIconSVG from '../../assets/container.svg?react';
+import PackageIconSVG from '../../assets/package.svg?react';
 
 interface Props {
   containers: Container[];
@@ -82,7 +91,9 @@ const QuoteItemContainers: React.FC<Props> = ({ containers, commodityTypes }) =>
                 </ListItemIcon>
                 <ListItemText
                   secondary={
-                    container.commodityType.id ? container.commodityType.name || container.commodityType.id : 'N/A'
+                    container.commodityType.id
+                      ? container.commodityType.name || container.commodityType.id
+                      : 'N/A'
                   }
                 />
               </ListItem>

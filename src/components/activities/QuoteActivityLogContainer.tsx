@@ -58,7 +58,12 @@ const QuoteActivityLogContainer: React.FC<Props> = ({ quoteId, quote }) => {
   );
 
   return (
-    <ActivityLogView activityLog={activities} onCommentSave={handleCommentSave} quoteActivityLog={true} quote={quote} />
+    <ActivityLogView
+      activityLog={activities}
+      onCommentSave={handleCommentSave}
+      quoteActivityLog={true}
+      quote={quote}
+    />
   );
 };
 

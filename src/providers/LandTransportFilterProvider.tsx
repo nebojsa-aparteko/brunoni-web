@@ -15,7 +15,9 @@ export const LandTransportFilterContext = createContext<
 const LandTransportFilterProvider: React.FC = ({ children }) => {
   const [state, setState] = useState<LandTransportFilter>(LAND_TRANSPORT_FILTERS_INITIAL_STATE);
   return (
-    <LandTransportFilterContext.Provider value={[state, setState]}>{children}</LandTransportFilterContext.Provider>
+    <LandTransportFilterContext.Provider value={[state, setState]}>
+      {children}
+    </LandTransportFilterContext.Provider>
   );
 };
 

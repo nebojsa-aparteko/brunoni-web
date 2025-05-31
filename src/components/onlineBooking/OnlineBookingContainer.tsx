@@ -1,5 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { Box, Container as ContainerView, makeStyles, Paper, Step, StepLabel, Stepper, Theme } from '@material-ui/core';
+import {
+  Box,
+  Container as ContainerView,
+  makeStyles,
+  Paper,
+  Step,
+  StepLabel,
+  Stepper,
+  Theme,
+} from '@material-ui/core';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import { TabPanel } from '../../pages/BookingsPage';
 import { BookingRequest } from '../../model/BookingRequest';

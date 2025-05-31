@@ -21,8 +21,8 @@ export default () => {
           <Typography variant="h2">SAVE WITH SHIPPING</Typography>
         </Box>
         <Typography variant="subtitle1" style={{ opacity: 0.5 }}>
-          CHECK OUT {specialOffers.length === 1 ? 'THIS SPECIAL OFFER' : 'THESE SPECIAL OFFERS'} BY OUR PARTNER
-          CARRIERS.
+          CHECK OUT {specialOffers.length === 1 ? 'THIS SPECIAL OFFER' : 'THESE SPECIAL OFFERS'} BY
+          OUR PARTNER CARRIERS.
         </Typography>
       </Box>
       <Grid id="offersSched" container spacing={3}>

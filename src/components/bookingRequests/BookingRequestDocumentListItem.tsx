@@ -22,7 +22,10 @@ import CompareIcon from '@material-ui/icons/Compare';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FlagIcon from '@material-ui/icons/Flag';
-import { ActivityLogContextProps, useActivityLogState } from '../bookings/checklist/ActivityLogContext';
+import {
+  ActivityLogContextProps,
+  useActivityLogState,
+} from '../bookings/checklist/ActivityLogContext';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import ActingAs from '../../contexts/ActingAs';
 import useActivityLogUserData from '../../hooks/useActivityLogUserData';
@@ -36,12 +39,17 @@ import {
 import { editRestriction } from '../bookings/checklist/CheckList';
 import firebase from '../../firebase';
 import { SAVED_ACTION_SNACKBAR } from '../../store/types/globalAppState';
-import { ActivityCreationProps, createActivityObject, fileWithExt } from '../bookings/checklist/ChecklistItemRow';
+import {
+  ActivityCreationProps,
+  createActivityObject,
+  fileWithExt,
+} from '../bookings/checklist/ChecklistItemRow';
 import { green } from '@material-ui/core/colors';
 import theme from '../../theme/index';
 import { ActivityLogItem } from '../bookings/checklist/ActivityModel';
 import useUser from '../../hooks/useUser';
 import { DescriptionOutlined } from '@material-ui/icons';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -96,15 +104,9 @@ const findTextForStatusType = (type: ChecklistItemValueDocumentStatusType) => {
 };
 
 const addActivity = (path: string, activity: ActivityLogItem) =>
-  firebase
-    .firestore()
-    .collection(path)
-    .add(activity);
+  firebase.firestore().collection(path).add(activity);
 const ref = (collectionPath: string, id: string) =>
-  firebase
-    .firestore()
-    .collection(collectionPath)
-    .doc(id);
+  firebase.firestore().collection(collectionPath).doc(id);
 const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemProps> = ({
   item,
   storageBasePath,
@@ -142,7 +144,8 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
 
   // should check about internal field and checklist
   const handleMention = useCallback(
-    () => activityLogContext.setState({ documentReference: item, ...(additionalMentionFields || {}) }),
+    () =>
+      activityLogContext.setState({ documentReference: item, ...(additionalMentionFields || {}) }),
     [activityLogContext, item, additionalMentionFields],
   );
   const markAsFinal = useCallback(() => docRef.update('final', !item.final), [item?.final]);
@@ -179,7 +182,7 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
             });
           })
           .catch(error => {
-            console.error('Failed to remove item - {error.message}', error);
+            console.error(`Failed to remove item - ${tryGetErrorMessage(error)}`, error);
           })
           .finally(() => {
             // remove item from the list in any case since if it is an error with the storage means file is already out
@@ -189,7 +192,7 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
         setRemovalInProgress(false);
         dispatch({
           type: 'SHOW_ERROR_SNACKBAR',
-          message: `Failed to remove item - ${error.message}!`,
+          message: `Failed to remove item - ${tryGetErrorMessage(error)}!`,
         });
       }
     },
@@ -226,13 +229,17 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
         id={`filelistitem-${item.storedName}`}
         disableTypography
         primary={
-          <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+          <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>
+            {item.name}
+          </Typography>
         }
         secondary={
           <span>
             <Typography variant="caption">
               {`${formatDistanceToNowConfigured(item.uploadedAt)} ${
-                isAdmin ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}` : ''
+                isAdmin
+                  ? ` by ${isPlatformActivity(item.uploadedBy) ? 'Platform' : item.uploadedBy.firstName}`
+                  : ''
               }`}
             </Typography>
             <br />
@@ -252,13 +259,21 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
             <AssignmentIcon />
           </IconButton>
           {isAdmin && shouldHaveAddForComparisonAction && (
-            <IconButton size="small" aria-label="Add to Comparison" onClick={() => selectForComparison()}>
-              <CompareIcon style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }} />
+            <IconButton
+              size="small"
+              aria-label="Add to Comparison"
+              onClick={() => selectForComparison()}
+            >
+              <CompareIcon
+                style={{ color: item.isSelectedForComparison ? '#F7BC06' : 'inherit' }}
+              />
             </IconButton>
           )}
           {shouldHaveMentionInCommentAction && (
             <IconButton size="small" aria-label="Add Comment" onClick={handleMention}>
-              <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              <AddCommentIcon
+                style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }}
+              />
             </IconButton>
           )}
           {shouldHaveDeleteAction && (
@@ -275,10 +290,20 @@ const BookingRequestDocumentListItem: React.FC<BookingRequestDocumentListItemPro
               <DeleteIcon />
             </IconButton>
           )}
-          {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+          {removalInProgress && (
+            <CircularProgress size={42} className={classes.iconDeleteProgress} />
+          )}
           {shouldHaveMarkAsFinalAction && (
-            <IconButton size="small" aria-label="Mark as final" onClick={() => markAsFinal()} disabled={!isAdmin}>
-              <FlagIcon className={classes.final} style={{ color: item.final ? '#F7BC06' : 'inherit' }} />
+            <IconButton
+              size="small"
+              aria-label="Mark as final"
+              onClick={() => markAsFinal()}
+              disabled={!isAdmin}
+            >
+              <FlagIcon
+                className={classes.final}
+                style={{ color: item.final ? '#F7BC06' : 'inherit' }}
+              />
             </IconButton>
           )}
         </div>

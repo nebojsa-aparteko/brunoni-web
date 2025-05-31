@@ -1,6 +1,20 @@
 import React from 'react';
-import { WeeklyPaymentPlatformStatus, WeeklyPaymentStatus, WeeklyPaymentStatusLabel } from '../../model/WeeklyPayment';
-import { Box, Checkbox, Chip, Link, makeStyles, Popover, TableCell, TableRow, Typography } from '@material-ui/core';
+import {
+  WeeklyPaymentPlatformStatus,
+  WeeklyPaymentStatus,
+  WeeklyPaymentStatusLabel,
+} from '../../model/WeeklyPayment';
+import {
+  Box,
+  Checkbox,
+  Chip,
+  Link,
+  makeStyles,
+  Popover,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@material-ui/core';
 import currencyFormatter from '../../utilities/currencyFormatter';
 import theme from '../../theme';
 import Payment, { DebitCredit } from '../../model/Payment';
@@ -53,18 +67,20 @@ const PaymentOverviewTableRow: React.FC<Props> = ({
         {status && (
           <Chip
             size="small"
-            label={WeeklyPaymentStatusLabel[status as WeeklyPaymentStatus | WeeklyPaymentPlatformStatus]}
+            label={
+              WeeklyPaymentStatusLabel[status as WeeklyPaymentStatus | WeeklyPaymentPlatformStatus]
+            }
             style={{
               backgroundColor:
                 status === WeeklyPaymentStatus.BLOCKED
                   ? theme.palette.primary.main
                   : status === WeeklyPaymentStatus.PAID
-                  ? '#10881a'
-                  : status === WeeklyPaymentPlatformStatus.CLEARED
-                  ? '#b186df'
-                  : status === WeeklyPaymentPlatformStatus.ON_HOLD
-                  ? '#df6b00'
-                  : '#999',
+                    ? '#10881a'
+                    : status === WeeklyPaymentPlatformStatus.CLEARED
+                      ? '#b186df'
+                      : status === WeeklyPaymentPlatformStatus.ON_HOLD
+                        ? '#df6b00'
+                        : '#999',
               color: 'white',
             }}
           />

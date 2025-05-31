@@ -126,4 +126,10 @@ export interface FreightDetail {
 
 export const commissionRelatedFreights = ['Seafreight', 'Seefracht', 'Fret Maritime'];
 
-export const emptyFreightDetail: Partial<FreightDetail> = { Currency: 'USD', UnitValue: 0, Unit: '', Total: 0, Anz: 0 };
+export const emptyFreightDetail: Partial<FreightDetail> = {
+  Currency: 'USD',
+  UnitValue: 0,
+  Unit: '',
+  Total: 0,
+  Anz: 0,
+};

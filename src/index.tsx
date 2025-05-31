@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, useHistory, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useNavigate, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
 import { ThemeProvider } from '@material-ui/styles';
@@ -31,10 +31,10 @@ import { isDashboardUser } from './model/UserRecord';
 import ClientsContext from './contexts/ClientsContext';
 import ClientUsersProvider from './providers/ClientUsersProvider';
 import GlobalStore from './store/GlobalStore';
+import { createRoot } from 'react-dom/client';
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+// Environment variables are handled by Vite automatically
+// https://vitejs.dev/guide/env-and-mode.html
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -49,7 +49,7 @@ const appFont = new FontFaceObserver('Montserrat');
 
 const fontLoaded = appFont.load();
 
-export const showCrispChat = (show: Boolean) => {
+export const showCrispChat = (show: boolean) => {
   try {
     $crisp.push(['do', show ? 'chat:show' : 'chat:hide']);
   } catch (e) {
@@ -66,12 +66,18 @@ const UserApp: React.FC = () => {
       $crisp.push([
         'set',
         'user:company',
-        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
+        [
+          userRecord.company?.name,
+          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
+        ],
       ]);
       $crisp.push([
         'set',
         'user:name',
-        [userRecord.company?.name, { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] }],
+        [
+          userRecord.company?.name,
+          { geolocation: [userRecord.company?.countryCode, userRecord.company?.city] },
+        ],
       ]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
@@ -140,15 +146,20 @@ const UserApp: React.FC = () => {
 };
 
 const CrispChatRouteUpdater = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     try {
-      $crisp.push(['set', 'session:data', [[['last-request-at', new Date().toISOString().slice(0, 10)]]]]);
+      $crisp.push([
+        'set',
+        'session:data',
+        [[['last-request-at', new Date().toISOString().slice(0, 10)]]],
+      ]);
     } catch (e) {
       console.warn('Failed to push crisp command.');
     }
-  }, [history.location.pathname]);
+  }, [location.pathname]);
 
   return null;
 };
@@ -207,10 +218,19 @@ const render = (user: firebase.User | null) => {
                     <UserRecordProvider>
                       <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                         <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                          <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                          <FirestoreCollectionProvider
+                            name="container-types"
+                            context={ContainerTypesContext}
+                          >
                             <SpecialOffersProvider>
-                              <FirestoreCollectionProvider name="commodity-types" context={CommodityTypesContext}>
-                                <FirestoreCollectionProvider name="pickup-locations" context={PickupLocationsContext}>
+                              <FirestoreCollectionProvider
+                                name="commodity-types"
+                                context={CommodityTypesContext}
+                              >
+                                <FirestoreCollectionProvider
+                                  name="pickup-locations"
+                                  context={PickupLocationsContext}
+                                >
                                   <ActingAsProvider>
                                     <UserApp />
                                   </ActingAsProvider>
@@ -226,7 +246,10 @@ const render = (user: firebase.User | null) => {
                   <UserContext.Provider value={null}>
                     <FirestoreCollectionProvider name="carriers" context={CarriersContext}>
                       <FirestoreCollectionProvider name="ports" context={PortsContext}>
-                        <FirestoreCollectionProvider name="container-types" context={ContainerTypesContext}>
+                        <FirestoreCollectionProvider
+                          name="container-types"
+                          context={ContainerTypesContext}
+                        >
                           <SpecialOffersProvider>
                             <ActingAsProvider anonymous>
                               <App />
@@ -245,7 +268,8 @@ const render = (user: firebase.User | null) => {
     </Router>
   );
 
-  ReactDOM.render(app, document.getElementById('root'));
+  createRoot(document.getElementById('root')!).render(app);
+  //   ReactDOM.render(app, document.getElementById('root'));
 };
 
 firebase.auth().onAuthStateChanged(async user => {

@@ -85,4 +85,7 @@ export default function useTasks() {
 }
 
 export const normalizeTaskData = (item: any) =>
-  flow(update('dueDate', safeInvoke('toDate')), update('payDate', safeInvoke('toDate')))(item) as Task;
+  flow(
+    update('dueDate', safeInvoke('toDate')),
+    update('payDate', safeInvoke('toDate')),
+  )(item) as Task;

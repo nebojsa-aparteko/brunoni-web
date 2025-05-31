@@ -20,7 +20,8 @@ const ChecklistContent = ({ booking }: CheckListContentProps) => {
       checklistItems
         ?.filter(
           checklistItem =>
-            checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS || checklistItem.id === ChecklistNames.B_L,
+            checklistItem.id === ChecklistNames.SHIPPING_INSTRUCTIONS ||
+            checklistItem.id === ChecklistNames.B_L,
         )
         .map(item =>
           (item.values || []).map(
@@ -28,7 +29,7 @@ const ChecklistContent = ({ booking }: CheckListContentProps) => {
               ({
                 ...i,
                 checklistId: item.id,
-              } as ChecklistItemValueDocument),
+              }) as ChecklistItemValueDocument,
           ),
         )
         .reduce((acc, val) => acc.concat(val), [])

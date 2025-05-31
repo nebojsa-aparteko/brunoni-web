@@ -20,12 +20,17 @@ interface Props {
   year: number;
 }
 
-const mergeCarrierMonthlyPerformances = (carrierMonthlyPerformances: Array<{ [key: number]: any[] }>) =>
+const mergeCarrierMonthlyPerformances = (
+  carrierMonthlyPerformances: Array<{ [key: number]: any[] }>,
+) =>
   flow(
     map((month: number) => [
       month,
       flow(
-        map((carrierMonthlyPerformance?: { [key: number]: any[] }) => (carrierMonthlyPerformance || {})[month]),
+        map(
+          (carrierMonthlyPerformance?: { [key: number]: any[] }) =>
+            (carrierMonthlyPerformance || {})[month],
+        ),
         flatten,
       )(carrierMonthlyPerformances),
     ]),
@@ -53,7 +58,20 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       [year]: normalizeByYear(year)(clientPerformance),
     };
 
-    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const labels = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     const datasets = [
       {
@@ -75,7 +93,10 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
 
   const dataByMonth = get('datasets.0.data')(data);
 
-  const total = useMemo(() => (dataByMonth.length > 0 ? sum(dataByMonth) : undefined), [dataByMonth]);
+  const total = useMemo(
+    () => (dataByMonth.length > 0 ? sum(dataByMonth) : undefined),
+    [dataByMonth],
+  );
 
   const options = {
     responsive: true,

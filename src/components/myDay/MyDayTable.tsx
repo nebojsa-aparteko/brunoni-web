@@ -161,7 +161,9 @@ const MyDayTable: React.FC<Props> = ({
   return (
     <Fragment>
       {tasks.length === 0 && normalizedTasksLength === 0 ? (
-        <BookingsEmptyResults message={'No tasks found for your filter criteria. Try changing filters.'} />
+        <BookingsEmptyResults
+          message={'No tasks found for your filter criteria. Try changing filters.'}
+        />
       ) : (
         <Paper>
           <EnhancedTableToolbar
@@ -183,7 +185,9 @@ const MyDayTable: React.FC<Props> = ({
                   </TableCell>
                   <TableCell align="center">Task</TableCell>
                   <TableCell align="center">B/L Number</TableCell>
-                  {taskCategory === TaskCategory.ACCOUNTING && <TableCell align="center">Reference</TableCell>}
+                  {taskCategory === TaskCategory.ACCOUNTING && (
+                    <TableCell align="center">Reference</TableCell>
+                  )}
                   <TableCell align="center">File No.</TableCell>
                   <TableCell align="center">Assigned To</TableCell>
                   <TableCell align="center">Due Date</TableCell>
@@ -218,9 +222,14 @@ const MyDayTable: React.FC<Props> = ({
                           <MyDayTableRow
                             task={task}
                             key={`${task.bookingId}/${task.id}-${normalizedTask[0]}`}
-                            selected={selectedTasks.includes(`${task.bookingId}/${task.id}-${normalizedTask[0]}`)}
+                            selected={selectedTasks.includes(
+                              `${task.bookingId}/${task.id}-${normalizedTask[0]}`,
+                            )}
                             onSelectRow={event =>
-                              onSelectRow(event, `${task.bookingId}/${task.id}-${normalizedTask[0]}`)
+                              onSelectRow(
+                                event,
+                                `${task.bookingId}/${task.id}-${normalizedTask[0]}`,
+                              )
                             }
                             updateComponent={updateComponent}
                             handleOpenPreviewDialog={handleOpenPreviewDialog}

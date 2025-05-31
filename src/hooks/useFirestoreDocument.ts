@@ -7,7 +7,9 @@ export default function useFirestoreDocument(
   subCollection?: string,
   subCollectionPath?: string,
 ) {
-  const [snapshot, setSnapshot] = useState<firebase.firestore.DocumentSnapshot | undefined | null>();
+  const [snapshot, setSnapshot] = useState<
+    firebase.firestore.DocumentSnapshot | undefined | null
+  >();
 
   useEffect(() => {
     if (!id) {
@@ -24,10 +26,7 @@ export default function useFirestoreDocument(
                 .doc(id)
                 .collection(subCollection)
                 .doc(subCollectionPath)
-            : firebase
-                .firestore()
-                .collection(collection)
-                .doc(id);
+            : firebase.firestore().collection(collection).doc(id);
 
         return document.onSnapshot({
           next: (snapshot: firebase.firestore.DocumentSnapshot) => {

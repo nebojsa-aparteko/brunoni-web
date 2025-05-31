@@ -12,7 +12,8 @@ export interface Sorting {
 export const sortingOptions: Sorting[] = [
   {
     name: 'Earliest departure date',
-    sort: (routes: RouteSearchResult[]) => sortBy(routes, (route: RouteSearchResult) => route.OriginInfo.DepartureDate),
+    sort: (routes: RouteSearchResult[]) =>
+      sortBy(routes, (route: RouteSearchResult) => route.OriginInfo.DepartureDate),
   },
   {
     name: 'Earliest arrival date',
@@ -21,7 +22,8 @@ export const sortingOptions: Sorting[] = [
   },
   {
     name: 'Shortest transit time',
-    sort: (routes: RouteSearchResult[]) => sortBy(routes, (route: RouteSearchResult) => route.TransitTime),
+    sort: (routes: RouteSearchResult[]) =>
+      sortBy(routes, (route: RouteSearchResult) => route.TransitTime),
   },
 ];
 

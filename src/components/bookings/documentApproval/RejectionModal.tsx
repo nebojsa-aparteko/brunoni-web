@@ -92,7 +92,14 @@ const RejectionModal: React.FC<Props> = ({
         })
         .catch(err => console.log(err));
     },
-    [booking.id, checklistItem, document, isAccountingDialog, updateDocumentStatus, userActivityLogData],
+    [
+      booking.id,
+      checklistItem,
+      document,
+      isAccountingDialog,
+      updateDocumentStatus,
+      userActivityLogData,
+    ],
   );
 
   const onReject = useCallback(() => {
@@ -135,7 +142,11 @@ interface Props {
   booking: Booking;
   document: ChecklistItemValueDocument;
   checklistItem?: ChecklistItem;
-  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) => void;
+  changeStatus: (
+    item: ChecklistItemValueDocument,
+    status: DocumentValueStatus,
+    dontCreateActivity?: boolean,
+  ) => void;
   allDocuments?: ChecklistItemValueDocument[];
   isComparisonDialog: boolean;
   isAccountingDialog?: boolean;

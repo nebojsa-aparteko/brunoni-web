@@ -1,5 +1,14 @@
 import React, { useContext, useMemo } from 'react';
-import { Card, CardHeader, Divider, CardContent, useTheme, colors, makeStyles, useMediaQuery } from '@material-ui/core';
+import {
+  Card,
+  CardHeader,
+  Divider,
+  CardContent,
+  useTheme,
+  colors,
+  makeStyles,
+  useMediaQuery,
+} from '@material-ui/core';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Pie } from 'react-chartjs-2';
 import flow from 'lodash/fp/flow';

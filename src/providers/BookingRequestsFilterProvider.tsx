@@ -1,4 +1,11 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
@@ -48,7 +55,9 @@ const BookingRequestsFilterProvider = (props: any) => {
 export const useBookingRequestsFilterContext = () => {
   const context = React.useContext(BookingRequestsFilterContext);
   if (context === undefined) {
-    throw new Error('useBookingRequestsListFilterContext must be used within a BookingListFilterProvider');
+    throw new Error(
+      'useBookingRequestsListFilterContext must be used within a BookingListFilterProvider',
+    );
   }
   return context;
 };

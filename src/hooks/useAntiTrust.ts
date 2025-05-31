@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useContext } from 'react';
 import UserRecord from '../contexts/UserRecordContext';
 import { isNil } from 'lodash/fp';
@@ -29,30 +29,27 @@ const extractIdFromPath = (pathname: string) => {
   }
 };
 
-const fetchQuteByGroupId = async (id: string, normalize: (...args: any[]) => any): Promise<Quote | undefined> => {
+const fetchQuteByGroupId = async (
+  id: string,
+  normalize: (...args: any[]) => any,
+): Promise<Quote | undefined> => {
   return (
-    await firebase
-      .firestore()
-      .collection('quotes')
-      .where('groupId', '==', id)
-      .get()
+    await firebase.firestore().collection('quotes').where('groupId', '==', id).get()
   ).docs.map(doc => normalize(doc.data()) as Quote)[0];
 };
 
 const fetchBookingRequestById = async (id: string) => {
-  return (
-    await firebase
-      .firestore()
-      .collection('bookings-requests')
-      .doc(id)
-      .get()
-  ).data() as BookingRequest | undefined;
+  return (await firebase.firestore().collection('bookings-requests').doc(id).get()).data() as
+    | BookingRequest
+    | undefined;
 };
 
-const isEligible = (userClientId: string, documentClientId: string) => userClientId === documentClientId;
+const isEligible = (userClientId: string, documentClientId: string) =>
+  userClientId === documentClientId;
 
 const useAntiTrust = async () => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const userRecord = useContext(UserRecord);
   const [actingAs] = useContext(ActingAs);
   const isAdmin = !actingAs;
@@ -60,7 +57,6 @@ const useAntiTrust = async () => {
 
   if (!userRecord || !userRecord.alphacomClientId || isAdmin) return;
 
-  const { location } = history;
   const { pathname } = location;
   const { type, id } = extractIdFromPath(pathname);
 
@@ -70,22 +66,23 @@ const useAntiTrust = async () => {
     case 'quotes/groups':
       const quoteGroup = await fetchQuteByGroupId(id, normalize);
       if (!quoteGroup || !quoteGroup.clientId) return;
-      if (!isEligible(userRecord.alphacomClientId, quoteGroup.clientId)) history.push('/not-found');
+      if (!isEligible(userRecord.alphacomClientId, quoteGroup.clientId)) navigate('/not-found');
       return;
     case 'quotes':
       const quote = (await getQuoteDocRef(id)).data() as Quote;
       if (!quote || !quote.clientId) return;
-      if (!isEligible(userRecord.alphacomClientId, quote.clientId)) history.push('/not-found');
+      if (!isEligible(userRecord.alphacomClientId, quote.clientId)) navigate('/not-found');
       return;
     case 'bookings':
       const booking = (await getBookingData(id)) as Booking | undefined;
       if (!booking || !booking.ForwAdrId) return;
-      if (!isEligible(userRecord.alphacomClientId, booking.ForwAdrId)) history.push('/not-found');
+      if (!isEligible(userRecord.alphacomClientId, booking.ForwAdrId)) navigate('/not-found');
       return;
     case 'bookings-requests':
       const bookingRequest = await fetchBookingRequestById(id);
       if (!bookingRequest || !bookingRequest.client?.id) return;
-      if (!isEligible(userRecord.alphacomClientId, bookingRequest.client?.id)) history.push('/not-found');
+      if (!isEligible(userRecord.alphacomClientId, bookingRequest.client?.id))
+        navigate('/not-found');
       return;
     default:
       return;

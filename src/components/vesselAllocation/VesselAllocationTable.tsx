@@ -29,16 +29,29 @@ const PercentData = ({ percent }: { percent: string }) => (
 );
 
 const countAllocation = (allocation?: VesselAllocation) => {
-  if (!allocation) return { initial: { teu: 0, weight: 0 }, total: { teu: 0, ton: 0 }, difference: { teu: 0, ton: 0 } };
+  if (!allocation)
+    return {
+      initial: { teu: 0, weight: 0 },
+      total: { teu: 0, ton: 0 },
+      difference: { teu: 0, ton: 0 },
+    };
 
   const initial = {
-    teu: !isNaN(+allocation.teuAllocation) && +allocation.teuAllocation !== 0 ? +allocation.teuAllocation : 0,
+    teu:
+      !isNaN(+allocation.teuAllocation) && +allocation.teuAllocation !== 0
+        ? +allocation.teuAllocation
+        : 0,
     weight:
-      !isNaN(+allocation.weightAllocation) && +allocation.weightAllocation !== 0 ? +allocation.weightAllocation : 0,
+      !isNaN(+allocation.weightAllocation) && +allocation.weightAllocation !== 0
+        ? +allocation.weightAllocation
+        : 0,
   };
 
   const allocationTotal = {
-    teu: (allocation.inProgress?.quantity || 0) + (allocation.requested?.quantity || 0) + +(allocation.teuBooked || 0),
+    teu:
+      (allocation.inProgress?.quantity || 0) +
+      (allocation.requested?.quantity || 0) +
+      +(allocation.teuBooked || 0),
     ton:
       ((allocation.inProgress && allocation.inProgress.weight / 1000) || 0) +
       ((allocation.requested && allocation.requested.weight / 1000) || 0) +
@@ -73,7 +86,9 @@ const BookingsOverviewTable: React.FC<BookingsOverviewTableProps> = ({ bookings 
   );
 };
 
-const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> = ({ bookingRequests }) => {
+const BookingRequestsOverviewTable: React.FC<BookingRequestsOverviewTableProps> = ({
+  bookingRequests,
+}) => {
   return (
     <Table size="small" aria-label="requests">
       <TableBody>
@@ -109,8 +124,12 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
   const [openRequested, setOpenRequested] = useState(false);
   const [openInProgress, setOpenInProgress] = useState(false);
 
-  const [requestedRequests, setRequestedRequests] = useState<BookingRequest[] | undefined>(undefined);
-  const [inProgressRequests, setInProgressRequests] = useState<BookingRequest[] | undefined>(undefined);
+  const [requestedRequests, setRequestedRequests] = useState<BookingRequest[] | undefined>(
+    undefined,
+  );
+  const [inProgressRequests, setInProgressRequests] = useState<BookingRequest[] | undefined>(
+    undefined,
+  );
 
   const relevantBookingRequests = useBookingRequests(
     useCallback(
@@ -145,12 +164,16 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
   useEffect(() => {
     setRequestedRequests(
       relevantBookingRequests
-        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.REQUESTED)
+        ? relevantBookingRequests?.filter(
+            request => request.statusCode === BookingRequestStatusCode.REQUESTED,
+          )
         : [],
     );
     setInProgressRequests(
       relevantBookingRequests
-        ? relevantBookingRequests?.filter(request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS)
+        ? relevantBookingRequests?.filter(
+            request => request.statusCode === BookingRequestStatusCode.IN_PROGRESS,
+          )
         : [],
     );
   }, [relevantBookingRequests]);
@@ -178,7 +201,9 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
             <TableCell component="th" scope="row">
               Allocation
             </TableCell>
-            <TableCell align="right">{allocation.initial.teu !== 0 ? allocation.initial.teu : 'On Request'}</TableCell>
+            <TableCell align="right">
+              {allocation.initial.teu !== 0 ? allocation.initial.teu : 'On Request'}
+            </TableCell>
             <TableCell align="right">
               {allocation.initial.weight !== 0 ? allocation.initial.weight : 'On Request'}
             </TableCell>
@@ -199,16 +224,22 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
             </TableCell>
             <TableCell component="th" scope="row">
               {`Confirmed Bookings ${
-                relevantBookings && relevantBookings?.length > 0 ? '(' + relevantBookings?.length + ' bookings)' : ''
+                relevantBookings && relevantBookings?.length > 0
+                  ? '(' + relevantBookings?.length + ' bookings)'
+                  : ''
               }`}
             </TableCell>
             <TableCell align="right">
               {vessel.teuBooked || 0}{' '}
-              {vessel.teuPercent ? <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} /> : null}
+              {vessel.teuPercent ? (
+                <PercentData percent={parseFloat(vessel.teuPercent).toFixed(1)} />
+              ) : null}
             </TableCell>
             <TableCell align="right">
               {vessel.weightBooked ? parseFloat(vessel.weightBooked).toFixed(2) : 0}{' '}
-              {vessel.weightPercent ? <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} /> : null}
+              {vessel.weightPercent ? (
+                <PercentData percent={parseFloat(vessel.weightPercent).toFixed(1)} />
+              ) : null}
             </TableCell>
           </TableRow>
           <TableRow>
@@ -320,7 +351,9 @@ const VesselAllocationTable: React.FC<AllocationProps> = ({ vessel, vesselVoyage
               {allocation.difference.teu !== 0 ? allocation.difference.teu : 'On Request'}
             </TableCell>
             <TableCell align="right">
-              {allocation.difference.ton !== 0 ? allocation.difference.ton.toFixed(2) : 'On Request'}
+              {allocation.difference.ton !== 0
+                ? allocation.difference.ton.toFixed(2)
+                : 'On Request'}
             </TableCell>
           </TableRow>
         </TableBody>

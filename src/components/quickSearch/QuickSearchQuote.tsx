@@ -1,8 +1,15 @@
 import React, { useState, Fragment, useEffect, useRef, useCallback } from 'react';
-import { Box, CircularProgress, FormControl, IconButton, makeStyles, TextField } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  FormControl,
+  IconButton,
+  makeStyles,
+  TextField,
+} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import firebase from '../../firebase';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Quote } from '../../providers/QuoteGroupsProvider';
 import QuickSearchQuotePreview from './QuickSearchQuotePreview';
 import Mousetrap from 'mousetrap';
@@ -29,14 +36,14 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
   const [inputValue, setInputValue] = useState('');
   const [searchResult, setSearchResult] = useState<Quote | undefined | null>();
   const [isLoading, setIsLoading] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const isEligibleForQuote = useIsEligibleForQuote();
 
   const normalize = useNormalizeQuote();
 
   const handleQuoteClick = () => {
-    history.push(`/quotes/${searchResult?.id}`);
+    navigate(`/quotes/${searchResult?.id}`);
     handleClose();
   };
 
@@ -83,7 +90,7 @@ const QuickSearchQuote: React.FC<Props> = ({ label, fieldPath, handleClose }) =>
     if (inputRef && inputRef.current && inputValue !== '') {
       inputRef.current?.focus();
       let moustrapInstance = new Mousetrap(inputRef?.current);
-      moustrapInstance.stopCallback = function() {
+      moustrapInstance.stopCallback = function () {
         return false;
       };
       moustrapInstance.bind(['enter', 'enter'], () => handleQuoteSearch(fieldPath));

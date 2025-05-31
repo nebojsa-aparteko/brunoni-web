@@ -17,7 +17,11 @@ const RouteSearchProvider = (props: any) => {
   const setStateFn = (state: any) => {
     setState(state);
   };
-  return <RouteSearchContext.Provider value={[state, setStateFn]}>{props.children}</RouteSearchContext.Provider>;
+  return (
+    <RouteSearchContext.Provider value={[state, setStateFn]}>
+      {props.children}
+    </RouteSearchContext.Provider>
+  );
 };
 
 export { RouteSearchContext, RouteSearchProvider };

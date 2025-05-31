@@ -19,6 +19,7 @@ import { useSnackbar } from 'notistack';
 import pick from 'lodash/fp/pick';
 import { TaskDescription, TaskType } from '../../model/Task';
 import CarriersMultiInput from '../inputs/CarriersMultiInput';
+import { tryGetErrorMessage } from '../../utilities/errorHelper';
 
 interface Props extends React.Attributes {
   team: Team;
@@ -55,7 +56,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
     setActiveTeam(set('categories', asArray(value))(activeTeam));
     setChanged(true);
   };
-  const handleChecklistItemChange = (event: React.ChangeEvent<{}>, value: string | string[] | null) => {
+  const handleChecklistItemChange = (
+    event: React.ChangeEvent<{}>,
+    value: string | string[] | null,
+  ) => {
     const checklistNamesPreview = Object.entries(ChecklistNamesPreview);
 
     setActiveTeam(
@@ -84,7 +88,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
     setChanged(true);
   };
 
-  const onTeamsChanged = (event: React.ChangeEvent<{}>, value: UserRecord[] | UserRecord | null) => {
+  const onTeamsChanged = (
+    event: React.ChangeEvent<{}>,
+    value: UserRecord[] | UserRecord | null,
+  ) => {
     setActiveTeam(
       set(
         'users',
@@ -109,7 +116,7 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
       })
       .catch(error => {
         console.trace(error);
-        enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -137,7 +144,11 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
         />
       </TableCell>
       <TableCell align="right">
-        <CarriersMultiInput options={carriers || []} defaultValues={team.carriers} onChange={handleCarrierChange} />
+        <CarriersMultiInput
+          options={carriers || []}
+          defaultValues={team.carriers}
+          onChange={handleCarrierChange}
+        />
         {/*<Autocomplete*/}
         {/*  multiple*/}
         {/*  autoHighlight*/}
@@ -166,7 +177,12 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
             value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
           }
           renderInput={params => (
-            <TextField {...params} label="Categories" placeholder="Type to filter" variant="outlined" />
+            <TextField
+              {...params}
+              label="Categories"
+              placeholder="Type to filter"
+              variant="outlined"
+            />
           )}
         />
       </TableCell>
@@ -178,7 +194,10 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
             autoHighlight
             options={checklistItems || []}
             defaultValue={team.checklistItems
-              ?.map(value => Object.entries(ChecklistNames).find(([, name]) => value === name)?.[0] || '')
+              ?.map(
+                value =>
+                  Object.entries(ChecklistNames).find(([, name]) => value === name)?.[0] || '',
+              )
               ?.map(val => checklistNamesPreview.find(([id]) => id === val)?.[1] || '')}
             getOptionSelected={(option, value) => option === value}
             onChange={handleChecklistItemChange}
@@ -186,7 +205,12 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
               value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
             }
             renderInput={params => (
-              <TextField {...params} label="Checklist" placeholder="Type to filter" variant="outlined" />
+              <TextField
+                {...params}
+                label="Checklist"
+                placeholder="Type to filter"
+                variant="outlined"
+              />
             )}
           />
         ) : (
@@ -203,7 +227,12 @@ const TeamTeamRow: React.FC<Props> = ({ team, selected, onSelectRow, ...other })
               value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
             }
             renderInput={params => (
-              <TextField {...params} label="Task type" placeholder="Type to filter" variant="outlined" />
+              <TextField
+                {...params}
+                label="Task type"
+                placeholder="Type to filter"
+                variant="outlined"
+              />
             )}
           />
         )}

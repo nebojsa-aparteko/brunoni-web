@@ -13,7 +13,7 @@ export default function useBookingRequestChecklist(bookingRequestId: string, che
   if (!checklistCollection) return undefined;
 
   const checklist = checklistCollection?.docs.map(
-    doc => ({ id: doc.id, ...doc.data() } as ChecklistItem),
+    doc => ({ id: doc.id, ...doc.data() }) as ChecklistItem,
   ) as ChecklistItem[];
 
   if (checklistId) {

@@ -1,15 +1,29 @@
-import React, { createContext, Dispatch, useCallback, useEffect, useReducer } from 'react';
-import { globalActions, GlobalAppState, START_GLOBAL_LOADING, STOP_GLOBAL_LOADING } from './types/globalAppState';
+import React from 'react';
+import { ReactNode, createContext, Dispatch, useEffect, useReducer } from 'react';
+import {
+  globalActions,
+  GlobalAppState,
+  START_GLOBAL_LOADING,
+  STOP_GLOBAL_LOADING,
+} from './types/globalAppState';
 import globalReducer from './reducers/globalReducer';
 import { useSnackbar } from 'notistack';
 import { Typography } from '@material-ui/core';
+import { tryGetErrorMessage } from '../utilities/errorHelper';
 
 export const defaultState: GlobalAppState = {
   isGlobalLoadingInProgress: false,
 };
-export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActions>]>([defaultState, () => {}]);
+export const GlobalContext = createContext<[GlobalAppState, Dispatch<globalActions>]>([
+  defaultState,
+  () => {},
+]);
 
-const GlobalStore: React.FC = ({ children }) => {
+interface GlobalStoreProps {
+  children: ReactNode;
+}
+
+const GlobalStore = ({ children }: GlobalStoreProps) => {
   const [state, dispatch] = useReducer(globalReducer, defaultState);
   const { snackbarMessage, promiseActivity } = state;
   const { enqueueSnackbar } = useSnackbar();
@@ -36,7 +50,7 @@ const GlobalStore: React.FC = ({ children }) => {
         })
         .catch(error => {
           console.error('error storing activity', error);
-          enqueueSnackbar(<Typography color="inherit"> {error.message}!</Typography>, {
+          enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
             variant: 'error',
             autoHideDuration: 3000,
           });

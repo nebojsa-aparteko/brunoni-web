@@ -45,7 +45,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelete, handleDialogOpen }) => {
+const InternalStorageItem: React.FC<Props> = ({
+  item,
+  handleMention,
+  handleDelete,
+  handleDialogOpen,
+}) => {
   const classes = useStyles();
 
   const [removalInProgress, setRemovalInProgress] = useState(false);
@@ -67,22 +72,35 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
           id={`filelistitem-${item.storedName}`}
           disableTypography
           primary={
-            <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>{item.name}</Typography>
+            <Typography style={{ wordBreak: 'break-word', paddingRight: theme.spacing(5) }}>
+              {item.name}
+            </Typography>
           }
           secondary={
-            <Box style={{ cursor: 'default' }} onClick={e => e.preventDefault()} display={'flex'} alignItems={'center'}>
+            <Box
+              style={{ cursor: 'default' }}
+              onClick={e => e.preventDefault()}
+              display={'flex'}
+              alignItems={'center'}
+            >
               <DateFormattedText date={safeInvoke('toDate')(item.uploadedAt)} />
               <Typography style={{ marginLeft: '.2em' }} variant="caption">
-                {isPlatformActivity(item.uploadedBy) ? 'by Platform' : `by ${item.uploadedBy.firstName}`}
+                {isPlatformActivity(item.uploadedBy)
+                  ? 'by Platform'
+                  : `by ${item.uploadedBy.firstName}`}
               </Typography>
               {item.bookingEmlStatus && (
                 <Box ml={1}>
                   {item.bookingEmlStatus === 'sent' ? (
-                    <Tooltip title={`Email sent ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}>
+                    <Tooltip
+                      title={`Email sent ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}
+                    >
                       <EmailIcon htmlColor={'rgba(0,200,81)'} />
                     </Tooltip>
                   ) : (
-                    <Tooltip title={`Email failed ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}>
+                    <Tooltip
+                      title={`Email failed ${item.bookingTimestamp ? 'at ' + item.bookingTimestamp : ''}`}
+                    >
                       <EmailIcon htmlColor={'rgba(200,0,0)'} />
                     </Tooltip>
                   )}
@@ -100,7 +118,11 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
       <ListItemSecondaryAction>
         <Box display={'flex'} alignItems={'center'} className={classes.progressWrapper}>
           {handleDialogOpen && (
-            <IconButton size="small" aria-label="Add to Comparison" onClick={() => handleDialogOpen(item)}>
+            <IconButton
+              size="small"
+              aria-label="Add to Comparison"
+              onClick={() => handleDialogOpen(item)}
+            >
               <CompareIcon />
             </IconButton>
           )}
@@ -114,7 +136,9 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
               }}
             >
               {/*<Badge badgeContent={item.mentionCount || 0} color="primary">*/}
-              <AddCommentIcon style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }} />
+              <AddCommentIcon
+                style={{ color: (item.mentionCount || 0) > 0 ? '#F7BC06' : 'inherit' }}
+              />
               {/*</Badge>*/}
             </IconButton>
           )}
@@ -133,7 +157,9 @@ const InternalStorageItem: React.FC<Props> = ({ item, handleMention, handleDelet
               <DeleteIcon />
             </IconButton>
           )}
-          {removalInProgress && <CircularProgress size={42} className={classes.iconDeleteProgress} />}
+          {removalInProgress && (
+            <CircularProgress size={42} className={classes.iconDeleteProgress} />
+          )}
         </Box>
       </ListItemSecondaryAction>
     </ListItem>

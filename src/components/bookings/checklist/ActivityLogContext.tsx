@@ -10,7 +10,10 @@ export type ActivityLogContextProps = {
 };
 
 const ActivityLogStateContext = createContext<
-  | { state: ActivityLogContextProps | undefined; setState: (state: ActivityLogContextProps | undefined) => void }
+  | {
+      state: ActivityLogContextProps | undefined;
+      setState: (state: ActivityLogContextProps | undefined) => void;
+    }
   | undefined
 >(undefined);
 

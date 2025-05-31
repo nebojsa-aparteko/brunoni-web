@@ -48,7 +48,13 @@ const Clients: React.FC<Props> = ({}) => {
     get('docs'),
     map(invoke('data')),
     groupBy('clientId'),
-    map(flow(head, (user: UserRecord) => set('company.id', user.alphacomClientId)(user), get('company'))),
+    map(
+      flow(
+        head,
+        (user: UserRecord) => set('company.id', user.alphacomClientId)(user),
+        get('company'),
+      ),
+    ),
     orderBy('name', 'asc'),
   )(users);
 

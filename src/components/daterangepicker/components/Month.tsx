@@ -1,7 +1,14 @@
 import * as React from 'react';
 import { createStyles, Grid, Paper, Typography, WithStyles, withStyles } from '@material-ui/core';
 import { getDate, getWeek, isSameMonth, isToday, isWithinInterval, subDays } from 'date-fns';
-import { chunks, getDaysInMonth, inDateRange, isEndOfRange, isRangeSameDay, isStartOfRange } from '../utils';
+import {
+  chunks,
+  getDaysInMonth,
+  inDateRange,
+  isEndOfRange,
+  isRangeSameDay,
+  isStartOfRange,
+} from '../utils';
 import Header from './Header';
 import Day from './Day';
 import { DateRange, NavigationAction } from '../types';
@@ -45,7 +52,17 @@ interface MonthProps extends WithStyles<typeof styles> {
 }
 
 const Month: React.FunctionComponent<MonthProps> = props => {
-  const { classes, helpers, handlers, value: date, dateRange, marker, setValue: setDate, minDate, maxDate } = props;
+  const {
+    classes,
+    helpers,
+    handlers,
+    value: date,
+    dateRange,
+    marker,
+    setValue: setDate,
+    minDate,
+    maxDate,
+  } = props;
   const [back, forward] = props.navState;
 
   return (
@@ -60,7 +77,13 @@ const Month: React.FunctionComponent<MonthProps> = props => {
           onClickNext={() => handlers.onMonthNavigate(marker, NavigationAction.Next)}
         />
 
-        <Grid item container direction="row" justify="space-between" className={classes.weekDaysContainer}>
+        <Grid
+          item
+          container
+          direction="row"
+          justify="space-between"
+          className={classes.weekDaysContainer}
+        >
           {WEEK_DAYS.map(day => (
             <Typography color="textSecondary" key={day} variant="caption">
               {day}
@@ -68,10 +91,24 @@ const Month: React.FunctionComponent<MonthProps> = props => {
           ))}
         </Grid>
 
-        <Grid item container direction="column" justify="space-between" className={classes.daysContainer}>
+        <Grid
+          item
+          container
+          direction="column"
+          justify="space-between"
+          className={classes.daysContainer}
+        >
           {chunks(getDaysInMonth(date), 7).map((week, idx) => (
             <div key={`Week_start_${week[idx]}`}>
-              <div style={{ position: 'absolute', marginTop: 9, marginLeft: -8, fontSize: '0.8em', color: 'grey' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  marginTop: 9,
+                  marginLeft: -8,
+                  fontSize: '0.8em',
+                  color: 'grey',
+                }}
+              >
                 {getWeek(subDays(week[idx], idx), { weekStartsOn: 0, firstWeekContainsDate: 4 })}
               </div>
               <Grid key={idx} container direction="row" justify="center">
@@ -87,7 +124,10 @@ const Month: React.FunctionComponent<MonthProps> = props => {
                         filled={isStart || isEnd}
                         outlined={isToday(day)}
                         highlighted={highlighted && !isRangeOneDay}
-                        disabled={!isSameMonth(date, day) || !isWithinInterval(day, { start: minDate, end: maxDate })}
+                        disabled={
+                          !isSameMonth(date, day) ||
+                          !isWithinInterval(day, { start: minDate, end: maxDate })
+                        }
                         startOfRange={isStart && !isRangeOneDay}
                         endOfRange={isEnd && !isRangeOneDay}
                         onClick={() => handlers.onDayClick(day)}

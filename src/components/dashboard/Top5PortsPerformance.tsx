@@ -1,5 +1,14 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent, CardHeader, Divider, Table, TableCell, TableRow, Theme } from '@material-ui/core';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Table,
+  TableCell,
+  TableRow,
+  Theme,
+} from '@material-ui/core';
 import classNames from 'classnames';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -61,7 +70,9 @@ const extractPortsAggregatedData = (year: number) =>
     ),
   );
 
-const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | React.ReactNode]> }> = ({ data }) => {
+const Top5Ports: React.FC<{
+  data?: Array<[string | React.ReactNode, string | React.ReactNode]>;
+}> = ({ data }) => {
   const classes = useStyles();
 
   return (
@@ -74,7 +85,11 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
         {data
           ? data.map((item, index) => (
               <TableRow key={index}>
-                <TableCell className={classNames(classes.tableCell, classes.tableCellFont)} component="th" scope="row">
+                <TableCell
+                  className={classNames(classes.tableCell, classes.tableCellFont)}
+                  component="th"
+                  scope="row"
+                >
                   {index + 1}
                 </TableCell>
                 <TableCell
@@ -100,7 +115,10 @@ const Top5Ports: React.FC<{ data?: Array<[string | React.ReactNode, string | Rea
 };
 
 const Top5PortsPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
-  const data = useMemo(() => extractPortsAggregatedData(year)(clientPerformance), [year, clientPerformance]);
+  const data = useMemo(
+    () => extractPortsAggregatedData(year)(clientPerformance),
+    [year, clientPerformance],
+  );
 
   return (
     <Grid container spacing={2}>

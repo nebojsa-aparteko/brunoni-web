@@ -4,9 +4,8 @@ import DateFnsUtils from '@date-io/date-fns';
 import enLocale from 'date-fns/locale/en-GB';
 import { DatePicker, Day, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { useTheme } from '@material-ui/core';
-import moment from 'moment';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
-import { getWeek } from 'date-fns';
+import { getWeek, isSameDay } from 'date-fns';
 import { Controller, useFormContext } from 'react-hook-form';
 
 interface Props {
@@ -21,30 +20,24 @@ interface Props {
   fullWidth?: boolean;
 }
 
-const renderDay = (date: MaterialUiPickersDate, selectedDate: MaterialUiPickersDate, dayInCurrentMonth: boolean) => {
+const renderDay = (
+  date: MaterialUiPickersDate,
+  selectedDate: MaterialUiPickersDate,
+  dayInCurrentMonth: boolean,
+) => {
   return (
     <div>
       {date && date.getDay() === 0 ? (
-        <div style={{ position: 'absolute', left: 6, marginTop: 9, fontSize: '0.8em', color: 'grey' }}>
+        <div
+          style={{ position: 'absolute', left: 6, marginTop: 9, fontSize: '0.8em', color: 'grey' }}
+        >
           {getWeek(date, { weekStartsOn: 1, firstWeekContainsDate: 4 })}
         </div>
       ) : null}
       <Day
-        current={
-          date
-            ? moment()
-                .date(date.getDate())
-                .isSame(moment().date(new Date().getDate()), 'day')
-            : undefined
-        }
+        current={date ? isSameDay(date, new Date()) : undefined}
         hidden={!dayInCurrentMonth}
-        selected={
-          date && selectedDate
-            ? moment()
-                .date(date.getDate())
-                .isSame(moment().date(selectedDate.getDate()), 'day')
-            : undefined
-        }
+        selected={date && selectedDate ? isSameDay(date, selectedDate) : undefined}
       >
         {date ? date.getDate().toString() : null}
       </Day>

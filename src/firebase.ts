@@ -1,14 +1,14 @@
 // Firebase App (the core Firebase SDK) is always required and must be listed first
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 // If you enabled Analytics in your project, add the Firebase SDK for Analytics
-import 'firebase/analytics';
+import 'firebase/compat/analytics';
 
 // Add the Firebase products that you want to use
-import 'firebase/auth';
-import 'firebase/firestore';
-import 'firebase/storage';
-import 'firebase/firebase-functions';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/storage';
+import 'firebase/compat/functions';
 
 const developmentConfig = {
   apiKey: 'AIzaSyCGqNPUnvvO9sGCfYeC3IdeAw_jMUpJ5NQ',
@@ -42,39 +42,20 @@ const productionConfig = {
 };
 
 const firebaseConfig =
-  process.env.REACT_APP_ENV === 'stage'
+  import.meta.env.MODE === 'development' || import.meta.env.MODE === 'staging'
     ? developmentConfig // TODO this means that stage.brunoni.ch will use brunoni-allmarine DB. Good for now, revisit later :)
-    : process.env.NODE_ENV === 'production'
-    ? productionConfig[process.env.REACT_APP_BRAND as 'brunoni' | 'allmarine']
-    : process.env.REACT_APP_API_URL === 'https://stage-dot-brunoni.appspot.com'
-    ? productionConfig.brunoni
-    : process.env.REACT_APP_API_URL === 'https://stage-dot-allmarine.appspot.com'
-    ? productionConfig.allmarine
-    : developmentConfig;
+    : import.meta.env.MODE === 'production'
+      ? productionConfig[import.meta.env.VITE_BRAND as 'brunoni' | 'allmarine']
+      : import.meta.env.VITE_REACT_APP_API_URL === 'https://stage-dot-brunoni.appspot.com'
+        ? productionConfig.brunoni
+        : import.meta.env.VITE_REACT_APP_API_URL === 'https://stage-dot-allmarine.appspot.com'
+          ? productionConfig.allmarine
+          : developmentConfig;
 
 firebase.initializeApp(firebaseConfig);
 
 firebase.firestore().settings({
   cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
 });
-
-// firebase
-//   .firestore()
-//   .clearPersistence()
-//   .catch(error => {
-//     console.error('Could not clear persistence:', error.code);
-//   });
-
-// firebase
-//   .firestore()
-//   .enablePersistence({
-//     synchronizeTabs: true,
-//   })
-//   .then(() => {
-//     console.log('Enabled offline sync');
-//   })
-//   .catch(function(err) {
-//     console.warn('Failed to enable firestore persistence', err);
-//   });
 
 export default firebase;

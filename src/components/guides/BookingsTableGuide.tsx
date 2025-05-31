@@ -15,8 +15,7 @@ export let bookingsTableShepherdTour: Shepherd.Tour = new Shepherd.Tour({
 bookingsTableShepherdTour.addSteps([
   {
     title: 'Tabs - Active, History',
-    text:
-      'As soon as a shipment has been successfully processed and all tasks have been completed, it is visible in the history.',
+    text: 'As soon as a shipment has been successfully processed and all tasks have been completed, it is visible in the history.',
     attachTo: { element: '#tabsBkgPage', on: 'right' },
     buttons: [
       {

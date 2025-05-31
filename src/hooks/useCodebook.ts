@@ -23,7 +23,11 @@ export default function useCodebook({
     () => (collection: firebase.firestore.Query) => {
       let q = collection;
       if (depotLocation && !isShipperOwnedContainer(equipment!)) {
-        q = collection.where('depotLocations', 'array-contains', depotLocation ? depotLocation : '');
+        q = collection.where(
+          'depotLocations',
+          'array-contains',
+          depotLocation ? depotLocation : '',
+        );
       }
       if (isShipperOwnedContainer(equipment!)) {
         q = q.where('type', '!=', 'DEMURRAGE');
@@ -37,7 +41,11 @@ export default function useCodebook({
   const codeBookCollection = useFirestoreCollection('brunoni-codes', query);
 
   if (!depotLocation && !isShipperOwnedContainer(equipment!))
-    return { storage: [] as BrunoniCodes[], demurrage: [] as BrunoniCodes[], plugin: [] as BrunoniCodes[] };
+    return {
+      storage: [] as BrunoniCodes[],
+      demurrage: [] as BrunoniCodes[],
+      plugin: [] as BrunoniCodes[],
+    };
 
   return codeBookCollection?.docs
     .map(d => {
@@ -51,17 +59,26 @@ export default function useCodebook({
     )
     .reduce(
       (previousValue, currentValue) => {
-        if (currentValue.type === BrunoniCodesType.STORAGE) previousValue.storage.push(currentValue);
-        if (currentValue.type === BrunoniCodesType.DEMURRAGE) previousValue.demurrage.push(currentValue);
+        if (currentValue.type === BrunoniCodesType.STORAGE)
+          previousValue.storage.push(currentValue);
+        if (currentValue.type === BrunoniCodesType.DEMURRAGE)
+          previousValue.demurrage.push(currentValue);
         if (currentValue.type === BrunoniCodesType.PLUGIN) previousValue.plugin.push(currentValue);
         return previousValue;
       },
-      { storage: [] as BrunoniCodes[], demurrage: [] as BrunoniCodes[], plugin: [] as BrunoniCodes[] },
+      {
+        storage: [] as BrunoniCodes[],
+        demurrage: [] as BrunoniCodes[],
+        plugin: [] as BrunoniCodes[],
+      },
     );
 }
 
 const normalizeCodebook = (data: any) =>
-  flow(update('lastUpdated', safeInvoke('toDate')), update('validFrom', safeInvoke('toDate')))(data);
+  flow(
+    update('lastUpdated', safeInvoke('toDate')),
+    update('validFrom', safeInvoke('toDate')),
+  )(data);
 
 export const isShipperOwnedContainer = (containerId: string): boolean =>
   Object.values(ShipperOwnedContainer).includes(containerId as ShipperOwnedContainer);

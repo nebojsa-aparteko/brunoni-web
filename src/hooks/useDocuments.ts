@@ -23,5 +23,7 @@ export default <T = any>({
   );
   const documents = useFirestoreCollection(collectionPath, query);
 
-  return documents?.docs.map(doc => update('uploadedAt', safeInvoke('toDate'))({ ...doc.data(), id: doc.id })) as T[];
+  return documents?.docs.map(doc =>
+    update('uploadedAt', safeInvoke('toDate'))({ ...doc.data(), id: doc.id }),
+  ) as T[];
 };

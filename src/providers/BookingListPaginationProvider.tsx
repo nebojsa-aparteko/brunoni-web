@@ -32,7 +32,9 @@ const BookingListPaginationProvider = (props: any) => {
 export const useBookingListPaginationContext = () => {
   const context = React.useContext(BookingListPaginationContext);
   if (context === undefined) {
-    throw new Error('useBookingListPaginationContext must be used within a BookingListPaginationProvider');
+    throw new Error(
+      'useBookingListPaginationContext must be used within a BookingListPaginationProvider',
+    );
   }
   return context;
 };

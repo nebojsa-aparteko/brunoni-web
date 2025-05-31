@@ -12,7 +12,7 @@ import SupervisedUserCircle from '@material-ui/icons/SupervisedUserCircle';
 import firebase from '../firebase';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { isDashboardUser } from '../model/UserRecord';
 
 const useStyles = makeStyles(() => ({
@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
 
 const UserWidget: React.FC = () => {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [menuId] = useId();
   const { enqueueSnackbar } = useSnackbar();
   const [user, userData] = useUser();
@@ -55,19 +55,24 @@ const UserWidget: React.FC = () => {
     } else {
       setActingAs(user.uid);
     }
-    history.push('/');
-  }, [setAnchorEl, setActingAs, user, history, actingAs]);
+    navigate('/');
+  }, [setAnchorEl, setActingAs, user, navigate, actingAs]);
 
   const handleLogOut = useCallback(async () => {
     try {
       await firebase.auth().signOut();
       setAnchorEl(null);
-      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, { variant: 'info' });
+      enqueueSnackbar(<Typography color="inherit">You are now signed out.</Typography>, {
+        variant: 'info',
+      });
     } catch (e) {
       console.error('Unable to sign out', e);
-      enqueueSnackbar(<Typography color="inherit">Error occurred while trying to sign you out.</Typography>, {
-        variant: 'error',
-      });
+      enqueueSnackbar(
+        <Typography color="inherit">Error occurred while trying to sign you out.</Typography>,
+        {
+          variant: 'error',
+        },
+      );
     }
   }, [setAnchorEl, enqueueSnackbar]);
 
@@ -76,7 +81,9 @@ const UserWidget: React.FC = () => {
       <Chip
         id="userMenuNav"
         avatar={
-          <Avatar className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}>
+          <Avatar
+            className={userData && userData.isRedirectionActive ? classes.avatarWarning : undefined}
+          >
             {isDashboardUser(userData) ? (
               userData && userData.isRedirectionActive ? (
                 <Forward color="error" />
@@ -113,13 +120,15 @@ const UserWidget: React.FC = () => {
               <MenuItem disabled style={{ opacity: 'initial' }}>
                 <Box>
                   <Typography variant="subtitle1">{client.name.toUpperCase()}</Typography>
-                  {client.city && <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>}
+                  {client.city && (
+                    <Typography variant="subtitle2">{client.city.toUpperCase()}</Typography>
+                  )}
                 </Box>
               </MenuItem>
               {isDashboardUser(actingAs) && (
                 <MenuItem onClick={handleSwitch}>
                   Switch to{' '}
-                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(import.meta.env.VITE_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </MenuItem>
@@ -131,7 +140,7 @@ const UserWidget: React.FC = () => {
             <MenuItem disabled style={{ opacity: 'initial' }}>
               <Box>
                 <Typography variant="subtitle1">
-                  {[changeCase.capitalCase(process.env.REACT_APP_BRAND || ''), 'Administrator']
+                  {[changeCase.capitalCase(import.meta.env.VITE_BRAND || ''), 'Administrator']
                     .filter(identity)
                     .join(' ')}
                 </Typography>

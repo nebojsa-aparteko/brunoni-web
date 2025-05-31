@@ -39,7 +39,10 @@ const BookingRequestSpecialRemarks: React.FC = () => {
   return bookingRequest ? (
     <React.Fragment>
       {editing && isDashboardUser(userRecord) ? (
-        <SpecialRemarksInput specialRemarks={specialRemarksState} handleChange={handleChangeSpecialRemarks} />
+        <SpecialRemarksInput
+          specialRemarks={specialRemarksState}
+          handleChange={handleChangeSpecialRemarks}
+        />
       ) : specialRemarksState && specialRemarksState.length > 0 ? (
         <Grid
           container

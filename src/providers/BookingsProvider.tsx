@@ -1,4 +1,11 @@
-import React, { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import useUser from '../hooks/useUser';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import { Booking } from '../model/Booking';
@@ -97,10 +104,10 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
           filters.carrier.id === 'HSG'
             ? 'Hamburg Süd'
             : filters.carrier.id === 'SLOM'
-            ? 'SLOMAN NEPTUN'
-            : filters.carrier?.id === 'STNN'
-            ? 'HUGO STINNES'
-            : filters.carrier.id,
+              ? 'SLOMAN NEPTUN'
+              : filters.carrier?.id === 'STNN'
+                ? 'HUGO STINNES'
+                : filters.carrier.id,
         );
       }
 
@@ -120,7 +127,13 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
         ? query.orderBy('createdAt', 'desc').orderBy('updatedAt', 'desc')
         : query.orderBy('updatedAt', 'desc');
 
-      const watchingFilters = ['clientFilter', 'originPort', 'destinationPort', 'carrier', 'assignee'];
+      const watchingFilters = [
+        'clientFilter',
+        'originPort',
+        'destinationPort',
+        'carrier',
+        'assignee',
+      ];
       if (isNumberOfAppliedFiltersLessThan(filters, watchingFilters, 3)) {
         query = query.limit(100);
       }
@@ -144,7 +157,11 @@ const BookingsProvider: React.FC<Props> = ({ children }) => {
     return normalizeBookings(bookings);
   }, [bookingsSnapshot]);
 
-  return <BookingsContext.Provider value={[bookingsResult, isLoading]}>{children}</BookingsContext.Provider>;
+  return (
+    <BookingsContext.Provider value={[bookingsResult, isLoading]}>
+      {children}
+    </BookingsContext.Provider>
+  );
 };
 
 export default BookingsProvider;

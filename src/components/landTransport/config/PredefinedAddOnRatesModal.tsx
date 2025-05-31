@@ -1,5 +1,14 @@
 import React from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, makeStyles, Theme, Typography } from '@material-ui/core';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  makeStyles,
+  Theme,
+  Typography,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import EditableTable from '../../EditableTable';
 import {

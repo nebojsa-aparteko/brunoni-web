@@ -132,7 +132,10 @@ export interface Remark {
   RemarkTitle: string;
 }
 
-export const normalizeDateRange = flow(update('from', invoke('toDate')), update('to', invoke('toDate')));
+export const normalizeDateRange = flow(
+  update('from', invoke('toDate')),
+  update('to', invoke('toDate')),
+);
 
 const uniqueCommodityTypes = flow(map(get('commodityType')), filter(identity), uniqBy('id'));
 
@@ -198,7 +201,9 @@ export const normalizeQuoteGroups = (
       placeOfDeliveryName: normalizedQuote.placeOfDeliveryName,
       placeOfReceiptName: normalizedQuote.placeOfReceiptName,
       commodityTypes: normalizedQuote.commodityTypes,
-      assignedUsers: normalizedQuotes.filter(quote => quote.assignedTo).map(quote => quote.assignedTo),
+      assignedUsers: normalizedQuotes
+        .filter(quote => quote.assignedTo)
+        .map(quote => quote.assignedTo),
       quotes: normalizedQuotes,
     };
   });
@@ -206,15 +211,18 @@ export const normalizeQuoteGroups = (
   return flow(
     groupBy('groupId'),
     values,
-    flatMap((group: any[]) => (group[0].groupId ? [group] : group.map(item => [set('groupId', item.id)(item)]))),
+    flatMap((group: any[]) =>
+      group[0].groupId ? [group] : group.map(item => [set('groupId', item.id)(item)]),
+    ),
     map(normalizeQuoteGroup),
     orderBy([get('dateIssued'), flow(get('id'), padStart(10))], ['desc', 'desc']),
   ) as (result: Quote[]) => QuoteGroup[];
 };
 
-export const getEntity = <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) => (
-  id: string | null | undefined,
-) => (id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null);
+export const getEntity =
+  <T extends { id: string }>(collection: T[] | null | undefined, prop: (i: T) => string) =>
+  (id: string | null | undefined) =>
+    id ? collection?.find(i => prop(i) === id) || ({ id } as T) : null;
 
 const QuoteGroupsProvider: React.FC<Props> = ({ children }) => {
   const containerTypes = useContext(ContainerTypes);
@@ -231,12 +239,23 @@ const QuoteGroupsProvider: React.FC<Props> = ({ children }) => {
     const getPort = getEntity(ports, port => port.id);
     const getCarrier = getEntity(carriers, carrier => carrier.name);
 
-    return normalizeQuoteGroups(getContainerType, getCommodityType, getPickupLocation, getPort, getCarrier);
+    return normalizeQuoteGroups(
+      getContainerType,
+      getCommodityType,
+      getPickupLocation,
+      getPort,
+      getCarrier,
+    );
   }, [containerTypes, commodityTypes, pickupLocations, ports, carriers]);
 
-  const quoteGroups = useMemo(() => (quotes === undefined ? undefined : normalize(quotes)), [quotes, normalize]);
+  const quoteGroups = useMemo(
+    () => (quotes === undefined ? undefined : normalize(quotes)),
+    [quotes, normalize],
+  );
 
-  return <Context.Provider value={!isLoading ? quoteGroups : undefined}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={!isLoading ? quoteGroups : undefined}>{children}</Context.Provider>
+  );
 };
 
 export default QuoteGroupsProvider;

@@ -171,7 +171,10 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
         className={classes.dialogTitleBar}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'start' }}
       >
-        <Typography variant="h4" className={classes.fileNumber}>{`File No: ${booking.id}`}</Typography>
+        <Typography
+          variant="h4"
+          className={classes.fileNumber}
+        >{`File No: ${booking.id}`}</Typography>
         <IconButton onClick={handleClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -223,7 +226,13 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <Button onClick={handleClose} color="primary" variant="outlined" autoFocus className={classes.button}>
+                <Button
+                  onClick={handleClose}
+                  color="primary"
+                  variant="outlined"
+                  autoFocus
+                  className={classes.button}
+                >
                   Cancel
                 </Button>
                 <Button
@@ -232,7 +241,9 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
                   disabled={payment.status !== WeeklyPaymentStatus.IN_PROGRESS}
                   style={{
                     backgroundColor:
-                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS ? 'lightgray' : 'rgb(200,74,77)',
+                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS
+                        ? 'lightgray'
+                        : 'rgb(200,74,77)',
                     color: 'white',
                   }}
                   className={classes.button}
@@ -246,7 +257,9 @@ const CheckAccountingDocumentDialog: React.FC<Props> = ({
                   disabled={payment.status !== WeeklyPaymentStatus.IN_PROGRESS}
                   style={{
                     backgroundColor:
-                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS ? 'lightgray' : 'rgba(0,200,81, 1)',
+                      payment.status !== WeeklyPaymentStatus.IN_PROGRESS
+                        ? 'lightgray'
+                        : 'rgba(0,200,81, 1)',
                     color: 'white',
                   }}
                   className={classes.button}
@@ -281,7 +294,11 @@ interface Props {
   booking: Booking;
   payment: WeeklyPayment;
   accountingDocuments: DocumentValue[];
-  changeStatus: (item: ChecklistItemValueDocument, status: DocumentValueStatus, dontCreateActivity?: boolean) => void;
+  changeStatus: (
+    item: ChecklistItemValueDocument,
+    status: DocumentValueStatus,
+    dontCreateActivity?: boolean,
+  ) => void;
   isAccountingDialog?: boolean;
   updateComponent?: () => void;
 }

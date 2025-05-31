@@ -73,7 +73,9 @@ const AdditionalInfo: React.FC<Props> = ({
                 handleOnDelete={file =>
                   setFiles(prevFiles => ({
                     ...prevFiles,
-                    certificate: prevFiles.certificate.filter(prevFile => prevFile.name !== file.name),
+                    certificate: prevFiles.certificate.filter(
+                      prevFile => prevFile.name !== file.name,
+                    ),
                   }))
                 }
                 dropzoneText={'Upload Certificate'}

@@ -1,7 +1,15 @@
 import 'isomorphic-fetch';
 import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
-import { CircularProgress, makeStyles, Paper, Popper, PopperProps, TextField, Theme } from '@material-ui/core';
+import {
+  CircularProgress,
+  makeStyles,
+  Paper,
+  Popper,
+  PopperProps,
+  TextField,
+  Theme,
+} from '@material-ui/core';
 import Port from '../../model/Port';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
@@ -11,9 +19,13 @@ import { FieldError } from 'react-hook-form';
 const filter = createFilterOptions<Port>();
 
 const getOptionLabel = (option: Port) =>
-  option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `${option.id}`;
+  option.city && option.country
+    ? `${option.city} - ${option.country} (${option.id})`
+    : `${option.id}`;
 const getOptionSelectItemLabel = (option: Port) =>
-  option.city && option.country ? `${option.city} - ${option.country} (${option.id})` : `Add "${option.id}"`;
+  option.city && option.country
+    ? `${option.city} - ${option.country} (${option.id})`
+    : `Add "${option.id}"`;
 
 interface Props {
   label?: string;
@@ -103,8 +115,14 @@ const PortInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), inputValue);
-        const parts = parse(freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option), matches);
+        const matches = match(
+          freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option),
+          inputValue,
+        );
+        const parts = parse(
+          freeSolo ? getOptionSelectItemLabel(option) : getOptionLabel(option),
+          matches,
+        );
 
         return (
           <div>

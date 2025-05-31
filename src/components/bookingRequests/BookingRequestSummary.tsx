@@ -15,8 +15,12 @@ import {
 import React, { Fragment, useCallback, useContext, useMemo } from 'react';
 import useUserByAlphacomId from '../../hooks/useUserByAlphacomId';
 import TableBody from '@material-ui/core/TableBody';
-import { BookingRequest, BookingRequestItinerary, BookingRequestLabels } from '../../model/BookingRequest';
-import { ClientDetails } from '../bookings/BookingSummary';
+import {
+  BookingRequest,
+  BookingRequestItinerary,
+  BookingRequestLabels,
+} from '../../model/BookingRequest';
+import { ClientDetails } from '../bookings/ClientDetails';
 import { formatDateString } from '../routeSearch/Route';
 import SchedulePicker from './SchedulePicker';
 import {
@@ -28,7 +32,7 @@ import {
   SearchResultsPort,
 } from '../../model/route-search/RouteSearchResults';
 import { useBookingRequestContext } from '../../providers/BookingRequestProvider';
-import { Link } from 'react-router-dom';
+import { Link } from '../Link';
 import UserRecord, { isDashboardUser, UserRecordMin } from '../../model/UserRecord';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
@@ -162,7 +166,9 @@ const emptyPlaceOfDelivery = {
 } as RouteSearchResultDestinationInfo;
 
 const getInputValueFromPort = (value: SearchResultsPort | null) => {
-  return value ? ({ id: value.ID, city: value.HarbourName, country: value.Land } as Port) : undefined;
+  return value
+    ? ({ id: value.ID, city: value.HarbourName, country: value.Land } as Port)
+    : undefined;
 };
 const getPortFromInputValue = (value: Port | null) => {
   return value
@@ -174,7 +180,13 @@ const getPortFromInputValue = (value: Port | null) => {
           PortName: value?.id,
           Land: value.country || '',
         }
-      : ({ ID: value?.id, HarbourName: value?.id, PortAgent: '', PortName: value?.id, Land: '' } as SearchResultsPort)
+      : ({
+          ID: value?.id,
+          HarbourName: value?.id,
+          PortAgent: '',
+          PortName: value?.id,
+          Land: '',
+        } as SearchResultsPort)
     : undefined;
 };
 
@@ -186,7 +198,8 @@ export const isVesselIntermediate = (vessel: string) => {
 export const hasPlaceOfReceipt = (schedule: RouteSearchResult | undefined) =>
   schedule?.IntermediatePortInfos.length === 2 ||
   (schedule?.IntermediatePortInfos.length === 1 &&
-    (isVesselIntermediate(schedule?.OriginInfo.VoyageInfo.VesselName) || !hasPlaceOfDelivery(schedule))); //Place of delivery has a priority
+    (isVesselIntermediate(schedule?.OriginInfo.VoyageInfo.VesselName) ||
+      !hasPlaceOfDelivery(schedule))); //Place of delivery has a priority
 
 const hasPlaceOfDelivery = (schedule: RouteSearchResult | undefined) =>
   schedule?.IntermediatePortInfos.length === 2 ||
@@ -197,12 +210,13 @@ export const getPortOfLoadingFromIntermediatePorts = (
   schedule: RouteSearchResult | undefined,
 ): [RouteSearchResultIntermediatePortInfo | undefined, number] => {
   return schedule?.IntermediatePortInfos.length === 2
-    ? schedule?.IntermediatePortInfos[0].DepartureDate > schedule?.IntermediatePortInfos[1].DepartureDate
+    ? schedule?.IntermediatePortInfos[0].DepartureDate >
+      schedule?.IntermediatePortInfos[1].DepartureDate
       ? [schedule?.IntermediatePortInfos[1], 1]
       : [schedule?.IntermediatePortInfos[0], 0]
     : schedule?.IntermediatePortInfos.length === 1
-    ? [schedule?.IntermediatePortInfos[0], 0]
-    : [undefined, -1]; //This should never happen
+      ? [schedule?.IntermediatePortInfos[0], 0]
+      : [undefined, -1]; //This should never happen
 };
 
 type RelevantDate = keyof Pick<ItineraryItem, 'ArrivalDate' | 'DepartureDate'>;
@@ -222,8 +236,11 @@ const PortPresentation: React.FC<{
   </Box>
 );
 
-const OptionalPaper: React.FC<{ showPaper: boolean } & PaperProps> = ({ showPaper, children, ...rest }) =>
-  showPaper ? <Paper {...rest}>{children}</Paper> : <>{children}</>;
+const OptionalPaper: React.FC<{ showPaper: boolean } & PaperProps> = ({
+  showPaper,
+  children,
+  ...rest
+}) => (showPaper ? <Paper {...rest}>{children}</Paper> : <>{children}</>);
 
 const EditingItineraryInput: React.FC<{
   editing: boolean;
@@ -279,7 +296,14 @@ const EditingItineraryInput: React.FC<{
         )}
       </Box>
       {canDelete && (
-        <Box py={2} px={1} display="flex" alignContent="center" alignItems="center" style={{ backgroundColor: '#eee' }}>
+        <Box
+          py={2}
+          px={1}
+          display="flex"
+          alignContent="center"
+          alignItems="center"
+          style={{ backgroundColor: '#eee' }}
+        >
           <IconButton onClick={handleDelete} aria-label="delete" size="small">
             <DeleteForeverIcon />
           </IconButton>
@@ -296,7 +320,11 @@ const ItineraryInfo: React.FC = () => {
   const [bookingRequest, setBookingRequest, editing] = useBookingRequestContext();
 
   const handleChangeItinerary = useCallback(
-    (itineraryField: keyof BookingRequestItinerary, value: any, fieldName?: keyof ItineraryItem) => {
+    (
+      itineraryField: keyof BookingRequestItinerary,
+      value: any,
+      fieldName?: keyof ItineraryItem,
+    ) => {
       setBookingRequest(prevState => {
         const itinerary = {
           ...prevState.itinerary,
@@ -314,7 +342,9 @@ const ItineraryInfo: React.FC = () => {
   );
 
   const handleDeleteItem = useCallback((field: keyof BookingRequestItinerary) => {
-    setBookingRequest(prevState => set('itinerary', omit([field])(get('itinerary')(prevState)))(prevState));
+    setBookingRequest(prevState =>
+      set('itinerary', omit([field])(get('itinerary')(prevState)))(prevState),
+    );
   }, []);
   return (
     <React.Fragment>
@@ -327,7 +357,9 @@ const ItineraryInfo: React.FC = () => {
               editing={editing}
               canEditDate={isDashboardUser(userRecord)}
               ports={ports}
-              handleChangeDate={value => handleChangeItinerary('placeOfReceipt', value, 'DepartureDate')}
+              handleChangeDate={value =>
+                handleChangeItinerary('placeOfReceipt', value, 'DepartureDate')
+              }
               handleChangePort={value => {
                 handleChangeItinerary('placeOfReceipt', getPortFromInputValue(value), 'Port');
               }}
@@ -368,7 +400,9 @@ const ItineraryInfo: React.FC = () => {
               editing={editing}
               canEditDate={isDashboardUser(userRecord)}
               ports={ports}
-              handleChangeDate={value => handleChangeItinerary('portOfLoading', value, 'DepartureDate')}
+              handleChangeDate={value =>
+                handleChangeItinerary('portOfLoading', value, 'DepartureDate')
+              }
               relevantDate="DepartureDate"
               dateLabel="ETS"
               canEditPort={false}
@@ -385,7 +419,9 @@ const ItineraryInfo: React.FC = () => {
               editing={editing}
               canEditDate={isDashboardUser(userRecord)}
               ports={ports}
-              handleChangeDate={value => handleChangeItinerary('portOfDischarge', value, 'ArrivalDate')}
+              handleChangeDate={value =>
+                handleChangeItinerary('portOfDischarge', value, 'ArrivalDate')
+              }
               relevantDate="ArrivalDate"
               dateLabel="ETA"
               canEditPort={false}
@@ -402,7 +438,9 @@ const ItineraryInfo: React.FC = () => {
               editing={editing}
               canEditDate={isDashboardUser(userRecord)}
               ports={ports}
-              handleChangeDate={value => handleChangeItinerary('finalDestinationPort', value, 'ArrivalDate')}
+              handleChangeDate={value =>
+                handleChangeItinerary('finalDestinationPort', value, 'ArrivalDate')
+              }
               handleChangePort={value =>
                 handleChangeItinerary('finalDestinationPort', getPortFromInputValue(value), 'Port')
               }
@@ -497,12 +535,17 @@ const getHSGRefValueFromBL = (blNo: string) => {
 const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
   const classes = useStyles();
   const [bookingRequest, setBookingRequest] = useBookingRequestContext();
-  const forwarder = useUserByAlphacomId(bookingRequest ? bookingRequest.createdBy?.alphacomId : undefined);
+  const forwarder = useUserByAlphacomId(
+    bookingRequest ? bookingRequest.createdBy?.alphacomId : undefined,
+  );
   const { closeModal, isOpen, openModal } = useModal();
   const clients = useClients();
   const [, userRecord] = useUser();
 
-  const vesselVoyage = useMemo(() => getVoyageInfoFromBookingRequest(bookingRequest), [bookingRequest]);
+  const vesselVoyage = useMemo(
+    () => getVoyageInfoFromBookingRequest(bookingRequest),
+    [bookingRequest],
+  );
 
   const handleChangeSchedule = useCallback(
     (schedule: RouteSearchResult | undefined) => {
@@ -537,7 +580,12 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
 
   const handleChangesAfterBLChange = useCallback(
     (value?: string) => {
-      if (bookingRequest.carrier?.id && bookingRequest.carrier.id === CarrierId.HSG && value && value.length === 16) {
+      if (
+        bookingRequest.carrier?.id &&
+        bookingRequest.carrier.id === CarrierId.HSG &&
+        value &&
+        value.length === 16
+      ) {
         const intBL = getHSGIntBLFromBL(value);
         const refValue = getHSGRefValueFromBL(value);
         setBookingRequest(prevState =>
@@ -548,8 +596,14 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               prevState.containers
                 ? prevState.containers.map(container =>
                     flow(
-                      set('pickupReference', container.pickupReference ? container.pickupReference : refValue),
-                      set('deliveryReference', container.deliveryReference ? container.deliveryReference : refValue),
+                      set(
+                        'pickupReference',
+                        container.pickupReference ? container.pickupReference : refValue,
+                      ),
+                      set(
+                        'deliveryReference',
+                        container.deliveryReference ? container.deliveryReference : refValue,
+                      ),
                       set('vgmPin', container.vgmPin ? container.vgmPin : refValue),
                     )(container),
                   )
@@ -618,7 +672,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                 <TableCell className={classes.tableCellLabel}>Status</TableCell>
                 <TableCell className={classes.tableCell}>
                   <Paper elevation={0} className={classes.statusContainer}>
-                    <Typography className={classes.statusText}>{bookingRequest.statusText}</Typography>
+                    <Typography className={classes.statusText}>
+                      {bookingRequest.statusText}
+                    </Typography>
                   </Paper>
                 </TableCell>
               </TableRow>
@@ -656,7 +712,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                       editing={editing}
                       value={bookingRequest.intraRefNumber}
                       inputProps={{
-                        onChange: event => handleChangeBRField('intraRefNumber', event.target.value),
+                        onChange: event =>
+                          handleChangeBRField('intraRefNumber', event.target.value),
                         className: classes.blNumberInput,
                       }}
                     />
@@ -686,7 +743,8 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                     editing={editing}
                     value={bookingRequest.customerReference}
                     inputProps={{
-                      onChange: event => handleChangeBRField('customerReference', event.target.value),
+                      onChange: event =>
+                        handleChangeBRField('customerReference', event.target.value),
                       className: classes.blNumberInput,
                     }}
                   />
@@ -704,7 +762,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
               )}
               <TableRow>
                 <TableCell className={classes.tableCellLabel}>Booking Agent</TableCell>
-                <TableCell className={classes.tableCell}>{userRepresentation(bookingRequest?.assignedUser)}</TableCell>
+                <TableCell className={classes.tableCell}>
+                  {userRepresentation(bookingRequest?.assignedUser)}
+                </TableCell>
               </TableRow>
               {clients && (
                 <>
@@ -716,7 +776,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                           label=""
                           clients={clients}
                           onChange={client =>
-                            setBookingRequest(prevState => prevState && set('client', client)(prevState))
+                            setBookingRequest(
+                              prevState => prevState && set('client', client)(prevState),
+                            )
                           }
                           value={bookingRequest.client}
                           margin="dense"
@@ -734,7 +796,9 @@ const BookingRequestSummary: React.FC<Props> = ({ editing }) => {
                           label=""
                           clients={clients}
                           onChange={client =>
-                            setBookingRequest(prevState => prevState && set('statClient', client)(prevState))
+                            setBookingRequest(
+                              prevState => prevState && set('statClient', client)(prevState),
+                            )
                           }
                           value={bookingRequest.statClient}
                           margin="dense"
