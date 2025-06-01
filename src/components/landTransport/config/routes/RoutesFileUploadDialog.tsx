@@ -1,4 +1,5 @@
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import {
   AutomaticProviderRoute,
@@ -33,7 +34,7 @@ export const incrementRouteVersion = async (providerId: string) => {
   await firebase
     .database()
     .ref(`/land-transport-versions/${providerId}/version`)
-    .transaction(value => value + 1);
+    .transaction((value: any) => value + 1);
 };
 
 const createAutomaticRouteVersion = async (provider: ProviderEntity) => {

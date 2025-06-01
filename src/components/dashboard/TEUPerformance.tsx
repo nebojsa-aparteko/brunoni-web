@@ -15,6 +15,31 @@ import identity from 'lodash/fp/identity';
 import { Card, CardHeader, Divider, CardContent, useTheme, Box } from '@material-ui/core';
 import ChartsCircularProgress from './ChartsCircularProgress';
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  ArcElement,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  ArcElement,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
 interface Props {
   clientPerformance: any;
   year: number;
@@ -110,41 +135,34 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
       padding: 0,
     },
     scales: {
-      xAxes: [
-        {
-          gridLines: {
-            display: false,
-            drawBorder: false,
-          },
-          ticks: {
-            padding: 20,
-            fontColor: theme.palette.text.secondary,
+      x: {
+        grid: {
+          display: false,
+          drawBorder: false,
+        },
+        ticks: {
+          padding: 20,
+          color: theme.palette.text.secondary,
+        },
+      },
+      y: {
+        grid: {
+          borderDash: [2],
+          borderDashOffset: [2],
+          color: theme.palette.divider,
+          drawBorder: false,
+        },
+        ticks: {
+          padding: 20,
+          color: theme.palette.text.secondary,
+          maxTicksLimit: 5,
+          callback: (value: any) => {
+            return value;
           },
         },
-      ],
-      yAxes: [
-        {
-          gridLines: {
-            borderDash: [2],
-            borderDashOffset: [2],
-            color: theme.palette.divider,
-            drawBorder: false,
-            zeroLineBorderDash: [2],
-            zeroLineBorderDashOffset: [2],
-            zeroLineColor: theme.palette.divider,
-          },
-          ticks: {
-            padding: 20,
-            fontColor: theme.palette.text.secondary,
-            beginAtZero: true,
-            min: 0,
-            maxTicksLimit: 5,
-            callback: (value: any) => {
-              return value;
-            },
-          },
-        },
-      ],
+        beginAtZero: true,
+        min: 0,
+      },
     },
     tooltips: {
       enabled: true,

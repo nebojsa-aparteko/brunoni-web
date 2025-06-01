@@ -24,6 +24,31 @@ import find from 'lodash/fp/find';
 import ContainerTypes from '../../contexts/ContainerTypes';
 import ChartsCircularProgress from './ChartsCircularProgress';
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  ArcElement,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  ArcElement,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
 interface Props {
   clientPerformance: any;
   year: number;
