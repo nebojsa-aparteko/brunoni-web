@@ -17,6 +17,7 @@ import RouteSummary from '../routeSearch/RouteSummary';
 import ContainersList from './ContainersList';
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 import { format } from 'date-fns';
 import useSaveFiles from '../../hooks/useSaveFiles';
 import { saveFilesToFirestore } from '../bookings/InternalStorage';
@@ -83,7 +84,7 @@ export const getBookingRequestId = async () => {
   await firebase
     .database()
     .ref(`/booking-request-ids/${path}`)
-    .transaction(value => {
+    .transaction((value: any) => {
       counter = value || 1;
       return +value + 1;
     });
