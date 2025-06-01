@@ -3,7 +3,7 @@ import { ChecklistItemValueDocument } from '../bookings/checklist/ChecklistItemM
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Box, createStyles, makeStyles } from '@material-ui/core';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 const useStyles = makeStyles(() =>
   createStyles({
