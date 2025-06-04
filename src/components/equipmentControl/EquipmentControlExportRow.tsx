@@ -127,7 +127,7 @@ const EquipmentControlExportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                     [classes.borderRight]: containerTypesLabels.length === index + 1,
                   })}
                   onClick={event => {
-                    if (s === 'Export Total') return;
+                    if (!data || !data.count || data.count === 0 || s === 'Export Total') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
                     setWeekAndYear([get(data, 'week', '-1'), get(data, 'year', '-1')]);
