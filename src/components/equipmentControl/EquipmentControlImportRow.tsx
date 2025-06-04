@@ -93,6 +93,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
           <Fragment key={`${location?.id}-${s}`}>
             {filters.containerTypes.map((type, index) => {
               const c = get(groupedStatus, type, []);
+              const data = c.pop();
               return (
                 <TableCell
                   aria-describedby={id}
@@ -101,7 +102,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                     [classes.borderRight]: containerTypesLabels.length === index + 1,
                   })}
                   onClick={event => {
-                    if (s === 'TOTAL') return;
+                    if (!data || !data.count || data.count === 0 || s === 'TOTAL') return;
                     setAnchorEl(event.currentTarget);
                     setBookings(undefined);
                     user
@@ -124,7 +125,7 @@ const EquipmentControlImportRow: React.FC<EquipmentControlRowProps> = ({ equipme
                       });
                   }}
                 >
-                  {get(c.pop(), 'count', '-')}
+                  {get(data, 'count', '-')}
                 </TableCell>
               );
             })}
