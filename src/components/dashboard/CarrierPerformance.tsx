@@ -105,39 +105,47 @@ const CarrierPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
     responsive: true,
     maintainAspectRatio: false,
     animation: false,
-    cutoutPercentage: 60,
-    legend: {
-      display: isSmAndUp && data?.datasets && data.datasets[0].data.length < 6,
-      position: 'right',
+    cutout: '60%',
+    plugins: {
+      legend: {
+        display: isSmAndUp && data?.datasets && data.datasets[0].data.length < 6,
+        position: 'right' as const,
+      },
+      tooltip: {
+        enabled: true,
+        mode: 'index' as const,
+        intersect: false,
+        caretSize: 10,
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20,
+        },
+        borderWidth: 1,
+        borderColor: theme.palette.divider,
+        backgroundColor: theme.palette.common.white,
+        titleColor: theme.palette.text.primary,
+        bodyColor: theme.palette.text.secondary,
+        footerColor: theme.palette.text.secondary,
+        callbacks: {
+          label: (context: any) => {
+            const label = context.chart.data.labels[context.dataIndex];
+            const value = context.chart.data.datasets[0].data[context.dataIndex];
+            const total = context.chart.data.datasets[0].data.reduce(
+              (a: number, b: number) => a + b,
+              0,
+            );
+
+            return `${label}: ${value} (${
+              value / total < 0.005 ? (value / total).toFixed(3) : Math.round((value / total) * 100)
+            }%)`;
+          },
+        },
+      },
     },
     layout: {
       padding: 0,
-    },
-    tooltips: {
-      enabled: true,
-      mode: 'index',
-      intersect: false,
-      caretSize: 10,
-      yPadding: 20,
-      xPadding: 20,
-      borderWidth: 1,
-      borderColor: theme.palette.divider,
-      backgroundColor: theme.palette.common.white,
-      titleFontColor: theme.palette.text.primary,
-      bodyFontColor: theme.palette.text.secondary,
-      footerFontColor: theme.palette.text.secondary,
-      callbacks: {
-        label: (tooltipItem: any, data: any) => {
-          const label = data['labels'][tooltipItem['index']];
-          const value = data['datasets'][0]['data'][tooltipItem['index']];
-
-          return `${label}: ${value} (${
-            value / data.total < 0.005
-              ? (value / data.total).toFixed(3)
-              : Math.round((value / data.total) * 100)
-          }%)`;
-        },
-      },
     },
   };
   return (
