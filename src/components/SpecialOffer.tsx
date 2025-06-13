@@ -96,7 +96,11 @@ const SpecialOffer: React.FC<Props> = ({
   const [imageURL, setImageURL] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    (async () => setImageURL(await firebase.storage().ref(image).getDownloadURL()))();
+    (async () => {
+      if (image) {
+        setImageURL(await firebase.storage().ref(image).getDownloadURL());
+      }
+    })();
   }, [image]);
 
   const handleClick = () => {
