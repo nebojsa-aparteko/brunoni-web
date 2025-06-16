@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useMemo, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { Theme, makeStyles, Tabs, Tab, Box, Button, CircularProgress } from '@material-ui/core';
 import isEqual from 'lodash/fp/isEqual';
 import Carriers from '../../contexts/Carriers';
@@ -117,14 +117,12 @@ const SideCharges: React.FC<{ carrier: Carrier }> = ({ carrier }) => {
   );
 };
 
-const WaitFor =
-  (Component: React.FC<{ carrier: Carrier }>) => (props: RouteComponentProps<{ id: string }>) => {
-    const carrierId = props.match.params.id;
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const carriers = useContext(Carriers);
-    const carrier = carriers?.find(carrier => carrier.id === carrierId);
+const WaitFor = (Component: React.FC<{ carrier: Carrier }>) => () => {
+  const { id: carrierId } = useParams();
+  const carriers = useContext(Carriers);
+  const carrier = carriers?.find(carrier => carrier.id === carrierId);
 
-    return carrier ? <Component key={carrierId} carrier={carrier} /> : <ChartsCircularProgress />;
-  };
+  return carrier ? <Component key={carrierId} carrier={carrier} /> : <ChartsCircularProgress />;
+};
 
 export default WaitFor(SideCharges);

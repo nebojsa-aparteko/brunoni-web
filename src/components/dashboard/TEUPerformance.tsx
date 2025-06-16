@@ -126,10 +126,38 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,
-    cornerRadius: 20,
-    legend: {
-      display: false,
+    animation: {
+      duration: 0,
+    },
+    borderRadius: 20,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+        mode: 'index' as const,
+        intersect: false,
+        caretSize: 10,
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20,
+        },
+        borderWidth: 1,
+        borderColor: theme.palette.divider,
+        backgroundColor: theme.palette.common.white,
+        titleColor: theme.palette.text.primary,
+        bodyColor: theme.palette.text.secondary,
+        footerColor: theme.palette.text.secondary,
+        callbacks: {
+          title: () => '',
+          label: (context: any) => {
+            return `${context.dataset.label}: ${context.parsed.y}`;
+          },
+        },
+      },
     },
     layout: {
       padding: 0,
@@ -141,7 +169,7 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           drawBorder: false,
         },
         ticks: {
-          padding: 20,
+          padding: 10,
           color: theme.palette.text.secondary,
         },
       },
@@ -153,7 +181,7 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
           drawBorder: false,
         },
         ticks: {
-          padding: 20,
+          padding: 10,
           color: theme.palette.text.secondary,
           maxTicksLimit: 5,
           callback: (value: any) => {
@@ -162,26 +190,6 @@ const TEUPerformance: React.FC<Props> = ({ clientPerformance, year }) => {
         },
         beginAtZero: true,
         min: 0,
-      },
-    },
-    tooltips: {
-      enabled: true,
-      mode: 'index',
-      intersect: false,
-      caretSize: 10,
-      yPadding: 20,
-      xPadding: 20,
-      borderWidth: 1,
-      borderColor: theme.palette.divider,
-      backgroundColor: theme.palette.common.white,
-      titleFontColor: theme.palette.text.primary,
-      bodyFontColor: theme.palette.text.secondary,
-      footerFontColor: theme.palette.text.secondary,
-      callbacks: {
-        title: () => {},
-        label: (tooltipItem: any) => {
-          return `${data.datasets[tooltipItem.datasetIndex].label}: ${tooltipItem.yLabel}`;
-        },
       },
     },
   };

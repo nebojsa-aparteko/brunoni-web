@@ -25,6 +25,7 @@ import TableBody from '@material-ui/core/TableBody';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/styles/makeStyles';
 import TextSkeleton from '../TextSkeleton';
+import { sortBy } from 'lodash';
 
 interface Props {
   clientPerformance: any;
@@ -64,7 +65,7 @@ const extractPortsAggregatedData = (year: number) =>
         groupBy('LocationName'),
         mapValues(flow(map(flow(get('Amount'), Number)), sum)),
         toPairs,
-        orderBy(1, 'desc'),
+        orderBy([1, 0], ['desc', 'asc']),
         slice(0, 5),
       ),
     ),
