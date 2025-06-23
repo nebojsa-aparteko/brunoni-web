@@ -7,10 +7,7 @@ import ExploreIcon from '@material-ui/icons/Explore';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
-import TeamsUsersContainer from '../components/teams/TeamsUsersContainer';
-import TeamsTeamsContainer from '../components/teams/TeamsTeamsContainer';
-import ReassignUsersContainer from '../components/teams/ReassignUsersContainer';
-import TeamsPaymentConfirmationContainer from '../components/teams/TeamsPaymentConfirmationContainer';
+import DeliveryGroupsContainer from '../components/opportunities/DeliveryGroupsContainer';
 import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -81,7 +78,7 @@ const OpportunitiesConfigPage: React.FC = () => {
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
-          Delivery
+          <DeliveryGroupsContainer />
         </TabPanel>
 
         <TabPanel value={selectedTab} index={1}>
