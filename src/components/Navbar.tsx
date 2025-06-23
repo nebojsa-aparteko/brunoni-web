@@ -368,6 +368,9 @@ const Navbar: React.FC = () => {
                           <MenuItemLink onClick={handleMenuClose} to="/land-transport-config">
                             Land Transport Config
                           </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/opportunities-config">
+                            Opportunities Config
+                          </MenuItemLink>
                         </Menu>
                         {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
                         {/*{isSuperAdmin(userRecord) && <ButtonMenuItem primary="Teams" to="/teams" />}*/}

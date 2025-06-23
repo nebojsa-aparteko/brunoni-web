@@ -1,5 +1,4 @@
-import React, { useContext, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, useNavigate, useLocation } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FontFaceObserver from 'fontfaceobserver';
@@ -109,7 +108,6 @@ const UserApp: React.FC = () => {
           return <App />;
         case null:
           showCrispChat(true);
-          // Company
           return (
             <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
               <ClientUsersProvider>
@@ -136,11 +134,9 @@ const UserApp: React.FC = () => {
     default:
       showCrispChat(true);
       return (
-        // <FirestoreClientDocumentProvider collection="statistics" context={StatisticsContext}>
         <ClientUsersProvider>
           <App />
         </ClientUsersProvider>
-        // </FirestoreClientDocumentProvider>
       );
   }
 };
@@ -164,45 +160,77 @@ const CrispChatRouteUpdater = () => {
   return null;
 };
 
-let prevUser: firebase.User | null | undefined = undefined;
+// Main App Component that handles auth state
+const MainApp: React.FC = () => {
+  const [user, setUser] = useState<firebase.User | null | undefined>(undefined);
+  const [fontLoaded, setFontLoaded] = useState(false);
 
-const render = (user: firebase.User | null) => {
-  if (prevUser && !user) {
-    try {
-      $crisp.push(['do', 'session:reset', [false]]);
-    } catch (e) {
-      console.warn('Failed to push crisp command.');
-    }
-  } else if (user) {
-    try {
-      $crisp.push(['set', 'user:email', [String(user.email)]]);
-    } catch (e) {
-      console.warn('Failed to push crisp command.');
-    }
+  useEffect(() => {
+    let prevUser: firebase.User | null | undefined = undefined;
 
-    try {
-      $crisp.push([
-        'set',
-        'session:data',
-        [
-          [
-            ['user-id', String(user.uid)],
-            ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
-            ...(user.metadata && user.metadata.creationTime
-              ? [['created-at', new Date(user.metadata.creationTime).toISOString().slice(0, 10)]]
-              : []),
-          ],
-        ],
-      ]);
-    } catch (e) {
-      console.warn('Failed to push crisp command.');
-    }
-  } else {
+    const unsubscribe = firebase.auth().onAuthStateChanged(async currentUser => {
+      // Handle font loading
+      if (!fontLoaded) {
+        try {
+          await appFont.load();
+          setFontLoaded(true);
+        } catch (error) {
+          console.warn('Application font failed to load', error);
+          setFontLoaded(true);
+        }
+      }
+
+      // Handle Crisp chat user changes
+      if (prevUser && !currentUser) {
+        try {
+          $crisp.push(['do', 'session:reset', [false]]);
+        } catch (e) {
+          console.warn('Failed to push crisp command.');
+        }
+      } else if (currentUser) {
+        try {
+          $crisp.push(['set', 'user:email', [String(currentUser.email)]]);
+        } catch (e) {
+          console.warn('Failed to push crisp command.');
+        }
+
+        try {
+          $crisp.push([
+            'set',
+            'session:data',
+            [
+              [
+                ['user-id', String(currentUser.uid)],
+                ['user-hash', '78006440b1b39b8027c8c865cc9f3b2ac92afb6e0fcceb4ac7da2182ec40237b'],
+                ...(currentUser.metadata && currentUser.metadata.creationTime
+                  ? [
+                      [
+                        'created-at',
+                        new Date(currentUser.metadata.creationTime).toISOString().slice(0, 10),
+                      ],
+                    ]
+                  : []),
+              ],
+            ],
+          ]);
+        } catch (e) {
+          console.warn('Failed to push crisp command.');
+        }
+      }
+
+      prevUser = currentUser;
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, [fontLoaded]);
+
+  // Don't render until we have font loaded and user state
+  if (!fontLoaded || user === undefined) {
+    return null;
   }
 
-  prevUser = user;
-
-  const app = (
+  return (
     <Router>
       <CrispChatRouteUpdater />
       <ThemeProvider theme={theme}>
@@ -267,20 +295,12 @@ const render = (user: firebase.User | null) => {
       </ThemeProvider>
     </Router>
   );
-
-  createRoot(document.getElementById('root')!).render(app);
-  //   ReactDOM.render(app, document.getElementById('root'));
 };
 
-firebase.auth().onAuthStateChanged(async user => {
-  try {
-    await fontLoaded;
-  } catch (error) {
-    console.warn('Application font failed to load', error);
-  }
-
-  render(user);
-});
+// Initialize the app
+const container = document.getElementById('root');
+const root = createRoot(container!);
+root.render(<MainApp />);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

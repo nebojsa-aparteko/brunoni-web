@@ -53,7 +53,7 @@ import useAntiTrust from './hooks/useAntiTrust';
 import LandTransportPage from './pages/LandTransportPage';
 import LandTransportConfigPage from './pages/LandTransportConfigPage';
 import LandTransportConfigProviderPage from './pages/LandTransportConfigProviderPage';
-
+import OpportunitiesConfigPage from './pages/OpportunitiesConfigPage';
 const anonymousRoutes = (
   <Routes>
     <Route path="/" element={<RoutesPage />} />
@@ -86,6 +86,7 @@ const adminRoutes = (
       path="/land-transport-config/:providerId"
       element={<LandTransportConfigProviderPage />}
     />
+    <Route path="/opportunities-config" element={<OpportunitiesConfigPage />} />
     <Route path="/charges/*" element={<AdminSideCharges />} />
     <Route path="/vessel" element={<VesselWithVoyagePage />} />
     <Route path="/land-transport" element={<LandTransportPage />} />
