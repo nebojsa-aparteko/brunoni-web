@@ -1,29 +1,49 @@
 import React from 'react';
-import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
-import { Place } from '../../model/DeliveryGroup';
-interface Props {
-  options: Place[];
-  defaultValues?: Place[];
-  onChange: (event: React.ChangeEvent<{}>, value: Place | Place[] | null) => void;
+
+import { makeStyles } from '@material-ui/core/styles';
+
+interface MultiPlacesInputInterface {
+  data: string[];
+  label?: string;
+  // setSelectedPlaces: (places: string[]) => void;
+  selectedPlaces?: string[];
 }
 
-const PlacesMultiInput: React.FC<Props> = ({ options, defaultValues, onChange }) => {
+const useStyles = makeStyles({
+  customTextField: {
+    '& .MuiAutocomplete-input': {
+      width: '150px',
+    },
+    '& input::placeholder': {
+      fontSize: '15px',
+    },
+  },
+  input: {
+    width: '300px',
+  },
+});
+
+const PlacesMultiInput: React.FC<MultiPlacesInputInterface> = ({
+  data,
+  label = '',
+  // setSelectedPlaces,
+  selectedPlaces = [],
+}) => {
+  const classes = useStyles();
   return (
     <Autocomplete
+      classes={{ root: classes.customTextField }}
       multiple
-      autoHighlight
-      options={options}
-      getOptionSelected={(option, value) => option.name === value.name}
-      getOptionLabel={option => `${option.name}`}
-      defaultValue={defaultValues}
-      onChange={onChange}
-      renderTags={(value, getTagProps) =>
-        value.map((option, index) => <Chip label={`${option.name}`} {...getTagProps({ index })} />)
-      }
+      freeSolo
+      options={data}
+      value={selectedPlaces}
+      // onChange={(_, newValue) => {
+      //   setSelectedPlaces(newValue);
+      // }}
       renderInput={params => (
-        <TextField {...params} label="Carriers" placeholder="Type to filter" variant="outlined" />
+        <TextField {...params} label={label} placeholder="Add place &#9166;" variant="outlined" />
       )}
     />
   );

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeliveryGroupRow from './DeliveryGroupRow';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import useClientUsers from '../../hooks/useClientUsers';
 import {
   Box,
   Button,
@@ -17,35 +16,30 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
+  TextField,
   Typography,
 } from '@material-ui/core';
-import UserInput from '../inputs/UserInput';
 import { ADMIN_ROLES, UserRecordMin } from '../../model/UserRecord';
-import firebase from '../../firebase';
 import CloseIcon from '@material-ui/icons/Close';
-import ConfirmationDialog from '../ConfirmationDialog';
-import { GlobalContext } from '../../store/GlobalStore';
-import { useSnackbar } from 'notistack';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import { tryGetErrorMessage } from '../../utilities/errorHelper';
 import { DeliveryGroup } from '../../model/DeliveryGroup';
+import PlacesMultiInput from '../inputs/PlacesMultiInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
     minWidth: 650,
   },
   dialogContent: {
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(3),
     display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 4,
+    flexDirection: 'column',
+    gap: theme.spacing(3),
+  },
+  formRow: {
+    display: 'flex',
+    gap: theme.spacing(2),
+    alignItems: 'flex-start',
   },
   closeModal: {
     position: 'absolute',
@@ -56,183 +50,114 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-// interface AddAdminsDialogProps {
-//   isOpen: boolean;
-//   handleClose: () => void;
-//   selectedUsers?: UserRecordMin[];
-// }
+interface AddDeliveryGroupDialogProps {
+  isOpen: boolean;
+  handleClose: () => void;
+  selectedGroups?: UserRecordMin[];
+}
 
-// const AddGroupDilog: React.FC<AddAdminsDialogProps> = ({ isOpen, handleClose }) => {
-//   const classes = useStyles();
-//   const clientUsers = useClientUsers(
-//     import.meta.env.VITE_BRAND === 'brunoni' ? '001772' : '005905',
-//   );
-//   const nonAdminUsers = clientUsers?.filter(user => !user.isAdmin && !user.role) || [];
-//   const [selectedUser, setSelectedUser] = useState<UserRecordMin | undefined>(undefined);
-//   const [selectedRole, setSelectedRole] = useState(ADMIN_ROLES[0]);
-//   const [, dispatch] = useContext(GlobalContext);
+const AddGroupDilog: React.FC<AddDeliveryGroupDialogProps> = ({ isOpen, handleClose }) => {
+  const classes = useStyles();
+  const [groupName, setGroupName] = useState('');
+  const [places, setPlaces] = useState<string[]>([]);
 
-//   const handleAddGroup = useCallback(() => {
-//     if (selectedUser) {
-//       dispatch({ type: 'START_GLOBAL_LOADING' });
-//       firebase
-//         .firestore()
-//         .collection('users')
-//         .doc(selectedUser.id)
-//         .set({ isAdmin: true, role: selectedRole }, { merge: true })
-//         .then(_ => {
-//           console.log('Saved');
-//           setSelectedUser(undefined);
-//           handleClose();
-//           dispatch({ type: 'STOP_GLOBAL_LOADING' });
-//         });
-//     }
-//   }, [selectedUser, selectedRole, handleClose, dispatch]);
-
-//   return (
-//     <Dialog
-//       open={isOpen}
-//       onClose={handleClose}
-//       aria-labelledby="addAdminsDialogTitle"
-//       maxWidth="md"
-//     >
-//       <DialogTitle disableTypography id="addAdminsDialogTitle">
-//         <Typography variant="h4">Assign admin role</Typography>
-//         <IconButton onClick={handleClose} className={classes.closeModal}>
-//           <CloseIcon />
-//         </IconButton>
-//       </DialogTitle>
-//       <DialogContent className={classes.dialogContent}>
-//         <Box minWidth={250} maxWidth={400} margin={1} paddingRight={1}>
-//           <UserInput
-//             label="Assign to"
-//             users={nonAdminUsers || []}
-//             onChange={(_, user) => setSelectedUser(user || undefined)}
-//             value={selectedUser}
-//           />
-//         </Box>
-//         <FormControl
-//           variant="outlined"
-//           style={{ minWidth: 250, maxWidth: 400, margin: 8, paddingRight: 8 }}
-//         >
-//           <InputLabel id="roleInputLabel">Role</InputLabel>
-//           <Select
-//             labelId="roleInputLabel"
-//             label="Role"
-//             value={selectedRole}
-//             onChange={event =>
-//               setSelectedRole(event.target.value ? (event.target.value as string) : ADMIN_ROLES[0])
-//             }
-//           >
-//             {ADMIN_ROLES.map(role => (
-//               <MenuItem key={role} value={role}>
-//                 {role}
-//               </MenuItem>
-//             ))}
-//           </Select>
-//         </FormControl>
-//         <Button
-//           color="primary"
-//           variant="contained"
-//           onClick={handleAddGroup}
-//           style={{ minWidth: 120, margin: 8, height: 54 }}
-//         >
-//           Add Group
-//         </Button>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// };
-
-const removeAdminRights = async (userIds: string[]): Promise<any> => {
-  const removeAdmin = async (userId: string): Promise<any> => {
-    return firebase
-      .firestore()
-      .collection('users')
-      .doc(userId)
-      .set({ isAdmin: false, role: null }, { merge: true });
+  const handlePlacesChange = (selectedPlaces: string[]) => {
+    setPlaces(selectedPlaces);
   };
 
-  const requests = userIds.map((userId: string) => {
-    return removeAdmin(userId).then(user => {
-      return user;
-    });
-  });
+  const handleAddGroup = useCallback(() => {
+    const filteredPlaces = places.filter(place => place.trim() !== '');
+    console.debug('Adding group:', { name: groupName, places: filteredPlaces });
+    setGroupName('');
+    setPlaces([]);
+    handleClose();
+  }, [groupName, places, handleClose]);
 
-  return Promise.all(requests);
+  const handleDialogClose = () => {
+    setGroupName('');
+    setPlaces([]);
+    handleClose();
+  };
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={handleDialogClose}
+      aria-labelledby="addGroupsDialogTitle"
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogTitle disableTypography id="addGroupsDialogTitle">
+        <Typography variant="h4">Add new delivery group</Typography>
+        <IconButton onClick={handleDialogClose} className={classes.closeModal}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent className={classes.dialogContent}>
+        <div className={classes.formRow}>
+          <TextField
+            label="Group Name"
+            variant="outlined"
+            value={groupName}
+            onChange={e => setGroupName(e.target.value)}
+            style={{ width: 300 }}
+            required
+          />
+
+          <div style={{ flex: 1 }}>
+            <PlacesMultiInput data={[]} selectedPlaces={places} onChange={handlePlacesChange} />
+          </div>
+        </div>
+
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleAddGroup}
+          disabled={!groupName.trim() || places.length === 0}
+          style={{ width: 120 }}
+        >
+          Add Group
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
-const TeamsUsersContainer: React.FC = () => {
+const DeliveryGroupsContainer: React.FC = () => {
   const classes = useStyles();
-  // const adminUsers = useAdminUsers();
-  const [isAdminDialogOpen, setIsAdminDialogOpen] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [, dispatch] = useContext(GlobalContext);
-  const { enqueueSnackbar } = useSnackbar();
-
+  const [isDeliveryGroupDialogOpen, setIsDeliveryGroupDialogOpen] = useState(false);
   const onSelectRow = useCallback(
     (event: React.MouseEvent<HTMLElement>, id: string) => {
       event.stopPropagation();
-      setSelectedUsers(prevState =>
-        selectedUsers.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+      setSelectedGroups(prevState =>
+        selectedGroups.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
       );
     },
-    [selectedUsers],
+    [selectedGroups],
   );
 
-  // const handleSelectDeselectAll = () => {
-  //   if (selectedUsers.length !== adminUsers.length) {
-  //     setSelectedUsers(adminUsers.map(user => user.id || ''));
-  //   } else {
-  //     setSelectedUsers([]);
-  //   }
-  // };
-  const handleRemoveAdminRights = useCallback(() => {
-    dispatch({ type: 'START_GLOBAL_LOADING' });
-
-    return Promise.resolve(removeAdminRights(selectedUsers))
-      .then(_ => {
-        setIsConfirmationDialogOpen(false);
-        dispatch({ type: 'STOP_GLOBAL_LOADING' });
-        enqueueSnackbar(<Typography color="inherit">Saved changes!</Typography>, {
-          variant: 'success',
-          autoHideDuration: 1500,
-        });
-      })
-      .catch(error => {
-        console.error('error storing activity', error);
-        enqueueSnackbar(<Typography color="inherit"> {tryGetErrorMessage(error)}!</Typography>, {
-          variant: 'error',
-          autoHideDuration: 3000,
-        });
-      })
-      .finally(() => setSelectedUsers([]));
-  }, [selectedUsers, enqueueSnackbar, dispatch]);
+  const handleSelectDeselectAll = () => {
+    if (selectedGroups.length !== deliveryGroups.length) {
+      setSelectedGroups(deliveryGroups.map(group => group.id || ''));
+    } else {
+      setSelectedGroups([]);
+    }
+  };
 
   const deliveryGroups = [
     {
       id: '1',
       name: 'DeliveryGroup 1',
-      places: [
-        { name: 'Sri Lanka' },
-        { name: 'Mogadishu' },
-        { name: 'Berlin' },
-        { name: 'Moscow' },
-      ],
+      places: ['Sri Lanka', 'Mogadishu', 'Berlin', 'Moscow'],
     } as DeliveryGroup,
     {
       id: '2',
       name: 'Delivery Group 2',
-      places: [
-        { name: 'Ulaanbaatar' },
-        { name: 'Moscow' },
-        { name: 'Berlin' },
-        { name: 'Paris' },
-        { name: 'London' },
-      ],
+      places: ['Ulaanbaatar', 'Moscow', 'Berlin', 'Paris', 'London'],
     } as DeliveryGroup,
-  ]; // Replace with actual data fetching logic
+  ];
   return (
     <Box flexGrow={1}>
       {!deliveryGroups ? (
@@ -240,30 +165,26 @@ const TeamsUsersContainer: React.FC = () => {
       ) : (
         <Paper>
           <EnhancedTableToolbar
-            numSelected={selectedUsers.length}
-            handleAdd={() => setIsAdminDialogOpen(true)}
+            numSelected={selectedGroups.length}
+            handleAdd={() => setIsDeliveryGroupDialogOpen(true)}
             handleDelete={() => setIsConfirmationDialogOpen(true)}
             labelWhenSelected={
-              selectedUsers.length === 1
-                ? `${selectedUsers.length} admin selected`
-                : `${selectedUsers.length} admins selected`
+              selectedGroups.length === 1
+                ? `${selectedGroups.length} group selected`
+                : `${selectedGroups.length} groups selected`
             }
-            addButtonLabel={'Add admin'}
-            deleteButtonLabel={selectedUsers.length === 1 ? `Delete admin` : `Delete admins`}
-            labelWhenNotSelected={'Admins'}
+            addButtonLabel={'Add delivery group'}
+            deleteButtonLabel={selectedGroups.length === 1 ? `Delete admin` : `Delete admins`}
+            labelWhenNotSelected={'Delivery groups'}
           />
           <TableContainer>
             <Table className={classes.table} size="small" aria-label="a dense table">
-              <colgroup>
-                <col style={{ width: '5%' }} />
-                <col style={{ width: '95%' }} />
-              </colgroup>
               <TableHead>
                 <TableRow>
                   <TableCell align="left" style={{ paddingLeft: 4 }}>
                     <Checkbox
-                      // checked={selectedUsers.length === adminUsers.length}
-                      // onClick={handleSelectDeselectAll}
+                      checked={selectedGroups.length === deliveryGroups.length}
+                      onClick={handleSelectDeselectAll}
                       onFocus={event => event.stopPropagation()}
                       color="primary"
                     />
@@ -277,7 +198,7 @@ const TeamsUsersContainer: React.FC = () => {
                   <DeliveryGroupRow
                     deliveryGroup={group}
                     key={`delivery-group-${group.id}-${index}`}
-                    selected={group.id ? selectedUsers.includes(group.id) : false}
+                    selected={group.id ? selectedGroups.includes(group.id) : false}
                     onSelectRow={event => group.id && onSelectRow(event, group.id)}
                   />
                 ))}
@@ -286,16 +207,19 @@ const TeamsUsersContainer: React.FC = () => {
           </TableContainer>
         </Paper>
       )}
-      {/* <AddGroupDilog isOpen={isAdminDialogOpen} handleClose={() => setIsAdminDialogOpen(false)} /> */}
-      <ConfirmationDialog
+      <AddGroupDilog
+        isOpen={isDeliveryGroupDialogOpen}
+        handleClose={() => setIsDeliveryGroupDialogOpen(false)}
+      />
+      {/* <ConfirmationDialog
         isOpen={isConfirmationDialogOpen}
         label={'Please confirm'}
         handleConfirm={handleRemoveAdminRights}
         handleClose={() => setIsConfirmationDialogOpen(false)}
         description="Are you sure you want remove admin rights from selected users?"
-      />
+      /> */}
     </Box>
   );
 };
 
-export default TeamsUsersContainer;
+export default DeliveryGroupsContainer;
