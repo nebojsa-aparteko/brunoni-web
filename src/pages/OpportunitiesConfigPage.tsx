@@ -9,6 +9,7 @@ import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
 import DeliveryGroupsContainer from '../components/opportunities/DeliveryGroupsContainer';
 import CommodityGroupsContainer from '../components/opportunities/CommodityGroupsContainer';
+import TagsContainer from '../components/opportunities/TagsContainer';
 import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 const useStyles = makeStyles((theme: Theme) => ({
@@ -95,7 +96,7 @@ const OpportunitiesConfigPage: React.FC = () => {
         </TabPanel>
 
         <TabPanel value={selectedTab} index={4}>
-          Tags
+          <TagsContainer />
         </TabPanel>
       </Box>
     </Fragment>
