@@ -9,6 +9,7 @@ import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
 import DeliveryGroupsContainer from '../components/opportunities/DeliveryGroupsContainer';
 import CommodityGroupsContainer from '../components/opportunities/CommodityGroupsContainer';
+import PortGroupsContainer from '../components/opportunities/PortGroupsContainer';
 import TagsContainer from '../components/opportunities/TagsContainer';
 import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
@@ -84,7 +85,7 @@ const OpportunitiesConfigPage: React.FC = () => {
         </TabPanel>
 
         <TabPanel value={selectedTab} index={1}>
-          Ports
+          <PortGroupsContainer />
         </TabPanel>
 
         <TabPanel value={selectedTab} index={2}>
