@@ -316,6 +316,9 @@ const Navbar: React.FC = () => {
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
                     )}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem to="/opportunities" primary="Opportunities" />
+                    )}
 
                     {actingAs !== null && (
                       <Fragment>
