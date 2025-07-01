@@ -231,7 +231,6 @@ const EquipmentGroupsContainer: React.FC = () => {
                   </TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell>Equipment</TableCell>
-                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

@@ -3,3 +3,4 @@ export interface DeliveryGroup {
   name: string;
   places: string[];
 }
+//Place of reciept or delivery

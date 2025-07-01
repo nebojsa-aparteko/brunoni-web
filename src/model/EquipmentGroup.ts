@@ -3,3 +3,4 @@ export interface EquipmentGroup {
   name: string;
   equipment: string[];
 }
+// equipment should be the arr of container types id

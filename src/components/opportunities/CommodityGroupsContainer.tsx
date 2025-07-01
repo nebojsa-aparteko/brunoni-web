@@ -203,7 +203,6 @@ const CommodityGroupsContainer: React.FC = () => {
                   </TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell>Commodities</TableCell>
-                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

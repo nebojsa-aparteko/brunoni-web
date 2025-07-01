@@ -82,5 +82,6 @@ const TagsContainer: React.FC = () => {
     </Box>
   );
 };
+//Tags should be free text without duplicates
 
 export default TagsContainer;

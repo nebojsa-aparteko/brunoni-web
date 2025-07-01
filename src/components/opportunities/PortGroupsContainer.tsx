@@ -210,7 +210,6 @@ const PortGroupsContainer: React.FC = () => {
                   </TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell>Ports</TableCell>
-                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
