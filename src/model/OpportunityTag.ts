@@ -1,4 +1,4 @@
 export interface OpportunityTag {
   id: string;
-  name: string;
+  tag: string;
 }
