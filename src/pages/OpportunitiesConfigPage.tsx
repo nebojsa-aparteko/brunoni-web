@@ -7,7 +7,7 @@ import ExploreIcon from '@material-ui/icons/Explore';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import RecentActorsIcon from '@material-ui/icons/RecentActors';
-import DeliveryGroupsContainer from '../components/opportunities/DeliveryGroupsContainer';
+import PlacesGroupsContainer from '../components/opportunities/PlacesGroupsContainer';
 import CommodityGroupsContainer from '../components/opportunities/CommodityGroupsContainer';
 import PortGroupsContainer from '../components/opportunities/PortGroupsContainer';
 import EquipmentGroupsContainer from '../components/opportunities/EquipmentGroupsContainer';
@@ -74,7 +74,7 @@ const OpportunitiesConfigPage: React.FC = () => {
             className={classes.tabs}
             aria-label="Opportunities config tabs"
           >
-            <Tab label="Delivery Groups" icon={<PinDropIcon />} />
+            <Tab label="Places of receipt / delivery group" icon={<PinDropIcon />} />
             <Tab label="Ports Groups" icon={<ExploreIcon />} />
             <Tab label="Commodities Groups" icon={<RecentActorsIcon />} />
             <Tab label="Equipments Groups" icon={<ReceiptIcon />} />
@@ -82,7 +82,7 @@ const OpportunitiesConfigPage: React.FC = () => {
           </Tabs>
         </Paper>
         <TabPanel value={selectedTab} index={0}>
-          <DeliveryGroupsContainer />
+          <PlacesGroupsContainer />
         </TabPanel>
 
         <TabPanel value={selectedTab} index={1}>
