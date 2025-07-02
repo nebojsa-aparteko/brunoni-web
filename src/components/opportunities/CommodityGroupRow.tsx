@@ -96,12 +96,11 @@ const CommodityGroupRow: React.FC<Props> = ({
         />
       </TableCell>
 
-      <TableCell component="th" scope="row" className={classes.nameField}>
+      <TableCell component="th" scope="row" style={{ minWidth: '150px' }}>
         <TextField
           value={activeCommodityGroup.name}
           onChange={handleNameChange}
           placeholder="Group name"
-          variant="outlined"
           size="small"
           fullWidth
         />
