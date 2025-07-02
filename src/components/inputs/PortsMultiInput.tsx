@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { MOCK_PORTS, getPortDisplayName, searchPorts } from '../../data/ports';
+import firebase from 'firebase/compat/app';
+
+interface Port {
+  id: string;
+  name: string;
+  code?: string;
+  country?: string;
+  city?: string;
+}
 
 interface PortsMultiInputProps {
   label?: string;
-  selectedPorts?: string[];
-  onChange?: (ports: string[]) => void;
+  selectedPortIds?: string[];
+  onChange?: (portIds: string[]) => void;
+  placeholder?: string;
 }
 
 const useStyles = makeStyles({
@@ -19,70 +28,74 @@ const useStyles = makeStyles({
       fontSize: '15px',
     },
   },
-  input: {
-    width: '100%',
-  },
 });
+
+const getPortDisplayName = (port: Port): string => {
+  if (port.code && port.city && port.country) {
+    return `${port.code} - ${port.city}, ${port.country}`;
+  } else if (port.city && port.country) {
+    return `${port.city}, ${port.country}`;
+  } else if (port.name) {
+    return port.name;
+  }
+  return port.id;
+};
 
 const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
   label = 'Ports',
-  selectedPorts = [],
+  selectedPortIds = [],
   onChange,
+  placeholder = 'Select ports ↵',
 }) => {
   const classes = useStyles();
+  const [ports, setPorts] = useState<Port[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Convert port objects to display strings for options
-  const portOptions = MOCK_PORTS.map(port => getPortDisplayName(port));
+  // Load ports from Firestore
+  useEffect(() => {
+    const loadPorts = async () => {
+      try {
+        const snapshot = await firebase.firestore().collection('ports').get();
+        const portsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Port[];
+        setPorts(portsData);
+      } catch (error) {
+        console.error('Error loading ports:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPorts();
+  }, []);
+
+  // Create port options from loaded ports
+  const portOptions = ports || [];
+
+  // Get selected ports based on IDs
+  const selectedPorts = ports?.filter(port => selectedPortIds.includes(port.id)) || [];
 
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
       multiple
-      freeSolo
       options={portOptions}
       value={selectedPorts}
       onChange={(_, newValue) => {
-        // Filter out any 'Add "..."' suggestions and clean the values
-        const cleanedValues = newValue.map(value => {
-          if (typeof value === 'string' && value.startsWith('Add "') && value.endsWith('"')) {
-            return value.slice(5, -1); // Remove 'Add "' and '"'
-          }
-          return value;
-        });
-        onChange?.(cleanedValues);
+        const selectedIds = newValue.map(port => port.id);
+        onChange?.(selectedIds);
       }}
-      filterOptions={(options, params) => {
-        const { inputValue } = params;
-
-        // First, filter existing ports
-        const filtered = options.filter(option =>
-          option.toLowerCase().includes(inputValue.toLowerCase()),
-        );
-
-        // If typing custom text and it doesn't match existing ports, suggest adding it
-        if (
-          inputValue !== '' &&
-          !options.some(option => option.toLowerCase() === inputValue.toLowerCase())
-        ) {
-          filtered.push(`Add "${inputValue}"`);
-        }
-
-        return filtered;
-      }}
-      getOptionLabel={option => {
-        // Handle the 'Add "..."' case
-        if (typeof option === 'string' && option.startsWith('Add "') && option.endsWith('"')) {
-          return option.slice(5, -1); // Remove 'Add "' and '"'
-        }
-        return option;
-      }}
+      getOptionLabel={option => getPortDisplayName(option)}
+      getOptionSelected={(option, value) => option.id === value.id}
       renderInput={params => (
         <TextField
           {...params}
           label={label}
-          placeholder="Select port or add custom port &#9166;"
+          placeholder={loading ? 'Loading ports...' : placeholder}
           variant="outlined"
-          fullWidth
+          disabled={loading}
         />
       )}
     />
