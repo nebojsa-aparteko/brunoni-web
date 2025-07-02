@@ -74,17 +74,6 @@ const CommodityGroupRow: React.FC<Props> = ({
     }
   }, [onSave, activeCommodityGroup, changed]);
 
-  const handleReset = useCallback(() => {
-    setActiveCommodityGroup(commodityGroup);
-    setChanged(false);
-  }, [commodityGroup]);
-
-  const handleDelete = useCallback(() => {
-    if (onDelete && window.confirm(`Are you sure you want to delete "${commodityGroup.name}"?`)) {
-      onDelete(commodityGroup.id);
-    }
-  }, [onDelete, commodityGroup]);
-
   return (
     <TableRow {...other}>
       <TableCell padding="checkbox">
@@ -125,18 +114,6 @@ const CommodityGroupRow: React.FC<Props> = ({
             disabled={!changed}
           >
             Save
-          </Button>
-          <Button
-            onClick={handleReset}
-            size="small"
-            color="default"
-            variant="outlined"
-            disabled={!changed}
-          >
-            Reset
-          </Button>
-          <Button onClick={handleDelete} size="small" color="secondary" variant="outlined">
-            Delete
           </Button>
         </Box>
       </TableCell>
