@@ -1,17 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import EquipmentGroupRow from './EquipmentGroupRow';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import {
   Box,
-  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Checkbox,
   Dialog,
   DialogContent,
@@ -19,11 +16,16 @@ import {
   IconButton,
   TextField,
   Typography,
+  Button,
 } from '@material-ui/core';
-import { UserRecordMin } from '../../model/UserRecord';
 import CloseIcon from '@material-ui/icons/Close';
+import { useSnackbar } from 'notistack';
+import firebase from 'firebase/compat/app';
+import { GlobalContext } from '../../store/GlobalStore';
+import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
+import EquipmentGroupRow from './EquipmentGroupRow';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import { EquipmentGroup } from '../../model/EquipmentGroup';
 import EquipmentMultiInput from '../inputs/EquipmentMultiInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -50,33 +52,37 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const COLLECTION_NAME = 'opportunity-equipments-groups';
+
 interface AddEquipmentGroupDialogProps {
   isOpen: boolean;
   handleClose: () => void;
-  selectedGroups?: UserRecordMin[];
+  onAdd: (group: Omit<OpportunityEquipmentGroup, 'id'>) => void;
 }
 
-const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handleClose }) => {
+const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handleClose, onAdd }) => {
   const classes = useStyles();
   const [groupName, setGroupName] = useState('');
-  const [equipment, setEquipment] = useState<string[]>([]);
+  const [equipmentTypeId, setEquipmentTypeId] = useState<string[]>([]);
 
-  const handleEquipmentChange = (selectedEquipment: string[]) => {
-    setEquipment(selectedEquipment);
+  const handleEquipmentChange = (selectedEquipmentIds: string[]) => {
+    setEquipmentTypeId(selectedEquipmentIds);
   };
 
   const handleAddGroup = useCallback(() => {
-    const filteredEquipment = equipment.filter(item => item.trim() !== '');
-    console.debug('Adding equipment group:', { name: groupName, equipment: filteredEquipment });
+    onAdd({
+      name: groupName,
+      equipmentTypeId: equipmentTypeId,
+    });
     // Reset form
     setGroupName('');
-    setEquipment([]);
+    setEquipmentTypeId([]);
     handleClose();
-  }, [groupName, equipment, handleClose]);
+  }, [groupName, equipmentTypeId, handleClose, onAdd]);
 
   const handleDialogClose = () => {
     setGroupName('');
-    setEquipment([]);
+    setEquipmentTypeId([]);
     handleClose();
   };
 
@@ -106,19 +112,22 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
           />
 
           <div style={{ flex: 1 }}>
-            <EquipmentMultiInput selectedEquipment={equipment} onChange={handleEquipmentChange} />
+            <EquipmentMultiInput
+              selectedEquipmentIds={equipmentTypeId}
+              onChange={handleEquipmentChange}
+            />
           </div>
-        </div>
 
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={handleAddGroup}
-          disabled={!groupName.trim() || equipment.length === 0}
-          style={{ width: 120 }}
-        >
-          Add Group
-        </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleAddGroup}
+            disabled={!groupName.trim()}
+            style={{ width: 120 }}
+          >
+            Add
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -126,15 +135,44 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
 
 const EquipmentGroupsContainer: React.FC = () => {
   const classes = useStyles();
+  const [, dispatch] = useContext(GlobalContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const [equipmentGroups, setEquipmentGroups] = useState<OpportunityEquipmentGroup[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isEquipmentGroupDialogOpen, setIsEquipmentGroupDialogOpen] = useState(false);
 
+  // Load equipment groups from database
+  useEffect(() => {
+    const loadEquipmentGroups = async () => {
+      try {
+        const snapshot = await firebase.firestore().collection(COLLECTION_NAME).get();
+        const groups = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as OpportunityEquipmentGroup[];
+        setEquipmentGroups(groups);
+      } catch (error) {
+        console.error('Error loading equipment groups:', error);
+        enqueueSnackbar('Error loading equipment groups!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEquipmentGroups();
+  }, [enqueueSnackbar]);
+
   const onSelectRow = useCallback(
-    (event: React.MouseEvent<HTMLElement>, id: string) => {
+    (event: React.MouseEvent<HTMLElement>, groupId: string) => {
       event.stopPropagation();
       setSelectedGroups(prevState =>
-        selectedGroups.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+        selectedGroups.includes(groupId)
+          ? [...prevState.filter(t => t !== groupId)]
+          : [...prevState, groupId],
       );
     },
     [selectedGroups],
@@ -142,72 +180,136 @@ const EquipmentGroupsContainer: React.FC = () => {
 
   const handleSelectDeselectAll = () => {
     if (selectedGroups.length !== equipmentGroups.length) {
-      setSelectedGroups(equipmentGroups.map(group => group.id || ''));
+      setSelectedGroups(equipmentGroups.map(group => group.id));
     } else {
       setSelectedGroups([]);
     }
   };
 
-  const equipmentGroups = [
-    {
-      id: '1',
-      name: 'Standard Containers',
-      equipment: [
-        '20ft Standard Container (Container)',
-        '40ft Standard Container (Container)',
-        '40ft High Cube Container (Container)',
-      ],
-    } as EquipmentGroup,
-    {
-      id: '2',
-      name: 'Refrigerated Equipment',
-      equipment: [
-        '20ft Refrigerated Container (Container)',
-        '40ft Refrigerated Container (Container)',
-        'Refrigerated Trailer (Trailer)',
-      ],
-    } as EquipmentGroup,
-    {
-      id: '3',
-      name: 'Port Handling Equipment',
-      equipment: [
-        'Reach Stacker (Handling Equipment)',
-        'Container Crane (Handling Equipment)',
-        'Mobile Harbor Crane (Handling Equipment)',
-      ],
-    } as EquipmentGroup,
-    {
-      id: '4',
-      name: 'Specialized Transport',
-      equipment: [
-        'Flatbed Trailer (Trailer)',
-        'Lowboy Trailer (Trailer)',
-        'Tank Trailer (Trailer)',
-        'Car Carrier Trailer (Trailer)',
-      ],
-    } as EquipmentGroup,
-    {
-      id: '5',
-      name: 'Rail Transport',
-      equipment: [
-        'Standard Rail Car (Rail Car)',
-        'Refrigerated Rail Car (Rail Car)',
-        'Tank Rail Car (Rail Car)',
-        'Flatcar (Rail Car)',
-      ],
-    } as EquipmentGroup,
-  ];
+  const handleAddNew = useCallback(
+    async (newGroup: Omit<OpportunityEquipmentGroup, 'id'>) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        const docRef = await firebase.firestore().collection(COLLECTION_NAME).add(newGroup);
+        const createdGroup: OpportunityEquipmentGroup = {
+          id: docRef.id,
+          ...newGroup,
+        };
+
+        setEquipmentGroups(prev => [...prev, createdGroup]);
+        enqueueSnackbar('New equipment group created!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error creating equipment group:', error);
+        enqueueSnackbar('Error creating equipment group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleSave = useCallback(
+    async (updatedGroup: OpportunityEquipmentGroup) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        await firebase.firestore().collection(COLLECTION_NAME).doc(updatedGroup.id).update({
+          name: updatedGroup.name,
+          equipmentTypeId: updatedGroup.equipmentTypeId,
+        });
+
+        setEquipmentGroups(prev =>
+          prev.map(group => (group.id === updatedGroup.id ? updatedGroup : group)),
+        );
+
+        enqueueSnackbar('Equipment group updated successfully!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error updating equipment group:', error);
+        enqueueSnackbar('Error updating equipment group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleDelete = useCallback(
+    async (groupId: string) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        await firebase.firestore().collection(COLLECTION_NAME).doc(groupId).delete();
+        setEquipmentGroups(prev => prev.filter(group => group.id !== groupId));
+        setSelectedGroups(prev => prev.filter(id => id !== groupId));
+
+        enqueueSnackbar('Equipment group deleted successfully!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error deleting equipment group:', error);
+        enqueueSnackbar('Error deleting equipment group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleDeleteSelected = useCallback(async () => {
+    if (selectedGroups.length === 0) return;
+
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    try {
+      const deletePromises = selectedGroups.map(groupId =>
+        firebase.firestore().collection(COLLECTION_NAME).doc(groupId).delete(),
+      );
+
+      await Promise.all(deletePromises);
+      setEquipmentGroups(prev => prev.filter(group => !selectedGroups.includes(group.id)));
+      setSelectedGroups([]);
+
+      enqueueSnackbar(
+        `${selectedGroups.length} equipment group${selectedGroups.length > 1 ? 's' : ''} deleted successfully!`,
+        {
+          variant: 'success',
+          autoHideDuration: 2000,
+        },
+      );
+    } catch (error) {
+      console.error('Error deleting equipment groups:', error);
+      enqueueSnackbar('Error deleting equipment groups!', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    } finally {
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
+    }
+  }, [selectedGroups, dispatch, enqueueSnackbar]);
 
   return (
     <Box flexGrow={1}>
-      {!equipmentGroups ? (
+      {loading ? (
         <ChartsCircularProgress />
       ) : (
         <Paper>
           <EnhancedTableToolbar
             numSelected={selectedGroups.length}
             handleAdd={() => setIsEquipmentGroupDialogOpen(true)}
-            handleDelete={() => setIsConfirmationDialogOpen(true)}
+            handleDelete={handleDeleteSelected}
             labelWhenSelected={
               selectedGroups.length === 1
                 ? `${selectedGroups.length} group selected`
@@ -218,28 +320,30 @@ const EquipmentGroupsContainer: React.FC = () => {
             labelWhenNotSelected={'Equipment groups'}
           />
           <TableContainer>
-            <Table className={classes.table} size="small" aria-label="a dense table">
+            <Table className={classes.table} size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell align="left" style={{ paddingLeft: 4 }}>
+                  <TableCell padding="checkbox">
                     <Checkbox
                       checked={selectedGroups.length === equipmentGroups.length}
                       onClick={handleSelectDeselectAll}
-                      onFocus={event => event.stopPropagation()}
                       color="primary"
                     />
                   </TableCell>
                   <TableCell>Name</TableCell>
                   <TableCell>Equipment</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {equipmentGroups?.map((group, index) => (
                   <EquipmentGroupRow
-                    equipmentGroup={group}
                     key={`equipment-group-${group.id}-${index}`}
+                    equipmentGroup={group}
                     selected={group.id ? selectedGroups.includes(group.id) : false}
                     onSelectRow={event => group.id && onSelectRow(event, group.id)}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
                   />
                 ))}
               </TableBody>
@@ -250,14 +354,8 @@ const EquipmentGroupsContainer: React.FC = () => {
       <AddGroupDialog
         isOpen={isEquipmentGroupDialogOpen}
         handleClose={() => setIsEquipmentGroupDialogOpen(false)}
+        onAdd={handleAddNew}
       />
-      {/* <ConfirmationDialog
-        isOpen={isConfirmationDialogOpen}
-        label={'Please confirm'}
-        handleConfirm={handleRemoveGroups}
-        handleClose={() => setIsConfirmationDialogOpen(false)}
-        description="Are you sure you want to delete the selected equipment groups?"
-      /> */}
     </Box>
   );
 };

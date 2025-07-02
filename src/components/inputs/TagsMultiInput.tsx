@@ -42,7 +42,7 @@ const TagsMultiInput: React.FC<TagsMultiInputProps> = ({
   label = 'Tags',
   selectedTags = [],
   onChange,
-  placeholder = 'Add tag and press Enter ↵',
+  placeholder = 'Add tag  ↵',
 }) => {
   const classes = useStyles();
   const [inputValue, setInputValue] = useState('');
