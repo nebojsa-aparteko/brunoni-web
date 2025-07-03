@@ -54,6 +54,7 @@ import LandTransportPage from './pages/LandTransportPage';
 import LandTransportConfigPage from './pages/LandTransportConfigPage';
 import LandTransportConfigProviderPage from './pages/LandTransportConfigProviderPage';
 import OpportunitiesConfigPage from './pages/OpportunitiesConfigPage';
+import OpportunitiesPage from './pages/OpportunitiesPage';
 const anonymousRoutes = (
   <Routes>
     <Route path="/" element={<RoutesPage />} />
@@ -77,6 +78,7 @@ const adminRoutes = (
     <Route path="/quotes/groups/:id" element={<AdminQuoteGroup />} />
     <Route path="/quotes/:id" element={<QuotePageContainer />} />
     <Route path="/online-booking" element={<OnlineBookingPage />} />
+    <Route path="/opportunities" element={<OpportunitiesPage />} />
     <Route path="/booking-requests/:id" element={<BookingRequestContainer />} />
     <Route path="/bookings" element={<BookingsPageContainer />} />
     <Route path="/bookings/:id" element={<BookingContainer />} />
