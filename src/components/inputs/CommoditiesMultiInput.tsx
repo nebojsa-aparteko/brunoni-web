@@ -1,14 +1,6 @@
 import React from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { TextField } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
-interface CommoditiesMultiInputProps {
-  data: string[];
-  label?: string;
-  selectedCommodities?: string[];
-  onChange?: (commodities: string[]) => void;
-}
+import { makeStyles, TextField } from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
 
 const useStyles = makeStyles({
   customTextField: {
@@ -19,18 +11,25 @@ const useStyles = makeStyles({
       fontSize: '15px',
     },
   },
-  input: {
-    width: '300px',
-  },
 });
 
+interface CommoditiesMultiInputProps {
+  data?: string[];
+  label?: string;
+  selectedCommodities?: string[];
+  onChange?: (commodities: string[]) => void;
+  placeholder?: string;
+}
+
 const CommoditiesMultiInput: React.FC<CommoditiesMultiInputProps> = ({
-  data,
-  label = '',
+  data = [],
+  label = 'Commodities',
   selectedCommodities = [],
   onChange,
+  placeholder = 'Add commodity ↵',
 }) => {
   const classes = useStyles();
+
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
@@ -42,12 +41,7 @@ const CommoditiesMultiInput: React.FC<CommoditiesMultiInputProps> = ({
         onChange?.(newValue);
       }}
       renderInput={params => (
-        <TextField
-          {...params}
-          label={label}
-          placeholder="Add commodity &#9166;"
-          variant="outlined"
-        />
+        <TextField {...params} label={label} placeholder={placeholder} variant="outlined" />
       )}
     />
   );

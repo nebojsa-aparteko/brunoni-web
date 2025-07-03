@@ -1,89 +1,57 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { MOCK_EQUIPMENT, getEquipmentDisplayName } from '../../data/equipment';
+import ContainerTypes from '../../contexts/ContainerTypes';
 
 interface EquipmentMultiInputProps {
   label?: string;
-  selectedEquipment?: string[];
-  onChange?: (equipment: string[]) => void;
+  selectedEquipmentIds?: string[];
+  onChange?: (equipmentIds: string[]) => void;
+  placeholder?: string;
 }
 
 const useStyles = makeStyles({
   customTextField: {
     '& .MuiAutocomplete-input': {
-      width: '200px',
+      width: '150px',
     },
     '& input::placeholder': {
       fontSize: '15px',
     },
   },
-  input: {
-    width: '100%',
-  },
 });
 
 const EquipmentMultiInput: React.FC<EquipmentMultiInputProps> = ({
   label = 'Equipment',
-  selectedEquipment = [],
+  selectedEquipmentIds = [],
   onChange,
+  placeholder = 'Select equipment type ↵',
 }) => {
   const classes = useStyles();
+  const containerTypes = useContext(ContainerTypes);
 
-  // Convert equipment objects to display strings for options
-  const equipmentOptions = MOCK_EQUIPMENT.map(equipment => getEquipmentDisplayName(equipment));
+  // Create options with both ID and display text
+  const equipmentOptions = containerTypes || [];
+
+  // Get selected container types based on IDs
+  const selectedContainerTypes =
+    containerTypes?.filter(ct => selectedEquipmentIds.includes(ct.id)) || [];
 
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
       multiple
-      freeSolo
       options={equipmentOptions}
-      value={selectedEquipment}
+      value={selectedContainerTypes}
       onChange={(_, newValue) => {
-        // Filter out any 'Add "..."' suggestions and clean the values
-        const cleanedValues = newValue.map(value => {
-          if (typeof value === 'string' && value.startsWith('Add "') && value.endsWith('"')) {
-            return value.slice(5, -1); // Remove 'Add "' and '"'
-          }
-          return value;
-        });
-        onChange?.(cleanedValues);
+        const selectedIds = newValue.map(containerType => containerType.id);
+        onChange?.(selectedIds);
       }}
-      filterOptions={(options, params) => {
-        const { inputValue } = params;
-
-        // First, filter existing equipment
-        const filtered = options.filter(option =>
-          option.toLowerCase().includes(inputValue.toLowerCase()),
-        );
-
-        // If typing custom text and it doesn't match existing equipment, suggest adding it
-        if (
-          inputValue !== '' &&
-          !options.some(option => option.toLowerCase() === inputValue.toLowerCase())
-        ) {
-          filtered.push(`Add "${inputValue}"`);
-        }
-
-        return filtered;
-      }}
-      getOptionLabel={option => {
-        // Handle the 'Add "..."' case
-        if (typeof option === 'string' && option.startsWith('Add "') && option.endsWith('"')) {
-          return option.slice(5, -1); // Remove 'Add "' and '"'
-        }
-        return option;
-      }}
+      getOptionLabel={option => option.description || option.name || option.id}
+      getOptionSelected={(option, value) => option.id === value.id}
       renderInput={params => (
-        <TextField
-          {...params}
-          label={label}
-          placeholder="Select equipment or add custom equipment &#9166;"
-          variant="outlined"
-          fullWidth
-        />
+        <TextField {...params} label={label} placeholder={placeholder} variant="outlined" />
       )}
     />
   );

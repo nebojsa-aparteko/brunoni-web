@@ -1,15 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { TableRow, TableCell, Checkbox, TextField, Button, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
-import EquipmentMultiInput from '../inputs/EquipmentMultiInput';
+import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
+import PlacesMultiInput from '../inputs/PlacesMultiInput';
 import { isEqual } from 'lodash/fp';
 
 interface Props extends React.Attributes {
-  equipmentGroup: OpportunityEquipmentGroup;
+  placesGroup: OpportunityPlacesGroup;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
-  onSave?: (equipmentGroup: OpportunityEquipmentGroup) => void;
+  onSave?: (placesGroup: OpportunityPlacesGroup) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   nameField: {
     minWidth: '200px',
   },
-  equipmentCell: {
+  placesCell: {
     minWidth: '300px',
     maxWidth: '400px',
   },
@@ -30,8 +30,8 @@ const useStyles = makeStyles({
   },
 });
 
-const EquipmentGroupRow: React.FC<Props> = ({
-  equipmentGroup,
+const PlacesGroupRow: React.FC<Props> = ({
+  placesGroup,
   selected,
   onSelectRow,
   onSave,
@@ -39,40 +39,50 @@ const EquipmentGroupRow: React.FC<Props> = ({
   ...other
 }) => {
   const classes = useStyles();
-  const [activeEquipmentGroup, setActiveEquipmentGroup] =
-    useState<OpportunityEquipmentGroup>(equipmentGroup);
+  const [activePlacesGroup, setActivePlacesGroup] = useState<OpportunityPlacesGroup>(placesGroup);
   const [changed, setChanged] = useState(false);
 
   useEffect(() => {
-    setActiveEquipmentGroup(equipmentGroup);
+    setActivePlacesGroup(placesGroup);
     setChanged(false);
-  }, [equipmentGroup]);
+  }, [placesGroup]);
 
   useEffect(() => {
-    const hasChanges = !isEqual(equipmentGroup, activeEquipmentGroup);
+    const hasChanges = !isEqual(placesGroup, activePlacesGroup);
     setChanged(hasChanges);
-  }, [equipmentGroup, activeEquipmentGroup]);
+  }, [placesGroup, activePlacesGroup]);
 
   const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const newName = event.target.value;
-    setActiveEquipmentGroup(prev => ({
+    setActivePlacesGroup(prev => ({
       ...prev,
       name: newName,
     }));
   }, []);
 
-  const handleEquipmentChange = useCallback((equipmentTypeId: string[]) => {
-    setActiveEquipmentGroup(prev => ({
+  const handlePlacesChange = useCallback((places: string[]) => {
+    setActivePlacesGroup(prev => ({
       ...prev,
-      equipmentTypeId,
+      places,
     }));
   }, []);
 
   const handleSave = useCallback(() => {
     if (onSave && changed) {
-      onSave(activeEquipmentGroup);
+      onSave(activePlacesGroup);
     }
-  }, [onSave, activeEquipmentGroup, changed]);
+  }, [onSave, activePlacesGroup, changed]);
+
+  const handleReset = useCallback(() => {
+    setActivePlacesGroup(placesGroup);
+    setChanged(false);
+  }, [placesGroup]);
+
+  const handleDelete = useCallback(() => {
+    if (onDelete && window.confirm(`Are you sure you want to delete "${placesGroup.name}"?`)) {
+      onDelete(placesGroup.id);
+    }
+  }, [onDelete, placesGroup]);
 
   return (
     <TableRow {...other}>
@@ -87,7 +97,7 @@ const EquipmentGroupRow: React.FC<Props> = ({
 
       <TableCell component="th" scope="row" className={classes.nameField}>
         <TextField
-          value={activeEquipmentGroup.name}
+          value={activePlacesGroup.name}
           onChange={handleNameChange}
           placeholder="Group name"
           variant="outlined"
@@ -96,12 +106,12 @@ const EquipmentGroupRow: React.FC<Props> = ({
         />
       </TableCell>
 
-      <TableCell className={classes.equipmentCell}>
-        <EquipmentMultiInput
-          selectedEquipmentIds={activeEquipmentGroup.equipmentTypeId}
-          onChange={handleEquipmentChange}
+      <TableCell className={classes.placesCell}>
+        <PlacesMultiInput
+          selectedPlaces={activePlacesGroup.places}
+          onChange={handlePlacesChange}
           label=""
-          placeholder="Select equipment..."
+          placeholder="Add place..."
         />
       </TableCell>
 
@@ -122,4 +132,4 @@ const EquipmentGroupRow: React.FC<Props> = ({
   );
 };
 
-export default EquipmentGroupRow;
+export default PlacesGroupRow;

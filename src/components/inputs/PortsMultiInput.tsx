@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { MOCK_PORTS, getPortDisplayName, searchPorts } from '../../data/ports';
+import firebase from 'firebase/compat/app';
+
+interface Port {
+  id: string;
+  name: string;
+  code?: string;
+  country?: string;
+  city?: string;
+}
 
 interface PortsMultiInputProps {
   label?: string;
-  selectedPorts?: string[];
-  onChange?: (ports: string[]) => void;
+  selectedPortIds?: string[];
+  selectedPortNames?: string[];
+  onChange?: (portIds: string[], portNames: string[]) => void;
+  placeholder?: string;
 }
 
 const useStyles = makeStyles({
@@ -19,42 +29,107 @@ const useStyles = makeStyles({
       fontSize: '15px',
     },
   },
-  input: {
-    width: '100%',
-  },
 });
+
+const getPortDisplayName = (port: Port): string => {
+  if (port.code && port.city && port.country) {
+    return `${port.code} - ${port.city}, ${port.country}`;
+  } else if (port.city && port.country) {
+    return `${port.city}, ${port.country}`;
+  } else if (port.name) {
+    return port.name;
+  }
+  return port.id;
+};
 
 const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
   label = 'Ports',
-  selectedPorts = [],
+  selectedPortIds = [],
+  selectedPortNames = [],
   onChange,
+  placeholder = 'Select ports or add custom port ↵',
 }) => {
   const classes = useStyles();
+  const [ports, setPorts] = useState<Port[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Convert port objects to display strings for options
-  const portOptions = MOCK_PORTS.map(port => getPortDisplayName(port));
+  // Load ports from Firestore
+  useEffect(() => {
+    const loadPorts = async () => {
+      try {
+        const snapshot = await firebase.firestore().collection('ports').get();
+        const portsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Port[];
+        setPorts(portsData);
+      } catch (error) {
+        console.error('Error loading ports:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPorts();
+  }, []);
+
+  // Create display values combining both selected database ports and custom port names
+  const getDisplayValues = () => {
+    const values: string[] = [];
+
+    // Add selected database ports (by their display names)
+    selectedPortIds.forEach(portId => {
+      const port = ports.find(p => p.id === portId);
+      if (port) {
+        values.push(getPortDisplayName(port));
+      }
+    });
+
+    // Add custom port names
+    values.push(...selectedPortNames);
+
+    return values;
+  };
+
+  // Create options from database ports
+  const portOptions = ports.map(port => getPortDisplayName(port));
 
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
       multiple
-      freeSolo
+      freeSolo // Allow free text input
       options={portOptions}
-      value={selectedPorts}
+      value={getDisplayValues()}
       onChange={(_, newValue) => {
-        // Filter out any 'Add "..."' suggestions and clean the values
-        const cleanedValues = newValue.map(value => {
+        const newPortIds: string[] = [];
+        const newPortNames: string[] = [];
+
+        newValue.forEach(value => {
+          // Clean up "Add ..." suggestions
+          let cleanValue = value;
           if (typeof value === 'string' && value.startsWith('Add "') && value.endsWith('"')) {
-            return value.slice(5, -1); // Remove 'Add "' and '"'
+            cleanValue = value.slice(5, -1);
           }
-          return value;
+
+          // Check if this value matches a database port
+          const foundPort = ports.find(port => getPortDisplayName(port) === cleanValue);
+
+          if (foundPort) {
+            // It's a database port - add to portIds
+            newPortIds.push(foundPort.id);
+          } else {
+            // It's a custom port name - add to portNames
+            newPortNames.push(cleanValue);
+          }
         });
-        onChange?.(cleanedValues);
+
+        onChange?.(newPortIds, newPortNames);
       }}
       filterOptions={(options, params) => {
         const { inputValue } = params;
 
-        // First, filter existing ports
+        // Filter existing ports
         const filtered = options.filter(option =>
           option.toLowerCase().includes(inputValue.toLowerCase()),
         );
@@ -72,7 +147,7 @@ const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
       getOptionLabel={option => {
         // Handle the 'Add "..."' case
         if (typeof option === 'string' && option.startsWith('Add "') && option.endsWith('"')) {
-          return option.slice(5, -1); // Remove 'Add "' and '"'
+          return option.slice(5, -1);
         }
         return option;
       }}
@@ -80,9 +155,9 @@ const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
         <TextField
           {...params}
           label={label}
-          placeholder="Select port or add custom port &#9166;"
+          placeholder={loading ? 'Loading ports...' : placeholder}
           variant="outlined"
-          fullWidth
+          disabled={loading}
         />
       )}
     />

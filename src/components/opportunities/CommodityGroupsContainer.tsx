@@ -1,17 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import CommodityGroupRow from './CommodityGroupRow';
-import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import {
   Box,
-  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Checkbox,
   Dialog,
   DialogContent,
@@ -19,11 +16,16 @@ import {
   IconButton,
   TextField,
   Typography,
+  Button,
 } from '@material-ui/core';
-import { UserRecordMin } from '../../model/UserRecord';
 import CloseIcon from '@material-ui/icons/Close';
+import { useSnackbar } from 'notistack';
+import firebase from 'firebase/compat/app';
+import { GlobalContext } from '../../store/GlobalStore';
+import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import CommodityGroupRow from './CommodityGroupRow';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import { CommodityGroup } from '../../model/CommodityGroup';
 import CommoditiesMultiInput from '../inputs/CommoditiesMultiInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -50,13 +52,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+const COLLECTION_NAME = 'opportunity-commodity-groups';
+
 interface AddCommodityGroupDialogProps {
   isOpen: boolean;
   handleClose: () => void;
-  selectedGroups?: UserRecordMin[];
+  onAdd: (group: Omit<OpportunityCommodityGroup, 'id'>) => void;
 }
 
-const AddGroupDialog: React.FC<AddCommodityGroupDialogProps> = ({ isOpen, handleClose }) => {
+const AddGroupDialog: React.FC<AddCommodityGroupDialogProps> = ({ isOpen, handleClose, onAdd }) => {
   const classes = useStyles();
   const [groupName, setGroupName] = useState('');
   const [commodities, setCommodities] = useState<string[]>([]);
@@ -67,12 +71,14 @@ const AddGroupDialog: React.FC<AddCommodityGroupDialogProps> = ({ isOpen, handle
 
   const handleAddGroup = useCallback(() => {
     const filteredCommodities = commodities.filter(commodity => commodity.trim() !== '');
-    console.debug('Adding commodity group:', { name: groupName, commodities: filteredCommodities });
-    // Reset form
+    onAdd({
+      name: groupName,
+      commodities: filteredCommodities,
+    });
     setGroupName('');
     setCommodities([]);
     handleClose();
-  }, [groupName, commodities, handleClose]);
+  }, [groupName, commodities, handleClose, onAdd]);
 
   const handleDialogClose = () => {
     setGroupName('');
@@ -107,22 +113,21 @@ const AddGroupDialog: React.FC<AddCommodityGroupDialogProps> = ({ isOpen, handle
 
           <div style={{ flex: 1 }}>
             <CommoditiesMultiInput
-              data={[]}
               selectedCommodities={commodities}
               onChange={handleCommoditiesChange}
             />
           </div>
-        </div>
 
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={handleAddGroup}
-          disabled={!groupName.trim() || commodities.length === 0}
-          style={{ width: 120 }}
-        >
-          Add Group
-        </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleAddGroup}
+            disabled={!groupName.trim()}
+            style={{ width: 120 }}
+          >
+            Add
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -130,15 +135,43 @@ const AddGroupDialog: React.FC<AddCommodityGroupDialogProps> = ({ isOpen, handle
 
 const CommodityGroupsContainer: React.FC = () => {
   const classes = useStyles();
+  const [, dispatch] = useContext(GlobalContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const [commodityGroups, setCommodityGroups] = useState<OpportunityCommodityGroup[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isCommodityGroupDialogOpen, setIsCommodityGroupDialogOpen] = useState(false);
 
+  useEffect(() => {
+    const loadCommodityGroups = async () => {
+      try {
+        const snapshot = await firebase.firestore().collection(COLLECTION_NAME).get();
+        const groups = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as OpportunityCommodityGroup[];
+        setCommodityGroups(groups);
+      } catch (error) {
+        console.error('Error loading commodity groups:', error);
+        enqueueSnackbar('Error loading commodity groups!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCommodityGroups();
+  }, [enqueueSnackbar]);
+
   const onSelectRow = useCallback(
-    (event: React.MouseEvent<HTMLElement>, id: string) => {
+    (event: React.MouseEvent<HTMLElement>, groupId: string) => {
       event.stopPropagation();
       setSelectedGroups(prevState =>
-        selectedGroups.includes(id) ? [...prevState.filter(t => t !== id)] : [...prevState, id],
+        selectedGroups.includes(groupId)
+          ? [...prevState.filter(t => t !== groupId)]
+          : [...prevState, groupId],
       );
     },
     [selectedGroups],
@@ -146,40 +179,136 @@ const CommodityGroupsContainer: React.FC = () => {
 
   const handleSelectDeselectAll = () => {
     if (selectedGroups.length !== commodityGroups.length) {
-      setSelectedGroups(commodityGroups.map(group => group.id || ''));
+      setSelectedGroups(commodityGroups.map(group => group.id));
     } else {
       setSelectedGroups([]);
     }
   };
 
-  const commodityGroups = [
-    {
-      id: '1',
-      name: 'Agricultural Products',
-      commodities: ['Wheat', 'Corn', 'Rice', 'Soybeans'],
-    } as CommodityGroup,
-    {
-      id: '2',
-      name: 'Energy Products',
-      commodities: ['Crude Oil', 'Natural Gas', 'Coal', 'Gasoline', 'Diesel'],
-    } as CommodityGroup,
-    {
-      id: '3',
-      name: 'Metals',
-      commodities: ['Steel', 'Aluminum', 'Copper', 'Iron Ore'],
-    } as CommodityGroup,
-  ];
+  const handleAddNew = useCallback(
+    async (newGroup: Omit<OpportunityCommodityGroup, 'id'>) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        const docRef = await firebase.firestore().collection(COLLECTION_NAME).add(newGroup);
+        const createdGroup: OpportunityCommodityGroup = {
+          id: docRef.id,
+          ...newGroup,
+        };
+
+        setCommodityGroups(prev => [...prev, createdGroup]);
+        enqueueSnackbar('New commodity group created!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error creating commodity group:', error);
+        enqueueSnackbar('Error creating commodity group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleSave = useCallback(
+    async (updatedGroup: OpportunityCommodityGroup) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        await firebase.firestore().collection(COLLECTION_NAME).doc(updatedGroup.id).update({
+          name: updatedGroup.name,
+          commodities: updatedGroup.commodities,
+        });
+
+        setCommodityGroups(prev =>
+          prev.map(group => (group.id === updatedGroup.id ? updatedGroup : group)),
+        );
+
+        enqueueSnackbar('Commodity group updated successfully!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error updating commodity group:', error);
+        enqueueSnackbar('Error updating commodity group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleDelete = useCallback(
+    async (groupId: string) => {
+      dispatch({ type: 'START_GLOBAL_LOADING' });
+      try {
+        await firebase.firestore().collection(COLLECTION_NAME).doc(groupId).delete();
+        setCommodityGroups(prev => prev.filter(group => group.id !== groupId));
+        setSelectedGroups(prev => prev.filter(id => id !== groupId));
+
+        enqueueSnackbar('Commodity group deleted successfully!', {
+          variant: 'success',
+          autoHideDuration: 2000,
+        });
+      } catch (error) {
+        console.error('Error deleting commodity group:', error);
+        enqueueSnackbar('Error deleting commodity group!', {
+          variant: 'error',
+          autoHideDuration: 3000,
+        });
+      } finally {
+        dispatch({ type: 'STOP_GLOBAL_LOADING' });
+      }
+    },
+    [dispatch, enqueueSnackbar],
+  );
+
+  const handleDeleteSelected = useCallback(async () => {
+    if (selectedGroups.length === 0) return;
+
+    dispatch({ type: 'START_GLOBAL_LOADING' });
+    try {
+      const deletePromises = selectedGroups.map(groupId =>
+        firebase.firestore().collection(COLLECTION_NAME).doc(groupId).delete(),
+      );
+
+      await Promise.all(deletePromises);
+      setCommodityGroups(prev => prev.filter(group => !selectedGroups.includes(group.id)));
+      setSelectedGroups([]);
+
+      enqueueSnackbar(
+        `${selectedGroups.length} commodity group${selectedGroups.length > 1 ? 's' : ''} deleted successfully!`,
+        {
+          variant: 'success',
+          autoHideDuration: 2000,
+        },
+      );
+    } catch (error) {
+      console.error('Error deleting commodity groups:', error);
+      enqueueSnackbar('Error deleting commodity groups!', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
+    } finally {
+      dispatch({ type: 'STOP_GLOBAL_LOADING' });
+    }
+  }, [selectedGroups, dispatch, enqueueSnackbar]);
 
   return (
     <Box flexGrow={1}>
-      {!commodityGroups ? (
+      {loading ? (
         <ChartsCircularProgress />
       ) : (
         <Paper>
           <EnhancedTableToolbar
             numSelected={selectedGroups.length}
             handleAdd={() => setIsCommodityGroupDialogOpen(true)}
-            handleDelete={() => setIsConfirmationDialogOpen(true)}
+            handleDelete={handleDeleteSelected}
             labelWhenSelected={
               selectedGroups.length === 1
                 ? `${selectedGroups.length} group selected`
@@ -190,14 +319,13 @@ const CommodityGroupsContainer: React.FC = () => {
             labelWhenNotSelected={'Commodity groups'}
           />
           <TableContainer>
-            <Table className={classes.table} size="small" aria-label="a dense table">
+            <Table className={classes.table} size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell align="left" style={{ paddingLeft: 4 }}>
+                  <TableCell padding="checkbox">
                     <Checkbox
                       checked={selectedGroups.length === commodityGroups.length}
                       onClick={handleSelectDeselectAll}
-                      onFocus={event => event.stopPropagation()}
                       color="primary"
                     />
                   </TableCell>
@@ -209,10 +337,12 @@ const CommodityGroupsContainer: React.FC = () => {
               <TableBody>
                 {commodityGroups?.map((group, index) => (
                   <CommodityGroupRow
-                    commodityGroup={group}
                     key={`commodity-group-${group.id}-${index}`}
+                    commodityGroup={group}
                     selected={group.id ? selectedGroups.includes(group.id) : false}
                     onSelectRow={event => group.id && onSelectRow(event, group.id)}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
                   />
                 ))}
               </TableBody>
@@ -223,14 +353,8 @@ const CommodityGroupsContainer: React.FC = () => {
       <AddGroupDialog
         isOpen={isCommodityGroupDialogOpen}
         handleClose={() => setIsCommodityGroupDialogOpen(false)}
+        onAdd={handleAddNew}
       />
-      {/* <ConfirmationDialog
-        isOpen={isConfirmationDialogOpen}
-        label={'Please confirm'}
-        handleConfirm={handleRemoveGroups}
-        handleClose={() => setIsConfirmationDialogOpen(false)}
-        description="Are you sure you want to delete the selected commodity groups?"
-      /> */}
     </Box>
   );
 };

@@ -22,11 +22,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useSnackbar } from 'notistack';
 import firebase from 'firebase/compat/app';
 import { GlobalContext } from '../../store/GlobalStore';
-import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
-import EquipmentGroupRow from './EquipmentGroupRow';
+import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
+import PlacesGroupRow from './PlacesGroupRow';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { EnhancedTableToolbar } from '../EnhancedTableToolbar';
-import EquipmentMultiInput from '../inputs/EquipmentMultiInput';
+import PlacesMultiInput from '../inputs/PlacesMultiInput';
 
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
@@ -52,37 +52,37 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const COLLECTION_NAME = 'opportunity-equipments-groups';
+const COLLECTION_NAME = 'opportunity-places-groups';
 
-interface AddEquipmentGroupDialogProps {
+interface AddPlacesGroupDialogProps {
   isOpen: boolean;
   handleClose: () => void;
-  onAdd: (group: Omit<OpportunityEquipmentGroup, 'id'>) => void;
+  onAdd: (group: Omit<OpportunityPlacesGroup, 'id'>) => void;
 }
 
-const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handleClose, onAdd }) => {
+const AddGroupDialog: React.FC<AddPlacesGroupDialogProps> = ({ isOpen, handleClose, onAdd }) => {
   const classes = useStyles();
   const [groupName, setGroupName] = useState('');
-  const [equipmentTypeId, setEquipmentTypeId] = useState<string[]>([]);
+  const [places, setPlaces] = useState<string[]>([]);
 
-  const handleEquipmentChange = (selectedEquipmentIds: string[]) => {
-    setEquipmentTypeId(selectedEquipmentIds);
+  const handlePlacesChange = (selectedPlaces: string[]) => {
+    setPlaces(selectedPlaces);
   };
 
   const handleAddGroup = useCallback(() => {
+    const filteredPlaces = places.filter(place => place.trim() !== '');
     onAdd({
       name: groupName,
-      equipmentTypeId: equipmentTypeId,
+      places: filteredPlaces,
     });
-    // Reset form
     setGroupName('');
-    setEquipmentTypeId([]);
+    setPlaces([]);
     handleClose();
-  }, [groupName, equipmentTypeId, handleClose, onAdd]);
+  }, [groupName, places, handleClose, onAdd]);
 
   const handleDialogClose = () => {
     setGroupName('');
-    setEquipmentTypeId([]);
+    setPlaces([]);
     handleClose();
   };
 
@@ -90,12 +90,12 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
     <Dialog
       open={isOpen}
       onClose={handleDialogClose}
-      aria-labelledby="addEquipmentGroupsDialogTitle"
+      aria-labelledby="addPlacesGroupsDialogTitle"
       maxWidth="md"
       fullWidth
     >
-      <DialogTitle disableTypography id="addEquipmentGroupsDialogTitle">
-        <Typography variant="h4">Add new equipment group</Typography>
+      <DialogTitle disableTypography id="addPlacesGroupsDialogTitle">
+        <Typography variant="h4">Add new places group</Typography>
         <IconButton onClick={handleDialogClose} className={classes.closeModal}>
           <CloseIcon />
         </IconButton>
@@ -112,10 +112,7 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
           />
 
           <div style={{ flex: 1 }}>
-            <EquipmentMultiInput
-              selectedEquipmentIds={equipmentTypeId}
-              onChange={handleEquipmentChange}
-            />
+            <PlacesMultiInput selectedPlaces={places} onChange={handlePlacesChange} />
           </div>
 
           <Button
@@ -133,28 +130,27 @@ const AddGroupDialog: React.FC<AddEquipmentGroupDialogProps> = ({ isOpen, handle
   );
 };
 
-const EquipmentGroupsContainer: React.FC = () => {
+const PlacesGroupsContainer: React.FC = () => {
   const classes = useStyles();
   const [, dispatch] = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
-  const [equipmentGroups, setEquipmentGroups] = useState<OpportunityEquipmentGroup[]>([]);
+  const [placesGroups, setPlacesGroups] = useState<OpportunityPlacesGroup[]>([]);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isEquipmentGroupDialogOpen, setIsEquipmentGroupDialogOpen] = useState(false);
+  const [isPlacesGroupDialogOpen, setIsPlacesGroupDialogOpen] = useState(false);
 
-  // Load equipment groups from database
   useEffect(() => {
-    const loadEquipmentGroups = async () => {
+    const loadPlacesGroups = async () => {
       try {
         const snapshot = await firebase.firestore().collection(COLLECTION_NAME).get();
         const groups = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-        })) as OpportunityEquipmentGroup[];
-        setEquipmentGroups(groups);
+        })) as OpportunityPlacesGroup[];
+        setPlacesGroups(groups);
       } catch (error) {
-        console.error('Error loading equipment groups:', error);
-        enqueueSnackbar('Error loading equipment groups!', {
+        console.error('Error loading places groups:', error);
+        enqueueSnackbar('Error loading places groups!', {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -163,7 +159,7 @@ const EquipmentGroupsContainer: React.FC = () => {
       }
     };
 
-    loadEquipmentGroups();
+    loadPlacesGroups();
   }, [enqueueSnackbar]);
 
   const onSelectRow = useCallback(
@@ -179,31 +175,31 @@ const EquipmentGroupsContainer: React.FC = () => {
   );
 
   const handleSelectDeselectAll = () => {
-    if (selectedGroups.length !== equipmentGroups.length) {
-      setSelectedGroups(equipmentGroups.map(group => group.id));
+    if (selectedGroups.length !== placesGroups.length) {
+      setSelectedGroups(placesGroups.map(group => group.id));
     } else {
       setSelectedGroups([]);
     }
   };
 
   const handleAddNew = useCallback(
-    async (newGroup: Omit<OpportunityEquipmentGroup, 'id'>) => {
+    async (newGroup: Omit<OpportunityPlacesGroup, 'id'>) => {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       try {
         const docRef = await firebase.firestore().collection(COLLECTION_NAME).add(newGroup);
-        const createdGroup: OpportunityEquipmentGroup = {
+        const createdGroup: OpportunityPlacesGroup = {
           id: docRef.id,
           ...newGroup,
         };
 
-        setEquipmentGroups(prev => [...prev, createdGroup]);
-        enqueueSnackbar('New equipment group created!', {
+        setPlacesGroups(prev => [...prev, createdGroup]);
+        enqueueSnackbar('New places group created!', {
           variant: 'success',
           autoHideDuration: 2000,
         });
       } catch (error) {
-        console.error('Error creating equipment group:', error);
-        enqueueSnackbar('Error creating equipment group!', {
+        console.error('Error creating places group:', error);
+        enqueueSnackbar('Error creating places group!', {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -215,25 +211,25 @@ const EquipmentGroupsContainer: React.FC = () => {
   );
 
   const handleSave = useCallback(
-    async (updatedGroup: OpportunityEquipmentGroup) => {
+    async (updatedGroup: OpportunityPlacesGroup) => {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       try {
         await firebase.firestore().collection(COLLECTION_NAME).doc(updatedGroup.id).update({
           name: updatedGroup.name,
-          equipmentTypeId: updatedGroup.equipmentTypeId,
+          places: updatedGroup.places,
         });
 
-        setEquipmentGroups(prev =>
+        setPlacesGroups(prev =>
           prev.map(group => (group.id === updatedGroup.id ? updatedGroup : group)),
         );
 
-        enqueueSnackbar('Equipment group updated successfully!', {
+        enqueueSnackbar('Places group updated successfully!', {
           variant: 'success',
           autoHideDuration: 2000,
         });
       } catch (error) {
-        console.error('Error updating equipment group:', error);
-        enqueueSnackbar('Error updating equipment group!', {
+        console.error('Error updating places group:', error);
+        enqueueSnackbar('Error updating places group!', {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -249,16 +245,16 @@ const EquipmentGroupsContainer: React.FC = () => {
       dispatch({ type: 'START_GLOBAL_LOADING' });
       try {
         await firebase.firestore().collection(COLLECTION_NAME).doc(groupId).delete();
-        setEquipmentGroups(prev => prev.filter(group => group.id !== groupId));
+        setPlacesGroups(prev => prev.filter(group => group.id !== groupId));
         setSelectedGroups(prev => prev.filter(id => id !== groupId));
 
-        enqueueSnackbar('Equipment group deleted successfully!', {
+        enqueueSnackbar('Places group deleted successfully!', {
           variant: 'success',
           autoHideDuration: 2000,
         });
       } catch (error) {
-        console.error('Error deleting equipment group:', error);
-        enqueueSnackbar('Error deleting equipment group!', {
+        console.error('Error deleting places group:', error);
+        enqueueSnackbar('Error deleting places group!', {
           variant: 'error',
           autoHideDuration: 3000,
         });
@@ -279,19 +275,19 @@ const EquipmentGroupsContainer: React.FC = () => {
       );
 
       await Promise.all(deletePromises);
-      setEquipmentGroups(prev => prev.filter(group => !selectedGroups.includes(group.id)));
+      setPlacesGroups(prev => prev.filter(group => !selectedGroups.includes(group.id)));
       setSelectedGroups([]);
 
       enqueueSnackbar(
-        `${selectedGroups.length} equipment group${selectedGroups.length > 1 ? 's' : ''} deleted successfully!`,
+        `${selectedGroups.length} places group${selectedGroups.length > 1 ? 's' : ''} deleted successfully!`,
         {
           variant: 'success',
           autoHideDuration: 2000,
         },
       );
     } catch (error) {
-      console.error('Error deleting equipment groups:', error);
-      enqueueSnackbar('Error deleting equipment groups!', {
+      console.error('Error deleting places groups:', error);
+      enqueueSnackbar('Error deleting places groups!', {
         variant: 'error',
         autoHideDuration: 3000,
       });
@@ -308,16 +304,16 @@ const EquipmentGroupsContainer: React.FC = () => {
         <Paper>
           <EnhancedTableToolbar
             numSelected={selectedGroups.length}
-            handleAdd={() => setIsEquipmentGroupDialogOpen(true)}
+            handleAdd={() => setIsPlacesGroupDialogOpen(true)}
             handleDelete={handleDeleteSelected}
             labelWhenSelected={
               selectedGroups.length === 1
                 ? `${selectedGroups.length} group selected`
                 : `${selectedGroups.length} groups selected`
             }
-            addButtonLabel={'Add equipment group'}
+            addButtonLabel={'Add places group'}
             deleteButtonLabel={selectedGroups.length === 1 ? `Delete group` : `Delete groups`}
-            labelWhenNotSelected={'Equipment groups'}
+            labelWhenNotSelected={'Places of receipt / delivery groups'}
           />
           <TableContainer>
             <Table className={classes.table} size="small">
@@ -325,21 +321,21 @@ const EquipmentGroupsContainer: React.FC = () => {
                 <TableRow>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedGroups.length === equipmentGroups.length}
+                      checked={selectedGroups.length === placesGroups.length}
                       onClick={handleSelectDeselectAll}
                       color="primary"
                     />
                   </TableCell>
                   <TableCell>Name</TableCell>
-                  <TableCell>Equipment</TableCell>
+                  <TableCell>Places</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {equipmentGroups?.map((group, index) => (
-                  <EquipmentGroupRow
-                    key={`equipment-group-${group.id}-${index}`}
-                    equipmentGroup={group}
+                {placesGroups?.map((group, index) => (
+                  <PlacesGroupRow
+                    key={`places-group-${group.id}-${index}`}
+                    placesGroup={group}
                     selected={group.id ? selectedGroups.includes(group.id) : false}
                     onSelectRow={event => group.id && onSelectRow(event, group.id)}
                     onSave={handleSave}
@@ -352,12 +348,12 @@ const EquipmentGroupsContainer: React.FC = () => {
         </Paper>
       )}
       <AddGroupDialog
-        isOpen={isEquipmentGroupDialogOpen}
-        handleClose={() => setIsEquipmentGroupDialogOpen(false)}
+        isOpen={isPlacesGroupDialogOpen}
+        handleClose={() => setIsPlacesGroupDialogOpen(false)}
         onAdd={handleAddNew}
       />
     </Box>
   );
 };
 
-export default EquipmentGroupsContainer;
+export default PlacesGroupsContainer;

@@ -1,32 +1,78 @@
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import React, { useCallback, useEffect, useState } from 'react';
-import { CommodityGroup } from '../../model/CommodityGroup';
-import { Button, Checkbox, TextField } from '@material-ui/core';
+import React, { useState, useCallback, useEffect } from 'react';
+import { TableRow, TableCell, Checkbox, TextField, Button, Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import CommoditiesMultiInput from '../inputs/CommoditiesMultiInput';
+import { isEqual } from 'lodash/fp';
 
 interface Props extends React.Attributes {
-  commodityGroup: CommodityGroup;
+  commodityGroup: OpportunityCommodityGroup;
   selected: boolean;
   onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
+  onSave?: (commodityGroup: OpportunityCommodityGroup) => void;
+  onDelete?: (id: string) => void;
 }
+
+const useStyles = makeStyles({
+  nameField: {
+    minWidth: '200px',
+  },
+  commoditiesCell: {
+    minWidth: '300px',
+    maxWidth: '400px',
+  },
+  actionsCell: {
+    minWidth: '120px',
+  },
+  buttonContainer: {
+    display: 'flex',
+    gap: '8px',
+  },
+});
 
 const CommodityGroupRow: React.FC<Props> = ({
   commodityGroup,
   selected,
   onSelectRow,
+  onSave,
+  onDelete,
   ...other
 }) => {
-  const [activeCommodityGroup, setActiveCommodityGroup] = useState(commodityGroup);
+  const classes = useStyles();
+  const [activeCommodityGroup, setActiveCommodityGroup] =
+    useState<OpportunityCommodityGroup>(commodityGroup);
   const [changed, setChanged] = useState(false);
 
   useEffect(() => {
     setActiveCommodityGroup(commodityGroup);
+    setChanged(false);
   }, [commodityGroup]);
 
-  const onSave = useCallback(() => {
-    console.debug('onSave not implemented yet');
+  useEffect(() => {
+    const hasChanges = !isEqual(commodityGroup, activeCommodityGroup);
+    setChanged(hasChanges);
+  }, [commodityGroup, activeCommodityGroup]);
+
+  const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = event.target.value;
+    setActiveCommodityGroup(prev => ({
+      ...prev,
+      name: newName,
+    }));
   }, []);
+
+  const handleCommoditiesChange = useCallback((commodities: string[]) => {
+    setActiveCommodityGroup(prev => ({
+      ...prev,
+      commodities,
+    }));
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (onSave && changed) {
+      onSave(activeCommodityGroup);
+    }
+  }, [onSave, activeCommodityGroup, changed]);
 
   return (
     <TableRow {...other}>
@@ -38,19 +84,38 @@ const CommodityGroupRow: React.FC<Props> = ({
           color="primary"
         />
       </TableCell>
+
       <TableCell component="th" scope="row" style={{ minWidth: '150px' }}>
-        <TextField defaultValue={commodityGroup?.name} placeholder="Group name" />
-      </TableCell>
-      <TableCell align="right">
-        <CommoditiesMultiInput data={[]} selectedCommodities={commodityGroup?.commodities} />
+        <TextField
+          value={activeCommodityGroup.name}
+          onChange={handleNameChange}
+          placeholder="Group name"
+          size="small"
+          fullWidth
+        />
       </TableCell>
 
-      <TableCell align="right">
-        {changed && (
-          <Button onClick={onSave} size="small" color="primary" variant="contained">
+      <TableCell className={classes.commoditiesCell}>
+        <CommoditiesMultiInput
+          selectedCommodities={activeCommodityGroup.commodities}
+          onChange={handleCommoditiesChange}
+          label=""
+          placeholder="Add commodity..."
+        />
+      </TableCell>
+
+      <TableCell className={classes.actionsCell}>
+        <Box className={classes.buttonContainer}>
+          <Button
+            onClick={handleSave}
+            size="small"
+            color="primary"
+            variant="contained"
+            disabled={!changed}
+          >
             Save
           </Button>
-        )}
+        </Box>
       </TableCell>
     </TableRow>
   );
