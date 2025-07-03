@@ -60,10 +60,11 @@ const PortGroupRow: React.FC<Props> = ({
     }));
   }, []);
 
-  const handlePortsChange = useCallback((portIds: string[]) => {
+  const handlePortsChange = useCallback((portIds: string[], portNames: string[]) => {
     setActivePortGroup(prev => ({
       ...prev,
       portIds,
+      portNames,
     }));
   }, []);
 
@@ -109,6 +110,7 @@ const PortGroupRow: React.FC<Props> = ({
       <TableCell className={classes.portsCell}>
         <PortsMultiInput
           selectedPortIds={activePortGroup.portIds}
+          selectedPortNames={activePortGroup.portNames}
           onChange={handlePortsChange}
           label=""
         />
@@ -124,6 +126,18 @@ const PortGroupRow: React.FC<Props> = ({
             disabled={!changed}
           >
             Save
+          </Button>
+          <Button
+            onClick={handleReset}
+            size="small"
+            color="default"
+            variant="outlined"
+            disabled={!changed}
+          >
+            Reset
+          </Button>
+          <Button onClick={handleDelete} size="small" color="secondary" variant="outlined">
+            Delete
           </Button>
         </Box>
       </TableCell>

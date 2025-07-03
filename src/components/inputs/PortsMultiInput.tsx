@@ -15,7 +15,8 @@ interface Port {
 interface PortsMultiInputProps {
   label?: string;
   selectedPortIds?: string[];
-  onChange?: (portIds: string[]) => void;
+  selectedPortNames?: string[];
+  onChange?: (portIds: string[], portNames: string[]) => void;
   placeholder?: string;
 }
 
@@ -44,8 +45,9 @@ const getPortDisplayName = (port: Port): string => {
 const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
   label = 'Ports',
   selectedPortIds = [],
+  selectedPortNames = [],
   onChange,
-  placeholder = 'Select ports ↵',
+  placeholder = 'Select ports or add custom port ↵',
 }) => {
   const classes = useStyles();
   const [ports, setPorts] = useState<Port[]>([]);
@@ -71,24 +73,84 @@ const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
     loadPorts();
   }, []);
 
-  // Create port options from loaded ports
-  const portOptions = ports || [];
+  // Create display values combining both selected database ports and custom port names
+  const getDisplayValues = () => {
+    const values: string[] = [];
 
-  // Get selected ports based on IDs
-  const selectedPorts = ports?.filter(port => selectedPortIds.includes(port.id)) || [];
+    // Add selected database ports (by their display names)
+    selectedPortIds.forEach(portId => {
+      const port = ports.find(p => p.id === portId);
+      if (port) {
+        values.push(getPortDisplayName(port));
+      }
+    });
+
+    // Add custom port names
+    values.push(...selectedPortNames);
+
+    return values;
+  };
+
+  // Create options from database ports
+  const portOptions = ports.map(port => getPortDisplayName(port));
 
   return (
     <Autocomplete
       classes={{ root: classes.customTextField }}
       multiple
+      freeSolo // Allow free text input
       options={portOptions}
-      value={selectedPorts}
+      value={getDisplayValues()}
       onChange={(_, newValue) => {
-        const selectedIds = newValue.map(port => port.id);
-        onChange?.(selectedIds);
+        const newPortIds: string[] = [];
+        const newPortNames: string[] = [];
+
+        newValue.forEach(value => {
+          // Clean up "Add ..." suggestions
+          let cleanValue = value;
+          if (typeof value === 'string' && value.startsWith('Add "') && value.endsWith('"')) {
+            cleanValue = value.slice(5, -1);
+          }
+
+          // Check if this value matches a database port
+          const foundPort = ports.find(port => getPortDisplayName(port) === cleanValue);
+
+          if (foundPort) {
+            // It's a database port - add to portIds
+            newPortIds.push(foundPort.id);
+          } else {
+            // It's a custom port name - add to portNames
+            newPortNames.push(cleanValue);
+          }
+        });
+
+        onChange?.(newPortIds, newPortNames);
       }}
-      getOptionLabel={option => getPortDisplayName(option)}
-      getOptionSelected={(option, value) => option.id === value.id}
+      filterOptions={(options, params) => {
+        const { inputValue } = params;
+
+        // Filter existing ports
+        const filtered = options.filter(option =>
+          option.toLowerCase().includes(inputValue.toLowerCase()),
+        );
+
+        // If typing custom text and it doesn't match existing ports, suggest adding it
+        if (
+          inputValue !== '' &&
+          !options.some(option => option.toLowerCase() === inputValue.toLowerCase())
+        ) {
+          filtered.push(`Add "${inputValue}"`);
+        }
+
+        return filtered;
+      }}
+      getOptionLabel={option => {
+        // Handle the 'Add "..."' case
+        if (typeof option === 'string' && option.startsWith('Add "') && option.endsWith('"')) {
+          return option.slice(5, -1);
+        }
+        return option;
+      }}
       renderInput={params => (
         <TextField
           {...params}

@@ -64,24 +64,30 @@ const AddGroupDialog: React.FC<AddPortGroupDialogProps> = ({ isOpen, handleClose
   const classes = useStyles();
   const [groupName, setGroupName] = useState('');
   const [portIds, setPortIds] = useState<string[]>([]);
+  const [portNames, setPortNames] = useState<string[]>([]);
 
-  const handlePortsChange = (selectedPortIds: string[]) => {
+  const handlePortsChange = (selectedPortIds: string[], selectedPortNames: string[]) => {
     setPortIds(selectedPortIds);
+    setPortNames(selectedPortNames);
   };
 
   const handleAddGroup = useCallback(() => {
     onAdd({
       name: groupName,
-      portIds: portIds,
+      portIds,
+      portNames,
     });
+    // Reset form
     setGroupName('');
     setPortIds([]);
+    setPortNames([]);
     handleClose();
-  }, [groupName, portIds, handleClose, onAdd]);
+  }, [groupName, portIds, portNames, handleClose, onAdd]);
 
   const handleDialogClose = () => {
     setGroupName('');
     setPortIds([]);
+    setPortNames([]);
     handleClose();
   };
 
@@ -111,17 +117,21 @@ const AddGroupDialog: React.FC<AddPortGroupDialogProps> = ({ isOpen, handleClose
           />
 
           <div style={{ flex: 1 }}>
-            <PortsMultiInput selectedPortIds={portIds} onChange={handlePortsChange} />
+            <PortsMultiInput
+              selectedPortIds={portIds}
+              selectedPortNames={portNames}
+              onChange={handlePortsChange}
+            />
           </div>
 
           <Button
             color="primary"
             variant="contained"
             onClick={handleAddGroup}
-            disabled={!groupName.trim()}
+            disabled={!groupName.trim() || (portIds.length === 0 && portNames.length === 0)}
             style={{ width: 120 }}
           >
-            Add
+            Add Group
           </Button>
         </div>
       </DialogContent>
@@ -217,6 +227,7 @@ const PortGroupsContainer: React.FC = () => {
         await firebase.firestore().collection(COLLECTION_NAME).doc(updatedGroup.id).update({
           name: updatedGroup.name,
           portIds: updatedGroup.portIds,
+          portNames: updatedGroup.portNames,
         });
 
         setPortGroups(prev =>
