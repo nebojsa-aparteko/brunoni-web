@@ -1,11 +1,10 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
-import { Grid, makeStyles } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { Grid } from '@material-ui/core';
 
 import Meta from './Meta';
 import OpportunitiesFiltersBar from './searchbar/OpportunitiesFiltersBar';
 import { useOpportunitiesListFilterContext } from '../providers/OpportunitiesFilterProvider';
 
-// Import the hooks
 import useOpportunityPortsGroups from '../hooks/useOpportunityPortsGroups';
 import useOpportunityPlacesGroups from '../hooks/useOpportunityPlacesGroups';
 import useOpportunityTags from '../hooks/useOpportunityTags';
