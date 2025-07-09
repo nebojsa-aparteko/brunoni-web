@@ -46,11 +46,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
     useOpportunityListPaginationContext();
   const { searchString, page, rowsPerPage } = opportunityPaginationContextData;
-  const portsGroups = useOpportunityPortsGroups();
-  const placesGroups = useOpportunityPlacesGroups();
-  const opportunityTags = useOpportunityTags();
-  const commodityGroups = useOpportunityCommodityGroups();
-  const equipmentGroups = useOpportunityEquipmentGroups();
 
   // TODO: Replace with real API call when backend is ready
   // const { data: allOpportunities, loading } = useOpportunities();
@@ -139,11 +134,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
             filters={filters}
             setFilters={setFilters}
             showAssigneeFilter={isAdmin}
-            portsGroups={portsGroups}
-            placesGroups={placesGroups}
-            opportunityTags={opportunityTags}
-            commodityGroups={commodityGroups}
-            equipmentGroups={equipmentGroups}
           />
         </Grid>
         <Grid item md={12}></Grid>
