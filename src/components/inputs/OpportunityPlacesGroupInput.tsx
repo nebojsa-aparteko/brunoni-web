@@ -1,28 +1,134 @@
-import React from 'react';
+import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { TextField } from '@material-ui/core';
+import {
+  CircularProgress,
+  makeStyles,
+  Paper,
+  Popper,
+  PopperProps,
+  TextField,
+  Theme,
+} from '@material-ui/core';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 
 interface Props {
   label: string;
   options: OpportunityPlacesGroup[];
-  value?: OpportunityPlacesGroup | null;
-  onChange: (group: OpportunityPlacesGroup | null) => void;
+  inputRef?: MutableRefObject<HTMLInputElement | undefined>;
+  value?: OpportunityPlacesGroup | null | undefined;
+  onChange: (group: OpportunityPlacesGroup | null | undefined) => void;
+  open?: boolean;
+  onOpen?: (event: React.ChangeEvent<{}>) => void;
+  onClose?: (event: React.ChangeEvent<{}>) => void;
+  margin?: any;
 }
 
-const OpportunityPlacesGroupInput: React.FC<Props> = ({ label, options, value, onChange }) => {
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    width: '100%',
+  },
+  input: {
+    flexWrap: 'nowrap',
+  },
+}));
+
+const OpportunityPlacesGroupInput: React.FC<Props> = ({
+  label,
+  options,
+  inputRef,
+  value,
+  onChange,
+  open,
+  onOpen,
+  onClose,
+  margin,
+  ...rest
+}) => {
+  const classes = useStyles();
+  const loading = open && !options;
+
   return (
     <Autocomplete
-      options={options}
-      getOptionLabel={(option: OpportunityPlacesGroup) => option.name}
-      getOptionSelected={(option, value) => option.id === value.id}
+      {...rest}
+      className={classes.root}
       value={value || null}
-      onChange={(_, newValue) => onChange(newValue)}
+      onChange={(_: ChangeEvent<{}>, group: OpportunityPlacesGroup | null | undefined) =>
+        onChange(group)
+      }
+      autoSelect
+      autoHighlight
+      open={open}
+      onOpen={onOpen}
+      onClose={onClose}
+      getOptionLabel={(option: OpportunityPlacesGroup) => option.name}
+      getOptionSelected={(option, value) => option.id === value?.id}
+      options={options}
+      loading={loading}
       renderInput={params => (
-        <TextField {...params} label={label} variant="outlined" size="small" fullWidth />
+        <TextField
+          {...params}
+          inputRef={inputRef}
+          label={label}
+          fullWidth
+          variant="outlined"
+          margin={margin}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <React.Fragment>
+                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </React.Fragment>
+            ),
+            className: classes.input,
+          }}
+        />
       )}
+      PopperComponent={Popup}
+      PaperComponent={Papyrus}
+      renderOption={(option, { inputValue }) => {
+        const matches = match(option.name, inputValue);
+        const parts = parse(option.name, matches);
+
+        return (
+          <div>
+            {parts.map((part: { highlight: boolean; text: string }, index: number) => (
+              <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
+                {part.text}
+              </span>
+            ))}
+          </div>
+        );
+      }}
     />
   );
 };
+
+const usePopupStyles = makeStyles((theme: Theme) => ({
+  popper: {
+    width: theme.breakpoints.values.md / 2,
+    zIndex: 5000,
+  },
+}));
+
+function Popup(props: PopperProps) {
+  const { popperRef, anchorEl, open, children } = props;
+  const classes = usePopupStyles();
+
+  return (
+    <Popper
+      placement="bottom-start"
+      popperRef={popperRef as Ref<any>}
+      anchorEl={anchorEl}
+      open={open}
+      children={children}
+      className={classes.popper}
+    />
+  );
+}
+
+const Papyrus: React.FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => <Paper {...props} />;
 
 export default OpportunityPlacesGroupInput;
