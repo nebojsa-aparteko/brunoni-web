@@ -289,7 +289,12 @@ const Navbar: React.FC = () => {
                   className={classes.logo}
                 />
               </Link>
-              <Box displayPrint="none" width="100%" display="flex">
+              <Box
+                displayPrint="none"
+                width="100%"
+                display="flex"
+                style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}
+              >
                 {user !== undefined && user !== null && (
                   <Fragment>
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
