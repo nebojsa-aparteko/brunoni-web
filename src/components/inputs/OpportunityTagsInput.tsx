@@ -1,48 +1,48 @@
 // filepath: /Users/urosd/Documents/coding/brunoni/oskar-web/src/components/inputs/OpportunityTagInput.tsx
-import React from 'react';
-import { Autocomplete } from '@material-ui/lab';
+import React, { useState } from 'react';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField, Chip } from '@material-ui/core';
 import { OpportunityTag } from '../../model/OpportunityTag';
+import asArray from '../../utilities/asArray';
 
 interface Props {
-  label: string;
   options: OpportunityTag[];
-  value: OpportunityTag[];
-  onChange: (tags: OpportunityTag[] | null) => void;
-  multiple?: boolean;
+  defaultValues?: OpportunityTag[];
+  onChange: (event: React.ChangeEvent<{}>, value: OpportunityTag[] | null) => void;
 }
 
-const OpportunityTagInput: React.FC<Props> = ({
-  label,
-  options,
-  value,
-  onChange,
-  multiple = true,
-}) => {
+const OpportunityTagsInput: React.FC<Props> = ({ options, defaultValues, onChange }) => {
+  const [disableInput, setDisableInput] = useState<boolean>(false);
+  const [selectedTags, setSelectedTags] = useState<OpportunityTag[]>(defaultValues || []);
+
+  const handleChange = (event: React.ChangeEvent<{}>, tags: OpportunityTag[] | null) => {
+    const tagsArray = tags || [];
+    setDisableInput(tagsArray.length >= 10);
+    setSelectedTags(tagsArray);
+    onChange(event, tagsArray);
+  };
+
   return (
     <Autocomplete
-      multiple={multiple}
+      multiple
+      autoHighlight
       options={options}
-      getOptionLabel={(option: OpportunityTag) => option.tag}
       getOptionSelected={(option, value) => option.id === value.id}
-      value={value || []}
-      onChange={(_, newValue) => onChange(newValue as OpportunityTag[])}
-      renderTags={(value: OpportunityTag[], getTagProps) =>
-        value.map((option: OpportunityTag, index: number) => (
-          <Chip
-            variant="outlined"
-            label={option.tag}
-            size="small"
-            {...getTagProps({ index })}
-            key={option.id}
-          />
+      getOptionDisabled={option => disableInput && !selectedTags.some(tag => tag.id === option.id)}
+      getOptionLabel={option => `${option.tag}`}
+      defaultValue={defaultValues}
+      onChange={handleChange}
+      renderTags={(value, getTagProps) =>
+        value.map((option, index) => (
+          <Chip key={option.id} label={option.tag} size="small" {...getTagProps({ index })} />
         ))
       }
+      renderOption={option => <Chip key={option.id} label={option.tag} size="small" />}
       renderInput={params => (
-        <TextField {...params} label={label} variant="outlined" size="small" fullWidth />
+        <TextField {...params} label="Tags" placeholder="Type to filter" variant="outlined" />
       )}
     />
   );
 };
 
-export default OpportunityTagInput;
+export default OpportunityTagsInput;
