@@ -56,22 +56,22 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setClientFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('clientFilter', client || undefined)(filters));
 
-  const setPortsGroup = (portsGroup: OpportunityPortsGroup | null) =>
+  const setPortsGroup = (portsGroup: OpportunityPortsGroup | null | undefined) =>
     setFilters && setFilters(set('portsGroup', portsGroup || undefined)(filters));
 
-  const setPlacesGroup = (placesGroup: OpportunityPlacesGroup | null) =>
+  const setPlacesGroup = (placesGroup: OpportunityPlacesGroup | null | undefined) =>
     setFilters && setFilters(set('placesGroup', placesGroup || undefined)(filters));
 
-  const setOpportunityTags = (tags: OpportunityTag[] | null) =>
+  const setOpportunityTags = (tags: OpportunityTag[] | null | undefined) =>
     setFilters && setFilters(set('tags', tags || [])(filters));
 
-  const setCommodityGroups = (groups: OpportunityCommodityGroup[] | null) =>
+  const setCommodityGroups = (groups: OpportunityCommodityGroup[] | null | undefined) =>
     setFilters && setFilters(set('commodityGroups', groups || [])(filters));
 
-  const setEquipmentGroups = (groups: OpportunityEquipmentGroup[] | null) =>
+  const setEquipmentGroups = (groups: OpportunityEquipmentGroup[] | null | undefined) =>
     setFilters && setFilters(set('equipmentGroups', groups || [])(filters));
 
-  const setUserFilter = (user: UserRecord | null) =>
+  const setUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignee', user || undefined)(filters));
 
   return (
@@ -138,7 +138,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               options={commodityGroups}
               onChange={setCommodityGroups}
               value={selectedCommodityGroups || []}
-              multiple
             />
           </Grid>
         )}
@@ -150,7 +149,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               options={equipmentGroups}
               onChange={setEquipmentGroups}
               value={selectedEquipmentGroups || []}
-              multiple
             />
           </Grid>
         )}
