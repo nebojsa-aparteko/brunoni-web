@@ -35,6 +35,7 @@ import Tags from '../../contexts/Tags';
 import { Opportunity } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import Client from '../../model/Client';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -145,6 +146,19 @@ const useStyles = makeStyles(() => ({
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '12px',
     marginTop: '8px',
+  },
+  progress: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    height: '8px',
+    width: '100%',
+    marginTop: '4px',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#3f51b5',
+    transition: 'width 0.3s ease-in-out',
   },
 }));
 
@@ -452,6 +466,19 @@ export const OpportunityRow: React.FC<OpportunityRowProps> = ({
             label1={opportunity.placeOfDeliveryGroupId?.name || 'Not specified'}
             gutterBottom
           />
+        </div>
+        <div className={classes.horizontalItem}>
+          <Typography variant="body2" gutterBottom>
+            Capacity Progress
+          </Typography>
+          <div className={classes.progress}>
+            <div
+              className={classes.progressBar}
+              role="progressbar"
+              style={{ width: `${(opportunity.capacityTEU / 1000) * 100}%` }}
+            />
+          </div>
+          <Typography variant="subtitle2">{opportunity.capacityTEU} TEU</Typography>
         </div>
       </div>
     </StyledTableRow>
