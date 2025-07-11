@@ -53,13 +53,14 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'row',
     overflowX: 'auto',
     overflowY: 'hidden',
-    gap: '12px',
+    gap: '8px',
     padding: '8px 0',
-    minWidth: 'max-content',
+    maxWidth: '80vw',
+    width: '100%',
     scrollbarWidth: 'thin',
     scrollbarColor: '#888 #f1f1f1',
     '&::-webkit-scrollbar': {
-      height: '6px',
+      height: '8px',
     },
     '&::-webkit-scrollbar-track': {
       background: '#f1f1f1',
@@ -74,10 +75,16 @@ const useStyles = makeStyles(() => ({
     },
   },
   horizontalItem: {
-    minWidth: '140px',
-    maxWidth: '140px',
-    flexShrink: 0,
+    minWidth: '150px',
+    width: 'auto',
+    flex: '0 0 auto',
     overflow: 'hidden',
+    '@media (max-width: 768px)': {
+      minWidth: '120px',
+    },
+    '@media (max-width: 480px)': {
+      minWidth: '100px',
+    },
   },
   avatarCell: {
     textAlign: 'center',
@@ -117,6 +124,7 @@ const useStyles = makeStyles(() => ({
     marginRight: '1px',
     marginBottom: '8px',
     overflow: 'hidden',
+    maxWidth: '100%',
   },
   compactRow: {
     padding: '12px 16px',
@@ -366,36 +374,85 @@ export const OpportunityRow: React.FC<OpportunityRowProps> = ({
         </div>
       </div>
 
-      <div className={classes.detailsGrid}>
-        <InfoBoxItem
-          title="Sales Rep"
-          label1={`${opportunity.sleasRep.firstName} ${opportunity.sleasRep.lastName}`}
-          label2={opportunity.sleasRep.emailAddress}
-        />
-        <InfoBoxItem
-          title="Booking Party"
-          label1={opportunity.bookingParty.name}
-          label2={opportunity.bookingParty.city}
-        />
-        <InfoBoxItem
-          title="Shipper/Consignee"
-          label1={opportunity.shipper || 'Not specified'}
-          label2={opportunity.cosignee || 'Not specified'}
-        />
-        <InfoBoxItem
-          title="Commodity Groups"
-          label1={
-            opportunity.commodityGroupIds?.map(group => group.name).join(', ') || 'Not specified'
-          }
-          label2={
-            opportunity.equipmentGroupIds?.map(group => group.name).join(', ') || 'Not specified'
-          }
-        />
-        <InfoBoxItem
-          title="Places/Ports"
-          label1={opportunity.placeOfReceiptGroupId?.name || 'Not specified'}
-          label2={opportunity.placeOfDeliveryGroupId?.name || 'Not specified'}
-        />
+      <div className={classes.horizontalContainer}>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Sales Rep"
+            label1={`${opportunity.sleasRep.firstName} ${opportunity.sleasRep.lastName}`}
+            label2={opportunity.sleasRep.emailAddress}
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Booking Party"
+            label1={opportunity.bookingParty.name}
+            label2={opportunity.bookingParty.city}
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Shipper"
+            label1={opportunity.shipper || 'Not specified'}
+            label2=""
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Consignee"
+            label1={opportunity.cosignee || 'Not specified'}
+            label2=""
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Commodity Groups"
+            label1={
+              opportunity.commodityGroupIds?.map(group => group.name).join(', ') || 'Not specified'
+            }
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Equipment Groups"
+            label1={
+              opportunity.equipmentGroupIds?.map(group => group.name).join(', ') || 'Not specified'
+            }
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Place of Receipt"
+            label1={opportunity.placeOfReceiptGroupId?.name || 'Not specified'}
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Port of Loading"
+            label1={opportunity.portOfLoadingGroupId?.name || 'Not specified'}
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Port of Discharge"
+            label1={opportunity.portOfDischargeGroupId?.name || 'Not specified'}
+            gutterBottom
+          />
+        </div>
+        <div className={classes.horizontalItem}>
+          <InfoBoxItem
+            title="Place of Delivery"
+            label1={opportunity.placeOfDeliveryGroupId?.name || 'Not specified'}
+            gutterBottom
+          />
+        </div>
       </div>
     </StyledTableRow>
   );
