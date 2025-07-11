@@ -74,7 +74,7 @@ const OpportunitiesConfigPage: React.FC = () => {
             className={classes.tabs}
             aria-label="Opportunities config tabs"
           >
-            <Tab label="Places of receipt / delivery group" icon={<PinDropIcon />} />
+            <Tab label="Places of receipt / places of delivery" icon={<PinDropIcon />} />
             <Tab label="Ports Groups" icon={<ExploreIcon />} />
             <Tab label="Commodities Groups" icon={<RecentActorsIcon />} />
             <Tab label="Equipments Groups" icon={<ReceiptIcon />} />

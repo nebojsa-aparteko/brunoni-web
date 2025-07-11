@@ -313,7 +313,7 @@ const PlacesGroupsContainer: React.FC = () => {
             }
             addButtonLabel={'Add places group'}
             deleteButtonLabel={selectedGroups.length === 1 ? `Delete group` : `Delete groups`}
-            labelWhenNotSelected={'Places of receipt / delivery groups'}
+            labelWhenNotSelected={'Places of receipt / places of delivery '}
           />
           <TableContainer>
             <Table className={classes.table} size="small">
