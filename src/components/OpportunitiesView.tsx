@@ -25,6 +25,8 @@ import useOpportunityEquipmentGroups from '../hooks/useOpportunityEquipmentGroup
 import { useOpportunityListPaginationContext } from '../providers/OpportunityListPaginationProvider';
 import Search from './searchbar/Search';
 import OpportunitiesEmptyResults from './opportunities/OpportunitisEmptyResults';
+import OpportunityTable from './opportunities/OpportunityTable';
+import { Opportunity } from '../model/Opportunity';
 
 interface Props {
   isAdmin?: boolean;
@@ -52,11 +54,8 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
 
   // Filter opportunities based on selected filters
   const { assignee } = filters;
-  const opportunities = [
-    {
-      name: 'Europe to Asia Container Route',
-    },
-  ];
+  // Using undefined to let OpportunityTable generate mock data
+  const opportunities: Opportunity[] | undefined = undefined;
   const isLoading = false;
   const handleSearch = useCallback(
     (searchStringNew: string) => {
@@ -139,7 +138,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
         <Grid item md={12}></Grid>
       </Grid>
       <div>
-        {opportunities && !isLoading ? (
+        {!isLoading ? (
           <Fragment>
             <Card>
               <CardHeader
@@ -157,8 +156,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
                       onSearch={handleSearch}
                       localStorageKey={'bookingSearchQuery'}
                       style={{
-                        visibility:
-                          opportunities && opportunities.length > 0 ? 'initial' : 'hidden',
+                        visibility: 'initial',
                       }}
                     />
                   </Box>
@@ -166,7 +164,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
               />
             </Card>
 
-            {opportunities.length === 0 && (
+            {opportunities && opportunities.length === 0 ? (
               <OpportunitiesEmptyResults
                 message={
                   assignee
@@ -175,6 +173,8 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
                     : 'No bookings found for your filter criteria. Try changing filters.'
                 }
               />
+            ) : (
+              <OpportunityTable opportunities={opportunities} isAdmin={isAdmin} />
             )}
           </Fragment>
         ) : (
