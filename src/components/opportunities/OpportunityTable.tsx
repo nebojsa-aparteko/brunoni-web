@@ -26,12 +26,12 @@ import clsx from 'clsx';
 import theme from '../../theme';
 import InfoBoxItem from '../InfoBoxItem';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import BookingsEmptyResults from '../bookings/BookingsEmptyResults';
 import TagsPreviewList from '../tags/TagsPreviewList';
 import Tags from '../../contexts/Tags';
 import { Opportunity } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import Client from '../../model/Client';
+import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -450,7 +450,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
   return (
     <Fragment>
       {displayOpportunities.length === 0 ? (
-        <BookingsEmptyResults
+        <OpportunitiesEmptyResults
           message={'No opportunities found for your filter criteria. Try changing filters.'}
         />
       ) : (
