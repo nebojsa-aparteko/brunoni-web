@@ -19,6 +19,8 @@ export interface Opportunity {
   placeOfDeliveryGroupId?: OpportunityPlacesGroup;
   commodityGroupIds?: OpportunityCommodityGroup[];
   equipmentGroupIds?: OpportunityEquipmentGroup[];
-  tag?: OpportunityTag[];
+  tags?: OpportunityTag[];
   capacityTEU: number;
+  quotedTEU?: number;
+  bookedTEU?: number;
 }

@@ -1,15 +1,9 @@
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import {
-  Box,
+  Chip,
   Button,
-  Checkbox,
   createStyles,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -20,18 +14,18 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import theme from '../../theme';
-import InfoBoxItem from '../InfoBoxItem';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import TagsPreviewList from '../tags/TagsPreviewList';
-import Tags from '../../contexts/Tags';
 import { Opportunity } from '../../model/Opportunity';
 import UserRecord from '../../model/UserRecord';
 import Client from '../../model/Client';
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
+import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
+import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
+import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
+import { OpportunityTag } from '../../model/OpportunityTag';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -119,7 +113,6 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           color="primary"
           variant="contained"
           onClick={() => {
-            // Handle bulk actions here
             console.log('Bulk action for opportunities:', selectedOpportunities);
           }}
           disabled={selectedOpportunities.length === 0}
@@ -135,204 +128,109 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 interface OpportunityTableRowProps {
   opportunity: Opportunity;
   selected: boolean;
-  onSelectRow: (event: React.MouseEvent<HTMLElement>, id: string) => void;
-  onRowClick: (id: string) => void;
-  handleOpenDetailsDialog: (opportunity: Opportunity) => void;
 }
 
-const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({
-  opportunity,
-  selected,
-  onSelectRow,
-  onRowClick,
-  handleOpenDetailsDialog,
-}) => {
+const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, selected }) => {
   const classes = useStyles();
-  const availableTags = useContext(Tags);
-  const [tags, setTags] = useState(
-    availableTags &&
-      availableTags.filter(
-        tag => opportunity.tag && opportunity.tag.some(oppTag => oppTag.id === tag.id),
-      ),
-  );
 
-  useEffect(
-    () =>
-      setTags(
-        availableTags &&
-          availableTags.filter(
-            tag => opportunity.tag && opportunity.tag.some(oppTag => oppTag.id === tag.id),
-          ),
-      ),
-    [availableTags, opportunity.tag],
-  );
+  const renderGroup = (group?: { name?: string; id?: string }) =>
+    group ? group.name || group.id : 'Not specified';
 
-  const handleRowClick = (event: React.MouseEvent<HTMLElement>) => {
-    if ((event.target as HTMLElement).closest('input[type="checkbox"]')) {
-      return;
-    }
-    onRowClick(opportunity.id);
-  };
-
-  const handleDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-    handleOpenDetailsDialog(opportunity);
-  };
+  const renderGroups = (groups?: { name?: string; id?: string }[]) =>
+    groups && groups.length > 0 ? groups.map(g => g.name || g.id).join(', ') : 'Not specified';
 
   return (
-    <TableRow
-      hover
-      className={classes.tableRow}
-      selected={selected}
-      onClick={handleRowClick}
-      role="checkbox"
-      aria-checked={selected}
-      tabIndex={-1}
-    >
-      <TableCell padding="checkbox">
-        <Checkbox
-          checked={selected}
-          onClick={event => onSelectRow(event, opportunity.id)}
-          onFocus={event => event.stopPropagation()}
-        />
-      </TableCell>
+    <TableRow hover className={classes.tableRow} selected={selected} tabIndex={-1}>
+      <TableCell padding="checkbox"></TableCell>
+      <TableCell align="center">{opportunity.id}</TableCell>
+      <TableCell align="center">{opportunity.kindOfQuote}</TableCell>
       <TableCell align="center">
-        <Typography variant="body2">{opportunity.id}</Typography>
+        {opportunity.sleasRep.firstName} {opportunity.sleasRep.lastName}
       </TableCell>
+      <TableCell align="center">{opportunity.bookingParty.name}</TableCell>
+      <TableCell align="center">{opportunity.shipper || 'Not specified'}</TableCell>
+      <TableCell align="center">{opportunity.cosignee || 'Not specified'}</TableCell>
+      <TableCell align="center">{renderGroup(opportunity.placeOfReceiptGroupId)}</TableCell>
+      <TableCell align="center">{renderGroup(opportunity.portOfLoadingGroupId)}</TableCell>
+      <TableCell align="center">{renderGroup(opportunity.portOfDischargeGroupId)}</TableCell>
+      <TableCell align="center">{renderGroup(opportunity.placeOfDeliveryGroupId)}</TableCell>
+      <TableCell align="center">{renderGroups(opportunity.commodityGroupIds)}</TableCell>
+      <TableCell align="center">{renderGroups(opportunity.equipmentGroupIds)}</TableCell>
       <TableCell align="center">
-        <Typography variant="body2">{opportunity.kindOfQuote}</Typography>
+        {opportunity.tags && opportunity.tags.length > 0
+          ? opportunity.tags.map(tag => (
+              <Chip
+                key={tag.id}
+                label={tag.tag}
+                size="small"
+                style={{ marginRight: 4, marginBottom: 2 }}
+                color="primary"
+                variant="outlined"
+              />
+            ))
+          : 'Not specified'}
       </TableCell>
+      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
       <TableCell align="center">
-        <Typography variant="body2">{opportunity.capacityTEU} TEU</Typography>
+        {opportunity.quotedTEU} / {opportunity.capacityTEU}
+        <span style={{ marginLeft: 8, color: '#888' }}>
+          ({(((opportunity.quotedTEU ?? 0) / opportunity.capacityTEU) * 100).toFixed(1)}%)
+        </span>
         <div className={classes.progress}>
           <div
             className={classes.progressBar}
-            style={{ width: `${Math.min((opportunity.capacityTEU / 1000) * 100, 100)}%` }}
+            style={{
+              width: `${Math.min(((opportunity.quotedTEU ?? 0) / opportunity.capacityTEU) * 100, 100)}%`,
+              backgroundColor: '#2196f3',
+            }}
           />
         </div>
       </TableCell>
       <TableCell align="center">
-        <Typography variant="body2">
-          {opportunity.sleasRep.firstName} {opportunity.sleasRep.lastName}
-        </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">{opportunity.bookingParty.name}</Typography>
-        <Typography variant="caption" color="textSecondary">
-          {opportunity.bookingParty.city}
-        </Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">{opportunity.shipper || 'Not specified'}</Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">{opportunity.cosignee || 'Not specified'}</Typography>
-      </TableCell>
-      <TableCell align="center">
-        <Typography variant="body2">
-          {opportunity.commodityGroupIds?.map(group => group.name).join(', ') || 'Not specified'}
-        </Typography>
-      </TableCell>
-      <TableCell align="center">{tags && <TagsPreviewList tags={tags} />}</TableCell>
-      <TableCell align="center">
-        <Button variant="outlined" size="small" onClick={handleDetailsClick}>
-          Details
-        </Button>
+        {opportunity.bookedTEU} / {opportunity.capacityTEU}
+        <span style={{ marginLeft: 8, color: '#888' }}>
+          ({(((opportunity.bookedTEU ?? 0) / opportunity.capacityTEU) * 100).toFixed(1)}%)
+        </span>
+        <div className={classes.progress}>
+          <div
+            className={classes.progressBar}
+            style={{
+              width: `${Math.min(((opportunity.bookedTEU ?? 0) / opportunity.capacityTEU) * 100, 100)}%`,
+              backgroundColor: '#4caf50',
+            }}
+          />
+        </div>
       </TableCell>
     </TableRow>
   );
 };
 
-interface OpportunityDetailsDialogProps {
-  isOpen: boolean;
-  opportunity: Opportunity | undefined;
-  handleClose: () => void;
-}
-
-export const OpportunityDetailsDialog: React.FC<OpportunityDetailsDialogProps> = ({
-  isOpen,
-  handleClose,
-  opportunity,
-}) => {
-  const classes = useStyles();
-
-  if (!opportunity) {
-    return null;
-  }
-
-  return (
-    <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      aria-labelledby="dialog-title-opportunity-details"
-      maxWidth="md"
-    >
-      <span className={classes.dialogBody}>
-        <DialogTitle disableTypography id="dialog-title-opportunity-details">
-          <Typography variant="h4">Opportunity {opportunity.id}</Typography>
-          <Typography variant="h6">Quote Kind: {opportunity.kindOfQuote}</Typography>
-          <Typography variant="h6">Capacity: {opportunity.capacityTEU} TEU</Typography>
-          <IconButton onClick={handleClose} className={classes.closeModal}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent className={classes.dialogContent}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <InfoBoxItem
-                title="Sales Rep"
-                label1={`${opportunity.sleasRep.firstName} ${opportunity.sleasRep.lastName}`}
-                label2={opportunity.sleasRep.emailAddress}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <InfoBoxItem
-                title="Booking Party"
-                label1={opportunity.bookingParty.name}
-                label2={opportunity.bookingParty.city}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <InfoBoxItem
-                title="Shipper"
-                label1={opportunity.shipper || 'Not specified'}
-                label2=""
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <InfoBoxItem
-                title="Consignee"
-                label1={opportunity.cosignee || 'Not specified'}
-                label2=""
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <InfoBoxItem
-                title="Commodity Groups"
-                label1={
-                  opportunity.commodityGroupIds?.map(group => group.name).join(', ') ||
-                  'Not specified'
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <InfoBoxItem
-                title="Equipment Groups"
-                label1={
-                  opportunity.equipmentGroupIds?.map(group => group.name).join(', ') ||
-                  'Not specified'
-                }
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </span>
-    </Dialog>
-  );
-};
-
 // Mock data generator
 const generateMockOpportunities = (): Opportunity[] => {
+  const mockPlacesGroups: OpportunityPlacesGroup[] = [
+    { id: 'pr1', name: 'East Europe', places: ['Prague', 'Tallin'] },
+    { id: 'pr2', name: 'Nort Africa', places: ['Cairo', 'Marrakesh'] },
+  ];
+
+  const mockPortsGroups: OpportunityPortsGroup[] = [
+    { id: 'pl1', name: 'Europe', portIds: ['h1', 'h2'], portNames: ['Hamburg', 'Waltershof'] },
+    { id: 'pl2', name: 'Africa', portIds: ['r1', 'r2'], portNames: ['Mogadishu', 'Freetown'] },
+  ];
+
+  const mockCommodityGroups: OpportunityCommodityGroup[] = [
+    { id: 'cg1', name: 'Chemicals', commodities: ['Paint', 'Solvent'] },
+    { id: 'cg2', name: 'Food', commodities: ['Wheat', 'Corn'] },
+  ];
+
+  const mockEquipmentGroups: OpportunityEquipmentGroup[] = [
+    { id: 'eg1', name: 'Standard Containers', equipmentTypeId: ['20GP', '40GP'] },
+    { id: 'eg2', name: 'Reefer Containers', equipmentTypeId: ['20RF', '40RF'] },
+  ];
+
+  const mockTags: OpportunityTag[] = [
+    { id: 't1', tag: 'Priority' },
+    { id: 't2', tag: 'Standard' },
+  ];
   const salesReps: UserRecord[] = [
     {
       id: '1',
@@ -371,6 +269,9 @@ const generateMockOpportunities = (): Opportunity[] => {
   return Array.from({ length: 10 }, (_, index) => {
     const salesRep = salesReps[index % salesReps.length];
     const bookingParty = clients[index % clients.length];
+    const capacityTEU = Math.floor(Math.random() * 9900) + 100; // 100 - 10000
+    const quotedTEU = Math.floor(Math.random() * (capacityTEU + 1)); // 0 - capacity
+    const bookedTEU = Math.floor(Math.random() * (quotedTEU + 1)); // 0 - quoted
 
     return {
       id: `opp-${index + 1}`,
@@ -379,7 +280,16 @@ const generateMockOpportunities = (): Opportunity[] => {
       shipper: `Shipper Company ${index + 1}`,
       cosignee: `Consignee Corp ${index + 1}`,
       kindOfQuote: quoteKinds[index % quoteKinds.length],
-      capacityTEU: Math.floor(Math.random() * 1000) + 100,
+      placeOfReceiptGroupId: mockPlacesGroups[index % mockPlacesGroups.length],
+      portOfLoadingGroupId: mockPortsGroups[index % mockPortsGroups.length],
+      portOfDischargeGroupId: mockPortsGroups[(index + 1) % mockPortsGroups.length],
+      placeOfDeliveryGroupId: mockPlacesGroups[(index + 1) % mockPlacesGroups.length],
+      commodityGroupIds: [mockCommodityGroups[index % mockCommodityGroups.length]],
+      equipmentGroupIds: [mockEquipmentGroups[index % mockEquipmentGroups.length]],
+      tags: [mockTags[index % mockTags.length]],
+      capacityTEU,
+      quotedTEU,
+      bookedTEU,
     };
   });
 };
@@ -391,61 +301,8 @@ interface OpportunityTableProps {
 
 const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAdmin }) => {
   const [selectedOpportunities, setSelectedOpportunities] = useState<string[]>([]);
-  const [dialogData, setDialogData] = useState<Opportunity | undefined>(undefined);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const navigate = useNavigate();
 
-  // Use mock data if no opportunities provided
   const displayOpportunities = opportunities || generateMockOpportunities();
-
-  const handleSelectRow = useCallback(
-    (event: React.MouseEvent<HTMLElement>, id: string) => {
-      event.stopPropagation();
-      const selectedIndex = selectedOpportunities.indexOf(id);
-      let newSelected: string[] = [];
-
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selectedOpportunities, id);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selectedOpportunities.slice(1));
-      } else if (selectedIndex === selectedOpportunities.length - 1) {
-        newSelected = newSelected.concat(selectedOpportunities.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selectedOpportunities.slice(0, selectedIndex),
-          selectedOpportunities.slice(selectedIndex + 1),
-        );
-      }
-
-      setSelectedOpportunities(newSelected);
-    },
-    [selectedOpportunities],
-  );
-
-  const handleSelectDeselectAll = useCallback(() => {
-    if (selectedOpportunities.length === displayOpportunities.length) {
-      setSelectedOpportunities([]);
-    } else {
-      setSelectedOpportunities(displayOpportunities.map(opp => opp.id));
-    }
-  }, [selectedOpportunities, displayOpportunities]);
-
-  const handleRowClick = useCallback(
-    (id: string) => {
-      navigate(`/opportunities/${id}`);
-    },
-    [navigate],
-  );
-
-  const handleOpenDetailsDialog = useCallback((opportunity: Opportunity) => {
-    setDialogData(opportunity);
-    setIsDialogOpen(true);
-  }, []);
-
-  const handleDialogClose = useCallback(() => {
-    setIsDialogOpen(false);
-    setDialogData(undefined);
-  }, []);
 
   return (
     <Fragment>
@@ -464,23 +321,23 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
             <Table aria-label="opportunities table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="left" style={{ paddingLeft: 4 }}>
-                    <Checkbox
-                      checked={selectedOpportunities.length === displayOpportunities.length}
-                      onClick={handleSelectDeselectAll}
-                      onFocus={event => event.stopPropagation()}
-                    />
-                  </TableCell>
+                  <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
                   <TableCell align="center">ID</TableCell>
                   <TableCell align="center">Quote Kind</TableCell>
-                  <TableCell align="center">Capacity</TableCell>
                   <TableCell align="center">Sales Rep</TableCell>
                   <TableCell align="center">Booking Party</TableCell>
                   <TableCell align="center">Shipper</TableCell>
                   <TableCell align="center">Consignee</TableCell>
+                  <TableCell align="center">Place of Receipt</TableCell>
+                  <TableCell align="center">Port of Loading</TableCell>
+                  <TableCell align="center">Port of Discharge</TableCell>
+                  <TableCell align="center">Place of Delivery</TableCell>
                   <TableCell align="center">Commodity Groups</TableCell>
+                  <TableCell align="center">Equipment Groups</TableCell>
                   <TableCell align="center">Tags</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell align="center">Capacity</TableCell>
+                  <TableCell align="center">Quoted</TableCell>
+                  <TableCell align="center">Booked</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -490,9 +347,6 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
                       key={opportunity.id}
                       opportunity={opportunity}
                       selected={selectedOpportunities.includes(opportunity.id)}
-                      onSelectRow={handleSelectRow}
-                      onRowClick={handleRowClick}
-                      handleOpenDetailsDialog={handleOpenDetailsDialog}
                     />
                   ))
                 ) : (
@@ -503,11 +357,6 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
           </TableContainer>
         </Paper>
       )}
-      <OpportunityDetailsDialog
-        isOpen={isDialogOpen}
-        handleClose={handleDialogClose}
-        opportunity={dialogData}
-      />
     </Fragment>
   );
 };
