@@ -148,8 +148,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         {opportunity.sleasRep.firstName} {opportunity.sleasRep.lastName}
       </TableCell>
       <TableCell align="center">{opportunity.bookingParty.name}</TableCell>
-      <TableCell align="center">{opportunity.shipper || 'Not specified'}</TableCell>
-      <TableCell align="center">{opportunity.cosignee || 'Not specified'}</TableCell>
+      <TableCell align="center">{opportunity.statClient || 'Not specified'}</TableCell>
       <TableCell align="center">{renderGroup(opportunity.placeOfReceiptGroupId)}</TableCell>
       <TableCell align="center">{renderGroup(opportunity.portOfLoadingGroupId)}</TableCell>
       <TableCell align="center">{renderGroup(opportunity.portOfDischargeGroupId)}</TableCell>
@@ -170,32 +169,32 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
             ))
           : 'Not specified'}
       </TableCell>
-      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
+      <TableCell align="center">{opportunity.potentialTEU} TEU</TableCell>
       <TableCell align="center">
-        {opportunity.quotedTEU} / {opportunity.capacityTEU}
+        {opportunity.bookedTEU} / {opportunity.potentialTEU}
         <span style={{ marginLeft: 8, color: '#888' }}>
-          ({(((opportunity.quotedTEU ?? 0) / opportunity.capacityTEU) * 100).toFixed(1)}%)
+          ({(((opportunity.quotedTEU ?? 0) / opportunity.potentialTEU) * 100).toFixed(1)}%)
         </span>
         <div className={classes.progress}>
           <div
             className={classes.progressBar}
             style={{
-              width: `${Math.min(((opportunity.quotedTEU ?? 0) / opportunity.capacityTEU) * 100, 100)}%`,
+              width: `${Math.min(((opportunity.quotedTEU ?? 0) / opportunity.potentialTEU) * 100, 100)}%`,
               backgroundColor: '#2196f3',
             }}
           />
         </div>
       </TableCell>
       <TableCell align="center">
-        {opportunity.bookedTEU} / {opportunity.capacityTEU}
+        {opportunity.bookedTEU} / {opportunity.potentialTEU}
         <span style={{ marginLeft: 8, color: '#888' }}>
-          ({(((opportunity.bookedTEU ?? 0) / opportunity.capacityTEU) * 100).toFixed(1)}%)
+          ({(((opportunity.bookedTEU ?? 0) / opportunity.potentialTEU) * 100).toFixed(1)}%)
         </span>
         <div className={classes.progress}>
           <div
             className={classes.progressBar}
             style={{
-              width: `${Math.min(((opportunity.bookedTEU ?? 0) / opportunity.capacityTEU) * 100, 100)}%`,
+              width: `${Math.min(((opportunity.bookedTEU ?? 0) / opportunity.potentialTEU) * 100, 100)}%`,
               backgroundColor: '#4caf50',
             }}
           />
@@ -269,16 +268,15 @@ const generateMockOpportunities = (): Opportunity[] => {
   return Array.from({ length: 10 }, (_, index) => {
     const salesRep = salesReps[index % salesReps.length];
     const bookingParty = clients[index % clients.length];
-    const capacityTEU = Math.floor(Math.random() * 9900) + 100; // 100 - 10000
-    const quotedTEU = Math.floor(Math.random() * (capacityTEU + 1)); // 0 - capacity
+    const potentialTEU = Math.floor(Math.random() * 9900) + 100; // 100 - 10000
+    const quotedTEU = Math.floor(Math.random() * (potentialTEU + 1)); // 0 - capacity
     const bookedTEU = Math.floor(Math.random() * (quotedTEU + 1)); // 0 - quoted
 
     return {
       id: `opp-${index + 1}`,
       sleasRep: salesRep,
       bookingParty,
-      shipper: `Shipper Company ${index + 1}`,
-      cosignee: `Consignee Corp ${index + 1}`,
+      StatClient: `Shipper Company ${index + 1}`,
       kindOfQuote: quoteKinds[index % quoteKinds.length],
       placeOfReceiptGroupId: mockPlacesGroups[index % mockPlacesGroups.length],
       portOfLoadingGroupId: mockPortsGroups[index % mockPortsGroups.length],
@@ -287,7 +285,7 @@ const generateMockOpportunities = (): Opportunity[] => {
       commodityGroupIds: [mockCommodityGroups[index % mockCommodityGroups.length]],
       equipmentGroupIds: [mockEquipmentGroups[index % mockEquipmentGroups.length]],
       tags: [mockTags[index % mockTags.length]],
-      capacityTEU,
+      potentialTEU,
       quotedTEU,
       bookedTEU,
     };
@@ -321,8 +319,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
                   <TableCell align="center">Quote Kind</TableCell>
                   <TableCell align="center">Sales Rep</TableCell>
                   <TableCell align="center">Booking Party</TableCell>
-                  <TableCell align="center">Shipper</TableCell>
-                  <TableCell align="center">Consignee</TableCell>
+                  <TableCell align="center">Statistical client</TableCell>
                   <TableCell align="center">Place of Receipt</TableCell>
                   <TableCell align="center">Port of Loading</TableCell>
                   <TableCell align="center">Port of Discharge</TableCell>
@@ -330,7 +327,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
                   <TableCell align="center">Commodity Groups</TableCell>
                   <TableCell align="center">Equipment Groups</TableCell>
                   <TableCell align="center">Tags</TableCell>
-                  <TableCell align="center">Capacity</TableCell>
+                  <TableCell align="center">Potential</TableCell>
                   <TableCell align="center">Quoted</TableCell>
                   <TableCell align="center">Booked</TableCell>
                 </TableRow>

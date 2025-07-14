@@ -127,18 +127,6 @@ const PortGroupRow: React.FC<Props> = ({
           >
             Save
           </Button>
-          <Button
-            onClick={handleReset}
-            size="small"
-            color="default"
-            variant="outlined"
-            disabled={!changed}
-          >
-            Reset
-          </Button>
-          <Button onClick={handleDelete} size="small" color="secondary" variant="outlined">
-            Delete
-          </Button>
         </Box>
       </TableCell>
     </TableRow>

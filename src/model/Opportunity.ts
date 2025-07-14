@@ -10,8 +10,7 @@ export interface Opportunity {
   id: string;
   sleasRep: UserRecord;
   bookingParty: Client;
-  shipper?: string;
-  cosignee?: string;
+  statClient?: string;
   kindOfQuote: string;
   placeOfReceiptGroupId?: OpportunityPlacesGroup;
   portOfLoadingGroupId?: OpportunityPortsGroup;
@@ -20,7 +19,7 @@ export interface Opportunity {
   commodityGroupIds?: OpportunityCommodityGroup[];
   equipmentGroupIds?: OpportunityEquipmentGroup[];
   tags?: OpportunityTag[];
-  capacityTEU: number;
+  potentialTEU: number;
   quotedTEU?: number;
   bookedTEU?: number;
 }
