@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import { Box, makeStyles, Paper, Tab, Tabs, Theme } from '@material-ui/core';
 import Meta from '../components/Meta';
-import BusinessIcon from '@material-ui/icons/Business';
-import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import HelpIcon from '@material-ui/icons/Help';
 import { TabPanel } from './BookingsPage';
 import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvider';
 import OpportunitiesView from '../components/OpportunitiesView';
@@ -47,8 +47,8 @@ const OpportunitiesPage: React.FC = () => {
               aria-label="Opportunities tabs"
               className={classes.tabs}
             >
-              <Tab icon={<BusinessIcon />} label="Matched" {...a11yProps(0)} />
-              <Tab icon={<TrendingUpIcon />} label="Not Matched" {...a11yProps(1)} />
+              <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
+              <Tab icon={<HelpIcon />} label="Not Matched" {...a11yProps(1)} />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>

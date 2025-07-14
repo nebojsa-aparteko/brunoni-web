@@ -312,11 +312,6 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
         />
       ) : (
         <Paper>
-          <EnhancedTableToolbar
-            numSelected={selectedOpportunities.length}
-            selectedOpportunities={selectedOpportunities}
-            setSelectedOpportunities={setSelectedOpportunities}
-          />
           <TableContainer component={Paper}>
             <Table aria-label="opportunities table">
               <TableHead>

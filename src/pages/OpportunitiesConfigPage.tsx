@@ -77,7 +77,7 @@ const OpportunitiesConfigPage: React.FC = () => {
             <Tab label="Places of receipt / places of delivery" icon={<PinDropIcon />} />
             <Tab label="Ports Groups" icon={<ExploreIcon />} />
             <Tab label="Commodities Groups" icon={<RecentActorsIcon />} />
-            <Tab label="Equipments Groups" icon={<ReceiptIcon />} />
+            <Tab label="Equipment Groups" icon={<ReceiptIcon />} />
             <Tab label="Tags" icon={<LocalOfferIcon />} />
           </Tabs>
         </Paper>
