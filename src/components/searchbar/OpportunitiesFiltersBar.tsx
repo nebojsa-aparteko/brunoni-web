@@ -23,7 +23,7 @@ import useAdminUsers from '../../hooks/useAdminUsers';
 import Client from '../../model/Client';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-
+import OpportunityQuoteKindInput from '../inputs/OpportunityQuoteKindInput';
 interface Props {
   filters: OpportunitiesContextFilters;
   setFilters: any;
@@ -163,6 +163,13 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             />
           </Grid>
         )}
+        <Grid item sm={3} xs={12}>
+          <OpportunityQuoteKindInput
+            label="Kind of Quote"
+            value={filters.kindOfQuote}
+            onChange={value => setFilters(f => ({ ...f, kindOfQuote: value || [] }))}
+          />
+        </Grid>
       </Grid>
     </Box>
   );

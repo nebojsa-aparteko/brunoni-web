@@ -7,6 +7,7 @@ import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
 import ActingAs from '../contexts/ActingAs';
+import UserRecord from '../model/UserRecord';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
   portsGroup?: OpportunityPortsGroup;
@@ -14,6 +15,7 @@ export interface OpportunitiesContextFilters extends ContextFilters {
   tags?: OpportunityTag[];
   commodityGroups?: OpportunityCommodityGroup[];
   equipmentGroups?: OpportunityEquipmentGroup[];
+  kindOfQuote?: string[];
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
