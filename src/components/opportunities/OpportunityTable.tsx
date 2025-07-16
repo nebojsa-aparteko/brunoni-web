@@ -1,8 +1,7 @@
-import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react';
-
+import React, { Fragment, useEffect, useState } from 'react';
+import firebase from 'firebase/compat/app';
 import {
   Chip,
-  Button,
   createStyles,
   Paper,
   Table,
@@ -11,21 +10,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Toolbar,
-  Typography,
 } from '@material-ui/core';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
-import clsx from 'clsx';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import { Opportunity } from '../../model/Opportunity';
-import UserRecord from '../../model/UserRecord';
-import Client from '../../model/Client';
+import { Opportunity, OpportunityMatchEntity } from '../../model/Opportunity';
+
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
-import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
-import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
-import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
-import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
-import { OpportunityTag } from '../../model/OpportunityTag';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -81,86 +71,75 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-  selectedOpportunities: string[];
-  setSelectedOpportunities: (opportunities: string[]) => void;
+interface OpportunityTableProps {
+  opportunities: Opportunity[] | undefined;
+  isAdmin?: boolean;
 }
-
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const classes = useStyles();
-  const { numSelected, selectedOpportunities, setSelectedOpportunities } = props;
-
-  return (
-    <Toolbar
-      className={clsx(classes.toolbarRoot, {
-        [classes.toolbarHighlight]: numSelected > 0,
-      })}
-    >
-      {numSelected > 0 ? (
-        <Typography className={classes.toolbarTitle} variant="subtitle1" component="div">
-          {numSelected === 1
-            ? `${numSelected} opportunity selected`
-            : `${numSelected} opportunities selected`}
-        </Typography>
-      ) : (
-        <Typography className={classes.toolbarTitle} variant="h5" id="tableTitle" component="div">
-          Opportunities
-        </Typography>
-      )}
-      {numSelected > 0 && (
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => {
-            console.log('Bulk action for opportunities:', selectedOpportunities);
-          }}
-          disabled={selectedOpportunities.length === 0}
-          style={{ minWidth: 140, height: 54 }}
-        >
-          Process Selected
-        </Button>
-      )}
-    </Toolbar>
-  );
-};
 
 interface OpportunityTableRowProps {
   opportunity: Opportunity;
-  selected: boolean;
 }
 
-const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, selected }) => {
+const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
   const classes = useStyles();
+  const [booked, setBooked] = useState<number | null>(null);
+  const [quoted, setQuoted] = useState<number | null>(null);
+  useEffect(() => {
+    let isMounted = true;
 
-  const renderGroup = (group?: { name?: string; id?: string }) =>
-    group ? group.name || group.id : 'Not specified';
+    const fetchBooked = async () => {
+      const snapshot = await firebase
+        .firestore()
+        .collection('opportunity-matches')
+        .where('entity', '==', OpportunityMatchEntity.Booking)
+        .where('opportunityId', '==', opportunity.id)
+        .get();
+      if (isMounted) {
+        setBooked(snapshot.size);
+      }
+    };
 
-  const renderGroups = (groups?: { name?: string; id?: string }[]) =>
-    groups && groups.length > 0 ? groups.map(g => g.name || g.id).join(', ') : 'Not specified';
+    const fetchQuoted = async () => {
+      const snapshot = await firebase
+        .firestore()
+        .collection('opportunity-matches')
+        .where('entity', '==', OpportunityMatchEntity.Quote)
+        .where('opportunityId', '==', opportunity.id)
+        .get();
+      if (isMounted) {
+        setQuoted(snapshot.size);
+      }
+    };
+
+    fetchBooked();
+    fetchQuoted();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [opportunity.id]);
 
   return (
-    <TableRow hover className={classes.tableRow} selected={selected} tabIndex={-1}>
+    <TableRow hover className={classes.tableRow} tabIndex={-1}>
       <TableCell padding="checkbox"></TableCell>
-      <TableCell align="center">{opportunity.id}</TableCell>
-      <TableCell align="center">{opportunity.kindOfQuote}</TableCell>
-      <TableCell align="center">
-        {opportunity.sleasRep.firstName} {opportunity.sleasRep.lastName}
-      </TableCell>
-      <TableCell align="center">{opportunity.bookingParty.name}</TableCell>
-      <TableCell align="center">{opportunity.statClient || 'Not specified'}</TableCell>
-      <TableCell align="center">{renderGroup(opportunity.placeOfReceiptGroupId)}</TableCell>
-      <TableCell align="center">{renderGroup(opportunity.portOfLoadingGroupId)}</TableCell>
-      <TableCell align="center">{renderGroup(opportunity.portOfDischargeGroupId)}</TableCell>
-      <TableCell align="center">{renderGroup(opportunity.placeOfDeliveryGroupId)}</TableCell>
-      <TableCell align="center">{renderGroups(opportunity.commodityGroupIds)}</TableCell>
-      <TableCell align="center">{renderGroups(opportunity.equipmentGroupIds)}</TableCell>
+
+      <TableCell align="center">{opportunity.salesRepId}</TableCell>
+      <TableCell align="center">{opportunity.bookingPartyId}</TableCell>
+      <TableCell align="center">{opportunity.statisticalClientId}</TableCell>
+      <TableCell align="center">{opportunity.agreementId}</TableCell>
+      <TableCell align="center">{opportunity.quoteKind}</TableCell>
+      <TableCell align="center">{opportunity.placeOfReceiptGroupId}</TableCell>
+      <TableCell align="center">{opportunity.portOfLoadingGroupId}</TableCell>
+      <TableCell align="center">{opportunity.portOfDischargeGroupId}</TableCell>
+      <TableCell align="center">{opportunity.placeOfDeliveryGroupId}</TableCell>
+      <TableCell align="center">{opportunity.commodityGroupId}</TableCell>
+      <TableCell align="center">{opportunity.equipmentGroupId}</TableCell>
       <TableCell align="center">
         {opportunity.tags && opportunity.tags.length > 0
           ? opportunity.tags.map(tag => (
               <Chip
-                key={tag.id}
-                label={tag.tag}
+                key={tag}
+                label={tag}
                 size="small"
                 style={{ marginRight: 4, marginBottom: 2 }}
                 color="primary"
@@ -169,138 +148,21 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
             ))
           : 'Not specified'}
       </TableCell>
-      <TableCell align="center">{opportunity.potentialTEU} TEU</TableCell>
       <TableCell align="center">
-        {opportunity.bookedTEU} / {opportunity.potentialTEU}
-        <span style={{ marginLeft: 8, color: '#888' }}>
-          ({(((opportunity.quotedTEU ?? 0) / opportunity.potentialTEU) * 100).toFixed(1)}%)
-        </span>
-        <div className={classes.progress}>
-          <div
-            className={classes.progressBar}
-            style={{
-              width: `${Math.min(((opportunity.quotedTEU ?? 0) / opportunity.potentialTEU) * 100, 100)}%`,
-              backgroundColor: '#2196f3',
-            }}
-          />
-        </div>
+        {opportunity.validity
+          ? new Date(opportunity.validity).toLocaleDateString()
+          : 'Not specified'}
       </TableCell>
-      <TableCell align="center">
-        {opportunity.bookedTEU} / {opportunity.potentialTEU}
-        <span style={{ marginLeft: 8, color: '#888' }}>
-          ({(((opportunity.bookedTEU ?? 0) / opportunity.potentialTEU) * 100).toFixed(1)}%)
-        </span>
-        <div className={classes.progress}>
-          <div
-            className={classes.progressBar}
-            style={{
-              width: `${Math.min(((opportunity.bookedTEU ?? 0) / opportunity.potentialTEU) * 100, 100)}%`,
-              backgroundColor: '#4caf50',
-            }}
-          />
-        </div>
-      </TableCell>
+      <TableCell align="center">{opportunity.note}</TableCell>
+      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
+      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
+      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
     </TableRow>
   );
 };
 
-// Mock data generator
-const generateMockOpportunities = (): Opportunity[] => {
-  const mockPlacesGroups: OpportunityPlacesGroup[] = [
-    { id: 'pr1', name: 'East Europe', places: ['Prague', 'Tallin'] },
-    { id: 'pr2', name: 'Nort Africa', places: ['Cairo', 'Marrakesh'] },
-  ];
-
-  const mockPortsGroups: OpportunityPortsGroup[] = [
-    { id: 'pl1', name: 'Europe', portIds: ['h1', 'h2'], portNames: ['Hamburg', 'Waltershof'] },
-    { id: 'pl2', name: 'Africa', portIds: ['r1', 'r2'], portNames: ['Mogadishu', 'Freetown'] },
-  ];
-
-  const mockCommodityGroups: OpportunityCommodityGroup[] = [
-    { id: 'cg1', name: 'Chemicals', commodities: ['Paint', 'Solvent'] },
-    { id: 'cg2', name: 'Food', commodities: ['Wheat', 'Corn'] },
-  ];
-
-  const mockEquipmentGroups: OpportunityEquipmentGroup[] = [
-    { id: 'eg1', name: 'Standard Containers', equipmentTypeId: ['20GP', '40GP'] },
-    { id: 'eg2', name: 'Reefer Containers', equipmentTypeId: ['20RF', '40RF'] },
-  ];
-
-  const mockTags: OpportunityTag[] = [
-    { id: 't1', tag: 'Priority' },
-    { id: 't2', tag: 'Standard' },
-  ];
-  const salesReps: UserRecord[] = [
-    {
-      id: '1',
-      alphacomId: 'john.smith',
-      firstName: 'John',
-      lastName: 'Smith',
-      emailAddress: 'john.smith@company.com',
-      role: 'sales',
-    },
-    {
-      id: '2',
-      alphacomId: 'sarah.johnson',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      emailAddress: 'sarah.johnson@company.com',
-      role: 'sales',
-    },
-    {
-      id: '3',
-      alphacomId: 'mike.brown',
-      firstName: 'Mike',
-      lastName: 'Brown',
-      emailAddress: 'mike.brown@company.com',
-      role: 'sales',
-    },
-  ];
-
-  const clients: Client[] = [
-    { id: '1', name: 'Global Trading Ltd', city: 'Hamburg', countryCode: 'DE' },
-    { id: '2', name: 'Ocean Freight Co', city: 'Rotterdam', countryCode: 'NL' },
-    { id: '3', name: 'Maritime Solutions', city: 'Antwerp', countryCode: 'BE' },
-  ];
-
-  const quoteKinds = ['Spot', 'Tender', 'Project'];
-
-  return Array.from({ length: 10 }, (_, index) => {
-    const salesRep = salesReps[index % salesReps.length];
-    const bookingParty = clients[index % clients.length];
-    const potentialTEU = Math.floor(Math.random() * 9900) + 100; // 100 - 10000
-    const quotedTEU = Math.floor(Math.random() * (potentialTEU + 1)); // 0 - capacity
-    const bookedTEU = Math.floor(Math.random() * (quotedTEU + 1)); // 0 - quoted
-
-    return {
-      id: `opp-${index + 1}`,
-      sleasRep: salesRep,
-      bookingParty,
-      StatClient: `Shipper Company ${index + 1}`,
-      kindOfQuote: quoteKinds[index % quoteKinds.length],
-      placeOfReceiptGroupId: mockPlacesGroups[index % mockPlacesGroups.length],
-      portOfLoadingGroupId: mockPortsGroups[index % mockPortsGroups.length],
-      portOfDischargeGroupId: mockPortsGroups[(index + 1) % mockPortsGroups.length],
-      placeOfDeliveryGroupId: mockPlacesGroups[(index + 1) % mockPlacesGroups.length],
-      commodityGroupIds: [mockCommodityGroups[index % mockCommodityGroups.length]],
-      equipmentGroupIds: [mockEquipmentGroups[index % mockEquipmentGroups.length]],
-      tags: [mockTags[index % mockTags.length]],
-      potentialTEU,
-      quotedTEU,
-      bookedTEU,
-    };
-  });
-};
-
-interface OpportunityTableProps {
-  opportunities: Opportunity[] | undefined;
-  isAdmin?: boolean;
-}
-
 const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAdmin }) => {
-  const [selectedOpportunities, setSelectedOpportunities] = useState<string[]>([]);
-
-  const displayOpportunities = opportunities || generateMockOpportunities();
+  const displayOpportunities = opportunities || [];
 
   return (
     <Fragment>
@@ -315,11 +177,11 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
               <TableHead>
                 <TableRow>
                   <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
-                  <TableCell align="center">ID</TableCell>
-                  <TableCell align="center">Quote Kind</TableCell>
                   <TableCell align="center">Sales Rep</TableCell>
                   <TableCell align="center">Booking Party</TableCell>
                   <TableCell align="center">Statistical client</TableCell>
+                  <TableCell align="center">Agremment</TableCell>
+                  <TableCell align="center">Quote Kind</TableCell>
                   <TableCell align="center">Place of Receipt</TableCell>
                   <TableCell align="center">Port of Loading</TableCell>
                   <TableCell align="center">Port of Discharge</TableCell>
@@ -327,6 +189,8 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
                   <TableCell align="center">Commodity Groups</TableCell>
                   <TableCell align="center">Equipment Groups</TableCell>
                   <TableCell align="center">Tags</TableCell>
+                  <TableCell align="center">Validity</TableCell>
+                  <TableCell align="center">Note</TableCell>
                   <TableCell align="center">Potential</TableCell>
                   <TableCell align="center">Quoted</TableCell>
                   <TableCell align="center">Booked</TableCell>
@@ -335,11 +199,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
               <TableBody>
                 {displayOpportunities ? (
                   displayOpportunities.map(opportunity => (
-                    <OpportunityTableRow
-                      key={opportunity.id}
-                      opportunity={opportunity}
-                      selected={selectedOpportunities.includes(opportunity.id)}
-                    />
+                    <OpportunityTableRow key={opportunity.id} opportunity={opportunity} />
                   ))
                 ) : (
                   <ChartsCircularProgress />
