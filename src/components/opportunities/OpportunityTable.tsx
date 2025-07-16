@@ -155,8 +155,56 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
       </TableCell>
       <TableCell align="center">{opportunity.note}</TableCell>
       <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
-      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
-      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
+      <TableCell align="center">
+        <div style={{ minWidth: 80 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 12, marginRight: 6 }}>
+              {booked !== null && opportunity.capacityTEU
+                ? `${booked} / ${opportunity.capacityTEU}`
+                : '—'}
+            </span>
+          </div>
+          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+            <div
+              style={{
+                width:
+                  booked !== null && opportunity.capacityTEU
+                    ? `${Math.min((booked / opportunity.capacityTEU) * 100, 100)}%`
+                    : '0%',
+                background: '#3f51b5',
+                height: '100%',
+                borderRadius: 4,
+                transition: 'width 0.3s',
+              }}
+            />
+          </div>
+        </div>
+      </TableCell>
+      <TableCell align="center">
+        <div style={{ minWidth: 80 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 12, marginRight: 6 }}>
+              {booked !== null && quoted !== null
+                ? `${booked} / ${quoted === 0 ? 1 : quoted}`
+                : '—'}
+            </span>
+          </div>
+          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+            <div
+              style={{
+                width:
+                  booked !== null && quoted
+                    ? `${Math.min((booked / (quoted === 0 ? 1 : quoted)) * 100, 100)}%`
+                    : '0%',
+                background: '#43a047',
+                height: '100%',
+                borderRadius: 4,
+                transition: 'width 0.3s',
+              }}
+            />
+          </div>
+        </div>
+      </TableCell>
     </TableRow>
   );
 };
