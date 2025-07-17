@@ -82,42 +82,8 @@ interface OpportunityTableRowProps {
 
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
   const classes = useStyles();
-  const [booked, setBooked] = useState<number | null>(null);
-  const [quoted, setQuoted] = useState<number | null>(null);
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchBooked = async () => {
-      const snapshot = await firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .where('entity', '==', OpportunityMatchEntity.Booking)
-        .where('opportunityId', '==', opportunity.id)
-        .get();
-      if (isMounted) {
-        setBooked(snapshot.size);
-      }
-    };
-
-    const fetchQuoted = async () => {
-      const snapshot = await firebase
-        .firestore()
-        .collection('opportunity-matches')
-        .where('entity', '==', OpportunityMatchEntity.Quote)
-        .where('opportunityId', '==', opportunity.id)
-        .get();
-      if (isMounted) {
-        setQuoted(snapshot.size);
-      }
-    };
-
-    fetchBooked();
-    fetchQuoted();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [opportunity.id]);
+  const booked = 0;
+  const quoted = 0; // Placeholder for quoted value, replace with actual logic
 
   return (
     <TableRow hover className={classes.tableRow} tabIndex={-1}>

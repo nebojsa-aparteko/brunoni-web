@@ -12,7 +12,7 @@ export interface Opportunity {
   placeOfDeliveryGroupId: string; // e.g. free text or group
   commodityGroupId: string; // e.g. Food - Milkpowder, Fish, etc
   equipmentGroupId: string; // e.g. Tank - 22T2S, etc.
-  tags: string[]; // e.g. Lost, Secured, Follow-up, Partial
+  tagIds: string[]; // e.g. Lost, Secured, Follow-up, Partial
   validity: Date; // user defined validity date
   note: string; // e.g. Free text note
   capacityTEU: number; // total capacity in number of TEU per year
