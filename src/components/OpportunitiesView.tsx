@@ -7,6 +7,7 @@ import {
   Grid,
   makeStyles,
   Paper,
+  Button,
   Typography,
 } from '@material-ui/core';
 import { flow, set } from 'lodash/fp';
@@ -21,7 +22,7 @@ import OpportunityTable from './opportunities/OpportunityTable';
 import { NormalizedOpportunity } from '../model/Opportunity';
 import useFirestoreCollection from '../hooks/useFirestoreCollection';
 import useNormalizedOpportunity from '../hooks/useNormalizedOpportunity';
-
+import NewOpportunityDialog from './NewOpportunityDialogue';
 interface Props {
   isAdmin?: boolean;
   archived?: boolean;
@@ -131,10 +132,31 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     [opportunityPaginationContextData, searchString, setOpportnityPaginationContextData],
   );
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newOpportunityName, setNewOpportunityName] = useState('');
+
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const handleAddOpportunity = () => {
+    setOpenDialog(false);
+    setNewOpportunityName('');
+  };
+
   return (
     <Fragment>
       <Meta title={`Opportunities`} />
       <Grid container direction="row">
+        <Grid item sm={3} xs={12}>
+          <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+            Add Opportunity
+          </Button>
+          <NewOpportunityDialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            onAdd={handleAddOpportunity}
+          />
+        </Grid>
         <Grid item md={12}>
           <OpportunitiesFiltersBar
             filters={filters}
@@ -142,6 +164,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
             showAssigneeFilter={isAdmin}
           />
         </Grid>
+
         <Grid item md={12}></Grid>
       </Grid>
       <div>
