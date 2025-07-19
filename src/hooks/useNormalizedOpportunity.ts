@@ -1,20 +1,21 @@
 import { normalizeOpportunity } from '../providers/OpportunityProvider';
 import { useContext, useMemo } from 'react';
-import Users from '../contexts/Users';
-import Clients from '../contexts/Clients';
-import OpportunityPortsGroups from '../contexts/OpportunityPortsGroups';
-import OpportunityPlacesGroups from '../contexts/OpportunityPlacesGroups';
-import OpportunityCommodityGroups from '../contexts/OpportunityCommodityGroups';
-import OpportunityEquipmentGroups from '../contexts/OpportunityEquipmentGroups';
-import OpportunityTags from '../contexts/OpportunityTags';
+import useOpportunityPortsGroups from './useOpportunityPortsGroups';
+import useOpportunityPlacesGroups from './useOpportunityPlacesGroups';
+import useOpportunityCommodityGroups from './useOpportunityCommodityGroups';
+import useOpportunityEquipmentGroups from './useOpportunityEquipmentGroups';
+import useOpportunityTags from './useOpportunityTags';
+import useClients from './useClients';
+import UserRecords from '../contexts/UserRecordsContext';
+
 const useNormalizedOpportunity = () => {
-  const users = useContext(Users);
-  const clients = useContext(Clients);
-  const portsGroups = useContext(OpportunityPortsGroups);
-  const placesGroups = useContext(OpportunityPlacesGroups);
-  const commodityGroups = useContext(OpportunityCommodityGroups);
-  const equipmentGroups = useContext(OpportunityEquipmentGroups);
-  const tags = useContext(OpportunityTags);
+  const users = useContext(UserRecords);
+  const clients = useClients();
+  const portsGroups = useOpportunityPortsGroups();
+  const placesGroups = useOpportunityPlacesGroups();
+  const commodityGroups = useOpportunityCommodityGroups();
+  const equipmentGroups = useOpportunityEquipmentGroups();
+  const tags = useOpportunityTags();
 
   return useMemo(() => {
     const getUser = (id: string) => users?.find(u => u.id === id) || null;

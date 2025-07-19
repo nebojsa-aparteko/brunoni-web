@@ -13,7 +13,11 @@ import {
 } from '@material-ui/core';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import { Opportunity, OpportunityMatchEntity } from '../../model/Opportunity';
+import {
+  NormalizedOpportunity,
+  Opportunity,
+  OpportunityMatchEntity,
+} from '../../model/Opportunity';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
@@ -72,40 +76,41 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface OpportunityTableProps {
-  opportunities: Opportunity[] | undefined;
+  opportunities: NormalizedOpportunity[] | undefined;
   isAdmin?: boolean;
 }
 
 interface OpportunityTableRowProps {
-  opportunity: Opportunity;
+  opportunity: NormalizedOpportunity;
 }
 
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
   const classes = useStyles();
   const booked = 0;
-  const quoted = 0; // Placeholder for quoted value, replace with actual logic
+  const quoted = 0;
 
   return (
     <TableRow hover className={classes.tableRow} tabIndex={-1}>
       <TableCell padding="checkbox"></TableCell>
-
-      <TableCell align="center">{opportunity.salesRepId}</TableCell>
-      <TableCell align="center">{opportunity.bookingPartyId}</TableCell>
-      <TableCell align="center">{opportunity.statisticalClientId}</TableCell>
+      <TableCell align="center">
+        {opportunity.salesRepId?.firstName} {opportunity.salesRepId?.lastName}
+      </TableCell>
+      <TableCell align="center">{opportunity.bookingPartyId?.name}</TableCell>
+      <TableCell align="center">{opportunity.statisticalClientId?.name}</TableCell>
       <TableCell align="center">{opportunity.agreementId}</TableCell>
       <TableCell align="center">{opportunity.quoteKind}</TableCell>
-      <TableCell align="center">{opportunity.placeOfReceiptGroupId}</TableCell>
-      <TableCell align="center">{opportunity.portOfLoadingGroupId}</TableCell>
-      <TableCell align="center">{opportunity.portOfDischargeGroupId}</TableCell>
-      <TableCell align="center">{opportunity.placeOfDeliveryGroupId}</TableCell>
-      <TableCell align="center">{opportunity.commodityGroupId}</TableCell>
-      <TableCell align="center">{opportunity.equipmentGroupId}</TableCell>
+      <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.portOfLoadingGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.portOfDischargeGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.commodityGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.equipmentGroupId?.name}</TableCell>
       <TableCell align="center">
-        {opportunity.tags && opportunity.tags.length > 0
-          ? opportunity.tags.map(tag => (
+        {opportunity.tagIds && opportunity.tagIds.length > 0
+          ? opportunity.tagIds.map(tag => (
               <Chip
-                key={tag}
-                label={tag}
+                key={tag.id}
+                label={tag.tag}
                 size="small"
                 style={{ marginRight: 4, marginBottom: 2 }}
                 color="primary"
@@ -177,7 +182,6 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
 
 const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAdmin }) => {
   const displayOpportunities = opportunities || [];
-
   return (
     <Fragment>
       {displayOpportunities.length === 0 ? (

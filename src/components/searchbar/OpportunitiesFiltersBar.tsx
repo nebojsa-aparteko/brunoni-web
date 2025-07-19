@@ -19,11 +19,11 @@ import useOpportunityTags from '../../hooks/useOpportunityTags';
 import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
 import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
 import UserInput from '../inputs/UserInput';
-import useAdminUsers from '../../hooks/useAdminUsers';
 import Client from '../../model/Client';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import OpportunityQuoteKindInput from '../inputs/OpportunityQuoteKindInput';
+import userRecords from '../../contexts/UserRecordsContext';
 interface Props {
   filters: OpportunitiesContextFilters;
   setFilters: any;
@@ -41,12 +41,14 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const opportunityTags = useOpportunityTags();
   const commodityGroups = useOpportunityCommodityGroups();
   const equipmentGroups = useOpportunityEquipmentGroups();
-  const users = useAdminUsers();
+  const users = useContext(userRecords);
   const clients = useClients();
   const {
     clientFilter,
-    portsGroup,
-    placesGroup,
+    portsOfLoadingGroup,
+    portsOfDischargeGroup,
+    placesOfDeliveryGroup,
+    placesOfReceiptGroup,
     tags: selectedOpportunityTags,
     commodityGroups: selectedCommodityGroups,
     equipmentGroups: selectedEquipmentGroups,
@@ -56,19 +58,25 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setClientFilter = (client: Client | null | undefined) =>
     setFilters && setFilters(set('clientFilter', client || undefined)(filters));
 
-  const setPortsGroup = (portsGroup: OpportunityPortsGroup | null | undefined) =>
-    setFilters && setFilters(set('portsGroup', portsGroup || undefined)(filters));
+  const setPortsOfLoadingGroupFilter = (portsGroup: OpportunityPortsGroup | null | undefined) =>
+    setFilters && setFilters(set('portsOfLoadingGroup', portsGroup || undefined)(filters));
 
-  const setPlacesGroup = (placesGroup: OpportunityPlacesGroup | null | undefined) =>
-    setFilters && setFilters(set('placesGroup', placesGroup || undefined)(filters));
+  const setPortsOfDischargeGroupFilter = (portsGroup: OpportunityPortsGroup | null | undefined) =>
+    setFilters && setFilters(set('portsOfDischargeGroup', portsGroup || undefined)(filters));
 
-  const setOpportunityTags = (tags: OpportunityTag[] | null | undefined) =>
+  const setPlacesOfDeliveryGroupFilter = (placesGroup: OpportunityPlacesGroup | null | undefined) =>
+    setFilters && setFilters(set('placesOfDeliveryGroup', placesGroup || undefined)(filters));
+
+  const setPlacesOfReceiptGroupFilter = (placesGroup: OpportunityPlacesGroup | null | undefined) =>
+    setFilters && setFilters(set('placesOfReceiptGroup', placesGroup || undefined)(filters));
+
+  const setOpportunityTagsFilter = (tags: OpportunityTag[] | null | undefined) =>
     setFilters && setFilters(set('tags', tags || [])(filters));
 
-  const setCommodityGroups = (groups: OpportunityCommodityGroup[] | null | undefined) =>
+  const setCommodityGroupsFilter = (groups: OpportunityCommodityGroup[] | null | undefined) =>
     setFilters && setFilters(set('commodityGroups', groups || [])(filters));
 
-  const setEquipmentGroups = (groups: OpportunityEquipmentGroup[] | null | undefined) =>
+  const setEquipmentGroupsFilter = (groups: OpportunityEquipmentGroup[] | null | undefined) =>
     setFilters && setFilters(set('equipmentGroups', groups || [])(filters));
 
   const setUserFilter = (user: UserRecord | null | undefined) =>
@@ -88,7 +96,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
           <Grid item sm={3} xs={12}>
             <Box display="flex">
               <ClientInput
-                label="Choose Client"
+                label="Statistical Client"
                 clients={clients || []}
                 onChange={setClientFilter}
                 value={clientFilter}
@@ -96,63 +104,79 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             </Box>
           </Grid>
         )}
-
         {portsGroups && (
           <Grid item sm={3} xs={12}>
             <OpportunityPortsGroupInput
-              label="Ports Group"
+              label="Port of Loading"
               options={portsGroups}
-              onChange={setPortsGroup}
-              value={portsGroup}
+              onChange={setPortsOfLoadingGroupFilter}
+              value={portsOfLoadingGroup}
             />
           </Grid>
         )}
-
+        {portsGroups && (
+          <Grid item sm={3} xs={12}>
+            <OpportunityPortsGroupInput
+              label="Port of Discharge"
+              options={portsGroups}
+              onChange={setPortsOfDischargeGroupFilter}
+              value={portsOfDischargeGroup}
+            />
+          </Grid>
+        )}
         {placesGroups && (
           <Grid item sm={3} xs={12}>
             <OpportunityPlacesGroupInput
-              label="Delivery Group"
+              label="Place of Delivery"
               options={placesGroups}
-              onChange={setPlacesGroup}
-              value={placesGroup}
+              onChange={setPlacesOfDeliveryGroupFilter}
+              value={placesOfDeliveryGroup}
+            />
+          </Grid>
+        )}{' '}
+        {placesGroups && (
+          <Grid item sm={3} xs={12}>
+            <OpportunityPlacesGroupInput
+              label="Place of Receipt"
+              options={placesGroups}
+              onChange={setPlacesOfReceiptGroupFilter}
+              value={placesOfReceiptGroup}
             />
           </Grid>
         )}
-
         {opportunityTags && (
           <Grid item sm={3} xs={12}>
             <OpportunityTagInput
               label="Opportunity Tags"
               options={opportunityTags}
-              onChange={setOpportunityTags}
+              onChange={(_, value) =>
+                setOpportunityTagsFilter(Array.isArray(value) ? value : value ? [value] : [])
+              }
               value={selectedOpportunityTags || []}
               multiple
             />
           </Grid>
         )}
-
         {commodityGroups && (
           <Grid item sm={3} xs={12}>
             <OpportunityCommodityGroupInput
               label="Commodity Groups"
               options={commodityGroups}
-              onChange={setCommodityGroups}
+              onChange={setCommodityGroupsFilter}
               value={selectedCommodityGroups || []}
             />
           </Grid>
         )}
-
         {equipmentGroups && (
           <Grid item sm={3} xs={12}>
             <OpportunityEquipmentGroupInput
               label="Equipment Groups"
               options={equipmentGroups}
-              onChange={setEquipmentGroups}
+              onChange={setEquipmentGroupsFilter}
               value={selectedEquipmentGroups || []}
             />
           </Grid>
         )}
-
         {users && (
           <Grid item sm={3} xs={12}>
             <UserInput

@@ -1,3 +1,11 @@
+import { OpportunityPortsGroup } from '../model/OpportunityPortsGroup';
+import { OpportunityPlacesGroup } from '../model/OpportunityPlacesGroup';
+import { OpportunityCommodityGroup } from '../model/OpportunityCommodityGroup';
+import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
+import { OpportunityTag } from '../model/OpportunityTag';
+import UserRecord from '../model/UserRecord';
+import Client from '../model/Client';
+
 // opportunities Firestore collection
 export interface Opportunity {
   id: string;
@@ -20,6 +28,26 @@ export interface Opportunity {
   createdBy: string; // User ID of the creator
   updatedAt: Date;
   updatedBy: string; // User ID of the last updater
+}
+
+export interface NormalizedOpportunity {
+  id: string;
+  salesRepId: UserRecord | null; // Normalized user object or null
+  bookingPartyId: Client | null; // Normalized client object or null
+  statisticalClientId: Client | null; // Normalized client object or null
+  agreementId: string;
+  quoteKind: string;
+  placeOfReceiptGroupId: OpportunityPlacesGroup | null; // Normalized group object or null
+  portOfLoadingGroupId: OpportunityPortsGroup | null; // Normalized group object or null
+  portOfDischargeGroupId: OpportunityPortsGroup | null; // Normalized group object or null
+  placeOfDeliveryGroupId: OpportunityPlacesGroup | null; // Normalized group object or null
+  commodityGroupId: OpportunityCommodityGroup | null; // Normalized group object or null
+  equipmentGroupId: OpportunityEquipmentGroup | null; // Normalized group object or null
+  tagIds: OpportunityTag[]; // Array of normalized tag objects
+  validity: Date;
+  note: string;
+  capacityTEU: number;
+  counters: any; // Normalized counters object
 }
 
 export interface OpportunityMatch {

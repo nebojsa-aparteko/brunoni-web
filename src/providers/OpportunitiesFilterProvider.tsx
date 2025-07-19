@@ -6,12 +6,12 @@ import { OpportunityPortsGroup } from '../model/OpportunityPortsGroup';
 import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
-import ActingAs from '../contexts/ActingAs';
-import UserRecord from '../model/UserRecord';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
-  portsGroup?: OpportunityPortsGroup;
-  placesGroup?: OpportunityPlacesGroup;
+  portsOfLoadingGroup?: OpportunityPortsGroup;
+  portsOfDischargeGroup?: OpportunityPortsGroup;
+  placesOfDeliveryGroup?: OpportunityPlacesGroup;
+  placesOfReceiptGroup?: OpportunityPlacesGroup;
   tags?: OpportunityTag[];
   commodityGroups?: OpportunityCommodityGroup[];
   equipmentGroups?: OpportunityEquipmentGroup[];
@@ -34,10 +34,9 @@ const OpportunitiesFilterContext = createContext<
 
 const OpportunitiesFilterProvider = (props: any) => {
   const userRecord = useUser()[1];
-  const actingAs = useContext(ActingAs)[0];
 
   const [state, setState] = useState<OpportunitiesContextFilters>({
-    assignee: !actingAs && userRecord,
+    assignee: userRecord,
     ...OPPORTUNITIES_FILTERS_INITIAL_STATE,
   });
 

@@ -2,14 +2,11 @@ import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Card,
-  CardActions,
-  CardContent,
   CardHeader,
   Divider,
   Grid,
   makeStyles,
   Paper,
-  TablePagination,
   Typography,
 } from '@material-ui/core';
 import { flow, set } from 'lodash/fp';
@@ -17,16 +14,13 @@ import Meta from './Meta';
 import OpportunitiesFiltersBar from './searchbar/OpportunitiesFiltersBar';
 import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
 import { useOpportunitiesListFilterContext } from '../providers/OpportunitiesFilterProvider';
-import useOpportunityPortsGroups from '../hooks/useOpportunityPortsGroups';
-import useOpportunityPlacesGroups from '../hooks/useOpportunityPlacesGroups';
-import useOpportunityTags from '../hooks/useOpportunityTags';
-import useOpportunityCommodityGroups from '../hooks/useOpportunityCommodityGroups';
-import useOpportunityEquipmentGroups from '../hooks/useOpportunityEquipmentGroups';
 import { useOpportunityListPaginationContext } from '../providers/OpportunityListPaginationProvider';
 import Search from './searchbar/Search';
 import OpportunitiesEmptyResults from './opportunities/OpportunitisEmptyResults';
 import OpportunityTable from './opportunities/OpportunityTable';
-import { Opportunity } from '../model/Opportunity';
+import { NormalizedOpportunity } from '../model/Opportunity';
+import useFirestoreCollection from '../hooks/useFirestoreCollection';
+import useNormalizedOpportunity from '../hooks/useNormalizedOpportunity';
 
 interface Props {
   isAdmin?: boolean;
@@ -44,19 +38,85 @@ const useStyles = makeStyles(theme => ({
 
 const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFilter }) => {
   const classes = useStyles();
+  const isLoading = false; // Replace with actual loading state if needed
+  const opportunitySnapshot = useFirestoreCollection('opportunities');
+  const normalizeOpportunity = useNormalizedOpportunity();
+  const opportunities: NormalizedOpportunity[] | undefined = opportunitySnapshot?.docs?.map(doc =>
+    normalizeOpportunity(doc.data()),
+  );
+
+  console.debug('OpportunitiesView', opportunities);
   const [filters, setFilters] = useOpportunitiesListFilterContext();
   const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
     useOpportunityListPaginationContext();
   const { searchString, page, rowsPerPage } = opportunityPaginationContextData;
 
-  // TODO: Replace with real API call when backend is ready
-  // const { data: allOpportunities, loading } = useOpportunities();
-
   // Filter opportunities based on selected filters
   const { assignee } = filters;
-  // Using undefined to let OpportunityTable generate mock data
-  const opportunities: Opportunity[] | undefined = undefined;
-  const isLoading = false;
+
+  const filteredOpportunities = useMemo(() => {
+    if (!opportunities) return [];
+    return opportunities.filter(opportunity => {
+      if (filters.assignee && opportunity.salesRepId?.id !== filters.assignee.id) {
+        return false;
+      }
+      if (filters.clientFilter && opportunity.statisticalClientId?.id !== filters.clientFilter.id) {
+        return false;
+      }
+
+      if (
+        filters.portsOfLoadingGroup &&
+        opportunity.portOfLoadingGroupId?.id !== filters.portsOfLoadingGroup.id
+      ) {
+        return false;
+      }
+      if (
+        filters.portsOfDischargeGroup &&
+        opportunity.portOfDischargeGroupId?.id !== filters.portsOfDischargeGroup.id
+      ) {
+        return false;
+      }
+
+      // Places group filter
+      if (
+        filters.placesOfDeliveryGroup &&
+        opportunity.placeOfDeliveryGroupId?.id !== filters.placesOfDeliveryGroup.id
+      ) {
+        return false;
+      }
+      if (
+        filters.placesOfReceiptGroup &&
+        opportunity.placeOfReceiptGroupId?.id !== filters.placesOfReceiptGroup.id
+      ) {
+        return false;
+      }
+
+      if (filters.tags && filters.tags.length > 0) {
+        const oppTagIds = (opportunity.tagIds || []).map(tag => tag.id);
+        const filterTagIds = filters.tags.map(tag => tag.id);
+        if (!filterTagIds.some(id => oppTagIds.includes(id))) {
+          return false;
+        }
+      }
+
+      if (filters.commodityGroups && filters.commodityGroups.length > 0) {
+        if (!filters.commodityGroups.some(group => opportunity.commodityGroupId?.id === group.id)) {
+          return false;
+        }
+      }
+
+      if (filters.equipmentGroups && filters.equipmentGroups.length > 0) {
+        if (!filters.equipmentGroups.some(group => opportunity.equipmentGroupId?.id === group.id)) {
+          return false;
+        }
+      }
+
+      // Add more filters as needed...
+
+      return true;
+    });
+  }, [opportunities, filters]);
+
   const handleSearch = useCallback(
     (searchStringNew: string) => {
       if (searchStringNew !== searchString && setOpportnityPaginationContextData) {
@@ -70,59 +130,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     },
     [opportunityPaginationContextData, searchString, setOpportnityPaginationContextData],
   );
-  // const filteredOpportunities = useMemo(() => {
-  //   return allOpportunities.filter(opportunity => {
-  //     // Filter by archived status
-  //     if (archived !== undefined && opportunity.archived !== archived) {
-  //       return false;
-  //     }
-
-  //     // Filter by ports group
-  //     if (filters.portsGroup && opportunity.portsGroup?.id !== filters.portsGroup.id) {
-  //       return false;
-  //     }
-
-  //     // Filter by places group
-  //     if (filters.placesGroup && opportunity.placesGroup?.id !== filters.placesGroup.id) {
-  //       return false;
-  //     }
-
-  //     // Filter by tags
-  //     if (filters.tags && filters.tags.length > 0) {
-  //       const opportunityTagIds = opportunity.tags?.map(tag => tag.id) || [];
-  //       const hasMatchingTag = filters.tags.some(filterTag =>
-  //         opportunityTagIds.includes(filterTag.id),
-  //       );
-  //       if (!hasMatchingTag) {
-  //         return false;
-  //       }
-  //     }
-
-  //     // Filter by commodity groups
-  //     if (filters.commodityGroups && filters.commodityGroups.length > 0) {
-  //       const opportunityCommodityIds = opportunity.commodityGroups?.map(group => group.id) || [];
-  //       const hasMatchingCommodity = filters.commodityGroups.some(filterGroup =>
-  //         opportunityCommodityIds.includes(filterGroup.id),
-  //       );
-  //       if (!hasMatchingCommodity) {
-  //         return false;
-  //       }
-  //     }
-
-  //     // Filter by equipment groups
-  //     if (filters.equipmentGroups && filters.equipmentGroups.length > 0) {
-  //       const opportunityEquipmentIds = opportunity.equipmentGroups?.map(group => group.id) || [];
-  //       const hasMatchingEquipment = filters.equipmentGroups.some(filterGroup =>
-  //         opportunityEquipmentIds.includes(filterGroup.id),
-  //       );
-  //       if (!hasMatchingEquipment) {
-  //         return false;
-  //       }
-  //     }
-
-  //     return true;
-  //   });
-  // }, [allOpportunities, archived, filters]);
 
   return (
     <Fragment>
@@ -164,7 +171,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
               />
             </Card>
 
-            {opportunities && opportunities.length === 0 ? (
+            {filteredOpportunities && filteredOpportunities.length === 0 ? (
               <OpportunitiesEmptyResults
                 message={
                   assignee
@@ -174,7 +181,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
                 }
               />
             ) : (
-              <OpportunityTable opportunities={opportunities} isAdmin={isAdmin} />
+              <OpportunityTable opportunities={filteredOpportunities} isAdmin={isAdmin} />
             )}
           </Fragment>
         ) : (
