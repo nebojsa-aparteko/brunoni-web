@@ -17,8 +17,8 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 interface Props {
   label: string;
   options: OpportunityCommodityGroup[];
-  value: OpportunityCommodityGroup[];
-  onChange: (groups: OpportunityCommodityGroup[] | null) => void;
+  value: OpportunityCommodityGroup | null;
+  onChange: (group: OpportunityCommodityGroup | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -51,10 +51,9 @@ const OpportunityCommodityGroupInput: React.FC<Props> = ({
   return (
     <Autocomplete
       {...rest}
-      multiple
       className={classes.root}
-      value={value || []}
-      onChange={(_, newValue) => onChange(newValue as OpportunityCommodityGroup[])}
+      value={value || null}
+      onChange={(_, newValue) => onChange(newValue as OpportunityCommodityGroup | null)}
       autoHighlight
       open={open}
       onOpen={onOpen}

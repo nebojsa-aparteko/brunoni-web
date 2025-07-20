@@ -13,8 +13,8 @@ export interface OpportunitiesContextFilters extends ContextFilters {
   placesOfDeliveryGroup?: OpportunityPlacesGroup;
   placesOfReceiptGroup?: OpportunityPlacesGroup;
   tags?: OpportunityTag[];
-  commodityGroups?: OpportunityCommodityGroup[];
-  equipmentGroups?: OpportunityEquipmentGroup[];
+  commodityGroup?: OpportunityCommodityGroup;
+  equipmentGroup?: OpportunityEquipmentGroup;
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
@@ -23,8 +23,8 @@ export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
   portsGroup: undefined,
   placesGroup: undefined,
   tags: [],
-  commodityGroups: [],
-  equipmentGroups: [],
+  commodityGroup: undefined,
+  equipmentGroup: undefined,
 } as OpportunitiesContextFilters;
 
 const OpportunitiesFilterContext = createContext<

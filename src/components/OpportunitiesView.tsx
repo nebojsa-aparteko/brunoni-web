@@ -100,16 +100,18 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
         }
       }
 
-      if (filters.commodityGroups && filters.commodityGroups.length > 0) {
-        if (!filters.commodityGroups.some(group => opportunity.commodityGroupId?.id === group.id)) {
-          return false;
-        }
+      if (
+        filters.commodityGroup &&
+        opportunity.commodityGroupId?.id !== filters.commodityGroup.id
+      ) {
+        return false;
       }
 
-      if (filters.equipmentGroups && filters.equipmentGroups.length > 0) {
-        if (!filters.equipmentGroups.some(group => opportunity.equipmentGroupId?.id === group.id)) {
-          return false;
-        }
+      if (
+        filters.equipmentGroup &&
+        opportunity.equipmentGroupId?.id !== filters.equipmentGroup.id
+      ) {
+        return false;
       }
 
       return true;

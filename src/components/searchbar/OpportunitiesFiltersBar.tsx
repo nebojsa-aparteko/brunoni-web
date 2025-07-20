@@ -7,7 +7,7 @@ import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityTag } from '../../model/OpportunityTag';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
-import UserRecord, { isSuperAdmin } from '../../model/UserRecord';
+import UserRecord from '../../model/UserRecord';
 import OpportunityPortsGroupInput from '../inputs/OpportunityPortsGroupInput';
 import OpportunityPlacesGroupInput from '../inputs/OpportunityPlacesGroupInput';
 import OpportunityCommodityGroupInput from '../inputs/OpportunityCommodityGroupInput';
@@ -50,8 +50,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
     placesOfDeliveryGroup,
     placesOfReceiptGroup,
     tags: selectedOpportunityTags,
-    commodityGroups: selectedCommodityGroups,
-    equipmentGroups: selectedEquipmentGroups,
+    commodityGroup: selectedCommodityGroup,
+    equipmentGroup: selectedEquipmentGroup,
     assignee,
   } = filters;
 
@@ -73,11 +73,11 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setOpportunityTagsFilter = (tags: OpportunityTag[] | null | undefined) =>
     setFilters && setFilters(set('tags', tags || [])(filters));
 
-  const setCommodityGroupsFilter = (groups: OpportunityCommodityGroup[] | null | undefined) =>
-    setFilters && setFilters(set('commodityGroups', groups || [])(filters));
+  const setCommodityGroupFilter = (group: OpportunityCommodityGroup | null | undefined) =>
+    setFilters && setFilters(set('commodityGroup', group || undefined)(filters));
 
-  const setEquipmentGroupsFilter = (groups: OpportunityEquipmentGroup[] | null | undefined) =>
-    setFilters && setFilters(set('equipmentGroups', groups || [])(filters));
+  const setEquipmentGroupFilter = (group: OpportunityEquipmentGroup | null | undefined) =>
+    setFilters && setFilters(set('equipmentGroup', group || undefined)(filters));
 
   const setUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignee', user || undefined)(filters));
@@ -162,8 +162,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityCommodityGroupInput
               label="Commodity Groups"
               options={commodityGroups}
-              onChange={setCommodityGroupsFilter}
-              value={selectedCommodityGroups || []}
+              onChange={setCommodityGroupFilter}
+              value={selectedCommodityGroup || null}
             />
           </Grid>
         )}
@@ -172,8 +172,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             <OpportunityEquipmentGroupInput
               label="Equipment Groups"
               options={equipmentGroups}
-              onChange={setEquipmentGroupsFilter}
-              value={selectedEquipmentGroups || []}
+              onChange={setEquipmentGroupFilter}
+              value={selectedEquipmentGroup || null}
             />
           </Grid>
         )}

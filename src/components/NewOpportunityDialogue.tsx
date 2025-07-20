@@ -21,6 +21,13 @@ import useOpportunityEquipmentGroups from '../hooks/useOpportunityEquipmentGroup
 import useClients from '../hooks/useClients';
 import userRecords from '../contexts/UserRecordsContext';
 import UserInput from './inputs/UserInput';
+import firebase from '../firebase';
+import Client from '../model/Client';
+import UserRecord from '../model/UserRecord';
+import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
+import { OpportunityPlacesGroup } from '../model/OpportunityPlacesGroup';
+import { OpportunityPortsGroup } from '../model/OpportunityPortsGroup';
+import { OpportunityCommodityGroup } from '../model/OpportunityCommodityGroup';
 interface NewOpportunityDialogProps {
   open: boolean;
   onClose: () => void;
@@ -28,19 +35,28 @@ interface NewOpportunityDialogProps {
 }
 
 const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClose, onAdd }) => {
-  const [newOpportunityName, setNewOpportunityName] = useState<string>('');
-  const [newSalesRep, setNewSalesRep] = useState<any>(null);
-  const [newStatisticalClient, setNewStatisticalClient] = useState<any>(null);
-  const [newEquipmentGroups, setNewEquipmentGroups] = useState<any[]>([]);
-  const [newPlaceOfReceiptGroup, setNewPlaceOfReceiptGroup] = useState<any>(null);
-  const [newPortOfLoadingGroup, setNewPortOfLoadingGroup] = useState<any>(null);
-  const [newPortOfDischargeGroup, setNewPortOfDischargeGroup] = useState<any>(null);
-  const [newPlaceOfDeliveryGroup, setNewPlaceOfDeliveryGroup] = useState<any>(null);
-  const [newCommodityGroups, setNewCommodityGroups] = useState<any[]>([]);
+  const [newSalesRep, setNewSalesRep] = useState<UserRecord | null>(null);
+  const [newBookingParty, setNewBookingParty] = useState<Client | null>(null);
+  const [newStatisticalClient, setNewStatisticalClient] = useState<Client | null>(null);
+  const [newEquipmentGroups, setNewEquipmentGroups] = useState<OpportunityEquipmentGroup | null>(
+    null,
+  );
+  const [newPlaceOfReceiptGroup, setNewPlaceOfReceiptGroup] =
+    useState<OpportunityPlacesGroup | null>(null);
+  const [newPortOfLoadingGroup, setNewPortOfLoadingGroup] = useState<OpportunityPortsGroup | null>(
+    null,
+  );
+  const [newPortOfDischargeGroup, setNewPortOfDischargeGroup] =
+    useState<OpportunityPortsGroup | null>(null);
+  const [newPlaceOfDeliveryGroup, setNewPlaceOfDeliveryGroup] =
+    useState<OpportunityPlacesGroup | null>(null);
+  const [newCommodityGroups, setNewCommodityGroups] = useState<OpportunityCommodityGroup | null>(
+    null,
+  );
   const [newTags, setNewTags] = useState<any[]>([]);
   const [newNote, setNewNote] = useState<string>('');
-  const [newCapacityTEU, setNewCapacityTEU] = useState<string>('');
-  const [newValidity, setNewValidity] = useState<string>('');
+  const [newCapacityTEU, setNewCapacityTEU] = useState<number>(0);
+  const [newValidity, setNewValidity] = useState<Date>(new Date());
 
   const portsGroups = useOpportunityPortsGroups();
   const placesGroups = useOpportunityPlacesGroups();
@@ -52,54 +68,53 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
 
   useEffect(() => {
     if (!open) {
-      setNewOpportunityName('');
       setNewSalesRep(null);
       setNewStatisticalClient(null);
-      setNewEquipmentGroups([]);
-      setNewCommodityGroups([]);
+      setNewEquipmentGroups(null);
+      setNewCommodityGroups(null);
       setNewPlaceOfReceiptGroup(null);
       setNewPortOfLoadingGroup(null);
       setNewPortOfDischargeGroup(null);
       setNewPlaceOfDeliveryGroup(null);
       setNewTags([]);
       setNewNote('');
-      setNewCapacityTEU('');
-      setNewValidity('');
+      setNewCapacityTEU(0);
+      setNewValidity(new Date());
     }
   }, [open]);
 
-  const handleAdd = () => {
-    onAdd({
-      name: newOpportunityName,
-      salesRep: newSalesRep,
-      statisticalClient: newStatisticalClient,
-      equipmentGroups: newEquipmentGroups,
-      commodityGroups: newCommodityGroups,
-      placeOfReceiptGroup: newPlaceOfReceiptGroup,
-      portOfLoadingGroup: newPortOfLoadingGroup,
-      portOfDischargeGroup: newPortOfDischargeGroup,
-      placeOfDeliveryGroup: newPlaceOfDeliveryGroup,
-      tags: newTags,
+  const handleAdd = async () => {
+    const opportunityData = {
+      salesRepId: newSalesRep?.id || '',
+      bookingPartyId: newBookingParty?.id || '',
+      statisticalClientId: newStatisticalClient?.id || '',
+      equipmentGroupId: newEquipmentGroups?.id || '',
+      commodityGroupId: newCommodityGroups?.id || '',
+      placeOfReceiptGroupId: newPlaceOfReceiptGroup?.id || '',
+      portOfLoadingGroupId: newPortOfLoadingGroup?.id || '',
+      portOfDischargeGroupId: newPortOfDischargeGroup?.id || '',
+      placeOfDeliveryGroupId: newPlaceOfDeliveryGroup?.id || '',
+      tagIds: newTags,
       note: newNote,
       capacityTEU: newCapacityTEU,
       validity: newValidity,
-    });
-    onClose();
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: newSalesRep?.id || null,
+    };
+    try {
+      await firebase.firestore().collection('opportunities').add(opportunityData);
+      console.debug('Adding new opportunity with data:', opportunityData);
+      onClose();
+    } catch (error) {
+      console.error('Failed to add opportunity:', error);
+    }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Opportunity</DialogTitle>
       <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Opportunity Name"
-          type="text"
-          fullWidth
-          value={newOpportunityName}
-          onChange={e => setNewOpportunityName(e.target.value)}
-        />
         <UserInput
           label="Choose User"
           users={users || []}
@@ -115,46 +130,55 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
             <TextField {...params} label="Statistical Client" margin="dense" variant="outlined" />
           )}
         />
+        <Autocomplete
+          options={clients || []}
+          getOptionLabel={option => option?.name || ''}
+          value={newBookingParty}
+          onChange={(_, value) => setNewBookingParty(value)}
+          renderInput={params => (
+            <TextField {...params} label="Booking Party" margin="dense" variant="outlined" />
+          )}
+        />
         <OpportunityEquipmentGroupInput
           label="Equipment Groups"
           options={equipmentGroups || []}
           value={newEquipmentGroups}
-          onChange={groups => setNewEquipmentGroups(groups || [])}
+          onChange={group => setNewEquipmentGroups(group)}
           margin="dense"
         />
         <OpportunityCommodityGroupInput
           label="Commodity Groups"
           options={commodityGroups || []}
           value={newCommodityGroups}
-          onChange={groups => setNewCommodityGroups(groups || [])}
+          onChange={group => setNewCommodityGroups(group)}
           margin="dense"
         />
         <OpportunityPlacesGroupInput
           label="Place of Receipt"
           options={placesGroups || []}
           value={newPlaceOfReceiptGroup}
-          onChange={setNewPlaceOfReceiptGroup}
+          onChange={group => setNewPlaceOfReceiptGroup(group ?? null)}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Loading"
           options={portsGroups || []}
           value={newPortOfLoadingGroup}
-          onChange={setNewPortOfLoadingGroup}
+          onChange={group => setNewPortOfLoadingGroup(group ?? null)}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Discharge"
           options={portsGroups || []}
           value={newPortOfDischargeGroup}
-          onChange={setNewPortOfDischargeGroup}
+          onChange={group => setNewPortOfDischargeGroup(group ?? null)}
           margin="dense"
         />
         <OpportunityPlacesGroupInput
           label="Place of Delivery"
           options={placesGroups || []}
           value={newPlaceOfDeliveryGroup}
-          onChange={setNewPlaceOfDeliveryGroup}
+          onChange={group => setNewPlaceOfDeliveryGroup(group ?? null)}
           margin="dense"
         />
         <OpportunityTagInput
@@ -195,7 +219,7 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           onClick={handleAdd}
           color="primary"
           variant="contained"
-          disabled={!newOpportunityName || !newSalesRep || !newStatisticalClient}
+          disabled={!newSalesRep || !newStatisticalClient}
         >
           Add
         </Button>

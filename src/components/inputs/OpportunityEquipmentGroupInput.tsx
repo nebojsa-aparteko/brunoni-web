@@ -18,8 +18,8 @@ import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup
 interface Props {
   label: string;
   options: OpportunityEquipmentGroup[];
-  value: OpportunityEquipmentGroup[];
-  onChange: (groups: OpportunityEquipmentGroup[] | null) => void;
+  value: OpportunityEquipmentGroup | null;
+  onChange: (groups: OpportunityEquipmentGroup | null) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
@@ -52,10 +52,9 @@ const OpportunityEquipmentGroupInput: React.FC<Props> = ({
   return (
     <Autocomplete
       {...rest}
-      multiple
       className={classes.root}
-      value={value || []}
-      onChange={(_, newValue) => onChange(newValue as OpportunityEquipmentGroup[])}
+      value={value || null}
+      onChange={(_, newValue) => onChange(newValue as OpportunityEquipmentGroup | null)}
       autoHighlight
       open={open}
       onOpen={onOpen}
