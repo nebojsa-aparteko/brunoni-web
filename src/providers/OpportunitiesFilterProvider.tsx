@@ -15,7 +15,6 @@ export interface OpportunitiesContextFilters extends ContextFilters {
   tags?: OpportunityTag[];
   commodityGroups?: OpportunityCommodityGroup[];
   equipmentGroups?: OpportunityEquipmentGroup[];
-  kindOfQuote?: string[];
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {

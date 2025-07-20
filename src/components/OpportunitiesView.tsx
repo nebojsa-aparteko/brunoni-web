@@ -112,8 +112,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
         }
       }
 
-      // Add more filters as needed...
-
       return true;
     });
   }, [opportunities, filters]);

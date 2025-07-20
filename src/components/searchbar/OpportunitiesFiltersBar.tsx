@@ -187,13 +187,6 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             />
           </Grid>
         )}
-        <Grid item sm={3} xs={12}>
-          <OpportunityQuoteKindInput
-            label="Kind of Quote"
-            value={filters.kindOfQuote}
-            onChange={value => setFilters(f => ({ ...f, kindOfQuote: value || [] }))}
-          />
-        </Grid>
       </Grid>
     </Box>
   );
