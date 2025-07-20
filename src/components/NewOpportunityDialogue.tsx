@@ -29,18 +29,18 @@ interface NewOpportunityDialogProps {
 
 const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClose, onAdd }) => {
   const [newOpportunityName, setNewOpportunityName] = useState<string>('');
-  const [newSalesRep, setSalesRep] = useState<any>(null);
-  const [newStatisticalClient, setStatisticalClient] = useState<any>(null);
-  const [newEquipmentGroups, setEquipmentGroups] = useState<any[]>([]);
-  const [newPlaceOfReceiptGroup, setPlaceOfReceiptGroup] = useState<any>(null);
-  const [newPortOfLoadingGroup, setPortOfLoadingGroup] = useState<any>(null);
-  const [newPortOfDischargeGroup, setPortOfDischargeGroup] = useState<any>(null);
-  const [newPlaceOfDeliveryGroup, setPlaceOfDeliveryGroup] = useState<any>(null);
-  const [newCommodityGroups, setCommodityGroups] = useState<any[]>([]);
-  const [newTags, setTags] = useState<any[]>([]);
-  const [newNote, setNote] = useState<string>('');
-  const [newCapacityTEU, setCapacityTEU] = useState<string>('');
-  const [newValidity, setValidity] = useState<string>('');
+  const [newSalesRep, setNewSalesRep] = useState<any>(null);
+  const [newStatisticalClient, setNewStatisticalClient] = useState<any>(null);
+  const [newEquipmentGroups, setNewEquipmentGroups] = useState<any[]>([]);
+  const [newPlaceOfReceiptGroup, setNewPlaceOfReceiptGroup] = useState<any>(null);
+  const [newPortOfLoadingGroup, setNewPortOfLoadingGroup] = useState<any>(null);
+  const [newPortOfDischargeGroup, setNewPortOfDischargeGroup] = useState<any>(null);
+  const [newPlaceOfDeliveryGroup, setNewPlaceOfDeliveryGroup] = useState<any>(null);
+  const [newCommodityGroups, setNewCommodityGroups] = useState<any[]>([]);
+  const [newTags, setNewTags] = useState<any[]>([]);
+  const [newNote, setNewNote] = useState<string>('');
+  const [newCapacityTEU, setNewCapacityTEU] = useState<string>('');
+  const [newValidity, setNewValidity] = useState<string>('');
 
   const portsGroups = useOpportunityPortsGroups();
   const placesGroups = useOpportunityPlacesGroups();
@@ -50,22 +50,21 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
   const users = useContext(userRecords);
   const clients = useClients();
 
-  // Reset state when dialog closes
   useEffect(() => {
     if (!open) {
       setNewOpportunityName('');
-      setSalesRep(null);
-      setStatisticalClient(null);
-      setEquipmentGroups([]);
-      setCommodityGroups([]);
-      setPlaceOfReceiptGroup(null);
-      setPortOfLoadingGroup(null);
-      setPortOfDischargeGroup(null);
-      setPlaceOfDeliveryGroup(null);
-      setTags([]);
-      setNote('');
-      setCapacityTEU('');
-      setValidity('');
+      setNewSalesRep(null);
+      setNewStatisticalClient(null);
+      setNewEquipmentGroups([]);
+      setNewCommodityGroups([]);
+      setNewPlaceOfReceiptGroup(null);
+      setNewPortOfLoadingGroup(null);
+      setNewPortOfDischargeGroup(null);
+      setNewPlaceOfDeliveryGroup(null);
+      setNewTags([]);
+      setNewNote('');
+      setNewCapacityTEU('');
+      setNewValidity('');
     }
   }, [open]);
 
@@ -111,7 +110,7 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           options={clients || []}
           getOptionLabel={option => option?.name || ''}
           value={newStatisticalClient}
-          onChange={(_, value) => setStatisticalClient(value)}
+          onChange={(_, value) => setNewStatisticalClient(value)}
           renderInput={params => (
             <TextField {...params} label="Statistical Client" margin="dense" variant="outlined" />
           )}
@@ -120,49 +119,49 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           label="Equipment Groups"
           options={equipmentGroups || []}
           value={newEquipmentGroups}
-          onChange={setEquipmentGroups}
+          onChange={groups => setNewEquipmentGroups(groups || [])}
           margin="dense"
         />
         <OpportunityCommodityGroupInput
           label="Commodity Groups"
           options={commodityGroups || []}
           value={newCommodityGroups}
-          onChange={setCommodityGroups}
+          onChange={groups => setNewCommodityGroups(groups || [])}
           margin="dense"
         />
         <OpportunityPlacesGroupInput
           label="Place of Receipt"
           options={placesGroups || []}
           value={newPlaceOfReceiptGroup}
-          onChange={setPlaceOfReceiptGroup}
+          onChange={setNewPlaceOfReceiptGroup}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Loading"
           options={portsGroups || []}
           value={newPortOfLoadingGroup}
-          onChange={setPortOfLoadingGroup}
+          onChange={setNewPortOfLoadingGroup}
           margin="dense"
         />
         <OpportunityPortsGroupInput
           label="Port of Discharge"
           options={portsGroups || []}
           value={newPortOfDischargeGroup}
-          onChange={setPortOfDischargeGroup}
+          onChange={setNewPortOfDischargeGroup}
           margin="dense"
         />
         <OpportunityPlacesGroupInput
           label="Place of Delivery"
           options={placesGroups || []}
           value={newPlaceOfDeliveryGroup}
-          onChange={setPlaceOfDeliveryGroup}
+          onChange={setNewPlaceOfDeliveryGroup}
           margin="dense"
         />
         <OpportunityTagInput
           label="Tags"
           options={opportunityTags || []}
           value={newTags}
-          onChange={(_, value) => setTags(value)}
+          onChange={(_, value) => setNewTags(Array.isArray(value) ? value : value ? [value] : [])}
         />
         <TextField
           margin="dense"
@@ -170,7 +169,7 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           type="text"
           fullWidth
           value={newNote}
-          onChange={e => setNote(e.target.value)}
+          onChange={e => setNewNote(e.target.value)}
         />
         <TextField
           margin="dense"
@@ -178,7 +177,7 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           type="number"
           fullWidth
           value={newCapacityTEU}
-          onChange={e => setCapacityTEU(e.target.value)}
+          onChange={e => setNewCapacityTEU(e.target.value)}
         />
         <TextField
           margin="dense"
@@ -187,7 +186,7 @@ const NewOpportunityDialog: React.FC<NewOpportunityDialogProps> = ({ open, onClo
           fullWidth
           InputLabelProps={{ shrink: true }}
           value={newValidity}
-          onChange={e => setValidity(e.target.value)}
+          onChange={e => setNewValidity(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
