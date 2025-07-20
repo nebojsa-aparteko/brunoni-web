@@ -22,7 +22,7 @@ import UserInput from '../inputs/UserInput';
 import Client from '../../model/Client';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
-import OpportunityQuoteKindInput from '../inputs/OpportunityQuoteKindInput';
+
 import userRecords from '../../contexts/UserRecordsContext';
 interface Props {
   filters: OpportunitiesContextFilters;
