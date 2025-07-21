@@ -11,18 +11,19 @@ import {
   Typography,
 } from '@material-ui/core';
 import { flow, set } from 'lodash/fp';
-import Meta from './Meta';
-import OpportunitiesFiltersBar from './searchbar/OpportunitiesFiltersBar';
-import ChartsCircularProgress from './dashboard/ChartsCircularProgress';
-import { useOpportunitiesListFilterContext } from '../providers/OpportunitiesFilterProvider';
-import { useOpportunityListPaginationContext } from '../providers/OpportunityListPaginationProvider';
-import Search from './searchbar/Search';
-import OpportunitiesEmptyResults from './opportunities/OpportunitisEmptyResults';
-import OpportunityTable from './opportunities/OpportunityTable';
-import { NormalizedOpportunity } from '../model/Opportunity';
-import useFirestoreCollection from '../hooks/useFirestoreCollection';
-import useNormalizedOpportunity from '../hooks/useNormalizedOpportunity';
-import NewOpportunityDialog from './NewOpportunityDialogue';
+import Meta from '../Meta';
+import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
+import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
+import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
+import { useOpportunityListPaginationContext } from '../../providers/OpportunityListPaginationProvider';
+import Search from '../searchbar/Search';
+import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
+import OpportunityTable from './OpportunityTable';
+import { NormalizedOpportunity } from '../../model/Opportunity';
+import useFirestoreCollection from '../../hooks/useFirestoreCollection';
+import useNormalizedOpportunity from '../../hooks/useNormalizedOpportunity';
+import AddOpportunityDialog from './AddOpportunityDialogue';
+import EditOpportunityDialog from './EditOpportunityDialog';
 interface Props {
   isAdmin?: boolean;
   archived?: boolean;
@@ -43,7 +44,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   const opportunitySnapshot = useFirestoreCollection('opportunities');
   const normalizeOpportunity = useNormalizedOpportunity();
   const opportunities: NormalizedOpportunity[] | undefined = opportunitySnapshot?.docs?.map(doc =>
-    normalizeOpportunity(doc.data()),
+    normalizeOpportunity({ id: doc.id, ...doc.data() }),
   );
 
   console.debug('OpportunitiesView', opportunities);
@@ -135,12 +136,35 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   const [openDialog, setOpenDialog] = useState(false);
   const [newOpportunityName, setNewOpportunityName] = useState('');
 
+  // Edit opportunity dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState<NormalizedOpportunity | null>(
+    null,
+  );
+
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
   const handleAddOpportunity = () => {
     setOpenDialog(false);
     setNewOpportunityName('');
+  };
+
+  // Edit opportunity handlers
+  const handleEditOpportunity = (opportunity: NormalizedOpportunity) => {
+    setSelectedOpportunity(opportunity);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setSelectedOpportunity(null);
+  };
+
+  const handleUpdateOpportunity = (updatedOpportunity: NormalizedOpportunity) => {
+    // The dialog handles the Firebase update, this callback is for any additional UI updates
+    console.debug('Opportunity updated:', updatedOpportunity);
+    // You might want to refresh the data or update local state here if needed
   };
 
   return (
@@ -151,10 +175,16 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
           <Button variant="contained" color="primary" onClick={handleOpenDialog}>
             Add Opportunity
           </Button>
-          <NewOpportunityDialog
+          <AddOpportunityDialog
             open={openDialog}
             onClose={handleCloseDialog}
             onAdd={handleAddOpportunity}
+          />
+          <EditOpportunityDialog
+            open={editDialogOpen}
+            opportunity={selectedOpportunity}
+            onClose={handleCloseEditDialog}
+            onUpdate={handleUpdateOpportunity}
           />
         </Grid>
         <Grid item md={12}>
@@ -204,7 +234,10 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
                 }
               />
             ) : (
-              <OpportunityTable opportunities={filteredOpportunities} isAdmin={isAdmin} />
+              <OpportunityTable
+                opportunities={filteredOpportunities}
+                onRowClick={handleEditOpportunity}
+              />
             )}
           </Fragment>
         ) : (

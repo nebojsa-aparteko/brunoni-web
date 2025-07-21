@@ -5,7 +5,7 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import HelpIcon from '@material-ui/icons/Help';
 import { TabPanel } from './BookingsPage';
 import OpportunitiesFilterProvider from '../providers/OpportunitiesFilterProvider';
-import OpportunitiesView from '../components/OpportunitiesView';
+import OpportunitiesView from '../components/opportunities/OpportunitiesView';
 
 const useStyles = makeStyles((theme: Theme) => ({
   tabContainer: {

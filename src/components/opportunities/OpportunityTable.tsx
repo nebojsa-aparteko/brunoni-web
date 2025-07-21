@@ -1,5 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import firebase from 'firebase/compat/app';
+import React, { Fragment } from 'react';
 import {
   Chip,
   createStyles,
@@ -13,11 +12,7 @@ import {
 } from '@material-ui/core';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
-import {
-  NormalizedOpportunity,
-  Opportunity,
-  OpportunityMatchEntity,
-} from '../../model/Opportunity';
+import { NormalizedOpportunity } from '../../model/Opportunity';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
@@ -77,20 +72,25 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface OpportunityTableProps {
   opportunities: NormalizedOpportunity[] | undefined;
-  isAdmin?: boolean;
+  onRowClick?: (opportunity: NormalizedOpportunity) => void;
 }
 
 interface OpportunityTableRowProps {
   opportunity: NormalizedOpportunity;
+  onRowClick?: (opportunity: NormalizedOpportunity) => void;
 }
 
-const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }) => {
+const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
   const classes = useStyles();
   const booked = 0;
   const quoted = 0;
 
+  const handleRowClick = () => {
+    onRowClick?.(opportunity);
+  };
+
   return (
-    <TableRow hover className={classes.tableRow} tabIndex={-1}>
+    <TableRow hover className={classes.tableRow} tabIndex={-1} onClick={handleRowClick}>
       <TableCell padding="checkbox"></TableCell>
       <TableCell align="center">
         {opportunity.salesRepId?.firstName} {opportunity.salesRepId?.lastName}
@@ -180,8 +180,9 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity }
   );
 };
 
-const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAdmin }) => {
+const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, onRowClick }) => {
   const displayOpportunities = opportunities || [];
+
   return (
     <Fragment>
       {displayOpportunities.length === 0 ? (
@@ -198,7 +199,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
                   <TableCell align="center">Sales Rep</TableCell>
                   <TableCell align="center">Booking Party</TableCell>
                   <TableCell align="center">Statistical client</TableCell>
-                  <TableCell align="center">Agremment</TableCell>
+                  <TableCell align="center">Agreement</TableCell>
                   <TableCell align="center">Quote Kind</TableCell>
                   <TableCell align="center">Place of Receipt</TableCell>
                   <TableCell align="center">Port of Loading</TableCell>
@@ -217,7 +218,11 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, isAd
               <TableBody>
                 {displayOpportunities ? (
                   displayOpportunities.map(opportunity => (
-                    <OpportunityTableRow key={opportunity.id} opportunity={opportunity} />
+                    <OpportunityTableRow
+                      key={opportunity.id}
+                      opportunity={opportunity}
+                      onRowClick={onRowClick}
+                    />
                   ))
                 ) : (
                   <ChartsCircularProgress />
