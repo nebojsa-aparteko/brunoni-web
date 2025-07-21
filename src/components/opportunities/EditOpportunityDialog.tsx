@@ -140,7 +140,6 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         .collection('opportunities')
         .doc(opportunity.id)
         .update(updatedData);
-      console.debug('Successfully updated opportunity:', opportunity.id);
 
       // Create updated opportunity object for callback
       const updatedOpportunity: NormalizedOpportunity = {

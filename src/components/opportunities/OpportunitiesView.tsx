@@ -200,30 +200,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       <div>
         {!isLoading ? (
           <Fragment>
-            <Card>
-              <CardHeader
-                title={
-                  <Box display="flex" alignItems="center">
-                    <Typography variant="subtitle1" display="inline">
-                      Opportunity {archived && '- Archive'}
-                    </Typography>
-                    <Divider orientation="vertical" style={{ height: '100%' }} />
-                    <div id="exportImportBkgView"></div>
-
-                    <Box flex={1} />
-
-                    <Search
-                      onSearch={handleSearch}
-                      localStorageKey={'bookingSearchQuery'}
-                      style={{
-                        visibility: 'initial',
-                      }}
-                    />
-                  </Box>
-                }
-              />
-            </Card>
-
             {filteredOpportunities && filteredOpportunities.length === 0 ? (
               <OpportunitiesEmptyResults
                 message={
