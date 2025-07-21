@@ -164,6 +164,10 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     // You might want to refresh the data or update local state here if needed
   };
 
+  const handleDeleteOpportunity = (opportunityId: string) => {
+    console.debug('Opportunity deleted:', opportunityId);
+  };
+
   return (
     <Fragment>
       <Meta title={`Opportunities`} />
@@ -191,6 +195,7 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
             opportunity={selectedOpportunity}
             onClose={handleCloseEditDialog}
             onUpdate={handleUpdateOpportunity}
+            onDelete={handleDeleteOpportunity}
           />
         </Grid>
         <Grid item md={12}>

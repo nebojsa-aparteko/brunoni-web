@@ -35,6 +35,7 @@ interface EditOpportunityDialogProps {
   onClose: () => void;
   opportunity: NormalizedOpportunity | null;
   onUpdate: (updatedOpportunity: NormalizedOpportunity) => void;
+  onDelete: (opportunityId: string) => void;
 }
 
 const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
@@ -42,6 +43,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   onClose,
   opportunity,
   onUpdate,
+  onDelete,
 }) => {
   const [salesRep, setSalesRep] = useState<UserRecord | null>(null);
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
@@ -65,6 +67,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const portsGroups = useOpportunityPortsGroups();
   const placesGroups = useOpportunityPlacesGroups();
@@ -166,6 +169,28 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
     } catch (error) {
       console.error('Failed to update opportunity:', error);
       alert('Failed to update opportunity. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!opportunity?.id) {
+      console.error('No opportunity ID found:', opportunity);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await firebase.firestore().collection('opportunities').doc(opportunity.id).delete();
+
+      onDelete(opportunity.id);
+      onClose();
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error('Failed to delete opportunity:', error);
+      alert('Failed to delete opportunity. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -305,6 +330,14 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         />
       </DialogContent>
       <DialogActions>
+        <Button
+          onClick={() => setShowDeleteConfirm(true)}
+          color="secondary"
+          disabled={isLoading}
+          style={{ marginRight: 'auto' }}
+        >
+          Delete
+        </Button>
         <Button onClick={onClose} disabled={isLoading}>
           Cancel
         </Button>
@@ -324,6 +357,21 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           {isLoading ? 'Saving...' : 'Update'}
         </Button>
       </DialogActions>
+
+      <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this opportunity? This action cannot be undone.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteConfirm(false)} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary" disabled={isLoading}>
+            {isLoading ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
