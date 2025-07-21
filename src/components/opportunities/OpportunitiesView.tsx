@@ -1,22 +1,11 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardHeader,
-  Divider,
-  Grid,
-  makeStyles,
-  Paper,
-  Button,
-  Typography,
-} from '@material-ui/core';
+import { Grid, makeStyles, Paper, Button } from '@material-ui/core';
 import { flow, set } from 'lodash/fp';
 import Meta from '../Meta';
 import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
 import { useOpportunityListPaginationContext } from '../../providers/OpportunityListPaginationProvider';
-import Search from '../searchbar/Search';
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 import OpportunityTable from './OpportunityTable';
 import { NormalizedOpportunity } from '../../model/Opportunity';
@@ -147,7 +136,9 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   const [selectedOpportunity, setSelectedOpportunity] = useState<NormalizedOpportunity | null>(
     null,
   );
-
+  const handleUploadDialog = () => {
+    console.debug('Open upload dialog');
+  };
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
@@ -178,9 +169,18 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       <Meta title={`Opportunities`} />
       <Grid container direction="row">
         <Grid item sm={3} xs={12}>
-          <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenDialog}
+            style={{ marginRight: 8 }}
+          >
             Add Opportunity
           </Button>
+          <Button variant="contained" color="primary" onClick={handleUploadDialog}>
+            Upload xlsx
+          </Button>
+
           <AddOpportunityDialog
             open={openDialog}
             onClose={handleCloseDialog}
