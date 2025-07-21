@@ -31,12 +31,16 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   const classes = useStyles();
   const isLoading = false; // Replace with actual loading state if needed
   const opportunitySnapshot = useFirestoreCollection('opportunities');
-  const normalizeOpportunity = useNormalizedOpportunity();
-  const opportunities: NormalizedOpportunity[] | undefined = opportunitySnapshot?.docs?.map(doc =>
-    normalizeOpportunity({ id: doc.id, ...doc.data() }),
-  );
+  const opportunityIds = useMemo(() => {
+    return opportunitySnapshot?.docs?.map(doc => doc.id) || [];
+  }, [opportunitySnapshot?.docs]);
+  const normalizeOpportunity = useNormalizedOpportunity(opportunityIds);
+  const opportunities: NormalizedOpportunity[] | undefined = useMemo(() => {
+    return opportunitySnapshot?.docs?.map(doc =>
+      normalizeOpportunity({ id: doc.id, ...doc.data() }),
+    );
+  }, [opportunitySnapshot?.docs, normalizeOpportunity]);
 
-  console.debug('OpportunitiesView', opportunities);
   const [filters, setFilters] = useOpportunitiesListFilterContext();
   const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
     useOpportunityListPaginationContext();

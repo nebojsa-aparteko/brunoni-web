@@ -130,8 +130,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         <div style={{ minWidth: 80 }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <span style={{ fontSize: 12, marginRight: 6 }}>
-              {booked !== null && opportunity.capacityTEU
-                ? `${booked} / ${opportunity.capacityTEU}`
+              {opportunity.booked !== null && opportunity.capacityTEU
+                ? `${opportunity.booked} / ${opportunity.capacityTEU}`
                 : '—'}
             </span>
           </div>
@@ -139,8 +139,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
             <div
               style={{
                 width:
-                  booked !== null && opportunity.capacityTEU
-                    ? `${Math.min((booked / opportunity.capacityTEU) * 100, 100)}%`
+                  opportunity.booked !== null && opportunity.capacityTEU
+                    ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
                     : '0%',
                 background: '#3f51b5',
                 height: '100%',
@@ -155,8 +155,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         <div style={{ minWidth: 80 }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
             <span style={{ fontSize: 12, marginRight: 6 }}>
-              {booked !== null && quoted !== null
-                ? `${booked} / ${quoted === 0 ? 1 : quoted}`
+              {opportunity.booked !== null && opportunity.quoted !== null
+                ? `${opportunity.booked} / ${opportunity.quoted}`
                 : '—'}
             </span>
           </div>
@@ -164,8 +164,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
             <div
               style={{
                 width:
-                  booked !== null && quoted
-                    ? `${Math.min((booked / (quoted === 0 ? 1 : quoted)) * 100, 100)}%`
+                  opportunity.booked !== null && opportunity.quoted
+                    ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
                     : '0%',
                 background: '#43a047',
                 height: '100%',

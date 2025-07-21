@@ -30,6 +30,13 @@ export interface Opportunity {
   updatedBy: string; // User ID of the last updater
 }
 
+export interface OpportunityCounter {
+  count: number;
+  entity: 'booking' | 'quote';
+  month: string;
+  year: number;
+}
+
 export interface NormalizedOpportunity {
   id: string;
   salesRepId: UserRecord | null; // Normalized user object or null
@@ -47,7 +54,8 @@ export interface NormalizedOpportunity {
   validity: Date;
   note: string;
   capacityTEU: number;
-  counters: any; // Normalized counters object
+  booked: number; // Sum of booking counts for current year
+  quoted: number; // Sum of quote counts for current year
 }
 
 export interface OpportunityMatch {

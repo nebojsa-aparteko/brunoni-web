@@ -7,8 +7,9 @@ import useOpportunityEquipmentGroups from './useOpportunityEquipmentGroups';
 import useOpportunityTags from './useOpportunityTags';
 import useClients from './useClients';
 import UserRecords from '../contexts/UserRecordsContext';
+import { useOpportunityCounters } from './useOpportunityCounters';
 
-const useNormalizedOpportunity = () => {
+const useNormalizedOpportunity = (opportunityIds: string[]) => {
   const users = useContext(UserRecords);
   const clients = useClients();
   const portsGroups = useOpportunityPortsGroups();
@@ -16,6 +17,7 @@ const useNormalizedOpportunity = () => {
   const commodityGroups = useOpportunityCommodityGroups();
   const equipmentGroups = useOpportunityEquipmentGroups();
   const tags = useOpportunityTags();
+  const counters = useOpportunityCounters(opportunityIds);
 
   return useMemo(() => {
     const getUser = (id: string) => users?.find(u => u.id === id) || null;
@@ -25,6 +27,7 @@ const useNormalizedOpportunity = () => {
     const getCommodityGroup = (id: string) => commodityGroups?.find(g => g.id === id) || null;
     const getEquipmentGroup = (id: string) => equipmentGroups?.find(g => g.id === id) || null;
     const getTag = (id: string) => tags?.find(t => t.id === id) || null;
+    const getCounters = (id: string) => counters[id] || { booked: 0, quoted: 0 };
 
     return normalizeOpportunity(
       getUser,
@@ -34,8 +37,9 @@ const useNormalizedOpportunity = () => {
       getCommodityGroup,
       getEquipmentGroup,
       getTag,
+      getCounters,
     );
-  }, [users, clients, portsGroups, placesGroups, commodityGroups, equipmentGroups, tags]);
+  }, [users, clients, portsGroups, placesGroups, commodityGroups, equipmentGroups, tags, counters]);
 };
 
 export default useNormalizedOpportunity;

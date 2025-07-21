@@ -12,6 +12,7 @@ export const normalizeOpportunity = (
   getCommodityGroup: (id: string) => any,
   getEquipmentGroup: (id: string) => any,
   getTag: (id: string) => any,
+  getCounters: (id: string) => { booked: number; quoted: number },
 ) =>
   flow(
     update('salesRepId', getUser),
@@ -28,4 +29,8 @@ export const normalizeOpportunity = (
     update('createdAt', invoke('toDate')),
     update('updatedAt', invoke('toDate')),
     update('tagIds', filter(Boolean)),
+    (opportunity: any) => ({
+      ...opportunity,
+      ...getCounters(opportunity.id),
+    }),
   );

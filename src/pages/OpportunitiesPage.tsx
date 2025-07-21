@@ -55,7 +55,7 @@ const OpportunitiesPage: React.FC = () => {
             <OpportunitiesView isAdmin={true} archived={false} showDateRangeFilter={true} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            <OpportunitiesView isAdmin={true} archived={false} showDateRangeFilter={true} />
+            {/* TODO: Implement "Not Matched" view - for now using same component */}
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>
