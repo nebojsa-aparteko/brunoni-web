@@ -44,7 +44,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const users = useContext(userRecords);
   const clients = useClients();
   const {
-    clientFilter,
+    statisticalClient,
+    bookingParty,
     portsOfLoadingGroup,
     portsOfDischargeGroup,
     placesOfDeliveryGroup,
@@ -55,8 +56,11 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
     assignee,
   } = filters;
 
-  const setClientFilter = (client: Client | null | undefined) =>
-    setFilters && setFilters(set('clientFilter', client || undefined)(filters));
+  const setStatisticalClient = (client: Client | null | undefined) =>
+    setFilters && setFilters(set('statisticalClient', client || undefined)(filters));
+
+  const setBookingPartyFilter = (client: Client | null | undefined) =>
+    setFilters && setFilters(set('bookingParty', client || undefined)(filters));
 
   const setPortsOfLoadingGroupFilter = (portsGroup: OpportunityPortsGroup | null | undefined) =>
     setFilters && setFilters(set('portsOfLoadingGroup', portsGroup || undefined)(filters));
@@ -98,8 +102,20 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               <ClientInput
                 label="Statistical Client"
                 clients={clients || []}
-                onChange={setClientFilter}
-                value={clientFilter}
+                onChange={setStatisticalClient}
+                value={statisticalClient}
+              />
+            </Box>
+          </Grid>
+        )}
+        {clients && (
+          <Grid item sm={3} xs={12}>
+            <Box display="flex">
+              <ClientInput
+                label="Booking Party"
+                clients={clients || []}
+                onChange={setBookingPartyFilter}
+                value={bookingParty}
               />
             </Box>
           </Grid>
@@ -180,7 +196,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
         {users && (
           <Grid item sm={3} xs={12}>
             <UserInput
-              label="Choose User"
+              label="Choose Sales Representative"
               users={users || []}
               onChange={(_, user) => setUserFilter(user)}
               value={assignee}

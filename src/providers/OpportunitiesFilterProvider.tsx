@@ -6,8 +6,11 @@ import { OpportunityPortsGroup } from '../model/OpportunityPortsGroup';
 import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
+import Client from '../model/Client';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
+  statisticalClient?: Client | null;
+  bookingParty?: Client | null;
   portsOfLoadingGroup?: OpportunityPortsGroup;
   portsOfDischargeGroup?: OpportunityPortsGroup;
   placesOfDeliveryGroup?: OpportunityPlacesGroup;
@@ -18,6 +21,8 @@ export interface OpportunitiesContextFilters extends ContextFilters {
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
+  statisticalClient: undefined,
+  bookingParty: undefined,
   archived: false,
   hold: false,
   portsGroup: undefined,

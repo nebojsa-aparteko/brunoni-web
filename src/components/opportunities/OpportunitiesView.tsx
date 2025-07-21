@@ -62,7 +62,13 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       if (filters.assignee && opportunity.salesRepId?.id !== filters.assignee.id) {
         return false;
       }
-      if (filters.clientFilter && opportunity.statisticalClientId?.id !== filters.clientFilter.id) {
+      if (
+        filters.statisticalClient &&
+        opportunity.statisticalClientId?.id !== filters.statisticalClient.id
+      ) {
+        return false;
+      }
+      if (filters.bookingParty && opportunity.bookingPartyId?.id !== filters.bookingParty.id) {
         return false;
       }
 
