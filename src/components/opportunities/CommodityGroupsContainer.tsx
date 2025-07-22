@@ -20,7 +20,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { useSnackbar } from 'notistack';
-import firebase from 'firebase/compat/app';
+import firebase from '../../firebase';
 import { GlobalContext } from '../../store/GlobalStore';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import CommodityGroupRow from './CommodityGroupRow';

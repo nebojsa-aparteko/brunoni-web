@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import firebase from 'firebase/compat/app';
+import firebase from '../firebase';
 import useFirestoreCollection from './useFirestoreCollection';
 import { Team, TeamType } from '../model/Teams';
 
