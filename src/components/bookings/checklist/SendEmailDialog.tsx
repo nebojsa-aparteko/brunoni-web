@@ -27,7 +27,7 @@ import { addActivityItem } from './ActivityLogContainer';
 import { createActivityObject } from './ChecklistItemRow';
 import { ActivityChangeType, ActivityLogUserData, ChecklistNames } from './ChecklistItemModel';
 import { ActivityType } from './ActivityModel';
-import firebase from 'firebase/compat/app';
+import firebase from '../../../firebase';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

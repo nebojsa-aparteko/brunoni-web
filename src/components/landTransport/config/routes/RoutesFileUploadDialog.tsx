@@ -1,4 +1,4 @@
-import firebase from 'firebase/compat/app';
+import firebase from '../../../../firebase';
 import 'firebase/compat/database';
 import ProviderEntity from '../../../../model/land-transport/providers/Provider';
 import {

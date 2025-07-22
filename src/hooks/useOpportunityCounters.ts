@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import firebase from 'firebase/compat/app';
+import firebase from '../firebase';
 import { OpportunityCounter } from '../model/Opportunity';
 
 interface OpportunityCounters {
