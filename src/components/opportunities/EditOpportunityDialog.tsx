@@ -204,7 +204,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       <DialogTitle>Edit Opportunity</DialogTitle>
       <DialogContent>
         <UserInput
-          label="Choose User"
+          label="Sales Representative"
           users={users || []}
           onChange={(_, user) => setSalesRep(user)}
           value={salesRep}

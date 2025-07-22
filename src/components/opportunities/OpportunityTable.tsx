@@ -212,20 +212,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.equipmentGroupId?.name || ''}</TableCell>
-      <TableCell align="center">
-        {opportunity.tagIds && opportunity.tagIds.length > 0
-          ? opportunity.tagIds.map(tag => (
-              <Chip
-                key={tag.id}
-                label={tag.tag}
-                size="small"
-                style={{ marginRight: 4, marginBottom: 2 }}
-                color="primary"
-                variant="outlined"
-              />
-            ))
-          : ''}
-      </TableCell>
+
       <TableCell align="center">
         {opportunity.validity ? new Date(opportunity.validity).toLocaleDateString() : ''}
       </TableCell>
@@ -306,6 +293,20 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           ''
         )}
       </TableCell>
+      <TableCell align="center">
+        {opportunity.tagIds && opportunity.tagIds.length > 0
+          ? opportunity.tagIds.map(tag => (
+              <Chip
+                key={tag.id}
+                label={tag.tag}
+                size="small"
+                style={{ marginRight: 4, marginBottom: 2 }}
+                color="primary"
+                variant="outlined"
+              />
+            ))
+          : ''}
+      </TableCell>
     </TableRow>
   );
 };
@@ -371,9 +372,6 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                   <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
                     Equipment Groups
                   </SortableHeader>
-                  <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
-                    Tags
-                  </SortableHeader>
                   <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
                     Validity
                   </SortableHeader>
@@ -388,6 +386,9 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                   </SortableHeader>
                   <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
                     Booked
+                  </SortableHeader>
+                  <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
+                    Tags
                   </SortableHeader>
                 </TableRow>
               </TableHead>
