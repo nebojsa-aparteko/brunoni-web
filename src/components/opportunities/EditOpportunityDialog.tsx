@@ -62,8 +62,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const [commodityGroup, setCommodityGroup] = useState<OpportunityCommodityGroup | null>(null);
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
-  const [capacityTEU, setCapacityTEU] = useState<number>(0);
-  const [validity, setValidity] = useState<Date>(new Date());
+  const [capacityTEU, setCapacityTEU] = useState<string>('');
+  const [validity, setValidity] = useState<string>('');
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -91,8 +91,10 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       setPlaceOfDeliveryGroup(opportunity.placeOfDeliveryGroupId || null);
       setTags(opportunity.tagIds || []);
       setNote(opportunity.note || '');
-      setCapacityTEU(opportunity.capacityTEU || 0);
-      setValidity(opportunity.validity ? new Date(opportunity.validity) : new Date());
+      setCapacityTEU(opportunity.capacityTEU ? opportunity.capacityTEU.toString() : '');
+      setValidity(
+        opportunity.validity ? new Date(opportunity.validity).toISOString().split('T')[0] : '',
+      );
       setAgreementId(opportunity.agreementId || '');
       setQuoteKind(opportunity.quoteKind || '');
     }
@@ -129,8 +131,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       placeOfDeliveryGroupId: placeOfDeliveryGroup?.id || '',
       tagIds,
       note,
-      capacityTEU,
-      validity,
+      capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
+      validity: validity === '' ? null : new Date(validity),
       agreementId,
       quoteKind,
       updatedAt: new Date(),
@@ -160,8 +162,9 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         agreementId,
         quoteKind,
         note,
-        capacityTEU,
-        validity,
+        capacityTEU:
+          capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
+        validity: validity === '' ? null : new Date(validity),
       };
 
       onUpdate(updatedOpportunity);
@@ -194,11 +197,6 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const formatDateForInput = (date: Date | null) => {
-    if (!date) return '';
-    return date.toISOString().split('T')[0];
   };
 
   return (
@@ -316,7 +314,12 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           fullWidth
           variant="outlined"
           value={capacityTEU}
-          onChange={e => setCapacityTEU(Number(e.target.value))}
+          onChange={e => setCapacityTEU(e.target.value)}
+          error={capacityTEU !== '' && Number(capacityTEU) <= 0}
+          helperText={
+            capacityTEU !== '' && Number(capacityTEU) <= 0 ? 'Capacity must be greater than 0' : ''
+          }
+          inputProps={{ min: 1 }}
         />
         <TextField
           margin="dense"
@@ -325,8 +328,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           fullWidth
           variant="outlined"
           InputLabelProps={{ shrink: true }}
-          value={formatDateForInput(validity)}
-          onChange={e => setValidity(new Date(e.target.value))}
+          value={validity}
+          onChange={e => setValidity(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
@@ -345,14 +348,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           onClick={handleUpdate}
           color="primary"
           variant="contained"
-          disabled={!salesRep || !statisticalClient || isLoading}
-          title={
-            !salesRep
-              ? 'Sales Rep required'
-              : !statisticalClient
-                ? 'Statistical Client required'
-                : ''
-          }
+          disabled={isLoading || (capacityTEU !== '' && Number(capacityTEU) <= 0)}
         >
           {isLoading ? 'Saving...' : 'Update'}
         </Button>

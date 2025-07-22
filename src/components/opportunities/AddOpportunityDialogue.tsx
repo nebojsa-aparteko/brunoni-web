@@ -53,8 +53,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const [commodityGroups, setCommodityGroups] = useState<OpportunityCommodityGroup | null>(null);
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
-  const [capacityTEU, setCapacityTEU] = useState<number>(0);
-  const [validity, setValidity] = useState<Date>(new Date());
+  const [capacityTEU, setCapacityTEU] = useState<string>('');
+  const [validity, setValidity] = useState<string>('');
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
 
@@ -79,8 +79,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setPlaceOfDeliveryGroup(null);
       setTags([]);
       setNote('');
-      setCapacityTEU(0);
-      setValidity(new Date());
+      setCapacityTEU('');
+      setValidity('');
       setAgreementId('');
       setQuoteKind('');
     }
@@ -99,8 +99,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       placeOfDeliveryGroupId: placeOfDeliveryGroup?.id || '',
       tagIds: tags,
       note,
-      capacityTEU,
-      validity,
+      capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
+      validity: validity === '' ? null : new Date(validity),
       agreementId,
       quoteKind,
       createdAt: new Date(),
@@ -114,10 +114,6 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
     } catch (error) {
       console.error('Failed to add opportunity:', error);
     }
-  };
-
-  const formatDateForInput = (date: Date) => {
-    return date.toISOString().split('T')[0];
   };
 
   return (
@@ -238,7 +234,12 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           fullWidth
           variant="outlined"
           value={capacityTEU}
-          onChange={e => setCapacityTEU(Number(e.target.value))}
+          onChange={e => setCapacityTEU(e.target.value)}
+          error={capacityTEU !== '' && Number(capacityTEU) <= 0}
+          helperText={
+            capacityTEU !== '' && Number(capacityTEU) <= 0 ? 'Capacity must be greater than 0' : ''
+          }
+          inputProps={{ min: 1 }}
         />
         <TextField
           margin="dense"
@@ -247,13 +248,18 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           fullWidth
           variant="outlined"
           InputLabelProps={{ shrink: true }}
-          value={formatDateForInput(validity)}
-          onChange={e => setValidity(new Date(e.target.value))}
+          value={validity}
+          onChange={e => setValidity(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleAdd} color="primary" variant="contained" disabled={!bookingParty}>
+        <Button
+          onClick={handleAdd}
+          color="primary"
+          variant="contained"
+          disabled={!bookingParty || (capacityTEU !== '' && Number(capacityTEU) <= 0)}
+        >
           Add
         </Button>
       </DialogActions>

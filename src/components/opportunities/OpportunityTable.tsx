@@ -93,18 +93,20 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
     <TableRow hover className={classes.tableRow} tabIndex={-1} onClick={handleRowClick}>
       <TableCell padding="checkbox"></TableCell>
       <TableCell align="center">
-        {opportunity.salesRepId?.firstName} {opportunity.salesRepId?.lastName}
+        {opportunity.salesRepId
+          ? `${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`
+          : ''}
       </TableCell>
-      <TableCell align="center">{opportunity.bookingPartyId?.name}</TableCell>
-      <TableCell align="center">{opportunity.statisticalClientId?.name}</TableCell>
-      <TableCell align="center">{opportunity.agreementId}</TableCell>
-      <TableCell align="center">{opportunity.quoteKind}</TableCell>
-      <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name}</TableCell>
-      <TableCell align="center">{opportunity.portOfLoadingGroupId?.name}</TableCell>
-      <TableCell align="center">{opportunity.portOfDischargeGroupId?.name}</TableCell>
-      <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name}</TableCell>
-      <TableCell align="center">{opportunity.commodityGroupId?.name}</TableCell>
-      <TableCell align="center">{opportunity.equipmentGroupId?.name}</TableCell>
+      <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
+      <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
+      <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.portOfLoadingGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.portOfDischargeGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.equipmentGroupId?.name || ''}</TableCell>
       <TableCell align="center">
         {opportunity.tagIds && opportunity.tagIds.length > 0
           ? opportunity.tagIds.map(tag => (
@@ -117,65 +119,87 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
                 variant="outlined"
               />
             ))
-          : 'Not specified'}
+          : ''}
       </TableCell>
       <TableCell align="center">
-        {opportunity.validity
-          ? new Date(opportunity.validity).toLocaleDateString()
-          : 'Not specified'}
+        {opportunity.validity ? new Date(opportunity.validity).toLocaleDateString() : ''}
       </TableCell>
-      <TableCell align="center">{opportunity.note}</TableCell>
-      <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
+      <TableCell align="center">{opportunity.note || ''}</TableCell>
+      <TableCell align="center">
+        {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}
+      </TableCell>
 
       <TableCell align="center">
-        <div style={{ minWidth: 80 }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-            <span style={{ fontSize: 12, marginRight: 6 }}>
-              {opportunity.booked !== null && opportunity.quoted !== null
-                ? `${opportunity.booked} / ${opportunity.quoted}`
-                : '—'}
-            </span>
+        {opportunity.capacityTEU && opportunity.capacityTEU > 0 ? (
+          <div style={{ minWidth: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 12, marginRight: 6 }}>
+                {opportunity.booked !== null && opportunity.quoted !== null
+                  ? `${opportunity.booked} / ${opportunity.quoted}`
+                  : '—'}
+              </span>
+              {opportunity.booked !== null &&
+                opportunity.quoted !== null &&
+                opportunity.quoted > 0 && (
+                  <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
+                    ({Math.round((opportunity.booked / opportunity.quoted) * 100)}%)
+                  </span>
+                )}
+            </div>
+            <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+              <div
+                style={{
+                  width:
+                    opportunity.booked !== null && opportunity.quoted
+                      ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
+                      : '0%',
+                  background: '#43a047',
+                  height: '100%',
+                  borderRadius: 4,
+                  transition: 'width 0.3s',
+                }}
+              />
+            </div>
           </div>
-          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
-            <div
-              style={{
-                width:
-                  opportunity.booked !== null && opportunity.quoted
-                    ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
-                    : '0%',
-                background: '#43a047',
-                height: '100%',
-                borderRadius: 4,
-                transition: 'width 0.3s',
-              }}
-            />
-          </div>
-        </div>
+        ) : (
+          ''
+        )}
       </TableCell>
       <TableCell align="center">
-        <div style={{ minWidth: 80 }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-            <span style={{ fontSize: 12, marginRight: 6 }}>
-              {opportunity.booked !== null && opportunity.capacityTEU
-                ? `${opportunity.booked} / ${opportunity.capacityTEU}`
-                : '—'}
-            </span>
+        {opportunity.capacityTEU && opportunity.capacityTEU > 0 ? (
+          <div style={{ minWidth: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 12, marginRight: 6 }}>
+                {opportunity.booked !== null && opportunity.capacityTEU
+                  ? `${opportunity.booked} / ${opportunity.capacityTEU}`
+                  : '—'}
+              </span>
+              {opportunity.booked !== null &&
+                opportunity.capacityTEU &&
+                opportunity.capacityTEU > 0 && (
+                  <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
+                    ({Math.round((opportunity.booked / opportunity.capacityTEU) * 100)}%)
+                  </span>
+                )}
+            </div>
+            <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+              <div
+                style={{
+                  width:
+                    opportunity.booked !== null && opportunity.capacityTEU
+                      ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
+                      : '0%',
+                  background: '#3f51b5',
+                  height: '100%',
+                  borderRadius: 4,
+                  transition: 'width 0.3s',
+                }}
+              />
+            </div>
           </div>
-          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
-            <div
-              style={{
-                width:
-                  opportunity.booked !== null && opportunity.capacityTEU
-                    ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
-                    : '0%',
-                background: '#3f51b5',
-                height: '100%',
-                borderRadius: 4,
-                transition: 'width 0.3s',
-              }}
-            />
-          </div>
-        </div>
+        ) : (
+          ''
+        )}
       </TableCell>
     </TableRow>
   );
@@ -199,7 +223,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, onRo
                   <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
                   <TableCell align="center">Sales Rep</TableCell>
                   <TableCell align="center">Booking Party</TableCell>
-                  <TableCell align="center">Statistical client</TableCell>
+                  <TableCell align="center">Statistical Client</TableCell>
                   <TableCell align="center">Agreement</TableCell>
                   <TableCell align="center">Quote Kind</TableCell>
                   <TableCell align="center">Place of Receipt</TableCell>
