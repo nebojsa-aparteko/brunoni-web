@@ -126,31 +126,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       </TableCell>
       <TableCell align="center">{opportunity.note}</TableCell>
       <TableCell align="center">{opportunity.capacityTEU} TEU</TableCell>
-      <TableCell align="center">
-        <div style={{ minWidth: 80 }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
-            <span style={{ fontSize: 12, marginRight: 6 }}>
-              {opportunity.booked !== null && opportunity.capacityTEU
-                ? `${opportunity.booked} / ${opportunity.capacityTEU}`
-                : '—'}
-            </span>
-          </div>
-          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
-            <div
-              style={{
-                width:
-                  opportunity.booked !== null && opportunity.capacityTEU
-                    ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
-                    : '0%',
-                background: '#3f51b5',
-                height: '100%',
-                borderRadius: 4,
-                transition: 'width 0.3s',
-              }}
-            />
-          </div>
-        </div>
-      </TableCell>
+
       <TableCell align="center">
         <div style={{ minWidth: 80 }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
@@ -168,6 +144,31 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
                     ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
                     : '0%',
                 background: '#43a047',
+                height: '100%',
+                borderRadius: 4,
+                transition: 'width 0.3s',
+              }}
+            />
+          </div>
+        </div>
+      </TableCell>
+      <TableCell align="center">
+        <div style={{ minWidth: 80 }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 12, marginRight: 6 }}>
+              {opportunity.booked !== null && opportunity.capacityTEU
+                ? `${opportunity.booked} / ${opportunity.capacityTEU}`
+                : '—'}
+            </span>
+          </div>
+          <div style={{ width: '100%', background: '#e0e0e0', borderRadius: 4, height: 8 }}>
+            <div
+              style={{
+                width:
+                  opportunity.booked !== null && opportunity.capacityTEU
+                    ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
+                    : '0%',
+                background: '#3f51b5',
                 height: '100%',
                 borderRadius: 4,
                 transition: 'width 0.3s',

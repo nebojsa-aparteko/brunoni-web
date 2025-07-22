@@ -1,6 +1,5 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { Grid, makeStyles, Paper, Button } from '@material-ui/core';
-import { flow, set } from 'lodash/fp';
 import Meta from '../Meta';
 import OpportunitiesFiltersBar from './OpportunitiesFiltersBar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
@@ -13,6 +12,8 @@ import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import useNormalizedOpportunity from '../../hooks/useNormalizedOpportunity';
 import AddOpportunityDialog from './AddOpportunityDialogue';
 import EditOpportunityDialog from './EditOpportunityDialog';
+import OpportunityUploadDialog from './OpportunityUploadDialog';
+
 interface Props {
   isAdmin?: boolean;
   archived?: boolean;
@@ -46,7 +47,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     useOpportunityListPaginationContext();
   const { searchString, page, rowsPerPage } = opportunityPaginationContextData;
 
-  // Filter opportunities based on selected filters
   const { assignee } = filters;
 
   const filteredOpportunities = useMemo(() => {
@@ -78,7 +78,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
         return false;
       }
 
-      // Places group filter
       if (
         filters.placesOfDeliveryGroup &&
         opportunity.placeOfDeliveryGroupId?.id !== filters.placesOfDeliveryGroup.id
@@ -118,31 +117,22 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     });
   }, [opportunities, filters]);
 
-  const handleSearch = useCallback(
-    (searchStringNew: string) => {
-      if (searchStringNew !== searchString && setOpportnityPaginationContextData) {
-        setOpportnityPaginationContextData(
-          flow(
-            set('searchString', searchStringNew),
-            set('page', 0),
-          )(opportunityPaginationContextData),
-        );
-      }
-    },
-    [opportunityPaginationContextData, searchString, setOpportnityPaginationContextData],
-  );
-
   const [openDialog, setOpenDialog] = useState(false);
   const [newOpportunityName, setNewOpportunityName] = useState('');
 
-  // Edit opportunity dialog state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<NormalizedOpportunity | null>(
     null,
   );
+
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const handleUploadDialog = () => {
-    console.debug('Open upload dialog');
+    setUploadDialogOpen(true);
   };
+  const handleCloseUploadDialog = () => {
+    setUploadDialogOpen(false);
+  };
+
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
@@ -151,7 +141,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
     setNewOpportunityName('');
   };
 
-  // Edit opportunity handlers
   const handleEditOpportunity = (opportunity: NormalizedOpportunity) => {
     setSelectedOpportunity(opportunity);
     setEditDialogOpen(true);
@@ -163,7 +152,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   };
 
   const handleUpdateOpportunity = (updatedOpportunity: NormalizedOpportunity) => {
-    // The dialog handles the Firebase update, this callback is for any additional UI updates
     console.debug('Opportunity updated:', updatedOpportunity);
     // You might want to refresh the data or update local state here if needed
   };
@@ -185,7 +173,12 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
           >
             Add Opportunity
           </Button>
-          <Button variant="contained" color="primary" onClick={handleUploadDialog}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUploadDialog}
+            style={{ marginRight: 8 }}
+          >
             Upload xlsx
           </Button>
 
@@ -200,6 +193,13 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
             onClose={handleCloseEditDialog}
             onUpdate={handleUpdateOpportunity}
             onDelete={handleDeleteOpportunity}
+          />
+          <OpportunityUploadDialog
+            isOpen={uploadDialogOpen}
+            handleClose={handleCloseUploadDialog}
+            onUploadComplete={() => {
+              console.debug('Upload completed - data should refresh automatically');
+            }}
           />
         </Grid>
         <Grid item md={12}>
