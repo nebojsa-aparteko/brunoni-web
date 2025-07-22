@@ -90,6 +90,7 @@ const CommodityGroupRow: React.FC<Props> = ({
           value={activeCommodityGroup.name}
           onChange={handleNameChange}
           placeholder="Group name"
+          variant="outlined"
           size="small"
           fullWidth
         />
