@@ -40,7 +40,7 @@ const OpportunityTagInput: React.FC<Props> = ({
       getOptionSelected={(option, value) => option.id === value.id}
       getOptionDisabled={option => disableInput && !selectedTags.some(tag => tag.id === option.id)}
       getOptionLabel={option => `${option.tag}`}
-      defaultValue={defaultValues}
+      value={value}
       onChange={handleChange}
       renderTags={value => value.map(option => <Chip key={option.id} label={option.tag} />)}
       renderOption={option => <Chip key={option.id} label={option.tag} />}

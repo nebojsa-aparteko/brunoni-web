@@ -79,6 +79,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
 
   // Pre-populate form fields when opportunity changes
   useEffect(() => {
+    console.debug('Editing opportunity:', opportunity);
     if (opportunity && open) {
       setSalesRep(opportunity.salesRepId || null);
       setBookingParty(opportunity.bookingPartyId || null);
