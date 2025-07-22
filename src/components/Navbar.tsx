@@ -289,7 +289,12 @@ const Navbar: React.FC = () => {
                   className={classes.logo}
                 />
               </Link>
-              <Box displayPrint="none" width="100%" display="flex">
+              <Box
+                displayPrint="none"
+                width="100%"
+                display="flex"
+                style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}
+              >
                 {user !== undefined && user !== null && (
                   <Fragment>
                     {actingAs !== null && <ButtonMenuItem primary="Dashboard" to="/" />}
@@ -315,6 +320,9 @@ const Navbar: React.FC = () => {
                     <ButtonMenuItem primary="Bookings" to="/bookings" />
                     {isDashboardUser(userRecord) && !actingAs && (
                       <ButtonMenuItem to="/client-statistics" primary="Statistics" />
+                    )}
+                    {isDashboardUser(userRecord) && !actingAs && (
+                      <ButtonMenuItem to="/opportunities" primary="Opportunities" />
                     )}
 
                     {actingAs !== null && (
@@ -367,6 +375,9 @@ const Navbar: React.FC = () => {
                           )}
                           <MenuItemLink onClick={handleMenuClose} to="/land-transport-config">
                             Land Transport Config
+                          </MenuItemLink>
+                          <MenuItemLink onClick={handleMenuClose} to="/opportunities-config">
+                            Opportunities Config
                           </MenuItemLink>
                         </Menu>
                         {/*<ButtonMenuItem primary="Side Charges" to="/charges" />*/}
