@@ -35,6 +35,7 @@ export interface OpportunityCounter {
   entity: 'booking' | 'quote';
   month: string;
   year: number;
+  teuCount?: number;
 }
 
 export interface NormalizedOpportunity {
@@ -56,6 +57,8 @@ export interface NormalizedOpportunity {
   capacityTEU: number;
   booked: number; // Sum of booking counts for current year
   quoted: number; // Sum of quote counts for current year
+  bookedTEU: number; // Sum of TEU counts for bookings in current year
+  quotedTEU: number; // Sum of TEU counts for quotes in current year
 }
 
 export interface OpportunityMatch {

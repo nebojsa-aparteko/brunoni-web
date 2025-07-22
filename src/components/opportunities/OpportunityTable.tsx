@@ -50,12 +50,12 @@ const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
     case 'capacityTEU':
       return opportunity.capacityTEU || 0;
     case 'quotedProgress':
-      return opportunity.quoted && opportunity.capacityTEU
-        ? opportunity.quoted / opportunity.capacityTEU
+      return opportunity.booked && opportunity.quoted && opportunity.capacityTEU
+        ? opportunity.booked / opportunity.quoted
         : 0;
     case 'bookedProgress':
-      return opportunity.booked && opportunity.capacityTEU
-        ? opportunity.booked / opportunity.capacityTEU
+      return opportunity.bookedTEU && opportunity.capacityTEU
+        ? opportunity.bookedTEU / opportunity.capacityTEU
         : 0;
     case 'note':
       return opportunity.note || '';
@@ -262,15 +262,15 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.booked !== null && opportunity.capacityTEU
-                  ? `${opportunity.booked} / ${opportunity.capacityTEU}`
+                {opportunity.bookedTEU !== null && opportunity.capacityTEU
+                  ? `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
                   : '—'}
               </span>
-              {opportunity.booked !== null &&
+              {opportunity.bookedTEU !== null &&
                 opportunity.capacityTEU &&
                 opportunity.capacityTEU > 0 && (
                   <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
-                    ({Math.round((opportunity.booked / opportunity.capacityTEU) * 100)}%)
+                    ({Math.round((opportunity.bookedTEU / opportunity.capacityTEU) * 100)}%)
                   </span>
                 )}
             </div>

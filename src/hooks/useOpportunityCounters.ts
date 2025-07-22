@@ -6,6 +6,8 @@ interface OpportunityCounters {
   [opportunityId: string]: {
     booked: number;
     quoted: number;
+    bookedTEU?: number;
+    quotedTEU?: number;
   };
 }
 
@@ -53,13 +55,21 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
 
           let booked = 0;
           let quoted = 0;
+          let bookedTEU: number | null = null;
+          let quotedTEU: number | null = null;
 
           countersSnapshot.docs.forEach(doc => {
             const counter = doc.data() as OpportunityCounter;
             if (counter.entity === 'booking') {
               booked += counter.count || 0;
+              if (counter.teuCount) {
+                bookedTEU = (bookedTEU || 0) + counter.teuCount;
+              }
             } else if (counter.entity === 'quote') {
               quoted += counter.count || 0;
+              if (counter.teuCount) {
+                quotedTEU = (quotedTEU || 0) + counter.teuCount;
+              }
             }
           });
 
@@ -67,6 +77,8 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
             opportunityId,
             booked,
             quoted,
+            bookedTEU,
+            quotedTEU,
           };
         } catch (error) {
           console.error(`Error fetching counters for opportunity ${opportunityId}:`, error);
@@ -74,6 +86,8 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
             opportunityId,
             booked: 0,
             quoted: 0,
+            bookedTEU: null,
+            quotedTEU: null,
           };
         }
       });
