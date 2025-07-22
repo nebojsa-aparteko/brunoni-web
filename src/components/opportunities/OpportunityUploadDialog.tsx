@@ -17,6 +17,7 @@ import useUser from '../../hooks/useUser';
 import DropZoneArea from '../dropzone/DropZoneArea';
 import useGlobalAppState from '../../hooks/useGlobalAppState';
 import { tryGetErrorMessage } from '../../utilities/errorHelper';
+import { de } from 'date-fns/locale';
 
 const useStyles = makeStyles(theme =>
   createStyles({
@@ -157,7 +158,10 @@ const OpportunityUploadDialog: React.FC<OpportunityUploadDialogProps> = ({
         handleClose();
       } else {
         const errorData = await response.json().catch(() => ({ message: response.statusText }));
-        throw new Error(errorData.message || `Upload failed: ${response.statusText}`);
+        console.debug('Upload error:', errorData);
+        const errorMessage = errorData.errors.join('/n ');
+        console.debug('Upload error message:', errorMessage);
+        throw new Error(errorMessage || `Upload failed: ${response.statusText}`);
       }
     } catch (error) {
       dispatch({
