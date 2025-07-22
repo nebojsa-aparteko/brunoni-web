@@ -278,8 +278,8 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               <div
                 style={{
                   width:
-                    opportunity.booked !== null && opportunity.capacityTEU
-                      ? `${Math.min((opportunity.booked / opportunity.capacityTEU) * 100, 100)}%`
+                    opportunity.bookedTEU !== null && opportunity.capacityTEU
+                      ? `${Math.min((opportunity.bookedTEU / opportunity.capacityTEU) * 100, 100)}%`
                       : '0%',
                   background: '#3f51b5',
                   height: '100%',
