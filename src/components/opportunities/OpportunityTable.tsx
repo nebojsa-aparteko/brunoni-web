@@ -9,12 +9,81 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
 } from '@material-ui/core';
 import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
+
+const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
+  switch (key) {
+    case 'salesRep':
+      return opportunity.salesRepId
+        ? `${opportunity.salesRepId.lastName} ${opportunity.salesRepId.firstName}`
+        : '';
+    case 'bookingParty':
+      return opportunity.bookingPartyId?.name || '';
+    case 'statisticalClient':
+      return opportunity.statisticalClientId?.name || '';
+    case 'agreement':
+      return opportunity.agreementId || '';
+    case 'quoteKind':
+      return opportunity.quoteKind || '';
+    case 'placeOfReceipt':
+      return opportunity.placeOfReceiptGroupId?.name || '';
+    case 'portOfLoading':
+      return opportunity.portOfLoadingGroupId?.name || '';
+    case 'portOfDischarge':
+      return opportunity.portOfDischargeGroupId?.name || '';
+    case 'placeOfDelivery':
+      return opportunity.placeOfDeliveryGroupId?.name || '';
+    case 'commodityGroup':
+      return opportunity.commodityGroupId?.name || '';
+    case 'equipmentGroup':
+      return opportunity.equipmentGroupId?.name || '';
+    case 'tags':
+      return opportunity.tagIds?.length || 0;
+    case 'validity':
+      return opportunity.validity ? new Date(opportunity.validity).getTime() : 0;
+    case 'capacityTEU':
+      return opportunity.capacityTEU || 0;
+    case 'quotedProgress':
+      return opportunity.quoted && opportunity.capacityTEU
+        ? opportunity.quoted / opportunity.capacityTEU
+        : 0;
+    case 'bookedProgress':
+      return opportunity.booked && opportunity.capacityTEU
+        ? opportunity.booked / opportunity.capacityTEU
+        : 0;
+    case 'note':
+      return opportunity.note || '';
+    default:
+      return '';
+  }
+};
+
+const sortOpportunities = (
+  opportunities: NormalizedOpportunity[],
+  sortConfig: SortConfig,
+): NormalizedOpportunity[] => {
+  if (!sortConfig.key) return opportunities;
+
+  return [...opportunities].sort((a, b) => {
+    const aValue = getSortValue(a, sortConfig.key);
+    const bValue = getSortValue(b, sortConfig.key);
+
+    let comparison = 0;
+    if (aValue > bValue) {
+      comparison = 1;
+    } else if (aValue < bValue) {
+      comparison = -1;
+    }
+
+    return sortConfig.direction === 'desc' ? -comparison : comparison;
+  });
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,9 +139,18 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+export type SortOrder = 'asc' | 'desc';
+
+export interface SortConfig {
+  key: string;
+  direction: SortOrder;
+}
+
 interface OpportunityTableProps {
   opportunities: NormalizedOpportunity[] | undefined;
   onRowClick?: (opportunity: NormalizedOpportunity) => void;
+  sortConfig?: SortConfig;
+  onSort?: (key: string) => void;
 }
 
 interface OpportunityTableRowProps {
@@ -80,10 +158,37 @@ interface OpportunityTableRowProps {
   onRowClick?: (opportunity: NormalizedOpportunity) => void;
 }
 
+interface SortableHeaderProps {
+  sortKey: string;
+  children: React.ReactNode;
+  sortConfig?: SortConfig;
+  onSort?: (key: string) => void;
+}
+
+const SortableHeader: React.FC<SortableHeaderProps> = ({
+  sortKey,
+  children,
+  sortConfig,
+  onSort,
+}) => {
+  const active = sortConfig?.key === sortKey;
+  const direction = active ? sortConfig.direction : 'asc';
+
+  const handleClick = () => {
+    onSort?.(sortKey);
+  };
+
+  return (
+    <TableCell align="center">
+      <TableSortLabel active={active} direction={direction} onClick={handleClick}>
+        {children}
+      </TableSortLabel>
+    </TableCell>
+  );
+};
+
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
   const classes = useStyles();
-  const booked = 0;
-  const quoted = 0;
 
   const handleRowClick = () => {
     onRowClick?.(opportunity);
@@ -205,8 +310,16 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
   );
 };
 
-const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, onRowClick }) => {
-  const displayOpportunities = opportunities || [];
+const OpportunityTable: React.FC<OpportunityTableProps> = ({
+  opportunities,
+  onRowClick,
+  sortConfig,
+  onSort,
+}) => {
+  const baseOpportunities = opportunities || [];
+  const displayOpportunities = sortConfig
+    ? sortOpportunities(baseOpportunities, sortConfig)
+    : baseOpportunities;
 
   return (
     <Fragment>
@@ -221,23 +334,61 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({ opportunities, onRo
               <TableHead>
                 <TableRow>
                   <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
-                  <TableCell align="center">Sales Rep</TableCell>
-                  <TableCell align="center">Booking Party</TableCell>
-                  <TableCell align="center">Statistical Client</TableCell>
-                  <TableCell align="center">Agreement</TableCell>
-                  <TableCell align="center">Quote Kind</TableCell>
-                  <TableCell align="center">Place of Receipt</TableCell>
-                  <TableCell align="center">Port of Loading</TableCell>
-                  <TableCell align="center">Port of Discharge</TableCell>
-                  <TableCell align="center">Place of Delivery</TableCell>
-                  <TableCell align="center">Commodity Groups</TableCell>
-                  <TableCell align="center">Equipment Groups</TableCell>
-                  <TableCell align="center">Tags</TableCell>
-                  <TableCell align="center">Validity</TableCell>
-                  <TableCell align="center">Note</TableCell>
-                  <TableCell align="center">Potential</TableCell>
-                  <TableCell align="center">Quoted</TableCell>
-                  <TableCell align="center">Booked</TableCell>
+                  <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
+                    Sales Rep
+                  </SortableHeader>
+                  <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
+                    Booking Party
+                  </SortableHeader>
+                  <SortableHeader
+                    sortKey="statisticalClient"
+                    sortConfig={sortConfig}
+                    onSort={onSort}
+                  >
+                    Statistical Client
+                  </SortableHeader>
+                  <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
+                    Agreement
+                  </SortableHeader>
+                  <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
+                    Quote Kind
+                  </SortableHeader>
+                  <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
+                    Place of Receipt
+                  </SortableHeader>
+                  <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
+                    Port of Loading
+                  </SortableHeader>
+                  <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
+                    Port of Discharge
+                  </SortableHeader>
+                  <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
+                    Place of Delivery
+                  </SortableHeader>
+                  <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
+                    Commodity Groups
+                  </SortableHeader>
+                  <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
+                    Equipment Groups
+                  </SortableHeader>
+                  <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
+                    Tags
+                  </SortableHeader>
+                  <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
+                    Validity
+                  </SortableHeader>
+                  <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
+                    Note
+                  </SortableHeader>
+                  <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
+                    Potential
+                  </SortableHeader>
+                  <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
+                    Quoted
+                  </SortableHeader>
+                  <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
+                    Booked
+                  </SortableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>

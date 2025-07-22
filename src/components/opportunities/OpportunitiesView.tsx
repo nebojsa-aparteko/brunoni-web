@@ -6,7 +6,7 @@ import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { useOpportunitiesListFilterContext } from '../../providers/OpportunitiesFilterProvider';
 import { useOpportunityListPaginationContext } from '../../providers/OpportunityListPaginationProvider';
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
-import OpportunityTable from './OpportunityTable';
+import OpportunityTable, { SortConfig } from './OpportunityTable';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import useNormalizedOpportunity from '../../hooks/useNormalizedOpportunity';
@@ -126,6 +126,17 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
   );
 
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: 'asc' });
+
+  const handleSort = (key: string) => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
   const handleUploadDialog = () => {
     setUploadDialogOpen(true);
   };
@@ -228,6 +239,8 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
               <OpportunityTable
                 opportunities={filteredOpportunities}
                 onRowClick={handleEditOpportunity}
+                sortConfig={sortConfig}
+                onSort={handleSort}
               />
             )}
           </Fragment>
