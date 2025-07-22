@@ -27,6 +27,12 @@ export default function useFirestoreCollection(
       return;
     }
 
+    console.debug(
+      'useFirestoreCollection setting up listener for',
+      name,
+      documentPath ? `/${documentPath}/${subCollection}` : '',
+    );
+
     const cleanup = (async () => {
       try {
         const collectionReference =
@@ -61,6 +67,11 @@ export default function useFirestoreCollection(
     })();
 
     return () => {
+      console.debug(
+        'useFirestoreCollection cleaning up listener for',
+        name,
+        documentPath ? `/${documentPath}/${subCollection}` : '',
+      );
       if (cleanup) {
         cleanup
           .then(result => {
@@ -69,7 +80,7 @@ export default function useFirestoreCollection(
           .catch(error => console.error('cleanup error', error));
       }
     };
-  }, [name, query, documentPath, subCollection, setSnapshot]);
+  }, [name, query, documentPath, subCollection]);
 
   return snapshot;
 }
