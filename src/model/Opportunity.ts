@@ -9,6 +9,7 @@ import Client from '../model/Client';
 // opportunities Firestore collection
 export interface Opportunity {
   id: string;
+  opportunityId: string; // Unique identifier for the opportunity
   salesRepId: string; // User ID of the sales representative
   bookingPartyId: string; // Client is always Booking Party for Import & Export
   statisticalClientId: string; // Export = Shipper, Import = Consignee
@@ -39,6 +40,7 @@ export interface OpportunityCounter {
 
 export interface NormalizedOpportunity {
   id: string;
+  opportunityId: string; // Unique identifier for the opportunity
   salesRepId: UserRecord | null; // Normalized user object or null
   bookingPartyId: Client | null; // Normalized client object or null
   statisticalClientId: Client | null; // Normalized client object or null

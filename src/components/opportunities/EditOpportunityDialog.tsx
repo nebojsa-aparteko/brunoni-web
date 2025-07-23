@@ -19,7 +19,8 @@ import useOpportunityTags from '../../hooks/useOpportunityTags';
 import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
 import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
 import useClients from '../../hooks/useClients';
-import UserRecordsContext from '../../contexts/UserRecordsContext';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserInput from '../inputs/UserInput';
 import firebase from '../../firebase';
 import { NormalizedOpportunity } from '../../model/Opportunity';
@@ -74,7 +75,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const opportunityTags = useOpportunityTags();
   const commodityGroups = useOpportunityCommodityGroups();
   const equipmentGroups = useOpportunityEquipmentGroups();
-  const users = useContext(UserRecordsContext);
+  const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
 
   // Pre-populate form fields when opportunity changes

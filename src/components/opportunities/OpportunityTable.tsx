@@ -196,27 +196,23 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
 
   return (
     <TableRow hover className={classes.tableRow} tabIndex={-1} onClick={handleRowClick}>
-      <TableCell padding="checkbox"></TableCell>
-      <TableCell align="center">
-        {opportunity.salesRepId
-          ? `${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`
-          : ''}
+      <TableCell component="th" scope="row" style={{ paddingLeft: 4 }}>
+        {opportunity.opportunityId}
       </TableCell>
       <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
-      <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
       <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.portOfLoadingGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.portOfDischargeGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.equipmentGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
+      <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
 
       <TableCell align="center">
         {opportunity.validity ? new Date(opportunity.validity).toLocaleDateString() : ''}
       </TableCell>
-      <TableCell align="center">{opportunity.note || ''}</TableCell>
       <TableCell align="center">
         {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}
       </TableCell>
@@ -293,6 +289,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           ''
         )}
       </TableCell>
+      <TableCell align="center">{opportunity.note || ''}</TableCell>
       <TableCell align="center">
         {opportunity.tagIds && opportunity.tagIds.length > 0
           ? opportunity.tagIds.map(tag => (
@@ -305,6 +302,11 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
                 variant="outlined"
               />
             ))
+          : ''}
+      </TableCell>
+      <TableCell align="center">
+        {opportunity.salesRepId
+          ? `${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`
           : ''}
       </TableCell>
     </TableRow>
@@ -334,49 +336,45 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
             <Table aria-label="opportunities table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="left" style={{ paddingLeft: 4 }}></TableCell>
-                  <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
-                    Sales Representative
+                  <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
+                    ID
                   </SortableHeader>
                   <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
-                    Booking Party
+                    B/Party
                   </SortableHeader>
                   <SortableHeader
                     sortKey="statisticalClient"
                     sortConfig={sortConfig}
                     onSort={onSort}
                   >
-                    Statistical Client
+                    S/Client
+                  </SortableHeader>
+                  <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
+                    PLR
+                  </SortableHeader>
+                  <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
+                    POL
+                  </SortableHeader>
+                  <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
+                    POD
+                  </SortableHeader>
+                  <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
+                    PLD
+                  </SortableHeader>
+                  <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
+                    Equipment
+                  </SortableHeader>
+                  <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
+                    Commodity
+                  </SortableHeader>
+                  <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
+                    Quote
                   </SortableHeader>
                   <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
                     Agreement
                   </SortableHeader>
-                  <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
-                    Quote Kind
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
-                    Place of Receipt
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
-                    Port of Loading
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
-                    Port of Discharge
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
-                    Place of Delivery
-                  </SortableHeader>
-                  <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Commodity Groups
-                  </SortableHeader>
-                  <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Equipment Groups
-                  </SortableHeader>
                   <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
                     Validity
-                  </SortableHeader>
-                  <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
-                    Note
                   </SortableHeader>
                   <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
                     Potential
@@ -387,8 +385,14 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                   <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
                     Booked
                   </SortableHeader>
+                  <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
+                    Note
+                  </SortableHeader>
                   <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
                     Tags
+                  </SortableHeader>
+                  <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
+                    S/Rep
                   </SortableHeader>
                 </TableRow>
               </TableHead>

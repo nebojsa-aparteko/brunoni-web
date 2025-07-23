@@ -22,8 +22,9 @@ import UserInput from '../inputs/UserInput';
 import Client from '../../model/Client';
 import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
+import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
+import useAdminUsers from '../../hooks/useAdminUsers';
 
-import userRecords from '../../contexts/UserRecordsContext';
 interface Props {
   filters: OpportunitiesContextFilters;
   setFilters: any;
@@ -41,7 +42,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const opportunityTags = useOpportunityTags();
   const commodityGroups = useOpportunityCommodityGroups();
   const equipmentGroups = useOpportunityEquipmentGroups();
-  const users = useContext(userRecords);
+  const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
   const {
     statisticalClient,

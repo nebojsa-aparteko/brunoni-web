@@ -19,7 +19,8 @@ import useOpportunityTags from '../../hooks/useOpportunityTags';
 import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
 import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
 import useClients from '../../hooks/useClients';
-import userRecords from '../../contexts/UserRecordsContext';
+import useAdminUsers from '../../hooks/useAdminUsers';
+import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserInput from '../inputs/UserInput';
 import firebase from '../../firebase';
 import Client from '../../model/Client';
@@ -63,7 +64,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const opportunityTags = useOpportunityTags();
   const commodityGroupsOptions = useOpportunityCommodityGroups();
   const equipmentGroupsOptions = useOpportunityEquipmentGroups();
-  const users = useContext(userRecords);
+  const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
 
   useEffect(() => {
