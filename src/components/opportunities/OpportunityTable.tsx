@@ -19,6 +19,8 @@ import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
 const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
   switch (key) {
+    case 'id':
+      return opportunity.opportunityId || '';
     case 'salesRep':
       return opportunity.salesRepId
         ? `${opportunity.salesRepId.lastName} ${opportunity.salesRepId.firstName}`
