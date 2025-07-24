@@ -1,17 +1,13 @@
 import React, { Fragment } from 'react';
-import {
-  Chip,
-  createStyles,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-} from '@material-ui/core';
-import { lighten, makeStyles, Theme } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableBody from '@material-ui/core/TableBody';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import { Chip, Paper, makeStyles, Theme } from '@material-ui/core';
+import clsx from 'clsx';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 
@@ -87,60 +83,6 @@ const sortOpportunities = (
   });
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    toolbarRoot: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-    },
-    toolbarHighlight:
-      theme.palette.type === 'light'
-        ? {
-            color: theme.palette.secondary.main,
-            backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-          }
-        : {
-            color: theme.palette.secondary.dark,
-            backgroundColor: theme.palette.secondary.dark,
-          },
-    toolbarTitle: {
-      flex: '1 1 100%',
-    },
-    closeModal: {
-      position: 'absolute',
-      top: '5px',
-      right: '12px',
-      width: '47px',
-      height: '47px',
-    },
-    dialogBody: {
-      width: theme.spacing(100),
-    },
-    dialogContent: {
-      paddingBottom: theme.spacing(3),
-    },
-    tableRow: {
-      cursor: 'pointer',
-      '&:hover': {
-        backgroundColor: 'rgba(161,213,255,0.20) !important',
-      },
-    },
-    progress: {
-      backgroundColor: '#e0e0e0',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      height: '8px',
-      width: '100%',
-      marginTop: '4px',
-    },
-    progressBar: {
-      height: '100%',
-      backgroundColor: '#3f51b5',
-      transition: 'width 0.3s ease-in-out',
-    },
-  }),
-);
-
 export type SortOrder = 'asc' | 'desc';
 
 export interface SortConfig {
@@ -173,6 +115,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   sortConfig,
   onSort,
 }) => {
+  const classes = opportunityTableStyles();
   const active = sortConfig?.key === sortKey;
   const direction = active ? sortConfig.direction : 'asc';
 
@@ -181,7 +124,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   };
 
   return (
-    <TableCell align="center">
+    <TableCell align="center" className={classes.headerCell}>
       <TableSortLabel active={active} direction={direction} onClick={handleClick}>
         {children}
       </TableSortLabel>
@@ -190,14 +133,14 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
 };
 
 const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, onRowClick }) => {
-  const classes = useStyles();
+  const classes = opportunityTableStyles();
 
   const handleRowClick = () => {
     onRowClick?.(opportunity);
   };
 
   return (
-    <TableRow hover className={classes.tableRow} tabIndex={-1} onClick={handleRowClick}>
+    <TableRow hover className={classes.row} tabIndex={-1} onClick={handleRowClick}>
       <TableCell component="th" scope="row" style={{ paddingLeft: 4 }}>
         {opportunity.opportunityId}
       </TableCell>
@@ -321,6 +264,7 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
   sortConfig,
   onSort,
 }) => {
+  const classes = opportunityTableStyles();
   const baseOpportunities = opportunities || [];
   const displayOpportunities = sortConfig
     ? sortOpportunities(baseOpportunities, sortConfig)
@@ -333,90 +277,144 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
           message={'No opportunities found for your filter criteria. Try changing filters.'}
         />
       ) : (
-        <Paper>
-          <TableContainer component={Paper}>
-            <Table aria-label="opportunities table">
-              <TableHead>
-                <TableRow>
-                  <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
-                    ID
-                  </SortableHeader>
-                  <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
-                    B/Party
-                  </SortableHeader>
-                  <SortableHeader
-                    sortKey="statisticalClient"
-                    sortConfig={sortConfig}
-                    onSort={onSort}
-                  >
-                    S/Client
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
-                    PLR
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
-                    POL
-                  </SortableHeader>
-                  <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
-                    POD
-                  </SortableHeader>
-                  <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
-                    PLD
-                  </SortableHeader>
-                  <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Equipment
-                  </SortableHeader>
-                  <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
-                    Commodity
-                  </SortableHeader>
-                  <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
-                    Quote
-                  </SortableHeader>
-                  <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
-                    Agreement
-                  </SortableHeader>
-                  <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
-                    Validity
-                  </SortableHeader>
-                  <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
-                    Potential
-                  </SortableHeader>
-                  <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
-                    Quoted
-                  </SortableHeader>
-                  <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
-                    Booked
-                  </SortableHeader>
-                  <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
-                    Note
-                  </SortableHeader>
-                  <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
-                    Tags
-                  </SortableHeader>
-                  <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
-                    S/Rep
-                  </SortableHeader>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {displayOpportunities ? (
-                  displayOpportunities.map(opportunity => (
-                    <OpportunityTableRow
-                      key={opportunity.id}
-                      opportunity={opportunity}
-                      onRowClick={onRowClick}
-                    />
-                  ))
-                ) : (
-                  <ChartsCircularProgress />
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        <TableContainer className={classes.container}>
+          <Table
+            stickyHeader
+            size="small"
+            aria-label="opportunities table"
+            className={classes.root}
+          >
+            <TableHead className={classes.table}>
+              <TableRow>
+                <SortableHeader sortKey="id" sortConfig={sortConfig} onSort={onSort}>
+                  ID
+                </SortableHeader>
+                <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
+                  B/Party
+                </SortableHeader>
+                <SortableHeader sortKey="statisticalClient" sortConfig={sortConfig} onSort={onSort}>
+                  S/Client
+                </SortableHeader>
+                <SortableHeader sortKey="placeOfReceipt" sortConfig={sortConfig} onSort={onSort}>
+                  PLR
+                </SortableHeader>
+                <SortableHeader sortKey="portOfLoading" sortConfig={sortConfig} onSort={onSort}>
+                  POL
+                </SortableHeader>
+                <SortableHeader sortKey="portOfDischarge" sortConfig={sortConfig} onSort={onSort}>
+                  POD
+                </SortableHeader>
+                <SortableHeader sortKey="placeOfDelivery" sortConfig={sortConfig} onSort={onSort}>
+                  PLD
+                </SortableHeader>
+                <SortableHeader sortKey="equipmentGroup" sortConfig={sortConfig} onSort={onSort}>
+                  Equipment
+                </SortableHeader>
+                <SortableHeader sortKey="commodityGroup" sortConfig={sortConfig} onSort={onSort}>
+                  Commodity
+                </SortableHeader>
+                <SortableHeader sortKey="quoteKind" sortConfig={sortConfig} onSort={onSort}>
+                  Quote
+                </SortableHeader>
+                <SortableHeader sortKey="agreement" sortConfig={sortConfig} onSort={onSort}>
+                  Agreement
+                </SortableHeader>
+                <SortableHeader sortKey="validity" sortConfig={sortConfig} onSort={onSort}>
+                  Validity
+                </SortableHeader>
+                <SortableHeader sortKey="capacityTEU" sortConfig={sortConfig} onSort={onSort}>
+                  Potential
+                </SortableHeader>
+                <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
+                  Quoted
+                </SortableHeader>
+                <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
+                  Booked
+                </SortableHeader>
+                <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
+                  Note
+                </SortableHeader>
+                <SortableHeader sortKey="tags" sortConfig={sortConfig} onSort={onSort}>
+                  Tags
+                </SortableHeader>
+                <SortableHeader sortKey="salesRep" sortConfig={sortConfig} onSort={onSort}>
+                  S/Rep
+                </SortableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody className={classes.table}>
+              {displayOpportunities ? (
+                displayOpportunities.map(opportunity => (
+                  <OpportunityTableRow
+                    key={opportunity.id}
+                    opportunity={opportunity}
+                    onRowClick={onRowClick}
+                  />
+                ))
+              ) : (
+                <ChartsCircularProgress />
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Fragment>
   );
 };
 
 export default OpportunityTable;
+
+const opportunityTableStyles = makeStyles((theme: Theme) => ({
+  container: {
+    marginBottom: theme.spacing(3),
+  },
+  row: {
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: 'rgba(161,213,255,0.20) !important',
+      '& > td': {
+        backgroundColor: 'inherit',
+      },
+    },
+  },
+  defaultCell: {
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor: 'white',
+  },
+  statusCell: {
+    alignItems: 'center',
+    fontSize: theme.typography.caption.fontSize,
+    borderCollapse: 'collapse',
+  },
+  headerCell: {
+    fontSize: theme.typography.caption.fontSize,
+    backgroundColor: theme.palette.grey['100'],
+  },
+  cityCell: {
+    fontSize: theme.typography.caption.fontSize,
+  },
+  borderRight: {
+    borderRight: `3px solid ${theme.palette.divider}`,
+  },
+  tightCell: {
+    lineHeight: 1,
+  },
+  stickySide: {
+    position: 'sticky',
+    left: 0,
+    zIndex: 3,
+  },
+  hoverColorControl: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  list: {
+    minWidth: '20rem',
+  },
+  root: {
+    position: 'relative',
+    left: theme.spacing(3),
+    paddingRight: theme.spacing(3),
+    border: `1px solid ${theme.palette.divider}`,
+  },
+  table: {},
+}));
