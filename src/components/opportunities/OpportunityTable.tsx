@@ -6,7 +6,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableBody from '@material-ui/core/TableBody';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Chip, Paper, makeStyles, Theme } from '@material-ui/core';
+import { Chip, Paper, makeStyles, Theme, Tooltip, IconButton } from '@material-ui/core';
+import { Notes as NotesIcon } from '@material-ui/icons';
 import clsx from 'clsx';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
@@ -234,7 +235,22 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           ''
         )}
       </TableCell>
-      <TableCell align="center">{opportunity.note || ''}</TableCell>
+      <TableCell align="center">
+        {opportunity.note ? (
+          <Tooltip
+            title={opportunity.note}
+            arrow
+            placement="top"
+            classes={{ tooltip: classes.largeTooltip }}
+          >
+            <IconButton size="small">
+              <NotesIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          ''
+        )}
+      </TableCell>
       <TableCell align="center">
         {opportunity.tagIds && opportunity.tagIds.length > 0
           ? opportunity.tagIds.map(tag => (
@@ -379,19 +395,20 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
   },
   defaultCell: {
     border: `1px solid ${theme.palette.divider}`,
+    fontSize: theme.typography.body2.fontSize,
     backgroundColor: 'white',
   },
   statusCell: {
     alignItems: 'center',
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: theme.typography.body2.fontSize,
     borderCollapse: 'collapse',
   },
   headerCell: {
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: theme.typography.body2.fontSize,
     backgroundColor: theme.palette.grey['100'],
   },
   cityCell: {
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: theme.typography.body2.fontSize,
   },
   borderRight: {
     borderRight: `3px solid ${theme.palette.divider}`,
@@ -417,4 +434,8 @@ const opportunityTableStyles = makeStyles((theme: Theme) => ({
     border: `1px solid ${theme.palette.divider}`,
   },
   table: {},
+  largeTooltip: {
+    fontSize: theme.typography.body1.fontSize,
+    maxWidth: 300,
+  },
 }));
