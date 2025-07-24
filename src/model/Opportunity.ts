@@ -6,6 +6,9 @@ import { OpportunityTag } from '../model/OpportunityTag';
 import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 
+export const QUOTE_KIND_OPTIONS = ['SPOT', 'QUARTERLY', 'TENDER'] as const;
+export type QuoteKind = (typeof QUOTE_KIND_OPTIONS)[number];
+
 // opportunities Firestore collection
 export interface Opportunity {
   id: string;

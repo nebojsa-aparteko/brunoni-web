@@ -29,6 +29,7 @@ import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup
 import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -162,14 +163,14 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           value={agreementId}
           onChange={e => setAgreementId(e.target.value)}
         />
-        <TextField
-          margin="dense"
-          label="Quote Kind"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={quoteKind}
-          onChange={e => setQuoteKind(e.target.value)}
+        <Autocomplete
+          options={[...QUOTE_KIND_OPTIONS]}
+          getOptionLabel={option => option}
+          value={quoteKind || null}
+          onChange={(_, value) => setQuoteKind(value || '')}
+          renderInput={params => (
+            <TextField {...params} label="Quote Kind" margin="dense" variant="outlined" />
+          )}
         />
         <OpportunityEquipmentGroupInput
           label="Equipment Groups"
