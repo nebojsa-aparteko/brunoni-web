@@ -24,6 +24,9 @@ import ClientInput from '../inputs/ClientInput';
 import useClients from '../../hooks/useClients';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import useAdminUsers from '../../hooks/useAdminUsers';
+import { QUOTE_KIND_OPTIONS, QuoteKind } from '../../model/Opportunity';
+import { TextField } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 interface Props {
   filters: OpportunitiesContextFilters;
@@ -55,6 +58,8 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
     commodityGroup: selectedCommodityGroup,
     equipmentGroup: selectedEquipmentGroup,
     assignee,
+    quoteKind,
+    opportunityId,
   } = filters;
 
   const setStatisticalClient = (client: Client | null | undefined) =>
@@ -87,6 +92,12 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const setUserFilter = (user: UserRecord | null | undefined) =>
     setFilters && setFilters(set('assignee', user || undefined)(filters));
 
+  const setQuoteKindFilter = (quoteKind: QuoteKind | null | undefined) =>
+    setFilters && setFilters(set('quoteKind', quoteKind || undefined)(filters));
+
+  const setOpportunityIdFilter = (opportunityId: string) =>
+    setFilters && setFilters(set('opportunityId', opportunityId || undefined)(filters));
+
   return (
     <Box
       display="flex"
@@ -97,6 +108,16 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
       alignContent="space-around"
     >
       <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <TextField
+            label="Opportunity ID"
+            variant="outlined"
+            fullWidth
+            value={opportunityId || ''}
+            onChange={e => setOpportunityIdFilter(e.target.value)}
+            placeholder="Search by ID..."
+          />
+        </Grid>
         {clients && (
           <Grid item sm={3} xs={12}>
             <Box display="flex">
@@ -204,6 +225,17 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
             />
           </Grid>
         )}
+        <Grid item sm={3} xs={12}>
+          <Autocomplete
+            options={[...QUOTE_KIND_OPTIONS]}
+            getOptionLabel={(option: string) => option}
+            value={quoteKind || null}
+            onChange={(_, value: string | null) => setQuoteKindFilter(value as QuoteKind)}
+            renderInput={(params: any) => (
+              <TextField {...params} label="Quote Kind" variant="outlined" />
+            )}
+          />
+        </Grid>
       </Grid>
     </Box>
   );

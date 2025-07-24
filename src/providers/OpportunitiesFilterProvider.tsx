@@ -7,6 +7,7 @@ import { OpportunityEquipmentGroup } from '../model/OpportunityEquipmentGroup';
 import { ContextFilters } from './filterActions';
 import useUser from '../hooks/useUser';
 import Client from '../model/Client';
+import { QuoteKind } from '../model/Opportunity';
 
 export interface OpportunitiesContextFilters extends ContextFilters {
   statisticalClient?: Client | null;
@@ -18,6 +19,8 @@ export interface OpportunitiesContextFilters extends ContextFilters {
   tags?: OpportunityTag[];
   commodityGroup?: OpportunityCommodityGroup;
   equipmentGroup?: OpportunityEquipmentGroup;
+  quoteKind?: QuoteKind;
+  opportunityId?: string;
 }
 
 export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
@@ -30,6 +33,8 @@ export const OPPORTUNITIES_FILTERS_INITIAL_STATE = {
   tags: [],
   commodityGroup: undefined,
   equipmentGroup: undefined,
+  quoteKind: undefined,
+  opportunityId: undefined,
 } as OpportunitiesContextFilters;
 
 const OpportunitiesFilterContext = createContext<

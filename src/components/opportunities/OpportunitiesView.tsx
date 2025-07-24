@@ -113,6 +113,18 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
         return false;
       }
 
+      if (filters.quoteKind && opportunity.quoteKind !== filters.quoteKind) {
+        return false;
+      }
+
+      if (filters.opportunityId && filters.opportunityId.trim() !== '') {
+        const searchTerm = filters.opportunityId.toLowerCase().trim();
+        const opportunityId = (opportunity.opportunityId || '').toLowerCase();
+        if (!opportunityId.includes(searchTerm)) {
+          return false;
+        }
+      }
+
       return true;
     });
   }, [opportunities, filters]);
