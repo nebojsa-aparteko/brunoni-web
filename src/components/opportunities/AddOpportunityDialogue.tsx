@@ -86,7 +86,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setQuoteKind('');
     }
   }, [open]);
-
+  const tagIds = tags.map(tag => tag.id || tag);
   const handleAdd = async () => {
     const opportunityData = {
       salesRepId: salesRep?.id || '',
@@ -98,7 +98,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       portOfLoadingGroupId: portOfLoadingGroup?.id || '',
       portOfDischargeGroupId: portOfDischargeGroup?.id || '',
       placeOfDeliveryGroupId: placeOfDeliveryGroup?.id || '',
-      tagIds: tags,
+      tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
       validity: validity === '' ? null : new Date(validity),
