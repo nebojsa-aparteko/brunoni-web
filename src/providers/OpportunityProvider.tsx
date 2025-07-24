@@ -22,6 +22,7 @@ export const normalizeOpportunity = (
   flow(
     update('salesRepId', getUser),
     update('bookingPartyId', getClient),
+    update('bookingPartyRepId', getUser),
     update('statisticalClientId', getClient),
     update('portOfLoadingGroupId', getPortsGroup),
     update('placeOfReceiptGroupId', getPlacesGroup),

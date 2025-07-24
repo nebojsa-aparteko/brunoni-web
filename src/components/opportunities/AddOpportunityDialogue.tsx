@@ -30,6 +30,7 @@ import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
+import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -40,6 +41,7 @@ interface AddOpportunityDialogProps {
 const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClose, onAdd }) => {
   const [salesRep, setSalesRep] = useState<UserRecord | null>(null);
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
+  const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
   const [statisticalClient, setStatisticalClient] = useState<Client | null>(null);
   const [equipmentGroups, setEquipmentGroups] = useState<OpportunityEquipmentGroup | null>(null);
   const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
@@ -67,11 +69,13 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const equipmentGroupsOptions = useOpportunityEquipmentGroups();
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
+  const bookingPartyUsers = useBookingPartyUsers(bookingParty?.id);
 
   useEffect(() => {
     if (!open) {
       setSalesRep(null);
       setBookingParty(null);
+      setBookingPartyRep(null);
       setStatisticalClient(null);
       setEquipmentGroups(null);
       setCommodityGroups(null);
@@ -87,11 +91,18 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setQuoteKind('');
     }
   }, [open]);
+
+  // Reset booking party rep when booking party changes
+  useEffect(() => {
+    setBookingPartyRep(null);
+  }, [bookingParty]);
+
   const tagIds = tags.map(tag => tag.id || tag);
   const handleAdd = async () => {
     const opportunityData = {
       salesRepId: salesRep?.id || '',
       bookingPartyId: bookingParty?.id || '',
+      bookingPartyRepId: bookingPartyRep?.id || '',
       statisticalClientId: statisticalClient?.id || '',
       equipmentGroupId: equipmentGroups?.id || '',
       commodityGroupId: commodityGroups?.id || '',
@@ -153,6 +164,12 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
               required
             />
           )}
+        />
+        <UserInput
+          label="Booking Party Representative"
+          users={bookingPartyUsers || []}
+          onChange={(_, user) => setBookingPartyRep(user)}
+          value={bookingPartyRep}
         />
         <TextField
           margin="dense"

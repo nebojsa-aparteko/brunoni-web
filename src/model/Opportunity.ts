@@ -15,6 +15,7 @@ export interface Opportunity {
   opportunityId: string; // Unique identifier for the opportunity
   salesRepId: string; // User ID of the sales representative
   bookingPartyId: string; // Client is always Booking Party for Import & Export
+  bookingPartyRepId: string; // User ID of the booking party representative
   statisticalClientId: string; // Export = Shipper, Import = Consignee
   agreementId: string; // e.g. Contract ID
   quoteKind: string; // e.g. Spot, Tender, Project
@@ -47,6 +48,7 @@ export interface NormalizedOpportunity {
   opportunityId: string; // Unique identifier for the opportunity
   salesRepId: UserRecord | null; // Normalized user object or null
   bookingPartyId: Client | null; // Normalized client object or null
+  bookingPartyRepId: UserRecord | null; // Normalized user object or null
   statisticalClientId: Client | null; // Normalized client object or null
   agreementId: string;
   quoteKind: string;

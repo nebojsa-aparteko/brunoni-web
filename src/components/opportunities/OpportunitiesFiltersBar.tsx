@@ -50,6 +50,7 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
   const {
     statisticalClient,
     bookingParty,
+    bookingPartyRep,
     portsOfLoadingGroup,
     portsOfDischargeGroup,
     placesOfDeliveryGroup,
@@ -97,6 +98,9 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
 
   const setOpportunityIdFilter = (opportunityId: string) =>
     setFilters && setFilters(set('opportunityId', opportunityId || undefined)(filters));
+
+  const setBookingPartyRepFilter = (bookingPartyRep: UserRecord | null | undefined) =>
+    setFilters && setFilters(set('bookingPartyRep', bookingPartyRep || undefined)(filters));
 
   return (
     <Box
@@ -222,6 +226,16 @@ const OpportunitiesFiltersBar: React.FC<Props> = ({ filters, setFilters }) => {
               users={users || []}
               onChange={(_, user) => setUserFilter(user)}
               value={assignee}
+            />
+          </Grid>
+        )}
+        {users && (
+          <Grid item sm={3} xs={12}>
+            <UserInput
+              label="Booking Party Representative"
+              users={users || []}
+              onChange={(_, user) => setBookingPartyRepFilter(user)}
+              value={bookingPartyRep}
             />
           </Grid>
         )}

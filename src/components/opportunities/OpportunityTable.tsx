@@ -22,6 +22,10 @@ const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
       return opportunity.salesRepId
         ? `${opportunity.salesRepId.lastName} ${opportunity.salesRepId.firstName}`
         : '';
+    case 'bookingPartyRep':
+      return opportunity.bookingPartyRepId
+        ? `${opportunity.bookingPartyRepId.lastName} ${opportunity.bookingPartyRepId.firstName}`
+        : '';
     case 'bookingParty':
       return opportunity.bookingPartyId?.name || '';
     case 'statisticalClient':
@@ -146,6 +150,11 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         {opportunity.opportunityId}
       </TableCell>
       <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
+      <TableCell align="center">
+        {opportunity.bookingPartyRepId
+          ? `${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName}`
+          : ''}
+      </TableCell>
       <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.portOfLoadingGroupId?.name || ''}</TableCell>
@@ -307,6 +316,9 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                 </SortableHeader>
                 <SortableHeader sortKey="bookingParty" sortConfig={sortConfig} onSort={onSort}>
                   B/Party
+                </SortableHeader>
+                <SortableHeader sortKey="bookingPartyRep" sortConfig={sortConfig} onSort={onSort}>
+                  B/Party Rep
                 </SortableHeader>
                 <SortableHeader sortKey="statisticalClient" sortConfig={sortConfig} onSort={onSort}>
                   S/Client

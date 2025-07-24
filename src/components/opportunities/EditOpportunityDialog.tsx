@@ -31,6 +31,7 @@ import { OpportunityPlacesGroup } from '../../model/OpportunityPlacesGroup';
 import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
+import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 
 interface EditOpportunityDialogProps {
   open: boolean;
@@ -49,6 +50,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
 }) => {
   const [salesRep, setSalesRep] = useState<UserRecord | null>(null);
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
+  const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
   const [statisticalClient, setStatisticalClient] = useState<Client | null>(null);
   const [equipmentGroup, setEquipmentGroup] = useState<OpportunityEquipmentGroup | null>(null);
   const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
@@ -78,6 +80,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const equipmentGroups = useOpportunityEquipmentGroups();
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
+  const bookingPartyUsers = useBookingPartyUsers(bookingParty?.id);
 
   // Pre-populate form fields when opportunity changes
   useEffect(() => {
@@ -85,6 +88,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
     if (opportunity && open) {
       setSalesRep(opportunity.salesRepId || null);
       setBookingParty(opportunity.bookingPartyId || null);
+      setBookingPartyRep(opportunity.bookingPartyRepId || null);
       setStatisticalClient(opportunity.statisticalClientId || null);
       setEquipmentGroup(opportunity.equipmentGroupId || null);
       setCommodityGroup(opportunity.commodityGroupId || null);
@@ -125,6 +129,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
     const updatedData = {
       salesRepId: salesRep?.id || '',
       // bookingPartyId is intentionally excluded - not editable
+      bookingPartyRepId: bookingPartyRep?.id || '',
       statisticalClientId: statisticalClient?.id || '',
       equipmentGroupId: equipmentGroup?.id || '',
       commodityGroupId: commodityGroup?.id || '',
@@ -154,6 +159,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         ...opportunity,
         salesRepId: salesRep,
         bookingPartyId: bookingParty,
+        bookingPartyRepId: bookingPartyRep,
         statisticalClientId: statisticalClient,
         equipmentGroupId: equipmentGroup,
         commodityGroupId: commodityGroup,
@@ -234,6 +240,12 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
             readOnly: true,
           }}
           disabled
+        />
+        <UserInput
+          label="Booking Party Representative"
+          users={bookingPartyUsers || []}
+          onChange={(_, user) => setBookingPartyRep(user)}
+          value={bookingPartyRep}
         />
         <TextField
           margin="dense"
