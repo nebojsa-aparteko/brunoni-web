@@ -6,6 +6,8 @@ interface OpportunityCounters {
   [opportunityId: string]: {
     booked: number;
     quoted: number;
+    bookedTEU: number;
+    quotedTEU: number;
   };
 }
 
@@ -53,13 +55,17 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
 
           let booked = 0;
           let quoted = 0;
+          let bookedTEU = 0;
+          let quotedTEU = 0;
 
           countersSnapshot.docs.forEach(doc => {
             const counter = doc.data() as OpportunityCounter;
             if (counter.entity === 'booking') {
               booked += counter.count || 0;
+              bookedTEU += counter.teuCount || 0;
             } else if (counter.entity === 'quote') {
               quoted += counter.count || 0;
+              quotedTEU += counter.teuCount || 0;
             }
           });
 
@@ -67,6 +73,8 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
             opportunityId,
             booked,
             quoted,
+            bookedTEU,
+            quotedTEU,
           };
         } catch (error) {
           console.error(`Error fetching counters for opportunity ${opportunityId}:`, error);
@@ -74,6 +82,8 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
             opportunityId,
             booked: 0,
             quoted: 0,
+            bookedTEU: 0,
+            quotedTEU: 0,
           };
         }
       });
@@ -89,14 +99,22 @@ export const useOpportunityCounters = (opportunityIds: string[]): OpportunityCou
       setCounters(prevCounters => {
         const newCounters = { ...prevCounters };
 
-        results.forEach(({ opportunityId, booked, quoted }) => {
-          newCounters[opportunityId] = { booked, quoted };
+        results.forEach(({ opportunityId, booked, quoted, bookedTEU, quotedTEU }) => {
+          newCounters[opportunityId] = { booked, quoted, bookedTEU, quotedTEU };
         });
 
-        const hasChanged = results.some(({ opportunityId, booked, quoted }) => {
-          const prev = prevCounters[opportunityId];
-          return !prev || prev.booked !== booked || prev.quoted !== quoted;
-        });
+        const hasChanged = results.some(
+          ({ opportunityId, booked, quoted, bookedTEU, quotedTEU }) => {
+            const prev = prevCounters[opportunityId];
+            return (
+              !prev ||
+              prev.booked !== booked ||
+              prev.quoted !== quoted ||
+              prev.bookedTEU !== bookedTEU ||
+              prev.quotedTEU !== quotedTEU
+            );
+          },
+        );
 
         return hasChanged ? newCounters : prevCounters;
       });

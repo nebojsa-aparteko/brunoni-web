@@ -12,7 +12,12 @@ export const normalizeOpportunity = (
   getCommodityGroup: (id: string) => any,
   getEquipmentGroup: (id: string) => any,
   getTag: (id: string) => any,
-  getCounters: (id: string) => { booked: number; quoted: number },
+  getCounters: (id: string) => {
+    booked: number;
+    bookedTEU?: number;
+    quoted: number;
+    quotedTEU?: number;
+  },
 ) =>
   flow(
     update('salesRepId', getUser),

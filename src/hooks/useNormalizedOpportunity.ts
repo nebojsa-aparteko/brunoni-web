@@ -27,7 +27,8 @@ const useNormalizedOpportunity = (opportunityIds: string[]) => {
     const getCommodityGroup = (id: string) => commodityGroups?.find(g => g.id === id) || null;
     const getEquipmentGroup = (id: string) => equipmentGroups?.find(g => g.id === id) || null;
     const getTag = (id: string) => tags?.find(t => t.id === id) || null;
-    const getCounters = (id: string) => counters[id] || { booked: 0, quoted: 0 };
+    const getCounters = (id: string) =>
+      counters[id] || { booked: 0, bookedTEU: 0, quoted: 0, quotedTEU: 0 };
 
     return normalizeOpportunity(
       getUser,

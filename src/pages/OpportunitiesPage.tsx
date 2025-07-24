@@ -48,14 +48,14 @@ const OpportunitiesPage: React.FC = () => {
               className={classes.tabs}
             >
               <Tab icon={<AssessmentIcon />} label="Opportunities" {...a11yProps(0)} />
-              <Tab icon={<HelpIcon />} label="Not Matched" {...a11yProps(1)} />
+              <Tab icon={<HelpIcon />} label="Manual Matching" {...a11yProps(1)} />
             </Tabs>
           </Paper>
           <TabPanel value={selectedTab} index={0}>
             <OpportunitiesView isAdmin={true} archived={false} showDateRangeFilter={true} />
           </TabPanel>
           <TabPanel value={selectedTab} index={1}>
-            {/* TODO: Implement "Not Matched" view - for now using same component */}
+            {/* TODO: Implement "Manual Matching" view - for now using same component */}
           </TabPanel>
         </Box>
       </OpportunitiesFilterProvider>
