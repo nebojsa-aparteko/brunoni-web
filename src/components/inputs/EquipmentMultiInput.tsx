@@ -80,6 +80,14 @@ const EquipmentMultiInput: React.FC<EquipmentMultiInputProps> = ({
             cleanValue = value.slice(5, -1);
           }
 
+          if (typeof cleanValue === 'string') {
+            cleanValue = cleanValue.trim();
+          }
+
+          if (!cleanValue) {
+            return;
+          }
+
           // Check if this value matches a database equipment
           const foundEquipment = equipmentOptions.find(
             equipment => getEquipmentDisplayName(equipment) === cleanValue,
@@ -94,7 +102,13 @@ const EquipmentMultiInput: React.FC<EquipmentMultiInputProps> = ({
           }
         });
 
-        onChange?.(newEquipmentIds, newEquipmentNames);
+        const uniqueEquipmentIds = [...new Set(newEquipmentIds)];
+        const uniqueEquipmentNames = newEquipmentNames.filter(
+          (name, index, array) =>
+            array.findIndex(item => item.toLowerCase() === name.toLowerCase()) === index,
+        );
+
+        onChange?.(uniqueEquipmentIds, uniqueEquipmentNames);
       }}
       filterOptions={(options, params) => {
         const { inputValue } = params;

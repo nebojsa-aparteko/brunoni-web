@@ -106,10 +106,17 @@ const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
         const newPortNames: string[] = [];
 
         newValue.forEach(value => {
-          // Clean up "Add ..." suggestions
           let cleanValue = value;
           if (typeof value === 'string' && value.startsWith('Add "') && value.endsWith('"')) {
             cleanValue = value.slice(5, -1);
+          }
+
+          if (typeof cleanValue === 'string') {
+            cleanValue = cleanValue.trim();
+          }
+
+          if (!cleanValue) {
+            return;
           }
 
           // Check if this value matches a database port
@@ -124,7 +131,13 @@ const PortsMultiInput: React.FC<PortsMultiInputProps> = ({
           }
         });
 
-        onChange?.(newPortIds, newPortNames);
+        const uniquePortIds = [...new Set(newPortIds)];
+        const uniquePortNames = newPortNames.filter(
+          (name, index, array) =>
+            array.findIndex(item => item.toLowerCase() === name.toLowerCase()) === index,
+        );
+
+        onChange?.(uniquePortIds, uniquePortNames);
       }}
       filterOptions={(options, params) => {
         const { inputValue } = params;

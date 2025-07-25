@@ -39,7 +39,20 @@ const PlacesMultiInput: React.FC<MultiPlacesInputInterface> = ({
       options={data}
       value={selectedPlaces}
       onChange={(_, newValue) => {
-        onChange?.(newValue);
+        const trimmedValues = newValue
+          .map(value => (typeof value === 'string' ? value.trim() : value))
+          .filter(value => value !== '');
+
+        const uniqueValues = trimmedValues.filter(
+          (value, index, array) =>
+            array.findIndex(item =>
+              typeof item === 'string' && typeof value === 'string'
+                ? item.toLowerCase() === value.toLowerCase()
+                : item === value,
+            ) === index,
+        );
+
+        onChange?.(uniqueValues);
       }}
       renderInput={params => (
         <TextField {...params} label={label} placeholder={placeholder} variant="outlined" />
