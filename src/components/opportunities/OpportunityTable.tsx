@@ -6,9 +6,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableBody from '@material-ui/core/TableBody';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Chip, Paper, makeStyles, Theme, Tooltip, IconButton } from '@material-ui/core';
+import { Chip, makeStyles, Theme, Tooltip, IconButton } from '@material-ui/core';
 import { Notes as NotesIcon } from '@material-ui/icons';
-import clsx from 'clsx';
+import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
 
@@ -151,9 +151,18 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       </TableCell>
       <TableCell align="center">{opportunity.bookingPartyId?.name || ''}</TableCell>
       <TableCell align="center">
-        {opportunity.bookingPartyRepId
-          ? `${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName}`
-          : ''}
+        {opportunity.bookingPartyRepId ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+            <Avatar
+              name={`${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName}`}
+              title={`${opportunity.bookingPartyRepId.firstName} ${opportunity.bookingPartyRepId.lastName} ${opportunity.bookingPartyRepId.emailAddress}`}
+              size="32"
+              round={true}
+            />
+          </div>
+        ) : (
+          ''
+        )}
       </TableCell>
       <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
       <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
@@ -275,9 +284,18 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           : ''}
       </TableCell>
       <TableCell align="center">
-        {opportunity.salesRepId
-          ? `${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`
-          : ''}
+        {opportunity.salesRepId ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+            <Avatar
+              name={`${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName}`}
+              title={`${opportunity.salesRepId.firstName} ${opportunity.salesRepId.lastName} ${opportunity.salesRepId.emailAddress}`}
+              size="32"
+              round={true}
+            />
+          </div>
+        ) : (
+          ''
+        )}
       </TableCell>
     </TableRow>
   );
@@ -354,10 +372,18 @@ const OpportunityTable: React.FC<OpportunityTableProps> = ({
                   Potential
                 </SortableHeader>
                 <SortableHeader sortKey="quotedProgress" sortConfig={sortConfig} onSort={onSort}>
-                  Quoted
+                  <div>
+                    <div>Quoted</div>
+                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>Booked / Quoted</div>
+                  </div>
                 </SortableHeader>
                 <SortableHeader sortKey="bookedProgress" sortConfig={sortConfig} onSort={onSort}>
-                  Booked
+                  <div>
+                    <div>Booked</div>
+                    <div style={{ fontSize: 10, color: '#666', marginTop: 2 }}>
+                      Booked TEU / Potential
+                    </div>
+                  </div>
                 </SortableHeader>
                 <SortableHeader sortKey="note" sortConfig={sortConfig} onSort={onSort}>
                   Note
