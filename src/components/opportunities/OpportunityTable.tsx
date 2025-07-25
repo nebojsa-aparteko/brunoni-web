@@ -11,6 +11,7 @@ import { Notes as NotesIcon } from '@material-ui/icons';
 import Avatar from 'react-avatar';
 import ChartsCircularProgress from '../dashboard/ChartsCircularProgress';
 import { NormalizedOpportunity } from '../../model/Opportunity';
+import { format } from 'date-fns';
 
 import OpportunitiesEmptyResults from './OpportunitisEmptyResults';
 
@@ -175,7 +176,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
       <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
 
       <TableCell align="center">
-        {opportunity.validity ? new Date(opportunity.validity).toLocaleDateString() : ''}
+        {opportunity.validity ? format(new Date(opportunity.validity), 'd.MMMM') : ''}
       </TableCell>
       <TableCell align="center">
         {opportunity.capacityTEU ? `${opportunity.capacityTEU} TEU` : ''}

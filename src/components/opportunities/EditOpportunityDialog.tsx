@@ -32,6 +32,7 @@ import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
+import DateInput from '../inputs/DateInput';
 
 interface EditOpportunityDialogProps {
   open: boolean;
@@ -67,7 +68,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
   const [capacityTEU, setCapacityTEU] = useState<string>('');
-  const [validity, setValidity] = useState<string>('');
+  const [validity, setValidity] = useState<Date | null>(null);
+  const [validityPickerOpen, setValidityPickerOpen] = useState(false);
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -99,9 +101,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       setTags(opportunity.tagIds || []);
       setNote(opportunity.note || '');
       setCapacityTEU(opportunity.capacityTEU ? opportunity.capacityTEU.toString() : '');
-      setValidity(
-        opportunity.validity ? new Date(opportunity.validity).toISOString().split('T')[0] : '',
-      );
+      setValidity(opportunity.validity ? new Date(opportunity.validity) : null);
       setAgreementId(opportunity.agreementId || '');
       setQuoteKind(opportunity.quoteKind || '');
     }
@@ -140,7 +140,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
-      validity: validity === '' ? null : new Date(validity),
+      validity: validity,
       agreementId,
       quoteKind,
       updatedAt: new Date(),
@@ -173,7 +173,7 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         note,
         capacityTEU:
           capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
-        validity: validity === '' ? null : new Date(validity),
+        validity: validity,
       };
 
       onUpdate(updatedOpportunity);
@@ -338,15 +338,15 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
           }
           inputProps={{ min: 1 }}
         />
-        <TextField
-          margin="dense"
+        <DateInput
           label="Validity"
-          type="date"
-          fullWidth
-          variant="outlined"
-          InputLabelProps={{ shrink: true }}
           value={validity}
-          onChange={e => setValidity(e.target.value)}
+          onChange={date => setValidity(date)}
+          open={validityPickerOpen}
+          onOpen={() => setValidityPickerOpen(true)}
+          onClose={() => setValidityPickerOpen(false)}
+          margin="dense"
+          fullWidth
         />
       </DialogContent>
       <DialogActions>

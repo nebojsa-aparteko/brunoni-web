@@ -31,6 +31,7 @@ import { OpportunityPortsGroup } from '../../model/OpportunityPortsGroup';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
+import DateInput from '../inputs/DateInput';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -58,7 +59,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
   const [capacityTEU, setCapacityTEU] = useState<string>('');
-  const [validity, setValidity] = useState<string>('');
+  const [validity, setValidity] = useState<Date | null>(null);
+  const [validityPickerOpen, setValidityPickerOpen] = useState(false);
   const [agreementId, setAgreementId] = useState<string>('');
   const [quoteKind, setQuoteKind] = useState<string>('');
 
@@ -86,7 +88,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setTags([]);
       setNote('');
       setCapacityTEU('');
-      setValidity('');
+      setValidity(null);
+      setValidityPickerOpen(false);
       setAgreementId('');
       setQuoteKind('');
     }
@@ -113,7 +116,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
-      validity: validity === '' ? null : new Date(validity),
+      validity: validity,
       agreementId,
       quoteKind,
       createdAt: new Date(),
@@ -262,15 +265,15 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
           }
           inputProps={{ min: 1 }}
         />
-        <TextField
-          margin="dense"
+        <DateInput
           label="Validity"
-          type="date"
-          fullWidth
-          variant="outlined"
-          InputLabelProps={{ shrink: true }}
           value={validity}
-          onChange={e => setValidity(e.target.value)}
+          onChange={date => setValidity(date)}
+          open={validityPickerOpen}
+          onOpen={() => setValidityPickerOpen(true)}
+          onClose={() => setValidityPickerOpen(false)}
+          margin="dense"
+          fullWidth
         />
       </DialogContent>
       <DialogActions>
