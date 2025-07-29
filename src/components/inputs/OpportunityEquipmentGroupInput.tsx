@@ -1,5 +1,5 @@
 // filepath: /Users/urosd/Documents/coding/brunoni/oskar-web/src/components/inputs/OpportunityEquipmentGroupInput.tsx
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import React, { HTMLAttributes, Ref } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import {
   CircularProgress,
@@ -14,19 +14,32 @@ import {
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
+import ContainerType from '../../model/ContainerType';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
 
 interface Props {
   label: string;
-  options: OpportunityEquipmentGroup[];
-  value: OpportunityEquipmentGroup | null;
-  onChange: (groups: OpportunityEquipmentGroup | null) => void;
+  options: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  }[];
+  value: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null;
+  onChange: (
+    groups: {
+      definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+      value: OpportunityEquipmentGroup | ContainerType;
+    } | null,
+  ) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: any;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -53,20 +66,38 @@ const OpportunityEquipmentGroupInput: React.FC<Props> = ({
     <Autocomplete
       {...rest}
       className={classes.root}
-      value={value || null}
-      onChange={(_, newValue) => onChange(newValue as OpportunityEquipmentGroup | null)}
+      value={value}
+      onChange={(_, newValue) => onChange(newValue)}
       autoHighlight
       open={open}
       onOpen={onOpen}
       onClose={onClose}
-      getOptionLabel={(option: OpportunityEquipmentGroup) => option.name}
-      getOptionSelected={(option, value) => option.id === value.id}
+      getOptionLabel={(option: {
+        definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+        value: OpportunityEquipmentGroup | ContainerType;
+      }) => option.value.name}
+      getOptionSelected={(option, value) => option.value.id === value?.value.id}
       options={options}
       loading={loading}
-      renderTags={(value: OpportunityEquipmentGroup[], getTagProps) =>
-        value.map((option, index) => (
-          <Chip variant="outlined" label={option.name} size="small" {...getTagProps({ index })} />
-        ))
+      renderTags={(
+        value:
+          | {
+              definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+              value: OpportunityEquipmentGroup | ContainerType;
+            }[]
+          | null,
+        getTagProps,
+      ) =>
+        value
+          ? value.map((option, index) => (
+              <Chip
+                variant="outlined"
+                label={option.value.name}
+                size="small"
+                {...getTagProps({ index })}
+              />
+            ))
+          : null
       }
       renderInput={params => (
         <TextField
@@ -90,8 +121,8 @@ const OpportunityEquipmentGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(option.name, inputValue);
-        const parts = parse(option.name, matches);
+        const matches = match(option.value.name, inputValue);
+        const parts = parse(option.value.name, matches);
 
         return (
           <div>

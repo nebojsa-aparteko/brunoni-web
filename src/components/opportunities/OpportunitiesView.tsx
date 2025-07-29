@@ -41,7 +41,6 @@ const OpportunitiesView: React.FC<Props> = ({ isAdmin, archived, showDateRangeFi
       normalizeOpportunity({ id: doc.id, ...doc.data() }),
     );
   }, [opportunitySnapshot?.docs, normalizeOpportunity]);
-
   const [filters, setFilters] = useOpportunitiesListFilterContext();
   const [opportunityPaginationContextData, setOpportnityPaginationContextData] =
     useOpportunityListPaginationContext();

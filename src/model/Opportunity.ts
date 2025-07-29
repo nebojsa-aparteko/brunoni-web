@@ -7,7 +7,6 @@ import UserRecord from '../model/UserRecord';
 import Client from '../model/Client';
 import Port from './Port';
 import ContainerType from './ContainerType';
-
 export const QUOTE_KIND_OPTIONS = ['SPOT', 'QUARTERLY', 'TENDER'] as const;
 export type QuoteKind = (typeof QUOTE_KIND_OPTIONS)[number];
 
@@ -57,16 +56,34 @@ export interface NormalizedOpportunity {
   statisticalClientId: Client | null; // Normalized client object or null
   agreementId: string;
   quoteKind: string;
-  placeOfReceipt: OpportunityPlacesGroup | string | null; // Normalized group object or null
-  portOfLoading: OpportunityPortsGroup | Port | string | null; // Normalized group object or null
-  portOfDischarge: OpportunityPortsGroup | Port | string | null; // Normalized group object or null
-  placeOfDelivery: OpportunityPlacesGroup | string | null; // Normalized group object or null
-  commodity: OpportunityCommodityGroup | string | null; // Normalized group object or null
-  equipment: OpportunityEquipmentGroup | ContainerType | null; // Normalized group object or null
+  placeOfReceipt: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null; // Normalized group object or null
+  portOfLoading: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  }; // Normalized group object or null
+  portOfDischarge: {
+    definition: OpportunityMatchDefinition<'groupId' | 'portId' | 'freeText'>;
+    value: OpportunityPortsGroup | Port | string;
+  }; // Normalized group object or null
+  placeOfDelivery: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityPlacesGroup | string;
+  } | null; // Normalized group object or null
+  commodity: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null; // Normalized group object or null
+  equipment: {
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null; // Normalized group object or null
   tagIds: OpportunityTag[]; // Array of normalized tag objects
-  validity: Date;
-  note: string;
-  capacityTEU: number;
+  validity: Date | null;
+  note: string | null;
+  capacityTEU: number | null; // Total capacity in number of TEU per year, or null if not set
   booked: number; // Sum of booking counts for current year
   quoted: number; // Sum of quote counts for current year
   bookedTEU: number; // Sum of TEU counts for bookings in current year

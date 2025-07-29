@@ -16,8 +16,8 @@ import OpportunityPortsGroupInput from '../inputs/OpportunityPortsGroupInput';
 import useOpportunityPortsGroups from '../../hooks/useOpportunityPortsGroups';
 import useOpportunityPlacesGroups from '../../hooks/useOpportunityPlacesGroups';
 import useOpportunityTags from '../../hooks/useOpportunityTags';
-import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
-import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
+import useOpportunityCommodityWithDefinition from '../../hooks/useOpportunityCommodityWithDefinition';
+import useOpportunityEquipmentWithDefinition from '../../hooks/useOpportunityEquipmentWithDefinition';
 import useClients from '../../hooks/useClients';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
@@ -32,6 +32,8 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 import DateInput from '../inputs/DateInput';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
+import ContainerType from '../../model/ContainerType';
 
 interface AddOpportunityDialogProps {
   open: boolean;
@@ -44,7 +46,10 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
   const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
   const [statisticalClient, setStatisticalClient] = useState<Client | null>(null);
-  const [equipmentGroups, setEquipmentGroups] = useState<OpportunityEquipmentGroup | null>(null);
+  const [equipment, setEquipment] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null>(null);
   const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
     null,
   );
@@ -55,7 +60,10 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const [placeOfDeliveryGroup, setPlaceOfDeliveryGroup] = useState<OpportunityPlacesGroup | null>(
     null,
   );
-  const [commodityGroups, setCommodityGroups] = useState<OpportunityCommodityGroup | null>(null);
+  const [commodity, setCommodity] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null>(null);
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
   const [capacityTEU, setCapacityTEU] = useState<string>('');
@@ -67,8 +75,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
   const portsGroups = useOpportunityPortsGroups();
   const placesGroups = useOpportunityPlacesGroups();
   const opportunityTags = useOpportunityTags();
-  const commodityGroupsOptions = useOpportunityCommodityGroups();
-  const equipmentGroupsOptions = useOpportunityEquipmentGroups();
+  const commodityOptions = useOpportunityCommodityWithDefinition();
+  const equipmentOptions = useOpportunityEquipmentWithDefinition();
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
   const bookingPartyUsers = useBookingPartyUsers(bookingParty?.id);
@@ -79,8 +87,8 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       setBookingParty(null);
       setBookingPartyRep(null);
       setStatisticalClient(null);
-      setEquipmentGroups(null);
-      setCommodityGroups(null);
+      setEquipment(null);
+      setCommodity(null);
       setPlaceOfReceiptGroup(null);
       setPortOfLoadingGroup(null);
       setPortOfDischargeGroup(null);
@@ -107,12 +115,12 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       bookingPartyId: bookingParty?.id || '',
       bookingPartyRepId: bookingPartyRep?.id || '',
       statisticalClientId: statisticalClient?.id || '',
-      equipmentGroupId: equipmentGroups?.id || '',
-      commodityGroupId: commodityGroups?.id || '',
-      placeOfReceiptGroupId: placeOfReceiptGroup?.id || '',
-      portOfLoadingGroupId: portOfLoadingGroup?.id || '',
-      portOfDischargeGroupId: portOfDischargeGroup?.id || '',
-      placeOfDeliveryGroupId: placeOfDeliveryGroup?.id || '',
+      equipment: equipment?.definition || '',
+      commodity: commodity?.definition || '',
+      placeOfReceipt: placeOfReceiptGroup,
+      portOfLoading: portOfLoadingGroup,
+      portOfDischarge: portOfDischargeGroup,
+      placeOfDelivery: placeOfDeliveryGroup,
       tagIds,
       note,
       capacityTEU: capacityTEU === '' ? null : Number(capacityTEU) > 0 ? Number(capacityTEU) : null,
@@ -128,7 +136,7 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
       console.debug('Adding new opportunity with data:', opportunityData);
       onClose();
     } catch (error) {
-      console.error('Failed to add opportunity:', error);
+      console.error('Failed to add opportunity:', error, opportunityData);
     }
   };
 
@@ -194,16 +202,16 @@ const AddOpportunityDialog: React.FC<AddOpportunityDialogProps> = ({ open, onClo
         />
         <OpportunityEquipmentGroupInput
           label="Equipment Groups"
-          options={equipmentGroupsOptions || []}
-          value={equipmentGroups}
-          onChange={group => setEquipmentGroups(group)}
+          options={equipmentOptions || []}
+          value={equipment}
+          onChange={group => setEquipment(group)}
           margin="dense"
         />
         <OpportunityCommodityGroupInput
           label="Commodity Groups"
-          options={commodityGroupsOptions || []}
-          value={commodityGroups}
-          onChange={group => setCommodityGroups(group)}
+          options={commodityOptions || []}
+          value={commodity}
+          onChange={group => setCommodity(group)}
           margin="dense"
         />
         <OpportunityPlacesGroupInput

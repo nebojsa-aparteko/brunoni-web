@@ -36,17 +36,71 @@ const getSortValue = (opportunity: NormalizedOpportunity, key: string): any => {
     case 'quoteKind':
       return opportunity.quoteKind || '';
     case 'placeOfReceipt':
-      return opportunity.placeOfReceiptGroupId?.name || '';
+      return opportunity.placeOfReceipt?.definition.type === 'groupId'
+        ? (typeof opportunity.placeOfReceipt.value === 'object' &&
+          opportunity.placeOfReceipt.value &&
+          'name' in opportunity.placeOfReceipt.value
+            ? opportunity.placeOfReceipt.value.name
+            : '') || ''
+        : String(opportunity.placeOfReceipt?.value || '');
     case 'portOfLoading':
-      return opportunity.portOfLoadingGroupId?.name || '';
+      return opportunity.portOfLoading?.definition.type === 'groupId'
+        ? (typeof opportunity.portOfLoading.value === 'object' &&
+          opportunity.portOfLoading.value &&
+          'name' in opportunity.portOfLoading.value
+            ? opportunity.portOfLoading.value.name
+            : '') || ''
+        : opportunity.portOfLoading?.definition.type === 'freeText'
+          ? String(opportunity.portOfLoading.value || '')
+          : (typeof opportunity.portOfLoading.value === 'object' &&
+            opportunity.portOfLoading.value &&
+            'city' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.city
+              : '') || '';
     case 'portOfDischarge':
-      return opportunity.portOfDischargeGroupId?.name || '';
+      return opportunity.portOfDischarge?.definition.type === 'groupId'
+        ? (typeof opportunity.portOfDischarge.value === 'object' &&
+          opportunity.portOfDischarge.value &&
+          'name' in opportunity.portOfDischarge.value
+            ? opportunity.portOfDischarge.value.name
+            : '') || ''
+        : opportunity.portOfDischarge?.definition.type === 'freeText'
+          ? String(opportunity.portOfDischarge.value || '')
+          : (typeof opportunity.portOfDischarge.value === 'object' &&
+            opportunity.portOfDischarge.value &&
+            'city' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.city
+              : '') || '';
     case 'placeOfDelivery':
-      return opportunity.placeOfDeliveryGroupId?.name || '';
+      return opportunity.placeOfDelivery?.definition.type === 'groupId'
+        ? (typeof opportunity.placeOfDelivery.value === 'object' &&
+          opportunity.placeOfDelivery.value &&
+          'name' in opportunity.placeOfDelivery.value
+            ? opportunity.placeOfDelivery.value.name
+            : '') || ''
+        : String(opportunity.placeOfDelivery?.value || '');
     case 'commodityGroup':
-      return opportunity.commodityGroupId?.name || '';
+      return opportunity.commodity?.definition.type === 'groupId'
+        ? (typeof opportunity.commodity.value === 'object' &&
+          opportunity.commodity.value &&
+          'name' in opportunity.commodity.value
+            ? opportunity.commodity.value.name
+            : '') || ''
+        : String(opportunity.commodity.value || '');
     case 'equipmentGroup':
-      return opportunity.equipmentGroupId?.name || '';
+      return opportunity.equipment?.definition.type === 'groupId'
+        ? (typeof opportunity.equipment?.value === 'object' &&
+          opportunity.equipment?.value &&
+          'name' in opportunity.equipment?.value
+            ? opportunity.equipment.value.name
+            : '') || ''
+        : String(
+            (typeof opportunity.equipment?.value === 'object' &&
+            opportunity.equipment?.value &&
+            'name' in opportunity.equipment?.value
+              ? opportunity.equipment.value.name
+              : opportunity.equipment?.value) || '',
+          );
     case 'tags':
       return opportunity.tagIds?.length || 0;
     case 'validity':
@@ -144,6 +198,77 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
   const handleRowClick = () => {
     onRowClick?.(opportunity);
   };
+  const placeOfReceipt =
+    opportunity.placeOfReceipt?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.placeOfReceipt.value === 'object' &&
+          opportunity.placeOfReceipt.value &&
+          'name' in opportunity.placeOfReceipt.value
+            ? opportunity.placeOfReceipt.value.name
+            : opportunity.placeOfReceipt.value) || '',
+        )
+      : String(opportunity.placeOfReceipt?.value || '');
+
+  const placeOfDelivery =
+    opportunity.placeOfDelivery?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.placeOfDelivery.value === 'object' &&
+          opportunity.placeOfDelivery.value &&
+          'name' in opportunity.placeOfDelivery.value
+            ? opportunity.placeOfDelivery.value.name
+            : opportunity.placeOfDelivery.value) || '',
+        )
+      : String(opportunity.placeOfDelivery?.value || '');
+
+  const equipment = String(opportunity.equipment?.value?.name || '');
+  const commodity =
+    opportunity.commodity?.definition.type === 'groupId'
+      ? String(
+          (typeof opportunity.commodity?.value === 'object' &&
+          opportunity.commodity?.value &&
+          'name' in opportunity.commodity.value
+            ? opportunity.commodity.value.name
+            : opportunity.commodity?.value) || '',
+        )
+      : String(opportunity.commodity?.value || '');
+
+  const portOfLoading =
+    opportunity.portOfLoading?.definition.type === 'freeText'
+      ? String(opportunity.portOfLoading?.value || '')
+      : opportunity.portOfLoading?.definition.type === 'groupId'
+        ? String(
+            (typeof opportunity.portOfLoading?.value === 'object' &&
+            opportunity.portOfLoading?.value &&
+            'name' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.name
+              : opportunity.portOfLoading?.value) || '',
+          )
+        : String(
+            (typeof opportunity.portOfLoading?.value === 'object' &&
+            opportunity.portOfLoading?.value &&
+            'city' in opportunity.portOfLoading.value
+              ? opportunity.portOfLoading.value.city
+              : opportunity.portOfLoading?.value) || '',
+          );
+
+  const portOfDischarge =
+    opportunity.portOfDischarge?.definition.type === 'freeText'
+      ? String(opportunity.portOfDischarge?.value || '')
+      : opportunity.portOfDischarge?.definition.type === 'groupId'
+        ? String(
+            (typeof opportunity.portOfDischarge?.value === 'object' &&
+            opportunity.portOfDischarge?.value &&
+            'name' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.name
+              : opportunity.portOfDischarge?.value) || '',
+          )
+        : String(
+            (typeof opportunity.portOfDischarge?.value === 'object' &&
+            opportunity.portOfDischarge?.value &&
+            'city' in opportunity.portOfDischarge.value
+              ? opportunity.portOfDischarge.value.city
+              : opportunity.portOfDischarge?.value) || '',
+          );
 
   return (
     <TableRow hover className={classes.row} tabIndex={-1} onClick={handleRowClick}>
@@ -166,12 +291,12 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
         )}
       </TableCell>
       <TableCell align="center">{opportunity.statisticalClientId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.placeOfReceiptGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.portOfLoadingGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.portOfDischargeGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.placeOfDeliveryGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.equipmentGroupId?.name || ''}</TableCell>
-      <TableCell align="center">{opportunity.commodityGroupId?.name || ''}</TableCell>
+      <TableCell align="center">{placeOfReceipt || ''}</TableCell>
+      <TableCell align="center">{portOfLoading || ''}</TableCell>
+      <TableCell align="center">{portOfDischarge || ''}</TableCell>
+      <TableCell align="center">{placeOfDelivery || ''}</TableCell>
+      <TableCell align="center">{equipment || ''}</TableCell>
+      <TableCell align="center">{commodity || ''}</TableCell>
       <TableCell align="center">{opportunity.quoteKind || ''}</TableCell>
       <TableCell align="center">{opportunity.agreementId || ''}</TableCell>
 
@@ -187,12 +312,12 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.booked !== null && opportunity.quoted !== null
+                {opportunity.booked != null && opportunity.quoted != null
                   ? `${opportunity.booked} / ${opportunity.quoted}`
                   : '—'}
               </span>
-              {opportunity.booked !== null &&
-                opportunity.quoted !== null &&
+              {opportunity.booked != null &&
+                opportunity.quoted != null &&
                 opportunity.quoted > 0 && (
                   <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
                     ({Math.round((opportunity.booked / opportunity.quoted) * 100)}%)
@@ -203,7 +328,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               <div
                 style={{
                   width:
-                    opportunity.booked !== null && opportunity.quoted
+                    opportunity.booked != null && opportunity.quoted != null
                       ? `${Math.min((opportunity.booked / (opportunity.quoted === 0 ? 1 : opportunity.quoted)) * 100, 100)}%`
                       : '0%',
                   background: '#43a047',
@@ -223,12 +348,12 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
           <div style={{ minWidth: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
               <span style={{ fontSize: 12, marginRight: 6 }}>
-                {opportunity.bookedTEU !== null && opportunity.capacityTEU
+                {opportunity.bookedTEU != null && opportunity.capacityTEU != null
                   ? `${opportunity.bookedTEU} / ${opportunity.capacityTEU}`
                   : '—'}
               </span>
-              {opportunity.bookedTEU !== null &&
-                opportunity.capacityTEU &&
+              {opportunity.bookedTEU != null &&
+                opportunity.capacityTEU != null &&
                 opportunity.capacityTEU > 0 && (
                   <span style={{ fontSize: 10, color: '#666', marginLeft: 'auto' }}>
                     ({Math.round((opportunity.bookedTEU / opportunity.capacityTEU) * 100)}%)
@@ -239,7 +364,7 @@ const OpportunityTableRow: React.FC<OpportunityTableRowProps> = ({ opportunity, 
               <div
                 style={{
                   width:
-                    opportunity.bookedTEU !== null && opportunity.capacityTEU
+                    opportunity.bookedTEU != null && opportunity.capacityTEU != null
                       ? `${Math.min((opportunity.bookedTEU / opportunity.capacityTEU) * 100, 100)}%`
                       : '0%',
                   background: '#3f51b5',

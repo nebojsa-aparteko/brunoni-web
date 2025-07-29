@@ -16,14 +16,13 @@ import OpportunityPortsGroupInput from '../inputs/OpportunityPortsGroupInput';
 import useOpportunityPortsGroups from '../../hooks/useOpportunityPortsGroups';
 import useOpportunityPlacesGroups from '../../hooks/useOpportunityPlacesGroups';
 import useOpportunityTags from '../../hooks/useOpportunityTags';
-import useOpportunityCommodityGroups from '../../hooks/useOpportunityCommodityGroups';
-import useOpportunityEquipmentGroups from '../../hooks/useOpportunityEquipmentGroups';
+import useOpportunityEquipmentWithDefinition from '../../hooks/useOpportunityEquipmentWithDefinition';
 import useClients from '../../hooks/useClients';
 import useAdminUsers from '../../hooks/useAdminUsers';
 import { CUSTOMER_FACING_ROLES } from '../../model/UserRecord';
 import UserInput from '../inputs/UserInput';
 import firebase from '../../firebase';
-import { NormalizedOpportunity } from '../../model/Opportunity';
+import { NormalizedOpportunity, OpportunityMatchDefinition } from '../../model/Opportunity';
 import Client from '../../model/Client';
 import UserRecord from '../../model/UserRecord';
 import { OpportunityEquipmentGroup } from '../../model/OpportunityEquipmentGroup';
@@ -33,6 +32,8 @@ import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup
 import { QUOTE_KIND_OPTIONS } from '../../model/Opportunity';
 import useBookingPartyUsers from '../../hooks/useBookingPartyUsers';
 import DateInput from '../inputs/DateInput';
+import ContainerType from '../../model/ContainerType';
+import useOpportunityCommodityWithDefinition from '../../hooks/useOpportunityCommodityWithDefinition';
 
 interface EditOpportunityDialogProps {
   open: boolean;
@@ -53,7 +54,10 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const [bookingParty, setBookingParty] = useState<Client | null>(null);
   const [bookingPartyRep, setBookingPartyRep] = useState<UserRecord | null>(null);
   const [statisticalClient, setStatisticalClient] = useState<Client | null>(null);
-  const [equipmentGroup, setEquipmentGroup] = useState<OpportunityEquipmentGroup | null>(null);
+  const [equipment, setEquipment] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'containerTypeId'>;
+    value: OpportunityEquipmentGroup | ContainerType;
+  } | null>(null);
   const [placeOfReceiptGroup, setPlaceOfReceiptGroup] = useState<OpportunityPlacesGroup | null>(
     null,
   );
@@ -64,7 +68,10 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const [placeOfDeliveryGroup, setPlaceOfDeliveryGroup] = useState<OpportunityPlacesGroup | null>(
     null,
   );
-  const [commodityGroup, setCommodityGroup] = useState<OpportunityCommodityGroup | null>(null);
+  const [commodity, setCommodity] = useState<{
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null>(null);
   const [tags, setTags] = useState<any[]>([]);
   const [note, setNote] = useState<string>('');
   const [capacityTEU, setCapacityTEU] = useState<string>('');
@@ -78,8 +85,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
   const portsGroups = useOpportunityPortsGroups();
   const placesGroups = useOpportunityPlacesGroups();
   const opportunityTags = useOpportunityTags();
-  const commodityGroups = useOpportunityCommodityGroups();
-  const equipmentGroups = useOpportunityEquipmentGroups();
+  const commodityOptions = useOpportunityCommodityWithDefinition();
+  const equipmentOptions = useOpportunityEquipmentWithDefinition();
   const users = useAdminUsers(CUSTOMER_FACING_ROLES);
   const clients = useClients();
   const bookingPartyUsers = useBookingPartyUsers(bookingParty?.id);
@@ -92,8 +99,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       setBookingParty(opportunity.bookingPartyId || null);
       setBookingPartyRep(opportunity.bookingPartyRepId || null);
       setStatisticalClient(opportunity.statisticalClientId || null);
-      setEquipmentGroup(opportunity.equipmentGroupId || null);
-      setCommodityGroup(opportunity.commodityGroupId || null);
+      setEquipment(opportunity.equipment || null);
+      setCommodity(opportunity.commodity || null);
       setPlaceOfReceiptGroup(opportunity.placeOfReceiptGroupId || null);
       setPortOfLoadingGroup(opportunity.portOfLoadingGroupId || null);
       setPortOfDischargeGroup(opportunity.portOfDischargeGroupId || null);
@@ -131,8 +138,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
       // bookingPartyId is intentionally excluded - not editable
       bookingPartyRepId: bookingPartyRep?.id || '',
       statisticalClientId: statisticalClient?.id || '',
-      equipmentGroupId: equipmentGroup?.id || '',
-      commodityGroupId: commodityGroup?.id || '',
+      equipment: equipment?.definition || null,
+      commodity: commodity?.definition || null,
       placeOfReceiptGroupId: placeOfReceiptGroup?.id || '',
       portOfLoadingGroupId: portOfLoadingGroup?.id || '',
       portOfDischargeGroupId: portOfDischargeGroup?.id || '',
@@ -161,8 +168,8 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         bookingPartyId: bookingParty,
         bookingPartyRepId: bookingPartyRep,
         statisticalClientId: statisticalClient,
-        equipmentGroupId: equipmentGroup,
-        commodityGroupId: commodityGroup,
+        equipment: equipment,
+        commodity: commodity,
         placeOfReceiptGroupId: placeOfReceiptGroup,
         portOfLoadingGroupId: portOfLoadingGroup,
         portOfDischargeGroupId: portOfDischargeGroup,
@@ -267,16 +274,16 @@ const EditOpportunityDialog: React.FC<EditOpportunityDialogProps> = ({
         />
         <OpportunityEquipmentGroupInput
           label="Equipment Groups"
-          options={equipmentGroups || []}
-          value={equipmentGroup}
-          onChange={group => setEquipmentGroup(group)}
+          options={equipmentOptions || []}
+          value={equipment}
+          onChange={group => setEquipment(group)}
           margin="dense"
         />
         <OpportunityCommodityGroupInput
           label="Commodity Groups"
-          options={commodityGroups || []}
-          value={commodityGroup}
-          onChange={group => setCommodityGroup(group)}
+          options={commodityOptions || []}
+          value={commodity}
+          onChange={group => setCommodity(group)}
           margin="dense"
         />
         <OpportunityPlacesGroupInput

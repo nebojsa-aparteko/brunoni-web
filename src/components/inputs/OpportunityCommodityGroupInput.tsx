@@ -1,4 +1,4 @@
-import React, { ChangeEvent, HTMLAttributes, MutableRefObject, Ref } from 'react';
+import React, { HTMLAttributes, Ref } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import {
   CircularProgress,
@@ -13,19 +13,31 @@ import {
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { OpportunityCommodityGroup } from '../../model/OpportunityCommodityGroup';
+import { OpportunityMatchDefinition } from '../../model/Opportunity';
 
 interface Props {
   label: string;
-  options: OpportunityCommodityGroup[];
-  value: OpportunityCommodityGroup | null;
-  onChange: (group: OpportunityCommodityGroup | null) => void;
+  options: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  }[];
+  value: {
+    definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+    value: OpportunityCommodityGroup | string;
+  } | null;
+  onChange: (
+    group: {
+      definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+      value: OpportunityCommodityGroup | string;
+    } | null,
+  ) => void;
   open?: boolean;
   onOpen?: (event: React.ChangeEvent<{}>) => void;
   onClose?: (event: React.ChangeEvent<{}>) => void;
   margin?: any;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   },
@@ -53,18 +65,40 @@ const OpportunityCommodityGroupInput: React.FC<Props> = ({
       {...rest}
       className={classes.root}
       value={value || null}
-      onChange={(_, newValue) => onChange(newValue as OpportunityCommodityGroup | null)}
+      onChange={(_, newValue) => onChange(newValue)}
       autoHighlight
       open={open}
       onOpen={onOpen}
       onClose={onClose}
-      getOptionLabel={(option: OpportunityCommodityGroup) => option.name}
-      getOptionSelected={(option, value) => option.id === value.id}
+      getOptionLabel={(option: {
+        definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+        value: OpportunityCommodityGroup | string;
+      }) => (typeof option.value === 'string' ? option.value : option.value.name)}
+      getOptionSelected={(option, value) => {
+        if (typeof option.value === 'string' && typeof value?.value === 'string') {
+          return option.value === value.value;
+        }
+        if (typeof option.value === 'object' && typeof value?.value === 'object') {
+          return option.value.id === value.value.id;
+        }
+        return false;
+      }}
       options={options}
       loading={loading}
-      renderTags={(value: OpportunityCommodityGroup[], getTagProps) =>
+      renderTags={(
+        value: {
+          definition: OpportunityMatchDefinition<'groupId' | 'freeText'>;
+          value: OpportunityCommodityGroup | string;
+        }[],
+        getTagProps,
+      ) =>
         value.map((option, index) => (
-          <Chip variant="outlined" label={option.name} size="small" {...getTagProps({ index })} />
+          <Chip
+            variant="outlined"
+            label={typeof option.value === 'string' ? option.value : option.value.name}
+            size="small"
+            {...getTagProps({ index })}
+          />
         ))
       }
       renderInput={params => (
@@ -89,8 +123,9 @@ const OpportunityCommodityGroupInput: React.FC<Props> = ({
       PopperComponent={Popup}
       PaperComponent={Papyrus}
       renderOption={(option, { inputValue }) => {
-        const matches = match(option.name, inputValue);
-        const parts = parse(option.name, matches);
+        const name = typeof option.value === 'string' ? option.value : option.value.name;
+        const matches = match(name, inputValue);
+        const parts = parse(name, matches);
 
         return (
           <div>

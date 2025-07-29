@@ -9,6 +9,8 @@ import useClients from './useClients';
 import UserRecords from '../contexts/UserRecordsContext';
 import { useOpportunityCounters } from './useOpportunityCounters';
 import { OpportunityMatchDefinition } from '../model/Opportunity';
+import Ports from '../contexts/Ports';
+import ContainerTypes from '../contexts/ContainerTypes';
 const useNormalizedOpportunity = (opportunityIds: string[]) => {
   const users = useContext(UserRecords);
   const clients = useClients();
@@ -18,43 +20,45 @@ const useNormalizedOpportunity = (opportunityIds: string[]) => {
   const equipmentGroups = useOpportunityEquipmentGroups();
   const tags = useOpportunityTags();
   const counters = useOpportunityCounters(opportunityIds);
-
+  const ports = useContext(Ports);
+  const containers = useContext(ContainerTypes);
   return useMemo(() => {
     const getUser = (id: string) => users?.find(u => u.id === id) || null;
     const getClient = (id: string) => clients?.find(c => c.id === id) || null;
     const getPortsGroup = (omd: OpportunityMatchDefinition) => {
       if (!omd) return null;
-      console.debug('getPortsGroup called with omd:', omd);
       if (omd.type === 'portId') {
-        return portsGroups?.find(g => g.id === omd.value) || null;
+        return { definition: omd, value: ports?.find(g => g.id === omd.value) || null };
       } else if (omd.type === 'groupId') {
-        return portsGroups?.find(g => g.id === omd.value) || null;
+        return { definition: omd, value: portsGroups?.find(p => p.id === omd.value) || null };
       } else {
-        return omd.value;
+        return { definition: omd, value: omd.value };
       }
     };
     const getPlacesGroup = (omd: OpportunityMatchDefinition) => {
       if (!omd) return null;
       if (omd.type === 'groupId') {
-        return placesGroups?.find(g => g.id === omd.value) || null;
+        return { definition: omd, value: placesGroups?.find(g => g.id === omd.value) || null };
       } else {
-        return omd.value;
+        return { definition: omd, value: omd.value };
       }
     };
     const getCommodityGroup = (omd: OpportunityMatchDefinition) => {
       if (!omd) return null;
       if (omd.type === 'groupId') {
-        return commodityGroups?.find(g => g.id === omd.value) || null;
+        return { definition: omd, value: commodityGroups?.find(g => g.id === omd.value) || null };
       } else {
-        return omd.value;
+        return { definition: omd, value: omd.value };
       }
     };
     const getEquipmentGroup = (omd: OpportunityMatchDefinition) => {
       if (!omd) return null;
       if (omd.type === 'groupId') {
-        return equipmentGroups?.find(g => g.id === omd.value) || null;
+        return { definition: omd, value: equipmentGroups?.find(g => g.id === omd.value) || null };
+      } else if (omd.type === 'containerTypeId') {
+        return { definition: omd, value: containers?.find(c => c.id === omd.value) || null };
       } else {
-        return omd.value;
+        return { definition: omd, value: omd.value };
       }
     };
     const getTag = (id: string) => tags?.find(t => t.id === id) || null;
